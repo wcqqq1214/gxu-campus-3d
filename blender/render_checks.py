@@ -35,5 +35,12 @@ for key,o in objects.items():
             width=max(p.x for p in projected)-min(p.x for p in projected);height=max(p.y for p in projected)-min(p.y for p in projected)
             camera.data.ortho_scale=max(width,height*scene.render.resolution_x/scene.render.resolution_y)*1.10
         scene.render.filepath=str(out/f'{key}-{index+1}.png');bpy.ops.render.render(write_still=True)
+    if key=='library':
+        b=next(b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if b['landmark']==key)
+        e=b['architecture'];a=e['angle'];ox,oy=e['origin']
+        def local(x,y,z):return Vector((ox+x*math.cos(a)-y*math.sin(a),oy+x*math.sin(a)+y*math.cos(a),b['elevation']+z))
+        target=local(-.55,31.8,7);camera.location=local(-22,75,19)
+        camera.rotation_euler=(target-camera.location).to_track_quat('-Z','Y').to_euler();camera.data.ortho_scale=37
+        scene.render.filepath=str(out/'library-north-entry.png');bpy.ops.render.render(write_still=True)
     o.hide_render=True
 print('Saved',len(objects)*2,'model inspection views',flush=True)

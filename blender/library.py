@@ -1,5 +1,5 @@
 """Library architectural study: mapped courtyard and axis, 2026 front reference.
-Unseen north elevations and tier heights are estimates, not a measured survey.
+North door dimensions follow the 2026 procurement; other dimensions are estimates.
 """
 import math
 from geometry import Mesh
@@ -99,6 +99,51 @@ def library(l,b,z,C,detail):
                 yy=a[1]+(bb[1]-a[1])*t;hh=1.05+1.25*t;stairs.line((xx,yy,z+hh-.85),(xx,yy,z+hh),.035,metal,6)
     for name,part in [('01_真实轮廓与内院',body),('02_分格玻璃幕墙',windows),('03_层间腰线与回纹',bands),('04_幕墙框架',frames),('05_镂空檐架',pergolas),('06_六柱入口',entrance),('07_台阶与扶手',stairs)]:m.add_part(name,part)
     m.add_part('08_立体馆名',inscription('图 书 馆',1.8,front-5.39,z+12.55,16,1.75,C['libraryInk'],False))
+    # North entrance occupies the mapped 25.7 m central recess, facing local +Y.
+    # Official 2026-05-26 specification: opening 6.60 x 2.55 m, six 1 x 2.25 m panes.
+    north=Mesh();doors=Mesh();north_steps=Mesh();cx=-.55;wall=27.25;landing=1.20
+    # Stone ground-floor infill hides the generic ribbon windows behind the portal.
+    north.box(cx,27.08,z+3.5,25.5,.28,7.0,stone)
+    north.box(cx,31.35,z+9.65,24.8,9.1,.7,stone)
+    north.box(cx,31.55,z+10.08,25.4,9.4,.16,trim)
+    north.box(cx,35.55,z+10.8,23.6,.8,2.3,stone)
+    # Recessed sign panel and projecting coping visible in the library's header photo.
+    for xx in [cx-11.0,cx+11.0]:north.box(xx,36.03,z+10.9,.24,.18,1.9,trim)
+    for zz in [9.98,11.84]:north.box(cx,36.03,z+zz,22.2,.18,.14,trim)
+    north.box(cx,35.65,z+12.12,25.6,1.6,.25,trim)
+    for xx in [cx-10.5,cx-4.1,cx+4.1,cx+10.5]:
+        north.cylinder(xx,35.15,z+5.3,.48,7.8,trim,24 if detail else 12,topr=.43)
+        for hh,rr in [(1.45,.65),(9.2,.63)]:north.cylinder(xx,35.15,z+hh,rr,.28,stone,20 if detail else 12)
+    # The 6.6 m opening is the inner dimension of the marble surround.
+    for xx in [cx-3.48,cx+3.48]:doors.box(xx,wall+.14,z+landing+1.275,.36,.40,2.55,trim)
+    doors.box(cx,wall+.14,z+landing+2.73,7.32,.40,.36,trim)
+    doors.box(cx,wall+.37,z+landing+2.40,6.60,.20,.30,C['metal'])
+    doors.box(cx,wall+.03,z+landing+1.125,6.6,.10,2.25,metal)
+    for j in range(6):
+        xx=cx+(j-2.5)*1.10
+        doors.box(xx,wall+.12,z+landing+1.125,1.0,.024,2.25,glass)
+        if detail:
+            for dz in [.08,2.17]:doors.box(xx,wall+.15,z+landing+dz,1.0,.045,.07,C['metal'])
+            # A narrow safety stripe and handles on the outside leaves.
+            doors.box(xx,wall+.15,z+landing+1.05,1.0,.035,.065,trim)
+            if j in (0,5):doors.line((xx,wall+.23,z+landing+.85),(xx,wall+.23,z+landing+1.45),.025,C['metal'],8)
+    if detail:doors.box(cx,wall+.50,z+landing+2.46,.22,.13,.095,C['dark'])
+    north_steps.box(cx,31.7,z+landing/2,25.2,9.3,landing,stone)
+    for j in range(8):
+        depth=(8-j)*.35;height=(j+1)*.15
+        north_steps.box(cx,36.35+depth/2,z+height/2,25.2,depth,height,stone)
+    if detail:
+        for xx in [cx-12.3,cx+12.3]:
+            north_steps.line((xx,39.15,z+.95),(xx,36.35,z+2.0),.04,metal,8)
+            for t in [0,.5,1]:
+                yy=39.15-2.8*t;hh=.95+1.05*t
+                north_steps.line((xx,yy,z+hh-.85),(xx,yy,z+hh),.035,metal,6)
+    m.add_part('09_北入口四柱门廊',north)
+    m.add_part('10_北门感应玻璃门',doors)
+    m.add_part('11_北入口平台台阶',north_steps)
+    north_sign=inscription('图 书 馆',cx,36.09,z+10.9,11.8,1.45,C['libraryInk'],False)
+    north_sign.rotate_z(cx,36.09,math.pi)
+    m.add_part('12_北向立体馆名',north_sign)
     # Local axes are derived from the OSM edge, never a north-aligned bounding box.
     m.rotate_z(0,0,envelope['angle']);ox,oy=envelope['origin'];m.v=[(x+ox,y+oy,zz) for x,y,zz in m.v]
     return m

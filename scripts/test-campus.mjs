@@ -269,6 +269,7 @@ test('图书馆与公寓入口的树冠避让台阶和柱廊', async () => {
   const trees = await json('vegetation');
   for (const { key, bounds } of [
     { key: 'library', bounds: [-23, -45.5, 27, -35] },
+    { key: 'library', bounds: [-13.3, 26.9, 12.2, 39.2] },
     { key: 'international-residence', bounds: [-3, -32, 18, -24] },
   ]) {
     const e = buildings.find((b) => b.landmark === key).architecture;

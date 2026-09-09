@@ -41,7 +41,8 @@ def clear_entrance_trees(trees, buildings):
     for b in buildings:
         if b['landmark'] not in ('library','international-residence'):continue
         e=b['architecture']
-        bounds=(-23,-45.5,27,-35) if b['landmark']=='library' else (-3,-32,18,-24)
-        masks.append(translate(rotate(box(*bounds),e['angle'],origin=(0,0),use_radians=True),*e['origin']))
+        entrances=[(-23,-45.5,27,-35),(-13.3,26.9,12.2,39.2)] if b['landmark']=='library' else [(-3,-32,18,-24)]
+        for bounds in entrances:
+            masks.append(translate(rotate(box(*bounds),e['angle'],origin=(0,0),use_radians=True),*e['origin']))
     mask=unary_union(masks)
     return [t for t in trees if mask.distance(Point(t[0],t[1]))>4*t[2]/9+1]
