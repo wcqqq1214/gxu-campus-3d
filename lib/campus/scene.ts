@@ -320,7 +320,10 @@ export function createScene(
     );
     mark.rotation.x = -Math.PI / 2;
     mark.position.set(c.center[0], c.elevation + 0.6, -c.center[1]);
-    highlight.add(mark);
+    if (l?.placeKind === 'sports') {
+      mark.geometry.dispose();
+      mark.material.dispose();
+    } else highlight.add(mark);
     callbacks.onSelect(id);
     if (l && manifest) {
       const a = manifest.landmarks.find((a) => a.id === l.id);
@@ -362,6 +365,14 @@ export function createScene(
       const mats = Array.isArray(o.material) ? o.material : [o.material];
       for (const m of mats) {
         if (m instanceof THREE.MeshStandardMaterial) {
+          if (m.name === 'sportWhite') {
+            // Paint is a decal surface: bias its depth at oblique/distant views
+            // as well as retaining geometric separation through Draco export.
+            m.polygonOffset = true;
+            m.polygonOffsetFactor = -2;
+            m.polygonOffsetUnits = -2;
+            o.castShadow = false;
+          }
           if (m.name === 'water') {
             o.castShadow = false;
             m.roughness = 0.3;
@@ -395,7 +406,7 @@ export function createScene(
       }
     }
     if (treesRoot) treesRoot.visible = layers.vegetation;
-    labels.style.display = layers.labels && layers.buildings ? '' : 'none';
+    labels.style.display = layers.labels ? '' : 'none';
     highlight.visible = layers.buildings;
     dirty = true;
   }
@@ -813,6 +824,7 @@ export function createScene(
         const obscured =
           (!compact() && x < 350) || y < 105 || y > rect.height - 95;
         const hidden =
+          (l.placeKind === 'sports' ? !layers.sports : !layers.buildings) ||
           p.z < 0 ||
           p.z > 1 ||
           Math.abs(p.x) > 1 ||

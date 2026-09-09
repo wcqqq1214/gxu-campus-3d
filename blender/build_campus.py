@@ -3,8 +3,10 @@
 import bpy,sys,json,math,time,random,hashlib
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
+BASE_ONLY='--base-only' in sys.argv
 from geometry import Mesh,material,MATERIALS
 from landmarks import landmark
+from sports import athletics,west_stand
 DATA=ROOT/'public/data';MODELS=ROOT/'public/models';MODELS.mkdir(exist_ok=True)
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 for c in list(bpy.data.collections):
@@ -17,6 +19,9 @@ def rgb(h):
 C={}
 for name,color,rough,metal in [('stone','#cebfaa',.83,0),('white','#eeeee4',.74,0),('glass','#527a83',.23,.35),('dark','#35494b',.72,0),('slate','#4d6c70',.6,.15),('paleRoof','#bdbfb7',.7,.12),('wood','#725246',.92,0),('red','#ad6c54',.8,0),('pink','#d1afa0',.9,0),('grass','#819668',1,0),('green','#64916b',1,0),('road','#a0a69e',.93,0),('path','#c7bda9',.98,0),('water','#488f8a',.2,.25),('sport','#b1785e',.93,0),('pitch','#659578',1,0),('metal','#8e9b9e',.45,.45),('bark','#6e6650',1,0),('leaf','#3f7049',1,0),('leaf2','#56824c',1,0),('leaf3','#67904f',1,0)]:C[name]=material(name,rgb(color),rough,metal)
 terrain=json.loads((DATA/'terrain.json').read_text());buildings=json.loads((DATA/'buildings.json').read_text());landmarks=json.loads((DATA/'landmarks.json').read_text());surfaces=json.loads((DATA/'surfaces.json').read_text());trees=json.loads((DATA/'vegetation.json').read_text())
+fields=json.loads((DATA/'sports.json').read_text())
+for name,color in [('track','#ba563f'),('trackAlt','#b7543e'),('trackApron','#a9513e'),('fieldGreen','#3d8650'),('fieldStripe','#458f57'),('sportWhite','#f5f3e7'),('goalNet','#c1cabb'),('seatYellow','#c9d92f'),('seatGreen','#6dbe33'),('seatBlue','#5cbdca')]:
+    C[name]=material(name,rgb(color),.92,0)
 for name,color,rough,metal in [('gateStone','#d7d0bf',.84,0),('gateTrim','#e4ddca',.8,0),('gateJoint','#a9a18f',.95,0),('gateRecess','#b7ae9b',.92,0),('gateRed','#872e35',.48,.12),('gateFlower','#c25283',.9,0)]:
     C[name]=material(name,rgb(color),rough,metal)
 # Original deterministic JPEG textures; packed into both .blend and exported GLBs.
@@ -39,6 +44,7 @@ def elevation(x,y):
 
 def generic(b,detail):
     m=Mesh();h=b['height'];cx,cy=b['center'];z=elevation(cx,cy);wall=C['pink'] if b['category']=='living' else C['stone'] if b['category']=='academic' else C['white']
+    if b['id']=='way/948683815':return west_stand(b,z,C,detail)
     if b['tags'].get('memorial')=='column':
         # The four mapped historic inner-gate piers are monuments, not windowed houses.
         x0,y0,x1,y1=b['bounds'];w=x1-x0;d=y1-y0;stone=C['gateStone'];trim=C['gateTrim']
@@ -94,6 +100,7 @@ for j in range(rows-1):
             x=xmin+(xmax-xmin)*ii/(cols-1);y=ymin+(ymax-ymin)*jj/(rows-1);pts.append((x,y,hh[jj*cols+ii]))
         base['terrain'].face(pts,C['grass'])
 for s in surfaces:
+    if s['id'] in [field['osmId'] for field in fields]:continue
     kind=s['kind'];verts=s['vertices'];tri=s['triangles'];mat=C['water'] if kind=='water' else C['sport'] if kind=='sports' else C['green'] if kind=='green' else C['path'] if s['tags'].get('highway') in ('path','footway','steps','pedestrian') else C['road']
     if kind=='sports' and s['tags'].get('sport') in ('soccer','basketball','tennis'):mat=C['pitch']
     layer='sports' if kind=='sports' else kind
@@ -112,18 +119,26 @@ for s in surfaces:
         if x1-x0>8 and y1-y0>12:
             for a,b in [((x0,y0),(x1,y0)),((x1,y0),(x1,y1)),((x1,y1),(x0,y1)),((x0,y1),(x0,y0)),((x0,(y0+y1)/2),(x1,(y0+y1)/2))]:base[layer].line((*a,elevation(*a)+.2),(*b,elevation(*b)+.2),.10,C['white'],4)
 print('Ground assembled',flush=True)
+if not BASE_ONLY:base['sports'].object('其他运动场地',GROUND,{'layer':'sports'})
+for field in fields:
+    mesh=athletics(field,C)
+    if not BASE_ONLY:mesh.object(field['name'],GROUND,{'layer':'sports','featureId':field['osmId'],'sportsId':field['id'],'precision':field['precision']})
+    # Separate nodes bound Draco quantization to ~180 meters instead of the
+    # campus-wide sports extent; paint stays distinct at 16 bits without bloat.
+    base['sports-'+field['id']]=mesh
 near={k:Mesh() for k in ['west','east','north']};zoneids={k:[] for k in near};bylandmark={b['landmark']:b for b in buildings if b['landmark']}
 for index,b in enumerate(buildings):
     z=elevation(*b['center']);b['elevation']=round(z,2);zone='context' if not b['insideCampus'] else 'north' if b['center'][1]>200 else 'west' if b['center'][0]<0 else 'east';b['zone']=zone
     if b['landmark']:
-        l=next(l for l in landmarks if l['id']==b['landmark']);low=landmark(l,b,z,C,False);high=landmark(l,b,z,C,True)
-        base[zone].extend(low);obj=high.object(l['name'],SOURCE,{'featureId':b['id'],'landmark':l['id'],'layer':'buildings','sourceUrl':b['sourceUrl']})
+        l=next(l for l in landmarks if l['id']==b['landmark']);low=landmark(l,b,z,C,False)
+        base[zone].extend(low)
+        if not BASE_ONLY:landmark(l,b,z,C,True).object(l['name'],SOURCE,{'featureId':b['id'],'landmark':l['id'],'layer':'buildings','sourceUrl':b['sourceUrl']})
         l['elevation']=round(z,2);l['zone']=zone
     else:
         low=generic(b,False);base[zone].extend(low)
-        if zone!='context':
+        if not BASE_ONLY and zone!='context':
             high=generic(b,True);near[zone].extend(high);zoneids[zone].append(b['id']);high.object(b['name'],SOURCE,{'featureId':b['id'],'layer':'buildings','sourceUrl':b['sourceUrl']})
-        else:low.object(b['name'],SOURCE,{'featureId':b['id'],'layer':'context'})
+        elif not BASE_ONLY:low.object(b['name'],SOURCE,{'featureId':b['id'],'layer':'context'})
     if index%100==0:print('Buildings',index,'/',len(buildings),flush=True)
 # Landmarks are independent streamed objects; do not duplicate them in zone replacements.
 # Base landmark geometry gets a separate export group for each landmark below.
@@ -152,11 +167,11 @@ for typ in range(3):
                 r=j*.8;r1=(j+1)*.8;z0=6+math.sin(j/5*math.pi)*1.3-j*.26;z1=6+math.sin((j+1)/5*math.pi)*1.3-(j+1)*.26
                 m.face([(math.cos(a)*r-math.sin(a)*.5,math.sin(a)*r+math.cos(a)*.5,z0),(math.cos(a)*r1,math.sin(a)*r1,z1),(math.cos(a)*r+math.sin(a)*.5,math.sin(a)*r-math.cos(a)*.5,z0)],C['leaf2'])
     templates.append(m.object(f'Tree-template-{typ}',PLANTS,{'template':typ}))
-for i,(x,y,h,t) in enumerate(trees):
+for i,(x,y,h,t) in enumerate([] if BASE_ONLY else trees):
     o=bpy.data.objects.new(f'树木示意-{i:04}',templates[t].data);PLANTS.objects.link(o);o.location=(x,y,elevation(x,y));o.scale=(h/9,h/9,h/9);o.rotation_euler.z=i*2.399
 for t in templates:t.hide_render=True;t.hide_set(True)
 for k,m in base.items():
-    if not k.startswith('landmark') and k not in near and k!='context':m.object(k,GROUND,{'layer':k})
+    if not BASE_ONLY and not k.startswith(('landmark','sports-')) and k not in near and k not in ('context','sports'):m.object(k,GROUND,{'layer':k})
 # A neutral studio sky and solar lighting for editable source preview.
 world=bpy.data.worlds.new('南宁晴空');world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.58,.73,.88,1);world.node_tree.nodes['Background'].inputs[1].default_value=.7;bpy.context.scene.world=world
 light=bpy.data.lights.new('下午日光','SUN');light.energy=2.5;light.angle=.08;sun=bpy.data.objects.new('下午日光',light);GROUND.objects.link(sun);sun.rotation_euler=(.4,-.6,-.6)
@@ -170,13 +185,19 @@ def export(name,groups):
     bpy.ops.object.select_all(action='DESELECT');objs=[]
     for key,mesh in groups.items():
         if not mesh.v:continue
-        layer='buildings' if key in near or key.startswith('landmark') else key
-        o=mesh.object(key,EXPORT,{'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else ''});o.select_set(True);objs.append(o)
+        layer='buildings' if key in near or key.startswith('landmark') else 'sports' if key.startswith('sports-') else key
+        o=mesh.object(key,EXPORT,{'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else '', 'sportsId':key[7:] if key.startswith('sports-') else ''});o.select_set(True);objs.append(o)
     path=MODELS/name
     bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=16,export_materials='EXPORT',export_cameras=False,export_lights=False)
     for o in objs:mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
     print('Export',name,round(path.stat().st_size/1e6,2),'MB',flush=True);return path.stat().st_size
 sizes={};sizes['base.glb']=export('base.glb',base)
+if BASE_ONLY:
+    manifest=json.loads((DATA/'models.json').read_text())
+    manifest['base'].update(bytes=sizes['base.glb'],sha256=hashlib.sha256((MODELS/'base.glb').read_bytes()).hexdigest())
+    (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+    print('Base-only export complete; retained editable source and near models',flush=True)
+    sys.exit(0)
 for zone,m in near.items():sizes[f'{zone}.glb']=export(f'{zone}.glb',{zone:m})
 for l in landmarks:
     key='landmark-'+l['id'];sizes[l['id']+'.glb']=export(l['id']+'.glb',{key:landmark(l,bylandmark.get(l['id']),l['elevation'],C,True)})
