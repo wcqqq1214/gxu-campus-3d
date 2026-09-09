@@ -3,17 +3,24 @@
     "id": "south-gate",
     "name": "南大门",
     "category": "landmark",
-    "lonLat": [
-      108.28453,
-      22.83677
+    "height": 12.5,
+    "description": "大学东路上的三跨石门，中央高、两侧低，横向红色校名面向南侧。",
+    "detail": "依据 2022—2026 年照片重建三跨门体、弧形承托、叠檐、雕花嵌板、顶部小亭及红色立体校名。尺寸与背面装饰估算，书法字体近似。",
+    "positionBasis": "OSM way/1492215424 的 ceremonial_gate / gatehouse 轮廓定位与宽度；2022—2026 年照片核对形态，高度及构件比例估算。",
+    "sourceUrl": "https://www.openstreetmap.org/way/1492215424",
+    "reference": "gate2026",
+    "distance": 68,
+    "additionalReferences": [
+      "gate2022",
+      "gate2024"
     ],
-    "height": 12,
-    "description": "从大学东路进入校园的标志性入口，面向校园南北轴线。",
-    "detail": "两翼展开的圆柱列、校名景石和门卫亭。",
-    "positionBasis": "OSM 君武路南端与校园边界，结合校方照片定位；门架尺寸估算。",
-    "sourceUrl": "https://www.openstreetmap.org/way/685682496",
-    "reference": "campusGallery",
-    "distance": 165
+    "cameraOffset": [
+      -0.16,
+      0.29,
+      1
+    ],
+    "frontBearing": 180,
+    "osmId": "way/1492215424"
   },
   {
     "id": "library",
@@ -32,9 +39,16 @@
     "name": "汇学堂",
     "category": "culture",
     "description": "校园文化活动的重要场所，坡屋顶与柱廊延续西大的建筑记忆。",
-    "detail": "深青色坡屋顶、庄重入口、竖向柱廊和木色大门。",
+    "detail": "朝东的入口、深青色坡屋顶、竖向柱廊和木色大门。",
     "reference": "campus2026",
-    "distance": 210
+    "distance": 210,
+    "frontBearing": 90,
+    "cameraOffset": [
+      1,
+      0.66,
+      0.5
+    ],
+    "orientationBasis": "根据用户 2026-09-09 现场认知纠正：原南向正面改为东向。"
   },
   {
     "id": "auditorium",

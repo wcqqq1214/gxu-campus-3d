@@ -70,6 +70,11 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['night', '夜景', Moon],
 ];
 const refs: Record<string, { name: string; url: string; year: string }> = {
+  gate2026: {
+    name: '2026 活动报道中的现南大门',
+    url: 'https://www.5iidea.com/contents/47982',
+    year: '发布于 2026-04-27 · 单张照片拍摄日期未注明；另以 2022 校方照片及 2024 日期水印照片交叉核对',
+  },
   stadiumVideo: {
     name: '校方综合体育馆视频',
     url: 'https://www.gxu.edu.cn/info/1294/28211.htm',
@@ -102,7 +107,7 @@ const refs: Record<string, { name: string; url: string; year: string }> = {
   },
 };
 async function getJson<T>(path: string): Promise<T> {
-  const r = await fetch(`${BASE}/data/${path}`);
+  const r = await fetch(`${BASE}/data/${path}`, { cache: 'no-cache' });
   if (!r.ok) throw new Error(path);
   return r.json();
 }
@@ -765,7 +770,12 @@ export default function Home() {
             <div className="source-links">
               {Object.entries(refs)
                 .filter(([k]) =>
-                  ['campus2026', 'campus2024', 'campusGallery'].includes(k),
+                  [
+                    'gate2026',
+                    'campus2026',
+                    'campus2024',
+                    'campusGallery',
+                  ].includes(k),
                 )
                 .map(([k, r]) => (
                   <a href={r.url} key={k} target="_blank" rel="noreferrer">

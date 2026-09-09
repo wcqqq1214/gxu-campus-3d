@@ -20,6 +20,7 @@ interface Asset {
   id?: string;
   url: string;
   bytes: number;
+  sha256?: string;
   featureIds?: string[];
 }
 interface Manifest {
@@ -297,7 +298,14 @@ export function createScene(
     );
     moveTo(
       target,
-      target.clone().add(new THREE.Vector3(-dist * 0.5, dist * 0.66, dist)),
+      target
+        .clone()
+        .add(
+          new THREE.Vector3(
+            ...(l?.cameraOffset ??
+              ([-0.5, 0.66, 1] as [number, number, number])),
+          ).multiplyScalar(dist),
+        ),
     );
     clearGroup(highlight);
     const mark = new THREE.Mesh(
@@ -392,7 +400,9 @@ export function createScene(
     dirty = true;
   }
   async function loadGLB(a: Asset) {
-    const gltf = await loader.loadAsync(asset(a.url));
+    const gltf = await loader.loadAsync(
+      asset(a.url) + (a.sha256 ? `?v=${a.sha256}` : ''),
+    );
     if (disposed) {
       disposeObject(gltf.scene);
       throw new Error('disposed');
@@ -537,7 +547,9 @@ export function createScene(
     loading.add('base');
     callbacks.onStatus('正在铺开校园…');
     try {
-      const response = await fetch(asset('data/models.json'));
+      const response = await fetch(asset('data/models.json'), {
+        cache: 'no-cache',
+      });
       if (!response.ok) throw new Error('manifest');
       manifest = await response.json();
       if (disposed) return;

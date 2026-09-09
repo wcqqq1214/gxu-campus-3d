@@ -1,6 +1,7 @@
 """Distinct architectural studies, using the reference catalogue and OSM footprints."""
 import math
 from geometry import Mesh
+from south_gate import south_gate
 
 def facade(m,x,y,z,w,d,h,wall,glass,trim,floors=6,spacing=4,band=False):
     m.box(x,y,z+h/2,w,d,h,wall)
@@ -24,13 +25,10 @@ def landmark(l,b,z,C,detail=True):
     stone,white,glass,dark,roof,wood=C['stone'],C['white'],C['glass'],C['dark'],C['slate'],C['wood']
     k=l['id']
     if k=='south-gate':
-        for s in [-1,1]:
-            for i in range(7):
-                xx=x+s*(14+i*5.3);yy=y-7+(i/6)**2*9;hh=5.8+i*.62
-                m.cylinder(xx,yy,z+hh/2,.7,hh,white,18);m.cylinder(xx,yy,z+hh-.1,.82,.5,stone,18);m.cylinder(xx,yy,z+.2,.95,.4,stone,18)
-        m.box(x-9,y-4,z+4,3,1.5,8,dark,angle=-.13)
-        m.box(x+12,y-2,z+2.2,4.7,4.2,4.4,stone);m.box(x+12,y-4.15,z+2.4,3.4,.1,2.7,glass);m.box(x+10,y-2,z+4.7,9,5,.45,white)
+        return south_gate(x,y,z,C,detail,footprint_width=w,footprint_depth=d)
     elif k=='huixue':
+        # Keep the mapped E/W and N/S extents after rotating the south-facing study east.
+        w,d=d,w
         m.box(x,y,z+10,w*.94,d*.88,20,stone)
         m.box(x,y+d*.2,z+22,w*.9,d*.44,6,dark)
         m.roof(x,y+d*.08,z+23,w*.88,d*.82,3.5,roof)
@@ -47,6 +45,7 @@ def landmark(l,b,z,C,detail=True):
                 m.box(x+sx*w*.476,y-d*.4+j*d*.065,z+10,.8,1.0,19,white)
                 m.box(x+sx*w*.477,y-d*.37+j*d*.065,z+10,.15,1.1,14,glass)
         steps(m,x,front-8,z,w*.4,12,2.1,stone)
+        m.rotate_z(x,y,math.pi/2)
     elif k=='auditorium':
         m.box(x,y,z+5.4,w*.9,d*.93,10.8,white)
         m.roof(x,y,z+10.8,w*.98,d,3,C['paleRoof'])

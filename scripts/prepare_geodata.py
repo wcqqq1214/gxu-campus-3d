@@ -89,8 +89,8 @@ def prepare():
     for l in landmarks:
         b=next((b for b in buildings if b['id']==l.get('osmId')),None)
         if b:l['center']=b['center'];l['bounds']=b['bounds'];l['height']=b['height'];l['sourceUrl']=b['sourceUrl'];l['osmEditedAt']=b['osmEditedAt']
-        else:l['center']=list(project(*l['lonLat']));x,y=l['center'];l['bounds']=[x-40,y-7,x+40,y+7]
-        l['sourceRefs']=['osm',l['reference']]+(['sports2024'] if l['id']=='stadium' else [])
+        else:l['center']=list(project(*l['lonLat']));x,y=l['center'];l['bounds']=[x-34,y-18,x+34,y+3]
+        l['sourceRefs']=['osm',l['reference']]+l.get('additionalReferences',[])+(['sports2024'] if l['id']=='stadium' else [])
     surfaces=[]
     for f in features:
         kind=f['properties']['kind'];g=transform(project,shape(f['geometry']))

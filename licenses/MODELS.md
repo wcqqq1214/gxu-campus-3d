@@ -9,3 +9,5 @@
 使用和改作时请保留作者、许可链接，并说明修改。使用 OSM 地理数据库和它的衍生数据库时，另须遵守 ODbL；CC BY 4.0 不替代该数据库许可。网页模型是数据库的可视化作品，对应地理数据已在 public/data/geography.geojson 和 data/snapshots 中公开。
 
 校方参考图片、视频和 PDF 不属于本项目创作，权利归原作者/校方。仓库只提供原网页链接，没有将这些照片再分发为模型贴图。
+
+南门立体校名字形来源于 Ma Shan Zheng 开源字体，原字体独立适用 SIL Open Font License 1.1，见 [完整许可](../blender/fonts/OFL.txt)。字体不属于项目原创；模型中的字形是对原校名书法的近似替代。
