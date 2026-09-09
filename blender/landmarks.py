@@ -2,6 +2,8 @@
 import math
 from geometry import Mesh
 from south_gate import south_gate
+from library import library
+from international_residence import international_residence
 
 def facade(m,x,y,z,w,d,h,wall,glass,trim,floors=6,spacing=4,band=False):
     m.box(x,y,z+h/2,w,d,h,wall)
@@ -64,21 +66,9 @@ def landmark(l,b,z,C,detail=True):
                 m.box(x+sx*w*.465,y-d*.43+j*d*.12,z+5.5,.4,.5,10,stone)
         steps(m,x,front-6,z,w*.94,9,1.2,stone)
     elif k=='library':
-        # Front reading rooms step down from the taller north block.
-        facade(m,x,y+d*.26,z,w*.94,d*.44,h,stone,glass,white,10,5,True)
-        for sx in [-1,1]:
-            facade(m,x+sx*w*.33,y-d*.18,z,w*.31,d*.52,h*.66,stone,glass,white,6,4,True)
-            for zz in [h*.67,h+1]:
-                yy=y-d*.18 if zz<h else y+d*.26
-                for col in [-1,1]:m.box(x+sx*w*.33+col*w*.1,yy,z+zz+1.2,.9,d*.42,2.4,white)
-                m.box(x+sx*w*.33,yy,z+zz+2.5,w*.36,d*.55,.45,white)
-        facade(m,x,y-d*.29,z,w*.37,d*.26,h*.48,stone,glass,white,5,4,True)
-        front=y-d*.48
-        for i in range(6):m.cylinder(x+(i-2.5)*w*.051,front-2,z+4.7,.65,9.4,white,16)
-        m.box(x,front-2,z+9.7,w*.35,7,1.2,stone);m.box(x,front-2,z+10.4,w*.38,8,.3,white)
-        for i in range(6):m.box(x+(i-2.5)*w*.072,y-d*.15,z+h*.5,.8,9,4,white)
-        m.box(x,y-d*.15,z+h*.5+2.3,w*.53,13,.5,white)
-        steps(m,x,front-6,z,w*.38,9,1.2,stone)
+        return library(l,b,z,C,detail)
+    elif k=='international-residence':
+        return international_residence(l,b,z,C,detail)
     elif k=='student-center':
         # Use the mapped curved exterior and courtyard instead of a substitute rectangle.
         for f in range(5):

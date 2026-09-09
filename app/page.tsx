@@ -53,6 +53,7 @@ import type {
 } from '@/lib/campus/types';
 import { DEFAULT_LAYERS, CATEGORY_NAMES } from '@/lib/campus/types';
 import { nextTourIndex } from '@/lib/campus/math';
+import { searchLandmarks } from '@/lib/campus/navigation';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
   ['buildings', '校园建筑', '教学楼、宿舍与校园地标', Building2],
@@ -70,6 +71,11 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['night', '夜景', Moon],
 ];
 const refs: Record<string, { name: string; url: string; year: string }> = {
+  apartmentOfficial: {
+    name: '校方留学生中心 · 公寓与裙楼外观',
+    url: 'https://gjxy.gxu.edu.cn/lbt/xxss.htm',
+    year: '当前首页链接的历史照片，拍摄日期未知；结合 2022 校方位置资料与 2024 住宿报道核对，未取得近期完整外立面照片',
+  },
   westTrack2025: {
     name: '校方 2025 新生开学典礼 · 西田径场',
     url: 'https://news.gxu.edu.cn/info/1002/42983.htm',
@@ -126,14 +132,12 @@ export default function Home() {
     controller = useRef<SceneController | null>(null);
   const [buildings, setBuildings] = useState<Building[]>([]),
     [landmarks, setLandmarks] = useState<Landmark[]>([]),
-    [sports, setSports] = useState<Landmark[]>([]),
     [overview, setOverview] = useState<Overview | null>(null);
   const [ready, setReady] = useState(false),
     [status, setStatus] = useState('正在铺开校园…'),
     [error, setError] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
     [query, setQuery] = useState(''),
-    [category, setCategory] = useState('landmark'),
     [tab, setTab] = useState('explore');
   const [layers, setLayers] = useState(DEFAULT_LAYERS),
     [preset, setPreset] = useState<Preset>('day'),
@@ -164,14 +168,12 @@ export default function Home() {
       getJson<Building[]>('buildings.json'),
       getJson<Landmark[]>('landmarks.json'),
       getJson<Overview>('overview.json'),
-      getJson<Landmark[]>('sports.json'),
       import('@/lib/campus/scene'),
     ])
-      .then(([bs, ls, stats, fields, { createScene }]) => {
+      .then(([bs, ls, stats, { createScene }]) => {
         if (!active || !host.current) return;
         setBuildings(bs);
         setLandmarks(ls);
-        setSports(fields);
         setOverview(stats);
         try {
           if (
@@ -179,7 +181,7 @@ export default function Home() {
             new URLSearchParams(location.search).has('test-webgl-unavailable')
           )
             throw new Error('WebGL test');
-          const c = createScene(host.current, bs, [...ls, ...fields], {
+          const c = createScene(host.current, bs, ls, {
             onStatus: (message, failed = false) => {
               if (active) {
                 setStatus(message);
@@ -237,58 +239,15 @@ export default function Home() {
     );
     return () => clearTimeout(timer);
   }, [tour, tourIndex, landmarks]);
-  const currentLandmark = [...landmarks, ...sports].find(
-    (l) => l.id === selected,
-  );
+  const currentLandmark = landmarks.find((l) => l.id === selected);
   const currentBuilding = selected
     ? buildings.find((b) => b.id === selected || b.landmark === selected)
     : undefined;
   const current = currentLandmark ?? currentBuilding;
-  const places = useMemo(() => {
-    const search = query.trim().toLowerCase();
-    if (!search && category === 'landmark')
-      return landmarks.map((l) => ({
-        id: l.id,
-        name: l.name,
-        category: l.category,
-        landmark: true,
-      }));
-    const list = buildings.filter(
-      (b) =>
-        b.insideCampus &&
-        (category === 'all' ||
-          category === 'landmark' ||
-          b.category === category) &&
-        (!search || `${b.name} ${b.id}`.toLowerCase().includes(search)),
-    );
-    const result = list.map((b) => ({
-      id: b.landmark ?? b.id,
-      name: b.name,
-      category: b.category,
-      landmark: !!b.landmark,
-    }));
-    if (['landmark', 'all', 'culture'].includes(category))
-      for (const field of sports.filter(
-        (f) => !search || `${f.name} ${f.osmId}`.includes(search),
-      ))
-        result.unshift({
-          id: field.id,
-          name: field.name,
-          category: field.category,
-          landmark: false,
-        });
-    if (['landmark', 'all'].includes(category))
-      for (const l of landmarks.filter(
-        (l) => !l.osmId && (!search || l.name.toLowerCase().includes(search)),
-      ))
-        result.unshift({
-          id: l.id,
-          name: l.name,
-          category: l.category,
-          landmark: true,
-        });
-    return result;
-  }, [buildings, landmarks, sports, query, category]);
+  const places = useMemo(
+    () => searchLandmarks(landmarks, query),
+    [landmarks, query],
+  );
   function toggleLayer(k: LayerKey, on: boolean) {
     setLayers((v) => ({ ...v, [k]: on }));
     controller.current?.setLayer(k, on);
@@ -408,8 +367,8 @@ export default function Home() {
                 type="search"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="寻找一栋楼，一处风景"
-                aria-label="搜索校园建筑"
+                placeholder="搜索精选地标，如图书馆"
+                aria-label="搜索精选地标"
               />
               {query && (
                 <button title="清除搜索" onClick={() => setQuery('')}>
@@ -417,39 +376,13 @@ export default function Home() {
                 </button>
               )}
             </div>
-            <div className="category-filters" aria-label="建筑分类">
-              {[
-                ['landmark', '精选地标'],
-                ['academic', '教学'],
-                ['living', '生活'],
-                ['culture', '文体'],
-                ['all', '全部'],
-              ].map(([v, label]) => (
-                <button
-                  key={v}
-                  aria-pressed={category === v}
-                  className={category === v ? 'active' : ''}
-                  onClick={() => setCategory(v)}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
             <div className="result-heading">
-              <span>
-                {query
-                  ? '搜索结果'
-                  : category === 'landmark'
-                    ? '从这里开始探索'
-                    : category === 'all'
-                      ? '校园建筑'
-                      : '分类探索'}
-              </span>
+              <span>{query ? '精选地标搜索结果' : '精选地标'}</span>
               <span>{places.length} 处</span>
             </div>
             <div className="places">
               {places.length ? (
-                places.map((p, i) => (
+                places.map((p) => (
                   <button
                     key={p.id}
                     className={`place-row ${selected === p.id ? 'selected' : ''}`}
@@ -457,13 +390,15 @@ export default function Home() {
                     disabled={!ready}
                   >
                     <span className="place-index">
-                      {String(i + 1).padStart(2, '0')}
+                      {String(
+                        landmarks.findIndex((l) => l.id === p.id) + 1,
+                      ).padStart(2, '0')}
                     </span>
                     <span className="place-copy">
                       <strong>{p.name}</strong>
                       <small>
                         {CATEGORY_NAMES[p.category]}
-                        {p.landmark ? ' · 重点复原' : ''}
+                        {' · 重点复原'}
                       </small>
                     </span>
                     <ArrowUpRight size={16} />
@@ -471,9 +406,9 @@ export default function Home() {
                 ))
               ) : (
                 <div className="empty-state">
-                  没有找到对应建筑。
+                  没有找到对应精选地标。
                   <br />
-                  试试“宿舍”“教学楼”或学院名称。
+                  试试“图书馆”“留学生”或“汇学堂”。
                 </div>
               )}
             </div>
@@ -707,8 +642,8 @@ export default function Home() {
           </strong>
           <small>
             {tourStarted
-              ? `${String(tourIndex + 1).padStart(2, '0')} / 10 · ${landmarks[tourIndex]?.name}`
-              : '10 处地标 · 自动导览'}
+              ? `${String(tourIndex + 1).padStart(2, '0')} / ${landmarks.length} · ${landmarks[tourIndex]?.name}`
+              : `${landmarks.length || '—'} 处精选地标 · 自动导览`}
           </small>
         </div>
         <button
@@ -784,7 +719,7 @@ export default function Home() {
                 <b>{overview?.campusBuildings ?? '—'}</b>校内建筑
               </span>
               <span>
-                <b>10</b>独立地标
+                <b>{landmarks.length || '—'}</b>精选地标
               </span>
               <span>
                 <b>{overview?.trees ?? '—'}</b>示意树木
@@ -809,6 +744,7 @@ export default function Home() {
                     'campus2026',
                     'campus2024',
                     'campusGallery',
+                    'apartmentOfficial',
                   ].includes(k),
                 )
                 .map(([k, r]) => (
@@ -821,7 +757,7 @@ export default function Home() {
             <h3>如何操作</h3>
             <p>
               鼠标左键旋转，右键平移，滚轮缩放；触屏单指旋转、双指平移与缩放。聚焦画面后可用方向键平移、加减键缩放、Home
-              返回全景。手动操作会暂停巡游。
+              返回全景。手动操作会暂停巡游。搜索、地图标注和点击定位仅开放精选地标。
             </p>
             <h3>开源与许可</h3>
             <p>

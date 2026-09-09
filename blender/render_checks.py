@@ -25,9 +25,15 @@ for key,o in objects.items():
         offsets=[(-.15,-1.8,.36),(1.1,.95,.60)]
         scene.render.resolution_x=1440;scene.render.resolution_y=900;scene.cycles.samples=24
         camera.data.ortho_scale=scale*.78
+    elif key in ('library','international-residence'):
+        scene.render.resolution_x=1440;scene.render.resolution_y=1000;scene.cycles.samples=16
     else:scene.render.resolution_x=720;scene.render.resolution_y=540;scene.cycles.samples=8
     for index,offset in enumerate([Vector(v) for v in offsets]):
         camera.location=center+offset*scale;camera.rotation_euler=(center-camera.location).to_track_quat('-Z','Y').to_euler()
+        if key in ('library','international-residence'):
+            inv=camera.rotation_euler.to_matrix().transposed();projected=[inv@(p-center) for p in points]
+            width=max(p.x for p in projected)-min(p.x for p in projected);height=max(p.y for p in projected)-min(p.y for p in projected)
+            camera.data.ortho_scale=max(width,height*scene.render.resolution_x/scene.render.resolution_y)*1.10
         scene.render.filepath=str(out/f'{key}-{index+1}.png');bpy.ops.render.render(write_still=True)
     o.hide_render=True
 print('Saved',len(objects)*2,'model inspection views',flush=True)

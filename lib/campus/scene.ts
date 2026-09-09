@@ -1,3 +1,4 @@
+import { navigableBuildings } from './navigation';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -183,7 +184,7 @@ export function createScene(
     };
   });
   const proxies: THREE.Mesh[] = [];
-  for (const b of buildings) {
+  for (const b of navigableBuildings(buildings, landmarks)) {
     const groupShapes = b.polygons.map((poly) => {
       const s = new THREE.Shape(
         poly[0].map((v) => new THREE.Vector2(v[0], v[1])),
@@ -281,7 +282,7 @@ export function createScene(
   function focus(id: string) {
     const l = landmarks.find((l) => l.id === id);
     const b = buildings.find((b) => b.id === id || b.landmark === id);
-    if (!l && !b) return;
+    if (!l) return;
     selected = id;
     const c = (l ?? b)!;
     const dist =
