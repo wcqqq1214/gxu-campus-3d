@@ -4,6 +4,7 @@ from geometry import Mesh
 from south_gate import south_gate
 from library import library
 from international_residence import international_residence
+from campus_gates import campus_gate
 
 def facade(m,x,y,z,w,d,h,wall,glass,trim,floors=6,spacing=4,band=False):
     m.box(x,y,z+h/2,w,d,h,wall)
@@ -26,6 +27,7 @@ def landmark(l,b,z,C,detail=True):
     m=Mesh();x,y=l['center'];xmin,ymin,xmax,ymax=l['bounds'];w=xmax-xmin;d=ymax-ymin;x=(xmin+xmax)/2;y=(ymin+ymax)/2;h=l['height']
     stone,white,glass,dark,roof,wood=C['stone'],C['white'],C['glass'],C['dark'],C['slate'],C['wood']
     k=l['id']
+    if l.get('placeKind')=='gate':return campus_gate(l,z,C,detail)
     if k=='south-gate':
         return south_gate(x,y,z,C,detail,footprint_width=w,footprint_depth=d)
     elif k=='huixue':

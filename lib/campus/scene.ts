@@ -1,4 +1,4 @@
-import { navigableBuildings } from './navigation';
+import { navigationFootprints } from './navigation';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -184,7 +184,7 @@ export function createScene(
     };
   });
   const proxies: THREE.Mesh[] = [];
-  for (const b of navigableBuildings(buildings, landmarks)) {
+  for (const b of navigationFootprints(buildings, landmarks)) {
     const groupShapes = b.polygons.map((poly) => {
       const s = new THREE.Shape(
         poly[0].map((v) => new THREE.Vector2(v[0], v[1])),

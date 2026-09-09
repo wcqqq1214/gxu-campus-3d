@@ -34,7 +34,7 @@ export interface Building {
   zone: string;
 }
 export interface Landmark {
-  placeKind?: 'sports';
+  placeKind?: 'sports' | 'gate';
   id: string;
   osmId?: string;
   name: string;

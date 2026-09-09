@@ -71,6 +71,21 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['night', '夜景', Moon],
 ];
 const refs: Record<string, { name: string; url: string; year: string }> = {
+  eastGatePhoto: {
+    name: '东门落成实拍 · 中国教育在线（校方供图）',
+    url: 'https://www.eol.cn/guangxi/xiaoyuandongtai/201812/t20181202_1635608.shtml',
+    year: '发布于 2018-12-02，辅以无日期街景；2025 校方说明核对位置。未取得近年完整立面照片',
+  },
+  westGatePhoto: {
+    name: '鲁班路西门入口街景',
+    url: 'https://m.sgpabj.com/bendi/10373143.html',
+    year: '照片拍摄日期未知；页面信息更新于 2026-01-16，2026 校方重开通知辅助核对位置',
+  },
+  newEast2026: {
+    name: '校方新东门位置说明 · 秀灵西一里',
+    url: 'https://www.gxu.edu.cn/info/1364/39930.htm',
+    year: '发布于 2026-01-22；结合 2026 雅思入校导览定位。门体照片待补，外观为推定细化',
+  },
   apartmentOfficial: {
     name: '校方留学生中心 · 公寓与裙楼外观',
     url: 'https://gjxy.gxu.edu.cn/lbt/xxss.htm',
@@ -398,7 +413,9 @@ export default function Home() {
                       <strong>{p.name}</strong>
                       <small>
                         {CATEGORY_NAMES[p.category]}
-                        {' · 重点复原'}
+                        {p.id === 'new-east-gate'
+                          ? ' · 外观推定'
+                          : ' · 重点复原'}
                       </small>
                     </span>
                     <ArrowUpRight size={16} />
@@ -600,7 +617,9 @@ export default function Home() {
                   <dd>
                     {currentLandmark?.placeKind === 'sports'
                       ? '历史 DEM 局部平整，非测量高程'
-                      : (currentBuilding?.heightBasis ?? '参考照片估算')}
+                      : currentLandmark?.id === 'new-east-gate'
+                        ? '缺少门体照片，暂按门卫设施尺度估算'
+                        : (currentBuilding?.heightBasis ?? '参考照片估算')}
                   </dd>
                 </div>
                 <div>
