@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "osm",
+      "name": "OpenStreetMap 最新完整快照",
+      "url": "https://www.openstreetmap.org/way/398115378",
+      "publishedAt": null,
+      "capturedAt": null,
+      "snapshotAt": "2026-09-09T07:57:13Z",
+      "license": "ODbL-1.0",
+      "use": "校界、建筑、道路、水体、绿地、球场的 WGS84 轮廓；版本和编辑时间见各要素。",
+      "note": "下载时间与数据要素最后编辑时间不同。2024—2026 最后编辑的建筑有 80 处，其余更早。",
+      "retrievedAt": "2026-09-09"
+    },
+    {
+      "id": "campus2024",
+      "name": "2025 年研考广西大学考点考前须知及导览图",
+      "url": "https://yjsc.gxu.edu.cn/info/1021/3604.htm",
+      "publishedAt": "2024-12-16",
+      "capturedAt": null,
+      "license": "校方版权，仅链接参考",
+      "use": "名称及相对位置核对",
+      "note": "底图具有规划图特征，底图绘制年份未知；不能当作 2024 年实测数据。",
+      "retrievedAt": "2026-09-09"
+    },
+    {
+      "id": "campus2026",
+      "name": "校方校园图文：苏林去的这所大学，太宝藏了吧！",
+      "url": "https://www.gxu.edu.cn/info/1004/40412.htm",
+      "publishedAt": "2026-04-17",
+      "capturedAt": null,
+      "license": "校方及摄影者版权，仅链接参考",
+      "use": "图书馆、汇学堂、大学生活动中心主要立面",
+      "note": "同文混合当代和历史照片；大礼堂黑白历史图片没有用于确认当代外观。照片拍摄日期未给出。",
+      "retrievedAt": "2026-09-09"
+    },
+    {
+      "id": "campusGallery",
+      "name": "广西大学校园风光",
+      "url": "https://www.gxu.edu.cn/info/1021/18800.htm",
+      "publishedAt": null,
+      "capturedAt": null,
+      "license": "校方及摄影者版权，仅链接参考",
+      "use": "南大门与实验楼、图书馆侧面、大礼堂现状、第六教学楼、校园植被氛围",
+      "note": "网页未注明发布日期、拍摄日期；具体照片标题用于核对对象。",
+      "retrievedAt": "2026-09-09"
+    },
+    {
+      "id": "stadiumVideo",
+      "name": "广西大学综合体育馆官方视频",
+      "url": "https://www.gxu.edu.cn/info/1294/28211.htm",
+      "publishedAt": "2021-11-17",
+      "capturedAt": null,
+      "license": "校方版权，仅链接参考",
+      "use": "00:07 航拍及 00:12 入口，核对浅坡屋盖、采光窗、柱墩与遮阳百叶",
+      "note": "历史外观辅助资料，不能确认 2026 年的所有变化。",
+      "retrievedAt": "2026-09-09"
+    },
+    {
+      "id": "sports2024",
+      "name": "体育学院 Facilities",
+      "url": "https://tyxy.gxu.edu.cn/info/1166/2372.htm",
+      "publishedAt": "2024-08-13",
+      "capturedAt": null,
+      "license": "校方版权，仅链接参考",
+      "use": "近期场馆用途与东、西校园分布核对",
+      "note": "东校园体育馆与西校园综合体育馆是不同建筑；本项目地标为西校园综合体育馆。",
+      "retrievedAt": "2026-09-09"
+    },
+    {
+      "id": "computer2024",
+      "name": "计算机与电子信息学院招生介绍 PDF",
+      "url": "https://scei.gxu.edu.cn/__local/E/D9/D5/85B5C2D7E31982E036EE64854F2_3961C65F_13838F.pdf?e=.pdf",
+      "publishedAt": null,
+      "capturedAt": null,
+      "license": "校方及摄影者版权，仅链接参考",
+      "use": "第 1 页两面可见的建筑照片，竖向玻璃核心、粉色侧墙、窗列与悬挑檐",
+      "note": "ID 沿用项目早期命名，不表示资料日期为 2024；PDF 未标注年份。",
+      "retrievedAt": "2026-09-09"
+    },
+    {
+      "id": "terrain",
+      "name": "Mapzen Terrain Tiles / SRTM 等全球高程资料",
+      "url": "https://registry.opendata.aws/terrain-tiles/",
+      "publishedAt": null,
+      "capturedAt": "SRTM：2000-02；单瓦片混合源具体日期未提供",
+      "license": "底层来源依其许可；SRTM 公共领域。来源组合见 tilezen/joerd attribution",
+      "use": "全局起伏；保留 rawHeights、基准高程和局部平整后的 heights",
+      "note": "https://github.com/tilezen/joerd/blob/master/docs/attribution.md；重采样格点约 20 米，不意味着相应测绘精度。",
+      "retrievedAt": "2026-09-09"
+    }
+  ],
+  "coordinates": {
+    "input": "WGS84",
+    "origin": [
+      108.2882,
+      22.84715
+    ],
+    "units": "meters",
+    "projection": "local equirectangular approximation",
+    "vertical": "historical DEM minus local median; no elevation exaggeration"
+  },
+  "precision": {
+    "facades": "参考资料与类型推定，不提供测绘或竣工精度保证",
+    "trees": "固定随机种子的示意配置",
+    "coverage": "OSM 校界内及约 300 米缓冲范围内已经被绘制的要素；未绘制建筑不补造位置"
+  }
+}
