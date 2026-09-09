@@ -11,6 +11,7 @@ from shapely.prepared import prep
 import mapbox_earcut as earcut
 from fetch_geodata import ROOT,CACHE,REGION,tile
 from sports_data import prepare_sports
+from architecture_data import architectural_envelope,clear_entrance_trees
 OUT=ROOT/'public/data';OUT.mkdir(parents=True,exist_ok=True)
 LON,LAT=REGION['center'];MX=111320*math.cos(math.radians(LAT));MY=111320
 
@@ -77,7 +78,7 @@ def prepare():
             defaults={'living':6,'academic':5,'culture':2,'service':3}
             try:levels=float(t.get('building:levels',defaults[cat]));height=float(t.get('height','').replace(' m','')) if t.get('height') else levels*3.3
             except ValueError:levels=defaults[cat];height=levels*3.3;estimated=True
-            if lm:height=lm.get('height',height)
+            if lm:height=lm.get('height',height);cat=lm['category']
             coords=[]
             for p in polygons(g):coords.append([list(p.exterior.coords)]+[list(r.coords) for r in p.interiors])
             name=lm['name'] if lm else t.get('name') or f"{'校内' if inside else '周边'}建筑 {e['id']}"
@@ -88,6 +89,9 @@ def prepare():
                 b['name']='西田径场主席台';b['category']='culture'
                 b['facadeBasis']='2025 校方照片：开放主席台、白色挑檐、桁架及分色阶梯座席；尺寸估算'
                 b['sourceRefs']=['osm','westTrack2025','westMeet2025']
+            if lm and lm['id'] in ('library','international-residence'):
+                b['architecture']=architectural_envelope(b)
+                b['facadeBasis']=lm['detail']
             props.update({k:b[k] for k in ('name','category','height','heightBasis','facadeBasis','landmark')});buildings.append(b)
         features.append({'type':'Feature','id':eid,'properties':props,'geometry':mapping(transform(inverse,g))})
     # South gate uses the mapped road / campus boundary; its architectural extent is photo-estimated.
@@ -191,6 +195,7 @@ def prepare():
     sx,sy=west_stand['center'];standmask=box(sx-11,sy-40,sx+11,sy+40)
     trees=[t for t in trees if grounds.distance(Point(t[0],t[1]))>4*t[2]/9+1
            and standmask.distance(Point(t[0],t[1]))>4*t[2]/9+1]
+    trees=clear_entrance_trees(trees,buildings)
     (OUT/'vegetation.json').write_text(json.dumps(trees,separators=(',',':')))
     stats={'snapshotAt':geo['metadata']['snapshotAt'],'buildings':len(buildings),'campusBuildings':sum(b['insideCampus'] for b in buildings),'landmarks':len(landmarks),'trees':len(trees),'layers':dict(collections.Counter(f['properties']['kind'] for f in features)),'estimatedHeights':sum(b['heightBasis']=='按类型估算' for b in buildings),'editYears':dict(sorted(collections.Counter(b['osmEditedAt'][:4] for b in buildings if b['osmEditedAt']).items()))}
     (OUT/'overview.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2));print(json.dumps(stats,ensure_ascii=False))

@@ -1,3 +1,7 @@
+import {
+  searchLandmarks,
+  navigableBuildings,
+} from '../lib/campus/navigation.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
@@ -102,7 +106,7 @@ test('庭院内环、三角面与真实轮廓保留', () => {
   );
 });
 test('地标定位与校园南北关系', () => {
-  assert.equal(landmarks.length, 10);
+  assert.equal(landmarks.length, 11);
   assert.ok(
     landmarks.find((l) => l.id === 'south-gate').center[1] <
       landmarks.find((l) => l.id === 'laboratory').center[1],
@@ -208,4 +212,79 @@ test('来源日期字段和高程原始值可追溯', async () => {
   assert.equal(terrain.heights.length, terrain.cols * terrain.rows);
   assert.equal(terrain.rawHeights.length, terrain.heights.length);
   assert.ok(terrain.heights.every(Number.isFinite));
+});
+
+test('索引、搜索和拾取仅使用精选地标目录', () => {
+  assert.equal(searchLandmarks(landmarks, '').length, 11);
+  assert.deepEqual(
+    searchLandmarks(landmarks, ' 图书馆 ').map((p) => p.id),
+    ['library'],
+  );
+  assert.deepEqual(
+    searchLandmarks(landmarks, '留学生').map((p) => p.id),
+    ['international-residence'],
+  );
+  const ordinary = buildings.find(
+    (b) => !b.landmark && b.name.startsWith('校内建筑'),
+  );
+  assert.equal(searchLandmarks(landmarks, ordinary.name).length, 0);
+  assert.equal(searchLandmarks(landmarks, ordinary.id).length, 0);
+  const picks = navigableBuildings(buildings, landmarks);
+  assert.equal(picks.length, landmarks.filter((l) => l.osmId).length);
+  assert.ok(picks.every((b) => landmarks.some((l) => l.id === b.landmark)));
+  assert.ok(!picks.some((b) => b.id === ordinary.id));
+});
+test('新公寓绑定现有 24 层轮廓，图书馆局部裁剪保留内院', () => {
+  const residence = landmarks.find((l) => l.id === 'international-residence');
+  assert.equal(residence.osmId, 'way/1076517227');
+  const b = buildings.find((b) => b.id === residence.osmId);
+  assert.equal(b.levels, 24);
+  assert.equal(b.category, 'living');
+  const library = buildings.find((b) => b.landmark === 'library');
+  assert.ok(
+    Math.abs((library.architecture.angle * 180) / Math.PI - 11.615) < 0.01,
+  );
+  const parts = library.architecture.parts;
+  assert.equal(parts.length, 5);
+  const ringArea = (ring) =>
+    ring
+      .slice(1)
+      .reduce((sum, b, i) => sum + ring[i][0] * b[1] - b[0] * ring[i][1], 0) /
+    2;
+  const area = (polys) =>
+    polys.reduce(
+      (sum, p) =>
+        sum +
+        Math.abs(ringArea(p[0])) -
+        p.slice(1).reduce((s, r) => s + Math.abs(ringArea(r)), 0),
+      0,
+    );
+  assert.ok(
+    Math.abs(
+      parts.reduce((s, p) => s + area(p.polygons), 0) - area(library.polygons),
+    ) < 0.001,
+  );
+});
+test('图书馆与公寓入口的树冠避让台阶和柱廊', async () => {
+  const trees = await json('vegetation');
+  for (const [key, bounds] of [
+    ['library', [-23, -45.5, 27, -35]],
+    ['international-residence', [-3, -32, 18, -24]],
+  ]) {
+    const e = buildings.find((b) => b.landmark === key).architecture;
+    for (const [x, y, height] of trees) {
+      const dx = x - e.origin[0],
+        dy = y - e.origin[1];
+      const u = dx * Math.cos(e.angle) + dy * Math.sin(e.angle),
+        v = -dx * Math.sin(e.angle) + dy * Math.cos(e.angle);
+      const distance = Math.hypot(
+        Math.max(bounds[0] - u, 0, u - bounds[2]),
+        Math.max(bounds[1] - v, 0, v - bounds[3]),
+      );
+      assert.ok(
+        distance > (4 * height) / 9 + 1,
+        `${key}: tree ${x},${y} blocks the entry`,
+      );
+    }
+  }
 });

@@ -28,10 +28,19 @@
     "name": "图书馆",
     "category": "academic",
     "height": 36,
-    "description": "校园的阅读与学习中心，层叠的檐架与蓝绿色玻璃构成鲜明立面。",
-    "detail": "中央入口柱廊、阶梯状体量、悬挑檐架和横向玻璃窗带。",
+    "description": "阶梯式楼体围合阅读内院，蓝绿色玻璃、米色墙面与白色镂空檐架构成鲜明的校园地标。",
+    "detail": "保留 OSM 内院与约 11.6° 建筑轴线；重建退台、玻璃分格、回纹腰线、六柱入口、馆名、台阶与镂空檐架。楼层分区、高度和未见北立面按照片及 OSM 推定。",
     "reference": "campus2026",
-    "distance": 235
+    "distance": 180,
+    "additionalReferences": [
+      "campusGallery"
+    ],
+    "cameraOffset": [
+      0.2,
+      0.42,
+      1
+    ],
+    "frontBearing": 191.6
   },
   {
     "id": "huixue",
@@ -121,5 +130,26 @@
     "detail": "校方照片中的竖向玻璃核心、粉色侧墙、连续窗格与悬挑平檐；背面和层高结合 OSM 推定。",
     "reference": "computer2024",
     "distance": 170
+  },
+  {
+    "id": "international-residence",
+    "osmId": "way/1076517227",
+    "name": "留学生公寓",
+    "category": "living",
+    "description": "碧云湖东南侧的高层留学生公寓，与国际学院裙楼相连。",
+    "detail": "OSM 24 层轮廓定位；独立重建折角双翼、逐层凹阳台及栏杆、近实墙端面、转角玻璃窗带及顶部镂空框、裙楼遮阳竖板、入口与屋面。楼高按 24×3.3 米估算，塔楼退界和未见立面推定；外观照片拍摄日期未知。",
+    "reference": "apartmentOfficial",
+    "additionalReferences": [
+      "apartmentSite2022",
+      "apartmentUse2024"
+    ],
+    "positionBasis": "OSM way/1076517227 的 24 层标签，校方 2022 设计项目说明所示碧云湖东南侧相对位置及留学生中心外观照片交叉定位。",
+    "distance": 165,
+    "cameraOffset": [
+      0.8,
+      0.44,
+      1
+    ],
+    "frontBearing": 192.1
   }
 ]
