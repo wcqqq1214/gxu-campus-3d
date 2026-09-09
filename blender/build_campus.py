@@ -150,8 +150,9 @@ for zone in near:
         if b['zone']==zone and not b['landmark']:base[zone].extend(generic(b,False))
 for l in landmarks:
     z=elevation(*l['center']);l['elevation']=round(z,2)
-    if l['id']=='south-gate' and not l.get('osmId'):
-        l['zone']='west';landmark(l,None,z,C,True).object(l['name'],SOURCE,{'featureId':'south-gate','landmark':l['id'],'layer':'buildings'})
+    if l['id'] not in bylandmark:
+        l['zone']='west' if l['center'][0]<0 else 'east'
+        if not BASE_ONLY:landmark(l,None,z,C,True).object(l['name'],SOURCE,{'featureId':l.get('osmId',l['id']),'landmark':l['id'],'layer':'buildings','sourceUrl':l['sourceUrl']})
     base['landmark-'+l['id']]=landmark(l,bylandmark.get(l['id']),z,C,False)
 # Reusable tree templates; linked copies keep the Blender source small.
 templates=[]

@@ -1,6 +1,7 @@
 import {
   searchLandmarks,
   navigableBuildings,
+  navigationFootprints,
 } from '../lib/campus/navigation.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -106,7 +107,7 @@ test('庭院内环、三角面与真实轮廓保留', () => {
   );
 });
 test('地标定位与校园南北关系', () => {
-  assert.equal(landmarks.length, 11);
+  assert.equal(landmarks.length, 14);
   assert.ok(
     landmarks.find((l) => l.id === 'south-gate').center[1] <
       landmarks.find((l) => l.id === 'laboratory').center[1],
@@ -118,7 +119,7 @@ test('地标定位与校园南北关系', () => {
   for (const l of landmarks) {
     assert.ok(l.sourceUrl.startsWith('https://'));
     assert.ok(l.reference);
-    if (l.osmId)
+    if (l.osmId && l.placeKind !== 'gate')
       assert.equal(buildings.find((b) => b.id === l.osmId)?.landmark, l.id);
   }
 });
@@ -215,7 +216,7 @@ test('来源日期字段和高程原始值可追溯', async () => {
 });
 
 test('索引、搜索和拾取仅使用精选地标目录', () => {
-  assert.equal(searchLandmarks(landmarks, '').length, 11);
+  assert.equal(searchLandmarks(landmarks, '').length, 14);
   assert.deepEqual(
     searchLandmarks(landmarks, ' 图书馆 ').map((p) => p.id),
     ['library'],
@@ -230,7 +231,10 @@ test('索引、搜索和拾取仅使用精选地标目录', () => {
   assert.equal(searchLandmarks(landmarks, ordinary.name).length, 0);
   assert.equal(searchLandmarks(landmarks, ordinary.id).length, 0);
   const picks = navigableBuildings(buildings, landmarks);
-  assert.equal(picks.length, landmarks.filter((l) => l.osmId).length);
+  assert.equal(
+    picks.length,
+    landmarks.filter((l) => l.osmId && l.placeKind !== 'gate').length,
+  );
   assert.ok(picks.every((b) => landmarks.some((l) => l.id === b.landmark)));
   assert.ok(!picks.some((b) => b.id === ordinary.id));
 });
@@ -288,4 +292,41 @@ test('图书馆与公寓入口的树冠避让台阶和柱廊', async () => {
       );
     }
   }
+});
+
+test('三座新增校门采用独立入口 POI，可导航且不伪造建筑轮廓', async () => {
+  const gates = landmarks.filter((l) => l.placeKind === 'gate');
+  assert.equal(gates.length, 3);
+  assert.deepEqual(
+    gates.map((l) => l.frontBearing),
+    [180, 90, 270],
+  );
+  const picks = navigationFootprints(buildings, landmarks);
+  assert.equal(picks.length, 14);
+  for (const gate of gates) {
+    assert.ok(picks.some((p) => p.id === gate.id));
+    assert.ok(!buildings.some((b) => b.landmark === gate.id));
+    assert.ok(
+      geo.features.some((f) => f.id === gate.id && f.geometry.type === 'Point'),
+    );
+    assert.ok(Number.isFinite(gate.elevation));
+    assert.ok(manifest.landmarks.some((m) => m.id === gate.id));
+  }
+  const newEast = gates.find((g) => g.id === 'new-east-gate');
+  const east = gates.find((g) => g.id === 'east-gate');
+  assert.ok(east.center[1] - newEast.center[1] > 650);
+  assert.equal(newEast.reference, 'newEast2026');
+  assert.ok(newEast.detail.includes('推定'));
+  assert.ok(east.detail.includes('2018'));
+  assert.deepEqual(
+    searchLandmarks(landmarks, '新东门').map((p) => p.id),
+    ['new-east-gate'],
+  );
+  const sources = (await json('sources')).sources;
+  for (const gate of gates)
+    for (const id of gate.sourceRefs)
+      assert.ok(
+        sources.some((s) => s.id === id),
+        `Unknown reference ${id}`,
+      );
 });

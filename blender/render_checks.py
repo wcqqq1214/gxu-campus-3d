@@ -3,16 +3,38 @@ import bpy,math,json,sys
 from pathlib import Path
 from mathutils import Vector
 ROOT=Path(__file__).resolve().parents[1]
-bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'))
+requested=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
+if requested:
+    # Append only requested source objects, avoiding full-campus dependency
+    # evaluation (especially thousands of linked tree instances) for each view.
+    names={l['name'] for l in json.loads((ROOT/'public/data/landmarks.json').read_text()) if l['id'] in requested}
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    with bpy.data.libraries.load(str(ROOT/'blender/gxu-campus.blend'),link=False) as (src,dst):
+        dst.objects=[n for n in src.objects if n in names or n in ('下午日光','校园鸟瞰')]
+        dst.worlds=['南宁晴空']
+    for o in dst.objects:bpy.context.scene.collection.objects.link(o)
+    bpy.context.scene.camera=next(o for o in dst.objects if o.type=='CAMERA')
+    bpy.context.scene.world=dst.worlds[0]
+else:bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'))
 scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.samples=8;scene.cycles.use_denoising=True
 scene.render.resolution_x=720;scene.render.resolution_y=540;scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG';scene.render.film_transparent=False
+if requested and set(requested)<= {'new-east-gate','east-gate','west-gate'}:
+    # Material-colour studio inspection; final PBR appearance is checked in Three.js.
+    scene.render.engine='BLENDER_WORKBENCH'
+    scene.display.shading.light='STUDIO';scene.display.shading.color_type='MATERIAL'
+    scene.display.shading.show_shadows=True;scene.display.shading.show_cavity=True
+    scene.display.shading.cavity_type='BOTH';scene.display.shading.background_type='WORLD'
+    scene.world.color=(.22,.26,.24)
 out=ROOT/'docs/model-checks';out.mkdir(exist_ok=True)
 objects={o.get('landmark'):o for o in scene.objects if o.get('landmark')}
-requested=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 if requested:objects={key:o for key,o in objects.items() if key in requested}
 for o in scene.objects:
     if o.type=='MESH':o.hide_render=True
+# Inspection is isolated to the requested landmarks. Remove unrelated meshes
+# from this unsaved preview scene to avoid evaluating the entire campus per view.
+for o in list(scene.objects):
+    if o.type=='MESH' and o not in objects.values():bpy.data.objects.remove(o,do_unlink=True)
 world=scene.world;world.node_tree.nodes['Background'].inputs[0].default_value=(.7,.75,.7,1);world.node_tree.nodes['Background'].inputs[1].default_value=.8
 camera=scene.camera;camera.data.type='ORTHO';scene.view_settings.view_transform='AgX'
 for key,o in objects.items():
@@ -25,6 +47,13 @@ for key,o in objects.items():
         offsets=[(-.15,-1.8,.36),(1.1,.95,.60)]
         scene.render.resolution_x=1440;scene.render.resolution_y=900;scene.cycles.samples=24
         camera.data.ortho_scale=scale*.78
+    elif key in ('east-gate','west-gate','new-east-gate'):
+        bearing={'east-gate':90,'west-gate':270,'new-east-gate':180}[key]
+        angle=math.radians(180-bearing)
+        offsets=[(a*math.cos(angle)-b*math.sin(angle),a*math.sin(angle)+b*math.cos(angle),c)
+                 for a,b,c in [(-.14,-1.7,.42),(1.0,.9,.70)]]
+        scene.render.resolution_x=1440;scene.render.resolution_y=900;scene.cycles.samples=16
+        camera.data.ortho_scale=scale*.82
     elif key in ('library','international-residence'):
         scene.render.resolution_x=1440;scene.render.resolution_y=1000;scene.cycles.samples=16
     else:scene.render.resolution_x=720;scene.render.resolution_y=540;scene.cycles.samples=8

@@ -98,7 +98,21 @@ def prepare():
     for l in landmarks:
         b=next((b for b in buildings if b['id']==l.get('osmId')),None)
         if b:l['center']=b['center'];l['bounds']=b['bounds'];l['height']=b['height'];l['sourceUrl']=b['sourceUrl'];l['osmEditedAt']=b['osmEditedAt']
-        else:l['center']=list(project(*l['lonLat']));x,y=l['center'];l['bounds']=[x-34,y-18,x+34,y+3]
+        else:
+            l['center']=list(project(*l['lonLat']));x,y=l['center']
+            if l.get('placeKind')=='gate':
+                # Gate nodes are POIs, not fabricated mapped building footprints.
+                w,d=l['gateWidth'],l['gateDepth']
+                if l['frontBearing'] in (90,270):w,d=d,w
+                l['bounds']=[x-w/2,y-d/2,x+w/2,y+d/2]
+                ref=l.get('osmId',l.get('positionRoad'));typ,num=ref.split('/')
+                source=byid[(typ,int(num))]
+                l['osmEditedAt']=source.get('timestamp');l['osmVersion']=source.get('version')
+                props={'kind':'entrances','name':l['name'],'landmark':l['id'],'sourceUrl':l['sourceUrl'],
+                       'osmEditedAt':l['osmEditedAt'],'osmVersion':l['osmVersion'],'positionBasis':l['positionBasis']}
+                features.append({'type':'Feature','id':l['id'],'properties':props,
+                                 'geometry':mapping(Point(l['lonLat']))})
+            else:l['bounds']=[x-34,y-18,x+34,y+3]
         l['sourceRefs']=['osm',l['reference']]+l.get('additionalReferences',[])+(['sports2024'] if l['id']=='stadium' else [])
     surfaces=[]
     for f in features:
@@ -196,6 +210,8 @@ def prepare():
     trees=[t for t in trees if grounds.distance(Point(t[0],t[1]))>4*t[2]/9+1
            and standmask.distance(Point(t[0],t[1]))>4*t[2]/9+1]
     trees=clear_entrance_trees(trees,buildings)
+    gate_mask=unary_union([box(*l['bounds']).buffer(2) for l in landmarks if l.get('placeKind')=='gate'])
+    trees=[t for t in trees if gate_mask.distance(Point(t[0],t[1]))>4*t[2]/9+1]
     (OUT/'vegetation.json').write_text(json.dumps(trees,separators=(',',':')))
     stats={'snapshotAt':geo['metadata']['snapshotAt'],'buildings':len(buildings),'campusBuildings':sum(b['insideCampus'] for b in buildings),'landmarks':len(landmarks),'trees':len(trees),'layers':dict(collections.Counter(f['properties']['kind'] for f in features)),'estimatedHeights':sum(b['heightBasis']=='按类型估算' for b in buildings),'editYears':dict(sorted(collections.Counter(b['osmEditedAt'][:4] for b in buildings if b['osmEditedAt']).items()))}
     (OUT/'overview.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2));print(json.dumps(stats,ensure_ascii=False))
