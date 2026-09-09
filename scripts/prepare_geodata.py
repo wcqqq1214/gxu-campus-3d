@@ -10,6 +10,7 @@ from shapely import make_valid
 from shapely.prepared import prep
 import mapbox_earcut as earcut
 from fetch_geodata import ROOT,CACHE,REGION,tile
+from sports_data import prepare_sports
 OUT=ROOT/'public/data';OUT.mkdir(parents=True,exist_ok=True)
 LON,LAT=REGION['center'];MX=111320*math.cos(math.radians(LAT));MY=111320
 
@@ -83,6 +84,10 @@ def prepare():
             b={'id':eid,'name':name,'category':cat,'center':[round(c.x,2),round(c.y,2)],'height':height,'levels':levels,'insideCampus':inside,'landmark':lm['id'] if lm else None,'polygons':coords,'bounds':list(g.bounds),'heightBasis':'参考照片估算' if lm and 'height' in lm else '按类型估算' if estimated else 'OSM高度或层数','facadeBasis':'参考照片独立建模' if lm else '按建筑类型推定','osmVersion':e.get('version'),'osmEditedAt':e.get('timestamp'),'sourceUrl':props['sourceUrl'],'tags':t}
             b['constructionStatus']='OSM 标记施工中，完成状态待核对' if t.get('building')=='construction' or t.get('construction') else None
             if lm and lm['id']=='teaching-two':b['facadeBasis']='重点体量，立面按类型推定'
+            if eid=='way/948683815':
+                b['name']='西田径场主席台';b['category']='culture'
+                b['facadeBasis']='2025 校方照片：开放主席台、白色挑檐、桁架及分色阶梯座席；尺寸估算'
+                b['sourceRefs']=['osm','westTrack2025','westMeet2025']
             props.update({k:b[k] for k in ('name','category','height','heightBasis','facadeBasis','landmark')});buildings.append(b)
         features.append({'type':'Feature','id':eid,'properties':props,'geometry':mapping(transform(inverse,g))})
     # South gate uses the mapped road / campus boundary; its architectural extent is photo-estimated.
@@ -131,6 +136,10 @@ def prepare():
         j=max(0,min(rows-1,round((y-ymin)/(ymax-ymin)*(rows-1))))
         return float(a[j,i])
     grading=[]
+    sports=prepare_sports(ROOT,features,project)
+    for field in sports:
+        ring=field['ground'][:-1]
+        field['groundTriangles']=earcut.triangulate_float64(np.asarray(ring,dtype=np.float64),np.asarray([len(ring)],dtype=np.uint32)).tolist()
     for f in features:
         if f['properties']['kind']!='water':continue
         water=transform(project,shape(f['geometry']));c=water.representative_point();level=sample(c.x,c.y)
@@ -139,6 +148,14 @@ def prepare():
             if surf['id']==f['id']:surf['waterLevel']=round(level-baseline,2)
     for b in buildings:
         p=unary_union([Polygon(poly[0],poly[1:]) for poly in b['polygons']]);grading.append((p.buffer(4),sample(*b['center']),18))
+    # Flatten all interpolation corners beneath each entire playing ground. A halo
+    # at least one grid diagonal wide prevents coarse DEM cells piercing its edge.
+    grid_diagonal=math.hypot((xmax-xmin)/(cols-1),(ymax-ymin)/(rows-1))
+    for field in sports:
+        level=round(sample(*field['center'])-baseline,2)
+        field['elevation']=level
+        grading.append((Polygon(field['ground']).buffer(grid_diagonal),level+baseline,24))
+    (OUT/'sports.json').write_text(json.dumps(sports,ensure_ascii=False,indent=2))
     xx=np.linspace(xmin,xmax,cols);yy=np.linspace(ymin,ymax,rows)
     for region,height,fade in grading:
         x0,y0,x1,y1=region.buffer(fade).bounds
@@ -167,6 +184,13 @@ def prepare():
         for x in np.arange(minx,maxx,13):
             p=Point(x+rng.uniform(-4,4),y+rng.uniform(-4,4))
             if valid.contains(p) and rng.random()<(0.94 if greenmask.contains(p) else .55):trees.append([round(p.x,1),round(p.y,1),round(rng.uniform(9,17),1),rng.choices([0,1,2],[.66,.25,.09])[0]])
+    # Filter AFTER generation to retain the random sequence and existing trees
+    # elsewhere. Include canopy radius, not just trunks, at playing-area edges.
+    grounds=unary_union([Polygon(field['ground']) for field in sports])
+    west_stand=next(b for b in buildings if b['id']=='way/948683815')
+    sx,sy=west_stand['center'];standmask=box(sx-11,sy-40,sx+11,sy+40)
+    trees=[t for t in trees if grounds.distance(Point(t[0],t[1]))>4*t[2]/9+1
+           and standmask.distance(Point(t[0],t[1]))>4*t[2]/9+1]
     (OUT/'vegetation.json').write_text(json.dumps(trees,separators=(',',':')))
     stats={'snapshotAt':geo['metadata']['snapshotAt'],'buildings':len(buildings),'campusBuildings':sum(b['insideCampus'] for b in buildings),'landmarks':len(landmarks),'trees':len(trees),'layers':dict(collections.Counter(f['properties']['kind'] for f in features)),'estimatedHeights':sum(b['heightBasis']=='按类型估算' for b in buildings),'editYears':dict(sorted(collections.Counter(b['osmEditedAt'][:4] for b in buildings if b['osmEditedAt']).items()))}
     (OUT/'overview.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2));print(json.dumps(stats,ensure_ascii=False))

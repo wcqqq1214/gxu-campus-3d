@@ -70,6 +70,16 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['night', '夜景', Moon],
 ];
 const refs: Record<string, { name: string; url: string; year: string }> = {
+  westTrack2025: {
+    name: '校方 2025 新生开学典礼 · 西田径场',
+    url: 'https://news.gxu.edu.cn/info/1002/42983.htm',
+    year: '发布于 2025-09-15 · 活动日 2025-09-15，单张照片拍摄时间未注明；另核对 2025 校运会照片',
+  },
+  eastTrack2026: {
+    name: '校方 2026 阳光缤纷跑 · 东田径场',
+    url: 'https://news.gxu.edu.cn/info/1002/43641.htm',
+    year: '发布于 2026-04-26 · 单张照片拍摄时间未注明；跑道面层与白色分道线参考',
+  },
   gate2026: {
     name: '2026 活动报道中的现南大门',
     url: 'https://www.5iidea.com/contents/47982',
@@ -116,6 +126,7 @@ export default function Home() {
     controller = useRef<SceneController | null>(null);
   const [buildings, setBuildings] = useState<Building[]>([]),
     [landmarks, setLandmarks] = useState<Landmark[]>([]),
+    [sports, setSports] = useState<Landmark[]>([]),
     [overview, setOverview] = useState<Overview | null>(null);
   const [ready, setReady] = useState(false),
     [status, setStatus] = useState('正在铺开校园…'),
@@ -153,12 +164,14 @@ export default function Home() {
       getJson<Building[]>('buildings.json'),
       getJson<Landmark[]>('landmarks.json'),
       getJson<Overview>('overview.json'),
+      getJson<Landmark[]>('sports.json'),
       import('@/lib/campus/scene'),
     ])
-      .then(([bs, ls, stats, { createScene }]) => {
+      .then(([bs, ls, stats, fields, { createScene }]) => {
         if (!active || !host.current) return;
         setBuildings(bs);
         setLandmarks(ls);
+        setSports(fields);
         setOverview(stats);
         try {
           if (
@@ -166,7 +179,7 @@ export default function Home() {
             new URLSearchParams(location.search).has('test-webgl-unavailable')
           )
             throw new Error('WebGL test');
-          const c = createScene(host.current, bs, ls, {
+          const c = createScene(host.current, bs, [...ls, ...fields], {
             onStatus: (message, failed = false) => {
               if (active) {
                 setStatus(message);
@@ -224,7 +237,9 @@ export default function Home() {
     );
     return () => clearTimeout(timer);
   }, [tour, tourIndex, landmarks]);
-  const currentLandmark = landmarks.find((l) => l.id === selected);
+  const currentLandmark = [...landmarks, ...sports].find(
+    (l) => l.id === selected,
+  );
   const currentBuilding = selected
     ? buildings.find((b) => b.id === selected || b.landmark === selected)
     : undefined;
@@ -252,6 +267,16 @@ export default function Home() {
       category: b.category,
       landmark: !!b.landmark,
     }));
+    if (['landmark', 'all', 'culture'].includes(category))
+      for (const field of sports.filter(
+        (f) => !search || `${f.name} ${f.osmId}`.includes(search),
+      ))
+        result.unshift({
+          id: field.id,
+          name: field.name,
+          category: field.category,
+          landmark: false,
+        });
     if (['landmark', 'all'].includes(category))
       for (const l of landmarks.filter(
         (l) => !l.osmId && (!search || l.name.toLowerCase().includes(search)),
@@ -263,7 +288,7 @@ export default function Home() {
           landmark: true,
         });
     return result;
-  }, [buildings, landmarks, query, category]);
+  }, [buildings, landmarks, sports, query, category]);
   function toggleLayer(k: LayerKey, on: boolean) {
     setLayers((v) => ({ ...v, [k]: on }));
     controller.current?.setLayer(k, on);
@@ -592,7 +617,11 @@ export default function Home() {
           <div className="detail-heading">
             <div>
               <div className="eyebrow">
-                {currentLandmark ? 'CAMPUS LANDMARK' : 'CAMPUS BUILDING'}
+                {currentLandmark?.placeKind === 'sports'
+                  ? 'CAMPUS ATHLETICS'
+                  : currentLandmark
+                    ? 'CAMPUS LANDMARK'
+                    : 'CAMPUS BUILDING'}
               </div>
               <h2>{current.name}</h2>
             </div>
@@ -624,6 +653,7 @@ export default function Home() {
             <div className="detail-evidence">
               <p>
                 {currentLandmark?.detail ??
+                  currentBuilding?.facadeBasis ??
                   '保留公开地图轮廓，窗格、屋顶和入口按建筑类型推定。'}
               </p>
               {currentBuilding?.constructionStatus && (
@@ -632,7 +662,11 @@ export default function Home() {
               <dl>
                 <div>
                   <dt>高度依据</dt>
-                  <dd>{currentBuilding?.heightBasis ?? '参考照片估算'}</dd>
+                  <dd>
+                    {currentLandmark?.placeKind === 'sports'
+                      ? '历史 DEM 局部平整，非测量高程'
+                      : (currentBuilding?.heightBasis ?? '参考照片估算')}
+                  </dd>
                 </div>
                 <div>
                   <dt>地图编辑时间</dt>
