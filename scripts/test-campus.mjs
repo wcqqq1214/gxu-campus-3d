@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, stat } from 'node:fs/promises';
 import { gunzipSync } from 'node:zlib';
+import { createHash } from 'node:crypto';
 import {
   project,
   unproject,
@@ -117,6 +118,47 @@ test('地标定位与校园南北关系', () => {
       assert.equal(buildings.find((b) => b.id === l.osmId)?.landmark, l.id);
   }
 });
+test('现南门绑定真实门楼且不重复导出，汇学堂从东侧进入', async () => {
+  const gate = landmarks.find((l) => l.id === 'south-gate');
+  const mapped = buildings.find((b) => b.id === gate.osmId);
+  assert.equal(mapped.tags.man_made, 'ceremonial_gate');
+  assert.deepEqual(gate.bounds, mapped.bounds);
+  assert.deepEqual(gate.center, mapped.center);
+  assert.equal(mapped.landmark, gate.id);
+  assert.equal(gate.reference, 'gate2026');
+  assert.ok(gate.additionalReferences.includes('gate2024'));
+  assert.ok(!manifest.zones.some((z) => z.featureIds.includes(gate.osmId)));
+  const base = glbJson(
+    await readFile(new URL('../public/models/base.glb', import.meta.url)),
+  );
+  assert.equal(
+    base.nodes.filter((n) => n.extras?.landmark === gate.id).length,
+    1,
+  );
+  for (const gltf of [
+    base,
+    glbJson(
+      await readFile(
+        new URL('../public/models/south-gate.glb', import.meta.url),
+      ),
+    ),
+  ]) {
+    const node = gltf.nodes.find((n) => n.extras?.landmark === gate.id);
+    const positions = gltf.meshes[node.mesh].primitives.map(
+      (p) => gltf.accessors[p.attributes.POSITION],
+    );
+    const minX = Math.min(...positions.map((p) => p.min[0]));
+    const maxX = Math.max(...positions.map((p) => p.max[0]));
+    assert.ok(
+      Math.abs(minX - gate.bounds[0]) < 0.2 &&
+        Math.abs(maxX - gate.bounds[2]) < 0.2,
+      '基础与近景南门均须保持真实轮廓宽度',
+    );
+  }
+  const hui = landmarks.find((l) => l.id === 'huixue');
+  assert.equal(hui.frontBearing, 90);
+  assert.ok(hui.cameraOffset[0] > Math.abs(hui.cameraOffset[2]));
+});
 test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
   for (const a of [
     manifest.base,
@@ -128,6 +170,7 @@ test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
       new URL(`../public/${a.url}`, import.meta.url),
     );
     assert.equal(bytes.length, a.bytes);
+    assert.equal(createHash('sha256').update(bytes).digest('hex'), a.sha256);
     const d = glbJson(bytes);
     assert.ok(d.extensionsRequired.includes('KHR_draco_mesh_compression'));
     assert.ok(d.nodes?.length);

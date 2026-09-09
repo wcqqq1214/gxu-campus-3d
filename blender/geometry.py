@@ -7,7 +7,12 @@ def material(name,color,roughness=.8,metallic=0):
     bs=m.node_tree.nodes.get('Principled BSDF');bs.inputs['Base Color'].default_value=(*color,1);bs.inputs['Roughness'].default_value=roughness;bs.inputs['Metallic'].default_value=metallic
     MATERIALS.append(m);return len(MATERIALS)-1
 class Mesh:
-    def __init__(self):self.v=[];self.f=[];self.m=[]
+    def __init__(self):self.v=[];self.f=[];self.m=[];self.parts=[]
+    def rotate_z(self,x,y,angle):
+        c=math.cos(angle);s=math.sin(angle)
+        self.v=[(x+(a-x)*c-(b-y)*s,y+(a-x)*s+(b-y)*c,z) for a,b,z in self.v]
+    def add_part(self,name,other):
+        start=len(self.v);self.extend(other);self.parts.append((name,start,len(self.v)))
     def face(self,coords,mat):
         i=len(self.v);self.v.extend(coords);self.f.append(tuple(range(i,i+len(coords))));self.m.append(mat)
     def box(self,x,y,z,w,d,h,mat,angle=0):
@@ -50,6 +55,8 @@ class Mesh:
         used=sorted(set(self.m));remap={v:i for i,v in enumerate(used)}
         for i in used:mesh.materials.append(MATERIALS[i])
         for p,m in zip(mesh.polygons,self.m):p.material_index=remap[m]
+        for label,start,end in self.parts:
+            o.vertex_groups.new(name=label).add(list(range(start,end)),1.0,'REPLACE')
         # Meter-scaled planar UVs, projected along each face's dominant normal.
         # Only textured faces need UVs; the exporter keeps the common layer for batching.
         uv=mesh.uv_layers.new(name='米制平面纹理')

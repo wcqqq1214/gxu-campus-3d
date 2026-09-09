@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build editable campus source and spatially streamed Draco GLBs with Blender 5.2."""
-import bpy,sys,json,math,time,random
+import bpy,sys,json,math,time,random,hashlib
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from geometry import Mesh,material,MATERIALS
@@ -17,6 +17,8 @@ def rgb(h):
 C={}
 for name,color,rough,metal in [('stone','#cebfaa',.83,0),('white','#eeeee4',.74,0),('glass','#527a83',.23,.35),('dark','#35494b',.72,0),('slate','#4d6c70',.6,.15),('paleRoof','#bdbfb7',.7,.12),('wood','#725246',.92,0),('red','#ad6c54',.8,0),('pink','#d1afa0',.9,0),('grass','#819668',1,0),('green','#64916b',1,0),('road','#a0a69e',.93,0),('path','#c7bda9',.98,0),('water','#488f8a',.2,.25),('sport','#b1785e',.93,0),('pitch','#659578',1,0),('metal','#8e9b9e',.45,.45),('bark','#6e6650',1,0),('leaf','#3f7049',1,0),('leaf2','#56824c',1,0),('leaf3','#67904f',1,0)]:C[name]=material(name,rgb(color),rough,metal)
 terrain=json.loads((DATA/'terrain.json').read_text());buildings=json.loads((DATA/'buildings.json').read_text());landmarks=json.loads((DATA/'landmarks.json').read_text());surfaces=json.loads((DATA/'surfaces.json').read_text());trees=json.loads((DATA/'vegetation.json').read_text())
+for name,color,rough,metal in [('gateStone','#d7d0bf',.84,0),('gateTrim','#e4ddca',.8,0),('gateJoint','#a9a18f',.95,0),('gateRecess','#b7ae9b',.92,0),('gateRed','#872e35',.48,.12),('gateFlower','#c25283',.9,0)]:
+    C[name]=material(name,rgb(color),rough,metal)
 # Original deterministic JPEG textures; packed into both .blend and exported GLBs.
 texture_dir=ROOT/'blender/textures';texture_dir.mkdir(exist_ok=True)
 for name in ['stone','grass','green','road','path','paleRoof','slate','sport','pitch']:
@@ -37,6 +39,21 @@ def elevation(x,y):
 
 def generic(b,detail):
     m=Mesh();h=b['height'];cx,cy=b['center'];z=elevation(cx,cy);wall=C['pink'] if b['category']=='living' else C['stone'] if b['category']=='academic' else C['white']
+    if b['tags'].get('memorial')=='column':
+        # The four mapped historic inner-gate piers are monuments, not windowed houses.
+        x0,y0,x1,y1=b['bounds'];w=x1-x0;d=y1-y0;stone=C['gateStone'];trim=C['gateTrim']
+        m.box(cx,cy,z+.25,w+.35,d+.35,.5,trim)
+        m.box(cx,cy,z+h*.43,w*.80,d*.80,h*.74,stone)
+        for zz,scale,hh in [(h*.10,1,.22),(h*.76,1.04,.18),(h*.87,1.15,h*.20),(h*.99,1.3,.18)]:
+            m.box(cx,cy,z+zz,w*scale,d*scale,hh,trim)
+        for sy in [-1,1]:
+            for i in range(9):m.box(cx+(i-4)*w*.072,cy+sy*d*.408,z+h*.42,.035,.045,h*.61,trim)
+            if detail:
+                for i in range(5):m.ellipsoid(cx+(i-2)*w*.19,cy+sy*d*.59,z+h*.86,w*.085,.10,h*.072,stone,8,5)
+        for sx in [-1,1]:
+            for i in range(9):m.box(cx+sx*w*.408,cy+(i-4)*d*.072,z+h*.42,.045,.035,h*.61,trim)
+        m.roof(cx,cy,z+h+0.08,w*1.4,d*1.4,.35,stone)
+        return m
     if b['tags'].get('building:colour'):
         # Keep the shared palette bounded for batching; common OSM pink / yellow families map to it.
         wall=C['pink'] if b['tags']['building:colour'].lower()=='#f0a0a0' else wall
@@ -116,7 +133,7 @@ for zone in near:
         if b['zone']==zone and not b['landmark']:base[zone].extend(generic(b,False))
 for l in landmarks:
     z=elevation(*l['center']);l['elevation']=round(z,2)
-    if l['id']=='south-gate':
+    if l['id']=='south-gate' and not l.get('osmId'):
         l['zone']='west';landmark(l,None,z,C,True).object(l['name'],SOURCE,{'featureId':'south-gate','landmark':l['id'],'layer':'buildings'})
     base['landmark-'+l['id']]=landmark(l,bylandmark.get(l['id']),z,C,False)
 # Reusable tree templates; linked copies keep the Blender source small.
@@ -171,6 +188,8 @@ for o in templates:o.hide_set(True);o.hide_render=True
 (DATA/'buildings.json').write_text(json.dumps(buildings,ensure_ascii=False,separators=(',',':')))
 (DATA/'landmarks.json').write_text(json.dumps(landmarks,ensure_ascii=False,separators=(',',':')))
 manifest={'version':1,'units':'meters','axes':{'x':'east','y':'up','z':'south'},'base':{'url':'models/base.glb','bytes':sizes['base.glb']},'trees':{'url':'models/trees.glb','bytes':(MODELS/'trees.glb').stat().st_size},'zones':[{'id':k,'url':f'models/{k}.glb','bytes':sizes[k+'.glb'],'featureIds':zoneids[k]} for k in near],'landmarks':[{'id':l['id'],'url':f"models/{l['id']}.glb",'bytes':sizes[l['id']+'.glb']} for l in landmarks]}
+for entry in [manifest['base'],manifest['trees']]+manifest['zones']+manifest['landmarks']:
+    entry['sha256']=hashlib.sha256((ROOT/'public'/entry['url']).read_bytes()).hexdigest()
 (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 bpy.data.collections.remove(EXPORT)
 bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'),compress=True)

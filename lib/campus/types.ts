@@ -47,6 +47,8 @@ export interface Landmark {
   sourceUrl: string;
   reference: string;
   distance: number;
+  cameraOffset?: [number, number, number];
+  frontBearing?: number;
   zone: string;
   osmEditedAt?: string;
 }
