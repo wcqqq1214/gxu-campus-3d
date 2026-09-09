@@ -267,9 +267,9 @@ test('新公寓绑定现有 24 层轮廓，图书馆局部裁剪保留内院', (
 });
 test('图书馆与公寓入口的树冠避让台阶和柱廊', async () => {
   const trees = await json('vegetation');
-  for (const [key, bounds] of [
-    ['library', [-23, -45.5, 27, -35]],
-    ['international-residence', [-3, -32, 18, -24]],
+  for (const { key, bounds } of [
+    { key: 'library', bounds: [-23, -45.5, 27, -35] },
+    { key: 'international-residence', bounds: [-3, -32, 18, -24] },
   ]) {
     const e = buildings.find((b) => b.landmark === key).architecture;
     for (const [x, y, height] of trees) {
