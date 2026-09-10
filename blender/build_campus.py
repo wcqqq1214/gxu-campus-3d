@@ -94,7 +94,7 @@ def generic(b,detail):
     if detail and b['height']<14 and len(b['polygons'][0])==1 and len(b['polygons'][0][0])==5 and all(abs(a[0]-bb[0])<.1 or abs(a[1]-bb[1])<.1 for a,bb in zip(b['polygons'][0][0],b['polygons'][0][0][1:])):
         a,bb,c,d=b['bounds'];m.roof((a+c)/2,(bb+d)/2,z+h+.5,c-a,d-bb,2.3,C['red'])
     return m
-base={k:Mesh() for k in ['terrain','roads','water','green','sports','context','west','east','north']}
+base={k:Mesh() for k in ['terrain','roads','water','green','sports','context']}
 for j in range(rows-1):
     for i in range(cols-1):
         pts=[]
@@ -128,26 +128,34 @@ for field in fields:
     # Separate nodes bound Draco quantization to ~180 meters instead of the
     # campus-wide sports extent; paint stays distinct at 16 bits without bloat.
     base['sports-'+field['id']]=mesh
-near={k:Mesh() for k in ['west','east','north']};zoneids={k:[] for k in near};bylandmark={b['landmark']:b for b in buildings if b['landmark']}
+# Whole buildings belong to one 360 m cell, including their courtyard rings.
+# Base nodes use the same key, so each near chunk replaces exactly its own low LOD.
+CHUNK_METERS=360
+near={};zoneids={};chunkbounds={};bylandmark={b['landmark']:b for b in buildings if b['landmark']}
+def chunk_key(b):
+    ix=math.floor(b['center'][0]/CHUNK_METERS);iy=math.floor(b['center'][1]/CHUNK_METERS)
+    def label(v):return ('p' if v>=0 else 'n')+str(abs(v))
+    return 'chunk-'+label(ix)+'-'+label(iy)
 for index,b in enumerate(buildings):
-    z=elevation(*b['center']);b['elevation']=round(z,2);zone='context' if not b['insideCampus'] else 'north' if b['center'][1]>200 else 'west' if b['center'][0]<0 else 'east';b['zone']=zone
+    z=elevation(*b['center']);b['elevation']=round(z,2)
+    zone='context' if not b['insideCampus'] else 'north' if b['center'][1]>200 else 'west' if b['center'][0]<0 else 'east';b['zone']=zone
     if b['landmark']:
-        l=next(l for l in landmarks if l['id']==b['landmark']);low=landmark(l,b,z,C,False)
-        base[zone].extend(low)
+        l=next(l for l in landmarks if l['id']==b['landmark'])
         if not BASE_ONLY:landmark(l,b,z,C,True).object(l['name'],SOURCE,{'featureId':b['id'],'landmark':l['id'],'layer':'buildings','sourceUrl':b['sourceUrl']})
         l['elevation']=round(z,2);l['zone']=zone
+    elif zone=='context':
+        low=generic(b,False);base['context'].extend(low)
+        if not BASE_ONLY:low.object(b['name'],SOURCE,{'featureId':b['id'],'layer':'context'})
     else:
-        low=generic(b,False);base[zone].extend(low)
-        if not BASE_ONLY and zone!='context':
-            high=generic(b,True);near[zone].extend(high);zoneids[zone].append(b['id']);high.object(b['name'],SOURCE,{'featureId':b['id'],'layer':'buildings','sourceUrl':b['sourceUrl']})
-        elif not BASE_ONLY:low.object(b['name'],SOURCE,{'featureId':b['id'],'layer':'context'})
+        key=chunk_key(b);b['chunk']=key
+        if key not in near:near[key]=Mesh();base[key]=Mesh();zoneids[key]=[];chunkbounds[key]=[math.inf,math.inf,-math.inf,-math.inf]
+        base[key].extend(generic(b,False));zoneids[key].append(b['id'])
+        bounds=chunkbounds[key]
+        for k in range(2):bounds[k]=min(bounds[k],b['bounds'][k]-2);bounds[k+2]=max(bounds[k+2],b['bounds'][k+2]+2)
+        if not BASE_ONLY:
+            high=generic(b,True);near[key].extend(high)
+            high.object(b['name'],SOURCE,{'featureId':b['id'],'chunk':key,'layer':'buildings','sourceUrl':b['sourceUrl']})
     if index%100==0:print('Buildings',index,'/',len(buildings),flush=True)
-# Landmarks are independent streamed objects; do not duplicate them in zone replacements.
-# Base landmark geometry gets a separate export group for each landmark below.
-for zone in near:
-    base[zone]=Mesh()
-    for b in buildings:
-        if b['zone']==zone and not b['landmark']:base[zone].extend(generic(b,False))
 for l in landmarks:
     z=elevation(*l['center']);l['elevation']=round(z,2)
     if l['id'] not in bylandmark:
@@ -191,12 +199,13 @@ def export(name,groups):
         layer='buildings' if key in near or key.startswith('landmark') else 'sports' if key.startswith('sports-') else key
         o=mesh.object(key,EXPORT,{'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else '', 'sportsId':key[7:] if key.startswith('sports-') else ''});o.select_set(True);objs.append(o)
     path=MODELS/name
-    bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=16,export_materials='EXPORT',export_cameras=False,export_lights=False)
+    bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=16,export_draco_normal_quantization=7 if name=='base.glb' else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
     for o in objs:mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
     print('Export',name,round(path.stat().st_size/1e6,2),'MB',flush=True);return path.stat().st_size
 sizes={};sizes['base.glb']=export('base.glb',base)
 if BASE_ONLY:
     manifest=json.loads((DATA/'models.json').read_text())
+    if {z['id'] for z in manifest['zones']}!=set(near):raise RuntimeError('Chunk layout changed; run a full build before --base-only')
     manifest['base'].update(bytes=sizes['base.glb'],sha256=hashlib.sha256((MODELS/'base.glb').read_bytes()).hexdigest())
     (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
     print('Base-only export complete; retained editable source and near models',flush=True)
@@ -211,10 +220,13 @@ bpy.ops.export_scene.gltf(filepath=str(MODELS/'trees.glb'),export_format='GLB',u
 for o in templates:o.hide_set(True);o.hide_render=True
 (DATA/'buildings.json').write_text(json.dumps(buildings,ensure_ascii=False,separators=(',',':')))
 (DATA/'landmarks.json').write_text(json.dumps(landmarks,ensure_ascii=False,separators=(',',':')))
-manifest={'version':1,'units':'meters','axes':{'x':'east','y':'up','z':'south'},'base':{'url':'models/base.glb','bytes':sizes['base.glb']},'trees':{'url':'models/trees.glb','bytes':(MODELS/'trees.glb').stat().st_size},'zones':[{'id':k,'url':f'models/{k}.glb','bytes':sizes[k+'.glb'],'featureIds':zoneids[k]} for k in near],'landmarks':[{'id':l['id'],'url':f"models/{l['id']}.glb",'bytes':sizes[l['id']+'.glb']} for l in landmarks]}
+manifest={'version':2,'chunkSizeMeters':CHUNK_METERS,'units':'meters','axes':{'x':'east','y':'up','z':'south'},'base':{'url':'models/base.glb','bytes':sizes['base.glb']},'trees':{'url':'models/trees.glb','bytes':(MODELS/'trees.glb').stat().st_size},'zones':[{'id':k,'url':f'models/{k}.glb','bytes':sizes[k+'.glb'],'featureIds':zoneids[k],'bounds':chunkbounds[k]} for k in sorted(near)],'landmarks':[{'id':l['id'],'url':f"models/{l['id']}.glb",'bytes':sizes[l['id']+'.glb']} for l in landmarks]}
 for entry in [manifest['base'],manifest['trees']]+manifest['zones']+manifest['landmarks']:
     entry['sha256']=hashlib.sha256((ROOT/'public'/entry['url']).read_bytes()).hexdigest()
 (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
+# Remove only obsolete generated near models after the new manifest is complete.
+for old in [MODELS/'west.glb',MODELS/'east.glb',MODELS/'north.glb']:
+    old.unlink(missing_ok=True)
 bpy.data.collections.remove(EXPORT)
 bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'),compress=True)
 print('COMPLETE',len(buildings),'buildings;',len(trees),'trees; source',round((ROOT/'blender/gxu-campus.blend').stat().st_size/1e6,2),'MB',flush=True)

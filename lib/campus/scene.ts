@@ -5,6 +5,8 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { isTap } from './math';
+import { fetchModel, nearbyChunks, ResourceQueue } from './streaming';
+import type { StreamAsset as Asset } from './streaming';
 import { entranceBox, fitBox, landmarkBox, landmarkDirection } from './camera';
 import { DEFAULT_LAYERS } from './types';
 import type {
@@ -20,13 +22,6 @@ import type {
 } from './types';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 export const asset = (path: string) => `${BASE}/${path}`;
-interface Asset {
-  id?: string;
-  url: string;
-  bytes: number;
-  sha256?: string;
-  featureIds?: string[];
-}
 interface Manifest {
   base: Asset;
   trees: Asset;
@@ -34,7 +29,7 @@ interface Manifest {
   landmarks: Asset[];
 }
 interface Callbacks {
-  onStatus: (message: string, error?: boolean) => void;
+  onStatus: (message: string, error?: boolean, progress?: number) => void;
   onReady: () => void;
   onSelect: (id: string | null) => void;
   onInteract: () => void;
@@ -163,6 +158,12 @@ export function createScene(
   const loaded = new Map<string, THREE.Group>();
   const loading = new Set<string>();
   const failed = new Map<string, Asset>();
+  const detailQueue = new ResourceQueue<void>(2);
+  const lifecycle = new AbortController();
+  const progresses = new Map<string, { label: string; fraction: number }>();
+  const geometryCosts = new Map<string, number>();
+  const wanted = new Set<string>();
+  const recentlyUsed = new Map<string, number>();
   let tween: {
     from: THREE.Vector3;
     to: THREE.Vector3;
@@ -295,7 +296,6 @@ export function createScene(
   }
   function focus(id: string) {
     const l = landmarks.find((l) => l.id === id);
-    const b = buildings.find((b) => b.id === id || b.landmark === id);
     if (!l) return;
     selected = id;
     selectedView = 'oblique';
@@ -325,14 +325,7 @@ export function createScene(
       mark.material.dispose();
     } else highlight.add(mark);
     callbacks.onSelect(id);
-    if (l && manifest) {
-      const a = manifest.landmarks.find((a) => a.id === l.id);
-      if (a) void loadDetail(a, 'landmark-' + l.id);
-    }
-    if (b && manifest && !modeSmooth) {
-      const a = manifest.zones.find((a) => a.id === b.zone);
-      if (a) void loadDetail(a, b.zone);
-    }
+    reconcileDetails(true);
   }
   function frameLandmark(animate = true) {
     const place = landmarks.find((p) => p.id === selected);
@@ -481,7 +474,7 @@ export function createScene(
         if (loaded.has(key) && !modeSmooth) child.visible = false;
       }
     for (const [key, root] of loaded) {
-      const isZone = manifest?.zones.some((z) => z.id === key);
+      const isZone = key.startsWith('chunk-');
       root.visible = layers.buildings && (!isZone || !modeSmooth);
       if (baseRoot) {
         const base = baseRoot.children.find((c) => c.name === key);
@@ -493,150 +486,308 @@ export function createScene(
     highlight.visible = layers.buildings;
     dirty = true;
   }
-  async function loadGLB(a: Asset) {
-    const gltf = await loader.loadAsync(
-      asset(a.url) + (a.sha256 ? `?v=${a.sha256}` : ''),
-    );
-    if (disposed) {
-      disposeObject(gltf.scene);
-      throw new Error('disposed');
-    }
-    loadedBytes += a.bytes;
-    styleMeshes(gltf.scene);
-    return gltf;
+  function updateLoadStatus() {
+    if (disposed) return;
+    const foreground =
+      progresses.get('landmark-' + selected) ??
+      progresses.get('base') ??
+      progresses.values().next().value;
+    if (foreground)
+      callbacks.onStatus(
+        `${foreground.label} · ${Math.round(foreground.fraction * 100)}%`,
+        false,
+        foreground.fraction,
+      );
+    else if ([...failed.keys()].some((key) => wanted.has(key)))
+      callbacks.onStatus('部分近景暂未加载，已保留基础校园；可重试。', true);
+    else if (initialReady) callbacks.onStatus('');
   }
-  async function loadDetail(a: Asset, key: string) {
-    if (loaded.has(key) || loading.has(key) || disposed) return;
-    loading.add(key);
+  async function loadGLB(a: Asset, key = 'base', signal = lifecycle.signal) {
+    const label =
+      key === 'base'
+        ? '正在铺开校园'
+        : key === 'trees'
+          ? '正在添上林荫'
+          : key.startsWith('landmark-')
+            ? `正在细化${landmarks.find((l) => 'landmark-' + l.id === key)?.name ?? '地标'}`
+            : '正在补充周边细节';
     try {
-      const g = await loadGLB(a);
-      dynamic.add(g.scene);
-      loaded.set(key, g.scene);
-      if (key === 'landmark-' + selected && autoFramed && !orbiting)
-        frameLandmark();
-      failed.delete(key);
-      applyLayers();
-      if (failed.size === 0 && initialReady) callbacks.onStatus('');
-    } catch {
-      if (!disposed) {
-        failed.set(key, a);
-        callbacks.onStatus('部分近景暂未加载，已保留校园基础画面。', true);
+      const buffer = await fetchModel(
+        asset(a.url) + (a.sha256 ? `?v=${a.sha256}` : ''),
+        a.bytes,
+        signal,
+        (fraction) => {
+          progresses.set(key, { label, fraction });
+          updateLoadStatus();
+        },
+      );
+      signal.throwIfAborted();
+      const gltf = await loader.parseAsync(buffer, asset('models/'));
+      if (disposed || signal.aborted) {
+        disposeObject(gltf.scene);
+        throw new DOMException('Request cancelled', 'AbortError');
       }
+      loadedBytes += a.bytes;
+      styleMeshes(gltf.scene);
+      return gltf;
     } finally {
-      loading.delete(key);
+      progresses.delete(key);
+      updateLoadStatus();
     }
+  }
+  function releaseDetail(key: string) {
+    const root = loaded.get(key);
+    if (!root) return;
+    dynamic.remove(root);
+    disposeObject(root);
+    loaded.delete(key);
+    recentlyUsed.delete(key);
+  }
+  function detailCost(root: THREE.Object3D) {
+    const buffers = new Set<ArrayBufferLike>();
+    root.traverse((o) => {
+      if (!(o instanceof THREE.Mesh)) return;
+      for (const attribute of Object.values(o.geometry.attributes) as (
+        | THREE.BufferAttribute
+        | THREE.InterleavedBufferAttribute
+      )[]) {
+        const a =
+          attribute instanceof THREE.InterleavedBufferAttribute
+            ? attribute.data.array
+            : attribute.array;
+        buffers.add(a.buffer);
+      }
+      if (o.geometry.index) buffers.add(o.geometry.index.array.buffer);
+    });
+    return [...buffers].reduce((n, buffer) => n + buffer.byteLength, 0);
+  }
+  function reconcileDetails(focusing = false) {
+    if (!manifest || disposed || !initialReady) return;
+    const cap = (compact() ? 32 : 64) * 1048576;
+    const currentKey = 'landmark-' + selected;
+    const foreground = manifest.landmarks.find((a) => a.id === selected);
+    const wantedAssets: [string, Asset][] = [];
+    let allocation = 0;
+    if (layers.buildings && foreground) {
+      wantedAssets.push([currentKey, foreground]);
+      allocation += geometryCosts.get(currentKey) ?? foreground.bytes * 24;
+    }
+    // A fast response during a flight must use its destination, not the passing campus area.
+    const destination = tween?.toTarget ?? controls.target;
+    const destinationCamera = tween?.to ?? camera.position;
+    const x = destination.x;
+    const y = -destination.z;
+    if (
+      layers.buildings &&
+      !modeSmooth &&
+      (focusing || destinationCamera.distanceTo(destination) < 1050)
+    ) {
+      const candidates = nearbyChunks(manifest.zones, x, y);
+      // Reserve in-flight nearby chunks before spending freed budget on another one.
+      candidates.sort(
+        (a, b) =>
+          Number(Boolean(detailQueue.tasks.get(b.asset.id!)?.started)) -
+          Number(Boolean(detailQueue.tasks.get(a.asset.id!)?.started)),
+      );
+      for (const { asset: a } of candidates) {
+        const cost = geometryCosts.get(a.id!) ?? a.bytes * 32;
+        if (
+          wantedAssets.length >=
+            (foreground ? (loaded.has(currentKey) ? 4 : 2) : 3) ||
+          allocation + cost > cap
+        )
+          continue;
+        allocation += cost;
+        wantedAssets.push([a.id!, a]);
+      }
+    }
+    wanted.clear();
+    wantedAssets.forEach(([key]) => wanted.add(key));
+    for (const key of detailQueue.tasks.keys())
+      if (!wanted.has(key)) detailQueue.cancel(key);
+    for (const key of failed.keys()) if (!wanted.has(key)) failed.delete(key);
+    // One recent landmark can stay warm if it fits the decoded-geometry budget.
+    const older = [...loaded.keys()]
+      .filter((key) => !wanted.has(key))
+      .sort((a, b) => (recentlyUsed.get(b) ?? 0) - (recentlyUsed.get(a) ?? 0));
+    let warm = false;
+    for (const key of older) {
+      const cost = geometryCosts.get(key) ?? 0;
+      if (
+        !warm &&
+        key.startsWith('landmark-') &&
+        layers.buildings &&
+        allocation + cost <= cap
+      ) {
+        allocation += cost;
+        warm = true;
+      } else releaseDetail(key);
+    }
+    for (const [index, [key, a]] of wantedAssets.entries()) {
+      if (loaded.has(key)) recentlyUsed.set(key, performance.now());
+      else loadDetail(a, key, index);
+    }
+    applyLayers();
+    updateLoadStatus();
+  }
+  function loadDetail(a: Asset, key: string, priority = 2) {
+    if (
+      loaded.has(key) ||
+      detailQueue.tasks.has(key) ||
+      failed.has(key) ||
+      disposed
+    )
+      return;
+    void detailQueue
+      .enqueue(key, priority, async (signal) => {
+        const g = await loadGLB(a, key, signal);
+        if (disposed || !wanted.has(key)) {
+          disposeObject(g.scene);
+          return;
+        }
+        dynamic.add(g.scene);
+        loaded.set(key, g.scene);
+        recentlyUsed.set(key, performance.now());
+        geometryCosts.set(key, detailCost(g.scene));
+        failed.delete(key);
+        if (key === 'landmark-' + selected && autoFramed && !orbiting)
+          frameLandmark();
+        reconcileDetails();
+      })
+      .catch((error) => {
+        if (!disposed && error?.name !== 'AbortError') {
+          failed.set(key, a);
+          updateLoadStatus();
+        }
+      })
+      .finally(() => {
+        if (!disposed) pendingRequest = performance.now();
+      });
   }
   async function loadTrees() {
-    if (!manifest || treesRoot) return;
-    const [g, data, terrain] = await Promise.all([
-      loadGLB(manifest.trees),
-      fetch(asset('data/vegetation.json')).then((r) => r.json()) as Promise<
-        number[][]
-      >,
-      fetch(asset('data/terrain.json')).then((r) => r.json()) as Promise<{
-        bounds: number[];
-        cols: number;
-        rows: number;
-        heights: number[];
-      }>,
-    ]);
-    if (disposed) {
-      disposeObject(g.scene);
-      return;
-    }
-    treesRoot = new THREE.Group();
-    treesRoot.name = 'vegetation';
-    treesRoot.userData.layer = 'vegetation';
-    scene.add(treesRoot);
-    const elevation = (x: number, y: number) => {
-      const [x0, y0, x1, y1] = terrain.bounds;
-      const u = Math.max(
-        0,
-        Math.min(
-          terrain.cols - 2,
-          Math.floor(((x - x0) / (x1 - x0)) * (terrain.cols - 1)),
-        ),
-      );
-      const v = Math.max(
-        0,
-        Math.min(
-          terrain.rows - 2,
-          Math.floor(((y - y0) / (y1 - y0)) * (terrain.rows - 1)),
-        ),
-      );
-      return terrain.heights[v * terrain.cols + u];
-    };
-    const parts: THREE.Mesh[] = [];
-    g.scene.traverse((o) => {
-      if (o instanceof THREE.Mesh) parts.push(o);
-    });
-    for (let typ = 0; typ < 3; typ++) {
-      const partsForType = parts.filter((o) => {
-        let p: THREE.Object3D | null = o;
-        while (p) {
-          if (p.userData.template === typ || p.name === `Tree-template-${typ}`)
-            return true;
-          p = p.parent;
-        }
-        return false;
-      });
-      if (!partsForType.length) continue;
-      const geometries = partsForType.map((part) => {
-        const geometry = part.geometry.index
-          ? part.geometry.toNonIndexed()
-          : part.geometry.clone();
-        const material = (
-          Array.isArray(part.material) ? part.material[0] : part.material
-        ) as THREE.MeshStandardMaterial;
-        const color = material.color;
-        const colors = new Float32Array(
-          geometry.getAttribute('position').count * 3,
+    if (!manifest || treesRoot || loading.has('trees')) return;
+    loading.add('trees');
+    try {
+      const [data, terrain] = await Promise.all([
+        fetch(asset('data/vegetation.json'), { signal: lifecycle.signal }).then(
+          (r) => {
+            if (!r.ok) throw new Error('vegetation');
+            return r.json();
+          },
+        ) as Promise<number[][]>,
+        fetch(asset('data/terrain.json'), { signal: lifecycle.signal }).then(
+          (r) => {
+            if (!r.ok) throw new Error('terrain');
+            return r.json();
+          },
+        ) as Promise<{
+          bounds: number[];
+          cols: number;
+          rows: number;
+          heights: number[];
+        }>,
+      ]);
+      if (disposed) return;
+      const g = await loadGLB(manifest.trees, 'trees');
+      treesRoot = new THREE.Group();
+      treesRoot.name = 'vegetation';
+      treesRoot.userData.layer = 'vegetation';
+      scene.add(treesRoot);
+      const elevation = (x: number, y: number) => {
+        const [x0, y0, x1, y1] = terrain.bounds;
+        const u = Math.max(
+          0,
+          Math.min(
+            terrain.cols - 2,
+            Math.floor(((x - x0) / (x1 - x0)) * (terrain.cols - 1)),
+          ),
         );
-        for (let i = 0; i < colors.length; i += 3) {
-          colors[i] = color.r;
-          colors[i + 1] = color.g;
-          colors[i + 2] = color.b;
-        }
-        geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-        geometry.deleteAttribute('uv');
-        return geometry;
+        const v = Math.max(
+          0,
+          Math.min(
+            terrain.rows - 2,
+            Math.floor(((y - y0) / (y1 - y0)) * (terrain.rows - 1)),
+          ),
+        );
+        return terrain.heights[v * terrain.cols + u];
+      };
+      const parts: THREE.Mesh[] = [];
+      g.scene.traverse((o) => {
+        if (o instanceof THREE.Mesh) parts.push(o);
       });
-      const geometry = mergeGeometries(geometries)!;
-      geometries.forEach((g) => g.dispose());
-      const material = new THREE.MeshStandardMaterial({
-        vertexColors: true,
-        roughness: 0.94,
-        side: THREE.DoubleSide,
-      });
-      const sectors = new Map<string, number[][]>();
-      for (const row of data) {
-        if (row[3] !== typ) continue;
-        const key = `${Math.floor(row[0] / 450)},${Math.floor(row[1] / 450)}`;
-        if (!sectors.has(key)) sectors.set(key, []);
-        sectors.get(key)!.push(row);
-      }
-      for (const rows of sectors.values()) {
-        const inst = new THREE.InstancedMesh(geometry, material, rows.length);
-        const transform = new THREE.Object3D();
-        rows.forEach(([x, y, h], i) => {
-          transform.position.set(x, elevation(x, y), -y);
-          transform.rotation.set(0, i * 2.399, 0);
-          transform.scale.setScalar(h / 9);
-          transform.updateMatrix();
-          inst.setMatrixAt(i, transform.matrix);
+      for (let typ = 0; typ < 3; typ++) {
+        const partsForType = parts.filter((o) => {
+          let p: THREE.Object3D | null = o;
+          while (p) {
+            if (
+              p.userData.template === typ ||
+              p.name === `Tree-template-${typ}`
+            )
+              return true;
+            p = p.parent;
+          }
+          return false;
         });
-        inst.instanceMatrix.needsUpdate = true;
-        inst.computeBoundingSphere();
-        inst.castShadow = true;
-        inst.receiveShadow = true;
-        inst.userData.fullCount = rows.length;
-        treesRoot.add(inst);
+        if (!partsForType.length) continue;
+        const geometries = partsForType.map((part) => {
+          const geometry = part.geometry.index
+            ? part.geometry.toNonIndexed()
+            : part.geometry.clone();
+          const material = (
+            Array.isArray(part.material) ? part.material[0] : part.material
+          ) as THREE.MeshStandardMaterial;
+          const color = material.color;
+          const colors = new Float32Array(
+            geometry.getAttribute('position').count * 3,
+          );
+          for (let i = 0; i < colors.length; i += 3) {
+            colors[i] = color.r;
+            colors[i + 1] = color.g;
+            colors[i + 2] = color.b;
+          }
+          geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+          geometry.deleteAttribute('uv');
+          return geometry;
+        });
+        const geometry = mergeGeometries(geometries)!;
+        geometries.forEach((g) => g.dispose());
+        const material = new THREE.MeshStandardMaterial({
+          vertexColors: true,
+          roughness: 0.94,
+          side: THREE.DoubleSide,
+        });
+        const sectors = new Map<string, number[][]>();
+        for (const row of data) {
+          if (row[3] !== typ) continue;
+          const key = `${Math.floor(row[0] / 450)},${Math.floor(row[1] / 450)}`;
+          if (!sectors.has(key)) sectors.set(key, []);
+          sectors.get(key)!.push(row);
+        }
+        for (const rows of sectors.values()) {
+          const inst = new THREE.InstancedMesh(geometry, material, rows.length);
+          const transform = new THREE.Object3D();
+          rows.forEach(([x, y, h], i) => {
+            transform.position.set(x, elevation(x, y), -y);
+            transform.rotation.set(0, i * 2.399, 0);
+            transform.scale.setScalar(h / 9);
+            transform.updateMatrix();
+            inst.setMatrixAt(i, transform.matrix);
+          });
+          inst.instanceMatrix.needsUpdate = true;
+          inst.computeBoundingSphere();
+          inst.castShadow = true;
+          inst.receiveShadow = true;
+          inst.userData.fullCount = rows.length;
+          treesRoot.add(inst);
+        }
       }
+      disposeObject(g.scene);
+      // Materials and geometry are shared with the instanced meshes and disposed once during teardown.
+      setQuality(quality);
+      applyLayers();
+    } finally {
+      loading.delete('trees');
     }
-    disposeObject(g.scene);
-    // Materials and geometry are shared with the instanced meshes and disposed once during teardown.
-    setQuality(quality);
-    applyLayers();
   }
   async function initialize() {
     if (loading.has('base') || initialReady) return;
@@ -675,6 +826,7 @@ export function createScene(
       applyLayers();
       callbacks.onReady();
       callbacks.onStatus('');
+      reconcileDetails();
       void loadTrees().catch(() => {
         if (!disposed) callbacks.onStatus('植被暂未加载，可重试。', true);
       });
@@ -708,6 +860,7 @@ export function createScene(
             : o.userData.fullCount;
       });
     applyLayers();
+    reconcileDetails();
   }
   function setPreset(p: Preset) {
     preset = p;
@@ -878,6 +1031,25 @@ export function createScene(
       pixelRatio: renderer.getPixelRatio(),
       quality: modeSmooth ? '流畅' : '精细',
       loadedBytes,
+      loadedDetails: [...loaded.keys()],
+      queuedDetails: detailQueue.tasks.size,
+      residentDetailBytes: [...loaded.keys()].reduce(
+        (n, key) =>
+          n +
+          (manifest?.landmarks.find((a) => 'landmark-' + a.id === key)?.bytes ??
+            manifest?.zones.find((a) => a.id === key)?.bytes ??
+            0),
+        0,
+      ),
+      detailGeometryMiB:
+        Math.round(
+          ([...loaded.keys()].reduce(
+            (n, key) => n + (geometryCosts.get(key) ?? 0),
+            0,
+          ) /
+            1048576) *
+            10,
+        ) / 10,
     };
   }
   function animate(time: number) {
@@ -971,22 +1143,11 @@ export function createScene(
     if (
       manifest &&
       initialReady &&
-      !modeSmooth &&
       pendingRequest &&
       time - pendingRequest > 450
     ) {
       pendingRequest = 0;
-      const distance = camera.position.distanceTo(controls.target);
-      if (distance < 1050) {
-        const zone =
-          controls.target.z < -200
-            ? 'north'
-            : controls.target.x < 0
-              ? 'west'
-              : 'east';
-        const a = manifest.zones.find((z) => z.id === zone);
-        if (a) void loadDetail(a, zone);
-      }
+      reconcileDetails();
     }
   }
   loop = requestAnimationFrame(animate);
@@ -1019,6 +1180,7 @@ export function createScene(
     setLayer: (key, on) => {
       layers[key] = on;
       applyLayers();
+      if (key === 'buildings') reconcileDetails();
     },
     setPreset,
     setQuality,
@@ -1053,7 +1215,8 @@ export function createScene(
     retry: () => {
       if (!initialReady) void initialize();
       else {
-        for (const [key, a] of failed) void loadDetail(a, key);
+        failed.clear();
+        reconcileDetails();
         if (!treesRoot)
           void loadTrees().catch(() =>
             callbacks.onStatus('植被加载失败，请稍后重试。', true),
@@ -1063,6 +1226,8 @@ export function createScene(
     getMetrics: metrics,
     dispose: () => {
       disposed = true;
+      lifecycle.abort();
+      detailQueue.dispose();
       skyTexture.dispose();
       cancelAnimationFrame(loop);
       observer.disconnect();
