@@ -85,6 +85,28 @@ export function createScene(
     MIDDLE: THREE.MOUSE.DOLLY,
     RIGHT: THREE.MOUSE.PAN,
   };
+  const wheelHost = host.parentElement ?? host;
+  function onOverlayWheel(event: WheelEvent) {
+    if (event.target === canvas || event.defaultPrevented) return;
+    if (!(event.target instanceof Element)) return;
+    // Scrollable menus keep their wheel gestures; other overlays zoom the map.
+    for (let el: Element | null = event.target; el; el = el.parentElement) {
+      const style = getComputedStyle(el);
+      if (
+        (/(auto|scroll)/.test(style.overflowY) &&
+          el.scrollHeight > el.clientHeight) ||
+        (/(auto|scroll)/.test(style.overflowX) &&
+          el.scrollWidth > el.clientWidth) ||
+        el.matches('[role="dialog"], dialog')
+      )
+        return;
+      if (el === wheelHost) break;
+    }
+    // Retain wheel units, cursor position and pinch modifiers for OrbitControls.
+    if (!canvas.dispatchEvent(new WheelEvent('wheel', event)))
+      event.preventDefault();
+  }
+  wheelHost.addEventListener('wheel', onOverlayWheel, { passive: false });
   const ambient = new THREE.HemisphereLight('#d9edff', '#60704e', 1.35);
   scene.add(ambient);
   const sun = new THREE.DirectionalLight('#fff3da', 2.6);
@@ -1409,6 +1431,7 @@ export function createScene(
       skyTexture.dispose();
       cancelAnimationFrame(loop);
       observer.disconnect();
+      wheelHost.removeEventListener('wheel', onOverlayWheel);
       controls.dispose();
       draco.dispose();
       canvas.removeEventListener('pointerdown', onDown);
