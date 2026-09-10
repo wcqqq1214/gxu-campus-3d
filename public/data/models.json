@@ -9,13 +9,18 @@
   },
   "base": {
     "url": "models/base.glb",
-    "bytes": 5898812,
-    "sha256": "62aef0b7582fbf49bf608de577fb30dbcaac8e78bd5725d94eef26a5863992f2"
+    "bytes": 5940068,
+    "sha256": "2e5360ab0bc517470668c7d24e0de003b8f2e5b9ccc30a14a1cbccfbcd1b9e39"
   },
   "trees": {
     "url": "models/trees.glb",
     "bytes": 21916,
     "sha256": "dda1d627c9f5196492d3e4c275ec51d0536494f24fa8980dc952dded9b7bb6ed"
+  },
+  "treesNear": {
+    "url": "models/trees-near.glb",
+    "bytes": 41304,
+    "sha256": "fe13967da352d7b82f57ff47aacd5ce4398fe7bb74f206c2dfb4a76fa99ebeff"
   },
   "zones": [
     {
@@ -947,11 +952,234 @@
       "url": "models/west-gate.glb",
       "bytes": 36188,
       "sha256": "f8530e2c14323ac8082d9419ccb8c1335631e829177ba6c351cd55a195414fea"
+    },
+    {
+      "id": "chongzuo-bridge",
+      "url": "models/chongzuo-bridge.glb",
+      "bytes": 877072,
+      "sha256": "5a103a54a90930184c6c4628b1e52e8945f4cfd61de5512cf6820918049964c6"
+    },
+    {
+      "id": "bocui-bridge",
+      "url": "models/bocui-bridge.glb",
+      "bytes": 98588,
+      "sha256": "acf27b97021b3c85e8d56f349ceaf79397cbb0fd7903a432acf1c512350dbdfe"
+    },
+    {
+      "id": "huixian-bridge",
+      "url": "models/huixian-bridge.glb",
+      "bytes": 104964,
+      "sha256": "ee181abc9891a268b174e892d9dff1769d838261027c2487acec4f8b8286ebea"
     }
   ],
-  "treesNear": {
-    "url": "models/trees-near.glb",
-    "bytes": 41304,
-    "sha256": "fe13967da352d7b82f57ff47aacd5ce4398fe7bb74f206c2dfb4a76fa99ebeff"
-  }
+  "infrastructure": [
+    {
+      "id": "infra-road-00",
+      "url": "models/infra-road-00.glb",
+      "bytes": 46044,
+      "bounds": [
+        285.2643877148947,
+        -1235.8371677504153,
+        322.2640309304454,
+        -949.0677674114318
+      ],
+      "layer": "roads",
+      "sha256": "c44d464d499222ce9e0b86df002d1205eea7d0e1bfa0512f363b5421223f0f1f"
+    },
+    {
+      "id": "infra-road-01",
+      "url": "models/infra-road-01.glb",
+      "bytes": 147284,
+      "bounds": [
+        186.22010428547256,
+        -969.0558064077022,
+        305.25242671116524,
+        -698.2588183581354
+      ],
+      "layer": "roads",
+      "sha256": "66c312e3594c1d3d60b51137615befbeca05745da366c21167079318dd89a4e7"
+    },
+    {
+      "id": "infra-road-02",
+      "url": "models/infra-road-02.glb",
+      "bytes": 342680,
+      "bounds": [
+        66.4254853820938,
+        -718.2561364638016,
+        206.2174223911388,
+        -460.9934778608641
+      ],
+      "layer": "roads",
+      "sha256": "219a730a076bea01a7d4db1dc48361a636807d161de4af25200ed2a56fab4171"
+    },
+    {
+      "id": "infra-road-03",
+      "url": "models/infra-road-03.glb",
+      "bytes": 403736,
+      "bounds": [
+        -61.42410968348735,
+        -480.9893501465601,
+        86.4213576677898,
+        -225.9634605629513
+      ],
+      "layer": "roads",
+      "sha256": "34a5681ee7df3130279b5df21e9edf75deba8e53cc720aa0ccea53b319944b60"
+    },
+    {
+      "id": "infra-road-04",
+      "url": "models/infra-road-04.glb",
+      "bytes": 283332,
+      "bounds": [
+        -319.81558858190806,
+        -245.95123688883888,
+        -41.436333357599764,
+        -158.31145814112872
+      ],
+      "layer": "roads",
+      "sha256": "84d1e83d043b395c29cb1f9d2dd5c3ce621d749d680d2b0c6f022be8acd37746"
+    },
+    {
+      "id": "infra-road-05",
+      "url": "models/infra-road-05.glb",
+      "bytes": 176264,
+      "bounds": [
+        -419.12703311912003,
+        -178.29411321747634,
+        -299.83293350556045,
+        41.90417748398958
+      ],
+      "layer": "roads",
+      "sha256": "29c09306f8675d4127703f8a52f00d11c5e54ab1ee1985c96daa9610df74792d"
+    },
+    {
+      "id": "infra-road-06",
+      "url": "models/infra-road-06.glb",
+      "bytes": 74416,
+      "bounds": [
+        -624.8231564068625,
+        21.912371155166007,
+        -399.13522679029643,
+        115.74659438654703
+      ],
+      "layer": "roads",
+      "sha256": "0a4b9c8f35aa0e3d70408d1016e44c9d9e0d904ab1ad6870e3f53f767f4bf24c"
+    },
+    {
+      "id": "infra-road-07",
+      "url": "models/infra-road-07.glb",
+      "bytes": 199600,
+      "bounds": [
+        -886.022547808556,
+        34.2577811782285,
+        -604.8338348059871,
+        101.37026750042146
+      ],
+      "layer": "roads",
+      "sha256": "5217764eeadcdc6fb5a40bcbae16370f3a46eb174f0d2e843145af94d4480954"
+    },
+    {
+      "id": "infra-road-08",
+      "url": "models/infra-road-08.glb",
+      "bytes": 13288,
+      "bounds": [
+        -897.1609159256143,
+        81.38059367720139,
+        -866.032873985336,
+        106.40908891157082
+      ],
+      "layer": "roads",
+      "sha256": "ecf721fcd9a30078bc60e1843cd38b70b42dc895d76f82a0402ae1bd3963abdc"
+    },
+    {
+      "id": "infra-lake-bridge-760193721",
+      "url": "models/infra-lake-bridge-760193721.glb",
+      "bytes": 18804,
+      "bounds": [
+        281.73827047717685,
+        252.90902347598367,
+        327.67547748450454,
+        283.61998052427396
+      ],
+      "layer": "roads",
+      "sha256": "decf8062363005e439f3d09ea64fcdeafdc1043cb1958bfdc3eaef447f38e0d0"
+    },
+    {
+      "id": "infra-lake-bridge-822812181",
+      "url": "models/infra-lake-bridge-822812181.glb",
+      "bytes": 27676,
+      "bounds": [
+        231.49967256849615,
+        -45.920485104350334,
+        327.26723297702506,
+        -14.737782895397958
+      ],
+      "layer": "roads",
+      "sha256": "69f8334bd29c857acc855a9f25172048cefbdf18444fed5a598f5fdaaaa73892"
+    },
+    {
+      "id": "infra-lake-bridge-833506388",
+      "url": "models/infra-lake-bridge-833506388.glb",
+      "bytes": 9912,
+      "bounds": [
+        219.62363614147344,
+        131.65687537125245,
+        230.79164907008976,
+        145.997468628859
+      ],
+      "layer": "roads",
+      "sha256": "a536b723d66f2cdf0aac6b8c1879323b335be06caac061faf8121a7c7c5ddf86"
+    },
+    {
+      "id": "infra-lake-bridge-834160220",
+      "url": "models/infra-lake-bridge-834160220.glb",
+      "bytes": 10040,
+      "bounds": [
+        231.4210458954181,
+        116.03866786109467,
+        243.3174443739649,
+        129.65570413926568
+      ],
+      "layer": "roads",
+      "sha256": "b009fab0ef80d6456eac5a3a6676b4ebe51276b1affe1caa42a80d4abdfce569"
+    },
+    {
+      "id": "infra-lake-bridge-835748952",
+      "url": "models/infra-lake-bridge-835748952.glb",
+      "bytes": 9108,
+      "bounds": [
+        34.72209238119333,
+        78.1453040053286,
+        44.68994066140446,
+        90.82732399502547
+      ],
+      "layer": "roads",
+      "sha256": "8f29c6792d4f6a69276a3a13efd944209696c8ffcca105aa27042cb0d36b835b"
+    },
+    {
+      "id": "infra-lake-bridge-845251806",
+      "url": "models/infra-lake-bridge-845251806.glb",
+      "bytes": 19232,
+      "bounds": [
+        321.11642139172636,
+        -75.13347137539554,
+        338.61589291525445,
+        -19.88928062451905
+      ],
+      "layer": "roads",
+      "sha256": "3a3aa963367fa0c84781dc422d67a64ba54167bb1d639194faaab627e702d485"
+    },
+    {
+      "id": "infra-lake-bridge-1492215405",
+      "url": "models/infra-lake-bridge-1492215405.glb",
+      "bytes": 14488,
+      "bounds": [
+        140.1616042965287,
+        -37.99047451001112,
+        168.4999704650295,
+        -23.981369490059198
+      ],
+      "layer": "roads",
+      "sha256": "972688c364d96d36dae974d765e69ba0b025f600515c2ae231ea8903951ffbbe"
+    }
+  ]
 }

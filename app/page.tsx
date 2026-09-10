@@ -67,7 +67,7 @@ const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
   ['buildings', '校园建筑', '教学楼、宿舍与校园地标', Building2],
   ['vegetation', '林木植被', '乔木、棕榈与林荫景观', Trees],
-  ['roads', '道路与步道', '校道、街道与步行空间', Navigation],
+  ['roads', '道路与桥梁', '公共农院路、校道、桥梁与步行空间', Navigation],
   ['water', '湖塘水面', '镜湖、碧云湖及其他水体', Waves],
   ['sports', '运动场地', '球场、跑道与游泳池', GraduationCap],
   ['context', '周边街区', '校界外约 300 米的建筑', Layers3],
@@ -80,6 +80,51 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['night', '夜景', Moon],
 ];
 const refs: Record<string, { name: string; url: string; year: string }> = {
+  chongzuo2023: {
+    name: '校方崇左桥下穿坡道与护栏照片',
+    url: 'https://ghjjc.gxu.edu.cn/info/1046/2619.htm',
+    year: '发布于 2023-06-27；单张拍摄日期未知。可见坡道、排水盖板和圆形护栏，未展示完整桥体',
+  },
+  bridgeFlowers2023: {
+    name: '校方崇左桥、博萃桥附近围栏与三角梅',
+    url: 'https://ghjjc.gxu.edu.cn/info/1057/2393.htm',
+    year: '发布于 2023-03-30；拍摄日期未知。仅作为围栏和植物外观参考',
+  },
+  huixian2025: {
+    name: '校方荟贤桥路段维护照片',
+    url: 'https://ghjjc.gxu.edu.cn/info/1046/3774.htm',
+    year: '发布于 2025-10-31；拍摄日期未知。可见道路铺装、盲道和路灯，桥洞形制未被完整覆盖',
+  },
+  bridgeMaintenance2024: {
+    name: '校方农院路围墙周边绿化养护记录',
+    url: 'https://ghjjc.gxu.edu.cn/info/1046/3085.htm',
+    year: '发布于 2024-04-17；用于核对围墙存在，不提供精确边界',
+  },
+  chongzuoHistoric2013: {
+    name: '崇左桥历史结构照片 · 2013',
+    url: 'http://www.archina.com/index.php?a=show&g=ela&id=1336&m=index',
+    year: '发布于 2013-04-16。只辅助桥洞及题名建模，不用于声称现状细部一致',
+  },
+  chongzuoReport2013: {
+    name: '广西新闻网崇左桥现场报道',
+    url: 'https://news.gxnews.com.cn/staticpages/20130416/newgx516c8136-7372321.shtml',
+    year: '发布于 2013-04-16；正文明确农院路在上、校园通道在下，仅辅助核对空间关系',
+  },
+  chongzuoRoute2025: {
+    name: '校方研学线路中的崇左桥',
+    url: 'https://cjxy.gxu.edu.cn/info/1082/1384.htm',
+    year: '发布于 2025-01-17；核对桥名与近期使用，不证明完整桥体外观',
+  },
+  bocuiNotice2023: {
+    name: '校方博萃桥道路示意图',
+    url: 'https://www.gxu.edu.cn/info/1365/32406.htm',
+    year: '发布于 2023-01-18；核对图书馆南侧与农院路交叉位置。历史封闭通知不代表当前通行状态',
+  },
+  bridgeNamingGuide: {
+    name: '校方捐赠指南中的荟贤桥位置',
+    url: 'https://jjh.gxu.edu.cn/__local/A/1C/2D/C94DA67648AB9698A6BE04E1718_D3801DBD_2512297.pdf',
+    year: '历史冠名资料，具体发布日期未知；荟贤桥位于新体育馆北侧的相对关系仅作位置辅助',
+  },
   eastGatePhoto: {
     name: '东门落成实拍 · 中国教育在线（校方供图）',
     url: 'https://www.eol.cn/guangxi/xiaoyuandongtai/201812/t20181202_1635608.shtml',
@@ -529,7 +574,9 @@ export default function Home() {
                         'entrance',
                         currentLandmark.id === 'library'
                           ? '南门近景'
-                          : '入口近景',
+                          : currentLandmark?.placeKind === 'bridge'
+                            ? '桥下近景'
+                            : '入口近景',
                       ],
                       ...(currentLandmark.id === 'library'
                         ? [['rear-entrance', '北门近景']]
@@ -585,11 +632,14 @@ export default function Home() {
                     <div>
                       <dt>高度依据</dt>
                       <dd>
-                        {currentLandmark?.placeKind === 'sports'
-                          ? '历史 DEM 局部平整，非测量高程'
-                          : currentLandmark?.id === 'new-east-gate'
-                            ? '缺少门体照片，暂按门卫设施尺度估算'
-                            : (currentBuilding?.heightBasis ?? '参考照片估算')}
+                        {currentLandmark?.placeKind === 'bridge'
+                          ? '净高与坡度为视觉估算，非工程测量'
+                          : currentLandmark?.placeKind === 'sports'
+                            ? '历史 DEM 局部平整，非测量高程'
+                            : currentLandmark?.id === 'new-east-gate'
+                              ? '缺少门体照片，暂按门卫设施尺度估算'
+                              : (currentBuilding?.heightBasis ??
+                                '参考照片估算')}
                       </dd>
                     </div>
                     <div>
@@ -613,6 +663,20 @@ export default function Home() {
                         <ArrowUpRight size={13} />
                       </a>
                       <small>{refs[currentLandmark.reference]?.year}</small>
+                      {currentLandmark.additionalReferences
+                        ?.filter((id) => refs[id])
+                        .map((id) => (
+                          <div key={id}>
+                            <a
+                              href={refs[id].url}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {refs[id].name} <ArrowUpRight size={13} />
+                            </a>
+                            <small>{refs[id].year}</small>
+                          </div>
+                        ))}
                     </>
                   )}
                 </div>
@@ -671,6 +735,7 @@ export default function Home() {
                         ['living', '生活'],
                         ['culture', '文体'],
                         ['landmark', '校门'],
+                        ['infrastructure', '路桥'],
                       ] as [Category | 'all', string][]
                     ).map(([value, label]) => (
                       <button
@@ -1009,6 +1074,12 @@ export default function Home() {
               年校方发布内容为优先，照片未注明拍摄日期时保留未知状态。
             </p>
             <p>
+              农院路为贯穿校园区域的公共道路，两侧校园通过立交通道连接。道路与桥梁快照：
+              {overview?.infrastructureSnapshotAt?.slice(0, 10)}；走廊约{' '}
+              {((overview?.publicRoadMeters ?? 0) / 1000).toFixed(2)}{' '}
+              千米。围墙、路幅及桥梁净高含估算，展示范围不代表权属或实际通行权限。
+            </p>
+            <p>
               建筑轮廓来自公开地图，{overview?.estimatedHeights ?? '部分'}{' '}
               处建筑高度按类型估算。重点地标依据照片独立建模；未被照片覆盖的立面、树位和植物种类包含推定。地形使用
               Mapzen / SRTM 历史高程，SRTM 采集于 2000 年，非近期校园测绘。
@@ -1022,6 +1093,8 @@ export default function Home() {
                     'campus2024',
                     'campusGallery',
                     'apartmentOfficial',
+                    'chongzuo2023',
+                    'huixian2025',
                   ].includes(k),
                 )
                 .map(([k, r]) => (
@@ -1034,7 +1107,7 @@ export default function Home() {
             <h3>如何操作</h3>
             <p>
               鼠标左键旋转，右键平移，滚轮缩放；触屏单指旋转、双指平移与缩放。聚焦画面后可用方向键平移、加减键缩放、Home
-              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆分别提供南北门。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”等别名，可按教学、生活、文体和校门筛选；地图标注和点击定位仅开放精选地标。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
+              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆分别提供南北门，桥梁提供桥下近景。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
             </p>
             <h3>开源与许可</h3>
             <p>

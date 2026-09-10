@@ -1,5 +1,5 @@
 'use client';
-import { memo, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { MapPin, ChevronDown } from 'lucide-react';
 import type { Building, Landmark } from '@/lib/campus/types';
 import { cameraBearing, type CameraSnapshot } from '@/lib/campus/share';
@@ -14,6 +14,22 @@ export const CampusMinimap = memo(function CampusMinimap({
   camera: CameraSnapshot | null;
 }) {
   const [open, setOpen] = useState(false);
+  const [publicRoad, setPublicRoad] = useState<number[][]>([]);
+  useEffect(() => {
+    if (!open || publicRoad.length) return;
+    const controller = new AbortController();
+    void fetch(
+      `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/data/infrastructure-map.json`,
+      { signal: controller.signal },
+    )
+      .then((r) => {
+        if (!r.ok) throw new Error('map');
+        return r.json();
+      })
+      .then((data: { path: number[][] }) => setPublicRoad(data.path))
+      .catch(() => {});
+    return () => controller.abort();
+  }, [open, publicRoad.length]);
   const map = useMemo(() => {
     const bounds = buildings.filter((b) => b.insideCampus).map((b) => b.bounds);
     if (!bounds.length) return null;
@@ -91,6 +107,22 @@ export const CampusMinimap = memo(function CampusMinimap({
                 fillRule="evenodd"
               />
             ))}
+            {publicRoad.length > 0 && (
+              <path
+                d={publicRoad
+                  .map(
+                    ([x, y], i) =>
+                      `${i ? 'L' : 'M'}${map.point(x, y).join(',')}`,
+                  )
+                  .join(' ')}
+                fill="none"
+                stroke="#b77d4b"
+                strokeWidth={2.4}
+                strokeLinecap="round"
+              >
+                <title>农院路 · 公共道路</title>
+              </path>
+            )}
             {point && (
               <circle
                 cx={point[0]}
@@ -120,7 +152,7 @@ export const CampusMinimap = memo(function CampusMinimap({
           <small>
             {outside
               ? '观察中心位于图外，箭头显示朝向'
-              : '北向朝上 · 金点为地标，箭头为观察中心与朝向'}
+              : `${publicRoad.length ? '棕线为公共农院路 · ' : ''}金点为地标，箭头为观察中心与朝向`}
           </small>
         </div>
       )}

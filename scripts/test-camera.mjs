@@ -76,3 +76,42 @@ test('汇学堂正面为东向；图书馆两侧入口沿实际建筑轴线定�
   assert.ok(north.x < south.x - 10);
   assert.ok(landmarkDirection(l, 'back').z < -0.9);
 });
+
+test('竖屏桥下镜头沿实际弯曲坡道定位，避免停在挡墙外', async () => {
+  const { bridgeEntrancePose } = await import('../lib/campus/camera.ts');
+  for (const l of landmarks.filter((l) => l.placeKind === 'bridge')) {
+    const pose = bridgeEntrancePose(
+      l,
+      fitBox(
+        entranceBox(l, landmarkBox(l), false),
+        landmarkDirection(l, 'entrance'),
+        { left: 18, top: 94, width: 298, height: 310 },
+        { width: 390, height: 844 },
+      ),
+    );
+    assert.ok(pose.position.distanceTo(pose.target) < 50, l.name);
+    let distance = Infinity;
+    for (let i = 1; i < l.approachPath.length; i++) {
+      const a = l.approachPath[i - 1],
+        b = l.approachPath[i];
+      const dx = b[0] - a[0],
+        dy = b[1] - a[1];
+      const t = Math.max(
+        0,
+        Math.min(
+          1,
+          ((pose.position.x - a[0]) * dx + (-pose.position.z - a[1]) * dy) /
+            (dx * dx + dy * dy),
+        ),
+      );
+      distance = Math.min(
+        distance,
+        Math.hypot(
+          pose.position.x - a[0] - dx * t,
+          pose.position.z + a[1] + dy * t,
+        ),
+      );
+    }
+    assert.ok(distance < 0.01, `${l.name}: camera is outside the ramp`);
+  }
+});

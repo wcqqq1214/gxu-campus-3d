@@ -1,0 +1,1 @@
+[out:json][timeout:80];(way[highway](22.8327,108.2763,22.8616,108.3001);way[barrier](22.8327,108.2763,22.8616,108.3001););out meta geom;

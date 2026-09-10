@@ -107,7 +107,7 @@ test('庭院内环、三角面与真实轮廓保留', () => {
   );
 });
 test('地标定位与校园南北关系', () => {
-  assert.equal(landmarks.length, 14);
+  assert.equal(landmarks.length, 17);
   assert.ok(
     landmarks.find((l) => l.id === 'south-gate').center[1] <
       landmarks.find((l) => l.id === 'laboratory').center[1],
@@ -119,7 +119,7 @@ test('地标定位与校园南北关系', () => {
   for (const l of landmarks) {
     assert.ok(l.sourceUrl.startsWith('https://'));
     assert.ok(l.reference);
-    if (l.osmId && l.placeKind !== 'gate')
+    if (l.osmId && !['gate', 'bridge'].includes(l.placeKind))
       assert.equal(buildings.find((b) => b.id === l.osmId)?.landmark, l.id);
   }
 });
@@ -171,6 +171,7 @@ test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
     ...(manifest.treesNear ? [manifest.treesNear] : []),
     ...manifest.zones,
     ...manifest.landmarks,
+    ...(manifest.infrastructure ?? []),
   ]) {
     const bytes = await readFile(
       new URL(`../public/${a.url}`, import.meta.url),
@@ -217,7 +218,7 @@ test('来源日期字段和高程原始值可追溯', async () => {
 });
 
 test('索引、搜索和拾取仅使用精选地标目录', () => {
-  assert.equal(searchLandmarks(landmarks, '').length, 14);
+  assert.equal(searchLandmarks(landmarks, '').length, 17);
   assert.deepEqual(
     searchLandmarks(landmarks, ' 图书馆 ').map((p) => p.id),
     ['library'],
@@ -234,7 +235,9 @@ test('索引、搜索和拾取仅使用精选地标目录', () => {
   const picks = navigableBuildings(buildings, landmarks);
   assert.equal(
     picks.length,
-    landmarks.filter((l) => l.osmId && l.placeKind !== 'gate').length,
+    landmarks.filter(
+      (l) => l.osmId && !['gate', 'bridge'].includes(l.placeKind),
+    ).length,
   );
   assert.ok(picks.every((b) => landmarks.some((l) => l.id === b.landmark)));
   assert.ok(!picks.some((b) => b.id === ordinary.id));
@@ -303,7 +306,7 @@ test('三座新增校门采用独立入口 POI，可导航且不伪造建筑轮�
     [180, 90, 270],
   );
   const picks = navigationFootprints(buildings, landmarks);
-  assert.equal(picks.length, 14);
+  assert.equal(picks.length, 17);
   for (const gate of gates) {
     assert.ok(picks.some((p) => p.id === gate.id));
     assert.ok(!buildings.some((b) => b.landmark === gate.id));

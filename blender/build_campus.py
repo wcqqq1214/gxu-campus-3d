@@ -7,6 +7,7 @@ BASE_ONLY='--base-only' in sys.argv
 from geometry import Mesh,material,MATERIALS
 from landmarks import landmark
 from sports import athletics,west_stand
+from infrastructure import road_chunk,bridge,approaches,lake_bridge
 DATA=ROOT/'public/data';MODELS=ROOT/'public/models';MODELS.mkdir(exist_ok=True)
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 for c in list(bpy.data.collections):
@@ -20,6 +21,11 @@ C={}
 for name,color,rough,metal in [('stone','#cebfaa',.83,0),('white','#eeeee4',.74,0),('glass','#527a83',.23,.35),('dark','#35494b',.72,0),('slate','#4d6c70',.6,.15),('paleRoof','#bdbfb7',.7,.12),('wood','#725246',.92,0),('red','#ad6c54',.8,0),('pink','#d1afa0',.9,0),('grass','#819668',1,0),('green','#64916b',1,0),('road','#a0a69e',.93,0),('path','#c7bda9',.98,0),('water','#488f8a',.2,.25),('sport','#b1785e',.93,0),('pitch','#659578',1,0),('metal','#8e9b9e',.45,.45),('bark','#6e6650',1,0),('leaf','#3f7049',1,0),('leaf2','#56824c',1,0),('leaf3','#67904f',1,0)]:C[name]=material(name,rgb(color),rough,metal)
 terrain=json.loads((DATA/'terrain.json').read_text());buildings=json.loads((DATA/'buildings.json').read_text());landmarks=json.loads((DATA/'landmarks.json').read_text());surfaces=json.loads((DATA/'surfaces.json').read_text());trees=json.loads((DATA/'vegetation.json').read_text())
 fields=json.loads((DATA/'sports.json').read_text())
+infrastructure=json.loads((DATA/'infrastructure.json').read_text())
+bridge_by_id={b['id']:b for b in infrastructure['bridges']}
+lake_by_id={b['id']:b for b in infrastructure['lakeBridges']}
+for name,color,rough,metal in [('asphalt','#626664',.97,0),('pavingRed','#b97865',.93,0),('tactile','#d6b663',.95,0),('curb','#c7c9bd',.86,0),('roadWhite','#f0ecda',.92,0),('roadYellow','#e5c266',.92,0),('wallStone','#d6c8aa',.9,0),('fenceIron','#343e3d',.63,.4),('lampMetal','#929f9e',.48,.5),('lampGlass','#e7e8cf',.25,.15),('bridgeConcrete','#afb2a6',.91,0),('bridgeEdge','#c7c9bd',.86,0),('bridgeJoint','#525b59',.95,0),('bridgePlaque','#665d4f',.82,0),('drainStone','#bfc0b3',.94,0)]:
+    C[name]=material(name,rgb(color),rough,metal)
 for name,color in [('track','#ba563f'),('trackAlt','#b7543e'),('trackApron','#a9513e'),('fieldGreen','#3d8650'),('fieldStripe','#458f57'),('sportWhite','#f5f3e7'),('goalNet','#c1cabb'),('seatYellow','#c9d92f'),('seatGreen','#6dbe33'),('seatBlue','#5cbdca')]:
     C[name]=material(name,rgb(color),.92,0)
 for name,color,rough,metal in [('gateStone','#d7d0bf',.84,0),('gateTrim','#e4ddca',.8,0),('gateJoint','#a9a18f',.95,0),('gateRecess','#b7ae9b',.92,0),('gateRed','#872e35',.48,.12),('gateFlower','#c25283',.9,0)]:
@@ -28,7 +34,7 @@ for name,color,rough,metal in [('libraryStone','#c6b9a7',.8,0),('libraryTrim','#
     C[name]=material(name,rgb(color),rough,metal)
 # Original deterministic JPEG textures; packed into both .blend and exported GLBs.
 texture_dir=ROOT/'blender/textures';texture_dir.mkdir(exist_ok=True)
-for name in ['stone','grass','green','road','path','paleRoof','slate','sport','pitch']:
+for name in ['stone','grass','green','road','path','paleRoof','slate','sport','pitch','asphalt']:
     mat=MATERIALS[C[name]];base=[1.055*(v**(1/2.4))-.055 if v>.0031308 else v*12.92 for v in mat.diffuse_color[:3]];image=bpy.data.images.new('自制-'+name,width=128,height=128)
     rng=random.Random(name);pixels=[]
     for j in range(128):
@@ -106,13 +112,21 @@ def generic(b,detail):
         a,bb,c,d=b['bounds'];m.roof((a+c)/2,(bb+d)/2,z+h+.5,c-a,d-bb,2.3,C['red'])
     return m
 base={k:Mesh() for k in ['terrain','roads','water','green','sports','context']}
+cut_cells=set(infrastructure['terrainCells'])
 for j in range(rows-1):
     for i in range(cols-1):
+        if j*(cols-1)+i in cut_cells:continue
         pts=[]
         for ii,jj in [(i,j),(i+1,j),(i+1,j+1),(i,j+1)]:
             x=xmin+(xmax-xmin)*ii/(cols-1);y=ymin+(ymax-ymin)*jj/(rows-1);pts.append((x,y,hh[jj*cols+ii]))
         base['terrain'].face(pts,C['grass'])
-for s in surfaces:
+for patch in infrastructure['terrainPatch']:
+    for i in range(0,len(patch['triangles']),3):base['terrain'].face([patch['vertices'][k] for k in patch['triangles'][i:i+3]],C['grass'])
+for si,original in enumerate(surfaces):
+    s=original
+    if s['id'] in infrastructure['replaceSurfaceIds']:continue
+    if str(si) in infrastructure['surfaceOverrides']:s={**s,**infrastructure['surfaceOverrides'][str(si)]}
+    if not s['vertices']:continue
     if s['id'] in [field['osmId'] for field in fields]:continue
     kind=s['kind'];verts=s['vertices'];tri=s['triangles'];mat=C['water'] if kind=='water' else C['sport'] if kind=='sports' else C['green'] if kind=='green' else C['path'] if s['tags'].get('highway') in ('path','footway','steps','pedestrian') else C['road']
     if kind=='sports' and s['tags'].get('sport') in ('soccer','basketball','tennis'):mat=C['pitch']
@@ -132,6 +146,15 @@ for s in surfaces:
         if x1-x0>8 and y1-y0>12:
             for a,b in [((x0,y0),(x1,y0)),((x1,y0),(x1,y1)),((x1,y1),(x0,y1)),((x0,y1),(x0,y0)),((x0,(y0+y1)/2),(x1,(y0+y1)/2))]:base[layer].line((*a,elevation(*a)+.2),(*b,elevation(*b)+.2),.10,C['white'],4)
 print('Ground assembled',flush=True)
+infra_near={}
+for chunk in infrastructure['chunks']:
+    key=chunk['id'];build=lambda detail:road_chunk(chunk,C,detail) if chunk['kind']=='corridor' else lake_bridge(lake_by_id[chunk['bridgeId']],C,detail)
+    base[key]=build(False)
+    if not BASE_ONLY:
+        high=build(True);infra_near[key]=high
+        high.object(('农院路 · 路段 ' if chunk['kind']=='corridor' else '跨水桥 · ')+key,GROUND,{'layer':'roads','infrastructureId':key,'precision':'OSM 位置；路幅、细部及配置按参考资料估算'})
+for b in infrastructure['bridges']:
+    base['infra-approach-'+b['id']]=approaches(b,C)
 if not BASE_ONLY:base['sports'].object('其他运动场地',GROUND,{'layer':'sports'})
 for field in fields:
     mesh=athletics(field,C)
@@ -168,6 +191,12 @@ for index,b in enumerate(buildings):
             high.object(b['name'],SOURCE,{'featureId':b['id'],'chunk':key,'layer':'buildings','sourceUrl':b['sourceUrl']})
     if index%100==0:print('Buildings',index,'/',len(buildings),flush=True)
 for l in landmarks:
+    if l.get('placeKind')=='bridge':
+        b=bridge_by_id[l['id']]
+        l['elevation']=b['floorElevation'];l['zone']='roads'
+        base['landmark-'+l['id']]=bridge(b,C,False)
+        if not BASE_ONLY:bridge(b,C,True).object(l['name'],GROUND,{'featureId':b['osmId'],'landmark':l['id'],'layer':'roads','sourceUrl':b['sourceUrl']})
+        continue
     z=elevation(*l['center']);l['elevation']=round(z,2)
     if l['id'] not in bylandmark:
         l['zone']='west' if l['center'][0]<0 else 'east'
@@ -180,7 +209,7 @@ for i,(x,y,h,t) in enumerate([] if BASE_ONLY else trees):
     o=bpy.data.objects.new(f'树木示意-{i:04}',templates[t].data);PLANTS.objects.link(o);o.location=(x,y,elevation(x,y));o.scale=(h/9,h/9,h/9);o.rotation_euler.z=i*2.399
 for t in templates:t.hide_render=True;t.hide_set(True)
 for k,m in base.items():
-    if not BASE_ONLY and not k.startswith(('landmark','sports-')) and k not in near and k not in ('context','sports'):m.object(k,GROUND,{'layer':k})
+    if not BASE_ONLY and not k.startswith(('landmark','sports-')) and k not in near and k not in infra_near and k not in ('context','sports'):m.object(k,GROUND,{'layer':'roads' if k.startswith('infra-') else k})
 # A neutral studio sky and solar lighting for editable source preview.
 world=bpy.data.worlds.new('南宁晴空');world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.58,.73,.88,1);world.node_tree.nodes['Background'].inputs[1].default_value=.7;bpy.context.scene.world=world
 light=bpy.data.lights.new('下午日光','SUN');light.energy=2.5;light.angle=.08;sun=bpy.data.objects.new('下午日光',light);GROUND.objects.link(sun);sun.rotation_euler=(.4,-.6,-.6)
@@ -194,10 +223,10 @@ def export(name,groups):
     bpy.ops.object.select_all(action='DESELECT');objs=[]
     for key,mesh in groups.items():
         if not mesh.v:continue
-        layer='buildings' if key in near or key.startswith('landmark') else 'sports' if key.startswith('sports-') else key
+        layer='roads' if key.startswith('infra-') or key.removeprefix('landmark-') in bridge_by_id else 'buildings' if key in near or key.startswith('landmark') else 'sports' if key.startswith('sports-') else key
         o=mesh.object(key,EXPORT,{'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else '', 'sportsId':key[7:] if key.startswith('sports-') else ''});o.select_set(True);objs.append(o)
     path=MODELS/name
-    bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=16,export_draco_normal_quantization=7 if name=='base.glb' else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
+    bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=15 if name=='base.glb' else 16,export_draco_normal_quantization=7 if name=='base.glb' else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
     for o in objs:mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
     print('Export',name,round(path.stat().st_size/1e6,2),'MB',flush=True);return path.stat().st_size
 sizes={};sizes['base.glb']=export('base.glb',base)
@@ -209,8 +238,10 @@ if BASE_ONLY:
     print('Base-only export complete; retained editable source and near models',flush=True)
     sys.exit(0)
 for zone,m in near.items():sizes[f'{zone}.glb']=export(f'{zone}.glb',{zone:m})
+for key,m in infra_near.items():sizes[f'{key}.glb']=export(f'{key}.glb',{key:m})
 for l in landmarks:
-    key='landmark-'+l['id'];sizes[l['id']+'.glb']=export(l['id']+'.glb',{key:landmark(l,bylandmark.get(l['id']),l['elevation'],C,True)})
+    key='landmark-'+l['id'];mesh=bridge(bridge_by_id[l['id']],C,True) if l.get('placeKind')=='bridge' else landmark(l,bylandmark.get(l['id']),l['elevation'],C,True)
+    sizes[l['id']+'.glb']=export(l['id']+'.glb',{key:mesh})
 # Export only tree templates; runtime uses InstancedMesh grouped by spatial sector.
 bpy.ops.object.select_all(action='DESELECT')
 for o in templates:o.hide_set(False);o.hide_render=False;o.select_set(True)
@@ -226,7 +257,8 @@ for o in low_templates:
 (DATA/'buildings.json').write_text(json.dumps(buildings,ensure_ascii=False,separators=(',',':')))
 (DATA/'landmarks.json').write_text(json.dumps(landmarks,ensure_ascii=False,separators=(',',':')))
 manifest={'version':2,'chunkSizeMeters':CHUNK_METERS,'units':'meters','axes':{'x':'east','y':'up','z':'south'},'base':{'url':'models/base.glb','bytes':sizes['base.glb']},'trees':{'url':'models/trees.glb','bytes':(MODELS/'trees.glb').stat().st_size},'treesNear':{'url':'models/trees-near.glb','bytes':(MODELS/'trees-near.glb').stat().st_size},'zones':[{'id':k,'url':f'models/{k}.glb','bytes':sizes[k+'.glb'],'featureIds':zoneids[k],'bounds':chunkbounds[k]} for k in sorted(near)],'landmarks':[{'id':l['id'],'url':f"models/{l['id']}.glb",'bytes':sizes[l['id']+'.glb']} for l in landmarks]}
-for entry in [manifest['base'],manifest['trees'],manifest['treesNear']]+manifest['zones']+manifest['landmarks']:
+manifest['infrastructure']=[{'id':c['id'],'url':f"models/{c['id']}.glb",'bytes':sizes[c['id']+'.glb'],'bounds':c['bounds'],'layer':'roads'} for c in infrastructure['chunks']]
+for entry in [manifest['base'],manifest['trees'],manifest['treesNear']]+manifest['zones']+manifest['landmarks']+manifest['infrastructure']:
     entry['sha256']=hashlib.sha256((ROOT/'public'/entry['url']).read_bytes()).hexdigest()
 (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 # Remove only obsolete generated near models after the new manifest is complete.

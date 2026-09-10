@@ -215,4 +215,7 @@ def prepare():
     (OUT/'vegetation.json').write_text(json.dumps(trees,separators=(',',':')))
     stats={'snapshotAt':geo['metadata']['snapshotAt'],'buildings':len(buildings),'campusBuildings':sum(b['insideCampus'] for b in buildings),'landmarks':len(landmarks),'trees':len(trees),'layers':dict(collections.Counter(f['properties']['kind'] for f in features)),'estimatedHeights':sum(b['heightBasis']=='按类型估算' for b in buildings),'editYears':dict(sorted(collections.Counter(b['osmEditedAt'][:4] for b in buildings if b['osmEditedAt']).items()))}
     (OUT/'overview.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2));print(json.dumps(stats,ensure_ascii=False))
-if __name__=='__main__':prepare()
+if __name__=='__main__':
+    prepare()
+    from infrastructure_data import prepare_infrastructure
+    prepare_infrastructure()
