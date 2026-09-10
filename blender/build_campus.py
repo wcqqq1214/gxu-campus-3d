@@ -226,7 +226,7 @@ def export(name,groups):
         layer='roads' if key.startswith('infra-') or key.removeprefix('landmark-') in bridge_by_id else 'buildings' if key in near or key.startswith('landmark') else 'sports' if key.startswith('sports-') else key
         o=mesh.object(key,EXPORT,{'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else '', 'sportsId':key[7:] if key.startswith('sports-') else ''});o.select_set(True);objs.append(o)
     path=MODELS/name
-    bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=15 if name=='base.glb' else 16,export_draco_normal_quantization=7 if name=='base.glb' else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
+    bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=15 if name=='base.glb' else 16,export_draco_normal_quantization=6 if name=='base.glb' else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
     for o in objs:mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
     print('Export',name,round(path.stat().st_size/1e6,2),'MB',flush=True);return path.stat().st_size
 sizes={};sizes['base.glb']=export('base.glb',base)

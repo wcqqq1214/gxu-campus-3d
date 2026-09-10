@@ -80,25 +80,31 @@ test('粗 DEM 与替换三角形不会填住三处桥洞', () => {
   const [x0, y0, x1, y1] = terrain.bounds;
   for (const b of data.bridges) {
     const bearing = (b.frontBearing * Math.PI) / 180;
-    for (const side of [-1, 1]) {
-      // Sample the two traffic lanes, avoiding the estimated median pier.
-      const p = [
-        b.center[0] + Math.cos(bearing) * side * 2.5,
-        b.center[1] - Math.sin(bearing) * side * 2.5,
-      ];
-      const i = Math.floor(((p[0] - x0) / (x1 - x0)) * (terrain.cols - 1));
-      const j = Math.floor(((p[1] - y0) / (y1 - y0)) * (terrain.rows - 1));
-      assert.ok(data.terrainCells.includes(j * (terrain.cols - 1) + i), b.name);
-      for (const patch of data.terrainPatch)
-        for (let k = 0; k < patch.triangles.length; k += 3)
-          assert.ok(
-            !inTriangle(
-              p,
-              ...patch.triangles.slice(k, k + 3).map((n) => patch.vertices[n]),
-            ),
-            `${b.name}: filled terrain void`,
-          );
-    }
+    for (const side of [-1, 1])
+      for (const offset of [2.5, 7.4]) {
+        // Both traffic lanes AND the raised pedestrian paths need terrain cuts.
+        const p = [
+          b.center[0] + Math.cos(bearing) * side * offset,
+          b.center[1] - Math.sin(bearing) * side * offset,
+        ];
+        const i = Math.floor(((p[0] - x0) / (x1 - x0)) * (terrain.cols - 1));
+        const j = Math.floor(((p[1] - y0) / (y1 - y0)) * (terrain.rows - 1));
+        assert.ok(
+          data.terrainCells.includes(j * (terrain.cols - 1) + i),
+          b.name,
+        );
+        for (const patch of data.terrainPatch)
+          for (let k = 0; k < patch.triangles.length; k += 3)
+            assert.ok(
+              !inTriangle(
+                p,
+                ...patch.triangles
+                  .slice(k, k + 3)
+                  .map((n) => patch.vertices[n]),
+              ),
+              `${b.name}: filled terrain void`,
+            );
+      }
   }
 });
 
