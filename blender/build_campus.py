@@ -34,6 +34,8 @@ for name,color,rough,metal in [('libraryStone','#c6b9a7',.8,0),('libraryTrim','#
     C[name]=material(name,rgb(color),rough,metal)
 for name,color,rough,metal in [('timeSilver','#e1e5e6',.19,.96),('timeLetter','#c6b582',.6,.5),('timeLight','#bcd8e6',.25,.2)]:
     C[name]=material(name,rgb(color),rough,metal)
+for name,color,rough,metal in [('tenWall','#e1c7b3',.88,0),('tenTrim','#e8e7de',.8,0),('tenGlass','#527d88',.24,.28)]:
+    C[name]=material(name,rgb(color),rough,metal)
 # Original deterministic JPEG textures; packed into both .blend and exported GLBs.
 texture_dir=ROOT/'blender/textures';texture_dir.mkdir(exist_ok=True)
 for name in ['stone','grass','green','road','path','paleRoof','slate','sport','pitch','asphalt']:
