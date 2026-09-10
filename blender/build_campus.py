@@ -23,6 +23,7 @@ terrain=json.loads((DATA/'terrain.json').read_text());buildings=json.loads((DATA
 fields=json.loads((DATA/'sports.json').read_text())
 infrastructure=json.loads((DATA/'infrastructure.json').read_text())
 surroundings=json.loads((DATA/'surroundings.json').read_text())
+basketball=json.loads((DATA/'basketball.json').read_text())
 bridge_by_id={b['id']:b for b in infrastructure['bridges']}
 lake_by_id={b['id']:b for b in infrastructure['lakeBridges']}
 for name,color,rough,metal in [('asphalt','#626664',.97,0),('pavingRed','#b97865',.93,0),('tactile','#d6b663',.95,0),('curb','#c7c9bd',.86,0),('roadWhite','#f0ecda',.92,0),('roadYellow','#e5c266',.92,0),('wallStone','#d6c8aa',.9,0),('fenceIron','#343e3d',.63,.4),('lampMetal','#929f9e',.48,.5),('lampGlass','#e7e8cf',.25,.15),('bridgeConcrete','#afb2a6',.91,0),('bridgeEdge','#c7c9bd',.86,0),('bridgeJoint','#525b59',.95,0),('bridgePlaque','#665d4f',.82,0),('drainStone','#bfc0b3',.94,0)]:
@@ -36,6 +37,8 @@ for name,color,rough,metal in [('libraryStone','#c6b9a7',.8,0),('libraryTrim','#
 for name,color,rough,metal in [('timeSilver','#e1e5e6',.19,.96),('timeLetter','#c6b582',.6,.5),('timeLight','#bcd8e6',.25,.2)]:
     C[name]=material(name,rgb(color),rough,metal)
 for name,color,rough,metal in [('tenWall','#e1c7b3',.88,0),('tenTrim','#e8e7de',.8,0),('tenGlass','#527d88',.24,.28)]:
+    C[name]=material(name,rgb(color),rough,metal)
+for name,color,rough,metal in [('courtGreen','#347e69',.92,0),('courtKey','#bd6447',.92,0),('courtApron','#47746a',.95,0),('courtFrame','#246752',.57,.24),('courtMetal','#879593',.47,.55),('courtOrange','#e5762c',.56,.2),('courtGlass','#a7c7c6',.20,.05)]:
     C[name]=material(name,rgb(color),rough,metal)
 # Original deterministic JPEG textures; packed into both .blend and exported GLBs.
 texture_dir=ROOT/'blender/textures';texture_dir.mkdir(exist_ok=True)
@@ -117,7 +120,7 @@ def generic(b,detail):
         a,bb,c,d=b['bounds'];m.roof((a+c)/2,(bb+d)/2,z+h+.5,c-a,d-bb,2.3,C['red'])
     return m
 base={k:Mesh() for k in ['terrain','roads','water','green','sports','context']}
-cut_cells=set(infrastructure['terrainCells'])
+cut_cells=set(infrastructure['terrainCells'])|set(basketball['terrainCells'])
 for j in range(rows-1):
     for i in range(cols-1):
         if j*(cols-1)+i in cut_cells:continue
@@ -125,7 +128,7 @@ for j in range(rows-1):
         for ii,jj in [(i,j),(i+1,j),(i+1,j+1),(i,j+1)]:
             x=xmin+(xmax-xmin)*ii/(cols-1);y=ymin+(ymax-ymin)*jj/(rows-1);pts.append((x,y,hh[jj*cols+ii]))
         base['terrain'].face(pts,C['grass'])
-for patch in infrastructure['terrainPatch']:
+for patch in infrastructure['terrainPatch']+basketball['terrainPatch']:
     for i in range(0,len(patch['triangles']),3):base['terrain'].face([patch['vertices'][k] for k in patch['triangles'][i:i+3]],C['grass'])
 for si,original in enumerate(surfaces):
     s=original
@@ -133,9 +136,9 @@ for si,original in enumerate(surfaces):
     if str(si) in infrastructure['surfaceOverrides']:s={**s,**infrastructure['surfaceOverrides'][str(si)]}
     if str(si) in surroundings['surfaceOverrides']:s={**s,**surroundings['surfaceOverrides'][str(si)]}
     if not s['vertices']:continue
-    if s['id'] in [field['osmId'] for field in fields]:continue
+    if s['id'] in [field['osmId'] for field in fields] or s['id'] in [court['osmId'] for court in basketball['courts']]:continue
     kind=s['kind'];verts=s['vertices'];tri=s['triangles'];mat=C['water'] if kind=='water' else C['sport'] if kind=='sports' else C['green'] if kind=='green' else C['path'] if s['tags'].get('highway') in ('path','footway','steps','pedestrian') else C['road']
-    if kind=='sports' and s['tags'].get('sport') in ('soccer','basketball','tennis'):mat=C['pitch']
+    if kind=='sports' and s['tags'].get('sport') in ('soccer','tennis'):mat=C['pitch']
     layer='sports' if kind=='sports' else kind
     if layer not in base:continue
     zwater=s.get('waterLevel',sum(elevation(x,y) for x,y in verts)/len(verts)+.12)
@@ -147,7 +150,7 @@ for si,original in enumerate(surfaces):
         else:base[layer].face([(p[0],p[1],zwater if kind=='water' else elevation(*p)+(.40 if kind=='roads' else .26)) for p in points],mat)
     for i in range(0,len(tri),3):
         drape([verts[k] for k in tri[i:i+3]])
-    if kind=='sports' and s['tags'].get('sport') in ('soccer','basketball','tennis'):
+    if kind=='sports' and s['tags'].get('sport') in ('soccer','tennis'):
         vx=[v[0] for v in verts];vy=[v[1] for v in verts];x0,x1=min(vx)+1,max(vx)-1;y0,y1=min(vy)+1,max(vy)-1
         if x1-x0>8 and y1-y0>12:
             for a,b in [((x0,y0),(x1,y0)),((x1,y0),(x1,y1)),((x1,y1),(x0,y1)),((x0,y1),(x0,y0)),((x0,(y0+y1)/2),(x1,(y0+y1)/2))]:base[layer].line((*a,elevation(*a)+.2),(*b,elevation(*b)+.2),.10,C['white'],4)
@@ -170,6 +173,13 @@ for field in fields:
     # Separate nodes bound Draco quantization to ~180 meters instead of the
     # campus-wide sports extent; paint stays distinct at 16 bits without bloat.
     base['sports-'+field['id']]=mesh
+from basketball import bank_model,court_model,bank_paving
+for bank in basketball['banks']:
+    base[bank['id']]=bank_model(bank,basketball['courts'],C)
+    if not BASE_ONLY:
+        bank_paving(bank,C).object(bank['id']+'-paving',GROUND,{'layer':'sports','basketballBank':bank['id']})
+if not BASE_ONLY:
+    for court in basketball['courts']:court_model(court,C).object(court['id'],GROUND,{'layer':'sports','featureId':court['osmId'],'precision':court['precision'],'basketballCourt':court['id']})
 # Whole buildings belong to one 360 m cell, including their courtyard rings.
 # Base nodes use the same key, so each near chunk replaces exactly its own low LOD.
 CHUNK_METERS=360
@@ -217,7 +227,7 @@ for i,(x,y,h,t) in enumerate([] if BASE_ONLY else trees):
     o=bpy.data.objects.new(f'树木示意-{i:04}',templates[t].data);PLANTS.objects.link(o);o.location=(x,y,elevation(x,y));o.scale=(h/9,h/9,h/9);o.rotation_euler.z=i*2.399
 for t in templates:t.hide_render=True;t.hide_set(True)
 for k,m in base.items():
-    if not BASE_ONLY and not k.startswith(('landmark','sports-')) and k not in near and k not in infra_near and k not in ('context','sports'):m.object(k,GROUND,{'layer':'roads' if k.startswith('infra-') else k})
+    if not BASE_ONLY and not k.startswith(('landmark','sports-','basketball-')) and k not in near and k not in infra_near and k not in ('context','sports'):m.object(k,GROUND,{'layer':'roads' if k.startswith('infra-') else k})
 # A neutral studio sky and solar lighting for editable source preview.
 world=bpy.data.worlds.new('南宁晴空');world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.58,.73,.88,1);world.node_tree.nodes['Background'].inputs[1].default_value=.7;bpy.context.scene.world=world
 light=bpy.data.lights.new('下午日光','SUN');light.energy=2.5;light.angle=.08;sun=bpy.data.objects.new('下午日光',light);GROUND.objects.link(sun);sun.rotation_euler=(.4,-.6,-.6)
@@ -231,7 +241,7 @@ def export(name,groups):
     bpy.ops.object.select_all(action='DESELECT');objs=[]
     for key,mesh in groups.items():
         if not mesh.v:continue
-        layer='roads' if key.startswith('infra-') or key.removeprefix('landmark-') in bridge_by_id else 'buildings' if key in near or key.startswith('landmark') else 'sports' if key.startswith('sports-') else key
+        layer='roads' if key.startswith('infra-') or key.removeprefix('landmark-') in bridge_by_id else 'buildings' if key in near or key.startswith('landmark') else 'sports' if key.startswith(('sports-','basketball-')) else key
         o=mesh.object(key,EXPORT,{'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else '', 'sportsId':key[7:] if key.startswith('sports-') else ''});o.select_set(True);objs.append(o)
     path=MODELS/name
     bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=15 if name=='base.glb' else 16,export_draco_normal_quantization=6 if name=='base.glb' else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
