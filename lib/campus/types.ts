@@ -27,6 +27,7 @@ export type Category =
   | 'living'
   | 'culture'
   | 'service'
+  | 'infrastructure'
   | 'landmark';
 export interface Building {
   architecture?: { origin: [number, number]; angle: number };
@@ -49,7 +50,11 @@ export interface Building {
   zone: string;
 }
 export interface Landmark {
-  placeKind?: 'sports' | 'gate';
+  placeKind?: 'sports' | 'gate' | 'bridge';
+  pickPolygon?: number[][];
+  portalCenter?: [number, number];
+  approachPath?: number[][];
+  additionalReferences?: string[];
   id: string;
   osmId?: string;
   name: string;
@@ -69,6 +74,9 @@ export interface Landmark {
   osmEditedAt?: string;
 }
 export interface Overview {
+  infrastructureSnapshotAt?: string;
+  publicRoadMeters?: number;
+  bridges?: number;
   snapshotAt: string;
   buildings: number;
   campusBuildings: number;
@@ -126,5 +134,6 @@ export const CATEGORY_NAMES: Record<Category, string> = {
   living: '校园生活',
   culture: '文化体育',
   service: '校园服务',
+  infrastructure: '道路桥梁',
   landmark: '校园地标',
 };

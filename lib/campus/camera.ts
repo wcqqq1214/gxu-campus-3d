@@ -16,7 +16,11 @@ export function landmarkDirection(
   const reverse = view === 'back' || view === 'rear-entrance' ? -1 : 1;
   return new Vector3(
     Math.sin(bearing) * reverse,
-    view === 'entrance' || view === 'rear-entrance' ? 0.48 : 0.32,
+    view === 'entrance' || view === 'rear-entrance'
+      ? place.placeKind === 'bridge'
+        ? 0.09
+        : 0.48
+      : 0.32,
     -Math.cos(bearing) * reverse,
   ).normalize();
 }
@@ -63,6 +67,50 @@ export function landmarkBox(place: Landmark) {
   );
 }
 
+/** Follow the curved ramp so a narrow viewport cannot put the eye behind its wall. */
+export function bridgeEntrancePose(
+  place: Landmark,
+  pose: { target: Vector3; position: Vector3 },
+) {
+  if (place.placeKind !== 'bridge' || !place.approachPath) return pose;
+  const intended = pose.position.clone();
+  if (intended.distanceTo(pose.target) < 30)
+    intended
+      .copy(pose.target)
+      .addScaledVector(pose.position.clone().sub(pose.target).normalize(), 30);
+  let nearest = Infinity;
+  const position = intended.clone();
+  const path = place.approachPath;
+  for (let i = 1; i < path.length; i++) {
+    const a = path[i - 1],
+      b = path[i];
+    const dx = b[0] - a[0],
+      dy = b[1] - a[1];
+    const lengthSq = dx * dx + dy * dy;
+    if (!lengthSq) continue;
+    const t = Math.max(
+      0,
+      Math.min(
+        1,
+        ((intended.x - a[0]) * dx + (-intended.z - a[1]) * dy) / lengthSq,
+      ),
+    );
+    const x = a[0] + dx * t,
+      y = a[1] + dy * t;
+    const distance = Math.hypot(intended.x - x, intended.z + y);
+    if (distance >= nearest) continue;
+    nearest = distance;
+    position.set(x, Math.max(intended.y, a[2] + (b[2] - a[2]) * t + 2.2), -y);
+  }
+  // Keep the pose within OrbitControls' 85.5 degree polar limit.
+  position.y = Math.max(
+    position.y,
+    pose.target.y +
+      0.08 * Math.hypot(position.x - pose.target.x, position.z - pose.target.z),
+  );
+  return { target: pose.target, position };
+}
+
 /** Entrance crops use the modeled front axis; the full-building views retain the entire box. */
 export function entranceBox(
   place: Landmark,
@@ -70,6 +118,19 @@ export function entranceBox(
   rear: boolean,
   architecture?: Building['architecture'],
 ) {
+  if (place.placeKind === 'bridge' && place.portalCenter) {
+    const forward = landmarkDirection(place, 'front').setY(0).normalize();
+    // Crop the opening rather than an 18 m cube. A deep cube pushes a portrait
+    // camera beyond the curved ramp, where the retaining wall obscures the view.
+    return new Box3().setFromCenterAndSize(
+      new Vector3(place.center[0], place.elevation + 2.7, -place.center[1]),
+      new Vector3(
+        Math.abs(forward.z) * 8 + Math.abs(forward.x) * 2,
+        5,
+        Math.abs(forward.x) * 8 + Math.abs(forward.z) * 2,
+      ),
+    );
+  }
   const forward = landmarkDirection(
     place,
     rear ? 'back' : 'front',

@@ -11,6 +11,9 @@ export const LANDMARK_ALIASES: Record<string, string[]> = {
   'new-east-gate': ['新东园门', '新东园入口', '秀灵西一里'],
   'east-gate': ['秀灵路东门'],
   'west-gate': ['鲁班路西门'],
+  'chongzuo-bridge': ['崇左', '农院路', '桥下通道'],
+  'bocui-bridge': ['博萃', '博翠桥', '农院路'],
+  'huixian-bridge': ['荟贤', '汇贤桥', '农院路'],
 };
 
 /** All navigation surfaces share the curated catalogue, never the footprint index. */
@@ -45,20 +48,27 @@ export function navigationFootprints(
   landmarks: Landmark[],
 ) {
   return [
-    ...navigableBuildings(buildings, landmarks),
+    ...navigableBuildings(buildings, landmarks).map((b) => ({
+      ...b,
+      layer: 'buildings' as const,
+    })),
     ...landmarks
-      .filter((l) => l.placeKind === 'gate')
+      .filter((l) => l.placeKind === 'gate' || l.placeKind === 'bridge')
       .map((l) => {
         const [x0, y0, x1, y1] = l.bounds;
         return {
           id: l.id,
           landmark: l.id,
           insideCampus: true,
+          layer:
+            l.placeKind === 'bridge'
+              ? ('roads' as const)
+              : ('buildings' as const),
           height: l.height,
           elevation: l.elevation,
           polygons: [
             [
-              [
+              l.pickPolygon ?? [
                 [x0, y0],
                 [x1, y0],
                 [x1, y1],
