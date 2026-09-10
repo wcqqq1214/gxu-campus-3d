@@ -31,7 +31,69 @@
       "minimumBeamClearanceMeters": 4.5
     }
   ],
+  "sourcePedestrian": [
+    {
+      "id": "chongzuo-bridge",
+      "floorAndHeadroomSamples": 1548,
+      "clearWalkingSegments": 1032,
+      "minimumPedestrianHeadroomMeters": 2.45
+    },
+    {
+      "id": "bocui-bridge",
+      "floorAndHeadroomSamples": 1548,
+      "clearWalkingSegments": 1032,
+      "minimumPedestrianHeadroomMeters": 2.45
+    },
+    {
+      "id": "huixian-bridge",
+      "floorAndHeadroomSamples": 1116,
+      "clearWalkingSegments": 744,
+      "minimumPedestrianHeadroomMeters": 2.45
+    }
+  ],
+  "sourceDeckSurface": [
+    {
+      "id": "chongzuo-bridge",
+      "samples": 810,
+      "maximumRoadProtrusionMeters": 0.035
+    },
+    {
+      "id": "bocui-bridge",
+      "samples": 687,
+      "maximumRoadProtrusionMeters": 0.035
+    },
+    {
+      "id": "huixian-bridge",
+      "samples": 858,
+      "maximumRoadProtrusionMeters": 0.045
+    }
+  ],
+  "railingBridgeIntersections": {
+    "chongzuo-bridge": 0,
+    "bocui-bridge": 0,
+    "huixian-bridge": 0
+  },
   "sourceRoadPaintFaces": 1512,
+  "basePedestrian": [
+    {
+      "id": "chongzuo-bridge",
+      "floorAndHeadroomSamples": 1548,
+      "clearWalkingSegments": 1032,
+      "minimumPedestrianHeadroomMeters": 2.695
+    },
+    {
+      "id": "bocui-bridge",
+      "floorAndHeadroomSamples": 1548,
+      "clearWalkingSegments": 1032,
+      "minimumPedestrianHeadroomMeters": 2.695
+    },
+    {
+      "id": "huixian-bridge",
+      "floorAndHeadroomSamples": 1116,
+      "clearWalkingSegments": 744,
+      "minimumPedestrianHeadroomMeters": 2.695
+    }
+  ],
   "dracoDecoded": [
     {
       "id": "chongzuo-bridge",
@@ -62,6 +124,43 @@
       ],
       "beamSamples": 202,
       "minimumBeamClearanceMeters": 4.5
+    }
+  ],
+  "dracoPedestrian": [
+    {
+      "id": "chongzuo-bridge",
+      "floorAndHeadroomSamples": 1548,
+      "clearWalkingSegments": 1032,
+      "minimumPedestrianHeadroomMeters": 2.45
+    },
+    {
+      "id": "bocui-bridge",
+      "floorAndHeadroomSamples": 1548,
+      "clearWalkingSegments": 1032,
+      "minimumPedestrianHeadroomMeters": 2.45
+    },
+    {
+      "id": "huixian-bridge",
+      "floorAndHeadroomSamples": 1116,
+      "clearWalkingSegments": 744,
+      "minimumPedestrianHeadroomMeters": 2.45
+    }
+  ],
+  "dracoDeckSurface": [
+    {
+      "id": "chongzuo-bridge",
+      "samples": 810,
+      "maximumRoadProtrusionMeters": 0.034
+    },
+    {
+      "id": "bocui-bridge",
+      "samples": 687,
+      "maximumRoadProtrusionMeters": 0.034
+    },
+    {
+      "id": "huixian-bridge",
+      "samples": 858,
+      "maximumRoadProtrusionMeters": 0.031
     }
   ],
   "result": "passed"

@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 import mapbox_earcut as earcut
 from shapely.geometry import Point,LineString,Polygon,box,mapping,shape
+from shapely.geometry.polygon import orient
 from shapely.ops import transform,unary_union,linemerge,substring
 from prepare_geodata import ROOT,OUT,geom,project,inverse,polygons
 
@@ -66,7 +67,10 @@ def prepare_infrastructure():
         slab=.85;beam_depth=.245;clearance=4.5;floor=deck-slab-beam_depth-clearance
         under=lower.intersection(upper.buffer(carriage/2+sidewalk+1,cap_style=2))
         covered=under.length/2+1.5
-        path=[]
+        path=[];pedestrian_path=[]
+        pedestrian_clearance=2.45
+        pedestrian_floor=deck-slab-beam_depth-pedestrian_clearance
+        pedestrian_inner=6.3;pedestrian_width=2.2;cut_half_width=8.65
         for x,y in samples(approach,2):
             signed=lower.project(Point(x,y))-distance;s=abs(signed)
             # Short approaches must meet the mapped T junction at ground level.
@@ -74,24 +78,54 @@ def prepare_infrastructure():
             weight=min(1,max(0,(s-covered)/max(1,available-covered)))
             weight=weight*weight*(3-2*weight)
             natural=elevation(x,y)+.40
-            path.append([x,y,round(floor*(1-weight)+natural*weight,3),round(natural,3)])
+            vehicle_height=floor*(1-weight)+natural*weight
+            path.append([x,y,round(vehicle_height,3),round(natural,3)])
+            # Raised side walks have their own vertical alignment. The old rail
+            # followed the untouched DEM and consequently cut through the deck.
+            # Extend the flat section for the full side-walk width on skew crossings.
+            walk_covered=covered+cut_half_width
+            walk_weight=min(1,max(0,(s-walk_covered)/max(1,available-walk_covered)))
+            walk_weight=walk_weight*walk_weight*(3-2*walk_weight)
+            walk_height=max(vehicle_height+.15,pedestrian_floor*(1-walk_weight)+(natural+.15)*walk_weight)
+            pedestrian_path.append([x,y,round(walk_height,3)])
         # Portal ends follow the actual crossing angle, rather than assumed E-W axes.
         p0=lower.interpolate(max(0,distance-.5));p1=lower.interpolate(min(lower.length,distance+.5))
         direction=np.array([p1.x-p0.x,p1.y-p0.y]);direction/=np.linalg.norm(direction)
         if direction[0]>0:direction=-direction
         bearing=math.degrees(math.atan2(direction[0],direction[1]))%360
         pick=upper.buffer(carriage/2+sidewalk+.4,cap_style=2)
+        # A skew crossing can put one full-width rectangular abutment across a
+        # side walk (Huixian). Reserve the complete pedestrian opening first.
+        ends=list(upper.coords);cx=(ends[0][0]+ends[-1][0])/2;cy=(ends[0][1]+ends[-1][1])/2
+        ux=(ends[-1][0]-ends[0][0])/upper.length;uy=(ends[-1][1]-ends[0][1])/upper.length
+        def bridge_local(x,y,z=None):return ((x-cx)*ux+(y-cy)*uy,-(x-cx)*uy+(y-cy)*ux)
+        opening=transform(bridge_local,approach.buffer(cut_half_width+.2,cap_style=2,join_style=2))
+        abutments=[]
+        for side in [-1,1]:
+            x=side*(upper.length/2-.55)
+            for p in polygons(box(x-.45,-7,x+.45,7).difference(opening)):
+                p=orient(p,sign=1)
+                rings=[list(map(list,p.exterior.coords))]+[list(map(list,r.coords)) for r in p.interiors]
+                abutments.append({'rings':rings,'triangles':triangulate(p)['triangles']})
         item={'id':ident,'name':name,**provenance(byid[upperid]),'center':[crossing.x,crossing.y],
               'upper':list(map(list,upper.coords)),'underpass':path,'underpassWidth':10.0,
               'deckWidth':carriage+sidewalk*2,'deckElevation':deck,'slabThickness':slab,'beamDepth':beam_depth,'clearance':clearance,
               'floorElevation':floor,'lowerRoadIds':[f'way/{i}' for i in lowerids],
+              'abutments':abutments,
+              'pedestrian':{'path':pedestrian_path,'innerOffset':pedestrian_inner,'width':pedestrian_width,
+                  'clearance':pedestrian_clearance,'cutHalfWidth':cut_half_width,
+                  'basis':('崇左桥两侧抬高步道依据用户现场指正，2023 年校方坡道照片辅助核对内侧护栏与挡墙。' if ident=='chongzuo-bridge' else '两侧步道采用通用连通构造估算，尚无近期完整桥洞照片核实。')+'步道宽度、高程、坡度与净空为视觉估算。'},
               'lowerSources':[provenance(byid[i]) for i in lowerids],
               'frontBearing':bearing,'bounds':list(pick.bounds),'pickPolygon':list(map(list,pick.exterior.coords)),
               'portalCenter':[crossing.x+direction[0]*covered,crossing.y+direction[1]*covered],
               'reference':reference,'topologyBasis':'OSM bridge=yes、layer=1 标记农院路上跨；校内道路下穿。',
               'nameBasis':'桥名由校方资料与相交校道位置匹配；农院路 OSM 桥段未直接标注 bridge:name。',
               'dimensionBasis':'车道宽、桥面宽、净高、坡度、桥墩数量及跨径分配为视觉估算，非工程测量。'}
-        bridges.append(item);cuts.append(approach.buffer(6.3,cap_style=2,join_style=2))
+        bridges.append(item)
+        # Remove ground below the full deck as well as the lower passage. Coarse
+        # DEM / Draco rounding can otherwise expose grass through the bridge road.
+        deck_cut=upper.buffer(carriage/2+sidewalk-.1,cap_style=2,join_style=2)
+        cuts.append(unary_union([approach.buffer(cut_half_width,cap_style=2,join_style=2),deck_cut]))
     # Smooth the public road into each estimated deck, independently of the lower road.
     bridge_ranges=[(road.project(Point(b['center'])),LineString(b['upper']).length/2,b['deckElevation']) for b in bridges]
     # Round unsurveyed sharp polyline corners within the estimated road width.
@@ -217,7 +251,7 @@ def prepare_infrastructure():
             'approachPath':[p[:3] for p in b['underpass']],
             'distance':90,'zone':'roads','cameraOffset':[-1,.75,1],
             'description':f"{b['name']}连接农院路两侧校园。农院路是公共道路，校内通道从桥下穿行，两者在这里分层交叉。",
-            'detail':recent+' 净高、路幅、跨径分配、桥墩及未见于照片的构件为视觉估算。',
+            'detail':recent+' '+b['pedestrian']['basis']+' 净高、路幅、跨径分配、桥墩及未见于照片的构件为视觉估算。',
             'sourceRefs':['infrastructureOsm',b['reference'],'bridgeMaintenance2024']+(['chongzuoReport2013','chongzuoHistoric2013','chongzuoRoute2025'] if b['id']=='chongzuo-bridge' else ['bocuiNotice2023'] if b['id']=='bocui-bridge' else ['bridgeNamingGuide']),
             'additionalReferences':['bridgeMaintenance2024']+(['chongzuoReport2013','chongzuoHistoric2013','chongzuoRoute2025'] if b['id']=='chongzuo-bridge' else ['bocuiNotice2023'] if b['id']=='bocui-bridge' else ['bridgeNamingGuide'])})
         geo['features'].append({'type':'Feature','id':b['id'],'properties':{'kind':'bridge-poi','name':b['name'],'landmark':b['id'],'osmId':b['osmId'],'sourceUrl':b['sourceUrl']},'geometry':mapping(Point(inverse(*b['center'])))})
