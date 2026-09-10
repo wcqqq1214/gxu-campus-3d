@@ -3,6 +3,7 @@ export type LayerKey =
   | 'buildings'
   | 'vegetation'
   | 'roads'
+  | 'boundary'
   | 'water'
   | 'sports'
   | 'context'
@@ -124,6 +125,7 @@ export const DEFAULT_LAYERS: Record<LayerKey, boolean> = {
   buildings: true,
   vegetation: true,
   roads: true,
+  boundary: true,
   water: true,
   sports: true,
   context: true,

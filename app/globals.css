@@ -1673,3 +1673,17 @@ a svg {
 .map-footer {
   font-size: 12px;
 }
+
+.map-footer { gap: 10px; }
+.boundary-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #805015;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.boundary-legend i {
+  width: 22px;
+  border-top: 2px dashed #ca852c;
+}
