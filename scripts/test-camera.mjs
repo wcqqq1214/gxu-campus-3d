@@ -115,3 +115,26 @@ test('竖屏桥下镜头沿实际弯曲坡道定位，避免停在挡墙外', as
     assert.ok(distance < 0.01, `${l.name}: camera is outside the ramp`);
   }
 });
+
+test('雕塑近景保留银色主体的脚部、三足和顶部突起', async () => {
+  const l = landmarks.find((p) => p.id === 'time-gate');
+  const bytes = await readFile(
+    new URL('../public/models/time-gate.glb', import.meta.url),
+  );
+  const gltf = JSON.parse(
+    bytes.toString('utf8', 20, 20 + bytes.readUInt32LE(12)),
+  );
+  const box = entranceBox(l, landmarkBox(l), false);
+  for (const primitive of gltf.meshes.flatMap((m) => m.primitives)) {
+    if (gltf.materials[primitive.material].name !== 'timeSilver') continue;
+    const bounds = gltf.accessors[primitive.attributes.POSITION];
+    assert.ok(
+      box.containsPoint(new Vector3(...bounds.min)),
+      '脚部不应被近景裁切',
+    );
+    assert.ok(
+      box.containsPoint(new Vector3(...bounds.max)),
+      '顶部不应被近景裁切',
+    );
+  }
+});

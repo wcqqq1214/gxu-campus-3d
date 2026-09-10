@@ -557,6 +557,12 @@ export function createScene(
             m.roughness = 0.3;
             m.metalness = 0.28;
           }
+          if (m.name === 'timeSilver') m.envMapIntensity = 1.5;
+          if (m.name === 'timeLight' || m.name === 'timeSilver') {
+            m.emissive.set('#83b6e2');
+            m.emissiveIntensity =
+              preset === 'night' ? (m.name === 'timeLight' ? 1.8 : 0.16) : 0;
+          }
           if (/glass$/i.test(m.name)) {
             m.emissive.set('#edbd71');
             m.emissiveIntensity = preset === 'night' ? 0.42 : 0;
@@ -1065,10 +1071,15 @@ export function createScene(
         for (const m of Array.isArray(o.material) ? o.material : [o.material])
           if (
             m instanceof THREE.MeshStandardMaterial &&
-            /glass$/i.test(m.name)
+            (/glass$/i.test(m.name) ||
+              m.name === 'timeLight' ||
+              m.name === 'timeSilver')
           ) {
-            m.emissive.set('#edbd71');
-            m.emissiveIntensity = p === 'night' ? 0.42 : 0;
+            const silver = m.name === 'timeSilver';
+            const sculpture = silver || m.name === 'timeLight';
+            m.emissive.set(sculpture ? '#83b6e2' : '#edbd71');
+            m.emissiveIntensity =
+              p === 'night' ? (sculpture ? (silver ? 0.16 : 1.8) : 0.42) : 0;
           }
       }
     });
