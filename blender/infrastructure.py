@@ -104,29 +104,56 @@ def road_chunk(chunk,C,detail):
     return m
 
 def approaches(b,C):
-    m=Mesh();path=b['underpass'];axes=frames(path)
-    ribbon(m,path,-5,5,C['asphalt'])
+    m=Mesh();road=Mesh();walks=Mesh();walls=Mesh()
+    path=b['underpass'];axes=frames(path);walk=b['pedestrian'];walkpath=walk['path']
+    inner=walk['innerOffset'];outer=inner+walk['width']
+    ba,bc=b['upper'];dx=bc[0]-ba[0];dy=bc[1]-ba[1];length=math.hypot(dx,dy)
+    def covered_segment(a,c,side,local_axes):
+        points=[]
+        for p,(ux,uy) in zip([a,c],local_axes):
+            x=p[0]-uy*side*walk['cutHalfWidth']-ba[0]
+            y=p[1]+ux*side*walk['cutHalfWidth']-ba[1]
+            points.append(((x*dx+y*dy)/length,(-x*dy+y*dx)/length))
+        return min(q[0] for q in points)<length+.5 and max(q[0] for q in points)>-.5 and min(q[1] for q in points)<b['deckWidth']/2+.5 and max(q[1] for q in points)>-b['deckWidth']/2-.5
+    ribbon(road,path,-5,5,C['asphalt'],axes=axes)
     for side in [-1,1]:
-        ribbon(m,path,side*5,side*6.35,C['curb'],.15)
+        ribbon(road,path,side*5,side*inner,C['curb'],.15,axes)
+        ribbon(walks,walkpath,side*inner,side*outer,C['path'],axes=axes)
         for i,(a,c) in enumerate(zip(path,path[1:])):
             ux,uy=axes[i];vx,vy=axes[i+1]
-            # Retaining walls connect the depressed pavement to untouched terrain.
-            off=side*6.3
-            wall=[(a[0]-uy*off,a[1]+ux*off,a[2]-.1),(c[0]-vy*off,c[1]+vx*off,c[2]-.1),
-                  (c[0]-vy*off,c[1]+vx*off,c[3]+.25),(a[0]-uy*off,a[1]+ux*off,a[3]+.25)]
-            m.face(wall if side>0 else wall[::-1],C['bridgeConcrete'])
+            wa,wc=walkpath[i:i+2]
+            covered=covered_segment(a,c,side,axes[i:i+2])
+            # Terminate the outer wall inside the edge beam so their junction
+            # closes, while staying below the public-road wearing surface.
+            ceiling=b['deckElevation']-.2
+            wall_top=tuple(min(p[3]+.25,ceiling) if covered else p[3]+.25 for p in [a,c])
+            # Inner wall supports the raised walk; outer wall meets the terrain.
+            # Neither the walk nor its railing inherits the uncut DEM elevation.
+            for offset,lower,upper in [(inner,(a[2]-.1,c[2]-.1),(wa[2],wc[2])),
+                                       (outer,(wa[2]-.15,wc[2]-.15),wall_top)]:
+                off=side*offset
+                wall=[(a[0]-uy*off,a[1]+ux*off,lower[0]),(c[0]-vy*off,c[1]+vx*off,lower[1]),
+                      (c[0]-vy*off,c[1]+vx*off,upper[1]),(a[0]-uy*off,a[1]+ux*off,upper[0])]
+                walls.face(wall if side>0 else wall[::-1],C['bridgeConcrete'])
+            edge_box(walls,wa,wc,side*inner,.24,.10,C['curb'],axes=axes[i:i+2])
+            # The outer cap also covers the small construction joint to the cut.
             top=[a[0],a[1],a[3]];top2=[c[0],c[1],c[3]]
-            edge_box(m,top,top2,off,.3,.24,C['curb'],axes=axes[i:i+2])
-            edge_box(m,a,c,side*5.0,.22,.18,C['curb'],axes=axes[i:i+2])
-    for i in range(0,len(path)-1,4):ribbon(m,path[i:i+2],-.07,.07,C['roadYellow'],.035)
+            # An untrimmed terrain-height cap would cut across the public road.
+            if not covered:edge_box(walls,top,top2,side*walk['cutHalfWidth'],.3,.25,C['curb'],axes=axes[i:i+2])
+            edge_box(road,a,c,side*5,.22,.18,C['curb'],axes=axes[i:i+2])
+    for i in range(0,len(path)-1,4):ribbon(road,path[i:i+2],-.07,.07,C['roadYellow'],.035,axes[i:i+2])
+    m.add_part('下穿车行道与排水边带',road)
+    m.add_part('两侧抬高人行步道',walks)
+    m.add_part('步道支挡与外侧挡墙',walls)
     return m
 
 def bridge(b,C,detail):
     m=Mesh();a,c=b['upper'];dx=c[0]-a[0];dy=c[1]-a[1];length=math.hypot(dx,dy);angle=math.atan2(dy,dx)
     cx=(a[0]+c[0])/2;cy=(a[1]+c[1])/2;z=b['deckElevation'];width=b['deckWidth'];floor=b['floorElevation'];slab=b['slabThickness']
     deck=Mesh();deck.box(0,0,z-(slab+.04)/2,length,width,slab-.04,C['bridgeConcrete'])
+    for abutment in b['abutments']:
+        deck.extrude([abutment['rings']],[abutment['triangles']],floor,z-floor,C['bridgeConcrete'])
     for side in [-1,1]:
-        deck.box(side*(length/2-.55),0,(z+floor)/2,.9,width,z-floor,C['bridgeConcrete'])
         deck.box(0,side*(width/2-.2),z-.35,length+.3,.55,.6,C['bridgeEdge'])
         # Vehicle parapets / railings above the public road.
         deck.box(0,side*(width/2-.16),z+.28,length,.3,.5,C['curb'])
@@ -154,8 +181,8 @@ def bridge(b,C,detail):
             reach=math.dist(b['portalCenter'],b['center'])
             for sign in [-1,1]:
                 fx,fy=ux*sign,uy*sign
-                px=b['center'][0]+fx*(reach+.18)-fy*5.85
-                py=b['center'][1]+fy*(reach+.18)+fx*5.85
+                px=b['center'][0]+fx*(reach+.18)-fy*5.65
+                py=b['center'][1]+fy*(reach+.18)+fx*5.65
                 panel=Mesh();panel.box(0,0,floor+2.3,1.12,.22,3.8,C['bridgePlaque'])
                 for i,char in enumerate('崇左桥'):
                     panel.extend(inscription(char,0,-.13,floor+3.45-i*1.05,.85,.9,C['white'],True))
@@ -163,26 +190,26 @@ def bridge(b,C,detail):
                 panel.v=[(x+px,y+py,h) for x,y,h in panel.v]
                 m.add_part('崇左桥入口题名（历史照片辅助；双面位置估算）',panel)
     if detail:
-        rails=Mesh();drains=Mesh()
+        rails=Mesh();drains=Mesh();walk=b['pedestrian'];walkpath=walk['path']
         for i,(a,c) in enumerate(zip(path,path[1:])):
-            if math.dist(a[:2],b['center'])>55:continue
             ux,uy=axes[i];theta=math.atan2(uy,ux)
             for side in [-1,1]:
-                off=side*6.3;x=a[0]-uy*off;y=a[1]+ux*off;zz=a[3]+.3
-                rails.cylinder(x,y,zz+.58,.045,1.16,C['lampMetal'],6)
-                nxt=(c[0]-uy*off,c[1]+ux*off,c[3]+1.42)
-                rails.line((x,y,zz+1.12),nxt,.04,C['lampMetal'],5)
+                off=side*walk['innerOffset'];vx,vy=axes[i+1]
+                start=(a[0]-uy*off,a[1]+ux*off,walkpath[i][2]+.1)
+                end=(c[0]-vy*off,c[1]+vx*off,walkpath[i+1][2]+.1)
+                def rail_point(t,h):
+                    return tuple(start[k]*(1-t)+end[k]*t+(h if k==2 else 0) for k in range(3))
+                rails.cylinder(*rail_point(0,.58),.045,1.16,C['lampMetal'],6)
+                if i==len(path)-2:rails.cylinder(*rail_point(1,.58),.045,1.16,C['lampMetal'],6)
+                for h in [.12,1.12]:rails.line(rail_point(0,h),rail_point(1,h),.04,C['lampMetal'],5)
                 # Chongzuo's photographed rail has alternating solid round panels
                 # and upright bars. Other unsighted bridge rails stay generic.
-                segment=math.dist(a[:2],c[:2])
+                segment=math.dist(start[:2],end[:2])
                 for t in [.16,.32,.68,.84]:
-                    rails.line((x+ux*segment*t,y+uy*segment*t,zz+.12),
-                               (x+ux*segment*t,y+uy*segment*t,zz+1.08),.019,C['lampMetal'],4)
+                    rails.line(rail_point(t,.12),rail_point(t,1.08),.019,C['lampMetal'],4)
                 if b['id']=='chongzuo-bridge':
-                    radius=.39 if i%2==0 else .19;center=segment*.5
-                    circle=[(x+ux*(center+radius*math.cos(j*math.tau/16)),
-                             y+uy*(center+radius*math.cos(j*math.tau/16)),
-                             zz+.6+radius*math.sin(j*math.tau/16)) for j in range(16)]
+                    radius=.39 if i%2==0 else .19
+                    circle=[rail_point(.5+radius*math.cos(j*math.tau/16)/segment,.6+radius*math.sin(j*math.tau/16)) for j in range(16)]
                     rails.face(circle,C['curb']);rails.face(circle[::-1],C['curb'])
                     for u,v in zip(circle,circle[1:]+circle[:1]):rails.line(u,v,.022,C['lampMetal'],4)
                 # Covered drainage channel and paired drain slots beside the retaining wall.

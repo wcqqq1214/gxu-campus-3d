@@ -20,6 +20,60 @@ def mesh_bvh(objects):
     assert vertices, 'Missing infrastructure mesh'
     return BVHTree.FromPolygons(vertices, faces)
 
+def check_rail_intersections(obj):
+    """Intersect the actual lower railing faces with the bridge structure."""
+    group=next(g for g in obj.vertex_groups if g.name.startswith('坡道'))
+    indices={v.index for v in obj.data.vertices if any(g.group==group.index for g in v.groups)}
+    def part_bvh(railing):
+        faces=[tuple(p.vertices) for p in obj.data.polygons if all((i in indices)==railing for i in p.vertices)]
+        return BVHTree.FromPolygons([obj.matrix_world@v.co for v in obj.data.vertices],faces)
+    collisions=part_bvh(True).overlap(part_bvh(False))
+    assert not collisions, f'{obj.name}: pedestrian railing intersects bridge structure ({len(collisions)} face pairs)'
+    return len(collisions)
+
+def check_walkways(bvh,b,label,tolerance=.06):
+    """Probe real surfaces and a standing person's volume across both full walks."""
+    walk=b['pedestrian'];path=walk['path'];frames=[]
+    for i in range(len(path)):
+        a=path[max(0,i-1)];c=path[min(len(path)-1,i+1)]
+        axis=Vector((c[0]-a[0],c[1]-a[1],0)).normalized();frames.append(axis)
+    samples=0;directions=0;minimum_headroom=math.inf
+    for side in [-1,1]:
+        for offset in [walk['innerOffset']+.35,walk['innerOffset']+walk['width']/2,
+                       walk['innerOffset']+walk['width']-.35]:
+            points=[]
+            for p,axis in zip(path,frames):
+                points.append(Vector((p[0]-axis.y*side*offset,p[1]+axis.x*side*offset,p[2])))
+            for a,c in zip(points,points[1:]):
+                for t in [.2,.5,.8]:
+                    p=a.lerp(c,t)
+                    hit=bvh.ray_cast(p+Vector((0,0,.3)),Vector((0,0,-1)),.8)[0]
+                    assert hit and abs(hit.z-p.z)<tolerance, f'{label} {b["name"]}: pedestrian floor missing at {tuple(p)}'
+                    roof=bvh.ray_cast(p+Vector((0,0,.3)),Vector((0,0,1)),8)[0]
+                    headroom=roof.z-hit.z if roof else math.inf
+                    minimum_headroom=min(minimum_headroom,headroom)
+                    assert headroom >= walk['clearance']-tolerance, f'{label} {b["name"]}: pedestrian headroom {headroom:.3f} at {tuple(p)}'
+                    samples+=1
+                for start,end in [(a,c),(c,a)]:
+                    ray=end-start
+                    hit=bvh.ray_cast(start+Vector((0,0,1.7)),ray.normalized(),ray.length)[0]
+                    assert hit is None, f'{label} {b["name"]}: pedestrian path blocked at {tuple(hit) if hit else None}'
+                    directions+=1
+    return {'id':b['id'],'floorAndHeadroomSamples':samples,'clearWalkingSegments':directions,
+            'minimumPedestrianHeadroomMeters':round(minimum_headroom,3)}
+
+def check_deck_surface(bvh,b,label):
+    a,c=b['upper'];axis=Vector((c[0]-a[0],c[1]-a[1],0));length=axis.length;axis.normalize()
+    normal=Vector((-axis.y,axis.x,0));highest=-math.inf;samples=0
+    for lane in [-2.5,0,2.5]:
+        for i in range(5,math.floor(length/.15)-5):
+            point=Vector((*a,b['deckElevation']))+axis*(i*.15)+normal*lane
+            hit=bvh.ray_cast(point+Vector((0,0,.65)),Vector((0,0,-1)),1)[0]
+            assert hit is not None, f'{label} {b["name"]}: missing public-road deck'
+            protrusion=hit.z-point.z;highest=max(highest,protrusion);samples+=1
+            assert protrusion<.08, f'{label} {b["name"]}: lower geometry protrudes through road by {protrusion:.3f} m at {tuple(point)}'
+    return {'id':b['id'],'samples':samples,'maximumRoadProtrusionMeters':round(highest,3)}
+
 def check_voids(bvh, b, label, tolerance=.05):
     bearing=math.radians(b['frontBearing'])
     direction=Vector((math.sin(bearing),math.cos(bearing),0))
@@ -58,9 +112,13 @@ bpy.context.view_layer.update()
 source_objects=list(bpy.context.scene.objects)
 source_bvh=mesh_bvh(source_objects)
 report={'source': [check_voids(source_bvh,b,'source') for b in data['bridges']]}
+report['sourcePedestrian']=[check_walkways(source_bvh,b,'source') for b in data['bridges']]
+report['sourceDeckSurface']=[check_deck_surface(source_bvh,b,'source') for b in data['bridges']]
+report['railingBridgeIntersections']={}
 for b in data['bridges']:
     obj=next(o for o in source_objects if o.get('landmark')==b['id'])
     assert obj.get('layer')=='roads' and len(obj.vertex_groups)>=3, f'{b["name"]}: editable groups missing'
+    report['railingBridgeIntersections'][b['id']]=check_rail_intersections(obj)
 # Both travel directions must have visible, upward-facing paint.
 paint_faces=0
 for obj in source_objects:
@@ -98,6 +156,8 @@ if '--no-render' not in sys.argv:
 reset()
 bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/models/base.glb'))
 bpy.context.view_layer.update()
+base_bvh=mesh_bvh(bpy.context.scene.objects)
+report['basePedestrian']=[check_walkways(base_bvh,b,'base Draco',.1) for b in data['bridges']]
 def root_name(obj):
     while obj.parent: obj=obj.parent
     return obj.name
@@ -114,6 +174,8 @@ for b in data['bridges']:bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/mod
 bpy.context.view_layer.update()
 decoded=mesh_bvh(bpy.context.scene.objects)
 report['dracoDecoded']=[check_voids(decoded,b,'Draco',.08) for b in data['bridges']]
+report['dracoPedestrian']=[check_walkways(decoded,b,'Draco',.1) for b in data['bridges']]
+report['dracoDeckSurface']=[check_deck_surface(decoded,b,'Draco') for b in data['bridges']]
 report['result']='passed'
 (out/'infrastructure-geometry-check.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(json.dumps(report,ensure_ascii=False),flush=True)
