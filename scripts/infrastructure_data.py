@@ -36,6 +36,58 @@ def triangulate(g):
 def samples(line,step=3):
     return [list(line.interpolate(s).coords[0]) for s in np.linspace(0,line.length,max(2,math.ceil(line.length/step)+1))]
 
+def path_frames(path):
+    result=[]
+    for i in range(len(path)):
+        a=path[max(0,i-1)];b=path[min(len(path)-1,i+1)]
+        dx=b[0]-a[0];dy=b[1]-a[1];length=math.hypot(dx,dy)
+        result.append([dx/length,dy/length])
+    return result
+
+def strip_shape(path,axes,sections,left=2,right=3,extra=0):
+    edges=[]
+    for p,(ux,uy),section in zip(path,axes,sections):
+        edges.append([(p[0]-uy*off,p[1]+ux*off) for off in [section[left]-extra,section[right]+extra]])
+    return unary_union([Polygon([a[0],b[0],b[1],a[1]]) for a,b in zip(edges,edges[1:])])
+
+def fit_road_sections(path,axes,buildings):
+    # Keep mapped building footprints and road axes. Only the unsurveyed road
+    # width changes; 2.2 m also reserves the generated entrances / balconies.
+    obstacles=unary_union(buildings).buffer(2.2)
+    def limits_at(p,axis):
+        ux,uy=axis
+        row=[]
+        for sign in [-1,1]:
+            ray=LineString([p[:2],(p[0]-uy*sign*7,p[1]+ux*sign*7)])
+            hit=ray.intersection(obstacles)
+            row.append(7.0 if hit.is_empty else Point(p[:2]).distance(hit)/math.hypot(ux,uy))
+        return row
+    # Check between road vertices too. Sampling only the stations misses a
+    # building corner between two rays, even when the endpoints are clear.
+    segment_limits=[]
+    for i,(a,b) in enumerate(zip(path,path[1:])):
+        values=[]
+        for t in np.linspace(0,1,math.ceil(math.dist(a[:2],b[:2])/.35)+1):
+            p=[a[k]*(1-t)+b[k]*t for k in [0,1]]
+            axis=[axes[i][k]*(1-t)+axes[i+1][k]*t for k in [0,1]]
+            values.append(limits_at(p,axis))
+        segment_limits.append([min(v[k] for v in values) for k in [0,1]])
+    limits=[[min(segment_limits[j][k] for j in {max(0,i-1),min(len(path)-2,i)}) for k in [0,1]] for i in range(len(path))]
+    # A lower envelope starts each taper BEFORE the obstruction, and is shared
+    # by neighbouring chunks. Avoid per-face clipping / abrupt notches in roads.
+    for side in [0,1]:
+        for order in [range(1,len(path)),range(len(path)-2,-1,-1)]:
+            for i in order:
+                j=i-1 if order.step>0 else i+1
+                limits[i][side]=min(limits[i][side],limits[j][side]+.12*math.dist(path[i][:2],path[j][:2]))
+    sections=[]
+    for negative,positive in limits:
+        walks=[min(2,max(1,width*2/7)) for width in [negative,positive]]
+        section=[-negative+walks[0],positive-walks[1],-negative,positive]
+        assert section[1]-section[0]>=5, 'Mapped clearance requires manual review; do not cut buildings or disconnect road'
+        sections.append(section)
+    return sections
+
 def prepare_infrastructure():
     raw=json.loads(gzip.decompress(SNAPSHOT.read_bytes()));byid={e['id']:e for e in raw['elements']}
     geo=json.loads((OUT/'geography.geojson').read_text())
@@ -160,6 +212,54 @@ def prepare_infrastructure():
             w=max(0,min(1,1-gap/22));w=w*w*(3-2*w)
             z=z*(1-w)+height*w
         roadpoints.append([x,y,round(z,3)])
+    roadframes=path_frames(roadpoints)
+    # At exact bridge ends, use the bridge normal rather than averaging in the
+    # curved approach. Otherwise one road edge extends beyond the slab end.
+    for bridge in bridges:
+        start,end=sorted(road.project(Point(p)) for p in bridge['upper'])
+        a=road.interpolate(start);c=road.interpolate(end);length=a.distance(c)
+        for i,p in enumerate(roadpoints):
+            if start-1e-6<=road.project(Point(p[:2]))<=end+1e-6:
+                roadframes[i]=[(c.x-a.x)/length,(c.y-a.y)/length]
+    building_data=json.loads((OUT/'buildings.json').read_text())
+    building_shapes=[unary_union([Polygon(p[0],p[1:]) for p in b['polygons']]) for b in building_data]
+    sections=fit_road_sections(roadpoints,roadframes,building_shapes)
+    pavement=strip_shape(roadpoints,roadframes,sections)
+    minimum_footprint_clearance=pavement.distance(unary_union(building_shapes))
+    assert minimum_footprint_clearance>2.15, 'Road taper cuts a building corner between stations'
+    # This display mask follows the fitted roadway, not the old uniform strip
+    # that excluded parts of buildings from the campus display area.
+    corridor=strip_shape(roadpoints,roadframes,sections,extra=1)
+    assert not corridor.intersects(unary_union(building_shapes)), 'Road display mask overlaps a mapped building'
+    clearance_records=[]
+    old_strip=LineString(roadpoints).buffer(8,cap_style=2)
+    for b,g in zip(building_data,building_shapes):
+        overlap=g.intersection(old_strip).area
+        if overlap>.01:
+            clearance_records.append({'id':b['id'],'name':b['name'],'previousOverlapSquareMeters':round(overlap,3)})
+    for index,b in enumerate(bridges):
+        start,end=sorted(road.project(Point(p)) for p in [b['upper'][0],b['upper'][-1]])
+        indices=[i for i,p in enumerate(roadpoints) if start-1e-6<=road.project(Point(p[:2]))<=end+1e-6]
+        profile={'path':[roadpoints[i] for i in indices],'frames':[roadframes[i] for i in indices],
+                 'sections':[sections[i] for i in indices]}
+        b['roadProfile']=profile
+        if all(abs(s[2]+7)<1e-6 and abs(s[3]-7)<1e-6 for s in profile['sections']):continue
+        deck_shape=strip_shape(profile['path'],profile['frames'],profile['sections'])
+        a,c=b['upper'][0],b['upper'][-1];cx=(a[0]+c[0])/2;cy=(a[1]+c[1])/2
+        length=math.dist(a,c);ux=(c[0]-a[0])/length;uy=(c[1]-a[1])/length
+        def local(x,y,z=None):return ((x-cx)*ux+(y-cy)*uy,-(x-cx)*uy+(y-cy)*ux)
+        local_deck=orient(transform(local,deck_shape),sign=1)
+        b['deckGeometry']={'rings':[list(map(list,local_deck.exterior.coords))],
+                           'triangles':triangulate(local_deck)['triangles']}
+        abutments=[]
+        for abutment in b['abutments']:
+            for piece in polygons(Polygon(abutment['rings'][0],abutment['rings'][1:]).intersection(local_deck)):
+                piece=orient(piece,sign=1)
+                abutments.append({'rings':[list(map(list,piece.exterior.coords))], 'triangles':triangulate(piece)['triangles']})
+        b['abutments']=abutments
+        pick=deck_shape.buffer(.4)
+        b['bounds']=list(pick.bounds);b['pickPolygon']=list(map(list,pick.exterior.coords))
+        cuts[index]=unary_union([LineString([p[:2] for p in b['underpass']]).buffer(b['pedestrian']['cutHalfWidth'],cap_style=2,join_style=2),deck_shape.buffer(-.1)])
     # Open railings at mapped at-grade junctions; an underpass is not a street entrance.
     roadnodes={n for e in roadways for n in e.get('nodes',[])};junctions=[]
     for e in raw['elements']:
@@ -215,6 +315,11 @@ def prepare_infrastructure():
         'attribution':'© OpenStreetMap contributors','license':'ODbL-1.0','units':'meters','axes':['east','north','up'],
         'corridor':{'id':'nongyuan-road','name':'农院路','publicRoad':True,'insideCampus':False,
           'path':roadpoints,'carriageWidth':carriage,'sidewalkWidth':sidewalk,'lengthMeters':round(road.length,1),
+          'sections':sections,'frames':roadframes,
+          'clearance':{'buildingBufferMeters':2.2,'affectedBuildings':clearance_records,
+                       'minimumFootprintClearanceMeters':round(minimum_footprint_clearance,3),
+                       'minimumCarriageWidthMeters':round(min(s[1]-s[0] for s in sections),3),
+                       'basis':'保留 OSM 建筑轮廓与道路轴线，按建筑及生成式入口、阳台避让收窄估算路幅并渐变衔接；桥面边缘同步调整。宽度及余量为展示参数，非实测或交通设计。'},
           'curveBasis':'原 OSM 中心线保存在 GeoJSON；展示路径对尖角做约 7 米尺度的平滑过渡，桥段及道路端点保持对齐。',
           'maximumCenterlineAdjustmentMeters':round(max(math.dist(a,b) for a,b in zip(rawpoints,renderpoints)),3),
           'bounds':list(corridor.bounds),'junctions':junctions,'sourceWays':[provenance(e) for e in roadways],
@@ -223,20 +328,21 @@ def prepare_infrastructure():
         'bridges':bridges,'lakeBridges':lakebridges,'replaceSurfaceIds':sorted(replace_ids),
         'terrainCells':terrain_cells,'terrainPatch':terrain_patch,'surfaceOverrides':overrides}
     # Partition small near models without adding the entire road to initial downloads.
-    chunks=[];roadframes=[]
-    for i,p in enumerate(roadpoints):
-        a=roadpoints[max(0,i-1)];b=roadpoints[min(len(roadpoints)-1,i+1)]
-        dx=b[0]-a[0];dy=b[1]-a[1];length=math.hypot(dx,dy)
-        roadframes.append([dx/length,dy/length])
+    chunks=[];all_buildings=unary_union(building_shapes)
     for start in range(0,len(roadpoints)-1,90):
         pts=roadpoints[start:min(start+91,len(roadpoints))]
         fence=[]
         for i,p in enumerate(pts):
             a=pts[max(0,i-1)];b=pts[min(len(pts)-1,i+1)];dx=b[0]-a[0];dy=b[1]-a[1];length=math.hypot(dx,dy)
             on_bridge=any(LineString(bridge['upper']).distance(Point(p[:2]))<1 and Point(p[:2]).distance(Point(bridge['center']))<LineString(bridge['upper']).length/2+1 for bridge in bridges)
-            fence.append([not on_bridge and campus.contains(Point(p[0]-side*dy/length*8,p[1]+side*dx/length*8)) and all(math.dist(p[:2],q)>9 for q in junctions) for side in [-1,1]])
+            row=[]
+            for k,side in enumerate([-1,1]):
+                off=sections[start+i][k+2]+side*.7;ux,uy=roadframes[start+i]
+                position=Point(p[0]-uy*off,p[1]+ux*off)
+                row.append(not on_bridge and campus.contains(position) and all_buildings.distance(position)>3.2 and all(math.dist(p[:2],q)>9 for q in junctions))
+            fence.append(row)
         chunks.append({'id':f'infra-road-{start//90:02d}','kind':'corridor','path':pts,'frames':roadframes[start:start+len(pts)],
-                       'fence':fence,'bounds':list(LineString([p[:2] for p in pts]).buffer(10).bounds)})
+                       'sections':sections[start:start+len(pts)],'fence':fence,'bounds':list(LineString([p[:2] for p in pts]).buffer(10).bounds)})
     for bridge in lakebridges:
         chunks.append({'id':'infra-'+bridge['id'],'kind':'lake','bridgeId':bridge['id'],'bounds':bridge['bounds']})
     result['chunks']=chunks

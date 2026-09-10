@@ -86,7 +86,19 @@ def landmark(l,b,z,C,detail=True):
         m.box(x,ymin-2,z+2.5,12,5,5,glass);m.box(x,ymin-3,z+5.2,16,8,.4,white)
     elif k=='stadium':
         # Official 2021 video, 00:07 and 00:12: broad shallow roof, vertical piers, horizontal louvers.
-        mainw=w*.84;maind=d*.9;hh=h*.83;xx=x-w*.07
+        # The mapped footprint has a narrow north wing. Using the full bounding
+        # rectangle filled that concavity and pushed the east annex into Nongyuan Road.
+        ring=b['polygons'][0][0][:-1]
+        winding=sum(a[0]*c[1]-c[0]*a[1] for a,c in zip(ring,ring[1:]+ring[:1]))
+        reflex=[]
+        for i,p in enumerate(ring):
+            a=ring[i-1];c=ring[(i+1)%len(ring)]
+            cross=(p[0]-a[0])*(c[1]-p[1])-(p[1]-a[1])*(c[0]-p[0])
+            if cross*winding<0:reflex.append(p)
+        notch=max(reflex,key=lambda p:p[0]);split=notch[1]
+        north=[p for p in ring if p[1]>split+1]
+        wing_left=min(p[0] for p in north);wing_right=max(p[0] for p in north)
+        mainw=w*.9;maind=(split-ymin)*.93;hh=h*.83;xx=x;y=(ymin+split)/2
         facade(m,xx,y,z,mainw,maind,hh,stone,glass,white,2,5,True)
         m.roof(xx,y,z+hh+1.4,mainw+8,maind+8,1.9,C['paleRoof'])
         for sy in [-1,1]:
@@ -94,7 +106,7 @@ def landmark(l,b,z,C,detail=True):
             for i in range(9):m.box(xx+(i-4)*mainw*.108,front,z+hh*.47,1.8,2.0,hh*.94,stone)
             for j in range(5):m.box(xx,front+sy*.8,z+hh*.66+j*.85,mainw-5,.35,.22,C['metal'])
             m.box(xx,front,z+hh+1.1,mainw+8,4,1.1,dark)
-        facade(m,x+w*.40,y+d*.05,z,w*.18,d*.75,h*.48,stone,glass,white,2,4,True)
+        facade(m,(wing_left+wing_right)/2,(split+ymax)/2,z,(wing_right-wing_left)*.93,(ymax-split)*.96,h*.48,stone,glass,white,2,4,True)
         for row in range(5):
             for col in range(6):
                 sx=xx+(col-2.5)*mainw*.115;sy=y+(row-2)*maind*.14
