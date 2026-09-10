@@ -8,7 +8,13 @@ import { isTap } from './math';
 import type { CameraSnapshot } from './share';
 import { fetchModel, nearbyChunks, ResourceQueue } from './streaming';
 import type { StreamAsset as Asset } from './streaming';
-import { entranceBox, fitBox, landmarkBox, landmarkDirection } from './camera';
+import {
+  bridgeEntrancePose,
+  entranceBox,
+  fitBox,
+  landmarkBox,
+  landmarkDirection,
+} from './camera';
 import { DEFAULT_LAYERS } from './types';
 import type {
   Building,
@@ -29,6 +35,7 @@ interface Manifest {
   treesNear?: Asset;
   zones: Asset[];
   landmarks: Asset[];
+  infrastructure?: Asset[];
 }
 interface Callbacks {
   onStatus: (message: string, error?: boolean, progress?: number) => void;
@@ -240,7 +247,7 @@ export function createScene(
     );
     mesh.position.y = b.elevation;
     mesh.updateMatrixWorld();
-    mesh.userData = { id: b.landmark ?? b.id, inside: b.insideCampus };
+    mesh.userData = { id: b.landmark ?? b.id, layer: b.layer };
     proxies.push(mesh);
   }
   const highlight = new THREE.Group();
@@ -282,9 +289,7 @@ export function createScene(
     );
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObjects(
-      proxies.filter((p) =>
-        p.userData.inside ? layers.buildings : layers.context,
-      ),
+      proxies.filter((p) => layers[p.userData.layer as LayerKey]),
       false,
     )[0];
     if (hit) focus(hit.object.userData.id);
@@ -340,7 +345,7 @@ export function createScene(
     );
     mark.rotation.x = -Math.PI / 2;
     mark.position.set(c.center[0], c.elevation + 0.6, -c.center[1]);
-    if (l?.placeKind === 'sports') {
+    if (l?.placeKind === 'sports' || l?.placeKind === 'bridge') {
       mark.geometry.dispose();
       mark.material.dispose();
     } else highlight.add(mark);
@@ -361,7 +366,7 @@ export function createScene(
         selectedView === 'rear-entrance',
         buildings.find((b) => b.landmark === selected)?.architecture,
       );
-    const fitted = fitBox(
+    const framing = fitBox(
       box,
       landmarkDirection(
         place,
@@ -372,6 +377,10 @@ export function createScene(
       { width: host.clientWidth, height: host.clientHeight },
       camera.fov,
     );
+    const fitted =
+      selectedView === 'entrance'
+        ? bridgeEntrancePose(place, framing)
+        : framing;
     if (animate) moveTo(fitted.target, fitted.position);
     else {
       tween = null;
@@ -509,7 +518,11 @@ export function createScene(
       const mats = Array.isArray(o.material) ? o.material : [o.material];
       for (const m of mats) {
         if (m instanceof THREE.MeshStandardMaterial) {
-          if (m.name === 'sportWhite') {
+          if (
+            ['sportWhite', 'roadWhite', 'roadYellow', 'tactile'].includes(
+              m.name,
+            )
+          ) {
             // Paint is a decal surface: bias its depth at oblique/distant views
             // as well as retaining geometric separation through Draco export.
             m.polygonOffset = true;
@@ -530,28 +543,27 @@ export function createScene(
       }
     });
   }
+  function detailLayer(key: string): LayerKey {
+    return key.startsWith('infra-') ||
+      landmarks.some(
+        (l) => 'landmark-' + l.id === key && l.placeKind === 'bridge',
+      )
+      ? 'roads'
+      : 'buildings';
+  }
   function applyLayers() {
-    if (baseRoot)
-      for (const child of baseRoot.children) {
-        const key = child.name;
-        const layer = classify(child);
-        child.visible =
-          layer === 'buildings'
-            ? layers.buildings && !loaded.get(key)?.visible
-            : (layers[layer as LayerKey] ?? true);
-        if (loaded.has(key) && !modeSmooth) child.visible = false;
-      }
     for (const [key, root] of loaded) {
-      const isZone = key.startsWith('chunk-');
-      root.visible = layers.buildings && (!isZone || !modeSmooth);
-      if (baseRoot) {
-        const base = baseRoot.children.find((c) => c.name === key);
-        if (base) base.visible = layers.buildings && !root.visible;
-      }
+      const isZone = key.startsWith('chunk-') || key.startsWith('infra-');
+      root.visible = layers[detailLayer(key)] && (!isZone || !modeSmooth);
     }
+    if (baseRoot)
+      for (const child of baseRoot.children)
+        child.visible =
+          (layers[classify(child) as LayerKey] ?? true) &&
+          !loaded.get(child.name)?.visible;
     if (treesRoot) treesRoot.visible = layers.vegetation;
     labels.style.display = layers.labels ? '' : 'none';
-    highlight.visible = layers.buildings;
+    highlight.visible = layers[detailLayer('landmark-' + selected)];
     dirty = true;
   }
   function updateLoadStatus() {
@@ -638,7 +650,7 @@ export function createScene(
     const foreground = manifest.landmarks.find((a) => a.id === selected);
     const wantedAssets: [string, Asset][] = [];
     let allocation = 0;
-    if (layers.buildings && foreground) {
+    if (layers[detailLayer(currentKey)] && foreground) {
       wantedAssets.push([currentKey, foreground]);
       allocation += geometryCosts.get(currentKey) ?? foreground.bytes * 24;
     }
@@ -647,6 +659,23 @@ export function createScene(
     const destinationCamera = tween?.to ?? camera.position;
     const x = destination.x;
     const y = -destination.z;
+    if (
+      layers.roads &&
+      !modeSmooth &&
+      (focusing || destinationCamera.distanceTo(destination) < 1050)
+    ) {
+      for (const { asset: a } of nearbyChunks(
+        manifest.infrastructure ?? [],
+        x,
+        y,
+        230,
+      ).slice(0, 3)) {
+        const cost = geometryCosts.get(a.id!) ?? a.bytes * 28;
+        if (allocation + cost > cap) continue;
+        allocation += cost;
+        wantedAssets.push([a.id!, a]);
+      }
+    }
     if (
       layers.buildings &&
       !modeSmooth &&
@@ -686,7 +715,7 @@ export function createScene(
       if (
         !warm &&
         key.startsWith('landmark-') &&
-        layers.buildings &&
+        layers[detailLayer(key)] &&
         allocation + cost <= cap
       ) {
         allocation += cost;
@@ -1173,6 +1202,7 @@ export function createScene(
           n +
           (manifest?.landmarks.find((a) => 'landmark-' + a.id === key)?.bytes ??
             manifest?.zones.find((a) => a.id === key)?.bytes ??
+            manifest?.infrastructure?.find((a) => a.id === key)?.bytes ??
             0),
         0,
       ),
@@ -1250,7 +1280,9 @@ export function createScene(
           bounds[1] < frame.top ||
           bounds[3] > frame.top + frame.height;
         const hidden =
-          (l.placeKind === 'sports' ? !layers.sports : !layers.buildings) ||
+          (l.placeKind === 'sports'
+            ? !layers.sports
+            : !layers[detailLayer('landmark-' + l.id)]) ||
           p.z < 0 ||
           p.z > 1 ||
           Math.abs(p.x) > 1 ||
@@ -1322,7 +1354,7 @@ export function createScene(
     setLayer: (key, on) => {
       layers[key] = on;
       applyLayers();
-      if (key === 'buildings') reconcileDetails();
+      if (key === 'buildings' || key === 'roads') reconcileDetails();
     },
     setPreset,
     setQuality,

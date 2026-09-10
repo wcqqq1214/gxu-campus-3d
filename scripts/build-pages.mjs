@@ -52,6 +52,7 @@ for (const a of [
   ...(manifest.treesNear ? [manifest.treesNear] : []),
   ...manifest.zones,
   ...manifest.landmarks,
+  ...(manifest.infrastructure ?? []),
 ])
   await access(path.join(out, a.url));
 for (const a of [
