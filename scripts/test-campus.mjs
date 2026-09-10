@@ -107,7 +107,7 @@ test('庭院内环、三角面与真实轮廓保留', () => {
   );
 });
 test('地标定位与校园南北关系', () => {
-  assert.equal(landmarks.length, 18);
+  assert.equal(landmarks.length, 19);
   assert.ok(
     landmarks.find((l) => l.id === 'south-gate').center[1] <
       landmarks.find((l) => l.id === 'laboratory').center[1],
@@ -218,7 +218,7 @@ test('来源日期字段和高程原始值可追溯', async () => {
 });
 
 test('索引、搜索和拾取仅使用精选地标目录', () => {
-  assert.equal(searchLandmarks(landmarks, '').length, 18);
+  assert.equal(searchLandmarks(landmarks, '').length, 19);
   assert.deepEqual(
     searchLandmarks(landmarks, ' 图书馆 ').map((p) => p.id),
     ['library', 'time-gate'],
@@ -306,7 +306,7 @@ test('三座新增校门采用独立入口 POI，可导航且不伪造建筑轮�
     [180, 90, 270],
   );
   const picks = navigationFootprints(buildings, landmarks);
-  assert.equal(picks.length, 18);
+  assert.equal(picks.length, 19);
   for (const gate of gates) {
     assert.ok(picks.some((p) => p.id === gate.id));
     assert.ok(!buildings.some((b) => b.landmark === gate.id));
@@ -388,4 +388,45 @@ test('时光之门绑定原雕塑节点、保留别名并纳入精选文体地�
     assert.ok(Math.max(...positions.map((p) => p.max[1])) > l.elevation + 19);
   }
   assert.ok(manifest.landmarks.some((m) => m.id === l.id));
+});
+
+test('十教绑定原八层轮廓、索引十九且不再重复出现在普通区块', async () => {
+  const l = landmarks.find((p) => p.id === 'teaching-ten');
+  const b = buildings.find((p) => p.id === 'way/759170254');
+  assert.equal(landmarks[17].id, 'time-gate');
+  assert.equal(landmarks[18].id, l.id);
+  assert.equal(b.landmark, l.id);
+  assert.equal(b.tags['building:levels'], '8');
+  assert.equal(b.height, 26.4);
+  assert.equal(l.category, 'academic');
+  assert.ok(l.center[1] > landmarks[17].center[1]);
+  for (const name of ['第十教学楼', '十教', '10教', '多媒体教学楼'])
+    assert.deepEqual(
+      searchLandmarks(landmarks, name, 'academic').map((p) => p.id),
+      [l.id],
+    );
+  assert.equal(
+    navigationFootprints(buildings, landmarks).filter(
+      (p) => p.landmark === l.id,
+    ).length,
+    1,
+  );
+  assert.ok(!manifest.zones.some((z) => z.featureIds.includes(b.id)));
+  assert.deepEqual(
+    b.architecture.parts.map((p) => p.height),
+    [9.9, 13.2, 6.6, 26.4],
+  );
+  for (const name of ['base', 'teaching-ten']) {
+    const gltf = glbJson(
+      await readFile(new URL(`../public/models/${name}.glb`, import.meta.url)),
+    );
+    assert.equal(
+      gltf.nodes.filter((n) => n.extras?.landmark === l.id).length,
+      1,
+    );
+    for (const material of ['tenWall', 'tenTrim', 'tenGlass'])
+      assert.ok(gltf.materials.some((m) => m.name === material));
+  }
+  const sources = (await json('sources')).sources;
+  for (const id of l.sourceRefs) assert.ok(sources.some((s) => s.id === id));
 });

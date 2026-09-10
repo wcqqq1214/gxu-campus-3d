@@ -118,6 +118,18 @@ export function entranceBox(
   rear: boolean,
   architecture?: Building['architecture'],
 ) {
+  if (place.id === 'teaching-ten' && architecture) {
+    const { origin, angle } = architecture;
+    const localY = -19.4;
+    return new Box3().setFromCenterAndSize(
+      new Vector3(
+        origin[0] - Math.sin(angle) * localY,
+        place.elevation + 3.5,
+        -(origin[1] + Math.cos(angle) * localY),
+      ),
+      new Vector3(18, 8, 13),
+    );
+  }
   if (place.placeKind === 'sculpture') {
     return new Box3(
       new Vector3(
