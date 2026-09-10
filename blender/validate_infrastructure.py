@@ -21,6 +21,17 @@ def mesh_bvh(objects, material_filter=None):
     assert vertices, 'Missing infrastructure mesh'
     return BVHTree.FromPolygons(vertices, faces)
 
+def deck_sample_points(b):
+    profile=b['roadProfile'];path=profile['path'];axes=profile['frames'];sections=profile['sections']
+    for i,(a,c) in enumerate(zip(path,path[1:])):
+        length=math.dist(a[:2],c[:2]);count=math.ceil(length/.15)
+        for fraction in [0,.25,.5,.75,1]:
+            ends=[]
+            for p,(ux,uy),s in zip([a,c],axes[i:i+2],sections[i:i+2]):
+                off=s[0]+.5+(s[1]-s[0]-1)*fraction
+                ends.append(Vector((p[0]-uy*off,p[1]+ux*off,b['deckElevation'])))
+            for j in range(count+1):yield ends[0].lerp(ends[1],(.01+(length-.02)*j/count)/length)
+
 def check_road_seams(objects, label):
     """The single asphalt surface must cover the deck without coplanar concrete.
 
@@ -31,20 +42,16 @@ def check_road_seams(objects, label):
     structure=mesh_bvh(objects,lambda name:name in ('bridgeConcrete','bridgeEdge','bridgeJoint','curb'))
     result=[]
     for b in data['bridges']:
-        a,c=b['upper'];axis=Vector((c[0]-a[0],c[1]-a[1],0));length=axis.length;axis.normalize()
-        normal=Vector((-axis.y,axis.x,0));minimum=math.inf;maximum_error=0;samples=0
-        for lane in [-4.5,-2.5,0,2.5,4.5]:
-            count=math.ceil(length/.15)
-            for i in range(count+1):
-                point=Vector((*a,b['deckElevation']))+axis*(.01+(length-.02)*i/count)+normal*lane
-                surface=road.ray_cast(point+Vector((0,0,.3)),Vector((0,0,-1)),.6)[0]
-                assert surface is not None, f'{label} {b["name"]}: asphalt missing at bridge end {tuple(point)}'
-                error=abs(surface.z-b['deckElevation']);maximum_error=max(maximum_error,error)
-                assert error<.012, f'{label} {b["name"]}: asphalt leaves the deck plane by {error:.4f} m'
-                hit=structure.ray_cast(surface+Vector((0,0,.5)),Vector((0,0,-1)),1.5)[0]
-                assert hit is not None, f'{label} {b["name"]}: deck support missing'
-                gap=surface.z-hit.z;minimum=min(minimum,gap);samples+=1
-                assert gap>.025, f'{label} {b["name"]}: bridge overlaps asphalt ({gap:.4f} m separation) at {tuple(point)}'
+        minimum=math.inf;maximum_error=0;samples=0
+        for point in deck_sample_points(b):
+            surface=road.ray_cast(point+Vector((0,0,.3)),Vector((0,0,-1)),.6)[0]
+            assert surface is not None, f'{label} {b["name"]}: asphalt missing at bridge end {tuple(point)}'
+            error=abs(surface.z-b['deckElevation']);maximum_error=max(maximum_error,error)
+            assert error<.012, f'{label} {b["name"]}: asphalt leaves the deck plane by {error:.4f} m'
+            hit=structure.ray_cast(surface+Vector((0,0,.5)),Vector((0,0,-1)),1.5)[0]
+            assert hit is not None, f'{label} {b["name"]}: deck support missing at {tuple(point)}'
+            gap=surface.z-hit.z;minimum=min(minimum,gap);samples+=1
+            assert gap>.025, f'{label} {b["name"]}: bridge overlaps asphalt ({gap:.4f} m separation) at {tuple(point)}'
         result.append({'id':b['id'],'samples':samples,'minimumSurfaceSeparationMeters':round(minimum,4),
                        'maximumDeckPlaneErrorMeters':round(maximum_error,4)})
     return result
@@ -92,15 +99,12 @@ def check_walkways(bvh,b,label,tolerance=.06):
             'minimumPedestrianHeadroomMeters':round(minimum_headroom,3)}
 
 def check_deck_surface(bvh,b,label):
-    a,c=b['upper'];axis=Vector((c[0]-a[0],c[1]-a[1],0));length=axis.length;axis.normalize()
-    normal=Vector((-axis.y,axis.x,0));highest=-math.inf;samples=0
-    for lane in [-2.5,0,2.5]:
-        for i in range(5,math.floor(length/.15)-5):
-            point=Vector((*a,b['deckElevation']))+axis*(i*.15)+normal*lane
-            hit=bvh.ray_cast(point+Vector((0,0,.65)),Vector((0,0,-1)),1)[0]
-            assert hit is not None, f'{label} {b["name"]}: missing public-road deck'
-            protrusion=hit.z-point.z;highest=max(highest,protrusion);samples+=1
-            assert protrusion<.08, f'{label} {b["name"]}: lower geometry protrudes through road by {protrusion:.3f} m at {tuple(point)}'
+    highest=-math.inf;samples=0
+    for point in deck_sample_points(b):
+        hit=bvh.ray_cast(point+Vector((0,0,.65)),Vector((0,0,-1)),1)[0]
+        assert hit is not None, f'{label} {b["name"]}: missing public-road deck'
+        protrusion=hit.z-point.z;highest=max(highest,protrusion);samples+=1
+        assert protrusion<.08, f'{label} {b["name"]}: lower geometry protrudes through road by {protrusion:.3f} m at {tuple(point)}'
     return {'id':b['id'],'samples':samples,'maximumRoadProtrusionMeters':round(highest,3)}
 
 def check_voids(bvh, b, label, tolerance=.05):

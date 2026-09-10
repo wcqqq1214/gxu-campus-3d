@@ -15,38 +15,41 @@ def frames(path):
     return result
 
 def ribbon(m,path,left,right,mat,raise_z=0,axes=None):
-    left,right=sorted([left,right])
+    left=[left]*len(path) if isinstance(left,(int,float)) else left
+    right=[right]*len(path) if isinstance(right,(int,float)) else right
     axes=axes or frames(path)
     for i,(a,b) in enumerate(zip(path,path[1:])):
+        al,ar=sorted([left[i],right[i]]);bl,br=sorted([left[i+1],right[i+1]])
         ux,uy=axes[i];vx,vy=axes[i+1]
-        m.face([(a[0]-uy*left,a[1]+ux*left,a[2]+raise_z),
-                (b[0]-vy*left,b[1]+vx*left,b[2]+raise_z),
-                (b[0]-vy*right,b[1]+vx*right,b[2]+raise_z),
-                (a[0]-uy*right,a[1]+ux*right,a[2]+raise_z)],mat)
+        m.face([(a[0]-uy*al,a[1]+ux*al,a[2]+raise_z),
+                (b[0]-vy*bl,b[1]+vx*bl,b[2]+raise_z),
+                (b[0]-vy*br,b[1]+vx*br,b[2]+raise_z),
+                (a[0]-uy*ar,a[1]+ux*ar,a[2]+raise_z)],mat)
 
 def edge_box(m,a,b,offset,width,height,mat,zoffset=0,axes=None):
     if axes is None:axes=frames([a,b])
     (ux,uy),(vx,vy)=axes;nx=-uy;ny=ux;mx=-vy;my=vx
+    oa,ob=(offset,offset) if isinstance(offset,(int,float)) else offset
     # Sloping box faces rather than horizontal blocks keep ramp curbs continuous.
     for side in [-1,1]:
-        off=offset+side*width/2
+        off=oa+side*width/2;end=ob+side*width/2
         face=[(a[0]+nx*off,a[1]+ny*off,a[2]+zoffset),
-                (b[0]+mx*off,b[1]+my*off,b[2]+zoffset),
-                (b[0]+mx*off,b[1]+my*off,b[2]+zoffset+height),
+                (b[0]+mx*end,b[1]+my*end,b[2]+zoffset),
+                (b[0]+mx*end,b[1]+my*end,b[2]+zoffset+height),
                 (a[0]+nx*off,a[1]+ny*off,a[2]+zoffset+height)]
         m.face(face if side<0 else face[::-1],mat)
-    m.face([(a[0]+nx*(offset-width/2),a[1]+ny*(offset-width/2),a[2]+zoffset+height),
-            (b[0]+mx*(offset-width/2),b[1]+my*(offset-width/2),b[2]+zoffset+height),
-            (b[0]+mx*(offset+width/2),b[1]+my*(offset+width/2),b[2]+zoffset+height),
-            (a[0]+nx*(offset+width/2),a[1]+ny*(offset+width/2),a[2]+zoffset+height)],mat)
+    m.face([(a[0]+nx*(oa-width/2),a[1]+ny*(oa-width/2),a[2]+zoffset+height),
+            (b[0]+mx*(ob-width/2),b[1]+my*(ob-width/2),b[2]+zoffset+height),
+            (b[0]+mx*(ob+width/2),b[1]+my*(ob+width/2),b[2]+zoffset+height),
+            (a[0]+nx*(oa+width/2),a[1]+ny*(oa+width/2),a[2]+zoffset+height)],mat)
 
-def fence_panel(m,a,b,side,C,detail,axes):
+def fence_panel(m,a,b,side,C,detail,axes,offsets):
     dx=b[0]-a[0];dy=b[1]-a[1];length=math.hypot(dx,dy);nx=-dy/length;ny=dx/length;angle=math.atan2(dy,dx)
-    edge_box(m,a,b,side*7.7,.35,.52,C['wallStone'],.14,axes)
+    edge_box(m,a,b,offsets,.35,.52,C['wallStone'],.14,axes)
     if not detail:return
     def point(t,h):
-        ux=axes[0][0]*(1-t)+axes[1][0]*t;uy=axes[0][1]*(1-t)+axes[1][1]*t
-        return (a[0]+dx*t-uy*side*7.7,a[1]+dy*t+ux*side*7.7,a[2]*(1-t)+b[2]*t+h)
+        return (a[0]*(1-t)+b[0]*t-axes[0][1]*offsets[0]*(1-t)-axes[1][1]*offsets[1]*t,
+                a[1]*(1-t)+b[1]*t+axes[0][0]*offsets[0]*(1-t)+axes[1][0]*offsets[1]*t,a[2]*(1-t)+b[2]*t+h)
     x,y,z=point(0,.14)
     for h,w,d,hh in [(.95,.48,.48,1.9),(1.96,.61,.61,.14),(2.07,.51,.51,.1)]:
         m.box(x,y,z+h,w,d,hh,C['wallStone'],angle)
@@ -66,20 +69,26 @@ def fence_panel(m,a,b,side,C,detail,axes):
             m.ellipsoid(px+nx*.2,py+ny*.2,pz+.18,.58,.48,.36,C['gateFlower'],6,3)
 
 def road_chunk(chunk,C,detail):
-    m=Mesh();p=chunk['path'];axes=chunk['frames'];ribbon(m,p,-5,5,C['asphalt'],axes=axes)
-    for side in [-1,1]:
-        ribbon(m,p,side*5,side*7,C['pavingRed'],.17,axes)
-        ribbon(m,p,side*5.7,side*6.05,C['tactile'],.185,axes)
+    m=Mesh();p=chunk['path'];axes=chunk['frames'];sections=chunk['sections']
+    carleft=[s[0] for s in sections];carright=[s[1] for s in sections]
+    centers=[(a+b)/2 for a,b in zip(carleft,carright)]
+    ribbon(m,p,carleft,carright,C['asphalt'],axes=axes)
+    for k,side in enumerate([-1,1]):
+        inner=[s[k] for s in sections];outer=[s[k+2] for s in sections]
+        ribbon(m,p,inner,outer,C['pavingRed'],.17,axes)
+        tactile=[(a+b)/2 for a,b in zip(inner,outer)]
+        ribbon(m,p,[o-.175 for o in tactile],[o+.175 for o in tactile],C['tactile'],.185,axes)
         for i,(a,b) in enumerate(zip(p,p[1:])):
-            edge_box(m,a,b,side*5,.25,.18,C['curb'],axes=axes[i:i+2])
+            edge_box(m,a,b,inner[i:i+2],.25,.18,C['curb'],axes=axes[i:i+2])
             if chunk['fence'][i][0 if side==-1 else 1] and chunk['fence'][i+1][0 if side==-1 else 1]:
-                fence_panel(m,a,b,side,C,detail,axes[i:i+2])
+                fence_panel(m,a,b,side,C,detail,axes[i:i+2],[o+side*.7 for o in outer[i:i+2]])
     # Dashed centre line is visible even in the inexpensive overview mesh.
-    for i in range(0,len(p)-1,3):ribbon(m,p[i:i+2],-.07,.07,C['roadYellow'],.035,axes[i:i+2])
+    for i in range(0,len(p)-1,3):ribbon(m,p[i:i+2],[o-.07 for o in centers[i:i+2]],[o+.07 for o in centers[i:i+2]],C['roadYellow'],.035,axes[i:i+2])
     if detail:
-        for offset in [-4.65,4.65]:ribbon(m,p,offset-.055,offset+.055,C['roadWhite'],.035,axes)
+        for offsets in [[o+.35 for o in carleft],[o-.35 for o in carright]]:
+            ribbon(m,p,[o-.055 for o in offsets],[o+.055 for o in offsets],C['roadWhite'],.035,axes)
         for i in range(5,len(p)-1,10):
-            x,y,z=p[i];ux,uy=axes[i];nx=-uy;ny=ux;x+=nx*6.7;y+=ny*6.7
+            x,y,z=p[i];ux,uy=axes[i];nx=-uy;ny=ux;off=sections[i][3]-.3;x+=nx*off;y+=ny*off
             m.cylinder(x,y,z+3.8,.105,7.2,C['lampMetal'],8)
             m.line((x,y,z+7.3),(x-nx*1.4,y-ny*1.4,z+7.6),.065,C['lampMetal'],6)
             m.box(x-nx*1.5,y-ny*1.5,z+7.58,.8,.34,.16,C['lampMetal'],math.atan2(ny,nx))
@@ -88,7 +97,8 @@ def road_chunk(chunk,C,detail):
             x,y,z=p[i];ux,uy=axes[i];nx=-uy;ny=ux
             for side in [-1,1]:
                 # Direction arrows, drawn as flat original geometry.
-                cx=x+nx*side*2.4;cy=y+ny*side*2.4;tx=-ux*side;ty=-uy*side
+                off=centers[i]+side*(carright[i]-carleft[i])*.24
+                cx=x+nx*off;cy=y+ny*off;tx=-ux*side;ty=-uy*side
                 arrow=[(cx+tx*2,cy+ty*2,z+.04),(cx-tx*.1+nx*.7,cy-ty*.1+ny*.7,z+.04),
                         (cx+tx*.3+nx*.18,cy+ty*.3+ny*.18,z+.04),(cx-tx*1.5+nx*.18,cy-ty*1.5+ny*.18,z+.04),
                         (cx-tx*1.5-nx*.18,cy-ty*1.5-ny*.18,z+.04),(cx+tx*.3-nx*.18,cy+ty*.3-ny*.18,z+.04),
@@ -147,15 +157,55 @@ def approaches(b,C):
     m.add_part('步道支挡与外侧挡墙',walls)
     return m
 
+def fitted_deck(b,C,detail,cx,cy,angle):
+    """A constrained bridge uses the same section edges as its wearing surface."""
+    m=Mesh();z=b['deckElevation'];slab=b['slabThickness'];g=b['deckGeometry']
+    m.extrude([g['rings']],[g['triangles']],z-slab,slab-.04,C['bridgeConcrete'])
+    flat=[p for ring in g['rings'] for p in ring[:-1]]
+    for i in range(0,len(g['triangles']),3):
+        m.face([(flat[k][0],flat[k][1],z-slab) for k in g['triangles'][i:i+3][::-1]],C['bridgeConcrete'])
+    profile=b['roadProfile'];ca=math.cos(angle);sa=math.sin(angle)
+    path=[((p[0]-cx)*ca+(p[1]-cy)*sa,-(p[0]-cx)*sa+(p[1]-cy)*ca,z) for p in profile['path']]
+    axes=[(u*ca+v*sa,-u*sa+v*ca) for u,v in profile['frames']];sections=profile['sections']
+    for k,side in enumerate([-1,1]):
+        outer=[s[k+2] for s in sections]
+        railing=[]
+        for p,(ux,uy),off in zip(path,axes,outer):
+            railing.append((p[0]-uy*(off-side*.16),p[1]+ux*(off-side*.16),z))
+        for i,(a,c) in enumerate(zip(path,path[1:])):
+            edge_box(m,a,c,[o-side*.2 for o in outer[i:i+2]],.55,.6,C['bridgeEdge'],-.65,axes[i:i+2])
+            edge_box(m,a,c,[o-side*.16 for o in outer[i:i+2]],.3,.5,C['curb'],.03,axes[i:i+2])
+        # Subdivide rail bays without shifting their endpoints off the deck edge.
+        for a,c in zip(railing,railing[1:]):
+            count=max(1,math.ceil(math.dist(a,c)/2))
+            for j in range(count):
+                start=tuple(a[k]+(c[k]-a[k])*j/count for k in range(3))
+                end=tuple(a[k]+(c[k]-a[k])*(j+1)/count for k in range(3))
+                if detail:
+                    m.box(start[0],start[1],z+.85,.09,.09,1.1,C['lampMetal'])
+                    for h in [.62,1.3]:m.line((start[0],start[1],z+h),(end[0],end[1],z+h),.033,C['lampMetal'],4)
+                    for h0,h1 in [(.64,1.23),(1.23,.64)]:m.line((start[0],start[1],z+h0),(end[0],end[1],z+h1),.027,C['lampMetal'],4)
+                else:m.line((start[0],start[1],z+.9),(end[0],end[1],z+.9),.04,C['lampMetal'],4)
+        if detail:m.box(railing[-1][0],railing[-1][1],z+.85,.09,.09,1.1,C['lampMetal'])
+    if detail:
+        for fraction in [.1,.3,.5,.7,.9]:
+            offsets=[s[0]+(s[1]-s[0])*fraction for s in sections]
+            for i,(a,c) in enumerate(zip(path,path[1:])):
+                edge_box(m,a,c,offsets[i:i+2],.24,.25,C['bridgeEdge'],-slab-b['beamDepth'],axes[i:i+2])
+                ribbon(m,[a,c],[o-.12 for o in offsets[i:i+2]],[o+.12 for o in offsets[i:i+2]],C['bridgeEdge'],-slab-b['beamDepth'],axes[i:i+2])
+                m.f[-1]=m.f[-1][::-1]
+    return m
+
 def bridge(b,C,detail):
     m=Mesh();a,c=b['upper'];dx=c[0]-a[0];dy=c[1]-a[1];length=math.hypot(dx,dy);angle=math.atan2(dy,dx)
     cx=(a[0]+c[0])/2;cy=(a[1]+c[1])/2;z=b['deckElevation'];width=b['deckWidth'];floor=b['floorElevation'];slab=b['slabThickness']
-    deck=Mesh();deck.box(0,0,z-(slab+.04)/2,length,width,slab-.04,C['bridgeConcrete'])
+    deck=fitted_deck(b,C,detail,cx,cy,angle) if 'deckGeometry' in b else Mesh()
+    if 'deckGeometry' not in b:deck.box(0,0,z-(slab+.04)/2,length,width,slab-.04,C['bridgeConcrete'])
     for abutment in b['abutments']:
         # Abutments support the slab from below; their old road-height caps
         # overlapped the continuous asphalt and produced mottled end seams.
         deck.extrude([abutment['rings']],[abutment['triangles']],floor,z-slab-floor,C['bridgeConcrete'])
-    for side in [-1,1]:
+    for side in ([] if 'deckGeometry' in b else [-1,1]):
         deck.box(0,side*(width/2-.2),z-.35,length+.3,.55,.6,C['bridgeEdge'])
         # Vehicle parapets / railings above the public road.
         deck.box(0,side*(width/2-.16),z+.28,length,.3,.5,C['curb'])
@@ -166,7 +216,7 @@ def bridge(b,C,detail):
             for xx in range(math.ceil(-length/2),math.floor(length/2)-2,2):
                 for sign in [-1,1]:deck.line((xx,side*(width/2-.16),z+.64 if sign==1 else z+1.23),(xx+2,side*(width/2-.16),z+1.23 if sign==1 else z+.64),.027,C['lampMetal'],4)
         else:deck.box(0,side*(width/2-.16),z+.9,length,.08,.08,C['lampMetal'])
-    if detail:
+    if detail and 'deckGeometry' not in b:
         # The wearing surface comes only from the continuous road ribbon.
         # Unsurveyed transverse joint boxes used to sit on top of that surface.
         for yy in [-4,-2,0,2,4]:deck.box(0,yy,z-slab-b['beamDepth']+.125,length-1,.24,.25,C['bridgeEdge'])
