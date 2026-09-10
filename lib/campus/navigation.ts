@@ -4,6 +4,7 @@ export const LANDMARK_ALIASES: Record<string, string[]> = {
   'time-gate': ['时空之门', '时光广场', '图书馆北广场'],
   'south-gate': ['南门', '大学东路校门'],
   library: ['校图书馆', '西大图书馆'],
+  'teaching-ten': ['十教', '10教', '教学十楼', '多媒体教学楼'],
   'teaching-six': ['六教', '6教'],
   'teaching-two': ['二教', '2教', '南宁楼'],
   'student-center': ['大活', '学生活动中心'],

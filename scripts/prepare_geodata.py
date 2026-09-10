@@ -89,15 +89,20 @@ def prepare():
                 b['name']='西田径场主席台';b['category']='culture'
                 b['facadeBasis']='2025 校方照片：开放主席台、白色挑檐、桁架及分色阶梯座席；尺寸估算'
                 b['sourceRefs']=['osm','westTrack2025','westMeet2025']
-            if lm and lm['id'] in ('library','international-residence'):
+            if lm and lm['id'] in ('library','international-residence','teaching-ten'):
                 b['architecture']=architectural_envelope(b)
                 b['facadeBasis']=lm['detail']
+                if lm['id']=='teaching-ten':
+                    b['heightBasis']=b['architecture']['heightBasis']
+                    b['sourceRefs']=['osm',lm['reference']]+lm.get('additionalReferences',[])
             props.update({k:b[k] for k in ('name','category','height','heightBasis','facadeBasis','landmark')});buildings.append(b)
         features.append({'type':'Feature','id':eid,'properties':props,'geometry':mapping(transform(inverse,g))})
     # South gate uses the mapped road / campus boundary; its architectural extent is photo-estimated.
     for l in landmarks:
         b=next((b for b in buildings if b['id']==l.get('osmId')),None)
-        if b:l['center']=b['center'];l['bounds']=b['bounds'];l['height']=b['height'];l['sourceUrl']=b['sourceUrl'];l['osmEditedAt']=b['osmEditedAt']
+        if b:
+            l['center']=b['center'];l['bounds']=b['bounds'];l['height']=b['height'];l['sourceUrl']=b['sourceUrl'];l['osmEditedAt']=b['osmEditedAt']
+            if l['id']=='teaching-ten':l['osmVersion']=b['osmVersion']
         else:
             l['center']=list(project(*l['lonLat']));x,y=l['center']
             if l.get('placeKind')=='gate':

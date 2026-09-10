@@ -80,6 +80,26 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['night', '夜景', Moon],
 ];
 const refs: Record<string, { name: string; url: string; year: string }> = {
+  teachingTenGallery: {
+    name: '第十教学楼 · 校方多媒体教学楼外观',
+    url: 'https://www.gxu.edu.cn/info/1021/18800.htm',
+    year: '发表及拍摄日期未知；外观参考',
+  },
+  teachingTen2024: {
+    name: '第十教学楼 · 智慧教室调研记录',
+    url: 'https://jwc.gxu.edu.cn/info/1222/3455.htm',
+    year: '发布于 2024-10-08；用途与名称核对',
+  },
+  teachingTen2026: {
+    name: '第十教学楼 · 2026 年校方面试公告',
+    url: 'https://www.gxu.edu.cn/info/1364/40889.htm',
+    year: '发布于 2026-06-09；用途与名称核对',
+  },
+  teachingTenClassrooms2022: {
+    name: '第十教学楼 · A/B 座智慧教室建设公告',
+    url: 'https://www.gxu.edu.cn/info/1006/29463.htm',
+    year: '发布于 2022-06-24；用途与名称核对',
+  },
   timeGate2025: {
     name: '时光之门 · 校方研学活动近景',
     url: 'https://cjxy.gxu.edu.cn/info/1041/1477.htm',

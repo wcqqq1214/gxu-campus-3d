@@ -30,6 +30,8 @@ def prepare_sculptures():
           'properties':{'kind':'artwork','name':l['name'],'osmSourceName':l['osmSourceName'],'tags':e['tags'],
             'landmark':l['id'],'insideCampus':True,'sourceUrl':l['sourceUrl'],'osmVersion':e['version'],
             'osmEditedAt':e['timestamp'],'positionBasis':l['positionBasis']}})
+    # Explicit order for newly curated buildings keeps existing index numbers stable.
+    landmarks.sort(key=lambda l:l.get('navigationOrder',0))
     trees=json.loads((OUT/'vegetation.json').read_text())
     trees=[t for t in trees if all(math.dist(t[:2],l['center'])>l['radius']+1+4*t[2]/9 for l in catalogue)]
     overview=json.loads((OUT/'overview.json').read_text());overview.update(landmarks=len(landmarks),trees=len(trees))
