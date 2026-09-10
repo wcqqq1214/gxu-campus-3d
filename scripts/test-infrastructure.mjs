@@ -70,6 +70,30 @@ test('立交上下层分离，短坡道也连续接回原校道', () => {
   }
 });
 
+test('桥上沥青覆盖完整桥段并在两端等高接回道路', () => {
+  const path = data.corridor.path;
+  for (let i = 1; i < path.length; i++)
+    assert.ok(
+      Math.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]) > 1.4,
+      'bridge endpoint must not create a tiny segment with folded road edges',
+    );
+  for (const b of data.bridges) {
+    const ends = [b.upper[0], b.upper.at(-1)].map((q) => {
+      const index = path.findIndex(
+        (p) => Math.hypot(p[0] - q[0], p[1] - q[1]) < 1e-6,
+      );
+      assert.ok(index >= 0, `${b.name}: missing exact deck endpoint`);
+      return index;
+    });
+    const [start, end] = ends.sort((a, b) => a - b);
+    for (const p of path.slice(start, end + 1))
+      assert.ok(
+        Math.abs(p[2] - b.deckElevation) < 0.001,
+        `${b.name}: asphalt dips into deck near an end`,
+      );
+  }
+});
+
 function inTriangle(p, a, b, c) {
   const sign = (a, b, p) =>
     (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]);
