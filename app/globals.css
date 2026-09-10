@@ -1550,3 +1550,13 @@ a svg {
     display: none;
   }
 }
+
+.scene-status:has(progress) {
+  flex-wrap: wrap;
+}
+.scene-status progress {
+  width: 100%;
+  height: 4px;
+  accent-color: #315e45;
+  border: 0;
+}

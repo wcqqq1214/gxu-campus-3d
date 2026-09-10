@@ -151,6 +151,7 @@ export default function Home() {
     [overview, setOverview] = useState<Overview | null>(null);
   const [ready, setReady] = useState(false),
     [status, setStatus] = useState('正在铺开校园…'),
+    [loadProgress, setLoadProgress] = useState<number | undefined>(undefined),
     [error, setError] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
     [query, setQuery] = useState(''),
@@ -204,9 +205,10 @@ export default function Home() {
           )
             throw new Error('WebGL test');
           const c = createScene(host.current, bs, ls, {
-            onStatus: (message, failed = false) => {
+            onStatus: (message, failed = false, progress) => {
               if (active) {
                 setStatus(message);
+                setLoadProgress(progress);
                 setError(failed);
               }
             },
@@ -862,6 +864,9 @@ export default function Home() {
         >
           {!error && <LoaderCircle className="spin" size={16} />}
           <span>{status}</span>
+          {loadProgress !== undefined && (
+            <progress aria-label="模型加载进度" max={1} value={loadProgress} />
+          )}
           {error && <button onClick={retry}>重试</button>}
         </div>
       )}
