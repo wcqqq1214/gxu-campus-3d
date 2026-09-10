@@ -68,12 +68,33 @@
       "maximumRoadProtrusionMeters": 0.045
     }
   ],
+  "sourceRoadSeams": [
+    {
+      "id": "chongzuo-bridge",
+      "samples": 1410,
+      "minimumSurfaceSeparationMeters": 0.04,
+      "maximumDeckPlaneErrorMeters": 0.0019
+    },
+    {
+      "id": "bocui-bridge",
+      "samples": 1205,
+      "minimumSurfaceSeparationMeters": 0.038,
+      "maximumDeckPlaneErrorMeters": 0.002
+    },
+    {
+      "id": "huixian-bridge",
+      "samples": 1490,
+      "minimumSurfaceSeparationMeters": 0.0383,
+      "maximumDeckPlaneErrorMeters": 0.0017
+    }
+  ],
   "railingBridgeIntersections": {
     "chongzuo-bridge": 0,
     "bocui-bridge": 0,
     "huixian-bridge": 0
   },
   "sourceRoadPaintFaces": 1512,
+  "sourceUpwardRoadSurfaceFaces": 5374,
   "basePedestrian": [
     {
       "id": "chongzuo-bridge",
@@ -92,6 +113,26 @@
       "floorAndHeadroomSamples": 1116,
       "clearWalkingSegments": 744,
       "minimumPedestrianHeadroomMeters": 2.695
+    }
+  ],
+  "baseRoadSeams": [
+    {
+      "id": "chongzuo-bridge",
+      "samples": 1410,
+      "minimumSurfaceSeparationMeters": 0.0398,
+      "maximumDeckPlaneErrorMeters": 0.0022
+    },
+    {
+      "id": "bocui-bridge",
+      "samples": 1205,
+      "minimumSurfaceSeparationMeters": 0.0411,
+      "maximumDeckPlaneErrorMeters": 0.0036
+    },
+    {
+      "id": "huixian-bridge",
+      "samples": 1490,
+      "minimumSurfaceSeparationMeters": 0.0396,
+      "maximumDeckPlaneErrorMeters": 0.0031
     }
   ],
   "dracoDecoded": [
@@ -160,7 +201,47 @@
     {
       "id": "huixian-bridge",
       "samples": 858,
-      "maximumRoadProtrusionMeters": 0.031
+      "maximumRoadProtrusionMeters": 0.038
+    }
+  ],
+  "dracoRoadSeams": [
+    {
+      "id": "chongzuo-bridge",
+      "samples": 1410,
+      "minimumSurfaceSeparationMeters": 0.0392,
+      "maximumDeckPlaneErrorMeters": 0.0022
+    },
+    {
+      "id": "bocui-bridge",
+      "samples": 1205,
+      "minimumSurfaceSeparationMeters": 0.0406,
+      "maximumDeckPlaneErrorMeters": 0.0036
+    },
+    {
+      "id": "huixian-bridge",
+      "samples": 1490,
+      "minimumSurfaceSeparationMeters": 0.0404,
+      "maximumDeckPlaneErrorMeters": 0.0031
+    }
+  ],
+  "nearRoadSeams": [
+    {
+      "id": "chongzuo-bridge",
+      "samples": 1410,
+      "minimumSurfaceSeparationMeters": 0.0391,
+      "maximumDeckPlaneErrorMeters": 0.0015
+    },
+    {
+      "id": "bocui-bridge",
+      "samples": 1205,
+      "minimumSurfaceSeparationMeters": 0.037,
+      "maximumDeckPlaneErrorMeters": 0.0027
+    },
+    {
+      "id": "huixian-bridge",
+      "samples": 1490,
+      "minimumSurfaceSeparationMeters": 0.0369,
+      "maximumDeckPlaneErrorMeters": 0.0033
     }
   ],
   "result": "passed"
