@@ -1216,3 +1216,337 @@ a svg {
     scroll-behavior: auto !important;
   }
 }
+
+/* One dock keeps navigation, landmark information and tour controls together. */
+.panel-dock {
+  position: absolute;
+  left: 24px;
+  top: 108px;
+  width: 320px;
+  max-height: calc(100dvh - 152px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 8;
+  background: #fcfdfbf5;
+  border: 1px solid #ffffffdb;
+  border-radius: 18px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 16px 60px #183c2514;
+}
+.dock-heading {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 3px 12px;
+}
+.dock-toggle,
+.dock-back {
+  border: 0;
+  background: none;
+  color: #274e3c;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.dock-toggle {
+  flex: 1;
+  gap: 8px;
+  text-align: left;
+  min-width: 0;
+  font-size: 14px;
+}
+.dock-toggle > span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+.dock-toggle small {
+  font-size: 12px;
+  color: #566d5f;
+}
+.dock-back {
+  width: 44px;
+  justify-content: center;
+}
+.panel-dock.collapsed {
+  width: 210px;
+}
+.panel-dock.collapsed .dock-toggle svg {
+  transform: rotate(180deg);
+}
+.panel-dock.collapsed .tour-bar {
+  display: none;
+}
+.dock-body {
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: thin;
+  overscroll-behavior: contain;
+}
+.dock-body[hidden] {
+  display: none;
+}
+.panel-dock .explorer,
+.panel-dock .place-detail {
+  position: static;
+  width: 100%;
+  padding: 4px 18px 12px;
+  max-height: none;
+  background: none;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+  overflow: visible;
+}
+.panel-dock .panel-heading {
+  display: none;
+}
+.panel-dock .places {
+  max-height: none;
+  overflow: visible;
+}
+.panel-dock .settings-content {
+  max-height: none;
+  overflow: visible;
+}
+.panel-dock .main-tabs {
+  overflow: visible;
+}
+.panel-dock .panel-foot {
+  font-size: 12px;
+}
+.panel-dock .tour-bar {
+  position: static;
+  transform: none;
+  width: auto;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 18px;
+  background: #f0f5ed;
+  border: 0;
+  border-top: 1px solid #dfe8da;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.panel-dock .tour-copy {
+  width: 100%;
+  margin-bottom: 4px;
+}
+.panel-dock .tour-copy strong {
+  font-size: 14px;
+}
+.panel-dock .tour-copy small {
+  font-size: 12px;
+  color: #526950;
+  white-space: normal;
+}
+.panel-dock .tour-start {
+  flex: 1;
+  margin: 0;
+  height: 44px;
+  justify-content: center;
+  font-size: 14px;
+}
+.panel-dock .tour-skip {
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  color: #335a40;
+  border: 1px solid #d3dfcd;
+  border-radius: 8px;
+}
+.return-landmark {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-height: 44px;
+  border: 0;
+  background: none;
+  color: #215d47;
+  font-size: 14px;
+}
+.landmark-views {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 7px;
+  margin: 16px 0;
+}
+.landmark-views button {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 14px;
+  color: #365840;
+  background: #f2f6ef;
+  border: 1px solid #dce7d6;
+  border-radius: 8px;
+}
+.landmark-views button[aria-pressed='true'] {
+  background: #215d47;
+  color: #fff;
+  border-color: #215d47;
+}
+.landmark-views button:last-child {
+  grid-column: span 2;
+}
+.panel-dock .detail-heading h2 {
+  font-size: 24px;
+}
+.panel-dock .detail-heading .eyebrow {
+  font-size: 12px;
+}
+.panel-dock .place-detail > p {
+  font-size: 14px;
+  color: #52674c;
+  line-height: 1.8;
+}
+.panel-dock .detail-actions {
+  padding-top: 4px;
+}
+.panel-dock .detail-actions button {
+  min-height: 44px;
+  font-size: 14px;
+}
+.panel-dock .detail-evidence,
+.panel-dock .detail-evidence dl {
+  font-size: 14px;
+}
+.panel-dock .detail-evidence dt,
+.panel-dock .detail-evidence > small {
+  color: #52674c;
+  font-size: 12px;
+}
+.panel-dock .detail-evidence a {
+  font-size: 14px;
+  min-height: 30px;
+}
+.panel-dock .detail-evidence dl > div {
+  display: block;
+  margin: 12px 0;
+}
+.place-index,
+.place-copy small,
+.result-heading,
+.section-hint,
+.panel-foot,
+.settings-note {
+  color: #566c53;
+}
+.map-footer {
+  left: var(--scene-left, 368px);
+  font-size: 12px;
+  gap: 12px;
+}
+.map-tools button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.icon-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+@media (max-width: 759px) {
+  .panel-dock,
+  .panel-dock.collapsed {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 48dvh;
+    border-radius: 20px 20px 0 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  .panel-dock.collapsed {
+    max-height: none;
+  }
+  .dock-heading {
+    padding: 3px 16px;
+  }
+  .panel-dock .tour-bar {
+    display: grid;
+    grid-template-columns: 1fr 44px 44px;
+    padding: 9px 18px;
+    gap: 6px;
+  }
+  .panel-dock.collapsed .tour-bar {
+    display: none;
+  }
+  .panel-dock .tour-copy {
+    display: none;
+  }
+  .panel-dock .tour-start span {
+    font-size: 14px;
+  }
+  .panel-dock .place-detail {
+    padding-top: 0;
+  }
+  .panel-dock .detail-heading {
+    display: none;
+  }
+  .panel-dock .place-detail > p {
+    margin-top: 0;
+    font-size: 14px;
+  }
+  .panel-dock .landmark-views {
+    grid-template-columns: repeat(4, 1fr);
+    margin: 10px 0;
+    gap: 6px;
+  }
+  .panel-dock .landmark-views button {
+    font-size: 13px;
+  }
+  .panel-dock .panel-foot {
+    display: none;
+  }
+  .map-tools {
+    top: 94px;
+    gap: 8px;
+    max-height: calc(100dvh - var(--dock-height, 48dvh) - 126px);
+    overflow: auto;
+    scrollbar-width: none;
+  }
+  .map-tools > * {
+    flex-shrink: 0;
+  }
+  .map-footer {
+    left: 12px;
+    right: 12px;
+    bottom: calc(var(--dock-height, 48dvh) + 9px);
+    font-size: 10px;
+  }
+  .map-label {
+    font-size: 12px;
+    min-height: 32px;
+  }
+  .map-label > span {
+    font-size: 10px;
+  }
+  .masthead p {
+    display: none;
+  }
+  .masthead h1 span {
+    letter-spacing: 0;
+  }
+}
+@media (max-height: 560px) and (min-width: 760px) {
+  .panel-dock {
+    top: 98px;
+    max-height: calc(100dvh - 134px);
+    width: 280px;
+  }
+  .panel-dock .tour-copy {
+    display: none;
+  }
+}
