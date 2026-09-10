@@ -6,7 +6,7 @@
 
 基于公开地理数据与 Blender 建模的三维校园，支持地标探索、自动巡游与昼夜切换。
 
-[在线游览](https://wcqqq1214.github.io/gxu-campus-3d/) · [数据依据](docs/DATA.md) · [建模说明](docs/MODELING.md) · [验收记录](docs/VALIDATION.md)
+[在线游览](https://wcqqq1214.github.io/gxu-campus-3d/) · [数据依据](docs/DATA.md) · [建模说明](docs/MODELING.md) · [体验优化](docs/OPTIMIZATION.md) · [验收记录](docs/VALIDATION.md)
 
 ![Three.js](https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=threedotjs&logoColor=white)
 ![Blender](https://img.shields.io/badge/Blender-E87D0D?style=for-the-badge&logo=blender&logoColor=white)
@@ -32,9 +32,10 @@
 
 | 功能 | 可以做什么 |
 | --- | --- |
-| **地标探索** | 搜索、点击建筑或通过列表定位 14 处精选地标。 |
+| **地标探索** | 按分类与“六教”“新东园门”等别名搜索，定位 14 处精选地标。 |
 | **自动巡游** | 按地标顺序游览，支持暂停、继续和前后跳站；手动操作会暂停巡游。 |
 | **自由视角** | 旋转、平移、缩放；地标可切换全貌、正背面、俯视、入口近景与环绕观察。 |
+| **位置与分享** | 小图显示地标及镜头方向；分享链接还原镜头和光照，并适配不同屏幕。 |
 | **光照与画质** | 选择晨光、日间、黄昏或夜景，搭配自动、精细、流畅画质。 |
 | **图层控制** | 分别开关建筑、植被、道路、水体、运动场、周边建筑和名称标注。 |
 | **截图与移动端** | 导出带 OSM 署名的 PNG；手机统一底部面板，桌面菜单可收起，镜头按可用画面自动构图。 |
@@ -52,7 +53,7 @@
 | --- | --- |
 | ![东田径场](docs/screenshots/east-track.png) | ![西田径场](docs/screenshots/west-track.png) |
 
-[查看移动端截图](docs/screenshots/mobile.png)
+[查看移动端截图](docs/screenshots/mobile-optimized.png)
 
 </details>
 

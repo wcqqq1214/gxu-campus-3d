@@ -16,7 +16,7 @@ export function landmarkDirection(
   const reverse = view === 'back' || view === 'rear-entrance' ? -1 : 1;
   return new Vector3(
     Math.sin(bearing) * reverse,
-    0.32,
+    view === 'entrance' || view === 'rear-entrance' ? 0.48 : 0.32,
     -Math.cos(bearing) * reverse,
   ).normalize();
 }

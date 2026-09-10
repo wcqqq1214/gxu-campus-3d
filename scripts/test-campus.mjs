@@ -168,6 +168,7 @@ test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
   for (const a of [
     manifest.base,
     manifest.trees,
+    ...(manifest.treesNear ? [manifest.treesNear] : []),
     ...manifest.zones,
     ...manifest.landmarks,
   ]) {
