@@ -138,3 +138,25 @@ test('雕塑近景保留银色主体的脚部、三足和顶部突起', async ()
     );
   }
 });
+
+test('六教南北门近景沿建筑轴线定位，四向入口与三个内院保留', async () => {
+  const l = landmarks.find((p) => p.id === 'teaching-six');
+  const b = buildings.find((p) => p.landmark === l.id);
+  const south = entranceBox(l, landmarkBox(l), false, b.architecture).getCenter(
+    new Vector3(),
+  );
+  const north = entranceBox(l, landmarkBox(l), true, b.architecture).getCenter(
+    new Vector3(),
+  );
+  assert.ok(Math.abs(south.distanceTo(north) - 60) < 0.001);
+  assert.ok(north.z < south.z - 58);
+  const direction = landmarkDirection(l, 'rear-entrance', b.architecture);
+  assert.ok(direction.z < -0.85 && direction.x < 0);
+  assert.ok(b.architecture);
+  assert.deepEqual(
+    b.architecture.entrances.map((e) => e.id),
+    ['south', 'north', 'west', 'east'],
+  );
+  assert.equal(b.polygons[0].length - 1, 3);
+  assert.ok(l.additionalReferences.includes('teachingSixEntrances2025'));
+});

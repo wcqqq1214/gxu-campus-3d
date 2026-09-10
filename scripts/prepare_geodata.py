@@ -89,9 +89,10 @@ def prepare():
                 b['name']='西田径场主席台';b['category']='culture'
                 b['facadeBasis']='2025 校方照片：开放主席台、白色挑檐、桁架及分色阶梯座席；尺寸估算'
                 b['sourceRefs']=['osm','westTrack2025','westMeet2025']
-            if lm and lm['id'] in ('library','international-residence','teaching-ten'):
+            if lm and lm['id'] in ('library','international-residence','teaching-ten','teaching-six'):
                 b['architecture']=architectural_envelope(b)
                 b['facadeBasis']=lm['detail']
+                if lm['id']=='teaching-six':b['sourceRefs']=['osm',lm['reference']]+lm.get('additionalReferences',[])
                 if lm['id']=='teaching-ten':
                     b['heightBasis']=b['architecture']['heightBasis']
                     b['sourceRefs']=['osm',lm['reference']]+lm.get('additionalReferences',[])

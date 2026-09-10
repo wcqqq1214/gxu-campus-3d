@@ -59,7 +59,7 @@ blender --background --python-exit-code 1 --python blender/validate_landmarks.py
 | 大礼堂 | 官方图库现状斜视：三角山花、六柱门廊、侧面窗列、台阶 | [查看](model-checks/auditorium-1.png) | [查看](model-checks/auditorium-2.png) |
 | 综合体育馆 | 2021 官方视频 7 秒/12 秒：浅坡大屋盖、采光构件、百叶、柱墩；辅以 2024 场馆用途 | [查看](model-checks/stadium-1.png) | [查看](model-checks/stadium-2.png) |
 | 大学生活动中心 | 2026 图文：曲线轮廓、白色水平带、深色玻璃；保留 OSM 内院 | [查看](model-checks/student-center-1.png) | [查看](model-checks/student-center-2.png) |
-| 第六教学楼 | 官方图库：竖向窗列、平屋顶挑檐、雨棚、台阶；保留真实内院，未见面推定 | [查看](model-checks/teaching-six-1.png) | [查看](model-checks/teaching-six-2.png) |
+| 第六教学楼 | 校方入口图：南北门、东西侧门及底层贯通；官方图库：窗框、挑檐、门厅、台阶，尺寸推定 | [查看](model-checks/teaching-six-1.png) | [查看](model-checks/teaching-six-2.png) |
 | 第二教学楼 | OSM 轮廓、7 层标签及 2024 导览位置；立面主要按教学楼类型推定，未取得可确认的近期外观 | [查看](model-checks/teaching-two-1.png) | [查看](model-checks/teaching-two-2.png) |
 | 综合实验大楼 | 校门与实验楼官方图库：双翼与中央上部桥体，底部通孔保持开放；后立面推定 | [查看](model-checks/laboratory-1.png) | [查看](model-checks/laboratory-2.png) |
 | 计算机与电子信息学院 | 官方 PDF 第 1 页：竖向玻璃核心、粉色侧墙、窗列与悬挑平檐；背面及细节推定 | [查看](model-checks/computer-1.png) | [查看](model-checks/computer-2.png) |
@@ -199,3 +199,21 @@ blender --background --python-exit-code 1 --python blender/validate_infrastructu
 ```sh
 blender --background --python-exit-code 1 --python blender/validate_teaching_ten.py
 ```
+
+## 第六教学楼四向入口核对（2026-09-11）
+
+旧模型为独立地标，但仅有南侧雨棚和台阶；首层整体挤出封住了实际入口，不足以视作完整精建。本次改为 `blender/teaching_six.py` 独立规则：保留 OSM `relation/11971046` 的三个内院，首层墙体按通道分割，二至六层保持原轮廓；补建南北门厅、东西侧门、台阶、雨棚、扶手、架空通道顶板和底面。基础和精细模型都保留通道，精细档增加窗框、线脚、竖向立柱与扶手。
+
+[校方 2025-12-17 考前通知](https://yjsc.gxu.edu.cn/info/1021/4254.htm)的附件 3 明确标示南大门、北大门及两侧出入口；图中安检门是考试管理位置，不作为永久门编号。[华蓝项目资料](https://www.gxhl.com/work/jianzhugongcheng/337.html)说明三个中庭及中央首层架空连通南北，并列出 2013 年设计、2016 年竣工。校方图库与设计单位外观照片均未标注拍摄日期，不能称为近期实景照片。
+
+入口位置关系有资料支持；约 14 米主入口、7 米侧入口、5.2 米顶板高度、台阶、背面和侧面立面细节为展示估算。通道宽高仅记录模型参数，未作现场测量。源模型按具名分组保留四个入口、楼层、通道和立面，网页新增六教“北门近景”。
+
+| 南侧与东门 | 北侧与西门 |
+| --- | --- |
+| ![六教南东面](model-checks/teaching-six-1.png) | ![六教北西面](model-checks/teaching-six-2.png) |
+
+```sh
+blender --background --python-exit-code 1 --python blender/validate_teaching_six.py
+```
+
+北门及西侧门附近的 DEM 高于建筑锚点约 0.33 米，台阶基底抬高并收敛至同一门厅标高，避免地面穿出台阶；门前挡住近景的树木为示意配置，已作局部避让。

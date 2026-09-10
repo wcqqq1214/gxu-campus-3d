@@ -80,6 +80,16 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['night', '夜景', Moon],
 ];
 const refs: Record<string, { name: string; url: string; year: string }> = {
+  teachingSixEntrances2025: {
+    name: '六教 · 校方南北门与两侧入口示意图',
+    url: 'https://yjsc.gxu.edu.cn/info/1021/4254.htm',
+    year: '发布于 2025-12-17；附件 3 入口位置关系',
+  },
+  teachingSixDesign: {
+    name: '六教 · 华蓝设计项目说明与外观',
+    url: 'https://www.gxhl.com/work/jianzhugongcheng/337.html',
+    year: '2013 年设计、2016 年竣工；照片日期未知',
+  },
   teachingTenGallery: {
     name: '第十教学楼 · 校方多媒体教学楼外观',
     url: 'https://www.gxu.edu.cn/info/1021/18800.htm',
@@ -603,16 +613,20 @@ export default function Home() {
                       ['oblique', '全貌'],
                       [
                         'front',
-                        currentLandmark.id === 'library' ? '南侧' : '正面',
+                        ['library', 'teaching-six'].includes(currentLandmark.id)
+                          ? '南侧'
+                          : '正面',
                       ],
                       [
                         'back',
-                        currentLandmark.id === 'library' ? '北侧' : '背面',
+                        ['library', 'teaching-six'].includes(currentLandmark.id)
+                          ? '北侧'
+                          : '背面',
                       ],
                       ['top', '俯视'],
                       [
                         'entrance',
-                        currentLandmark.id === 'library'
+                        ['library', 'teaching-six'].includes(currentLandmark.id)
                           ? '南门近景'
                           : currentLandmark?.placeKind === 'bridge'
                             ? '桥下近景'
@@ -620,7 +634,9 @@ export default function Home() {
                               ? '雕塑近景'
                               : '入口近景',
                       ],
-                      ...(currentLandmark.id === 'library'
+                      ...(['library', 'teaching-six'].includes(
+                        currentLandmark.id,
+                      )
                         ? [['rear-entrance', '北门近景']]
                         : []),
                     ] as [LandmarkView, string][]
@@ -1149,7 +1165,7 @@ export default function Home() {
             <h3>如何操作</h3>
             <p>
               鼠标左键旋转，右键平移，滚轮缩放；触屏单指旋转、双指平移与缩放。聚焦画面后可用方向键平移、加减键缩放、Home
-              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆分别提供南北门，桥梁提供桥下近景。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
+              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆和六教分别提供南北门，桥梁提供桥下近景。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
             </p>
             <h3>开源与许可</h3>
             <p>
