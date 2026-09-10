@@ -165,3 +165,7 @@ blender --background --python-exit-code 1 --python blender/validate_infrastructu
 ```
 
 道路或桥梁几何改变后使用完整构建，确保可编辑源文件、基础 LOD 和近景资产一致。基于实际源文件和导出 GLB 的检查与实拍对照记录见 [农院路与桥梁](INFRASTRUCTURE.md)。
+
+### 体育馆临路体量修正（2026-09-11）
+
+针对农院路穿模，体育馆按 `way/699156920` 的原凹形轮廓区分南侧主体与较窄北翼，取消在整个外接矩形东侧生成附楼的做法。既有照片用于屋顶和立面节奏，体量定位依据原 OSM 轮廓；没有新增照片或测绘证据。源文件、基础和精细 GLB 均同步，两个检查视角见 [正面](model-checks/stadium-1.png)与[北侧](model-checks/stadium-2.png)。
