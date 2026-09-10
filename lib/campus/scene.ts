@@ -16,6 +16,7 @@ import {
   landmarkDirection,
 } from './camera';
 import { DEFAULT_LAYERS } from './types';
+import { createBoundary } from './boundary';
 import type {
   Building,
   Landmark,
@@ -121,6 +122,11 @@ export function createScene(
   fill.position.set(1000, 600, -700);
   scene.add(fill);
   const layers = { ...DEFAULT_LAYERS };
+  const boundaryRoot = new THREE.Group();
+  scene.add(boundaryRoot);
+  let boundaryReady = false,
+    boundaryLoading = false,
+    boundaryFailed = false;
   const dynamic = new THREE.Group();
   scene.add(dynamic);
   const ground = new THREE.Mesh(
@@ -589,6 +595,7 @@ export function createScene(
         child.visible =
           (layers[classify(child) as LayerKey] ?? true) &&
           !loaded.get(child.name)?.visible;
+    boundaryRoot.visible = layers.boundary;
     if (treesRoot) treesRoot.visible = layers.vegetation;
     labels.style.display = layers.labels ? '' : 'none';
     highlight.visible = layers[detailLayer('landmark-' + selected)];
@@ -605,6 +612,11 @@ export function createScene(
         `${foreground.label} · ${Math.round(foreground.fraction * 100)}%`,
         false,
         foreground.fraction,
+      );
+    else if (boundaryFailed && layers.boundary)
+      callbacks.onStatus(
+        '校园边界暂未加载，现有场景可继续浏览；可重试。',
+        true,
       );
     else if (treesFailed || (highTreesFailed && !modeSmooth))
       callbacks.onStatus('部分植被暂未加载，已保留现有场景，可重试。', true);
@@ -978,6 +990,28 @@ export function createScene(
       o.visible = o.userData.lod === 1 ? near : !near;
     }
   }
+  async function loadBoundary() {
+    if (boundaryLoading || boundaryReady || disposed) return;
+    boundaryLoading = true;
+    try {
+      const response = await fetch(asset('data/campus-boundary.json'), {
+        signal: lifecycle.signal,
+        cache: 'no-cache',
+      });
+      if (!response.ok) throw new Error('boundary');
+      const data = await response.json();
+      if (disposed) return;
+      boundaryRoot.add(createBoundary(data));
+      boundaryReady = true;
+      boundaryFailed = false;
+      applyLayers();
+    } catch {
+      if (!disposed) boundaryFailed = true;
+    } finally {
+      boundaryLoading = false;
+      if (!disposed) updateLoadStatus();
+    }
+  }
   async function initialize() {
     if (loading.has('base') || initialReady) return;
     loading.add('base');
@@ -1015,6 +1049,7 @@ export function createScene(
       applyLayers();
       callbacks.onReady();
       callbacks.onStatus('');
+      void loadBoundary();
       reconcileDetails();
       void loadTrees().catch(() => {
         if (!disposed) callbacks.onStatus('植被暂未加载，可重试。', true);
@@ -1278,6 +1313,13 @@ export function createScene(
     }
     if (dirty || moving || tween) {
       cameraChanged = true;
+      // A 1 m near plane wastes depth precision at campus-wide altitude,
+      // causing thin road/terrain surfaces to flicker in the overview.
+      const near = Math.max(1, Math.min(100, (camera.position.y - 50) * 0.01));
+      if (camera.near !== near) {
+        camera.near = near;
+        camera.updateProjectionMatrix();
+      }
       shadowFrustum();
       applyTreeLOD();
       renderer.render(scene, camera);
@@ -1388,6 +1430,8 @@ export function createScene(
       layers[key] = on;
       applyLayers();
       if (key === 'buildings' || key === 'roads') reconcileDetails();
+      if (key === 'boundary' && on) void loadBoundary();
+      updateLoadStatus();
     },
     setPreset,
     setQuality,
@@ -1403,7 +1447,8 @@ export function createScene(
       const size = Math.max(15, Math.round(out.width / 110));
       ctx.font = `${size}px sans-serif`;
       const label =
-        '广西大学 · 云游校园  |  © OpenStreetMap contributors · ODbL';
+        '广西大学 · 云游校园  |  © OpenStreetMap contributors · ODbL' +
+        (layers.boundary && boundaryReady ? '  |  橙色虚线：校园大致边界' : '');
       ctx.fillStyle = '#15382ddd';
       ctx.fillRect(0, out.height - size * 3, out.width, size * 3);
       ctx.fillStyle = 'white';
@@ -1422,6 +1467,7 @@ export function createScene(
     retry: () => {
       if (!initialReady) void initialize();
       else {
+        void loadBoundary();
         failed.clear();
         highTreesFailed = false;
         treesFailed = false;

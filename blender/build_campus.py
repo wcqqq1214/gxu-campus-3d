@@ -22,6 +22,7 @@ for name,color,rough,metal in [('stone','#cebfaa',.83,0),('white','#eeeee4',.74,
 terrain=json.loads((DATA/'terrain.json').read_text());buildings=json.loads((DATA/'buildings.json').read_text());landmarks=json.loads((DATA/'landmarks.json').read_text());surfaces=json.loads((DATA/'surfaces.json').read_text());trees=json.loads((DATA/'vegetation.json').read_text())
 fields=json.loads((DATA/'sports.json').read_text())
 infrastructure=json.loads((DATA/'infrastructure.json').read_text())
+surroundings=json.loads((DATA/'surroundings.json').read_text())
 bridge_by_id={b['id']:b for b in infrastructure['bridges']}
 lake_by_id={b['id']:b for b in infrastructure['lakeBridges']}
 for name,color,rough,metal in [('asphalt','#626664',.97,0),('pavingRed','#b97865',.93,0),('tactile','#d6b663',.95,0),('curb','#c7c9bd',.86,0),('roadWhite','#f0ecda',.92,0),('roadYellow','#e5c266',.92,0),('wallStone','#d6c8aa',.9,0),('fenceIron','#343e3d',.63,.4),('lampMetal','#929f9e',.48,.5),('lampGlass','#e7e8cf',.25,.15),('bridgeConcrete','#afb2a6',.91,0),('bridgeEdge','#c7c9bd',.86,0),('bridgeJoint','#525b59',.95,0),('bridgePlaque','#665d4f',.82,0),('drainStone','#bfc0b3',.94,0)]:
@@ -130,6 +131,7 @@ for si,original in enumerate(surfaces):
     s=original
     if s['id'] in infrastructure['replaceSurfaceIds']:continue
     if str(si) in infrastructure['surfaceOverrides']:s={**s,**infrastructure['surfaceOverrides'][str(si)]}
+    if str(si) in surroundings['surfaceOverrides']:s={**s,**surroundings['surfaceOverrides'][str(si)]}
     if not s['vertices']:continue
     if s['id'] in [field['osmId'] for field in fields]:continue
     kind=s['kind'];verts=s['vertices'];tri=s['triangles'];mat=C['water'] if kind=='water' else C['sport'] if kind=='sports' else C['green'] if kind=='green' else C['path'] if s['tags'].get('highway') in ('path','footway','steps','pedestrian') else C['road']
@@ -149,6 +151,8 @@ for si,original in enumerate(surfaces):
         vx=[v[0] for v in verts];vy=[v[1] for v in verts];x0,x1=min(vx)+1,max(vx)-1;y0,y1=min(vy)+1,max(vy)-1
         if x1-x0>8 and y1-y0>12:
             for a,b in [((x0,y0),(x1,y0)),((x1,y0),(x1,y1)),((x1,y1),(x0,y1)),((x0,y1),(x0,y0)),((x0,(y0+y1)/2),(x1,(y0+y1)/2))]:base[layer].line((*a,elevation(*a)+.2),(*b,elevation(*b)+.2),.10,C['white'],4)
+from surroundings import surroundings_mesh
+base['roads'].extend(surroundings_mesh(surroundings,C,elevation,base['terrain']))
 print('Ground assembled',flush=True)
 infra_near={}
 for chunk in infrastructure['chunks']:
