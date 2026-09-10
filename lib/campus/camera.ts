@@ -118,6 +118,20 @@ export function entranceBox(
   rear: boolean,
   architecture?: Building['architecture'],
 ) {
+  if (place.placeKind === 'sculpture') {
+    return new Box3(
+      new Vector3(
+        place.center[0] - 8,
+        place.elevation - 0.5,
+        -place.center[1] - 7,
+      ),
+      new Vector3(
+        place.center[0] + 8,
+        place.elevation + place.height + 3,
+        -place.center[1] + 7,
+      ),
+    );
+  }
   if (place.placeKind === 'bridge' && place.portalCenter) {
     const forward = landmarkDirection(place, 'front').setY(0).normalize();
     // Crop the opening rather than an 18 m cube. A deep cube pushes a portrait

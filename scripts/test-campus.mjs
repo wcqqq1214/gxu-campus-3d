@@ -107,7 +107,7 @@ test('庭院内环、三角面与真实轮廓保留', () => {
   );
 });
 test('地标定位与校园南北关系', () => {
-  assert.equal(landmarks.length, 17);
+  assert.equal(landmarks.length, 18);
   assert.ok(
     landmarks.find((l) => l.id === 'south-gate').center[1] <
       landmarks.find((l) => l.id === 'laboratory').center[1],
@@ -119,7 +119,7 @@ test('地标定位与校园南北关系', () => {
   for (const l of landmarks) {
     assert.ok(l.sourceUrl.startsWith('https://'));
     assert.ok(l.reference);
-    if (l.osmId && !['gate', 'bridge'].includes(l.placeKind))
+    if (l.osmId && !['gate', 'bridge', 'sculpture'].includes(l.placeKind))
       assert.equal(buildings.find((b) => b.id === l.osmId)?.landmark, l.id);
   }
 });
@@ -218,10 +218,10 @@ test('来源日期字段和高程原始值可追溯', async () => {
 });
 
 test('索引、搜索和拾取仅使用精选地标目录', () => {
-  assert.equal(searchLandmarks(landmarks, '').length, 17);
+  assert.equal(searchLandmarks(landmarks, '').length, 18);
   assert.deepEqual(
     searchLandmarks(landmarks, ' 图书馆 ').map((p) => p.id),
-    ['library'],
+    ['library', 'time-gate'],
   );
   assert.deepEqual(
     searchLandmarks(landmarks, '留学生').map((p) => p.id),
@@ -236,7 +236,7 @@ test('索引、搜索和拾取仅使用精选地标目录', () => {
   assert.equal(
     picks.length,
     landmarks.filter(
-      (l) => l.osmId && !['gate', 'bridge'].includes(l.placeKind),
+      (l) => l.osmId && !['gate', 'bridge', 'sculpture'].includes(l.placeKind),
     ).length,
   );
   assert.ok(picks.every((b) => landmarks.some((l) => l.id === b.landmark)));
@@ -306,7 +306,7 @@ test('三座新增校门采用独立入口 POI，可导航且不伪造建筑轮�
     [180, 90, 270],
   );
   const picks = navigationFootprints(buildings, landmarks);
-  assert.equal(picks.length, 17);
+  assert.equal(picks.length, 18);
   for (const gate of gates) {
     assert.ok(picks.some((p) => p.id === gate.id));
     assert.ok(!buildings.some((b) => b.landmark === gate.id));
@@ -333,4 +333,59 @@ test('三座新增校门采用独立入口 POI，可导航且不伪造建筑轮�
         sources.some((s) => s.id === id),
         `Unknown reference ${id}`,
       );
+});
+
+test('时光之门绑定原雕塑节点、保留别名并纳入精选文体地标', async () => {
+  const l = landmarks.find((p) => p.id === 'time-gate');
+  const library = landmarks.find((p) => p.id === 'library');
+  assert.equal(l.placeKind, 'sculpture');
+  assert.equal(l.category, 'culture');
+  assert.equal(l.osmId, 'node/7862028559');
+  assert.equal(l.osmSourceName, '时空之门');
+  assert.deepEqual(l.lonLat, [108.290083, 22.8440442]);
+  const xy = project(...l.lonLat);
+  assert.ok(Math.hypot(xy[0] - l.center[0], xy[1] - l.center[1]) < 0.001);
+  assert.ok(
+    l.center[1] - library.center[1] > 130 &&
+      l.center[1] - library.center[1] < 150,
+  );
+  assert.equal(geo.features.filter((f) => f.id === l.osmId).length, 1);
+  assert.ok(!buildings.some((b) => b.id === l.osmId));
+  for (const name of ['时光之门', '时空之门', '图书馆北广场'])
+    assert.deepEqual(
+      searchLandmarks(landmarks, name, 'culture').map((p) => p.id),
+      [l.id],
+    );
+  assert.equal(
+    navigationFootprints(buildings, landmarks).filter(
+      (p) => p.landmark === l.id,
+    ).length,
+    1,
+  );
+  const sources = (await json('sources')).sources;
+  for (const id of l.sourceRefs)
+    assert.ok(
+      sources.some((s) => s.id === id),
+      id,
+    );
+  assert.equal((await json('overview')).landmarks, landmarks.length);
+  for (const name of ['base', 'time-gate']) {
+    const gltf = glbJson(
+      await readFile(new URL(`../public/models/${name}.glb`, import.meta.url)),
+    );
+    const node = gltf.nodes.filter((n) => n.extras?.landmark === l.id);
+    assert.equal(node.length, 1);
+    assert.ok(
+      gltf.materials.some(
+        (m) =>
+          m.name === 'timeSilver' &&
+          m.pbrMetallicRoughness.metallicFactor > 0.9,
+      ),
+    );
+    const positions = gltf.meshes[node[0].mesh].primitives.map(
+      (p) => gltf.accessors[p.attributes.POSITION],
+    );
+    assert.ok(Math.max(...positions.map((p) => p.max[1])) > l.elevation + 19);
+  }
+  assert.ok(manifest.landmarks.some((m) => m.id === l.id));
 });
