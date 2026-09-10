@@ -8,12 +8,30 @@ export const CampusMinimap = memo(function CampusMinimap({
   buildings,
   current,
   camera,
+  showBoundary,
 }: {
   buildings: Building[];
   current?: Landmark;
   camera: CameraSnapshot | null;
+  showBoundary: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [boundary, setBoundary] = useState<number[][][]>([]);
+  useEffect(() => {
+    if (!open || !showBoundary || boundary.length) return;
+    const c = new AbortController();
+    void fetch(
+      `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/data/campus-boundary.json`,
+      { signal: c.signal },
+    )
+      .then((r) => {
+        if (!r.ok) throw new Error('boundary');
+        return r.json();
+      })
+      .then((d: { rings: number[][][] }) => setBoundary(d.rings))
+      .catch(() => {});
+    return () => c.abort();
+  }, [open, showBoundary, boundary.length]);
   const [publicRoad, setPublicRoad] = useState<number[][]>([]);
   useEffect(() => {
     if (!open || publicRoad.length) return;
@@ -33,6 +51,15 @@ export const CampusMinimap = memo(function CampusMinimap({
   const map = useMemo(() => {
     const bounds = buildings.filter((b) => b.insideCampus).map((b) => b.bounds);
     if (!bounds.length) return null;
+    if (boundary.length) {
+      const points = boundary.flat();
+      bounds.push([
+        Math.min(...points.map((p) => p[0])),
+        Math.min(...points.map((p) => p[1])),
+        Math.max(...points.map((p) => p[0])),
+        Math.max(...points.map((p) => p[1])),
+      ]);
+    }
     const x0 = Math.min(...bounds.map((b) => b[0])) - 70,
       y0 = Math.min(...bounds.map((b) => b[1])) - 70;
     const x1 = Math.max(...bounds.map((b) => b[2])) + 70,
@@ -69,7 +96,7 @@ export const CampusMinimap = memo(function CampusMinimap({
             .join(' '),
         })),
     };
-  }, [buildings]);
+  }, [buildings, boundary]);
   if (!map) return null;
   const point = current ? map.point(...current.center) : null;
   const target = camera ? map.point(camera.target[0], -camera.target[2]) : null;
@@ -107,6 +134,24 @@ export const CampusMinimap = memo(function CampusMinimap({
                 fillRule="evenodd"
               />
             ))}
+            {showBoundary &&
+              boundary.map((ring, i) => (
+                <path
+                  key={`boundary-${i}`}
+                  d={ring
+                    .map(
+                      ([x, y], j) =>
+                        `${j ? 'L' : 'M'}${map.point(x, y).join(',')}`,
+                    )
+                    .join(' ')}
+                  fill="none"
+                  stroke="#ca852c"
+                  strokeWidth={1.3}
+                  strokeDasharray="3 2"
+                >
+                  <title>校园大致边界</title>
+                </path>
+              ))}
             {publicRoad.length > 0 && (
               <path
                 d={publicRoad
@@ -152,7 +197,7 @@ export const CampusMinimap = memo(function CampusMinimap({
           <small>
             {outside
               ? '观察中心位于图外，箭头显示朝向'
-              : `${publicRoad.length ? '棕线为公共农院路 · ' : ''}金点为地标，箭头为观察中心与朝向`}
+              : `${publicRoad.length ? '棕线为公共农院路 · ' : ''}${showBoundary && boundary.length ? '橙虚线为校园大致边界 · ' : ''}金点为地标，箭头为观察中心与朝向`}
           </small>
         </div>
       )}

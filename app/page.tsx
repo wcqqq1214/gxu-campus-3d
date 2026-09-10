@@ -70,6 +70,7 @@ const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
   ['roads', '道路与桥梁', '公共农院路、校道、桥梁与步行空间', Navigation],
   ['water', '湖塘水面', '镜湖、碧云湖及其他水体', Waves],
   ['sports', '运动场地', '球场、跑道与游泳池', GraduationCap],
+  ['boundary', '校园边界', '橙色虚线表示大致范围，农院路为公共道路', MapPin],
   ['context', '周边街区', '校界外约 300 米的建筑', Layers3],
   ['labels', '地点名称', '可点击的校园地标标注', MapPin],
 ];
@@ -935,6 +936,7 @@ export default function Home() {
             buildings={buildings}
             current={currentLandmark}
             camera={cameraState}
+            showBoundary={layers.boundary}
           />
         </div>
         <div className="tour-bar">
@@ -1053,6 +1055,12 @@ export default function Home() {
       </div>
       <footer className="map-footer">
         <span className="gesture-help">拖动旋转 · 右键平移 · 滚轮缩放</span>
+        {layers.boundary && (
+          <span className="boundary-legend">
+            <i />
+            校园大致边界
+          </span>
+        )}
         <a
           href="https://www.openstreetmap.org/copyright"
           target="_blank"
@@ -1165,7 +1173,7 @@ export default function Home() {
             <h3>如何操作</h3>
             <p>
               鼠标左键旋转，右键平移，滚轮缩放；触屏单指旋转、双指平移与缩放。聚焦画面后可用方向键平移、加减键缩放、Home
-              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆和六教分别提供南北门，桥梁提供桥下近景。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
+              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆和六教分别提供南北门，桥梁提供桥下近景。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。橙色虚线表示校园大致边界，可在图层中关闭，农院路公共走廊从校园范围中扣除。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
             </p>
             <h3>开源与许可</h3>
             <p>

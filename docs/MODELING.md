@@ -217,3 +217,18 @@ blender --background --python-exit-code 1 --python blender/validate_teaching_six
 ```
 
 北门及西侧门附近的 DEM 高于建筑锚点约 0.33 米，台阶基底抬高并收敛至同一门厅标高，避免地面穿出台阶；门前挡住近景的树木为示意配置，已作局部避让。
+
+## 周边道路规整与边界显示
+
+`scripts/surroundings_data.py` 在既有道路/桥梁与雕塑数据准备完成后运行。保留校内路面和详细农院路模型，仅替换校外同层地面道路：按道路等级或 OSM 宽度生成圆角路面，将交叉口合为一个面，浅色路缘与沥青、步道保持互不重叠，外围建筑留出估算间距。长条路缘先按 12 米网格切分再三角化，避免递归细分产生大量无用面。路面随 DEM 起伏，并按 Blender 与 GLB 实际使用的地形三角面采样高度，避免双线性插值与地形网格不一致造成遮挡。道路位置没有为了视觉整齐而拉直或迁移。
+
+边界线由 Three.js 绘制，固定屏幕线宽，浅色描边搭配橙色虚线；与物理建筑独立，不生成围墙。Blender 保留更新后的可编辑周边道路面，边界 JSON 为公开地理数据交付的一部分。
+
+```sh
+python3 scripts/surroundings_data.py
+python3 scripts/test_surroundings.py
+blender --background --python-exit-code 1 --python blender/update_roads.py
+blender --background --python-exit-code 1 --python blender/validate_surroundings.py
+```
+
+仅修改周边铺装时可运行上述更新脚本，重建基础 GLB 并替换源文件中的道路对象；完整 `build_campus.py` 同样读取派生数据。所有坐标以米为单位，原始 OSM GeoJSON 和道路中心线保留。

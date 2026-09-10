@@ -385,5 +385,7 @@ def prepare_infrastructure():
     print(f"农院路 {road.length:.0f} m；3 座校道立交、{len(lakebridges)} 座跨水桥；{len(terrain_cells)} 个地形单元精确开口")
     from sculpture_data import prepare_sculptures
     prepare_sculptures()
+    from surroundings_data import prepare_surroundings
+    prepare_surroundings()
 
 if __name__=='__main__':prepare_infrastructure()
