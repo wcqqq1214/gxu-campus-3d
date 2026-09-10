@@ -152,7 +152,9 @@ def bridge(b,C,detail):
     cx=(a[0]+c[0])/2;cy=(a[1]+c[1])/2;z=b['deckElevation'];width=b['deckWidth'];floor=b['floorElevation'];slab=b['slabThickness']
     deck=Mesh();deck.box(0,0,z-(slab+.04)/2,length,width,slab-.04,C['bridgeConcrete'])
     for abutment in b['abutments']:
-        deck.extrude([abutment['rings']],[abutment['triangles']],floor,z-floor,C['bridgeConcrete'])
+        # Abutments support the slab from below; their old road-height caps
+        # overlapped the continuous asphalt and produced mottled end seams.
+        deck.extrude([abutment['rings']],[abutment['triangles']],floor,z-slab-floor,C['bridgeConcrete'])
     for side in [-1,1]:
         deck.box(0,side*(width/2-.2),z-.35,length+.3,.55,.6,C['bridgeEdge'])
         # Vehicle parapets / railings above the public road.
@@ -165,9 +167,9 @@ def bridge(b,C,detail):
                 for sign in [-1,1]:deck.line((xx,side*(width/2-.16),z+.64 if sign==1 else z+1.23),(xx+2,side*(width/2-.16),z+1.23 if sign==1 else z+.64),.027,C['lampMetal'],4)
         else:deck.box(0,side*(width/2-.16),z+.9,length,.08,.08,C['lampMetal'])
     if detail:
-        # Exposed beam ends and joints; exact reinforcement is not asserted.
+        # The wearing surface comes only from the continuous road ribbon.
+        # Unsurveyed transverse joint boxes used to sit on top of that surface.
         for yy in [-4,-2,0,2,4]:deck.box(0,yy,z-slab-b['beamDepth']+.125,length-1,.24,.25,C['bridgeEdge'])
-        for xx in [-length/2+.2,length/2-.2]:deck.box(xx,0,z+.015,.08,width,.025,C['bridgeJoint'])
     deck.rotate_z(0,0,angle);deck.v=[(x+cx,y+cy,h) for x,y,h in deck.v]
     m.add_part('桥面梁板与桥台',deck)
     path=b['underpass'];axes=frames(path)

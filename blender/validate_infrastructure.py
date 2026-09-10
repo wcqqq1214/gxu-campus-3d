@@ -10,15 +10,44 @@ out = ROOT/'docs/model-checks'; out.mkdir(exist_ok=True)
 def reset():
     bpy.ops.wm.read_factory_settings(use_empty=True)
 
-def mesh_bvh(objects):
+def mesh_bvh(objects, material_filter=None):
     vertices=[]; faces=[]
     for obj in objects:
         if obj.type != 'MESH': continue
         offset=len(vertices)
         vertices.extend(obj.matrix_world@v.co for v in obj.data.vertices)
-        faces.extend(tuple(i+offset for i in p.vertices) for p in obj.data.polygons)
+        faces.extend(tuple(i+offset for i in p.vertices) for p in obj.data.polygons
+                     if material_filter is None or material_filter(obj.data.materials[p.material_index].name.split('.')[0]))
     assert vertices, 'Missing infrastructure mesh'
     return BVHTree.FromPolygons(vertices, faces)
+
+def check_road_seams(objects, label):
+    """The single asphalt surface must cover the deck without coplanar concrete.
+
+    Include both ends: the older clearance check skipped the abutments and
+    allowed small protrusions, so it could not detect their visible z-fighting.
+    """
+    road=mesh_bvh(objects,lambda name:name=='asphalt')
+    structure=mesh_bvh(objects,lambda name:name in ('bridgeConcrete','bridgeEdge','bridgeJoint','curb'))
+    result=[]
+    for b in data['bridges']:
+        a,c=b['upper'];axis=Vector((c[0]-a[0],c[1]-a[1],0));length=axis.length;axis.normalize()
+        normal=Vector((-axis.y,axis.x,0));minimum=math.inf;maximum_error=0;samples=0
+        for lane in [-4.5,-2.5,0,2.5,4.5]:
+            count=math.ceil(length/.15)
+            for i in range(count+1):
+                point=Vector((*a,b['deckElevation']))+axis*(.01+(length-.02)*i/count)+normal*lane
+                surface=road.ray_cast(point+Vector((0,0,.3)),Vector((0,0,-1)),.6)[0]
+                assert surface is not None, f'{label} {b["name"]}: asphalt missing at bridge end {tuple(point)}'
+                error=abs(surface.z-b['deckElevation']);maximum_error=max(maximum_error,error)
+                assert error<.012, f'{label} {b["name"]}: asphalt leaves the deck plane by {error:.4f} m'
+                hit=structure.ray_cast(surface+Vector((0,0,.5)),Vector((0,0,-1)),1.5)[0]
+                assert hit is not None, f'{label} {b["name"]}: deck support missing'
+                gap=surface.z-hit.z;minimum=min(minimum,gap);samples+=1
+                assert gap>.025, f'{label} {b["name"]}: bridge overlaps asphalt ({gap:.4f} m separation) at {tuple(point)}'
+        result.append({'id':b['id'],'samples':samples,'minimumSurfaceSeparationMeters':round(minimum,4),
+                       'maximumDeckPlaneErrorMeters':round(maximum_error,4)})
+    return result
 
 def check_rail_intersections(obj):
     """Intersect the actual lower railing faces with the bridge structure."""
@@ -114,21 +143,26 @@ source_bvh=mesh_bvh(source_objects)
 report={'source': [check_voids(source_bvh,b,'source') for b in data['bridges']]}
 report['sourcePedestrian']=[check_walkways(source_bvh,b,'source') for b in data['bridges']]
 report['sourceDeckSurface']=[check_deck_surface(source_bvh,b,'source') for b in data['bridges']]
+report['sourceRoadSeams']=check_road_seams(source_objects,'source')
 report['railingBridgeIntersections']={}
 for b in data['bridges']:
     obj=next(o for o in source_objects if o.get('landmark')==b['id'])
     assert obj.get('layer')=='roads' and len(obj.vertex_groups)>=3, f'{b["name"]}: editable groups missing'
     report['railingBridgeIntersections'][b['id']]=check_rail_intersections(obj)
-# Both travel directions must have visible, upward-facing paint.
-paint_faces=0
+# Offset sidewalks must not fold inside short curved segments; both travel
+# directions must also have visible, upward-facing paint.
+paint_faces=0;road_surface_faces=0
 for obj in source_objects:
     if not obj.get('infrastructureId','').startswith('infra-road-'):continue
     for p in obj.data.polygons:
-        if obj.data.materials[p.material_index].name=='roadWhite':
-            assert p.normal.z>.8, f'{obj.name}: inverted road paint'
-            paint_faces+=1
+        material_name=obj.data.materials[p.material_index].name
+        if material_name in ('asphalt','pavingRed','tactile','roadWhite','roadYellow'):
+            assert p.normal.z>.8, f'{obj.name}: inverted {material_name} road surface'
+            road_surface_faces+=1
+        if material_name=='roadWhite':paint_faces+=1
 assert paint_faces>100
 report['sourceRoadPaintFaces']=paint_faces
+report['sourceUpwardRoadSurfaceFaces']=road_surface_faces
 
 if '--no-render' not in sys.argv:
     scene=bpy.context.scene; scene.render.engine='BLENDER_WORKBENCH'
@@ -158,6 +192,7 @@ bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/models/base.glb'))
 bpy.context.view_layer.update()
 base_bvh=mesh_bvh(bpy.context.scene.objects)
 report['basePedestrian']=[check_walkways(base_bvh,b,'base Draco',.1) for b in data['bridges']]
+report['baseRoadSeams']=check_road_seams(list(bpy.context.scene.objects),'base Draco')
 def root_name(obj):
     while obj.parent: obj=obj.parent
     return obj.name
@@ -176,6 +211,15 @@ decoded=mesh_bvh(bpy.context.scene.objects)
 report['dracoDecoded']=[check_voids(decoded,b,'Draco',.08) for b in data['bridges']]
 report['dracoPedestrian']=[check_walkways(decoded,b,'Draco',.1) for b in data['bridges']]
 report['dracoDeckSurface']=[check_deck_surface(decoded,b,'Draco') for b in data['bridges']]
+report['dracoRoadSeams']=check_road_seams(list(bpy.context.scene.objects),'Draco bridge / base road')
+# Road and bridge details stream independently. Verify the final near-road
+# combination too, with the replaced base road chunks removed as in Three.js.
+road_roots={c['id'] for c in data['chunks'] if c['kind']=='corridor'}
+replaced_roads=[obj for obj in bpy.context.scene.objects if root_name(obj) in road_roots]
+for obj in replaced_roads:bpy.data.objects.remove(obj,do_unlink=True)
+for ident in sorted(road_roots):bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/models'/f'{ident}.glb'))
+bpy.context.view_layer.update()
+report['nearRoadSeams']=check_road_seams(list(bpy.context.scene.objects),'Draco bridge / near road')
 report['result']='passed'
 (out/'infrastructure-geometry-check.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(json.dumps(report,ensure_ascii=False),flush=True)

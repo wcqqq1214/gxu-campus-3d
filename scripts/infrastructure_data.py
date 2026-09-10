@@ -127,13 +127,24 @@ def prepare_infrastructure():
         deck_cut=upper.buffer(carriage/2+sidewalk-.1,cap_style=2,join_style=2)
         cuts.append(unary_union([approach.buffer(cut_half_width,cap_style=2,join_style=2),deck_cut]))
     # Smooth the public road into each estimated deck, independently of the lower road.
-    bridge_ranges=[(road.project(Point(b['center'])),LineString(b['upper']).length/2,b['deckElevation']) for b in bridges]
+    bridge_ranges=[];deck_stations=[]
+    for b in bridges:
+        # The crossing is not necessarily at the midpoint of the upper span.
+        # Align the flat wearing surface to BOTH mapped bridge endpoints.
+        start,end=sorted(road.project(Point(p)) for p in [b['upper'][0],b['upper'][-1]])
+        bridge_ranges.append(((start+end)/2,(end-start)/2,b['deckElevation']))
+        deck_stations.extend([start,end])
     # Round unsurveyed sharp polyline corners within the estimated road width.
     # Shared smooth stations keep wide sidewalks from folding inside a bend.
-    rawpoints=samples(road,3);renderpoints=[];sigma=7.0
+    regular_stations=np.linspace(0,road.length,math.ceil(road.length/3)+1).tolist()
+    # Replace nearby regular stations instead of creating centimetre-long
+    # segments whose offset sidewalk / paint edges can fold at a corner.
+    stations=sorted(set([s for s in regular_stations if s in (0,road.length) or
+                        all(abs(s-end)>=1.5 for end in deck_stations)]+deck_stations))
+    rawpoints=[list(road.interpolate(s).coords[0]) for s in stations];renderpoints=[];sigma=7.0
     for i,p in enumerate(rawpoints):
-        station=i/(len(rawpoints)-1)*road.length
-        weights=[(j,math.exp(-.5*((j-i)*3/sigma)**2)) for j in range(max(0,i-7),min(len(rawpoints),i+8))]
+        station=stations[i]
+        weights=[(j,math.exp(-.5*((stations[j]-station)/sigma)**2)) for j in range(max(0,i-9),min(len(rawpoints),i+10)) if abs(stations[j]-station)<=21.01]
         total=sum(w for _,w in weights)
         smooth=[sum(rawpoints[j][k]*w for j,w in weights)/total for k in [0,1]]
         blend=min(1,station/21,(road.length-station)/21)
