@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowUpRight,
-  ArrowRight,
   Building2,
   Check,
   ChevronDown,
@@ -50,6 +49,7 @@ import type {
   Preset,
   LayerKey,
   Metrics,
+  LandmarkView,
 } from '@/lib/campus/types';
 import { DEFAULT_LAYERS, CATEGORY_NAMES } from '@/lib/campus/types';
 import { nextTourIndex } from '@/lib/campus/math';
@@ -143,6 +143,7 @@ async function getJson<T>(path: string): Promise<T> {
   return r.json();
 }
 export default function Home() {
+  const dock = useRef<HTMLElement>(null);
   const host = useRef<HTMLDivElement>(null),
     controller = useRef<SceneController | null>(null);
   const [buildings, setBuildings] = useState<Building[]>([]),
@@ -167,6 +168,12 @@ export default function Home() {
     [retrySeed, setRetrySeed] = useState(0),
     [metrics, setMetrics] = useState<Metrics | null>(null);
   const [debug, setDebug] = useState(false);
+  const [panelMode, setPanelMode] = useState<'menu' | 'detail'>('menu');
+  const [landmarkView, setLandmarkView] = useState<LandmarkView | null>(
+    'oblique',
+  );
+  const [orbit, setOrbit] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const notify = useCallback((message: string) => setToast(message), []);
   useEffect(() => {
     if (!toast) return;
@@ -210,11 +217,22 @@ export default function Home() {
               if (active) {
                 setSelected(id);
                 setMore(false);
-                if (window.innerWidth < 760) setCollapsed(Boolean(id));
+                setPanelMode(id ? 'detail' : 'menu');
+                setLandmarkView('oblique');
+                setCollapsed(false);
               }
             },
             onInteract: () => {
-              if (active) setTour(false);
+              if (active) {
+                setTour(false);
+                setLandmarkView(null);
+              }
+            },
+            onOrbit: (on) => {
+              if (active) {
+                setOrbit(on);
+                if (on) setLandmarkView('oblique');
+              }
             },
             onMetrics: (m) => {
               if (active) setMetrics(m);
@@ -241,6 +259,60 @@ export default function Home() {
       controller.current = null;
     };
   }, [retrySeed]);
+  useEffect(() => {
+    const preference = matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(preference.matches);
+    update();
+    preference.addEventListener('change', update);
+    return () => preference.removeEventListener('change', update);
+  }, []);
+  useEffect(() => {
+    if (!ready || !host.current || !dock.current) return;
+    const root = host.current.parentElement!;
+    const header = root.querySelector<HTMLElement>('.masthead')!;
+    const tools = root.querySelector<HTMLElement>('.map-tools')!;
+    let pending = 0;
+    let previous = '';
+    const measure = () => {
+      cancelAnimationFrame(pending);
+      pending = requestAnimationFrame(() => {
+        const panel = dock.current!.getBoundingClientRect();
+        const menu = tools.getBoundingClientRect();
+        const top = header.getBoundingClientRect().bottom + 18;
+        const mobile = window.innerWidth < 760;
+        const left = mobile || collapsed ? 18 : panel.right + 24;
+        const right = menu.left - 18;
+        const bottom = mobile ? panel.top - 34 : window.innerHeight - 42;
+        const frame = {
+          left,
+          top,
+          width: Math.max(120, right - left),
+          height: Math.max(100, bottom - top),
+        };
+        root.style.setProperty('--dock-height', `${panel.height}px`);
+        root.style.setProperty('--scene-left', `${left}px`);
+        const key = JSON.stringify(frame);
+        if (key !== previous) {
+          previous = key;
+          controller.current?.setViewport(frame);
+        }
+      });
+    };
+    const observer = new ResizeObserver(measure);
+    [dock.current, header, tools, host.current].forEach((el) =>
+      observer.observe(el),
+    );
+    measure();
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(pending);
+    };
+  }, [ready, collapsed]);
+  function changeLandmarkView(value: LandmarkView) {
+    setTour(false);
+    setLandmarkView(value);
+    controller.current?.landmarkView(value);
+  }
   const choose = useCallback((id: string) => {
     setTour(false);
     controller.current?.focus(id);
@@ -339,167 +411,379 @@ export default function Home() {
         </a>
       </header>
       <aside
-        className={`explorer ${collapsed ? 'collapsed' : ''}`}
+        ref={dock}
+        className={`panel-dock ${collapsed ? 'collapsed' : ''}`}
         aria-label="校园探索菜单"
       >
-        <button
-          className="mobile-handle"
-          aria-expanded={!collapsed}
-          onClick={() => setCollapsed((v) => !v)}
-        >
-          <span />
-          {collapsed ? '展开校园菜单' : '收起菜单'}
-          <ChevronDown size={16} />
-        </button>
-        <div className="panel-heading">
-          <div className="eyebrow">发现 · GUANGXI UNIVERSITY</div>
-          <h2>林荫深处，是西大。</h2>
-          <p className="intro">沿着校道，发现熟悉的风景。</p>
+        <div className="dock-heading">
+          {panelMode === 'detail' && current && (
+            <button
+              className="dock-back"
+              title="返回精选地标"
+              onClick={() => setPanelMode('menu')}
+            >
+              <ChevronLeft size={18} />
+            </button>
+          )}
+          <button
+            className="dock-toggle"
+            aria-expanded={!collapsed}
+            aria-controls="campus-panel-body"
+            onClick={() => setCollapsed((v) => !v)}
+          >
+            <span>
+              {panelMode === 'detail' && current ? current.name : '校园探索'}
+            </span>
+            <small>{collapsed ? '展开' : '收起'}</small>
+            <ChevronDown size={16} />
+          </button>
         </div>
-        <Tabs
-          value={tab}
-          onValueChange={(v) => setTab(String(v))}
-          className="main-tabs"
-        >
-          <TabsList className="panel-tabs">
-            <TabsTrigger value="explore">
-              <Compass size={17} />
-              探索
-            </TabsTrigger>
-            <TabsTrigger value="layers">
-              <Layers3 size={17} />
-              图层
-            </TabsTrigger>
-            <TabsTrigger value="environment">
-              <Sun size={17} />
-              环境
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="explore" className="explore-content">
-            <div className="search-wrap">
-              <Search size={16} />
-              <Input
-                type="search"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索精选地标，如图书馆"
-                aria-label="搜索精选地标"
-              />
-              {query && (
-                <button title="清除搜索" onClick={() => setQuery('')}>
-                  <X size={14} />
+        <div id="campus-panel-body" className="dock-body" hidden={collapsed}>
+          {panelMode === 'detail' && current ? (
+            <section
+              className={`place-detail ${more ? 'expanded' : ''}`}
+              aria-label="建筑详情"
+            >
+              <div className="detail-heading">
+                <div>
+                  <div className="eyebrow">
+                    {currentLandmark?.placeKind === 'sports'
+                      ? 'CAMPUS ATHLETICS'
+                      : currentLandmark
+                        ? 'CAMPUS LANDMARK'
+                        : 'CAMPUS BUILDING'}
+                  </div>
+                  <h2>{current.name}</h2>
+                </div>
+                <button
+                  className="icon-button"
+                  title="关闭建筑详情"
+                  onClick={() => {
+                    setSelected(null);
+                    setMore(false);
+                    setPanelMode('menu');
+                    controller.current?.clearSelection();
+                  }}
+                >
+                  <X size={18} />
                 </button>
-              )}
-            </div>
-            <div className="result-heading">
-              <span>{query ? '精选地标搜索结果' : '精选地标'}</span>
-              <span>{places.length} 处</span>
-            </div>
-            <div className="places">
-              {places.length ? (
-                places.map((p) => (
+              </div>
+              <p>
+                {currentLandmark?.description ??
+                  `${CATEGORY_NAMES[currentBuilding!.category]}建筑，位置依据公开地图。`}
+              </p>
+              {currentLandmark && (
+                <fieldset className="landmark-views" aria-label="地标观察视角">
+                  {(
+                    [
+                      ['oblique', '全貌'],
+                      [
+                        'front',
+                        currentLandmark.id === 'library' ? '南侧' : '正面',
+                      ],
+                      [
+                        'back',
+                        currentLandmark.id === 'library' ? '北侧' : '背面',
+                      ],
+                      ['top', '俯视'],
+                      [
+                        'entrance',
+                        currentLandmark.id === 'library'
+                          ? '南门近景'
+                          : '入口近景',
+                      ],
+                      ...(currentLandmark.id === 'library'
+                        ? [['rear-entrance', '北门近景']]
+                        : []),
+                    ] as [LandmarkView, string][]
+                  ).map(([value, label]) => (
+                    <button
+                      key={value}
+                      aria-pressed={!orbit && landmarkView === value}
+                      onClick={() => changeLandmarkView(value)}
+                    >
+                      {label}
+                    </button>
+                  ))}
                   <button
-                    key={p.id}
-                    className={`place-row ${selected === p.id ? 'selected' : ''}`}
-                    onClick={() => choose(p.id)}
-                    disabled={!ready}
+                    aria-pressed={orbit}
+                    disabled={reducedMotion}
+                    title={
+                      reducedMotion
+                        ? '系统已启用减少动态效果'
+                        : '环绕当前地标，拖动画面可暂停'
+                    }
+                    onClick={() => {
+                      setTour(false);
+                      controller.current?.setOrbit(!orbit);
+                    }}
                   >
-                    <span className="place-index">
-                      {String(
-                        landmarks.findIndex((l) => l.id === p.id) + 1,
-                      ).padStart(2, '0')}
-                    </span>
-                    <span className="place-copy">
-                      <strong>{p.name}</strong>
-                      <small>
-                        {CATEGORY_NAMES[p.category]}
-                        {p.id === 'new-east-gate'
-                          ? ' · 外观推定'
-                          : ' · 重点复原'}
-                      </small>
-                    </span>
-                    <ArrowUpRight size={16} />
+                    {orbit ? <Pause size={14} /> : <RotateCcw size={14} />}{' '}
+                    {orbit ? '暂停环绕' : '环绕观察'}
                   </button>
-                ))
-              ) : (
-                <div className="empty-state">
-                  没有找到对应精选地标。
-                  <br />
-                  试试“图书馆”“留学生”或“汇学堂”。
+                </fieldset>
+              )}
+              <div className="detail-actions">
+                <button onClick={() => setMore((v) => !v)} aria-expanded={more}>
+                  复原依据 <ChevronDown size={14} />
+                </button>
+              </div>
+              {more && (
+                <div className="detail-evidence">
+                  <p>
+                    {currentLandmark?.detail ??
+                      currentBuilding?.facadeBasis ??
+                      '保留公开地图轮廓，窗格、屋顶和入口按建筑类型推定。'}
+                  </p>
+                  {currentBuilding?.constructionStatus && (
+                    <p>{currentBuilding.constructionStatus}</p>
+                  )}
+                  <dl>
+                    <div>
+                      <dt>高度依据</dt>
+                      <dd>
+                        {currentLandmark?.placeKind === 'sports'
+                          ? '历史 DEM 局部平整，非测量高程'
+                          : currentLandmark?.id === 'new-east-gate'
+                            ? '缺少门体照片，暂按门卫设施尺度估算'
+                            : (currentBuilding?.heightBasis ?? '参考照片估算')}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>地图编辑时间</dt>
+                      <dd>
+                        {current.osmEditedAt?.slice(0, 10) ?? '详见位置来源'}
+                      </dd>
+                    </div>
+                  </dl>
+                  <a href={current.sourceUrl} target="_blank" rel="noreferrer">
+                    查看位置来源 <ArrowUpRight size={13} />
+                  </a>
+                  {currentLandmark && (
+                    <>
+                      <a
+                        href={refs[currentLandmark.reference]?.url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {refs[currentLandmark.reference]?.name}{' '}
+                        <ArrowUpRight size={13} />
+                      </a>
+                      <small>{refs[currentLandmark.reference]?.year}</small>
+                    </>
+                  )}
                 </div>
               )}
-            </div>
-          </TabsContent>
-          <TabsContent value="layers" className="settings-content">
-            <p className="section-hint">选择你想看见的校园层次。</p>
-            {LAYER_ITEMS.map(([key, label, desc, Icon]) => (
-              <label className="layer-row" key={key} htmlFor={`layer-${key}`}>
-                <Icon size={19} />
-                <span>
-                  <strong>{label}</strong>
-                  <small>{desc}</small>
-                </span>
-                <Switch
-                  id={`layer-${key}`}
-                  checked={layers[key]}
-                  onCheckedChange={(on) => toggleLayer(key, on)}
-                  aria-label={label}
-                />
-              </label>
-            ))}
-          </TabsContent>
-          <TabsContent value="environment" className="settings-content">
-            <p className="section-hint">同一座校园，不同的光景。</p>
-            <div className="preset-grid">
-              {PRESETS.map(([p, label, Icon]) => (
-                <button
-                  key={p}
-                  className={preset === p ? 'active' : ''}
-                  onClick={() => changePreset(p)}
-                  aria-pressed={preset === p}
-                >
-                  <Icon size={24} />
-                  {label}
-                  {preset === p && <Check size={12} />}
+            </section>
+          ) : (
+            <div className="explorer">
+              <div className="panel-heading">
+                <div className="eyebrow">发现 · GUANGXI UNIVERSITY</div>
+                <h2>林荫深处，是西大。</h2>
+                <p className="intro">沿着校道，发现熟悉的风景。</p>
+              </div>
+              <Tabs
+                value={tab}
+                onValueChange={(v) => setTab(String(v))}
+                className="main-tabs"
+              >
+                <TabsList className="panel-tabs">
+                  <TabsTrigger value="explore">
+                    <Compass size={17} />
+                    探索
+                  </TabsTrigger>
+                  <TabsTrigger value="layers">
+                    <Layers3 size={17} />
+                    图层
+                  </TabsTrigger>
+                  <TabsTrigger value="environment">
+                    <Sun size={17} />
+                    环境
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="explore" className="explore-content">
+                  <div className="search-wrap">
+                    <Search size={16} />
+                    <Input
+                      type="search"
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="搜索精选地标，如图书馆"
+                      aria-label="搜索精选地标"
+                    />
+                    {query && (
+                      <button title="清除搜索" onClick={() => setQuery('')}>
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
+                  <div className="result-heading">
+                    <span>{query ? '精选地标搜索结果' : '精选地标'}</span>
+                    <span>{places.length} 处</span>
+                  </div>
+                  <div className="places">
+                    {places.length ? (
+                      places.map((p) => (
+                        <button
+                          key={p.id}
+                          className={`place-row ${selected === p.id ? 'selected' : ''}`}
+                          onClick={() => choose(p.id)}
+                          disabled={!ready}
+                        >
+                          <span className="place-index">
+                            {String(
+                              landmarks.findIndex((l) => l.id === p.id) + 1,
+                            ).padStart(2, '0')}
+                          </span>
+                          <span className="place-copy">
+                            <strong>{p.name}</strong>
+                            <small>
+                              {CATEGORY_NAMES[p.category]}
+                              {p.id === 'new-east-gate'
+                                ? ' · 外观推定'
+                                : ' · 重点复原'}
+                            </small>
+                          </span>
+                          <ArrowUpRight size={16} />
+                        </button>
+                      ))
+                    ) : (
+                      <div className="empty-state">
+                        没有找到对应精选地标。
+                        <br />
+                        试试“图书馆”“留学生”或“汇学堂”。
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+                <TabsContent value="layers" className="settings-content">
+                  <p className="section-hint">选择你想看见的校园层次。</p>
+                  {LAYER_ITEMS.map(([key, label, desc, Icon]) => (
+                    <label
+                      className="layer-row"
+                      key={key}
+                      htmlFor={`layer-${key}`}
+                    >
+                      <Icon size={19} />
+                      <span>
+                        <strong>{label}</strong>
+                        <small>{desc}</small>
+                      </span>
+                      <Switch
+                        id={`layer-${key}`}
+                        checked={layers[key]}
+                        onCheckedChange={(on) => toggleLayer(key, on)}
+                        aria-label={label}
+                      />
+                    </label>
+                  ))}
+                </TabsContent>
+                <TabsContent value="environment" className="settings-content">
+                  <p className="section-hint">同一座校园，不同的光景。</p>
+                  <div className="preset-grid">
+                    {PRESETS.map(([p, label, Icon]) => (
+                      <button
+                        key={p}
+                        className={preset === p ? 'active' : ''}
+                        onClick={() => changePreset(p)}
+                        aria-pressed={preset === p}
+                      >
+                        <Icon size={24} />
+                        {label}
+                        {preset === p && <Check size={12} />}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="settings-title">画面偏好</div>
+                  <RadioGroup
+                    value={quality}
+                    onValueChange={(v) => changeQuality(v as Quality)}
+                    className="quality-options"
+                  >
+                    {[
+                      ['auto', '自动', '根据屏幕与运行表现调节'],
+                      ['fine', '精细', '完整植被、阴影与近景细节'],
+                      ['smooth', '流畅', '降低植被密度与渲染分辨率'],
+                    ].map(([q, name, desc]) => (
+                      <label key={q} htmlFor={`quality-${q}`}>
+                        <RadioGroupItem
+                          id={`quality-${q}`}
+                          value={q}
+                          aria-label={name}
+                        />
+                        <span>
+                          <strong>{name}</strong>
+                          <small>{desc}</small>
+                        </span>
+                      </label>
+                    ))}
+                  </RadioGroup>
+                  <p className="settings-note">
+                    光照为氛围模拟。复原比例保持一致，资料缺失处已注明推定。
+                  </p>
+                </TabsContent>
+              </Tabs>
+              <div className="panel-foot">
+                <span className="live-dot" />
+                地图快照{' '}
+                {overview?.snapshotAt.slice(0, 10).replaceAll('-', '.') ??
+                  '2026.09.09'}
+                <button onClick={() => setAbout(true)} title="查看数据来源">
+                  <Info size={14} />
                 </button>
-              ))}
+              </div>
+              {current && (
+                <button
+                  className="return-landmark"
+                  onClick={() => setPanelMode('detail')}
+                >
+                  返回 {current.name} <ArrowUpRight size={14} />
+                </button>
+              )}
             </div>
-            <div className="settings-title">画面偏好</div>
-            <RadioGroup
-              value={quality}
-              onValueChange={(v) => changeQuality(v as Quality)}
-              className="quality-options"
-            >
-              {[
-                ['auto', '自动', '根据屏幕与运行表现调节'],
-                ['fine', '精细', '完整植被、阴影与近景细节'],
-                ['smooth', '流畅', '降低植被密度与渲染分辨率'],
-              ].map(([q, name, desc]) => (
-                <label key={q} htmlFor={`quality-${q}`}>
-                  <RadioGroupItem
-                    id={`quality-${q}`}
-                    value={q}
-                    aria-label={name}
-                  />
-                  <span>
-                    <strong>{name}</strong>
-                    <small>{desc}</small>
-                  </span>
-                </label>
-              ))}
-            </RadioGroup>
-            <p className="settings-note">
-              光照为氛围模拟。复原比例保持一致，资料缺失处已注明推定。
-            </p>
-          </TabsContent>
-        </Tabs>
-        <div className="panel-foot">
-          <span className="live-dot" />
-          地图快照{' '}
-          {overview?.snapshotAt.slice(0, 10).replaceAll('-', '.') ??
-            '2026.09.09'}
-          <button onClick={() => setAbout(true)} title="查看数据来源">
-            <Info size={14} />
+          )}
+        </div>
+        <div className="tour-bar">
+          <div className="tour-copy">
+            <strong>
+              {tour
+                ? '正在云游西大'
+                : tourStarted
+                  ? '巡游已暂停'
+                  : '把校园，慢慢看一遍'}
+            </strong>
+            <small>
+              {tourStarted
+                ? `${String(tourIndex + 1).padStart(2, '0')} / ${landmarks.length} · ${landmarks[tourIndex]?.name}`
+                : `${landmarks.length || '—'} 处精选地标 · 自动导览`}
+            </small>
+          </div>
+          <button
+            className="tour-start"
+            disabled={!ready}
+            onClick={() => {
+              setTourStarted(true);
+              setTour((v) => !v);
+            }}
+          >
+            {tour ? <Pause size={15} /> : <Play size={15} />}
+            <span>{tour ? '暂停' : tourStarted ? '继续巡游' : '开始巡游'}</span>
+          </button>
+          <button
+            className="tour-skip"
+            title="上一站"
+            disabled={!ready}
+            onClick={() => jump(-1)}
+          >
+            <ChevronLeft size={17} />
+          </button>
+          <button
+            className="tour-skip"
+            title="下一站"
+            disabled={!ready}
+            onClick={() => jump(1)}
+          >
+            <ChevronRight size={17} />
           </button>
         </div>
       </aside>
@@ -560,138 +844,6 @@ export default function Home() {
             <Download size={18} />
           </button>
         </div>
-      </div>
-      {current && (
-        <section
-          className={`place-detail ${more ? 'expanded' : ''}`}
-          aria-label="建筑详情"
-        >
-          <div className="detail-heading">
-            <div>
-              <div className="eyebrow">
-                {currentLandmark?.placeKind === 'sports'
-                  ? 'CAMPUS ATHLETICS'
-                  : currentLandmark
-                    ? 'CAMPUS LANDMARK'
-                    : 'CAMPUS BUILDING'}
-              </div>
-              <h2>{current.name}</h2>
-            </div>
-            <button
-              className="icon-button"
-              title="关闭建筑详情"
-              onClick={() => {
-                setSelected(null);
-                setMore(false);
-                controller.current?.clearSelection();
-              }}
-            >
-              <X size={18} />
-            </button>
-          </div>
-          <p>
-            {currentLandmark?.description ??
-              `${CATEGORY_NAMES[currentBuilding!.category]}建筑，位置依据公开地图。`}
-          </p>
-          <div className="detail-actions">
-            <button onClick={() => setMore((v) => !v)} aria-expanded={more}>
-              复原依据 <ChevronDown size={14} />
-            </button>
-            <button onClick={() => controller.current?.focus(selected!)}>
-              查看近景 <ArrowRight size={14} />
-            </button>
-          </div>
-          {more && (
-            <div className="detail-evidence">
-              <p>
-                {currentLandmark?.detail ??
-                  currentBuilding?.facadeBasis ??
-                  '保留公开地图轮廓，窗格、屋顶和入口按建筑类型推定。'}
-              </p>
-              {currentBuilding?.constructionStatus && (
-                <p>{currentBuilding.constructionStatus}</p>
-              )}
-              <dl>
-                <div>
-                  <dt>高度依据</dt>
-                  <dd>
-                    {currentLandmark?.placeKind === 'sports'
-                      ? '历史 DEM 局部平整，非测量高程'
-                      : currentLandmark?.id === 'new-east-gate'
-                        ? '缺少门体照片，暂按门卫设施尺度估算'
-                        : (currentBuilding?.heightBasis ?? '参考照片估算')}
-                  </dd>
-                </div>
-                <div>
-                  <dt>地图编辑时间</dt>
-                  <dd>{current.osmEditedAt?.slice(0, 10) ?? '详见位置来源'}</dd>
-                </div>
-              </dl>
-              <a href={current.sourceUrl} target="_blank" rel="noreferrer">
-                查看位置来源 <ArrowUpRight size={13} />
-              </a>
-              {currentLandmark && (
-                <>
-                  <a
-                    href={refs[currentLandmark.reference]?.url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {refs[currentLandmark.reference]?.name}{' '}
-                    <ArrowUpRight size={13} />
-                  </a>
-                  <small>{refs[currentLandmark.reference]?.year}</small>
-                </>
-              )}
-            </div>
-          )}
-        </section>
-      )}
-      <div className="tour-bar">
-        <span className="tour-symbol">
-          <Compass size={21} />
-        </span>
-        <div className="tour-copy">
-          <strong>
-            {tour
-              ? '正在云游西大'
-              : tourStarted
-                ? '巡游已暂停'
-                : '把校园，慢慢看一遍'}
-          </strong>
-          <small>
-            {tourStarted
-              ? `${String(tourIndex + 1).padStart(2, '0')} / ${landmarks.length} · ${landmarks[tourIndex]?.name}`
-              : `${landmarks.length || '—'} 处精选地标 · 自动导览`}
-          </small>
-        </div>
-        <button
-          className="tour-start"
-          disabled={!ready}
-          onClick={() => {
-            setTourStarted(true);
-            setTour((v) => !v);
-          }}
-        >
-          {tour ? <Pause size={15} /> : <Play size={15} />}
-          <span>{tour ? '暂停' : tourStarted ? '继续巡游' : '开始巡游'}</span>
-        </button>
-        <button
-          className="tour-skip"
-          title="上一站"
-          disabled={!ready}
-          onClick={() => jump(-1)}
-        >
-          <ChevronLeft size={17} />
-        </button>
-        <button
-          className="tour-skip"
-          title="下一站"
-          disabled={!ready}
-          onClick={() => jump(1)}
-        >
-          <ChevronRight size={17} />
-        </button>
       </div>
       <footer className="map-footer">
         <span className="gesture-help">拖动旋转 · 右键平移 · 滚轮缩放</span>
@@ -776,7 +928,7 @@ export default function Home() {
             <h3>如何操作</h3>
             <p>
               鼠标左键旋转，右键平移，滚轮缩放；触屏单指旋转、双指平移与缩放。聚焦画面后可用方向键平移、加减键缩放、Home
-              返回全景。手动操作会暂停巡游。搜索、地图标注和点击定位仅开放精选地标。
+              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆分别提供南北门。面板可收起，镜头会避开展开的面板。搜索、地图标注和点击定位仅开放精选地标。
             </p>
             <h3>开源与许可</h3>
             <p>
