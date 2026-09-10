@@ -49,6 +49,7 @@ const manifest = JSON.parse(
 for (const a of [
   manifest.base,
   manifest.trees,
+  ...(manifest.treesNear ? [manifest.treesNear] : []),
   ...manifest.zones,
   ...manifest.landmarks,
 ])

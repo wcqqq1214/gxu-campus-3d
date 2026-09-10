@@ -23,6 +23,7 @@ import {
   Plus,
   RotateCcw,
   Search,
+  Share2,
   Sun,
   Sunrise,
   Sunset,
@@ -50,10 +51,18 @@ import type {
   LayerKey,
   Metrics,
   LandmarkView,
+  Category,
 } from '@/lib/campus/types';
 import { DEFAULT_LAYERS, CATEGORY_NAMES } from '@/lib/campus/types';
 import { nextTourIndex } from '@/lib/campus/math';
 import { searchLandmarks } from '@/lib/campus/navigation';
+import {
+  decodeShare,
+  encodeShare,
+  cameraBearing,
+  type CameraSnapshot,
+} from '@/lib/campus/share';
+import { CampusMinimap } from '@/components/campus-minimap';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
   ['buildings', '校园建筑', '教学楼、宿舍与校园地标', Building2],
@@ -169,6 +178,9 @@ export default function Home() {
     [retrySeed, setRetrySeed] = useState(0),
     [metrics, setMetrics] = useState<Metrics | null>(null);
   const [debug, setDebug] = useState(false);
+  const [category, setCategory] = useState<Category | 'all'>('all');
+  const [cameraState, setCameraState] = useState<CameraSnapshot | null>(null);
+  const [shareLink, setShareLink] = useState('');
   const [panelMode, setPanelMode] = useState<'menu' | 'detail'>('menu');
   const [landmarkView, setLandmarkView] = useState<LandmarkView | null>(
     'oblique',
@@ -230,6 +242,9 @@ export default function Home() {
                 setLandmarkView(null);
               }
             },
+            onCamera: (snapshot) => {
+              if (active) setCameraState(snapshot);
+            },
             onOrbit: (on) => {
               if (active) {
                 setOrbit(on);
@@ -241,6 +256,15 @@ export default function Home() {
             },
           });
           controller.current = c;
+          const shared = decodeShare(
+            location.hash,
+            ls.map((l) => l.id),
+          );
+          if (shared) {
+            c.restoreSnapshot(shared);
+            if (shared.preset) setPreset(shared.preset);
+            setLandmarkView(shared.view ?? null);
+          }
           cleanup = () => c.dispose();
         } catch {
           setStatus(
@@ -334,8 +358,8 @@ export default function Home() {
     : undefined;
   const current = currentLandmark ?? currentBuilding;
   const places = useMemo(
-    () => searchLandmarks(landmarks, query),
-    [landmarks, query],
+    () => searchLandmarks(landmarks, query, category),
+    [landmarks, query, category],
   );
   function toggleLayer(k: LayerKey, on: boolean) {
     setLayers((v) => ({ ...v, [k]: on }));
@@ -353,10 +377,23 @@ export default function Home() {
     v: 'overview' | 'top' | 'tilt' | 'north' | 'zoomIn' | 'zoomOut',
   ) {
     setTour(false);
+    setLandmarkView(null);
     controller.current?.view(v);
     if (v === 'overview') {
       setSelected(null);
       setCollapsed(false);
+    }
+  }
+  async function shareView() {
+    const snapshot = controller.current?.getSnapshot();
+    if (!snapshot) return;
+    const url = new URL(location.pathname, location.origin);
+    url.hash = encodeShare(snapshot);
+    try {
+      await navigator.clipboard.writeText(url.href);
+      notify('视角链接已复制，可分享或稍后打开');
+    } catch {
+      setShareLink(url.href);
     }
   }
   function retry() {
@@ -529,6 +566,10 @@ export default function Home() {
                 <button onClick={() => setMore((v) => !v)} aria-expanded={more}>
                   复原依据 <ChevronDown size={14} />
                 </button>
+                <button onClick={() => void shareView()}>
+                  <Share2 size={14} />
+                  分享视角
+                </button>
               </div>
               {more && (
                 <div className="detail-evidence">
@@ -610,7 +651,7 @@ export default function Home() {
                       type="search"
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      placeholder="搜索精选地标，如图书馆"
+                      placeholder="搜索地标，如图书馆、六教"
                       aria-label="搜索精选地标"
                     />
                     {query && (
@@ -619,6 +660,29 @@ export default function Home() {
                       </button>
                     )}
                   </div>
+                  <fieldset
+                    className="category-filters"
+                    aria-label="精选地标分类"
+                  >
+                    {(
+                      [
+                        ['all', '全部'],
+                        ['academic', '教学'],
+                        ['living', '生活'],
+                        ['culture', '文体'],
+                        ['landmark', '校门'],
+                      ] as [Category | 'all', string][]
+                    ).map(([value, label]) => (
+                      <button
+                        key={value}
+                        className={category === value ? 'active' : ''}
+                        aria-pressed={category === value}
+                        onClick={() => setCategory(value)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </fieldset>
                   <div className="result-heading">
                     <span>{query ? '精选地标搜索结果' : '精选地标'}</span>
                     <span>{places.length} 处</span>
@@ -653,7 +717,7 @@ export default function Home() {
                       <div className="empty-state">
                         没有找到对应精选地标。
                         <br />
-                        试试“图书馆”“留学生”或“汇学堂”。
+                        试试“图书馆”“六教”，或切换到全部分类。
                       </div>
                     )}
                   </div>
@@ -744,6 +808,11 @@ export default function Home() {
               )}
             </div>
           )}
+          <CampusMinimap
+            buildings={buildings}
+            current={currentLandmark}
+            camera={cameraState}
+          />
         </div>
         <div className="tour-bar">
           <div className="tour-copy">
@@ -795,7 +864,12 @@ export default function Home() {
           onClick={() => view('north')}
           title="正北朝向"
         >
-          <Navigation size={20} />
+          <Navigation
+            size={20}
+            style={{
+              transform: `rotate(${cameraBearing(cameraState) - 45}deg)`,
+            }}
+          />
           <span>N</span>
         </button>
         <div className="tool-stack">
@@ -832,6 +906,13 @@ export default function Home() {
             }}
           >
             <Expand size={18} />
+          </button>
+          <button
+            title="分享当前视角"
+            disabled={!ready}
+            onClick={() => void shareView()}
+          >
+            <Share2 size={18} />
           </button>
           <button
             title="导出校园画面"
@@ -879,6 +960,26 @@ export default function Home() {
       {debug && metrics && (
         <pre className="debug-metrics">{JSON.stringify(metrics, null, 2)}</pre>
       )}
+      <Dialog
+        open={Boolean(shareLink)}
+        onOpenChange={(open) => {
+          if (!open) setShareLink('');
+        }}
+      >
+        <DialogContent className="share-dialog">
+          <DialogTitle>分享这个校园视角</DialogTitle>
+          <DialogDescription>
+            链接保留当前地标、镜头和光照，换一块屏幕也能继续浏览。
+          </DialogDescription>
+          <Input
+            aria-label="校园视角链接"
+            value={shareLink}
+            readOnly
+            onFocus={(event) => event.currentTarget.select()}
+          />
+          <p>复制上方链接即可分享。</p>
+        </DialogContent>
+      </Dialog>
       <Dialog open={about} onOpenChange={setAbout}>
         <DialogContent className="about-dialog">
           <DialogTitle>关于「西大 · 云游校园」</DialogTitle>
@@ -933,7 +1034,7 @@ export default function Home() {
             <h3>如何操作</h3>
             <p>
               鼠标左键旋转，右键平移，滚轮缩放；触屏单指旋转、双指平移与缩放。聚焦画面后可用方向键平移、加减键缩放、Home
-              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆分别提供南北门。面板可收起，镜头会避开展开的面板。搜索、地图标注和点击定位仅开放精选地标。
+              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆分别提供南北门。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”等别名，可按教学、生活、文体和校门筛选；地图标注和点击定位仅开放精选地标。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
             </p>
             <h3>开源与许可</h3>
             <p>

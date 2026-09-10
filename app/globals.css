@@ -1560,3 +1560,116 @@ a svg {
   accent-color: #315e45;
   border: 0;
 }
+
+.category-filters {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+.category-filters button {
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 14px;
+  padding: 6px 9px;
+  color: #3c5d49;
+}
+.category-filters .active {
+  color: white;
+}
+.campus-minimap {
+  margin: 0 18px 10px;
+  border-top: 1px solid #dce7d6;
+}
+.minimap-toggle {
+  display: flex;
+  gap: 7px;
+  min-height: 44px;
+  width: 100%;
+  align-items: center;
+  border: 0;
+  background: none;
+  color: #345b43;
+  text-align: left;
+  font-size: 14px;
+}
+.minimap-toggle span {
+  flex: 1;
+}
+.minimap-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 10px;
+}
+.minimap-body svg {
+  height: 160px;
+  width: 100%;
+  border: 1px solid #dce7d6;
+  border-radius: 10px;
+  background: #eaf0e4;
+}
+.minimap-body small {
+  font-size: 12px;
+  color: #52674c;
+  margin-top: 8px;
+}
+.share-dialog {
+  max-width: min(500px, 90vw) !important;
+}
+.share-dialog input {
+  min-height: 44px;
+  width: 100%;
+  font-size: 14px;
+}
+.share-dialog p {
+  font-size: 14px;
+  color: #52674c;
+}
+.scene-status button {
+  min-height: 44px;
+  min-width: 44px;
+}
+@media (max-width: 759px) {
+  .category-filters {
+    gap: 5px;
+  }
+  .category-filters button {
+    font-size: 14px;
+    min-height: 44px;
+    padding: 5px 9px;
+  }
+  .panel-dock .detail-actions {
+    gap: 14px;
+  }
+  .panel-dock .detail-actions button {
+    font-size: 14px;
+  }
+  .minimap-body svg {
+    height: 140px;
+  }
+}
+
+.panel-dock .panel-tabs [data-slot='tabs-trigger'] {
+  min-height: 44px;
+  height: 44px !important;
+}
+.search-wrap > button {
+  width: 44px;
+  height: 44px;
+  right: 0;
+  display: grid;
+  place-items: center;
+}
+.search-wrap input {
+  padding-right: 46px;
+  min-height: 44px;
+}
+.section-hint,
+.settings-note,
+.north-button span,
+.map-footer {
+  font-size: 12px;
+}

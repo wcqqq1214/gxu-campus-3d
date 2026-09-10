@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { isTap } from './math';
+import type { CameraSnapshot } from './share';
 import { fetchModel, nearbyChunks, ResourceQueue } from './streaming';
 import type { StreamAsset as Asset } from './streaming';
 import { entranceBox, fitBox, landmarkBox, landmarkDirection } from './camera';
@@ -25,6 +26,7 @@ export const asset = (path: string) => `${BASE}/${path}`;
 interface Manifest {
   base: Asset;
   trees: Asset;
+  treesNear?: Asset;
   zones: Asset[];
   landmarks: Asset[];
 }
@@ -35,6 +37,7 @@ interface Callbacks {
   onInteract: () => void;
   onMetrics: (m: Metrics) => void;
   onOrbit: (on: boolean) => void;
+  onCamera: (snapshot: CameraSnapshot) => void;
 }
 export function createScene(
   host: HTMLElement,
@@ -54,7 +57,7 @@ export function createScene(
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.92;
-  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const canvas = renderer.domElement;
   canvas.setAttribute(
     'aria-label',
@@ -81,8 +84,8 @@ export function createScene(
   sun.position.set(-700, 1400, 600);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
-  sun.shadow.bias = -0.00035;
-  sun.shadow.normalBias = 0.9;
+  sun.shadow.bias = -0.00008;
+  sun.shadow.normalBias = 0.18;
   scene.add(sun);
   scene.add(sun.target);
   const fill = new THREE.DirectionalLight('#b4d9ea', 0.35);
@@ -126,6 +129,18 @@ export function createScene(
   let manifest: Manifest | null = null;
   let baseRoot: THREE.Group | null = null;
   let treesRoot: THREE.Group | null = null;
+  let highTreesReady = false;
+  let highTreesFailed = false;
+  let treesFailed = false;
+  let treeData: {
+    data: number[][];
+    terrain: {
+      bounds: number[];
+      cols: number;
+      rows: number;
+      heights: number[];
+    };
+  } | null = null;
   let disposed = false;
   let quality: Quality = 'auto';
   let preset: Preset = 'day';
@@ -153,6 +168,10 @@ export function createScene(
   let selectedView: LandmarkView = 'oblique';
   let autoFramed = true;
   let orbiting = false;
+  let restoredPose: Partial<CameraSnapshot> | null = null;
+  let frameReady = false;
+  let cameraChanged = true;
+  let cameraSampleAt = 0;
   const compact = () => window.innerWidth < 760;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const loaded = new Map<string, THREE.Group>();
@@ -298,6 +317,7 @@ export function createScene(
     const l = landmarks.find((l) => l.id === id);
     if (!l) return;
     selected = id;
+    restoredPose = null;
     selectedView = 'oblique';
     autoFramed = true;
     setOrbit(false);
@@ -362,12 +382,14 @@ export function createScene(
     }
   }
   function landmarkView(value: LandmarkView) {
+    restoredPose = null;
     setOrbit(false);
     selectedView = value;
     autoFramed = true;
     frameLandmark();
   }
   function setOrbit(on: boolean) {
+    restoredPose = null;
     orbiting = on && Boolean(selected) && !reduced.matches;
     callbacks.onOrbit(orbiting);
     if (orbiting) {
@@ -393,6 +415,7 @@ export function createScene(
   }
   function setViewport(value: ViewportFrame) {
     frame = value;
+    frameReady = true;
     camera.setViewOffset(
       host.clientWidth,
       host.clientHeight,
@@ -401,10 +424,55 @@ export function createScene(
       host.clientWidth,
       host.clientHeight,
     );
-    if (orbiting) setOrbit(true);
+    if (restoredPose?.position) applyRestoredPose();
+    else if (orbiting) setOrbit(true);
     else if (selected && autoFramed) frameLandmark();
     else if (!selected && autoFramed) overview();
     dirty = true;
+  }
+  function visibleTangent() {
+    return (
+      (Math.tan((camera.fov * Math.PI) / 360) *
+        Math.min(frame.width, frame.height)) /
+      host.clientHeight
+    );
+  }
+  function getSnapshot(): CameraSnapshot {
+    return {
+      selected,
+      view: autoFramed && !orbiting ? selectedView : null,
+      preset,
+      position: camera.position.toArray() as CameraSnapshot['position'],
+      target: controls.target.toArray() as CameraSnapshot['target'],
+      span: camera.position.distanceTo(controls.target) * visibleTangent(),
+    };
+  }
+  function applyRestoredPose() {
+    if (!restoredPose?.position || !restoredPose.target || !restoredPose.span)
+      return;
+    const target = new THREE.Vector3(...restoredPose.target);
+    const offset = new THREE.Vector3(...restoredPose.position)
+      .sub(target)
+      .normalize();
+    const distance = Math.max(
+      controls.minDistance,
+      Math.min(controls.maxDistance, restoredPose.span / visibleTangent()),
+    );
+    tween = null;
+    autoFramed = false;
+    controls.target.copy(target);
+    camera.position.copy(target).addScaledVector(offset, distance);
+    controls.update();
+    dirty = true;
+  }
+  function restoreSnapshot(snapshot: Partial<CameraSnapshot>) {
+    if (snapshot.preset) setPreset(snapshot.preset);
+    if (snapshot.selected) {
+      focus(snapshot.selected);
+      if (snapshot.view) landmarkView(snapshot.view);
+    }
+    restoredPose = snapshot.position ? snapshot : null;
+    if (frameReady) applyRestoredPose();
   }
   function overview(animate = true) {
     const box = new THREE.Box3(
@@ -455,8 +523,8 @@ export function createScene(
             m.metalness = 0.28;
           }
           if (/glass$/i.test(m.name)) {
-            m.emissive.set('#eec47b');
-            m.emissiveIntensity = preset === 'night' ? 0.38 : 0;
+            m.emissive.set('#edbd71');
+            m.emissiveIntensity = preset === 'night' ? 0.42 : 0;
           }
         }
       }
@@ -498,6 +566,8 @@ export function createScene(
         false,
         foreground.fraction,
       );
+    else if (treesFailed || (highTreesFailed && !modeSmooth))
+      callbacks.onStatus('部分植被暂未加载，已保留现有场景，可重试。', true);
     else if ([...failed.keys()].some((key) => wanted.has(key)))
       callbacks.onStatus('部分近景暂未加载，已保留基础校园；可重试。', true);
     else if (initialReady) callbacks.onStatus('');
@@ -506,7 +576,7 @@ export function createScene(
     const label =
       key === 'base'
         ? '正在铺开校园'
-        : key === 'trees'
+        : key.startsWith('trees')
           ? '正在添上林荫'
           : key.startsWith('landmark-')
             ? `正在细化${landmarks.find((l) => 'landmark-' + l.id === key)?.name ?? '地标'}`
@@ -604,7 +674,7 @@ export function createScene(
     wanted.clear();
     wantedAssets.forEach(([key]) => wanted.add(key));
     for (const key of detailQueue.tasks.keys())
-      if (!wanted.has(key)) detailQueue.cancel(key);
+      if (key !== 'trees-near' && !wanted.has(key)) detailQueue.cancel(key);
     for (const key of failed.keys()) if (!wanted.has(key)) failed.delete(key);
     // One recent landmark can stay warm if it fits the decoded-geometry budget.
     const older = [...loaded.keys()]
@@ -627,6 +697,25 @@ export function createScene(
       if (loaded.has(key)) recentlyUsed.set(key, performance.now());
       else loadDetail(a, key, index);
     }
+    if (
+      !modeSmooth &&
+      treesRoot &&
+      manifest.treesNear &&
+      !highTreesReady &&
+      !highTreesFailed &&
+      !loading.has('trees') &&
+      !detailQueue.tasks.has('trees-near') &&
+      destinationCamera.distanceTo(destination) < 1000
+    )
+      void detailQueue
+        .enqueue('trees-near', 5, (signal) => loadTrees(true, signal))
+        .catch(() => {
+          if (!disposed)
+            callbacks.onStatus(
+              '近景植被暂未加载，已保留远景林荫，可重试。',
+              true,
+            );
+        });
     applyLayers();
     updateLoadStatus();
   }
@@ -664,35 +753,49 @@ export function createScene(
         if (!disposed) pendingRequest = performance.now();
       });
   }
-  async function loadTrees() {
-    if (!manifest || treesRoot || loading.has('trees')) return;
+  async function loadTrees(near = false, signal = lifecycle.signal) {
+    if (
+      !manifest ||
+      (near ? highTreesReady || !manifest.treesNear : treesRoot) ||
+      loading.has('trees')
+    )
+      return;
     loading.add('trees');
     try {
-      const [data, terrain] = await Promise.all([
-        fetch(asset('data/vegetation.json'), { signal: lifecycle.signal }).then(
-          (r) => {
-            if (!r.ok) throw new Error('vegetation');
-            return r.json();
-          },
-        ) as Promise<number[][]>,
-        fetch(asset('data/terrain.json'), { signal: lifecycle.signal }).then(
-          (r) => {
-            if (!r.ok) throw new Error('terrain');
-            return r.json();
-          },
-        ) as Promise<{
-          bounds: number[];
-          cols: number;
-          rows: number;
-          heights: number[];
-        }>,
-      ]);
+      const [data, terrain] = treeData
+        ? [treeData.data, treeData.terrain]
+        : await Promise.all([
+            fetch(asset('data/vegetation.json'), {
+              signal: lifecycle.signal,
+            }).then((r) => {
+              if (!r.ok) throw new Error('vegetation');
+              return r.json();
+            }) as Promise<number[][]>,
+            fetch(asset('data/terrain.json'), {
+              signal: lifecycle.signal,
+            }).then((r) => {
+              if (!r.ok) throw new Error('terrain');
+              return r.json();
+            }) as Promise<{
+              bounds: number[];
+              cols: number;
+              rows: number;
+              heights: number[];
+            }>,
+          ]);
       if (disposed) return;
-      const g = await loadGLB(manifest.trees, 'trees');
-      treesRoot = new THREE.Group();
-      treesRoot.name = 'vegetation';
-      treesRoot.userData.layer = 'vegetation';
-      scene.add(treesRoot);
+      treeData = { data, terrain };
+      const g = await loadGLB(
+        near ? manifest.treesNear! : manifest.trees,
+        near ? 'trees-near' : 'trees',
+        signal,
+      );
+      if (!treesRoot) {
+        treesRoot = new THREE.Group();
+        treesRoot.name = 'vegetation';
+        treesRoot.userData.layer = 'vegetation';
+        scene.add(treesRoot);
+      }
       const elevation = (x: number, y: number) => {
         const [x0, y0, x1, y1] = terrain.bounds;
         const u = Math.max(
@@ -772,21 +875,50 @@ export function createScene(
             transform.scale.setScalar(h / 9);
             transform.updateMatrix();
             inst.setMatrixAt(i, transform.matrix);
+            const tint =
+              0.92 +
+              (((Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1) + 1) *
+                0.07;
+            inst.setColorAt(i, new THREE.Color(tint * 0.98, tint, tint * 0.96));
           });
           inst.instanceMatrix.needsUpdate = true;
           inst.computeBoundingSphere();
           inst.castShadow = true;
           inst.receiveShadow = true;
           inst.userData.fullCount = rows.length;
+          inst.userData.lod = near ? 1 : 0;
+          inst.userData.center = new THREE.Vector3(
+            rows.reduce((sum, r) => sum + r[0], 0) / rows.length,
+            0,
+            -rows.reduce((sum, r) => sum + r[1], 0) / rows.length,
+          );
           treesRoot.add(inst);
         }
       }
       disposeObject(g.scene);
+      if (near) highTreesReady = true;
       // Materials and geometry are shared with the instanced meshes and disposed once during teardown.
       setQuality(quality);
       applyLayers();
+    } catch (error) {
+      if (!disposed) {
+        if (near) highTreesFailed = true;
+        else treesFailed = true;
+      }
+      throw error;
     } finally {
       loading.delete('trees');
+      pendingRequest = performance.now();
+    }
+  }
+  function applyTreeLOD() {
+    if (!treesRoot) return;
+    for (const o of treesRoot.children) {
+      const near =
+        highTreesReady &&
+        !modeSmooth &&
+        camera.position.distanceTo(o.userData.center) < 500;
+      o.visible = o.userData.lod === 1 ? near : !near;
     }
   }
   async function initialize() {
@@ -885,13 +1017,14 @@ export function createScene(
             /glass$/i.test(m.name)
           ) {
             m.emissive.set('#edbd71');
-            m.emissiveIntensity = p === 'night' ? 0.48 : 0;
+            m.emissiveIntensity = p === 'night' ? 0.42 : 0;
           }
       }
     });
     dirty = true;
   }
   function view(v: string) {
+    restoredPose = null;
     setOrbit(false);
     if (v === 'overview') {
       autoFramed = true;
@@ -970,6 +1103,7 @@ export function createScene(
     dirty = true;
   });
   controls.addEventListener('change', () => {
+    cameraChanged = true;
     dirty = true;
     pendingRequest = performance.now();
   });
@@ -997,6 +1131,7 @@ export function createScene(
       Math.max(100, camera.position.distanceTo(controls.target) * 0.8),
     );
     const t = controls.target;
+    sun.shadow.normalBias = size < 350 ? 0.18 : 0.6;
     sun.target.position.copy(t);
     const directions = {
       morning: [-1300, 500, 700],
@@ -1079,7 +1214,9 @@ export function createScene(
       dirty = true;
     }
     if (dirty || moving || tween) {
+      cameraChanged = true;
       shadowFrustum();
+      applyTreeLOD();
       renderer.render(scene, camera);
       dirty = false;
       lastFrame = time;
@@ -1128,6 +1265,11 @@ export function createScene(
       }
     }
 
+    if (cameraChanged && time - cameraSampleAt > 200) {
+      callbacks.onCamera(getSnapshot());
+      cameraSampleAt = time;
+      cameraChanged = false;
+    }
     if (time - sampleStart > 1500) {
       if (activeFrames > 3) fps = (1000 * activeFrames) / activeFrameMs;
       callbacks.onMetrics(metrics());
@@ -1216,6 +1358,8 @@ export function createScene(
       if (!initialReady) void initialize();
       else {
         failed.clear();
+        highTreesFailed = false;
+        treesFailed = false;
         reconcileDetails();
         if (!treesRoot)
           void loadTrees().catch(() =>
@@ -1224,6 +1368,8 @@ export function createScene(
       }
     },
     getMetrics: metrics,
+    getSnapshot,
+    restoreSnapshot,
     dispose: () => {
       disposed = true;
       lifecycle.abort();

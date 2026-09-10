@@ -1,3 +1,4 @@
+import type { CameraSnapshot } from './share';
 export type LayerKey =
   | 'buildings'
   | 'vegetation'
@@ -108,6 +109,8 @@ export interface SceneController {
   retry: () => void;
   dispose: () => void;
   getMetrics: () => Metrics;
+  getSnapshot: () => CameraSnapshot;
+  restoreSnapshot: (snapshot: Partial<CameraSnapshot>) => void;
 }
 export const DEFAULT_LAYERS: Record<LayerKey, boolean> = {
   buildings: true,
