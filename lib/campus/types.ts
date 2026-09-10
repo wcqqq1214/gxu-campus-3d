@@ -8,6 +8,19 @@ export type LayerKey =
   | 'labels';
 export type Quality = 'auto' | 'fine' | 'smooth';
 export type Preset = 'morning' | 'day' | 'evening' | 'night';
+export type LandmarkView =
+  | 'oblique'
+  | 'front'
+  | 'back'
+  | 'top'
+  | 'entrance'
+  | 'rear-entrance';
+export interface ViewportFrame {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
 export type Category =
   | 'academic'
   | 'living'
@@ -15,6 +28,7 @@ export type Category =
   | 'service'
   | 'landmark';
 export interface Building {
+  architecture?: { origin: [number, number]; angle: number };
   constructionStatus?: string | null;
   id: string;
   name: string;
@@ -77,6 +91,9 @@ export interface Metrics {
 export interface SceneController {
   clearSelection: () => void;
   focus: (id: string) => void;
+  landmarkView: (view: LandmarkView) => void;
+  setOrbit: (on: boolean) => void;
+  setViewport: (frame: ViewportFrame) => void;
   setLayer: (key: LayerKey, on: boolean) => void;
   setPreset: (p: Preset) => void;
   setQuality: (q: Quality) => void;

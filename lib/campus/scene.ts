@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { isTap } from './math';
+import { entranceBox, fitBox, landmarkBox, landmarkDirection } from './camera';
 import { DEFAULT_LAYERS } from './types';
 import type {
   Building,
@@ -14,6 +15,8 @@ import type {
   SceneController,
   Metrics,
   LayerKey,
+  LandmarkView,
+  ViewportFrame,
 } from './types';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 export const asset = (path: string) => `${BASE}/${path}`;
@@ -36,6 +39,7 @@ interface Callbacks {
   onSelect: (id: string | null) => void;
   onInteract: () => void;
   onMetrics: (m: Metrics) => void;
+  onOrbit: (on: boolean) => void;
 }
 export function createScene(
   host: HTMLElement,
@@ -45,7 +49,7 @@ export function createScene(
 ): SceneController {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#d8e5e5');
-  scene.fog = new THREE.Fog('#d8e5e5', 4800, 10500);
+  scene.fog = new THREE.Fog('#d8e5e5', 8500, 22000);
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: false,
@@ -63,12 +67,12 @@ export function createScene(
   );
   canvas.tabIndex = 0;
   host.appendChild(canvas);
-  const camera = new THREE.PerspectiveCamera(41, 1, 1, 12000);
+  const camera = new THREE.PerspectiveCamera(41, 1, 1, 30000);
   const controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
   controls.dampingFactor = 0.09;
-  controls.minDistance = 45;
-  controls.maxDistance = 6500;
+  controls.minDistance = 18;
+  controls.maxDistance = 18000;
   controls.maxPolarAngle = Math.PI * 0.475;
   controls.minPolarAngle = 0.02;
   controls.mouseButtons = {
@@ -145,6 +149,15 @@ export function createScene(
   let activeFrames = 0;
   let dirty = true;
   let pendingRequest = 0;
+  let frame: ViewportFrame = {
+    left: 20,
+    top: 100,
+    width: Math.max(200, host.clientWidth - 100),
+    height: Math.max(200, host.clientHeight - 160),
+  };
+  let selectedView: LandmarkView = 'oblique';
+  let autoFramed = true;
+  let orbiting = false;
   const compact = () => window.innerWidth < 760;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const loaded = new Map<string, THREE.Group>();
@@ -266,6 +279,7 @@ export function createScene(
   canvas.addEventListener('pointercancel', onCancel);
   function moveTo(target: THREE.Vector3, position: THREE.Vector3) {
     dirty = true;
+    tween = null;
     if (reduced.matches) {
       controls.target.copy(target);
       camera.position.copy(position);
@@ -284,33 +298,18 @@ export function createScene(
     const b = buildings.find((b) => b.id === id || b.landmark === id);
     if (!l) return;
     selected = id;
-    const c = (l ?? b)!;
-    const dist =
-      (l?.distance ??
-        Math.max(
-          100,
-          Math.hypot(c.bounds[2] - c.bounds[0], c.bounds[3] - c.bounds[1]) *
-            1.9,
-        )) * (compact() ? 1.45 : 1);
-    const target = new THREE.Vector3(
-      c.center[0],
-      c.elevation + c.height * 0.35,
-      -c.center[1],
-    );
-    moveTo(
-      target,
-      target
-        .clone()
-        .add(
-          new THREE.Vector3(
-            ...(l?.cameraOffset ??
-              ([-0.5, 0.66, 1] as [number, number, number])),
-          ).multiplyScalar(dist),
-        ),
+    selectedView = 'oblique';
+    autoFramed = true;
+    setOrbit(false);
+    const c = l;
+    frameLandmark();
+    const radius = Math.max(
+      12,
+      Math.hypot(c.bounds[2] - c.bounds[0], c.bounds[3] - c.bounds[1]) * 0.54,
     );
     clearGroup(highlight);
     const mark = new THREE.Mesh(
-      new THREE.RingGeometry(dist * 0.2, dist * 0.205, 64),
+      new THREE.RingGeometry(radius, radius + 0.6, 64),
       new THREE.MeshBasicMaterial({
         color: '#d9ae56',
         transparent: true,
@@ -335,13 +334,96 @@ export function createScene(
       if (a) void loadDetail(a, b.zone);
     }
   }
-  function overview(animate = true) {
-    const t = new THREE.Vector3(-310, 0, 15);
-    const p = new THREE.Vector3(1350, 2050, 2350);
-    if (compact()) {
-      t.x = 0;
-      p.set(1600, 2900, 3100);
+  function frameLandmark(animate = true) {
+    const place = landmarks.find((p) => p.id === selected);
+    if (!place) return;
+    const detail = loaded.get('landmark-' + place.id);
+    let box = detail
+      ? new THREE.Box3().setFromObject(detail)
+      : landmarkBox(place);
+    if (selectedView === 'entrance' || selectedView === 'rear-entrance')
+      box = entranceBox(
+        place,
+        box,
+        selectedView === 'rear-entrance',
+        buildings.find((b) => b.landmark === selected)?.architecture,
+      );
+    const fitted = fitBox(
+      box,
+      landmarkDirection(
+        place,
+        selectedView,
+        buildings.find((b) => b.landmark === selected)?.architecture,
+      ),
+      frame,
+      { width: host.clientWidth, height: host.clientHeight },
+      camera.fov,
+    );
+    if (animate) moveTo(fitted.target, fitted.position);
+    else {
+      tween = null;
+      controls.target.copy(fitted.target);
+      camera.position.copy(fitted.position);
+      controls.update();
+      dirty = true;
     }
+  }
+  function landmarkView(value: LandmarkView) {
+    setOrbit(false);
+    selectedView = value;
+    autoFramed = true;
+    frameLandmark();
+  }
+  function setOrbit(on: boolean) {
+    orbiting = on && Boolean(selected) && !reduced.matches;
+    callbacks.onOrbit(orbiting);
+    if (orbiting) {
+      selectedView = 'oblique';
+      // A sphere fits through a complete rotation, including the wider sides.
+      const place = landmarks.find((p) => p.id === selected)!;
+      const detail = loaded.get('landmark-' + place.id);
+      const box = detail
+        ? new THREE.Box3().setFromObject(detail)
+        : landmarkBox(place);
+      const sphere = box.getBoundingSphere(new THREE.Sphere());
+      const fit = fitBox(
+        new THREE.Box3().setFromCenterAndSize(
+          sphere.center,
+          new THREE.Vector3().setScalar(sphere.radius * 2),
+        ),
+        landmarkDirection(place, 'oblique'),
+        frame,
+        { width: host.clientWidth, height: host.clientHeight },
+      );
+      moveTo(fit.target, fit.position);
+    }
+  }
+  function setViewport(value: ViewportFrame) {
+    frame = value;
+    camera.setViewOffset(
+      host.clientWidth,
+      host.clientHeight,
+      host.clientWidth / 2 - (frame.left + frame.width / 2),
+      host.clientHeight / 2 - (frame.top + frame.height / 2),
+      host.clientWidth,
+      host.clientHeight,
+    );
+    if (orbiting) setOrbit(true);
+    else if (selected && autoFramed) frameLandmark();
+    else if (!selected && autoFramed) overview();
+    dirty = true;
+  }
+  function overview(animate = true) {
+    const box = new THREE.Box3(
+      new THREE.Vector3(-920, -10, -1260),
+      new THREE.Vector3(1000, 65, 1300),
+    );
+    const { target: t, position: p } = fitBox(
+      box,
+      new THREE.Vector3(0.55, 1.1, 1),
+      frame,
+      { width: host.clientWidth, height: host.clientHeight },
+    );
     if (animate) moveTo(t, p);
     else {
       controls.target.copy(t);
@@ -379,7 +461,7 @@ export function createScene(
             m.roughness = 0.3;
             m.metalness = 0.28;
           }
-          if (m.name === 'glass') {
+          if (/glass$/i.test(m.name)) {
             m.emissive.set('#eec47b');
             m.emissiveIntensity = preset === 'night' ? 0.38 : 0;
           }
@@ -430,6 +512,8 @@ export function createScene(
       const g = await loadGLB(a);
       dynamic.add(g.scene);
       loaded.set(key, g.scene);
+      if (key === 'landmark-' + selected && autoFramed && !orbiting)
+        frameLandmark();
       failed.delete(key);
       applyLayers();
       if (failed.size === 0 && initialReady) callbacks.onStatus('');
@@ -635,7 +719,7 @@ export function createScene(
     } as const;
     const [sky, color, power, amb, pos] = settings[p];
     scene.background = new THREE.Color(sky);
-    scene.fog = new THREE.Fog(sky, 4800, 10500);
+    scene.fog = new THREE.Fog(sky, 8500, 22000);
     sun.color.set(color);
     sun.intensity = power;
     ambient.intensity = amb;
@@ -643,7 +727,10 @@ export function createScene(
     scene.traverse((o) => {
       if (o instanceof THREE.Mesh) {
         for (const m of Array.isArray(o.material) ? o.material : [o.material])
-          if (m instanceof THREE.MeshStandardMaterial && m.name === 'glass') {
+          if (
+            m instanceof THREE.MeshStandardMaterial &&
+            /glass$/i.test(m.name)
+          ) {
             m.emissive.set('#edbd71');
             m.emissiveIntensity = p === 'night' ? 0.48 : 0;
           }
@@ -652,13 +739,16 @@ export function createScene(
     dirty = true;
   }
   function view(v: string) {
+    setOrbit(false);
     if (v === 'overview') {
+      autoFramed = true;
       selected = null;
       callbacks.onSelect(null);
       clearGroup(highlight);
       overview();
       return;
     }
+    autoFramed = false;
     const t = controls.target.clone();
     const offset = camera.position.clone().sub(t);
     if (v === 'top')
@@ -700,6 +790,8 @@ export function createScene(
     if (dirs[e.key]) {
       e.preventDefault();
       callbacks.onInteract();
+      autoFramed = false;
+      setOrbit(false);
       tween = null;
       const d = camera.position.distanceTo(controls.target) * 0.035;
       const [x, z] = dirs[e.key];
@@ -719,6 +811,8 @@ export function createScene(
   canvas.addEventListener('keydown', onKey);
   controls.addEventListener('start', () => {
     tween = null;
+    autoFramed = false;
+    setOrbit(false);
     callbacks.onInteract();
     dirty = true;
   });
@@ -730,8 +824,14 @@ export function createScene(
     const w = host.clientWidth,
       h = host.clientHeight;
     renderer.setSize(w, h);
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
+    camera.setViewOffset(
+      w,
+      h,
+      w / 2 - (frame.left + frame.width / 2),
+      h / 2 - (frame.top + frame.height / 2),
+      w,
+      h,
+    );
     setQuality(quality);
     dirty = true;
   }
@@ -785,6 +885,19 @@ export function createScene(
     loop = requestAnimationFrame(animate);
     if (modeSmooth && time - lastFrame < 32) return;
     const moving = controls.update();
+    if (orbiting && !tween) {
+      if (reduced.matches) setOrbit(false);
+      else {
+        const offset = camera.position.clone().sub(controls.target);
+        offset.applyAxisAngle(
+          new THREE.Vector3(0, 1, 0),
+          Math.min(0.05, (time - lastFrame) / 1000) * 0.13,
+        );
+        camera.position.copy(controls.target).add(offset);
+        camera.lookAt(controls.target);
+        dirty = true;
+      }
+    }
     if (tween) {
       const f = Math.min(1, (time - tween.start) / 1300);
       const e = 1 - (1 - f) ** 3;
@@ -823,7 +936,10 @@ export function createScene(
             bounds[3] > r[1] - 6,
         );
         const obscured =
-          (!compact() && x < 350) || y < 105 || y > rect.height - 95;
+          bounds[0] < frame.left ||
+          bounds[2] > frame.left + frame.width ||
+          bounds[1] < frame.top ||
+          bounds[3] > frame.top + frame.height;
         const hidden =
           (l.placeKind === 'sports' ? !layers.sports : !layers.buildings) ||
           p.z < 0 ||
@@ -890,8 +1006,13 @@ export function createScene(
   canvas.addEventListener('webglcontextrestored', onRestored);
   return {
     focus,
+    landmarkView,
+    setOrbit,
+    setViewport,
     clearSelection: () => {
       selected = null;
+      autoFramed = false;
+      setOrbit(false);
       clearGroup(highlight);
       dirty = true;
     },
