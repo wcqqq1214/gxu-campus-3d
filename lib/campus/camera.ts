@@ -118,6 +118,18 @@ export function entranceBox(
   rear: boolean,
   architecture?: Building['architecture'],
 ) {
+  if (place.id === 'teaching-six' && architecture) {
+    const { origin, angle } = architecture;
+    const y = rear ? 30 : -30;
+    return new Box3().setFromCenterAndSize(
+      new Vector3(
+        origin[0] - Math.sin(angle) * y,
+        place.elevation + 3,
+        -(origin[1] + Math.cos(angle) * y),
+      ),
+      new Vector3(34, 9, 13),
+    );
+  }
   if (place.id === 'teaching-ten' && architecture) {
     const { origin, angle } = architecture;
     const localY = -19.4;
