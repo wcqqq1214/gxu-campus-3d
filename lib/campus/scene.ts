@@ -569,7 +569,7 @@ export function createScene(
             m.emissiveIntensity =
               preset === 'night' ? (m.name === 'timeLight' ? 1.8 : 0.16) : 0;
           }
-          if (/glass$/i.test(m.name)) {
+          if ((/glass$/i.test(m.name) && m.name !== 'courtGlass')) {
             m.emissive.set('#edbd71');
             m.emissiveIntensity = preset === 'night' ? 0.42 : 0;
           }
@@ -1106,7 +1106,7 @@ export function createScene(
         for (const m of Array.isArray(o.material) ? o.material : [o.material])
           if (
             m instanceof THREE.MeshStandardMaterial &&
-            (/glass$/i.test(m.name) ||
+            ((/glass$/i.test(m.name) && m.name !== 'courtGlass') ||
               m.name === 'timeLight' ||
               m.name === 'timeSilver')
           ) {

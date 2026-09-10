@@ -387,5 +387,7 @@ def prepare_infrastructure():
     prepare_sculptures()
     from surroundings_data import prepare_surroundings
     prepare_surroundings()
+    from basketball_data import prepare_basketball
+    prepare_basketball()
 
 if __name__=='__main__':prepare_infrastructure()
