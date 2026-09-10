@@ -7,6 +7,7 @@ from international_residence import international_residence
 from campus_gates import campus_gate
 from time_gate import time_gate
 from teaching_ten import teaching_ten
+from teaching_six import teaching_six
 
 def facade(m,x,y,z,w,d,h,wall,glass,trim,floors=6,spacing=4,band=False):
     m.box(x,y,z+h/2,w,d,h,wall)
@@ -125,27 +126,7 @@ def landmark(l,b,z,C,detail=True):
         for i in [-3,-2,2,3]:m.box(x+i*w*.08,y-d*.45,z+h*.26,1.3,1.8,h*.52,stone)
         m.box(x,y-d*.45,z+h*.52,w*.85,3,.8,white)
     elif k=='teaching-six':
-        m.extrude(b['polygons'],b['roofTriangles'],z,h,stone,white)
-        for poly in b['polygons']:
-            for ring in poly:
-                for a,bb in zip(ring,ring[1:]):
-                    dx=bb[0]-a[0];dy=bb[1]-a[1];ln=math.hypot(dx,dy);angle=math.atan2(dy,dx)
-                    if ln<2:continue
-                    count=max(1,int(ln/3.8))
-                    for floor in range(6):
-                        for i in range(count):
-                            t=(i+.5)/count;xx=a[0]+dx*t;yy=a[1]+dy*t
-                            m.box(xx,yy,z+(floor+.54)*h/6,ln/count*.68,.32,h/6*.68,glass,angle)
-                            if detail:m.box(xx,yy,z+(floor+.54)*h/6,.07,.38,h/6*.7,white,angle)
-                    m.box((a[0]+bb[0])/2,(a[1]+bb[1])/2,z+h+.6,ln+2,2,.5,white,angle)
-        edges=[(a,bb) for poly in b['polygons'] for a,bb in zip(poly[0],poly[0][1:]) if math.dist(a,bb)>w*.4]
-        a,bb=min(edges,key=lambda pair:(pair[0][1]+pair[1][1])/2)
-        dx=bb[0]-a[0];dy=bb[1]-a[1];ln=math.hypot(dx,dy);theta=math.atan2(dy,dx)
-        frontx=(a[0]+bb[0])/2;fronty=(a[1]+bb[1])/2
-        for i in range(max(2,int(ln/7))):
-            t=(i+.5)/max(2,int(ln/7));m.box(a[0]+dx*t,a[1]+dy*t-.35,z+h*.5,1.1,1.4,h,white,theta)
-        m.box(frontx,fronty-3,z+5,ln*.42,8,.65,C['wood'],theta)
-        steps(m,frontx,fronty-6,z,ln*.40,10,1.5,stone)
+        return teaching_six(l,b,z,C,detail)
     elif k=='teaching-two':
         facade(m,x,y,z,w,d,h,C['pink'],glass,white,7,3.8)
         m.box(x,ymin-1.6,z+h*.50,9,3,h,stone)
