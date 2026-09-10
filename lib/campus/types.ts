@@ -87,6 +87,10 @@ export interface Metrics {
   pixelRatio: number;
   quality: string;
   loadedBytes: number;
+  loadedDetails: string[];
+  queuedDetails: number;
+  residentDetailBytes: number;
+  detailGeometryMiB: number;
 }
 export interface SceneController {
   clearSelection: () => void;

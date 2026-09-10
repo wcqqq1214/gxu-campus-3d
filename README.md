@@ -65,10 +65,10 @@
 | **React + TypeScript** | 游览菜单、搜索与交互状态。 |
 | **vinext + Vite** | 本地开发与静态构建。 |
 | **OpenStreetMap + DEM** | 建筑轮廓、道路、水体和地形的数据基础。 |
-| **GLB + Draco** | 压缩模型资源，按区域加载近景。 |
+| **GLB + Draco** | 压缩模型资源，优先加载当前地标与附近区块。 |
 
 - [Blender 源文件](blender/gxu-campus.blend)：米制尺寸、具名建筑、材质与集合，纹理已打包。
-- [模型资源](public/models/)：校园基础模型、东／西／北近景分区、独立地标和树木模板。
+- [模型资源](public/models/)：校园基础模型、30 个空间区块、独立地标和树木模板。
 - [场景数据](public/data/)：GeoJSON、建筑与地标目录、模型清单、来源记录和高程数据。
 - [原始快照](data/snapshots/)：保留版本与编辑时间的 OSM 数据、DEM 瓦片及查询，支持离线恢复与重建。
 
