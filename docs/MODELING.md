@@ -232,3 +232,29 @@ blender --background --python-exit-code 1 --python blender/validate_surroundings
 ```
 
 仅修改周边铺装时可运行上述更新脚本，重建基础 GLB 并替换源文件中的道路对象；完整 `build_campus.py` 同样读取派生数据。所有坐标以米为单位，原始 OSM GeoJSON 和道路中心线保留。
+
+
+## 篮球场（2026-09-11）
+
+重建已有 OSM 定位的 31 片室外单场，其中西校园集中区 16 片。其余为原有周边和零散球场，不应把 31 片理解为全校总数。学校 [2024 年体育设施介绍](https://tyxy.gxu.edu.cn/info/1166/2372.htm)记载东区 15 片、西区 16 片；当前地图没有东校园田径场旁的独立篮球场轮廓，本次没有凭统计数量添加位置。两块仅标注整体范围的活动区继续保留铺地，去掉误导性的超大单场外框和中线；室内篮球馆保持原建筑。
+
+- 单场保留 OSM 中心、长轴与 ID，比赛区按 28×15 米统一归整；原地图宽度约 14.2—14.6 米，归整存在少量外扩，原轮廓保存在数据中。没有移动球场去迎合排布。
+- [FIBA 2024 规则](https://assets.fiba.basketball/image/upload/documents-corporate-fiba-official-rules-2024-v10a.pdf)用于场线比例：5 厘米线宽、三分线直段与圆弧衔接、中圈、罚球半圆及禁区、合理冲撞区。面层采用互不重叠的色块；白线单独抬高约 4 厘米并采用既有深度偏移，确保压缩后仍可见，此抬高是显示处理。
+- 篮架包含底座、防护立柱、悬臂、篮板及目标框、连续圆管篮圈和开放的锥形菱格篮网。篮圈上缘采用距比赛面 3.05 米的通用建模规格；不属于经实测的专业设备型号。
+- [2026 年东校园现场照片](https://zyhjcl.gxu.edu.cn/info/1106/4503.htm)辅助绿色场面、橙色局部铺装与绿色设施的视觉风格。该照片不能核对每片球场或西校园的确切配色；对应颜色、架型和缓冲区均按视觉估算记录。活动日期 2026-01-20，页面发布 2026-01-21，照片元数据拍摄日期未知。
+- 分成四组连续铺装，89 个局部地形单元重新分面，球场区域整平、边缘 1.5 米范围回接原地形。仅修改模型工程修正，原始 DEM 年代和高程数据不变。4 株侵入球场或缓冲区的示意树移除，树木总数为 3,120。
+
+`public/data/basketball.json` 保存定位、原轮廓、估算轮廓、分组、地形补片及来源。基础 GLB 按四个场地组聚合，避免每个篮架成为单独绘制对象；源文件保留 31 个独立球场及具名的标线、篮架、篮网分组。球场由“运动场地”图层控制，不加入搜索或自动巡游。
+
+```sh
+python3 scripts/basketball_data.py
+python3 scripts/test_basketball.py
+blender --background --python-exit-code 1 --python blender/update_basketball.py
+blender --background --python-exit-code 1 --python blender/validate_basketball.py
+```
+
+完整数据与模型构建也包含这些步骤。专项更新脚本重建基础 GLB、篮球场、地形与贴地道路，保留其他建筑、地标和近景资源。
+
+| 西校园整体 | 篮架近景 |
+| --- | --- |
+| ![西校园篮球场](screenshots/basketball-west.png) | ![篮板、篮圈与镂空篮网](screenshots/basketball-hoop.png) |
