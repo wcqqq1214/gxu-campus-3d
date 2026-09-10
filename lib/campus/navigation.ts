@@ -1,6 +1,7 @@
 import type { Building, Category, Landmark } from './types';
 
 export const LANDMARK_ALIASES: Record<string, string[]> = {
+  'time-gate': ['时空之门', '时光广场', '图书馆北广场'],
   'south-gate': ['南门', '大学东路校门'],
   library: ['校图书馆', '西大图书馆'],
   'teaching-six': ['六教', '6教'],
@@ -42,7 +43,7 @@ export function navigableBuildings(
   );
 }
 
-/** Independent gate POIs have estimated pick bounds, never OSM building IDs. */
+/** Independent landmark POIs have estimated pick bounds, never OSM building IDs. */
 export function navigationFootprints(
   buildings: Building[],
   landmarks: Landmark[],
@@ -53,7 +54,9 @@ export function navigationFootprints(
       layer: 'buildings' as const,
     })),
     ...landmarks
-      .filter((l) => l.placeKind === 'gate' || l.placeKind === 'bridge')
+      .filter((l) =>
+        ['gate', 'bridge', 'sculpture'].includes(l.placeKind ?? ''),
+      )
       .map((l) => {
         const [x0, y0, x1, y1] = l.bounds;
         return {

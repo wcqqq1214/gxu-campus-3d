@@ -80,6 +80,26 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['night', '夜景', Moon],
 ];
 const refs: Record<string, { name: string; url: string; year: string }> = {
+  timeGate2025: {
+    name: '时光之门 · 校方研学活动近景',
+    url: 'https://cjxy.gxu.edu.cn/info/1041/1477.htm',
+    year: '发布于 2025-03-21；拍摄日期未单独注明',
+  },
+  timeGateOverall2023: {
+    name: '时光之门 · 2023 年地标导览转载全貌',
+    url: 'https://www.sohu.com/a/718274615_121123989',
+    year: '发布于 2023-09-06；拍摄日期未单独注明',
+  },
+  timeGateRoute2022: {
+    name: '时光之门 · 外国语学院云游路线',
+    url: 'https://fls.gxu.edu.cn/info/1205/4151.htm',
+    year: '发布于 2022-07-14；拍摄日期未单独注明',
+  },
+  timeGateUse2026: {
+    name: '时光之门 · 2026 年校友返校记录',
+    url: 'https://gxulif.gxu.edu.cn/info/1527/12265.htm',
+    year: '发布于 2026-07-27；拍摄日期未单独注明',
+  },
   chongzuo2023: {
     name: '校方崇左桥下穿坡道与护栏照片',
     url: 'https://ghjjc.gxu.edu.cn/info/1046/2619.htm',
@@ -576,7 +596,9 @@ export default function Home() {
                           ? '南门近景'
                           : currentLandmark?.placeKind === 'bridge'
                             ? '桥下近景'
-                            : '入口近景',
+                            : currentLandmark?.placeKind === 'sculpture'
+                              ? '雕塑近景'
+                              : '入口近景',
                       ],
                       ...(currentLandmark.id === 'library'
                         ? [['rear-entrance', '北门近景']]
