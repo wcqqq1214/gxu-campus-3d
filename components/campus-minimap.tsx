@@ -1,0 +1,129 @@
+'use client';
+import { memo, useMemo, useState } from 'react';
+import { MapPin, ChevronDown } from 'lucide-react';
+import type { Building, Landmark } from '@/lib/campus/types';
+import { cameraBearing, type CameraSnapshot } from '@/lib/campus/share';
+
+export const CampusMinimap = memo(function CampusMinimap({
+  buildings,
+  current,
+  camera,
+}: {
+  buildings: Building[];
+  current?: Landmark;
+  camera: CameraSnapshot | null;
+}) {
+  const [open, setOpen] = useState(false);
+  const map = useMemo(() => {
+    const bounds = buildings.filter((b) => b.insideCampus).map((b) => b.bounds);
+    if (!bounds.length) return null;
+    const x0 = Math.min(...bounds.map((b) => b[0])) - 70,
+      y0 = Math.min(...bounds.map((b) => b[1])) - 70;
+    const x1 = Math.max(...bounds.map((b) => b[2])) + 70,
+      y1 = Math.max(...bounds.map((b) => b[3])) + 70;
+    const scale = 170 / Math.max(x1 - x0, y1 - y0);
+    const point = (x: number, y: number) => [
+      14 + (x - x0) * scale,
+      14 + (y1 - y) * scale,
+    ];
+    return {
+      point,
+      width: (x1 - x0) * scale + 28,
+      height: (y1 - y0) * scale + 28,
+      shapes: buildings
+        .filter((b) => b.insideCampus)
+        .map((b) => ({
+          id: b.id,
+          path: b.polygons
+            .map((poly) =>
+              poly
+                .map(
+                  (ring) =>
+                    ring
+                      .map(
+                        ([x, y], i) =>
+                          `${i ? 'L' : 'M'}${point(x, y)
+                            .map((n) => n.toFixed(1))
+                            .join(',')}`,
+                      )
+                      .join(' ') + ' Z',
+                )
+                .join(' '),
+            )
+            .join(' '),
+        })),
+    };
+  }, [buildings]);
+  if (!map) return null;
+  const point = current ? map.point(...current.center) : null;
+  const target = camera ? map.point(camera.target[0], -camera.target[2]) : null;
+  const outside =
+    target &&
+    (target[0] < 0 ||
+      target[0] > map.width ||
+      target[1] < 0 ||
+      target[1] > map.height);
+  return (
+    <section
+      className={`campus-minimap ${open ? 'open' : ''}`}
+      aria-label="校园位置小图"
+    >
+      <button
+        className="minimap-toggle"
+        aria-expanded={open}
+        onClick={() => setOpen(!open)}
+      >
+        <MapPin size={16} />
+        <span>{current ? `${current.name}的位置` : '校园位置小图'}</span>
+        <ChevronDown size={14} />
+      </button>
+      {open && (
+        <div className="minimap-body">
+          <svg
+            viewBox={`0 0 ${map.width} ${map.height}`}
+            aria-label="北向朝上的校园建筑分布与镜头方向"
+          >
+            {map.shapes.map((shape) => (
+              <path
+                key={shape.id}
+                d={shape.path}
+                fill="#a8bda4"
+                fillRule="evenodd"
+              />
+            ))}
+            {point && (
+              <circle
+                cx={point[0]}
+                cy={point[1]}
+                r={6}
+                fill="#cf9e38"
+                stroke="#fff"
+                strokeWidth={2}
+              />
+            )}
+            {target && (
+              <g
+                transform={`translate(${Math.max(10, Math.min(map.width - 10, target[0]))},${Math.max(10, Math.min(map.height - 10, target[1]))}) rotate(${-cameraBearing(camera)})`}
+              >
+                <path
+                  d="M0 -13 L-7 7 L0 4 L7 7 Z"
+                  fill="#1a5743"
+                  stroke="white"
+                  strokeWidth={1.5}
+                />
+              </g>
+            )}
+            <text x={map.width - 16} y={16} fontSize="12" fill="#244d36">
+              N
+            </text>
+          </svg>
+          <small>
+            {outside
+              ? '观察中心位于图外，箭头显示朝向'
+              : '北向朝上 · 金点为地标，箭头为观察中心与朝向'}
+          </small>
+        </div>
+      )}
+    </section>
+  );
+});

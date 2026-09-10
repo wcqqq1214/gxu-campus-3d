@@ -39,6 +39,9 @@ for name in ['stone','grass','green','road','path','paleRoof','slate','sport','p
             pixels.extend([min(1,v*grain) for v in base]+[1])
     image.pixels.foreach_set(pixels);image.filepath_raw=str(texture_dir/(name+'.jpg'));image.file_format='JPEG';image.save();image.pack()
     node=mat.node_tree.nodes.new('ShaderNodeTexImage');node.image=image;node.extension='REPEAT';mat.node_tree.links.new(node.outputs['Color'],mat.node_tree.nodes['Principled BSDF'].inputs['Base Color'])
+# Modest near-view variation remains an explicitly estimated facade treatment.
+for name,color in [('stoneWarm','#c6b69f'),('stoneCool','#c5c0b1'),('livingWarm','#d0b39f'),('livingCool','#c3b0a4'),('shadeGlass','#3b6573')]:
+    C[name]=material(name,rgb(color),.28 if name.endswith('Glass') else .84,.28 if name.endswith('Glass') else 0)
 cols=terrain['cols'];rows=terrain['rows'];xmin,ymin,xmax,ymax=terrain['bounds'];hh=terrain['heights']
 def elevation(x,y):
     u=max(0,min(cols-1.001,(x-xmin)/(xmax-xmin)*(cols-1)));v=max(0,min(rows-1.001,(y-ymin)/(ymax-ymin)*(rows-1)));i=int(u);j=int(v);a=u-i;b=v-j
@@ -46,6 +49,10 @@ def elevation(x,y):
 
 def generic(b,detail):
     m=Mesh();h=b['height'];cx,cy=b['center'];z=elevation(cx,cy);wall=C['pink'] if b['category']=='living' else C['stone'] if b['category']=='academic' else C['white']
+    seed=int(hashlib.sha256(b['id'].encode()).hexdigest()[:8],16)
+    if detail and b['category'] in ('academic','living'):
+        choices=['pink','livingWarm','livingCool'] if b['category']=='living' else ['stone','stoneWarm','stoneCool']
+        wall=C[choices[seed%3]]
     if b['id']=='way/948683815':return west_stand(b,z,C,detail)
     if b['tags'].get('memorial')=='column':
         # The four mapped historic inner-gate piers are monuments, not windowed houses.
@@ -79,7 +86,7 @@ def generic(b,detail):
                         # Flat panes remain present in the lightweight model; near LOD adds relief and mullions.
                         if detail:
                             m.box(x,y,zz,ww+.30,.22,wh+.30,C['white'],theta)
-                            m.box(x+nx*.13,y+ny*.13,zz,ww,.10,wh,C['glass'],theta)
+                            m.box(x+nx*.13,y+ny*.13,zz,ww,.10,wh,C['shadeGlass'] if (seed+i*7+level*13)%7<2 else C['glass'],theta)
                             m.box(x+nx*.2,y+ny*.2,zz,.055,.10,wh,C['white'],theta)
                             if b['category']=='living' and i%2==0:
                                 m.box(x+nx*.65,y+ny*.65,zz-wh*.52,ww+.5,1.3,.14,C['white'],theta)
@@ -91,6 +98,10 @@ def generic(b,detail):
         if detail:
             ring=poly[0];a,bb=max(zip(ring,ring[1:]),key=lambda p:math.dist(*p));dx=bb[0]-a[0];dy=bb[1]-a[1];theta=math.atan2(dy,dx);x=(a[0]+bb[0])/2;y=(a[1]+bb[1])/2
             m.box(x,y,z+1.3,2.2,.35,2.6,C['dark'],theta);m.box(x,y,z+2.9,3.5,2.5,.25,C['white'],theta)
+            area=sum(a[0]*bb[1]-bb[0]*a[1] for a,bb in zip(ring,ring[1:]));sign=1 if area>0 else -1
+            length=math.hypot(dx,dy);nx=dy/length*sign;ny=-dx/length*sign
+            m.box(x+nx*.65,y+ny*.65,z+.12,3.4,1.6,.20,C['path'],theta)
+            m.box(x+nx*.9,y+ny*.9,z+.035,3.8,2,.08,C['stone'],theta)
     if detail and b['height']<14 and len(b['polygons'][0])==1 and len(b['polygons'][0][0])==5 and all(abs(a[0]-bb[0])<.1 or abs(a[1]-bb[1])<.1 for a,bb in zip(b['polygons'][0][0],b['polygons'][0][0][1:])):
         a,bb,c,d=b['bounds'];m.roof((a+c)/2,(bb+d)/2,z+h+.5,c-a,d-bb,2.3,C['red'])
     return m
@@ -163,21 +174,8 @@ for l in landmarks:
         if not BASE_ONLY:landmark(l,None,z,C,True).object(l['name'],SOURCE,{'featureId':l.get('osmId',l['id']),'landmark':l['id'],'layer':'buildings','sourceUrl':l['sourceUrl']})
     base['landmark-'+l['id']]=landmark(l,bylandmark.get(l['id']),z,C,False)
 # Reusable tree templates; linked copies keep the Blender source small.
-templates=[]
-for typ in range(3):
-    m=Mesh();m.cylinder(0,0,2.5,.24,5,C['bark'],8,topr=.12)
-    if typ<2:
-        rng=random.Random(200+typ)
-        for i in range(8 if typ==0 else 5):
-            angle=i*math.tau/8;r=1.7 if i else 0
-            m.ellipsoid(math.cos(angle)*r,math.sin(angle)*r,5+rng.uniform(-.8,1.6),2.0,1.8,2.0 if typ==0 else 3.2,C[['leaf','leaf2','leaf3'][i%3]],8,5)
-    else:
-        for i in range(10):
-            a=i*math.tau/10
-            for j in range(5):
-                r=j*.8;r1=(j+1)*.8;z0=6+math.sin(j/5*math.pi)*1.3-j*.26;z1=6+math.sin((j+1)/5*math.pi)*1.3-(j+1)*.26
-                m.face([(math.cos(a)*r-math.sin(a)*.5,math.sin(a)*r+math.cos(a)*.5,z0),(math.cos(a)*r1,math.sin(a)*r1,z1),(math.cos(a)*r+math.sin(a)*.5,math.sin(a)*r-math.cos(a)*.5,z0)],C['leaf2'])
-    templates.append(m.object(f'Tree-template-{typ}',PLANTS,{'template':typ}))
+from vegetation import tree_templates
+templates=tree_templates(C,PLANTS,True)
 for i,(x,y,h,t) in enumerate([] if BASE_ONLY else trees):
     o=bpy.data.objects.new(f'树木示意-{i:04}',templates[t].data);PLANTS.objects.link(o);o.location=(x,y,elevation(x,y));o.scale=(h/9,h/9,h/9);o.rotation_euler.z=i*2.399
 for t in templates:t.hide_render=True;t.hide_set(True)
@@ -216,12 +214,19 @@ for l in landmarks:
 # Export only tree templates; runtime uses InstancedMesh grouped by spatial sector.
 bpy.ops.object.select_all(action='DESELECT')
 for o in templates:o.hide_set(False);o.hide_render=False;o.select_set(True)
-bpy.ops.export_scene.gltf(filepath=str(MODELS/'trees.glb'),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True)
+bpy.ops.export_scene.gltf(filepath=str(MODELS/'trees-near.glb'),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True)
 for o in templates:o.hide_set(True);o.hide_render=True
+# Far templates keep the initial scene light; high templates stream only for close views.
+low_templates=tree_templates(C,PLANTS,False)
+bpy.ops.object.select_all(action='DESELECT')
+for o in low_templates:o.select_set(True)
+bpy.ops.export_scene.gltf(filepath=str(MODELS/'trees.glb'),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True)
+for o in low_templates:
+    mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
 (DATA/'buildings.json').write_text(json.dumps(buildings,ensure_ascii=False,separators=(',',':')))
 (DATA/'landmarks.json').write_text(json.dumps(landmarks,ensure_ascii=False,separators=(',',':')))
-manifest={'version':2,'chunkSizeMeters':CHUNK_METERS,'units':'meters','axes':{'x':'east','y':'up','z':'south'},'base':{'url':'models/base.glb','bytes':sizes['base.glb']},'trees':{'url':'models/trees.glb','bytes':(MODELS/'trees.glb').stat().st_size},'zones':[{'id':k,'url':f'models/{k}.glb','bytes':sizes[k+'.glb'],'featureIds':zoneids[k],'bounds':chunkbounds[k]} for k in sorted(near)],'landmarks':[{'id':l['id'],'url':f"models/{l['id']}.glb",'bytes':sizes[l['id']+'.glb']} for l in landmarks]}
-for entry in [manifest['base'],manifest['trees']]+manifest['zones']+manifest['landmarks']:
+manifest={'version':2,'chunkSizeMeters':CHUNK_METERS,'units':'meters','axes':{'x':'east','y':'up','z':'south'},'base':{'url':'models/base.glb','bytes':sizes['base.glb']},'trees':{'url':'models/trees.glb','bytes':(MODELS/'trees.glb').stat().st_size},'treesNear':{'url':'models/trees-near.glb','bytes':(MODELS/'trees-near.glb').stat().st_size},'zones':[{'id':k,'url':f'models/{k}.glb','bytes':sizes[k+'.glb'],'featureIds':zoneids[k],'bounds':chunkbounds[k]} for k in sorted(near)],'landmarks':[{'id':l['id'],'url':f"models/{l['id']}.glb",'bytes':sizes[l['id']+'.glb']} for l in landmarks]}
+for entry in [manifest['base'],manifest['trees'],manifest['treesNear']]+manifest['zones']+manifest['landmarks']:
     entry['sha256']=hashlib.sha256((ROOT/'public'/entry['url']).read_bytes()).hexdigest()
 (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 # Remove only obsolete generated near models after the new manifest is complete.

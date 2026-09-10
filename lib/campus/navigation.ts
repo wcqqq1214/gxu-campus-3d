@@ -1,13 +1,31 @@
-import type { Building, Landmark } from './types';
+import type { Building, Category, Landmark } from './types';
+
+export const LANDMARK_ALIASES: Record<string, string[]> = {
+  'south-gate': ['南门', '大学东路校门'],
+  library: ['校图书馆', '西大图书馆'],
+  'teaching-six': ['六教', '6教'],
+  'teaching-two': ['二教', '2教', '南宁楼'],
+  'student-center': ['大活', '学生活动中心'],
+  computer: ['计电', '计电学院', '计算机学院'],
+  'international-residence': ['留学生', '国际学生公寓'],
+  'new-east-gate': ['新东园门', '新东园入口', '秀灵西一里'],
+  'east-gate': ['秀灵路东门'],
+  'west-gate': ['鲁班路西门'],
+};
 
 /** All navigation surfaces share the curated catalogue, never the footprint index. */
 export function searchLandmarks(
   landmarks: Landmark[],
   query: string,
+  category: Category | 'all' = 'all',
 ): Landmark[] {
   const term = query.trim().toLocaleLowerCase();
-  return landmarks.filter((place) =>
-    place.name.toLocaleLowerCase().includes(term),
+  return landmarks.filter(
+    (place) =>
+      (category === 'all' || place.category === category) &&
+      [place.name, ...(LANDMARK_ALIASES[place.id] ?? [])].some((name) =>
+        name.toLocaleLowerCase().includes(term),
+      ),
   );
 }
 
