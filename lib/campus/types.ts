@@ -50,7 +50,7 @@ export interface Building {
   zone: string;
 }
 export interface Landmark {
-  placeKind?: 'sports' | 'gate' | 'bridge';
+  placeKind?: 'sports' | 'gate' | 'bridge' | 'sculpture';
   pickPolygon?: number[][];
   portalCenter?: [number, number];
   approachPath?: number[][];
