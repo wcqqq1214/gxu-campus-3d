@@ -133,6 +133,19 @@ npm run preview
 
 数据准备与模型重建流程见 [建模说明](docs/MODELING.md)，来源与快照说明见 [数据依据](docs/DATA.md)。
 
+### 数据回归测试
+
+使用 Python 3.12（与 CI 一致），首次安装依赖后运行篮球场、桥下接口与周边建筑范围测试：
+
+```sh
+python3.12 -m venv work/data-venv
+source work/data-venv/bin/activate
+python -m pip install -r scripts/requirements.txt
+npm run test:data
+```
+
+提交到 `main` 和面向 `main` 的 Pull Request 均运行类型、lint、Node 测试、Python 数据测试和静态构建；PR 不发布 Pages。完整优化与验证记录见 [逐项修复记录](docs/FIXES.md)。
+
 ## 数据来源与精度
 
 模型以公开地理数据为基础，结合校方照片、视频及资料重建部分地标。近期核对采用 2024—2026 年校方资料；缺少近期外观时也引用更早的官方记录，资料获取时间不等于拍摄时间。
