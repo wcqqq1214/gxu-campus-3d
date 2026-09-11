@@ -4,7 +4,7 @@ export const metadata: Metadata = {
   title: '西大 · 云游校园',
   icons: { icon: `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/favicon.svg` },
   description:
-    '以真实地理数据与 Blender 建筑模型，探索广西大学的林荫、湖塘与校园建筑。',
+    '广西大学主校区三维地图，支持地标搜索、自动巡游和昼夜切换。使用 Three.js 和 Blender 制作。',
 };
 export default function RootLayout({
   children,
