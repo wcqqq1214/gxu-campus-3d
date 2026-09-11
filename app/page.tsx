@@ -71,7 +71,7 @@ const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
   ['water', '湖塘水面', '镜湖、碧云湖及其他水体', Waves],
   ['sports', '运动场地', '球场、跑道与游泳池', GraduationCap],
   ['boundary', '校园边界', '橙色虚线表示大致范围，农院路为公共道路', MapPin],
-  ['context', '周边街区', '校界外约 300 米的建筑', Layers3],
+  ['context', '紧邻校界建筑', '仅保留贴近校界的周边建筑', Layers3],
   ['labels', '地点名称', '可点击的校园地标标注', MapPin],
 ];
 const PRESETS: [Preset, string, typeof Sun][] = [
@@ -1119,8 +1119,7 @@ export default function Home() {
           </DialogDescription>
           <div className="about-scroll">
             <p>
-              以大学东路主校区为中心，涵盖东、西、北校园，以及校界外约 300
-              米的周边街区。
+              以大学东路主校区为中心，涵盖东、西、北校园。校外建筑仅保留紧邻校界的部分，周边道路用于交代位置。
             </p>
             <div className="about-stats">
               <span>
