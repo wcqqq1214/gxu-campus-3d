@@ -145,9 +145,10 @@ export const CampusMinimap = memo(function CampusMinimap({
                     )
                     .join(' ')}
                   fill="none"
-                  stroke="#607b6e"
-                  strokeWidth={1.3}
-                  strokeOpacity={0.7}
+                  stroke="#ffffff"
+                  strokeWidth={1.8}
+                  strokeOpacity={1}
+                  style={{ filter: 'drop-shadow(0 0 1px #45584c)' }}
                 >
                   <title>校园大致边界</title>
                 </path>
@@ -197,7 +198,7 @@ export const CampusMinimap = memo(function CampusMinimap({
           <small>
             {outside
               ? '观察中心位于图外，箭头显示朝向'
-              : `${publicRoad.length ? '棕线为公共农院路 · ' : ''}${showBoundary && boundary.length ? '灰绿细线为校园大致边界 · ' : ''}金点为地标，箭头为观察中心与朝向`}
+              : `${publicRoad.length ? '棕线为公共农院路 · ' : ''}${showBoundary && boundary.length ? '白色细线为校园大致边界 · ' : ''}金点为地标，箭头为观察中心与朝向`}
           </small>
         </div>
       )}

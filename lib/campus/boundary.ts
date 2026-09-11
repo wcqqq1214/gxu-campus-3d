@@ -31,10 +31,10 @@ export function createBoundary(data: CampusBoundary) {
   const root = new Group();
   root.name = '校园大致边界';
   const material = new LineMaterial({
-    color: '#607b6e',
-    linewidth: 1.2,
+    color: '#ffffff',
+    linewidth: 2,
     transparent: true,
-    opacity: 0.7,
+    opacity: 0.95,
     depthTest: true,
     depthWrite: false,
     toneMapped: false,
