@@ -9,6 +9,20 @@ const fail = new Set(
     .split(',')
     .filter(Boolean),
 );
+const failAlways = new Set(
+  (
+    process.argv.find((a) => a.startsWith('--fail-always='))?.split('=')[1] ??
+    ''
+  ).split(','),
+);
+const delays = new Map(
+  (process.argv.find((a) => a.startsWith('--delay='))?.split('=')[1] ?? '')
+    .split(',')
+    .map((entry) => {
+      const [file, ms] = entry.split(':');
+      return [file, Math.max(0, Number(ms) || 0)];
+    }),
+);
 const types = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript',
@@ -35,7 +49,12 @@ http
         res.end();
         return;
       }
-      if (fail.delete(path.basename(file))) {
+      const delay = delays.get(path.basename(file));
+      if (delay) await new Promise((resolve) => setTimeout(resolve, delay));
+      if (
+        failAlways.has(path.basename(file)) ||
+        fail.delete(path.basename(file))
+      ) {
         if (logRequests)
           console.log(JSON.stringify({ path: url, status: 503 }));
         res.writeHead(503, { 'Cache-Control': 'no-store' });

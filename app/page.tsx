@@ -63,6 +63,7 @@ import {
   type CameraSnapshot,
 } from '@/lib/campus/share';
 import sourceData from '@/public/data/sources.json';
+import { fetchJson } from '@/lib/campus/streaming';
 import { sourceIndex, sourceDates } from '@/lib/campus/sources';
 import { CampusMinimap } from '@/components/campus-minimap';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
@@ -83,11 +84,6 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['night', '夜景', Moon],
 ];
 const refs = sourceIndex(sourceData.sources);
-async function getJson<T>(path: string): Promise<T> {
-  const r = await fetch(`${BASE}/data/${path}`, { cache: 'no-cache' });
-  if (!r.ok) throw new Error(path);
-  return r.json();
-}
 export default function Home() {
   const dock = useRef<HTMLElement>(null);
   const detailBack = useRef<HTMLButtonElement>(null);
@@ -118,6 +114,14 @@ export default function Home() {
     [toast, setToast] = useState(''),
     [retrySeed, setRetrySeed] = useState(0),
     [metrics, setMetrics] = useState<Metrics | null>(null);
+  const settings = useRef({
+    layers: DEFAULT_LAYERS,
+    preset: 'day' as Preset,
+    quality: 'auto' as Quality,
+  });
+  const presetEdited = useRef(false);
+  const [overviewRetry, setOverviewRetry] = useState(0);
+  const [overviewError, setOverviewError] = useState(false);
   const [debug, setDebug] = useState(false);
   const [category, setCategory] = useState<Category | 'all'>('all');
   const [cameraState, setCameraState] = useState<CameraSnapshot | null>(null);
@@ -135,22 +139,35 @@ export default function Home() {
     return () => clearTimeout(t);
   }, [toast]);
   useEffect(() => {
+    const lifetime = new AbortController();
+    void fetchJson<Overview>(`${BASE}/data/overview.json`, lifetime.signal)
+      .then((data) => {
+        if (!lifetime.signal.aborted) {
+          setOverview(data);
+          setOverviewError(false);
+        }
+      })
+      .catch(() => {
+        if (!lifetime.signal.aborted) setOverviewError(true);
+      });
+    return () => lifetime.abort();
+  }, [overviewRetry]);
+  useEffect(() => {
     let active = true;
+    const lifetime = new AbortController();
     queueMicrotask(() => {
       if (active) setDebug(new URLSearchParams(location.search).has('debug'));
     });
     let cleanup: (() => void) | undefined;
     void Promise.all([
-      getJson<Building[]>('buildings.json'),
-      getJson<Landmark[]>('landmarks.json'),
-      getJson<Overview>('overview.json'),
+      fetchJson<Building[]>(`${BASE}/data/buildings.json`, lifetime.signal),
+      fetchJson<Landmark[]>(`${BASE}/data/landmarks.json`, lifetime.signal),
       import('@/lib/campus/scene'),
     ])
-      .then(([bs, ls, stats, { createScene }]) => {
+      .then(([bs, ls, { createScene }]) => {
         if (!active || !host.current) return;
         setBuildings(bs);
         setLandmarks(ls);
-        setOverview(stats);
         try {
           if (
             process.env.NODE_ENV === 'development' &&
@@ -204,14 +221,25 @@ export default function Home() {
             },
           });
           controller.current = c;
+          cleanup = () => c.dispose();
+          c.setQuality(settings.current.quality);
+          c.setPreset(settings.current.preset);
+          for (const key of Object.keys(settings.current.layers) as LayerKey[])
+            c.setLayer(key, settings.current.layers[key]);
           const shared = decodeShare(
             location.hash,
             ls.map((l) => l.id),
           );
           if (shared) {
+            if (presetEdited.current) shared.preset = settings.current.preset;
             c.restoreSnapshot(shared);
-            if (shared.preset) setPreset(shared.preset);
-            setLandmarkView(shared.view ?? null);
+            if (shared.preset) {
+              settings.current.preset = shared.preset;
+              setPreset(shared.preset);
+            }
+            setLandmarkView(
+              shared.view ?? (shared.position ? null : 'oblique'),
+            );
           }
           cleanup = () => c.dispose();
         } catch {
@@ -229,6 +257,7 @@ export default function Home() {
       });
     return () => {
       active = false;
+      lifetime.abort();
       cleanup?.();
       controller.current = null;
     };
@@ -336,14 +365,18 @@ export default function Home() {
     [landmarks, query, category],
   );
   function toggleLayer(k: LayerKey, on: boolean) {
-    setLayers((v) => ({ ...v, [k]: on }));
+    settings.current.layers = { ...settings.current.layers, [k]: on };
+    setLayers(settings.current.layers);
     controller.current?.setLayer(k, on);
   }
   function changePreset(p: Preset) {
+    presetEdited.current = true;
+    settings.current.preset = p;
     setPreset(p);
     controller.current?.setPreset(p);
   }
   function changeQuality(q: Quality) {
+    settings.current.quality = q;
     setQuality(q);
     controller.current?.setQuality(q);
   }
@@ -693,7 +726,9 @@ export default function Home() {
                     <span>{places.length} 处</span>
                   </div>
                   <div className="places">
-                    {places.length ? (
+                    {!landmarks.length && !error ? (
+                      <output className="empty-state">正在加载精选地标…</output>
+                    ) : places.length ? (
                       places.map((p) => (
                         <button
                           key={p.id}
@@ -797,9 +832,15 @@ export default function Home() {
               </Tabs>
               <div className="panel-foot">
                 <span className="live-dot" />
-                地图快照{' '}
-                {overview?.snapshotAt.slice(0, 10).replaceAll('-', '.') ??
-                  '2026.09.09'}
+                {overviewError ? (
+                  <button onClick={() => setOverviewRetry((n) => n + 1)}>
+                    统计资料暂不可用 · 重试
+                  </button>
+                ) : overview ? (
+                  `地图快照 ${overview.snapshotAt.slice(0, 10).replaceAll('-', '.')}`
+                ) : (
+                  '统计资料加载中…'
+                )}
                 <button onClick={() => setAbout(true)} title="查看数据来源">
                   <Info size={14} />
                 </button>
@@ -1013,6 +1054,14 @@ export default function Home() {
             <p>
               以大学东路主校区为中心，涵盖东、西、北校园。校外建筑仅保留紧邻校界的部分，周边道路用于交代位置。
             </p>
+            {overviewError && (
+              <output className="metadata-status">
+                统计资料暂不可用，仍可游览校园。
+                <button onClick={() => setOverviewRetry((n) => n + 1)}>
+                  重试统计资料
+                </button>
+              </output>
+            )}
             <div className="about-stats">
               <span>
                 <b>{overview?.campusBuildings ?? '—'}</b>校内建筑
@@ -1026,14 +1075,17 @@ export default function Home() {
             </div>
             <h3>地图与复原依据</h3>
             <p>
-              OSM 快照：{overview?.snapshotAt.slice(0, 10)}
+              OSM 快照：{overview?.snapshotAt.slice(0, 10) ?? '暂不可用'}
               。获取日期不代表所有要素都在当年更新。近期资料以 2024—2026
               年校方发布内容为优先，照片未注明拍摄日期时保留未知状态。
             </p>
             <p>
               农院路为贯穿校园区域的公共道路，两侧校园通过立交通道连接。道路与桥梁快照：
-              {overview?.infrastructureSnapshotAt?.slice(0, 10)}；走廊约{' '}
-              {((overview?.publicRoadMeters ?? 0) / 1000).toFixed(2)}{' '}
+              {overview?.infrastructureSnapshotAt?.slice(0, 10) ?? '暂不可用'}
+              ；走廊约{' '}
+              {overview?.publicRoadMeters == null
+                ? '—'
+                : (overview.publicRoadMeters / 1000).toFixed(2)}{' '}
               千米。围墙、路幅及桥梁净高含估算，展示范围不代表权属或实际通行权限。
             </p>
             <p>
