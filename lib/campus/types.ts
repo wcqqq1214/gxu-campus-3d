@@ -8,6 +8,7 @@ export type LayerKey =
   | 'sports'
   | 'context'
   | 'labels';
+export type SelectionOrigin = 'manual' | 'tour' | 'restore';
 export type Quality = 'auto' | 'fine' | 'smooth';
 export type Preset = 'morning' | 'day' | 'evening' | 'night';
 export type LandmarkView =
@@ -104,7 +105,7 @@ export interface Metrics {
 }
 export interface SceneController {
   clearSelection: () => void;
-  focus: (id: string) => void;
+  focus: (id: string, origin?: SelectionOrigin) => void;
   landmarkView: (view: LandmarkView) => void;
   setOrbit: (on: boolean) => void;
   setViewport: (frame: ViewportFrame) => void;

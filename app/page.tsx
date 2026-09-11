@@ -249,6 +249,10 @@ async function getJson<T>(path: string): Promise<T> {
 }
 export default function Home() {
   const dock = useRef<HTMLElement>(null);
+  const detailBack = useRef<HTMLButtonElement>(null);
+  const menuScroll = useRef(0);
+  const returnPlace = useRef<string | null>(null);
+  const pendingFocus = useRef<'detail' | 'menu' | null>(null);
   const host = useRef<HTMLDivElement>(null),
     controller = useRef<SceneController | null>(null);
   const [buildings, setBuildings] = useState<Building[]>([]),
@@ -323,13 +327,20 @@ export default function Home() {
             onReady: () => {
               if (active) setReady(true);
             },
-            onSelect: (id) => {
+            onSelect: (id, origin = 'manual') => {
               if (active) {
                 setSelected(id);
                 setMore(false);
-                setPanelMode(id ? 'detail' : 'menu');
                 setLandmarkView('oblique');
-                setCollapsed(false);
+                if (id) setTourIndex(ls.findIndex((place) => place.id === id));
+                if (origin !== 'tour') {
+                  setPanelMode(id ? 'detail' : 'menu');
+                  setCollapsed(false);
+                  if (origin === 'manual') {
+                    setTour(false);
+                    pendingFocus.current = id ? 'detail' : 'menu';
+                  }
+                }
               }
             },
             onInteract: () => {
@@ -430,6 +441,32 @@ export default function Home() {
       cancelAnimationFrame(pending);
     };
   }, [ready, collapsed]);
+  useEffect(() => {
+    if (!pendingFocus.current || collapsed) return;
+    const destination = pendingFocus.current;
+    pendingFocus.current = null;
+    const body = dock.current?.querySelector<HTMLElement>('.dock-body');
+    if (destination === 'detail') {
+      if (body) body.scrollTop = 0;
+      detailBack.current?.focus({ preventScroll: true });
+    } else {
+      const row = Array.from(
+        dock.current?.querySelectorAll<HTMLButtonElement>('[data-place-id]') ??
+          [],
+      ).find((item) => item.dataset.placeId === returnPlace.current);
+      (
+        row ??
+        dock.current?.querySelector<HTMLInputElement>('input[type="search"]')
+      )?.focus({ preventScroll: true });
+      if (body) body.scrollTop = menuScroll.current;
+    }
+  }, [selected, panelMode, collapsed]);
+  function returnToMenu() {
+    returnPlace.current = selected;
+    pendingFocus.current = 'menu';
+    setPanelMode('menu');
+    setCollapsed(false);
+  }
   function changeLandmarkView(value: LandmarkView) {
     setTour(false);
     setLandmarkView(value);
@@ -441,7 +478,7 @@ export default function Home() {
   }, []);
   useEffect(() => {
     if (!tour || !landmarks.length) return;
-    controller.current?.focus(landmarks[tourIndex].id);
+    controller.current?.focus(landmarks[tourIndex].id, 'tour');
     const timer = setTimeout(
       () => setTourIndex((i) => nextTourIndex(i, landmarks.length)),
       8500,
@@ -506,6 +543,7 @@ export default function Home() {
     if (!tour && landmarks.length)
       controller.current?.focus(
         landmarks[(tourIndex + delta + landmarks.length) % landmarks.length].id,
+        'tour',
       );
   }
   return (
@@ -553,9 +591,10 @@ export default function Home() {
         <div className="dock-heading">
           {panelMode === 'detail' && current && (
             <button
+              ref={detailBack}
               className="dock-back"
               title="返回精选地标"
-              onClick={() => setPanelMode('menu')}
+              onClick={returnToMenu}
             >
               <ChevronLeft size={18} />
             </button>
@@ -573,7 +612,15 @@ export default function Home() {
             <ChevronDown size={16} />
           </button>
         </div>
-        <div id="campus-panel-body" className="dock-body" hidden={collapsed}>
+        <div
+          id="campus-panel-body"
+          className="dock-body"
+          hidden={collapsed}
+          onScroll={(event) => {
+            if (panelMode === 'menu')
+              menuScroll.current = event.currentTarget.scrollTop;
+          }}
+        >
           {panelMode === 'detail' && current ? (
             <section
               className={`place-detail ${more ? 'expanded' : ''}`}
@@ -594,9 +641,9 @@ export default function Home() {
                   className="icon-button"
                   title="关闭建筑详情"
                   onClick={() => {
+                    returnToMenu();
                     setSelected(null);
                     setMore(false);
-                    setPanelMode('menu');
                     controller.current?.clearSelection();
                   }}
                 >
@@ -816,6 +863,7 @@ export default function Home() {
                       places.map((p) => (
                         <button
                           key={p.id}
+                          data-place-id={p.id}
                           className={`place-row ${selected === p.id ? 'selected' : ''}`}
                           onClick={() => choose(p.id)}
                           disabled={!ready}
@@ -939,6 +987,16 @@ export default function Home() {
             showBoundary={layers.boundary}
           />
         </div>
+        {collapsed && tourStarted && (
+          <button
+            className="tour-compact"
+            onClick={() => setTour((value) => !value)}
+          >
+            {tour ? <Pause size={15} /> : <Play size={15} />}
+            {tour ? '暂停巡游' : '继续巡游'} · {tourIndex + 1}/
+            {landmarks.length}
+          </button>
+        )}
         <div className="tour-bar">
           <div className="tour-copy">
             <strong>
