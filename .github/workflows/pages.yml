@@ -1,12 +1,14 @@
 name: 发布广西大学三维校园
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
 concurrency:
-  group: github-pages
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
   build:
@@ -20,20 +22,30 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
       - uses: actions/configure-pages@v5
         id: pages
+        if: github.event_name != 'pull_request'
       - run: npm ci
+      - run: python -m pip install -r scripts/requirements.txt
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
+      - run: npm run test:data
       - run: npm run build:pages
         env:
-          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          PAGES_BASE_PATH: ${{ github.event_name == 'pull_request' && '/gxu-campus-3d' || steps.pages.outputs.base_path }}
       - uses: actions/upload-pages-artifact@v4
+        if: github.event_name != 'pull_request'
         with:
           path: out
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       pages: write

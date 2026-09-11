@@ -17,6 +17,7 @@
     "data:prepare": "python3 scripts/prepare_geodata.py",
     "models:build": "blender --background --python-exit-code 1 --python blender/build_campus.py",
     "test": "node --experimental-strip-types --test scripts/test-*.mjs",
+    "test:data": "python3 -m unittest discover -s scripts -p 'test_*.py'",
     "data:restore": "python3 scripts/restore_snapshot.py",
     "preview": "node scripts/preview.mjs"
   },
