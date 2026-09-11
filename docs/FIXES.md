@@ -79,4 +79,4 @@
 - 清理后本地 Git 对象为约 306 MiB，清理前约 1,853 MiB。已将 `.blend1` 本地备份移到仓库外，忽略规则覆盖所有带数字后缀的 Blender 备份。
 - 验证：类型、lint、51 项 Node 测试、生产构建、README 本地链接和六张截图检查通过；实际浏览器确认图书馆加载与新 metadata 正常。
 
-此次清理重写了提交 ID。其他已有克隆应重新克隆，避免合并旧分支时重新引入旧模型历史。GitHub 对不再引用的服务端对象有独立回收周期；检查新克隆可确认正常下载所包含的历史。后续持续提交新版大型 `.blend` 仍会增加 Git 体积，频繁模型版本归档应另用 Git LFS 或发布附件。
+此次清理重写了提交 ID。其他已有克隆应重新克隆，避免合并旧分支时重新引入旧模型历史。本次核对可达历史和新克隆；GitHub 的缓存及后台存储统计不由本地 Git 命令控制，不保证服务端旧缓存立即物理删除，见 [GitHub 说明](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository#about-sensitive-data-exposure)。后续持续提交新版大型 `.blend` 仍会增加 Git 体积，频繁模型版本归档应另用 Git LFS 或发布附件。
