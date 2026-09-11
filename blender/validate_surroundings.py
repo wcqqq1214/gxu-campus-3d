@@ -1,9 +1,11 @@
 """Check saved and Draco-decoded perimeter road surfaces against delivery data."""
-import bpy,json,math
+import bpy,json,math,sys
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
-R=Path(__file__).resolve().parents[1];d=json.loads((R/'public/data/surroundings.json').read_text());terrain=json.loads((R/'public/data/terrain.json').read_text())
+R=Path(__file__).resolve().parents[1]
+name='campus-roads' if '--campus' in sys.argv else 'surroundings'
+d=json.loads((R/f'public/data/{name}.json').read_text());terrain=json.loads((R/'public/data/terrain.json').read_text())
 def elevation(x,y):
  c,r=terrain['cols'],terrain['rows'];x0,y0,x1,y1=terrain['bounds'];hh=terrain['heights'];u=(x-x0)/(x1-x0)*(c-1);v=(y-y0)/(y1-y0)*(r-1);i,j=int(u),int(v);a,t=u-i,v-j
  return (hh[j*c+i]*(1-a)+hh[j*c+i+1]*a)*(1-t)+(hh[(j+1)*c+i]*(1-a)+hh[(j+1)*c+i+1]*a)*t
@@ -48,4 +50,4 @@ for o in bpy.context.scene.objects:
  if root.name=='roads':objects.append(o)
  if root.name=='terrain':ground_objects.append(o)
 report.append(check(objects,ground_objects,'base GLB'))
-(R/'docs/model-checks/surroundings-geometry.json').write_text(json.dumps(report,indent=2)+'\n');print(report,flush=True)
+(R/f'docs/model-checks/{name}-geometry.json').write_text(json.dumps(report,indent=2)+'\n');print(report,flush=True)

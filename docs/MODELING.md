@@ -227,6 +227,7 @@ blender --background --python-exit-code 1 --python blender/validate_teaching_six
 ```sh
 python3 scripts/surroundings_data.py
 python3 scripts/test_surroundings.py
+python3 scripts/campus_roads_data.py
 blender --background --python-exit-code 1 --python blender/update_roads.py
 blender --background --python-exit-code 1 --python blender/validate_surroundings.py
 ```
@@ -267,3 +268,7 @@ blender --background --python-exit-code 1 --python blender/validate_basketball.p
 ## 紧邻校界建筑
 
 校外建筑保留规则来自 `scripts/context_data.py`，完整数据处理后应用。`blender/update_context.py` 仅重建基础 GLB 的 context 节点及可编辑源文件的同层对象；所有校内建筑、篮球场、道路、植被和地标近景文件保持原样。页面“紧邻校界建筑”图层控制这 13 栋建筑，删除的远处建筑不会在后续完整重建时恢复。
+
+## 校内主路与汇学堂草地（2026-09-11）
+
+`campus_roads_data.py` 合并既有主路面，将沥青、路缘和中心虚线分割为互不重叠的面，沿用桥下材质。Blender 使用实际地形三角面采样高度，源文件焊接道路重合顶点以缩小体积。`update_roads.py` 同步更新道路与草地树木对象，保留所有建筑、地标及近景 GLB。参数与重建方法见 [CAMPUS_ROADS.md](CAMPUS_ROADS.md)；可运行 `blender --background --python-exit-code 1 --python blender/validate_surroundings.py -- --campus` 检查实际源文件和 GLB 路面高程。
