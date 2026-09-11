@@ -1,0 +1,20 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
+const json = async (file) => JSON.parse(await readFile(new URL(`../public/data/${file}.json`, import.meta.url), 'utf8'));
+test('荟萃楼复用原关系及内院，只精建而不扩充精选索引', async () => {
+  const [buildings, landmarks, manifest, sources] = await Promise.all(['buildings', 'landmarks', 'models', 'sources'].map(json));
+  const records = buildings.filter(b => b.customModel === 'huicui');
+  assert.equal(records.length, 1);
+  const b = records[0];
+  assert.equal(b.id, 'relation/11970574');
+  assert.equal(b.landmark, null);
+  assert.equal(landmarks.length, 19);
+  assert.ok(!landmarks.some(l => l.id === 'huicui'));
+  assert.equal(manifest.zones.filter(z => z.featureIds.includes(b.id)).length, 1);
+  assert.equal(b.polygons[0].length, 2);
+  assert.equal(b.architecture.parts[1].polygons[0].length, 2);
+  assert.ok(b.sourceRefs.every(id => sources.sources.some(s => s.id === id)));
+  assert.equal(sources.sources.find(s => s.id === 'huicuiExterior2020').publishedAt, '2020-01-10');
+  assert.equal(sources.sources.find(s => s.id === 'huicuiExterior2020').capturedAt, null);
+});
