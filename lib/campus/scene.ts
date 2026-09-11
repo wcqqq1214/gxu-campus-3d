@@ -22,6 +22,7 @@ import {
   landmarkDirection,
 } from './camera';
 import { DEFAULT_LAYERS } from './types';
+import { AdaptiveQuality, qualityProfile } from './quality';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import type {
@@ -195,8 +196,14 @@ export function createScene(
   let loadedBytes = 0;
   let loop = 0;
   let modeSmooth = false;
+  const adaptive = new AdaptiveQuality();
+  let profile = qualityProfile('auto', false, false, 0);
+  const saveData = () =>
+    Boolean(
+      (navigator as Navigator & { connection?: { saveData?: boolean } })
+        .connection?.saveData,
+    );
   let lastFrame = 0;
-  let frameCount = 0;
   let sampleStart = performance.now();
   let fps = 0;
   let lastRendered = 0;
@@ -698,7 +705,7 @@ export function createScene(
   }
   function reconcileDetails(focusing = false) {
     if (!manifest || disposed || !initialReady) return;
-    const cap = (compact() ? 32 : 64) * 1048576;
+    const cap = profile.detailBudgetMiB * 1048576;
     const currentKey = 'landmark-' + selected;
     const foreground = manifest.landmarks.find((a) => a.id === selected);
     // A flight selects details around its destination, not the passing campus area.
@@ -762,7 +769,7 @@ export function createScene(
       else loadDetail(a, key, index);
     }
     if (
-      !modeSmooth &&
+      profile.nearTrees &&
       treesRoot &&
       manifest.treesNear &&
       !highTreesReady &&
@@ -773,8 +780,8 @@ export function createScene(
     )
       void detailQueue
         .enqueue('trees-near', 5, (signal) => loadTrees(true, signal))
-        .catch(() => {
-          if (!disposed)
+        .catch((error) => {
+          if (!disposed && error?.name !== 'AbortError')
             callbacks.onStatus(
               '近景植被暂未加载，已保留远景林荫，可重试。',
               true,
@@ -965,7 +972,7 @@ export function createScene(
       setQuality(quality);
       applyLayers();
     } catch (error) {
-      if (!disposed) {
+      if (!disposed && !signal.aborted) {
         if (near) highTreesFailed = true;
         else treesFailed = true;
       }
@@ -980,7 +987,7 @@ export function createScene(
     for (const o of treesRoot.children) {
       const near =
         highTreesReady &&
-        !modeSmooth &&
+        profile.nearTrees &&
         camera.position.distanceTo(o.userData.center) < 500;
       o.visible = o.userData.lod === 1 ? near : !near;
     }
@@ -1056,27 +1063,38 @@ export function createScene(
     }
   }
   function setQuality(q: Quality) {
+    if (q !== quality) adaptive.reset();
     quality = q;
-    modeSmooth =
-      q === 'smooth' ||
-      (q === 'auto' &&
-        (compact() ||
-          Boolean(
-            (navigator as Navigator & { connection?: { saveData?: boolean } })
-              .connection?.saveData,
-          )));
+    applyQuality();
+  }
+  function applyQuality() {
+    profile = qualityProfile(quality, compact(), saveData(), adaptive.level);
+    modeSmooth = profile.level === 2;
     renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, modeSmooth ? 1.25 : 1.75),
+      Math.min(window.devicePixelRatio, profile.pixelRatio),
     );
-    renderer.shadowMap.enabled = !modeSmooth;
-    sun.castShadow = !modeSmooth;
-    if (treesRoot)
-      treesRoot.traverse((o) => {
-        if (o instanceof THREE.InstancedMesh)
-          o.count = modeSmooth
-            ? Math.ceil(o.userData.fullCount * 0.55)
-            : o.userData.fullCount;
-      });
+    renderer.shadowMap.enabled = profile.shadows;
+    sun.castShadow = profile.shadows;
+    if (!profile.shadows) {
+      sun.shadow.dispose();
+      sun.shadow.map = null;
+      sun.shadow.mapPass = null;
+    }
+    if (!profile.nearTrees) {
+      detailQueue.cancel('trees-near');
+      if (treesRoot && highTreesReady) {
+        const retired = new THREE.Group();
+        for (const child of treesRoot.children.slice())
+          if (child.userData.lod === 1) retired.add(child);
+        disposeObject(retired, [scene]);
+        highTreesReady = false;
+      }
+    }
+    treesRoot?.traverse((o) => {
+      if (o instanceof THREE.InstancedMesh)
+        o.count = Math.ceil(o.userData.fullCount * profile.treeDensity);
+    });
+    dirty = true;
     applyLayers();
     reconcileDetails();
   }
@@ -1255,7 +1273,11 @@ export function createScene(
       geometries: renderer.info.memory.geometries,
       textures: renderer.info.memory.textures,
       pixelRatio: renderer.getPixelRatio(),
-      quality: modeSmooth ? '流畅' : '精细',
+      quality: ['精细', '均衡', '流畅'][profile.level],
+      automaticQualityLevel: adaptive.level,
+      shadows: profile.shadows,
+      nearTrees: profile.nearTrees,
+      detailBudgetMiB: profile.detailBudgetMiB,
       loadedBytes,
       loadedDetails: [...loaded.keys()],
       queuedDetails: detailQueue.tasks.size,
@@ -1319,8 +1341,7 @@ export function createScene(
       renderer.render(scene, camera);
       dirty = false;
       lastFrame = time;
-      frameCount++;
-      if (lastRendered && time - lastRendered < 200) {
+      if (lastRendered && time - lastRendered < 1000) {
         activeFrameMs += time - lastRendered;
         activeFrames++;
       }
@@ -1374,11 +1395,9 @@ export function createScene(
     if (time - sampleStart > 1500) {
       if (activeFrames > 3) fps = (1000 * activeFrames) / activeFrameMs;
       callbacks.onMetrics(metrics());
-      if (quality === 'auto' && frameCount > 10 && fps < 23) {
-        renderer.setPixelRatio(Math.max(0.8, renderer.getPixelRatio() * 0.85));
-        dirty = true;
+      if (quality === 'auto' && !compact() && !saveData() && !document.hidden) {
+        if (adaptive.sample(fps, activeFrames)) applyQuality();
       }
-      frameCount = 0;
       activeFrameMs = 0;
       activeFrames = 0;
       sampleStart = time;
