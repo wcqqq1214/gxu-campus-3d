@@ -26,6 +26,6 @@ def prepare_sports(root, features, project):
                       cameraOffset=[-.35,1.25,1],zone='west' if record['id']=='west-track' else 'east',
                       sourceUrl=feature['properties']['sourceUrl'],
                       reference='westTrack2025' if record['id']=='west-track' else 'eastTrack2026',
-                      description='红色环形跑道环绕绿色足球内场，支持近景查看分道线、球场标线与球门。',
+                      description='红色环形跑道环绕足球内场，西侧为篮球场区，可近看场线、篮板与篮网。' if record['id']=='east-track' else '红色环形跑道环绕绿色足球内场，支持近景查看分道线、球场标线与球门。',
                       detail=record['precision'])
     return records
