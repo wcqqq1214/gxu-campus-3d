@@ -6,7 +6,12 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { isTap } from './math';
 import type { CameraSnapshot } from './share';
-import { fetchModel, nearbyChunks, ResourceQueue } from './streaming';
+import {
+  fetchModel,
+  nearbyChunks,
+  planDetails,
+  ResourceQueue,
+} from './streaming';
 import type { StreamAsset as Asset } from './streaming';
 import {
   bridgeEntrancePose,
@@ -694,58 +699,40 @@ export function createScene(
     const cap = (compact() ? 32 : 64) * 1048576;
     const currentKey = 'landmark-' + selected;
     const foreground = manifest.landmarks.find((a) => a.id === selected);
-    const wantedAssets: [string, Asset][] = [];
-    let allocation = 0;
-    if (layers[detailLayer(currentKey)] && foreground) {
-      wantedAssets.push([currentKey, foreground]);
-      allocation += geometryCosts.get(currentKey) ?? foreground.bytes * 24;
-    }
-    // A fast response during a flight must use its destination, not the passing campus area.
+    // A flight selects details around its destination, not the passing campus area.
     const destination = tween?.toTarget ?? controls.target;
     const destinationCamera = tween?.to ?? camera.position;
     const x = destination.x;
     const y = -destination.z;
-    if (
-      layers.roads &&
+    const near =
       !modeSmooth &&
-      (focusing || destinationCamera.distanceTo(destination) < 1050)
-    ) {
-      for (const { asset: a } of nearbyChunks(
-        manifest.infrastructure ?? [],
-        x,
-        y,
-        230,
-      ).slice(0, 3)) {
-        const cost = geometryCosts.get(a.id!) ?? a.bytes * 28;
-        if (allocation + cost > cap) continue;
-        allocation += cost;
-        wantedAssets.push([a.id!, a]);
-      }
-    }
-    if (
-      layers.buildings &&
-      !modeSmooth &&
-      (focusing || destinationCamera.distanceTo(destination) < 1050)
-    ) {
-      const candidates = nearbyChunks(manifest.zones, x, y);
-      // Reserve in-flight nearby chunks before spending freed budget on another one.
-      candidates.sort(
-        (a, b) =>
-          Number(Boolean(detailQueue.tasks.get(b.asset.id!)?.started)) -
-          Number(Boolean(detailQueue.tasks.get(a.asset.id!)?.started)),
-      );
-      for (const { asset: a } of candidates) {
-        const cost = geometryCosts.get(a.id!) ?? a.bytes * 32;
-        if (
-          wantedAssets.length >=
-            (foreground ? (loaded.has(currentKey) ? 4 : 2) : 3) ||
-          allocation + cost > cap
-        )
-          continue;
-        allocation += cost;
-        wantedAssets.push([a.id!, a]);
-      }
-    }
+      (focusing || destinationCamera.distanceTo(destination) < 1050);
+    const candidates =
+      near && layers.buildings ? nearbyChunks(manifest.zones, x, y) : [];
+    // Keep in-flight building chunks ahead of new background work.
+    candidates.sort(
+      (a, b) =>
+        Number(Boolean(detailQueue.tasks.get(b.asset.id!)?.started)) -
+        Number(Boolean(detailQueue.tasks.get(a.asset.id!)?.started)),
+    );
+    const plan = planDetails({
+      foreground:
+        foreground && layers[detailLayer(currentKey)]
+          ? [currentKey, foreground]
+          : undefined,
+      foregroundReady: loaded.has(currentKey),
+      roads:
+        near && layers.roads
+          ? nearbyChunks(manifest.infrastructure ?? [], x, y, 230).map(
+              ({ asset }) => asset,
+            )
+          : [],
+      buildings: candidates.map(({ asset }) => asset),
+      costs: geometryCosts,
+      cap,
+    });
+    const wantedAssets = plan.assets;
+    let allocation = plan.allocation;
     wanted.clear();
     wantedAssets.forEach(([key]) => wanted.add(key));
     for (const key of detailQueue.tasks.keys())

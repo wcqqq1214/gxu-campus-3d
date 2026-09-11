@@ -34,6 +34,38 @@ export function nearbyChunks(
     );
 }
 
+/** Foreground, roads and buildings share a byte budget, not a slot count. */
+export function planDetails(options: {
+  foreground?: [string, StreamAsset];
+  foregroundReady: boolean;
+  roads: StreamAsset[];
+  buildings: StreamAsset[];
+  costs: ReadonlyMap<string, number>;
+  cap: number;
+}) {
+  const { foreground, foregroundReady, roads, buildings, costs, cap } = options;
+  const assets: [string, StreamAsset][] = [];
+  let allocation = 0;
+  if (foreground) {
+    assets.push(foreground);
+    allocation = costs.get(foreground[0]) ?? foreground[1].bytes * 24;
+  }
+  const append = (candidates: StreamAsset[], limit: number, factor: number) => {
+    let count = 0;
+    for (const item of candidates) {
+      if (!item.id || count >= limit) continue;
+      const cost = costs.get(item.id) ?? item.bytes * factor;
+      if (allocation + cost > cap) continue;
+      allocation += cost;
+      assets.push([item.id, item]);
+      count++;
+    }
+  };
+  append(roads.slice(0, 3), 3, 28);
+  append(buildings, foreground && !foregroundReady ? 1 : 3, 32);
+  return { assets, allocation };
+}
+
 const abortError = () => new DOMException('Request cancelled', 'AbortError');
 export class HttpError extends Error {
   status: number;
