@@ -183,7 +183,10 @@ for bank in basketball['banks']:
     if not BASE_ONLY:
         bank_paving(bank,C).object(bank['id']+'-paving',GROUND,{'layer':'sports','basketballBank':bank['id']})
 if not BASE_ONLY:
-    for court in basketball['courts']:court_model(court,C).object(court['id'],GROUND,{'layer':'sports','featureId':court['osmId'],'precision':court['precision'],'basketballCourt':court['id']})
+    for court in basketball['courts']:
+        obj=court_model(court,C).object(court['id'],GROUND,{'layer':'sports','featureId':court['osmId'] or court['id'],'precision':court['precision'],'basketballCourt':court['id']})
+        from huicui import compact_source
+        compact_source(obj)
 # Whole buildings belong to one 360 m cell, including their courtyard rings.
 # Base nodes use the same key, so each near chunk replaces exactly its own low LOD.
 CHUNK_METERS=360

@@ -48,7 +48,9 @@
 
 ![荟萃楼北立面，实际网页截图](docs/screenshots/huicui-north.png)
 
-[查看西校园篮球场](https://wcqqq1214.github.io/gxu-campus-3d/#light=day&camera=-392,55,490,-420,3,375&span=46)：重建 31 片已有地图定位的独立球场，其中西校园集中区 16 片；补齐禁区、三分线、中圈、篮板、篮圈及镂空篮网。
+[查看西校园篮球场](https://wcqqq1214.github.io/gxu-campus-3d/#light=day&camera=-392,55,490,-420,3,375&span=46)：重建 31 片已有地图定位的独立球场，其中西校园集中区 16 片；另补东田径场西侧 15 片资料约束的估算球场；补齐禁区、三分线、中圈、篮板、篮圈及镂空篮网。
+
+[查看东田径场旁篮球场](https://wcqqq1214.github.io/gxu-campus-3d/#light=day&camera=655,240,155,620,3,-120&span=108) · [位置与精度说明](docs/EAST_BASKETBALL.md)
 
 ![西校园篮球场，实际网页截图](docs/screenshots/basketball-west.png)
 
