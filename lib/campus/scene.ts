@@ -1448,7 +1448,7 @@ export function createScene(
       ctx.font = `${size}px sans-serif`;
       const label =
         '广西大学 · 云游校园  |  © OpenStreetMap contributors · ODbL' +
-        (layers.boundary && boundaryReady ? '  |  橙色虚线：校园大致边界' : '');
+        (layers.boundary && boundaryReady ? '  |  灰绿色细线：校园大致边界' : '');
       ctx.fillStyle = '#15382ddd';
       ctx.fillRect(0, out.height - size * 3, out.width, size * 3);
       ctx.fillStyle = 'white';
