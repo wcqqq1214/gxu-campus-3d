@@ -106,6 +106,35 @@ export async function withRetry<T>(
   }
 }
 
+/** Apply the same cancellation/retry policy to JSON metadata, including its body. */
+export async function fetchJson<T>(
+  url: string,
+  signal: AbortSignal,
+  options: { timeoutMs?: number; delays?: number[] } = {},
+): Promise<T> {
+  return withRetry(
+    async () => {
+      const request = new AbortController();
+      const abort = () => request.abort();
+      signal.addEventListener('abort', abort, { once: true });
+      const timer = setTimeout(abort, options.timeoutMs ?? 15000);
+      try {
+        const response = await fetch(url, {
+          signal: request.signal,
+          cache: 'no-cache',
+        });
+        if (!response.ok) throw new HttpError(response.status);
+        return (await response.json()) as T;
+      } finally {
+        clearTimeout(timer);
+        signal.removeEventListener('abort', abort);
+      }
+    },
+    signal,
+    options.delays,
+  );
+}
+
 export async function fetchModel(
   url: string,
   bytes: number,
