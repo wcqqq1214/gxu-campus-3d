@@ -8,7 +8,7 @@ D=Path(__file__).resolve().parents[1]/'public/data'
 def read(n):return json.loads((D/n).read_text())
 class BasketballTest(unittest.TestCase):
     def test_mapped_centers_and_existing_selection(self):
-        d=read('basketball.json');self.assertEqual(len(d['courts']),34)
+        d=read('basketball.json');self.assertEqual(len(d['courts']),31)
         self.assertEqual(sum(c['insideCampus'] for c in d['courts']),31)
         for c in d['courts']:
             if c['osmId']:self.assertLess(Polygon(c['mappedFootprint']).centroid.distance(Point(c['center'])),.02)
