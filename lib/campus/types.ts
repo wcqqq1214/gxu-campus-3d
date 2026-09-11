@@ -97,6 +97,10 @@ export interface Metrics {
   textures: number;
   pixelRatio: number;
   quality: string;
+  automaticQualityLevel: number;
+  shadows: boolean;
+  nearTrees: boolean;
+  detailBudgetMiB: number;
   loadedBytes: number;
   loadedDetails: string[];
   queuedDetails: number;
