@@ -34,7 +34,7 @@
 
 ![东田径场西侧的篮球场模型](docs/screenshots/readme/basketball-east.jpg)
 
-以上为正式网站的原始截图；手机图使用桌面浏览器的手机尺寸视口采集。[截图日期、版本与视角](docs/screenshots/readme/captures.json)。
+截图更新于 2026-09-12，采自正式网站；手机图使用桌面浏览器的手机尺寸视口采集。[截图日期、版本与视角](docs/screenshots/readme/captures.json)。
 
 建筑轮廓主要来自 **2026-09-09 的 OpenStreetMap 快照**，道路与桥梁使用 2026-09-11 获取的补充数据。建筑外观参考不同年份的公开照片和资料，资料日期不等于当前实景。这是独立开源项目，未经过校园实地测绘。
 
