@@ -65,14 +65,17 @@ def signature(doc,binary,node):
         v=doc['bufferViews'][p['extensions']['KHR_draco_mesh_compression']['bufferView']];start=v.get('byteOffset',0)
         result.append((doc['materials'][p['material']]['name'],hashlib.sha256(binary[start:start+v['byteLength']]).hexdigest()))
     return result
-changed=[];retained=[]
+changed=[];retained=[];removed=[]
 for node in a['nodes']:
     if 'mesh' not in node:continue
-    other=next(n for n in c['nodes'] if n.get('name')==node['name'])
+    other=next((n for n in c['nodes'] if n.get('name')==node['name']),None)
+    if other is None:
+        assert node['name'].startswith('basketball-bank-') and node['name'] not in {b['id'] for b in ns['basketball']['banks']}
+        removed.append(node['name']);continue
     if signature(a,ab,node)!=signature(c,cb,other):changed.append(node['name'])
     else:retained.append(node['name'])
 assert set(changed)<=set(['terrain','roads','sports']),changed
 assert all(hashlib.sha256((ROOT/'public/models'/n).read_bytes()).hexdigest()==h for n,h in before.items() if n!='base.glb')
-report={'changedExistingNodes':changed,'preservedNodeCount':len(retained),'newNodes':[n['name'] for n in c['nodes'] if n.get('name') not in {o.get('name') for o in a['nodes']}],'method':'Exact Draco primitive bytes; all unrelated GLBs retained','initialBytes':manifest['base']['bytes']+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
+report={'removedNodes':removed,'changedExistingNodes':changed,'preservedNodeCount':len(retained),'newNodes':[n['name'] for n in c['nodes'] if n.get('name') not in {o.get('name') for o in a['nodes']}],'method':'Exact Draco primitive bytes; all unrelated GLBs retained','initialBytes':manifest['base']['bytes']+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
 (ROOT/'docs/model-checks/basketball-retained-nodes.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(report,flush=True)

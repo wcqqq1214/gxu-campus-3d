@@ -135,6 +135,7 @@ for j in range(rows-1):
 for patch in infrastructure['terrainPatch']+basketball['terrainPatch']:
     for i in range(0,len(patch['triangles']),3):base['terrain'].face([patch['vertices'][k] for k in patch['triangles'][i:i+3]],C['grass'])
 for si,original in enumerate(surfaces):
+    if original.get('suppressed'):continue
     s=original
     if s['id'] in infrastructure['replaceSurfaceIds']:continue
     if str(si) in infrastructure['surfaceOverrides']:s={**s,**infrastructure['surfaceOverrides'][str(si)]}
