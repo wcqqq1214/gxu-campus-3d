@@ -17,7 +17,7 @@
 
 每片比赛区按 28×15 米建模。场线比例参考 [FIBA 2024](https://assets.fiba.basketball/image/upload/documents-corporate-fiba-official-rules-2024-v10a.pdf)，不表示校内球场获得赛事认证。篮架样式、铺装边界及地面标高为估算；校方资料仍不足以核对全部场地在 2026 年的精确布局。
 
-`data/east-basketball.json` 保存可调整的布局参数。输出的 15 个 `basketball-east-*` 对象使用 `placement: reference-estimate`，OSM ID、版本、编辑时间和原始轮廓均为 null，资料来源与估算说明单独保留。其余 31 片已有 OSM 定位的场地保持原位置，46 片是当前场景含周边的渲染数量，不能称作全校总数。
+`data/east-basketball.json` 保存可调整的布局参数。输出的 15 个 `basketball-east-*` 对象使用 `placement: reference-estimate`，OSM ID、版本、编辑时间和原始轮廓均为 null，资料来源与估算说明单独保留。校外清理后其余 19 片已有 OSM 定位的场地保持原位置，34 片是当前场景含零散场地的渲染数量，不能称作全校总数。
 
 ## 地形与检查
 
