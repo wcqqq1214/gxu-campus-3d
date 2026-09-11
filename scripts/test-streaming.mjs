@@ -6,6 +6,7 @@ import {
   withRetry,
   HttpError,
   nearbyChunks,
+  planDetails,
 } from '../lib/campus/streaming.ts';
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 test('加载并发最多两项，等待的精选地标优先于背景区块', async () => {
@@ -127,4 +128,57 @@ test('区块覆盖全部普通校内建筑一次，每块低于 2 MB 且使用�
   }
   assert.ok(nearbyChunks(manifest.zones, 179, -485).length > 0);
   assert.equal(nearbyChunks(manifest.zones, 9000, 9000).length, 0);
+});
+
+test('地标和三条道路不会挤占附近建筑的三个名额，所有背景资源仍受同一预算限制', async () => {
+  const manifest = JSON.parse(
+    await readFile(new URL('../public/data/models.json', import.meta.url)),
+  );
+  const landmarks = JSON.parse(
+    await readFile(new URL('../public/data/landmarks.json', import.meta.url)),
+  );
+  const place = landmarks.find((p) => p.id === 'library');
+  const foreground = manifest.landmarks.find((p) => p.id === 'library');
+  const roads = nearbyChunks(manifest.infrastructure, ...place.center, 230).map(
+    ({ asset }) => asset,
+  );
+  const buildings = nearbyChunks(manifest.zones, ...place.center).map(
+    ({ asset }) => asset,
+  );
+  assert.ok(roads.length >= 3);
+  assert.ok(buildings.length >= 3);
+  const mib = 1048576;
+  const costs = new Map([...roads, ...buildings].map((a) => [a.id, 2 * mib]));
+  costs.set('landmark-library', 18 * mib);
+  const options = {
+    foreground: ['landmark-library', foreground],
+    foregroundReady: true,
+    roads,
+    buildings,
+    costs,
+    cap: 64 * mib,
+  };
+  const plan = planDetails(options);
+  assert.equal(
+    plan.assets.filter(([key]) => buildings.some((b) => b.id === key)).length,
+    3,
+  );
+  assert.equal(
+    plan.assets.filter(([key]) => roads.some((b) => b.id === key)).length,
+    3,
+  );
+  assert.equal(plan.allocation, 30 * mib);
+  const constrained = planDetails({ ...options, cap: 26 * mib });
+  assert.equal(constrained.allocation, 26 * mib);
+  assert.equal(
+    constrained.assets.filter(([key]) => buildings.some((b) => b.id === key))
+      .length,
+    1,
+  );
+  const pending = planDetails({ ...options, foregroundReady: false });
+  assert.equal(
+    pending.assets.filter(([key]) => buildings.some((b) => b.id === key))
+      .length,
+    1,
+  );
 });
