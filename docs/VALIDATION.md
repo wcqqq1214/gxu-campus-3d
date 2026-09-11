@@ -350,3 +350,11 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 - 源文件和 Draco 解码 GLB 各抽查 195 个路面采样，全部高于实际地形；最小间隔分别为 0.1960 / 0.1927 米，导出最大高程偏差 0.0645 米。见 [几何检查](model-checks/campus-roads-geometry.json)。
 - 基础 GLB 仅 roads 节点改变，其他 80 个节点的压缩几何和全部 68 个近景/树木 GLB 保持逐字节一致。Blender 同步道路与树木对象，压缩源文件 101,804,746 bytes；首屏基础模型与树木模板共 5,290,772 bytes，满足原 6 MB 预算，JSON、脚本与解码器另计。见 [模型检查](model-checks/campus-roads-models.json)。
 - TypeScript、Oxlint、40 项 Node 检查和 Pages 生产构建通过。Codex 内置 Chromium 本地生产预览检查汇学堂东侧草地、主路交叉口与近景纹理、道路图层开关；error 日志为空。未新增手机真机或持续性能测试。
+
+## 六处桥下道路接口（2026-09-11）
+
+- 两项 Python 检查验证六个接口铺面分区、车道端点覆盖、主路路缘不侵入接口；另与 448 栋建筑轮廓核对无交叠。
+- [接口网格检查](model-checks/bridge-joins-geometry.json)对源文件和 Draco 解码模型各完成 2,175 个沥青采样，未发现漏地；接口内外相距 0.28 米的采样高差最大约 0.040 米，包含坡度。压缩模型跨细缝的最大短距离高差约 0.142 米，来自低于面层的接缝下承层，不作为道路工程精度。
+- [桥梁回归](model-checks/bridge-joins-clearance.json)验证桥洞车辆净空、中段双侧步道地面及通行、护栏不穿梁板，桥上连续沥青和近景组合通过。步道原高程测试只覆盖未改动中段，末端新过渡由接口专项和预览检查覆盖。
+- [资产比较](model-checks/bridge-joins-models.json)相对 12939ca 确认基础模型只改 roads 与三个 infra-approach 节点，77 个其他节点压缩几何保持一致；近景只更新三座桥末端护栏，其余 65 个 GLB 保留。树位、建筑、地标、篮球场、田径场和原始地形目录逐字节不变。首屏模型 5,386,220 bytes，仍低于 6 MB。
+- TypeScript、Oxlint、40 项 Node 检查及生产构建通过；本机 Codex 内置 Chromium 对照崇左桥前后、博萃桥直行收口、荟贤桥丁字路口，error 日志为空。本轮未新增手机真机或性能基准。

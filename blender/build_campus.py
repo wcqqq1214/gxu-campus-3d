@@ -27,6 +27,7 @@ surroundings=json.loads((DATA/'surroundings.json').read_text())
 basketball=json.loads((DATA/'basketball.json').read_text())
 campus_roads=json.loads((DATA/'campus-roads.json').read_text())
 bridge_by_id={b['id']:b for b in infrastructure['bridges']}
+for join in campus_roads.get('bridgeJoins',[]):bridge_by_id[join['bridgeId']]['joinTrim']=join['trim']
 lake_by_id={b['id']:b for b in infrastructure['lakeBridges']}
 for name,color,rough,metal in [('asphalt','#626664',.97,0),('pavingRed','#b97865',.93,0),('tactile','#d6b663',.95,0),('curb','#c7c9bd',.86,0),('roadWhite','#f0ecda',.92,0),('roadYellow','#e5c266',.92,0),('wallStone','#d6c8aa',.9,0),('fenceIron','#343e3d',.63,.4),('lampMetal','#929f9e',.48,.5),('lampGlass','#e7e8cf',.25,.15),('bridgeConcrete','#afb2a6',.91,0),('bridgeEdge','#c7c9bd',.86,0),('bridgeJoint','#525b59',.95,0),('bridgePlaque','#665d4f',.82,0),('drainStone','#bfc0b3',.94,0)]:
     C[name]=material(name,rgb(color),rough,metal)
@@ -174,6 +175,9 @@ for chunk in infrastructure['chunks']:
         high.object(('农院路 · 路段 ' if chunk['kind']=='corridor' else '跨水桥 · ')+key,GROUND,{'layer':'roads','infrastructureId':key,'precision':'OSM 位置；路幅、细部及配置按参考资料估算'})
 for b in infrastructure['bridges']:
     base['infra-approach-'+b['id']]=approaches(b,C)
+from bridge_joins import bridge_join_mesh
+for join in campus_roads.get('bridgeJoins',[]):
+    base['infra-approach-'+join['bridgeId']].extend(bridge_join_mesh(join,C,elevation,base['terrain']))
 if not BASE_ONLY:base['sports'].object('其他运动场地',GROUND,{'layer':'sports'})
 for field in fields:
     mesh=athletics(field,C)
