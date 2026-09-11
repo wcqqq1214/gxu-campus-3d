@@ -62,6 +62,8 @@ import {
   cameraBearing,
   type CameraSnapshot,
 } from '@/lib/campus/share';
+import sourceData from '@/public/data/sources.json';
+import { sourceIndex, sourceDates } from '@/lib/campus/sources';
 import { CampusMinimap } from '@/components/campus-minimap';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
@@ -80,168 +82,7 @@ const PRESETS: [Preset, string, typeof Sun][] = [
   ['evening', '黄昏', Sunset],
   ['night', '夜景', Moon],
 ];
-const refs: Record<string, { name: string; url: string; year: string }> = {
-  teachingSixEntrances2025: {
-    name: '六教 · 校方南北门与两侧入口示意图',
-    url: 'https://yjsc.gxu.edu.cn/info/1021/4254.htm',
-    year: '发布于 2025-12-17；附件 3 入口位置关系',
-  },
-  teachingSixDesign: {
-    name: '六教 · 华蓝设计项目说明与外观',
-    url: 'https://www.gxhl.com/work/jianzhugongcheng/337.html',
-    year: '2013 年设计、2016 年竣工；照片日期未知',
-  },
-  teachingTenGallery: {
-    name: '第十教学楼 · 校方多媒体教学楼外观',
-    url: 'https://www.gxu.edu.cn/info/1021/18800.htm',
-    year: '发表及拍摄日期未知；外观参考',
-  },
-  teachingTen2024: {
-    name: '第十教学楼 · 智慧教室调研记录',
-    url: 'https://jwc.gxu.edu.cn/info/1222/3455.htm',
-    year: '发布于 2024-10-08；用途与名称核对',
-  },
-  teachingTen2026: {
-    name: '第十教学楼 · 2026 年校方面试公告',
-    url: 'https://www.gxu.edu.cn/info/1364/40889.htm',
-    year: '发布于 2026-06-09；用途与名称核对',
-  },
-  teachingTenClassrooms2022: {
-    name: '第十教学楼 · A/B 座智慧教室建设公告',
-    url: 'https://www.gxu.edu.cn/info/1006/29463.htm',
-    year: '发布于 2022-06-24；用途与名称核对',
-  },
-  timeGate2025: {
-    name: '时光之门 · 校方研学活动近景',
-    url: 'https://cjxy.gxu.edu.cn/info/1041/1477.htm',
-    year: '发布于 2025-03-21；拍摄日期未单独注明',
-  },
-  timeGateOverall2023: {
-    name: '时光之门 · 2023 年地标导览转载全貌',
-    url: 'https://www.sohu.com/a/718274615_121123989',
-    year: '发布于 2023-09-06；拍摄日期未单独注明',
-  },
-  timeGateRoute2022: {
-    name: '时光之门 · 外国语学院云游路线',
-    url: 'https://fls.gxu.edu.cn/info/1205/4151.htm',
-    year: '发布于 2022-07-14；拍摄日期未单独注明',
-  },
-  timeGateUse2026: {
-    name: '时光之门 · 2026 年校友返校记录',
-    url: 'https://gxulif.gxu.edu.cn/info/1527/12265.htm',
-    year: '发布于 2026-07-27；拍摄日期未单独注明',
-  },
-  chongzuo2023: {
-    name: '校方崇左桥下穿坡道与护栏照片',
-    url: 'https://ghjjc.gxu.edu.cn/info/1046/2619.htm',
-    year: '发布于 2023-06-27；单张拍摄日期未知。可见坡道、排水盖板和圆形护栏，未展示完整桥体',
-  },
-  bridgeFlowers2023: {
-    name: '校方崇左桥、博萃桥附近围栏与三角梅',
-    url: 'https://ghjjc.gxu.edu.cn/info/1057/2393.htm',
-    year: '发布于 2023-03-30；拍摄日期未知。仅作为围栏和植物外观参考',
-  },
-  huixian2025: {
-    name: '校方荟贤桥路段维护照片',
-    url: 'https://ghjjc.gxu.edu.cn/info/1046/3774.htm',
-    year: '发布于 2025-10-31；拍摄日期未知。可见道路铺装、盲道和路灯，桥洞形制未被完整覆盖',
-  },
-  bridgeMaintenance2024: {
-    name: '校方农院路围墙周边绿化养护记录',
-    url: 'https://ghjjc.gxu.edu.cn/info/1046/3085.htm',
-    year: '发布于 2024-04-17；用于核对围墙存在，不提供精确边界',
-  },
-  chongzuoHistoric2013: {
-    name: '崇左桥历史结构照片 · 2013',
-    url: 'http://www.archina.com/index.php?a=show&g=ela&id=1336&m=index',
-    year: '发布于 2013-04-16。只辅助桥洞及题名建模，不用于声称现状细部一致',
-  },
-  chongzuoReport2013: {
-    name: '广西新闻网崇左桥现场报道',
-    url: 'https://news.gxnews.com.cn/staticpages/20130416/newgx516c8136-7372321.shtml',
-    year: '发布于 2013-04-16；正文明确农院路在上、校园通道在下，仅辅助核对空间关系',
-  },
-  chongzuoRoute2025: {
-    name: '校方研学线路中的崇左桥',
-    url: 'https://cjxy.gxu.edu.cn/info/1082/1384.htm',
-    year: '发布于 2025-01-17；核对桥名与近期使用，不证明完整桥体外观',
-  },
-  bocuiNotice2023: {
-    name: '校方博萃桥道路示意图',
-    url: 'https://www.gxu.edu.cn/info/1365/32406.htm',
-    year: '发布于 2023-01-18；核对图书馆南侧与农院路交叉位置。历史封闭通知不代表当前通行状态',
-  },
-  bridgeNamingGuide: {
-    name: '校方捐赠指南中的荟贤桥位置',
-    url: 'https://jjh.gxu.edu.cn/__local/A/1C/2D/C94DA67648AB9698A6BE04E1718_D3801DBD_2512297.pdf',
-    year: '历史冠名资料，具体发布日期未知；荟贤桥位于新体育馆北侧的相对关系仅作位置辅助',
-  },
-  eastGatePhoto: {
-    name: '东门落成实拍 · 中国教育在线（校方供图）',
-    url: 'https://www.eol.cn/guangxi/xiaoyuandongtai/201812/t20181202_1635608.shtml',
-    year: '发布于 2018-12-02，辅以无日期街景；2025 校方说明核对位置。未取得近年完整立面照片',
-  },
-  westGatePhoto: {
-    name: '鲁班路西门入口街景',
-    url: 'https://m.sgpabj.com/bendi/10373143.html',
-    year: '照片拍摄日期未知；页面信息更新于 2026-01-16，2026 校方重开通知辅助核对位置',
-  },
-  newEast2026: {
-    name: '校方新东门位置说明 · 秀灵西一里',
-    url: 'https://www.gxu.edu.cn/info/1364/39930.htm',
-    year: '发布于 2026-01-22；结合 2026 雅思入校导览定位。门体照片待补，外观为推定细化',
-  },
-  apartmentOfficial: {
-    name: '校方留学生中心 · 公寓与裙楼外观',
-    url: 'https://gjxy.gxu.edu.cn/lbt/xxss.htm',
-    year: '当前首页链接的历史照片，拍摄日期未知；结合 2022 校方位置资料与 2024 住宿报道核对，未取得近期完整外立面照片',
-  },
-  westTrack2025: {
-    name: '校方 2025 新生开学典礼 · 西田径场',
-    url: 'https://news.gxu.edu.cn/info/1002/42983.htm',
-    year: '发布于 2025-09-15 · 活动日 2025-09-15，单张照片拍摄时间未注明；另核对 2025 校运会照片',
-  },
-  eastTrack2026: {
-    name: '校方 2026 阳光缤纷跑 · 东田径场',
-    url: 'https://news.gxu.edu.cn/info/1002/43641.htm',
-    year: '发布于 2026-04-26 · 单张照片拍摄时间未注明；跑道面层与白色分道线参考',
-  },
-  gate2026: {
-    name: '2026 活动报道中的现南大门',
-    url: 'https://www.5iidea.com/contents/47982',
-    year: '发布于 2026-04-27 · 单张照片拍摄日期未注明；另以 2022 校方照片及 2024 日期水印照片交叉核对',
-  },
-  stadiumVideo: {
-    name: '校方综合体育馆视频',
-    url: 'https://www.gxu.edu.cn/info/1294/28211.htm',
-    year: '发布于 2021-11-17 · 拍摄日期未注明；2024 场馆介绍辅助核对',
-  },
-  campus2026: {
-    name: '校方发布的校园图文',
-    url: 'https://www.gxu.edu.cn/info/1004/40412.htm',
-    year: '发布于 2026-04-17 · 拍摄日期未注明',
-  },
-  campusGallery: {
-    name: '广西大学校园风光',
-    url: 'https://www.gxu.edu.cn/info/1021/18800.htm',
-    year: '发布日期与拍摄日期未注明',
-  },
-  campusAerial: {
-    name: '校方校园图文与航拍参考',
-    url: 'https://www.gxu.edu.cn/info/1004/40412.htm',
-    year: '发布于 2026-04-17 · 场馆屋面局部推定',
-  },
-  campus2024: {
-    name: '校方导览与考场位置图',
-    url: 'https://yjsc.gxu.edu.cn/info/1021/3604.htm',
-    year: '发布于 2024-12-16 · 图底年代未注明',
-  },
-  computer2024: {
-    name: '计算机与电子信息学院介绍',
-    url: 'https://scei.gxu.edu.cn/__local/E/D9/D5/85B5C2D7E31982E036EE64854F2_3961C65F_13838F.pdf?e=.pdf',
-    year: '校方 PDF 第 1 页；发布与拍摄日期未注明',
-  },
-};
+const refs = sourceIndex(sourceData.sources);
 async function getJson<T>(path: string): Promise<T> {
   const r = await fetch(`${BASE}/data/${path}`, { cache: 'no-cache' });
   if (!r.ok) throw new Error(path);
@@ -758,33 +599,26 @@ export default function Home() {
                   <a href={current.sourceUrl} target="_blank" rel="noreferrer">
                     查看位置来源 <ArrowUpRight size={13} />
                   </a>
-                  {currentLandmark && (
-                    <>
-                      <a
-                        href={refs[currentLandmark.reference]?.url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {refs[currentLandmark.reference]?.name}{' '}
-                        <ArrowUpRight size={13} />
-                      </a>
-                      <small>{refs[currentLandmark.reference]?.year}</small>
-                      {currentLandmark.additionalReferences
-                        ?.filter((id) => refs[id])
-                        .map((id) => (
-                          <div key={id}>
-                            <a
-                              href={refs[id].url}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              {refs[id].name} <ArrowUpRight size={13} />
-                            </a>
-                            <small>{refs[id].year}</small>
-                          </div>
-                        ))}
-                    </>
-                  )}
+                  {currentLandmark &&
+                    [
+                      ...new Set([
+                        currentLandmark.reference,
+                        ...(currentLandmark.additionalReferences ?? []),
+                      ]),
+                    ].map((id) => {
+                      const source = refs[id];
+                      return source ? (
+                        <div key={id}>
+                          <a href={source.url} target="_blank" rel="noreferrer">
+                            {source.name} <ArrowUpRight size={13} />
+                          </a>
+                          <small>{sourceDates(source)}</small>
+                          {source.note && <small>{source.note}</small>}
+                        </div>
+                      ) : (
+                        <p key={id}>这项复原资料的链接暂缺。</p>
+                      );
+                    })}
                 </div>
               )}
             </section>
