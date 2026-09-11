@@ -30,39 +30,22 @@ export function createBoundary(data: CampusBoundary) {
     throw new Error('boundary ring');
   const root = new Group();
   root.name = '校园大致边界';
-  const materials = [
-    new LineMaterial({
-      color: '#fff5d9',
-      linewidth: 3,
-      transparent: true,
-      opacity: 0.35,
-      depthTest: false,
-      depthWrite: false,
-      toneMapped: false,
-    }),
-    new LineMaterial({
-      color: '#ca852c',
-      linewidth: 1.8,
-      transparent: true,
-      opacity: 1,
-      dashed: true,
-      dashSize: 45,
-      gapSize: 24,
-      depthTest: false,
-      depthWrite: false,
-      toneMapped: false,
-    }),
-  ];
+  const material = new LineMaterial({
+    color: '#607b6e',
+    linewidth: 1.2,
+    transparent: true,
+    opacity: 0.7,
+    depthTest: true,
+    depthWrite: false,
+    toneMapped: false,
+  });
   for (const ring of data.rings) {
     const geometry = new LineGeometry();
     geometry.setPositions(ring.flatMap(([x, y, z]) => [x, z, -y]));
-    materials.forEach((material, i) => {
-      const line = new Line2(geometry, material);
-      line.computeLineDistances();
-      line.renderOrder = 20 + i;
-      line.frustumCulled = false;
-      root.add(line);
-    });
+    const line = new Line2(geometry, material);
+    line.renderOrder = 20;
+    line.frustumCulled = false;
+    root.add(line);
   }
   return root;
 }
