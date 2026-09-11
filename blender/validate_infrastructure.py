@@ -5,6 +5,7 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 ROOT = Path(__file__).resolve().parents[1]
 data = json.loads((ROOT/'public/data/infrastructure.json').read_text())
+join_trims={j['bridgeId']:j['trim'] for j in json.loads((ROOT/'public/data/campus-roads.json').read_text()).get('bridgeJoins',[])}
 out = ROOT/'docs/model-checks'; out.mkdir(exist_ok=True)
 
 def reset():
@@ -73,6 +74,9 @@ def check_walkways(bvh,b,label,tolerance=.06):
     for i in range(len(path)):
         a=path[max(0,i-1)];c=path[min(len(path)-1,i+1)]
         axis=Vector((c[0]-a[0],c[1]-a[1],0)).normalized();frames.append(axis)
+    # Transition mouths have a new graded floor, checked in validate_bridge_joins.py.
+    trim=join_trims.get(b['id'],0)
+    if trim:path=path[trim:-trim];frames=frames[trim:-trim]
     samples=0;directions=0;minimum_headroom=math.inf
     for side in [-1,1]:
         for offset in [walk['innerOffset']+.35,walk['innerOffset']+walk['width']/2,
@@ -225,5 +229,5 @@ for ident in sorted(road_roots):bpy.ops.import_scene.gltf(filepath=str(ROOT/'pub
 bpy.context.view_layer.update()
 report['nearRoadSeams']=check_road_seams(list(bpy.context.scene.objects),'Draco bridge / near road')
 report['result']='passed'
-(out/'infrastructure-geometry-check.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+(out/('bridge-joins-clearance.json' if '--joins' in sys.argv else 'infrastructure-geometry-check.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(json.dumps(report,ensure_ascii=False),flush=True)

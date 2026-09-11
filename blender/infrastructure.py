@@ -117,6 +117,8 @@ def approaches(b,C):
     m=Mesh();road=Mesh();walks=Mesh();walls=Mesh()
     path=b['underpass'];axes=frames(path);walk=b['pedestrian'];walkpath=walk['path']
     inner=walk['innerOffset'];outer=inner+walk['width']
+    trim=b.get('joinTrim',0)
+    if trim:path=path[trim:-trim];axes=axes[trim:-trim];walkpath=walkpath[trim:-trim]
     ba,bc=b['upper'];dx=bc[0]-ba[0];dy=bc[1]-ba[1];length=math.hypot(dx,dy)
     def covered_segment(a,c,side,local_axes):
         points=[]
@@ -244,6 +246,8 @@ def bridge(b,C,detail):
     if detail:
         rails=Mesh();drains=Mesh();walk=b['pedestrian'];walkpath=walk['path']
         for i,(a,c) in enumerate(zip(path,path[1:])):
+            trim=b.get('joinTrim',0)
+            if i<trim or i>=len(path)-1-trim:continue
             ux,uy=axes[i];theta=math.atan2(uy,ux)
             for side in [-1,1]:
                 off=side*walk['innerOffset'];vx,vy=axes[i+1]
