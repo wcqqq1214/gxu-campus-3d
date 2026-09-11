@@ -8,7 +8,7 @@ export function landmarkDirection(
   architecture?: Building['architecture'],
 ) {
   const bearing = architecture
-    ? Math.PI - architecture.angle
+    ? (place.id === 'huicui' ? 0 : Math.PI) - architecture.angle
     : ((place.frontBearing ?? 180) * Math.PI) / 180;
   if (view === 'top') return new Vector3(0, 1, 0.025).normalize();
   if (view === 'oblique')
@@ -118,6 +118,18 @@ export function entranceBox(
   rear: boolean,
   architecture?: Building['architecture'],
 ) {
+  if (place.id === 'huicui' && architecture && !rear) {
+    const { origin, angle } = architecture;
+    const localY = 34;
+    return new Box3().setFromCenterAndSize(
+      new Vector3(
+        origin[0] - Math.sin(angle) * localY,
+        place.elevation + 3,
+        -(origin[1] + Math.cos(angle) * localY),
+      ),
+      new Vector3(22, 8, 10),
+    );
+  }
   if (place.id === 'teaching-six' && architecture) {
     const { origin, angle } = architecture;
     const y = rear ? 30 : -30;

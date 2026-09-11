@@ -107,7 +107,7 @@ test('庭院内环、三角面与真实轮廓保留', () => {
   );
 });
 test('地标定位与校园南北关系', () => {
-  assert.equal(landmarks.length, 19);
+  assert.equal(landmarks.length, 20);
   assert.ok(
     landmarks.find((l) => l.id === 'south-gate').center[1] <
       landmarks.find((l) => l.id === 'laboratory').center[1],
@@ -218,7 +218,7 @@ test('来源日期字段和高程原始值可追溯', async () => {
 });
 
 test('索引、搜索和拾取仅使用精选地标目录', () => {
-  assert.equal(searchLandmarks(landmarks, '').length, 19);
+  assert.equal(searchLandmarks(landmarks, '').length, 20);
   assert.deepEqual(
     searchLandmarks(landmarks, ' 图书馆 ').map((p) => p.id),
     ['library', 'time-gate'],
@@ -306,7 +306,7 @@ test('三座新增校门采用独立入口 POI，可导航且不伪造建筑轮�
     [180, 90, 270],
   );
   const picks = navigationFootprints(buildings, landmarks);
-  assert.equal(picks.length, 19);
+  assert.equal(picks.length, 20);
   for (const gate of gates) {
     assert.ok(picks.some((p) => p.id === gate.id));
     assert.ok(!buildings.some((b) => b.landmark === gate.id));

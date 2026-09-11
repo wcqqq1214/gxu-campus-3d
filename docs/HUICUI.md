@@ -1,8 +1,8 @@
 # 荟萃楼精细建模记录
 
-更新：2026-09-11。[查看荟萃楼](https://wcqqq1214.github.io/gxu-campus-3d/#light=day&camera=-135,58,503,-85,16,635&span=44)。
+更新：2026-09-11。[查看荟萃楼](https://wcqqq1214.github.io/gxu-campus-3d/#place=huicui)。
 
-荟萃楼位于新闻传播学院同一组楼体的北侧。本次替换原来按教学楼类型生成的模型，保留 `relation/11970574` 的真实轮廓、内院、西侧弧形凹口以及坐标和朝向。没有另放一栋重叠酒店，也没有新增精选导航条目，仍随 `chunk-n1-n2` 分区加载。
+荟萃楼位于新闻传播学院同一组楼体的北侧。本次替换原来按教学楼类型生成的模型，保留 `relation/11970574` 的真实轮廓、内院、西侧弧形凹口以及坐标和朝向。复用原有模型，现为第 20 处精选地标；独立加载 `huicui.glb`，已从普通建筑分区移出，避免重复。
 
 ## 复原内容
 
@@ -41,8 +41,8 @@ blender --background --python-exit-code 1 --python blender/update_huicui.py
 blender --background --python-exit-code 1 --python blender/validate_huicui.py
 ```
 
-第一步需要 `scripts/requirements.txt` 的 Python 地理依赖。完整 `data:prepare` 和 `blender/build_campus.py` 也已接入。局部脚本只重建基础 GLB、相关近景分区和 Blender 源对象。源对象“荟萃楼 · 新闻传播学院共用楼体”具有顶板、立面、门厅、学院侧翼和屋顶分组；仅对此对象合并重合顶点，保留面 UV 和分组以控制体积。
+第一步需要 `scripts/requirements.txt` 的 Python 地理依赖。完整 `data:prepare` 和 `blender/build_campus.py` 也已接入。局部脚本只重建基础 GLB、独立地标 GLB、原分区及 Blender 源对象。源对象“荟萃楼 · 新闻传播学院共用楼体”具有顶板、立面、门厅、学院侧翼和屋顶分组；仅对此对象合并重合顶点，保留面 UV 和分组以控制体积。
 
 源网格及压缩后两档 GLB 均检查柱廊无实墙遮挡、内院不封顶、雨棚顶板存在、踏步高于地形，并限制下级踏步离地高度。[几何检查结果](model-checks/huicui-geometry.json)与[其他资产保留记录](model-checks/huicui-retained-assets.json)可复核。
 
-网站仍为 19 处精选目录，荟萃楼没有加入名称搜索；可通过本页链接直接查看。材质沿用原有昼夜和画质切换逻辑。
+网站现有 20 处精选目录，支持“荟萃楼”“荟萃楼酒店”“新闻传播学院”搜索、分类筛选、模型点选、详情与来源、北门近景、分享链接和自动巡游。材质沿用原有昼夜和画质切换逻辑。

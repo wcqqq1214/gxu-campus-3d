@@ -46,9 +46,9 @@ bpy.ops.wm.open_mainfile(filepath=str(R/'blender/gxu-campus.blend'))
 objects=[o for o in bpy.context.scene.objects if o.get('featureId')==b['id']];assert len(objects)==1
 assert len(objects[0].vertex_groups)>=8
 report=[check(objects,[bpy.data.objects['terrain']],'editable source')]
-for name in ['base',b['chunk']]:
+for name in ['base','huicui']:
     raw=(R/f'public/models/{name}.glb').read_bytes();size=struct.unpack_from('<I',raw,12)[0];doc=json.loads(raw[20:20+size])
-    for scene in doc['scenes']:scene['nodes']=[i for i in scene['nodes'] if doc['nodes'][i].get('name') in (b['chunk'],'terrain')]
+    for scene in doc['scenes']:scene['nodes']=[i for i in scene['nodes'] if doc['nodes'][i].get('name') in ('landmark-huicui','terrain')]
     js=json.dumps(doc,separators=(',',':')).encode();js+=b' '*((-len(js))%4);tail=raw[20+size:]
     path=R/'work/huicui-validation.glb';path.write_bytes(struct.pack('<4sII',b'glTF',2,20+len(js)+len(tail))+struct.pack('<I4s',len(js),b'JSON')+js+tail)
     bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(path));bpy.context.view_layer.update()
@@ -56,7 +56,7 @@ for name in ['base',b['chunk']]:
     for o in bpy.context.scene.objects:
         root=o
         while root.parent:root=root.parent
-        if root.name==b['chunk']:buildings.append(o)
+        if root.name=='landmark-huicui':buildings.append(o)
         elif root.name=='terrain':terrain.append(o)
     report.append(check(buildings,terrain,name+'.glb'))
 (R/'docs/model-checks/huicui-geometry.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')

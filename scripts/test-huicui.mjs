@@ -1,17 +1,28 @@
+import { searchLandmarks, navigationFootprints } from '../lib/campus/navigation.ts';
+import { landmarkDirection, landmarkBox, entranceBox } from '../lib/campus/camera.ts';
+import { Vector3 } from 'three';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 const json = async (file) => JSON.parse(await readFile(new URL(`../public/data/${file}.json`, import.meta.url), 'utf8'));
-test('荟萃楼复用原关系及内院，只精建而不扩充精选索引', async () => {
+test('荟萃楼进入第20项索引并复用原关系及内院', async () => {
   const [buildings, landmarks, manifest, sources] = await Promise.all(['buildings', 'landmarks', 'models', 'sources'].map(json));
   const records = buildings.filter(b => b.customModel === 'huicui');
   assert.equal(records.length, 1);
   const b = records[0];
   assert.equal(b.id, 'relation/11970574');
-  assert.equal(b.landmark, null);
-  assert.equal(landmarks.length, 19);
-  assert.ok(!landmarks.some(l => l.id === 'huicui'));
-  assert.equal(manifest.zones.filter(z => z.featureIds.includes(b.id)).length, 1);
+  assert.equal(b.landmark, 'huicui');
+  assert.equal(landmarks.length, 20);
+  assert.equal(landmarks[19].id, 'huicui');
+  const l=landmarks[19];
+  assert.ok(landmarkDirection(l,'entrance',b.architecture).z < -.8);
+  const door=entranceBox(l,landmarkBox(l),false,b.architecture).getCenter(new Vector3());
+  assert.ok(door.z < -b.bounds[3]);
+  assert.ok(Math.abs(door.x-b.architecture.origin[0])<1);
+  assert.ok(manifest.landmarks.some(l => l.id === 'huicui'));
+  for (const name of ['荟萃楼', '荟萃楼酒店', '新闻传播学院']) assert.deepEqual(searchLandmarks(landmarks, name).map(l=>l.id), ['huicui']);
+  assert.equal(navigationFootprints(buildings, landmarks).filter(b=>b.landmark==='huicui').length, 1);
+  assert.equal(manifest.zones.filter(z => z.featureIds.includes(b.id)).length, 0);
   assert.equal(b.polygons[0].length, 2);
   assert.equal(b.architecture.parts[1].polygons[0].length, 2);
   assert.ok(b.sourceRefs.every(id => sources.sources.some(s => s.id === id)));
