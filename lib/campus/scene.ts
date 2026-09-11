@@ -8,6 +8,7 @@ import { isTap } from './math';
 import type { CameraSnapshot } from './share';
 import {
   fetchModel,
+  fetchJson,
   nearbyChunks,
   planDetails,
   ResourceQueue,
@@ -1010,11 +1011,10 @@ export function createScene(
     loading.add('base');
     callbacks.onStatus('正在铺开校园…');
     try {
-      const response = await fetch(asset('data/models.json'), {
-        cache: 'no-cache',
-      });
-      if (!response.ok) throw new Error('manifest');
-      manifest = await response.json();
+      manifest = await fetchJson<Manifest>(
+        asset('data/models.json'),
+        lifecycle.signal,
+      );
       if (disposed) return;
       const gltf = await loadGLB(manifest!.base);
       baseRoot = gltf.scene;
