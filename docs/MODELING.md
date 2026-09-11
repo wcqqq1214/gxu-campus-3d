@@ -16,7 +16,7 @@ npm run models:build
 
 `blender` 必须位于 PATH，也可改用本机 Blender 可执行文件绝对路径。工作文件位于 `work/`，不纳入 Git。固定随机种子使植物配置和纹理一致；不同 Blender/Draco 版本可能改变二进制压缩结果。
 
-数据流程：OSM JSON → Shapely 合并关系和内环 → 校园外扩 300 米裁剪 → Earcut 多边形三角化 → 米制地形、轮廓及 POI 目录 → Blender 几何 → 自包含 Draco GLB。`data:restore` 使用已发布快照；要更新数据，运行 `python3 scripts/fetch_geodata.py --refresh` 后重新准备和构建。
+数据流程：OSM JSON → Shapely 合并关系和内环 → 校园外扩 300 米裁剪（建筑最终仅保留校内及距校界 20 米内的外部建筑） → Earcut 多边形三角化 → 米制地形、轮廓及 POI 目录 → Blender 几何 → 自包含 Draco GLB。`data:restore` 使用已发布快照；要更新数据，运行 `python3 scripts/fetch_geodata.py --refresh` 后重新准备和构建。
 
 ## 模型分级
 
@@ -262,3 +262,8 @@ blender --background --python-exit-code 1 --python blender/validate_basketball.p
 ## 荟萃楼（2026-09-11）
 
 按新闻传播学院共用楼体北翼精建，保留原关系及内院；2024—2026 年资料确认在用情况，清晰外观照片主要来自 2020 年校方全景和更早入口近景，不能当作近期实测。[来源、复原范围与重建方式](HUICUI.md)。
+
+
+## 紧邻校界建筑
+
+校外建筑保留规则来自 `scripts/context_data.py`，完整数据处理后应用。`blender/update_context.py` 仅重建基础 GLB 的 context 节点及可编辑源文件的同层对象；所有校内建筑、篮球场、道路、植被和地标近景文件保持原样。页面“紧邻校界建筑”图层控制这 13 栋建筑，删除的远处建筑不会在后续完整重建时恢复。
