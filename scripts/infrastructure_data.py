@@ -391,5 +391,7 @@ def prepare_infrastructure():
     prepare_basketball()
     from huicui_data import prepare_huicui
     prepare_huicui()
+    from context_data import prepare_context
+    prepare_context()
 
 if __name__=='__main__':prepare_infrastructure()
