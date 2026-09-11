@@ -8,6 +8,8 @@ from prepare_geodata import project
 from surroundings_data import triangulate,tiled_triangles
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'public/data'
 def prepare_basketball():
+    from external_surfaces_data import prepare_external_surfaces
+    prepare_external_surfaces()
     geo=json.loads((OUT/'geography.geojson').read_text());terrain=json.loads((OUT/'terrain.json').read_text());infra=json.loads((OUT/'infrastructure.json').read_text())
     courts=[];areas=[]
     for f in geo['features']:
@@ -64,7 +66,7 @@ def prepare_basketball():
                 assert cell_id not in infra['terrainCells'],'Basketball grading intersects bridge earthworks'
                 assert cell_id not in cells,'Basketball grading halos share a DEM cell'
                 cells.add(cell_id);patch(cell.difference(halo),elevation)
-    data={'version':2,'snapshotAt':geo['metadata']['snapshotAt'],'basis':'31 片 OSM 单场轮廓；东田径场西侧另补 15 片资料约束的估算球场，独立注明定位精度；场线采用 2024 FIBA 尺度参考。','estimatedLayouts':[layout],'courts':courts,'banks':banks,'areas':areas,'terrainCells':sorted(cells),'terrainPatch':patches,'sourceRefs':['osm','sports2024','basketballEast2026','basketballRules2024','campus2024','basketballEastLayout']}
+    data={'version':2,'snapshotAt':geo['metadata']['snapshotAt'],'basis':f"{sum(c['osmId'] is not None for c in courts)} 片 OSM 单场轮廓；东田径场西侧另补 15 片资料约束的估算球场，独立注明定位精度；场线采用 2024 FIBA 尺度参考。",'estimatedLayouts':[layout],'courts':courts,'banks':banks,'areas':areas,'terrainCells':sorted(cells),'terrainPatch':patches,'sourceRefs':['osm','sports2024','basketballEast2026','basketballRules2024','campus2024','basketballEastLayout']}
     trees=json.loads((OUT/'vegetation.json').read_text());mask=unary_union([Polygon(b['ground']) for b in banks])
     trees=[t for t in trees if mask.distance(Point(t[:2]))>4*t[2]/9+1]
     (OUT/'vegetation.json').write_text(json.dumps(trees,separators=(',',':')))
