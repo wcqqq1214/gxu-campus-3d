@@ -51,4 +51,4 @@ for o in bpy.context.scene.objects:
     elif root.name=='terrain':terrain.append(o)
 report.append(verify(groups,terrain,'base GLB'))
 (R/'docs/model-checks/basketball-geometry.json').write_text(json.dumps(report,indent=2)+'\n')
-print('Passed: 31 courts × source/GLB; court paint, 3.05 m rims, open nets and terrain',flush=True)
+print(f"Passed: {len(data['courts'])} courts × source/GLB; court paint, 3.05 m rims, open nets and terrain",flush=True)

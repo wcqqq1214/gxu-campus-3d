@@ -8,14 +8,25 @@ D=Path(__file__).resolve().parents[1]/'public/data'
 def read(n):return json.loads((D/n).read_text())
 class BasketballTest(unittest.TestCase):
     def test_mapped_centers_and_existing_selection(self):
-        d=read('basketball.json');self.assertEqual(len(d['courts']),31)
-        self.assertEqual(sum(c['insideCampus'] for c in d['courts']),16)
+        d=read('basketball.json');self.assertEqual(len(d['courts']),46)
+        self.assertEqual(sum(c['insideCampus'] for c in d['courts']),31)
         for c in d['courts']:
-            self.assertLess(Polygon(c['mappedFootprint']).centroid.distance(Point(c['center'])),.02)
+            if c['osmId']:self.assertLess(Polygon(c['mappedFootprint']).centroid.distance(Point(c['center'])),.02)
+            else:
+                self.assertEqual(c['placement'],'reference-estimate')
+                self.assertIsNone(c['mappedFootprint'])
+                self.assertIsNone(c['osmEditedAt'])
             self.assertAlmostEqual(Polygon(c['footprint']).area,420,places=5)
             self.assertEqual(c['rimHeight'],3.05)
-        self.assertEqual(len(read('landmarks.json')),19)
+        self.assertFalse(any(l['id'].startswith('basketball-') for l in read('landmarks.json')))
         self.assertEqual(len(d['areas']),2)
+    def test_east_location_and_count(self):
+        d=read('basketball.json');bank=next(b for b in d['banks'] if b['id']=='basketball-bank-east')
+        self.assertEqual(len(bank['courtIds']),15)
+        track=next(f for f in read('sports.json') if f['id']=='east-track')
+        self.assertLess(bank['bounds'][2],track['bounds'][0])
+        self.assertGreater(bank['bounds'][1],track['bounds'][1]-2)
+        self.assertLess(bank['bounds'][3],track['bounds'][3])
     def test_playing_areas_and_paving_do_not_intersect_obstacles(self):
         d=read('basketball.json');buildings=unary_union([Polygon(p[0],p[1:]) for b in read('buildings.json') for p in b['polygons']])
         obstacles=unary_union([buildings]+[surface_shape(s) for s in read('surfaces.json') if s['kind'] in ('roads','water')])

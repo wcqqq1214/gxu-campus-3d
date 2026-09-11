@@ -1,4 +1,4 @@
-"""Derive basketball courts from mapped single-court footprints; no new POIs."""
+"""Derive mapped courts and explicitly estimated east-campus courts; no new POIs."""
 import json,math
 from pathlib import Path
 import numpy as np
@@ -23,6 +23,16 @@ def prepare_basketball():
         c,s=math.cos(angle),math.sin(angle)
         footprint=[[cx+x*c-y*s,cy+x*s+y*c] for x,y in [(-7.5,-14),(7.5,-14),(7.5,14),(-7.5,14),(-7.5,-14)]]
         courts.append({'id':'basketball-'+f['id'].split('/')[1],'osmId':f['id'],'center':[cx,cy],'rotation':angle,'footprint':footprint,'mappedFootprint':list(g.exterior.coords),'length':28,'width':15,'rimHeight':3.05,'insideCampus':p['insideCampus'],'sourceUrl':p['sourceUrl'],'osmVersion':p['osmVersion'],'osmEditedAt':p['osmEditedAt'],'precision':'OSM 中心与长轴；按 28×15 米标准比例归整，篮架、配色和缓冲铺装为视觉估算，非实测或赛事认证。'})
+    layout=json.loads((ROOT/'data/east-basketball.json').read_text())
+    track=next(f for f in json.loads((OUT/'sports.json').read_text()) if f['id']==layout['anchorSportsId'])
+    angle=track['rotation'];c,s=math.cos(angle),math.sin(angle)
+    ox,oy=layout['offsetFromTrack'];cx=track['center'][0]+ox*c-oy*s;cy=track['center'][1]+ox*s+oy*c
+    for row in range(layout['rows']):
+        for col in range(layout['columns']):
+            x=(col-(layout['columns']-1)/2)*layout['columnSpacing'];y=(row-(layout['rows']-1)/2)*layout['rowSpacing']
+            x,y=cx+x*c-y*s,cy+x*s+y*c
+            footprint=[[x+u*c-v*s,y+u*s+v*c] for u,v in [(-7.5,-14),(7.5,-14),(7.5,14),(-7.5,14),(-7.5,-14)]]
+            courts.append({'id':f'basketball-east-{row+1}-{col+1}','osmId':None,'mappedFootprint':None,'placement':'reference-estimate','center':[x,y],'rotation':angle,'footprint':footprint,'length':28,'width':15,'rimHeight':3.05,'insideCampus':True,'sourceUrl':layout['sourceUrl'],'sourceRefs':layout['sourceRefs'],'osmVersion':None,'osmEditedAt':None,'precision':layout['precision'],'bank':'basketball-bank-east'})
     pending=list(courts);groups=[]
     while pending:
         group=[pending.pop(0)]
@@ -37,7 +47,7 @@ def prepare_basketball():
         return (hh[j*cols+i]*(1-a)+hh[j*cols+i+1]*a)*(1-b)+(hh[(j+1)*cols+i]*(1-a)+hh[(j+1)*cols+i+1]*a)*b
     banks=[];cells=set();patches=[]
     for group in groups:
-        key='basketball-bank-'+group[0]['osmId'].split('/')[1];ground=unary_union([Polygon(c['footprint']) for c in group]).convex_hull.buffer(.9,join_style=2)
+        key=group[0].get('bank') or 'basketball-bank-'+group[0]['osmId'].split('/')[1];ground=unary_union([Polygon(c['footprint']) for c in group]).convex_hull.buffer(.9,join_style=2)
         level=round(float(np.median([elevation(*c['center']) for c in group])),3)
         for court in group:court.update(bank=key,elevation=level+.22)
         halo=ground.buffer(1.5,join_style=2);ring=halo.difference(ground)
@@ -54,7 +64,7 @@ def prepare_basketball():
                 assert cell_id not in infra['terrainCells'],'Basketball grading intersects bridge earthworks'
                 assert cell_id not in cells,'Basketball grading halos share a DEM cell'
                 cells.add(cell_id);patch(cell.difference(halo),elevation)
-    data={'version':1,'snapshotAt':geo['metadata']['snapshotAt'],'basis':'既有 OSM 单场轮廓与 2024 FIBA 尺度参考；近期校方照片辅助通用配色，不声称逐场实测。','courts':courts,'banks':banks,'areas':areas,'terrainCells':sorted(cells),'terrainPatch':patches,'sourceRefs':['osm','sports2024','basketballEast2026','basketballRules2024']}
+    data={'version':2,'snapshotAt':geo['metadata']['snapshotAt'],'basis':'31 片 OSM 单场轮廓；东田径场西侧另补 15 片资料约束的估算球场，独立注明定位精度；场线采用 2024 FIBA 尺度参考。','estimatedLayouts':[layout],'courts':courts,'banks':banks,'areas':areas,'terrainCells':sorted(cells),'terrainPatch':patches,'sourceRefs':['osm','sports2024','basketballEast2026','basketballRules2024','campus2024','basketballEastLayout']}
     trees=json.loads((OUT/'vegetation.json').read_text());mask=unary_union([Polygon(b['ground']) for b in banks])
     trees=[t for t in trees if mask.distance(Point(t[:2]))>4*t[2]/9+1]
     (OUT/'vegetation.json').write_text(json.dumps(trees,separators=(',',':')))
