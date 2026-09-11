@@ -389,5 +389,7 @@ def prepare_infrastructure():
     prepare_surroundings()
     from basketball_data import prepare_basketball
     prepare_basketball()
+    from huicui_data import prepare_huicui
+    prepare_huicui()
 
 if __name__=='__main__':prepare_infrastructure()

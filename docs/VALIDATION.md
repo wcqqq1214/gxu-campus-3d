@@ -305,3 +305,9 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 | 可编辑 Blender 源文件 | 102,109,123 bytes |
 
 继续满足首屏模型及贴图 6 MB / 12 MB 预算。约 510 KB 的 `basketball.json` 供建模复用，浏览器不加载该中间几何数据。验收图：[西校园整体](screenshots/basketball-west.png)、[篮架近景](screenshots/basketball-hoop.png)。
+
+## 荟萃楼（2026-09-11）
+
+在 macOS 本机 Blender 5.2.1 验证编辑源文件、基础 GLB 与近景 GLB，三份表示合计 42 条柱廊通行射线、9 条内院射线及 36 个踏步样本通过；基础模型与源文件踏步均未被地形覆盖，底部踏步离地不超过 0.45 米。保留其余 79 个基础节点的 Draco 几何及 66 个其他模型文件。
+
+首屏模型合计 5,475,548 字节，低于 6 MB；Blender 源文件 104,165,197 字节，低于 GitHub 100 MiB 限制。类型检查、lint、40 项 Node 检查及 Pages 生产构建通过。浏览器人工检查北立面与北门两个视角、名称字牌和截图导出；没有进行手机真机测试，也未另测帧率或内存。[具体记录](HUICUI.md)。

@@ -258,3 +258,7 @@ blender --background --python-exit-code 1 --python blender/validate_basketball.p
 | 西校园整体 | 篮架近景 |
 | --- | --- |
 | ![西校园篮球场](screenshots/basketball-west.png) | ![篮板、篮圈与镂空篮网](screenshots/basketball-hoop.png) |
+
+## 荟萃楼（2026-09-11）
+
+按新闻传播学院共用楼体北翼精建，保留原关系及内院；2024—2026 年资料确认在用情况，清晰外观照片主要来自 2020 年校方全景和更早入口近景，不能当作近期实测。[来源、复原范围与重建方式](HUICUI.md)。
