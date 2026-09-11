@@ -8,6 +8,7 @@ from campus_gates import campus_gate
 from time_gate import time_gate
 from teaching_ten import teaching_ten
 from teaching_six import teaching_six
+from huicui import huicui
 
 def facade(m,x,y,z,w,d,h,wall,glass,trim,floors=6,spacing=4,band=False):
     m.box(x,y,z+h/2,w,d,h,wall)
@@ -30,6 +31,7 @@ def landmark(l,b,z,C,detail=True):
     m=Mesh();x,y=l['center'];xmin,ymin,xmax,ymax=l['bounds'];w=xmax-xmin;d=ymax-ymin;x=(xmin+xmax)/2;y=(ymin+ymax)/2;h=l['height']
     stone,white,glass,dark,roof,wood=C['stone'],C['white'],C['glass'],C['dark'],C['slate'],C['wood']
     k=l['id']
+    if k=='huicui':return huicui(b,z,C,detail)
     if k=='teaching-ten':return teaching_ten(l,b,z,C,detail)
     if l.get('placeKind')=='sculpture':return time_gate(l,z,C,detail)
     if l.get('placeKind')=='gate':return campus_gate(l,z,C,detail)
