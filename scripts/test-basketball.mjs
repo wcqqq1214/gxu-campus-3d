@@ -10,8 +10,10 @@ test('篮球场使用独立运动场节点，保持精选目录稳定且来源�
     const roots=gltf.nodes.filter(n=>n.name===bank.id);
     assert.equal(roots.length,1);assert.equal(roots[0].extras.layer,'sports');
   }
+  for(const id of ['basketball-bank-1379222486','basketball-bank-1379222488'])
+    assert.ok(!gltf.nodes.some(n=>n.name===id),`校外球场仍在模型中：${id}`);
   assert.ok(!read('landmarks.json').some(l=>l.id.startsWith('basketball-')));
-  assert.equal(new Set(data.courts.filter(c=>c.osmId).map(c=>c.osmId)).size,19);
+  assert.equal(new Set(data.courts.filter(c=>c.osmId).map(c=>c.osmId)).size,16);
   const sources=new Set(read('sources.json').sources.map(s=>s.id));
   for(const id of data.sourceRefs)assert.ok(sources.has(id),id);
   assert.equal(read('overview.json').trees,read('vegetation.json').length);

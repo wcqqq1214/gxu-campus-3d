@@ -45,7 +45,7 @@ blender --background --python-exit-code 1 --python blender/validate_landmarks.py
 | 20 个地标 GLB | 独立加载，可点选、巡游和单独修改；使用一致的米制位置 |
 | trees.glb | 3 个多材质模板，网页合并为顶点色几何后分块实例化 |
 
-模板材质包括石材、白色涂层、玻璃、深色金属、灰青屋瓦、铺装、草地、树皮和三种树冠色。10 张 128 × 128 自制 JPEG 纹理采用米制平面 UV；没有大尺寸摄影贴图。几何使用 Draco，解码器本地托管。东/西/北是场景加载分区，并不逐线等同于校方的行政分区。网页以视距触发普通分区近景，树木按空间块进行视锥剔除。首屏基础模型和树木模板约 5.39 MB。自动画质按运行表现调整阴影、植被密度与近景预算，手机默认采用保守配置，详见 [近期优化](FIXES.md)。
+模板材质包括石材、白色涂层、玻璃、深色金属、灰青屋瓦、铺装、草地、树皮和三种树冠色。10 张 128 × 128 自制 JPEG 纹理采用米制平面 UV；没有大尺寸摄影贴图。几何使用 Draco，解码器本地托管。东/西/北是场景加载分区，并不逐线等同于校方的行政分区。网页以视距触发普通分区近景，树木按空间块进行视锥剔除。首屏基础模型和树木模板约 5.05 MB。自动画质按运行表现调整阴影、植被密度与近景预算，手机默认采用保守配置，详见 [近期优化](FIXES.md)。
 
 ## 14 处地标检查
 
@@ -268,6 +268,21 @@ blender --background --python-exit-code 1 --python blender/validate_basketball.p
 ## 紧邻校界建筑
 
 校外建筑保留规则来自 `scripts/context_data.py`，完整数据处理后应用。`blender/update_context.py` 仅重建基础 GLB 的 context 节点及可编辑源文件的同层对象；所有校内建筑、篮球场、道路、植被和地标近景文件保持原样。页面“紧邻校界建筑”图层控制这 13 栋建筑，删除的远处建筑不会在后续完整重建时恢复。
+
+### 校外零散色块与道路（2026-09-12）
+
+按用户圈选移除北侧公园、西侧湖岸色块、零散球场，以及西、东、南侧的多余支路。周边主干道与校门连接保留，三处断头段在连接处收束。此调整限定网页展示范围，不表示原地图要素不存在。
+
+`scripts/scene_cleanup.py` 按 OSM ID 记录范围，`external_surfaces_data.py` 在周边道路合并前执行清理，保留曲面索引和原始 OSM 快照。专项更新顺序：
+
+```sh
+python3 scripts/external_surfaces_data.py
+python3 scripts/surroundings_data.py
+python3 scripts/basketball_data.py
+blender --background --python-exit-code 1 --python blender/update_scene_cleanup.py
+```
+
+更新脚本同步基础 GLB 和 Blender 中的道路、水面、绿地与地形，移除三片校外篮球场及底板；保留建筑、地标、两处田径场、31 片校内篮球场及近景模型。
 
 ## 校内主路与汇学堂草地（2026-09-11）
 
