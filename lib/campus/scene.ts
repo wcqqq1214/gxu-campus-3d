@@ -22,6 +22,7 @@ import {
   landmarkDirection,
 } from './camera';
 import { DEFAULT_LAYERS } from './types';
+import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import type {
   Building,
@@ -74,7 +75,7 @@ export function createScene(
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.92;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   const canvas = renderer.domElement;
   canvas.setAttribute(
     'aria-label',
@@ -673,7 +674,7 @@ export function createScene(
     const root = loaded.get(key);
     if (!root) return;
     dynamic.remove(root);
-    disposeObject(root);
+    disposeObject(root, [scene]);
     loaded.delete(key);
     recentlyUsed.delete(key);
   }
@@ -1478,7 +1479,6 @@ export function createScene(
       disposed = true;
       lifecycle.abort();
       detailQueue.dispose();
-      skyTexture.dispose();
       cancelAnimationFrame(loop);
       observer.disconnect();
       wheelHost.removeEventListener('wheel', onOverlayWheel);
@@ -1507,22 +1507,4 @@ function clearGroup(group: THREE.Group) {
     group.remove(c);
     disposeObject(c);
   }
-}
-function disposeObject(root: THREE.Object3D) {
-  const geometries = new Set<THREE.BufferGeometry>(),
-    materials = new Set<THREE.Material>(),
-    textures = new Set<THREE.Texture>();
-  root.traverse((o) => {
-    if (o instanceof THREE.Mesh) {
-      geometries.add(o.geometry);
-      for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
-        materials.add(m);
-        for (const v of Object.values(m))
-          if (v instanceof THREE.Texture) textures.add(v);
-      }
-    }
-  });
-  for (const g of geometries) g.dispose();
-  for (const m of materials) m.dispose();
-  for (const t of textures) t.dispose();
 }
