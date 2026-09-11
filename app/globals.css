@@ -1674,7 +1674,9 @@ a svg {
   font-size: 12px;
 }
 
-.map-footer { gap: 10px; }
+.map-footer {
+  gap: 10px;
+}
 .boundary-legend {
   display: inline-flex;
   align-items: center;
@@ -1688,4 +1690,16 @@ a svg {
   width: 22px;
   border-top: 2px solid #ffffff;
   filter: drop-shadow(0 1px 1px #45584c);
+}
+
+.tour-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  flex-shrink: 0;
+  background: #315e45;
+  color: white;
+  border: 0;
 }
