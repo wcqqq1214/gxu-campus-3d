@@ -25,6 +25,7 @@ fields=json.loads((DATA/'sports.json').read_text())
 infrastructure=json.loads((DATA/'infrastructure.json').read_text())
 surroundings=json.loads((DATA/'surroundings.json').read_text())
 basketball=json.loads((DATA/'basketball.json').read_text())
+campus_roads=json.loads((DATA/'campus-roads.json').read_text())
 bridge_by_id={b['id']:b for b in infrastructure['bridges']}
 lake_by_id={b['id']:b for b in infrastructure['lakeBridges']}
 for name,color,rough,metal in [('asphalt','#626664',.97,0),('pavingRed','#b97865',.93,0),('tactile','#d6b663',.95,0),('curb','#c7c9bd',.86,0),('roadWhite','#f0ecda',.92,0),('roadYellow','#e5c266',.92,0),('wallStone','#d6c8aa',.9,0),('fenceIron','#343e3d',.63,.4),('lampMetal','#929f9e',.48,.5),('lampGlass','#e7e8cf',.25,.15),('bridgeConcrete','#afb2a6',.91,0),('bridgeEdge','#c7c9bd',.86,0),('bridgeJoint','#525b59',.95,0),('bridgePlaque','#665d4f',.82,0),('drainStone','#bfc0b3',.94,0)]:
@@ -140,6 +141,7 @@ for si,original in enumerate(surfaces):
     if s['id'] in infrastructure['replaceSurfaceIds']:continue
     if str(si) in infrastructure['surfaceOverrides']:s={**s,**infrastructure['surfaceOverrides'][str(si)]}
     if str(si) in surroundings['surfaceOverrides']:s={**s,**surroundings['surfaceOverrides'][str(si)]}
+    if str(si) in campus_roads['surfaceOverrides']:s={**s,**campus_roads['surfaceOverrides'][str(si)]}
     if not s['vertices']:continue
     if s['id'] in [field['osmId'] for field in fields] or s['id'] in [court['osmId'] for court in basketball['courts']]:continue
     kind=s['kind'];verts=s['vertices'];tri=s['triangles'];mat=C['water'] if kind=='water' else C['sport'] if kind=='sports' else C['green'] if kind=='green' else C['path'] if s['tags'].get('highway') in ('path','footway','steps','pedestrian') else C['road']
@@ -161,6 +163,7 @@ for si,original in enumerate(surfaces):
             for a,b in [((x0,y0),(x1,y0)),((x1,y0),(x1,y1)),((x1,y1),(x0,y1)),((x0,y1),(x0,y0)),((x0,(y0+y1)/2),(x1,(y0+y1)/2))]:base[layer].line((*a,elevation(*a)+.2),(*b,elevation(*b)+.2),.10,C['white'],4)
 from surroundings import surroundings_mesh
 base['roads'].extend(surroundings_mesh(surroundings,C,elevation,base['terrain']))
+base['roads'].extend(surroundings_mesh(campus_roads,C,elevation,base['terrain']))
 print('Ground assembled',flush=True)
 infra_near={}
 for chunk in infrastructure['chunks']:
@@ -239,7 +242,9 @@ for i,(x,y,h,t) in enumerate([] if BASE_ONLY else trees):
     o=bpy.data.objects.new(f'树木示意-{i:04}',templates[t].data);PLANTS.objects.link(o);o.location=(x,y,elevation(x,y));o.scale=(h/9,h/9,h/9);o.rotation_euler.z=i*2.399
 for t in templates:t.hide_render=True;t.hide_set(True)
 for k,m in base.items():
-    if not BASE_ONLY and not k.startswith(('landmark','sports-','basketball-')) and k not in near and k not in infra_near and k not in ('context','sports'):m.object(k,GROUND,{'layer':'roads' if k.startswith('infra-') else k})
+    if not BASE_ONLY and not k.startswith(('landmark','sports-','basketball-')) and k not in near and k not in infra_near and k not in ('context','sports'):
+        obj=m.object(k,GROUND,{'layer':'roads' if k.startswith('infra-') else k})
+        if k=='roads':compact_source(obj)
 # A neutral studio sky and solar lighting for editable source preview.
 world=bpy.data.worlds.new('南宁晴空');world.use_nodes=True;world.node_tree.nodes['Background'].inputs[0].default_value=(.58,.73,.88,1);world.node_tree.nodes['Background'].inputs[1].default_value=.7;bpy.context.scene.world=world
 light=bpy.data.lights.new('下午日光','SUN');light.energy=2.5;light.angle=.08;sun=bpy.data.objects.new('下午日光',light);GROUND.objects.link(sun);sun.rotation_euler=(.4,-.6,-.6)
