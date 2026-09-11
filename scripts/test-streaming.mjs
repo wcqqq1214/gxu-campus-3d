@@ -7,6 +7,7 @@ import {
   HttpError,
   nearbyChunks,
   planDetails,
+  fetchJson,
 } from '../lib/campus/streaming.ts';
 const tick = () => new Promise((resolve) => setImmediate(resolve));
 test('加载并发最多两项，等待的精选地标优先于背景区块', async () => {
@@ -180,5 +181,60 @@ test('地标和三条道路不会挤占附近建筑的三个名额，所有背�
     pending.assets.filter(([key]) => buildings.some((b) => b.id === key))
       .length,
     1,
+  );
+});
+
+test('JSON请求503自动恢复，超时退出并可重试，生命周期取消停止所有后续请求', async (t) => {
+  let calls = 0;
+  const fake = t.mock.method(globalThis, 'fetch', async () => {
+    calls++;
+    return calls === 1
+      ? new Response('', { status: 503 })
+      : Response.json({ ready: true });
+  });
+  assert.deepEqual(
+    await fetchJson(
+      'https://example.com/data.json',
+      new AbortController().signal,
+      { delays: [0, 0] },
+    ),
+    { ready: true },
+  );
+  assert.equal(calls, 2);
+  calls = 0;
+  fake.mock.mockImplementation(async (_url, { signal }) => {
+    calls++;
+    return new Promise((_, reject) =>
+      signal.addEventListener(
+        'abort',
+        () => reject(new DOMException('Aborted', 'AbortError')),
+        { once: true },
+      ),
+    );
+  });
+  await assert.rejects(
+    fetchJson('https://example.com/hang.json', new AbortController().signal, {
+      timeoutMs: 10,
+      delays: [0, 0],
+    }),
+  );
+  assert.equal(calls, 3);
+  calls = 0;
+  const lifetime = new AbortController();
+  const pending = fetchJson(
+    'https://example.com/cancel.json',
+    lifetime.signal,
+    { timeoutMs: 1000, delays: [0, 0] },
+  );
+  lifetime.abort();
+  await assert.rejects(pending, { name: 'AbortError' });
+  assert.equal(calls, 1);
+  fake.mock.mockImplementation(async () => Response.json({ recovered: true }));
+  assert.deepEqual(
+    await fetchJson(
+      'https://example.com/retry.json',
+      new AbortController().signal,
+    ),
+    { recovered: true },
   );
 });
