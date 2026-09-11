@@ -27,11 +27,13 @@ def prepare_campus_roads():
         part=g.intersection(campus)
         if part.is_empty:continue
         selected.append(part);records.append({'id':s['id'],'name':t.get('name','未命名主路'),'highway':t['highway'],'lengthMeters':round(axis.intersection(campus).length,2),'sourceUrl':f['properties']['sourceUrl'],'osmVersion':f['properties'].get('osmVersion'),'osmEditedAt':f['properties'].get('osmEditedAt')})
-    area=unary_union(selected)
+    from bridge_joins_data import prepare_joins
+    joins,join_mask=prepare_joins(infra,ss,roads)
+    area=unary_union(selected).difference(join_mask)
     # Reuse existing footprint; remove only intersections under the new finish.
-    overrides={str(i):triangulate(g.difference(area)) for i,g in original.items() if g.intersects(area)}
+    overrides={str(i):triangulate(g.difference(area.union(join_mask))) for i,g in original.items() if g.intersects(area.union(join_mask))}
     ids={r['id'] for r in records};other=unary_union([g for i,g in original.items() if ss[i]['id'] not in ids])
-    curb=area.difference(area.buffer(-.28,join_style=2)).difference(other.buffer(.35))
+    curb=area.difference(area.buffer(-.28,join_style=2)).difference(other.buffer(.35)).difference(join_mask.buffer(.35))
     asphalt=area.difference(curb)
     junctions=[]
     main=[r for r in roads if r[0] in ids]
@@ -56,7 +58,7 @@ def prepare_campus_roads():
     (OUT/'vegetation.json').write_text(json.dumps(kept,separators=(',',':')))
     overview=json.loads((OUT/'overview.json').read_text());overview['trees']=len(kept)
     (OUT/'overview.json').write_text(json.dumps(overview,ensure_ascii=False,indent=2)+'\n')
-    data={'version':1,'scope':'校内同层主路；道路轴线和原路幅保留，小路及支路不作扩建。','basis':'借用崇左桥等下穿路面已有的 asphalt、curb、roadYellow 材质；中心虚线与路缘分带为展示估算，不声称逐条道路实测。','sources':records,'surfaceOverrides':overrides,'layers':layers,'lawn':{'osmId':'way/822812174','polygon':list(lawn.exterior.coords),'basis':'用户现场指正：汇学堂正对的东侧为无树草地；以 OSM 草地轮廓及树冠余量清除示意树。'}}
+    data={'version':1,'scope':'校内同层主路；保留道路轴线，桥下六处接口局部渐变接入，其余路幅及支路保留。','basis':'借用崇左桥等下穿路面已有的 asphalt、curb、roadYellow 材质；中心虚线与路缘分带为展示估算，不声称逐条道路实测。','sources':records,'surfaceOverrides':overrides,'layers':layers,'bridgeJoins':joins,'lawn':{'osmId':'way/822812174','polygon':list(lawn.exterior.coords),'basis':'用户现场指正：汇学堂正对的东侧为无树草地；以 OSM 草地轮廓及树冠余量清除示意树。'}}
     (OUT/'campus-roads.json').write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')))
     report={'roadFeatures':len(records),'roadMeters':round(sum(r['lengthMeters'] for r in records),2),'mainRoadArea':round(area.area,2),'pavingOverlap':round(asphalt.intersection(curb).area+asphalt.intersection(paint).area+curb.intersection(paint).area,8),'uncoveredArea':round(area.difference(unary_union([asphalt,curb,paint])).area,8),'trees':len(kept),'lawnRemainingTrees':sum(lawn.distance(Point(t[:2]))<=4*t[2]/9+1 for t in kept),'basis':data['basis']}
     assert report['pavingOverlap']<1e-5 and report['uncoveredArea']<1e-5 and report['lawnRemainingTrees']==0
