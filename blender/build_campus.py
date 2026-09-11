@@ -197,7 +197,9 @@ for index,b in enumerate(buildings):
     zone='context' if not b['insideCampus'] else 'north' if b['center'][1]>200 else 'west' if b['center'][0]<0 else 'east';b['zone']=zone
     if b['landmark']:
         l=next(l for l in landmarks if l['id']==b['landmark'])
-        if not BASE_ONLY:landmark(l,b,z,C,True).object(l['name'],SOURCE,{'featureId':b['id'],'landmark':l['id'],'layer':'buildings','sourceUrl':b['sourceUrl']})
+        if not BASE_ONLY:
+            obj=landmark(l,b,z,C,True).object(l['name'],SOURCE,{'featureId':b['id'],'landmark':l['id'],'layer':'buildings','sourceUrl':b['sourceUrl']})
+            if l['id']=='huicui':obj['customModel']='huicui';obj['precision']=b['architecture']['precision'];compact_source(obj)
         l['elevation']=round(z,2);l['zone']=zone
     elif zone=='context':
         low=generic(b,False);base['context'].extend(low)

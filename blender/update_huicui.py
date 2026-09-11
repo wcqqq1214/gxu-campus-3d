@@ -1,4 +1,4 @@
-"""Bounded rebuild: Huicui's existing chunk, base LOD and editable source object."""
+"""Bounded rebuild: indexed Huicui LODs, former chunk and editable source object."""
 import sys,json,hashlib
 from pathlib import Path
 import bpy
@@ -13,14 +13,18 @@ sys.argv.append('--base-only')
 try:exec(compile(script.read_text(),str(script),'exec'),ns)
 except SystemExit as e:
     if e.code not in (0,None):raise
-b=next(b for b in ns['buildings'] if b.get('customModel')=='huicui');key=b['chunk']
+b=next(b for b in ns['buildings'] if b.get('customModel')=='huicui');key=ns['chunk_key'](b)
 preserve_geometry(previous_base,ROOT/'public/models/base.glb',['landmark-time-gate'])
 high=ns['generic'](b,True);zone=Mesh()
 for building in ns['buildings']:
-    if building.get('chunk')==key:zone.extend(high if building['id']==b['id'] else ns['generic'](building,True))
+    if not building['landmark'] and building.get('chunk')==key:zone.extend(ns['generic'](building,True))
 ns['export'](key+'.glb',{key:zone})
+ns['export']('huicui.glb',{'landmark-huicui':high})
 manifest=json.loads((ROOT/'public/data/models.json').read_text())
-for entry in [manifest['base']]+[e for e in manifest['zones'] if e['id']==key]:
+for zone in manifest['zones']:
+    zone['featureIds']=[i for i in zone['featureIds'] if i!=b['id']]
+manifest['landmarks']=[e for e in manifest['landmarks'] if e['id']!='huicui']+[{'id':'huicui','url':'models/huicui.glb'}]
+for entry in [manifest['base']]+[e for e in manifest['zones'] if e['id']==key]+[e for e in manifest['landmarks'] if e['id']=='huicui']:
     raw=(ROOT/'public'/entry['url']).read_bytes();entry.update(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
 (ROOT/'public/data/models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 records=[(m.name,tuple(m.diffuse_color),m.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value,m.node_tree.nodes['Principled BSDF'].inputs['Metallic'].default_value) for m in MATERIALS]
@@ -39,7 +43,7 @@ collection=old[0].users_collection[0];mesh=old[0].data
 bpy.data.objects.remove(old[0],do_unlink=True)
 if mesh.users==0:bpy.data.meshes.remove(mesh)
 from huicui import compact_source
-obj=high.object('荟萃楼 · 新闻传播学院共用楼体',collection,{'featureId':b['id'],'chunk':key,'layer':'buildings','customModel':'huicui','sourceUrl':b['sourceUrl'],'precision':b['architecture']['precision']})
+obj=high.object('荟萃楼 · 新闻传播学院共用楼体',collection,{'featureId':b['id'],'landmark':'huicui','layer':'buildings','customModel':'huicui','sourceUrl':b['sourceUrl'],'precision':b['architecture']['precision']})
 compact_source(obj)
 bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'),compress=True)
 assert (ROOT/'blender/gxu-campus.blend').stat().st_size<100*1024*1024
@@ -55,12 +59,12 @@ def signature(doc,binary,node):
     return result
 retained=[]
 for node in a['nodes']:
-    if 'mesh' not in node or node['name']==key:continue
+    if 'mesh' not in node or node['name'] in (key,'landmark-huicui'):continue
     other=next(n for n in c['nodes'] if n.get('name')==node['name'])
     assert signature(a,ab,node)==signature(c,cb,other),node['name']
     retained.append(node['name'])
-changed=[p.name for p in (ROOT/'public/models').glob('*.glb') if before[p.name]!=hashlib.sha256(p.read_bytes()).hexdigest()]
-assert set(changed)<=set(['base.glb',key+'.glb'])
-report={'changedGlbs':sorted(changed),'retainedBaseNodes':retained,'retainedNearAndTreeGlbs':len(before)-2,'initialBytes':manifest['base']['bytes']+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
+changed=[p.name for p in (ROOT/'public/models').glob('*.glb') if before.get(p.name)!=hashlib.sha256(p.read_bytes()).hexdigest()]
+assert set(changed)<=set(['base.glb',key+'.glb','huicui.glb'])
+report={'changedGlbs':sorted(changed),'retainedBaseNodes':retained,'retainedNearAndTreeGlbs':len([n for n in before if n not in ('base.glb',key+'.glb','huicui.glb')]),'initialBytes':manifest['base']['bytes']+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
 (ROOT/'docs/model-checks/huicui-retained-assets.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-print('Huicui source + two LODs updated:',json.dumps(report),flush=True)
+print('Huicui indexed source + two LODs updated:',json.dumps(report),flush=True)

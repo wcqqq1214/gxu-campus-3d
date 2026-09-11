@@ -31,7 +31,18 @@ def prepare_huicui():
                            'footprint':[list(local.exterior.coords)]+[list(r.coords) for r in local.interiors],
                            'hotelEntrance':[0, north], 'arcadeDepth':4.2, 'arcadeClearHeight':6.8,
                            'precision':'荟萃楼为新闻传播学院同一 OSM 建筑北翼；保留整栋关系 ID、轮廓和内院。7 层来自 OSM，总高按 3.3 米/层估算；楼层分段、门窗、雨棚尺寸及未拍到立面均非实测。',
-                           'navigation':'仅精建，仍随普通建筑分区加载，不增加精选导航条目。'})
+                           'navigation':'第 20 处精选地标；支持名称搜索、定位、详情与巡游。'})
+    b['landmark']='huicui'
+    b.pop('chunk',None)
+    catalogue=json.loads((ROOT/'data/landmarks.json').read_text())
+    l=next(l for l in catalogue if l['id']=='huicui').copy()
+    l.update(center=b['center'],bounds=b['bounds'],height=b['height'],elevation=b.get('elevation',0),zone='west',sourceUrl=b['sourceUrl'],osmEditedAt=b['osmEditedAt'],sourceRefs=b['sourceRefs'])
+    lp=ROOT/'public/data/landmarks.json';landmarks=[a for a in json.loads(lp.read_text()) if a['id']!='huicui']+[l]
+    landmarks.sort(key=lambda a:a.get('navigationOrder',0));lp.write_text(json.dumps(landmarks,ensure_ascii=False,separators=(',',':')))
+    op=ROOT/'public/data/overview.json';overview=json.loads(op.read_text());overview['landmarks']=len(landmarks);op.write_text(json.dumps(overview,ensure_ascii=False,indent=2)+'\n')
+    gp=ROOT/'public/data/geography.geojson';geo=json.loads(gp.read_text())
+    next(f for f in geo['features'] if f['id']==FEATURE_ID)['properties']['landmark']='huicui'
+    gp.write_text(json.dumps(geo,ensure_ascii=False,separators=(',',':')))
     path.write_text(json.dumps(buildings, ensure_ascii=False, separators=(',', ':')))
     path = ROOT/'public/data/sources.json'
     sources = json.loads(path.read_text())
@@ -39,6 +50,6 @@ def prepare_huicui():
     ids = {r['id'] for r in refs}
     sources['sources'] = [r for r in sources['sources'] if r['id'] not in ids] + refs
     path.write_text(json.dumps(sources, ensure_ascii=False, indent=2)+'\n')
-    print('Huicui: retained one OSM relation, one courtyard and existing navigation; north entrance', north)
+    print('Huicui: retained one OSM relation and courtyard; curated landmark 20')
 
 if __name__ == '__main__': prepare_huicui()
