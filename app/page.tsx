@@ -12,6 +12,8 @@ import {
   Expand,
   GraduationCap,
   Info,
+  Ellipsis,
+  CircleHelp,
   Layers3,
   LoaderCircle,
   MapPin,
@@ -89,7 +91,7 @@ export default function Home() {
   const detailBack = useRef<HTMLButtonElement>(null);
   const menuScroll = useRef(0);
   const returnPlace = useRef<string | null>(null);
-  const pendingFocus = useRef<'detail' | 'menu' | null>(null);
+  const pendingFocus = useRef<'detail' | 'menu' | 'views' | null>(null);
   const host = useRef<HTMLDivElement>(null),
     controller = useRef<SceneController | null>(null);
   const [buildings, setBuildings] = useState<Building[]>([]),
@@ -122,6 +124,10 @@ export default function Home() {
   const presetEdited = useRef(false);
   const [overviewRetry, setOverviewRetry] = useState(0);
   const [overviewError, setOverviewError] = useState(false);
+  const [panelExpanded, setPanelExpanded] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [helpOpen, setHelpOpen] = useState(false);
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [debug, setDebug] = useState(false);
   const [category, setCategory] = useState<Category | 'all'>('all');
   const [cameraState, setCameraState] = useState<CameraSnapshot | null>(null);
@@ -188,12 +194,16 @@ export default function Home() {
             onSelect: (id, origin = 'manual') => {
               if (active) {
                 setSelected(id);
-                setMore(false);
                 setLandmarkView('oblique');
                 if (id) setTourIndex(ls.findIndex((place) => place.id === id));
                 if (origin !== 'tour') {
+                  setMore(false);
                   setPanelMode(id ? 'detail' : 'menu');
                   setCollapsed(false);
+                  setPanelExpanded(false);
+                  dock.current
+                    ?.querySelector<HTMLInputElement>('input[type="search"]')
+                    ?.blur();
                   if (origin === 'manual') {
                     setTour(false);
                     pendingFocus.current = id ? 'detail' : 'menu';
@@ -270,6 +280,30 @@ export default function Home() {
     return () => preference.removeEventListener('change', update);
   }, []);
   useEffect(() => {
+    const viewport = window.visualViewport;
+    const update = () => {
+      const root = host.current?.parentElement;
+      const height = viewport?.height ?? window.innerHeight;
+      root?.style.setProperty('--app-height', `${height}px`);
+      root?.style.setProperty(
+        '--viewport-top',
+        `${viewport?.offsetTop ?? 0}px`,
+      );
+      setKeyboardOpen(
+        window.innerWidth < 760 && height < window.innerHeight * 0.75,
+      );
+    };
+    update();
+    viewport?.addEventListener('resize', update);
+    viewport?.addEventListener('scroll', update);
+    window.addEventListener('resize', update);
+    return () => {
+      viewport?.removeEventListener('resize', update);
+      viewport?.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+  useEffect(() => {
     if (!ready || !host.current || !dock.current) return;
     const root = host.current.parentElement!;
     const header = root.querySelector<HTMLElement>('.masthead')!;
@@ -319,6 +353,10 @@ export default function Home() {
     if (destination === 'detail') {
       if (body) body.scrollTop = 0;
       detailBack.current?.focus({ preventScroll: true });
+    } else if (destination === 'views') {
+      dock.current
+        ?.querySelector<HTMLButtonElement>('.landmark-views button')
+        ?.focus();
     } else {
       const row = Array.from(
         dock.current?.querySelectorAll<HTMLButtonElement>('[data-place-id]') ??
@@ -330,11 +368,12 @@ export default function Home() {
       )?.focus({ preventScroll: true });
       if (body) body.scrollTop = menuScroll.current;
     }
-  }, [selected, panelMode, collapsed]);
+  }, [selected, panelMode, collapsed, panelExpanded]);
   function returnToMenu() {
     returnPlace.current = selected;
     pendingFocus.current = 'menu';
     setPanelMode('menu');
+    setPanelExpanded(true);
     setCollapsed(false);
   }
   function changeLandmarkView(value: LandmarkView) {
@@ -420,8 +459,26 @@ export default function Home() {
         'tour',
       );
   }
+  function toggleFullscreen() {
+    if (!document.fullscreenEnabled) {
+      notify('当前浏览器不支持全屏，可使用横屏浏览。');
+      return;
+    }
+    const action = document.fullscreenElement
+      ? document.exitFullscreen()
+      : document.documentElement.requestFullscreen();
+    void action.catch(() => notify('当前浏览器不支持全屏，可使用横屏浏览。'));
+  }
+  async function exportView() {
+    try {
+      await controller.current?.exportImage();
+      notify('校园画面已导出');
+    } catch {
+      notify('导出失败，请重试。');
+    }
+  }
   return (
-    <main className="campus-app">
+    <main className={`campus-app ${keyboardOpen ? 'keyboard-open' : ''}`}>
       <div className="scene-host" ref={host} />
       <header className="masthead">
         <button
@@ -459,7 +516,7 @@ export default function Home() {
       </header>
       <aside
         ref={dock}
-        className={`panel-dock ${collapsed ? 'collapsed' : ''}`}
+        className={`panel-dock ${collapsed ? 'collapsed' : ''} ${panelExpanded ? 'expanded' : ''} ${panelMode === 'detail' ? 'detail-mode' : ''}`}
         aria-label="校园探索菜单"
       >
         <div className="dock-heading">
@@ -485,6 +542,19 @@ export default function Home() {
             <small>{collapsed ? '展开' : '收起'}</small>
             <ChevronDown size={16} />
           </button>
+          {!collapsed && (
+            <button
+              className="dock-expand"
+              aria-expanded={panelExpanded}
+              onClick={() => setPanelExpanded((value) => !value)}
+            >
+              {panelExpanded
+                ? '简要'
+                : panelMode === 'detail'
+                  ? '详情'
+                  : '展开面板'}
+            </button>
+          )}
         </div>
         <div
           id="campus-panel-body"
@@ -495,6 +565,37 @@ export default function Home() {
               menuScroll.current = event.currentTarget.scrollTop;
           }}
         >
+          {panelMode === 'detail' && current && !collapsed && (
+            <div className="mobile-place-summary">
+              <p>{currentLandmark?.description ?? current.name}</p>
+              <div className="summary-actions">
+                <button
+                  aria-pressed={landmarkView === 'oblique'}
+                  onClick={() => changeLandmarkView('oblique')}
+                >
+                  全貌
+                </button>
+                <button
+                  aria-pressed={landmarkView === 'entrance'}
+                  onClick={() => changeLandmarkView('entrance')}
+                >
+                  {currentLandmark?.placeKind === 'bridge'
+                    ? '桥下近景'
+                    : currentLandmark?.placeKind === 'sculpture'
+                      ? '雕塑近景'
+                      : '入口近景'}
+                </button>
+                <button
+                  onClick={() => {
+                    pendingFocus.current = 'views';
+                    setPanelExpanded(true);
+                  }}
+                >
+                  更多视角
+                </button>
+              </div>
+            </div>
+          )}
           {panelMode === 'detail' && current ? (
             <section
               className={`place-detail ${more ? 'expanded' : ''}`}
@@ -686,6 +787,7 @@ export default function Home() {
                     <Search size={16} />
                     <Input
                       type="search"
+                      onFocus={() => setPanelExpanded(true)}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="搜索地标，如图书馆、六教"
@@ -848,7 +950,11 @@ export default function Home() {
               {current && (
                 <button
                   className="return-landmark"
-                  onClick={() => setPanelMode('detail')}
+                  onClick={() => {
+                    pendingFocus.current = 'detail';
+                    setPanelMode('detail');
+                    setPanelExpanded(false);
+                  }}
                 >
                   返回 {current.name} <ArrowUpRight size={14} />
                 </button>
@@ -897,6 +1003,11 @@ export default function Home() {
           >
             {tour ? <Pause size={15} /> : <Play size={15} />}
             <span>{tour ? '暂停' : tourStarted ? '继续巡游' : '开始巡游'}</span>
+            {tourStarted && (
+              <small className="mobile-tour-progress">
+                {tourIndex + 1}/{landmarks.length}
+              </small>
+            )}
           </button>
           <button
             className="tour-skip"
@@ -930,7 +1041,7 @@ export default function Home() {
           />
           <span>N</span>
         </button>
-        <div className="tool-stack">
+        <div className="tool-stack zoom-tools">
           <button onClick={() => view('zoomIn')} title="放大">
             <Plus size={19} />
           </button>
@@ -938,7 +1049,7 @@ export default function Home() {
             <Minus size={19} />
           </button>
         </div>
-        <div className="tool-stack">
+        <div className="tool-stack secondary-tools">
           <button onClick={() => view('top')} title="俯视校园">
             <Layers3 size={18} />
           </button>
@@ -948,21 +1059,7 @@ export default function Home() {
           <button onClick={() => view('overview')} title="全景复位">
             <RotateCcw size={18} />
           </button>
-          <button
-            title="全屏"
-            onClick={() => {
-              if (!document.fullscreenEnabled) {
-                notify('当前浏览器不支持全屏，可使用横屏浏览。');
-                return;
-              }
-              const action = document.fullscreenElement
-                ? document.exitFullscreen()
-                : document.documentElement.requestFullscreen();
-              void action.catch(() =>
-                notify('当前浏览器不支持全屏，可使用横屏浏览。'),
-              );
-            }}
-          >
+          <button title="全屏" onClick={toggleFullscreen}>
             <Expand size={18} />
           </button>
           <button
@@ -975,19 +1072,34 @@ export default function Home() {
           <button
             title="导出校园画面"
             disabled={!ready}
-            onClick={() =>
-              void controller.current
-                ?.exportImage()
-                .then(() => notify('校园画面已导出'))
-                .catch(() => notify('导出失败，请重试。'))
-            }
+            onClick={() => void exportView()}
           >
             <Download size={18} />
           </button>
         </div>
+        <div className="tool-stack mobile-tools">
+          <button
+            className="mobile-reset"
+            onClick={() => view('overview')}
+            title="全景复位"
+          >
+            <RotateCcw size={18} />
+          </button>
+          <button
+            className="more-tools-button"
+            onClick={() => setToolsOpen(true)}
+            aria-haspopup="dialog"
+            title="更多工具"
+          >
+            <Ellipsis size={20} />
+            <span>更多</span>
+          </button>
+        </div>
       </div>
       <footer className="map-footer">
-        <span className="gesture-help">拖动旋转 · 右键平移 · 滚轮缩放</span>
+        <button className="gesture-help" onClick={() => setHelpOpen(true)}>
+          操作说明 · 拖动旋转 · 滚轮缩放
+        </button>
         {layers.boundary && (
           <span className="boundary-legend">
             <i />
@@ -1024,6 +1136,115 @@ export default function Home() {
       {debug && metrics && (
         <pre className="debug-metrics">{JSON.stringify(metrics, null, 2)}</pre>
       )}
+      <Dialog open={toolsOpen} onOpenChange={setToolsOpen}>
+        <DialogContent className="tools-dialog">
+          <DialogTitle>校园工具</DialogTitle>
+          <DialogDescription>
+            调整视角、分享画面，或查看操作说明。
+          </DialogDescription>
+          <div className="tools-grid">
+            <button
+              onClick={() => {
+                setToolsOpen(false);
+                view('overview');
+              }}
+            >
+              <RotateCcw size={20} />
+              全景复位
+            </button>
+            <button
+              onClick={() => {
+                setToolsOpen(false);
+                view('north');
+              }}
+            >
+              <Navigation size={20} />
+              正北朝向
+            </button>
+            <button
+              onClick={() => {
+                setToolsOpen(false);
+                view('top');
+              }}
+            >
+              <Layers3 size={20} />
+              俯视校园
+            </button>
+            <button
+              onClick={() => {
+                setToolsOpen(false);
+                view('tilt');
+              }}
+            >
+              <Compass size={20} />
+              倾斜鸟瞰
+            </button>
+            <button
+              onClick={() => {
+                setToolsOpen(false);
+                toggleFullscreen();
+              }}
+            >
+              <Expand size={20} />
+              切换全屏
+            </button>
+            <button
+              disabled={!ready}
+              onClick={() => {
+                setToolsOpen(false);
+                void shareView();
+              }}
+            >
+              <Share2 size={20} />
+              分享当前视角
+            </button>
+            <button
+              disabled={!ready}
+              onClick={() => {
+                setToolsOpen(false);
+                void exportView();
+              }}
+            >
+              <Download size={20} />
+              导出校园画面
+            </button>
+            <button
+              onClick={() => {
+                setToolsOpen(false);
+                setHelpOpen(true);
+              }}
+            >
+              <CircleHelp size={20} />
+              操作说明
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
+        <DialogContent className="tools-dialog">
+          <DialogTitle>怎样游览校园</DialogTitle>
+          <DialogDescription>
+            先搜索地标，或点击“开始巡游”自动探索。
+          </DialogDescription>
+          <dl className="gesture-instructions">
+            <dt>手机触控</dt>
+            <dd>单指拖动旋转；双指拖动平移；双指捏合缩放。</dd>
+            <dt>鼠标与触控板</dt>
+            <dd>拖动旋转，右键拖动平移，滚轮缩放。</dd>
+            <dt>键盘</dt>
+            <dd>
+              Tab 选择控件，Enter 确认。聚焦三维画面后，方向键平移，+ / −
+              缩放，Home 返回全景。
+            </dd>
+            <dt>查看地标</dt>
+            <dd>
+              搜索“六教”等名称或别名，选择全貌、正背面及入口近景。手机点击“更多视角”展开详情。
+            </dd>
+            <dt>暂停巡游</dt>
+            <dd>点击暂停，或直接拖动画面。收起面板后仍可暂停和继续。</dd>
+          </dl>
+        </DialogContent>
+      </Dialog>
       <Dialog
         open={Boolean(shareLink)}
         onOpenChange={(open) => {

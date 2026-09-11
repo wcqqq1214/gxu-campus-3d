@@ -69,7 +69,8 @@ a svg {
 .campus-app {
   position: relative;
   width: 100%;
-  height: 100dvh;
+  height: var(--app-height, 100dvh);
+  top: var(--viewport-top, 0px);
   background: #dce7dd;
   color: var(--foreground);
 }
@@ -1702,4 +1703,165 @@ a svg {
   background: #315e45;
   color: white;
   border: 0;
+}
+
+/* Mobile panel: compact landmark summary, expanded tasks, or fully collapsed. */
+.dock-expand,
+.mobile-place-summary,
+.mobile-tour-progress,
+.map-tools .mobile-tools {
+  display: none;
+}
+.gesture-help {
+  border: 0;
+  background: none;
+  color: inherit;
+  padding: 4px 0;
+  cursor: pointer;
+}
+.tools-dialog {
+  max-height: calc(var(--app-height, 100dvh) - 32px);
+  overflow: auto;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.tools-grid button,
+.summary-actions button,
+.dock-expand {
+  min-height: 44px;
+  border: 1px solid #dce7d6;
+  border-radius: 8px;
+  background: #f2f6ef;
+  color: #315e45;
+  font-size: 14px;
+}
+.tools-grid button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  text-align: left;
+}
+.gesture-instructions dt {
+  font-weight: 600;
+  margin-top: 12px;
+}
+.gesture-instructions dd {
+  margin: 4px 0 0;
+  line-height: 1.7;
+  color: #52674c;
+}
+.metadata-status,
+output.empty-state {
+  display: block;
+}
+@media (max-width: 759px) {
+  .panel-dock {
+    max-height: min(48dvh, calc(var(--app-height, 100dvh) - 150px));
+  }
+  .panel-dock.expanded {
+    max-height: min(76dvh, calc(var(--app-height, 100dvh) - 150px));
+  }
+  .dock-expand {
+    display: block;
+    flex-shrink: 0;
+    padding: 0 9px;
+    margin-left: 4px;
+  }
+  .dock-heading {
+    padding: 3px 12px;
+  }
+  .dock-back {
+    min-width: 36px;
+    width: 36px;
+  }
+  .detail-mode:not(.expanded) .place-detail,
+  .detail-mode:not(.expanded) .campus-minimap {
+    display: none;
+  }
+  .detail-mode:not(.expanded) .mobile-place-summary {
+    display: block;
+    padding: 0 18px 12px;
+  }
+  .mobile-place-summary p {
+    margin: 0 0 10px;
+    color: #52674c;
+    font-size: 14px;
+    line-height: 1.6;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .summary-actions {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .summary-actions button[aria-pressed='true'] {
+    background: #315e45;
+    color: #fff;
+  }
+  .mobile-tour-progress {
+    display: inline;
+    font-size: 12px;
+    margin-left: 4px;
+  }
+  .map-tools {
+    max-height: none;
+    overflow: visible;
+  }
+  .map-tools .secondary-tools {
+    display: none;
+  }
+  .map-tools .mobile-tools {
+    display: block;
+  }
+  .map-tools .more-tools-button {
+    flex-direction: column;
+    gap: 0;
+    height: 48px;
+  }
+  .more-tools-button span {
+    font-size: 11px;
+  }
+  .campus-app:has(.panel-dock.expanded) .map-tools .north-button,
+  .campus-app:has(.panel-dock.expanded) .map-tools .zoom-tools,
+  .campus-app:has(.panel-dock.expanded) .map-tools .mobile-reset {
+    display: none;
+  }
+  .map-footer {
+    gap: 6px;
+    font-size: 10px;
+    right: 76px;
+    flex-wrap: wrap;
+  }
+  .keyboard-open .panel-dock.expanded {
+    max-height: calc(var(--app-height, 100dvh) - 82px);
+  }
+  .keyboard-open .map-tools,
+  .keyboard-open .map-footer,
+  .keyboard-open .panel-tabs,
+  .keyboard-open .category-filters,
+  .keyboard-open .tour-bar,
+  .keyboard-open .return-landmark,
+  .keyboard-open .campus-minimap {
+    display: none;
+  }
+  .keyboard-open .panel-dock .explorer {
+    padding-top: 0;
+  }
+}
+@media (max-height: 560px) and (min-width: 760px) {
+  .map-tools {
+    max-height: calc(var(--app-height, 100dvh) - 120px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  .map-tools > * {
+    flex-shrink: 0;
+  }
 }
