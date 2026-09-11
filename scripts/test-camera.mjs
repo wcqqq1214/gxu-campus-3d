@@ -1,9 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { PerspectiveCamera, Vector3 } from 'three';
+import { Box3, PerspectiveCamera, Vector3 } from 'three';
 import {
   fitBox,
+  fitPoints,
+  campusOverviewPoints,
   landmarkBox,
   landmarkDirection,
   entranceBox,
@@ -14,6 +16,59 @@ const landmarks = JSON.parse(
 const buildings = JSON.parse(
   await readFile(new URL('../public/data/buildings.json', import.meta.url)),
 );
+test('全景按实际校界与屋顶构图，在手机、横屏和桌面完整显示且减少空白', async () => {
+  const boundary = JSON.parse(
+    await readFile(
+      new URL('../public/data/campus-boundary.json', import.meta.url),
+    ),
+  );
+  const points = campusOverviewPoints(boundary.rings, buildings, landmarks);
+  const direction = new Vector3(0.55, 1.1, 1);
+  for (const [width, height, left, top, w, h] of [
+    [1280, 720, 368, 106, 816, 572],
+    [390, 844, 18, 94, 298, 410],
+    [844, 390, 328, 106, 446, 242],
+  ]) {
+    const frame = { left, top, width: w, height: h };
+    const fit = fitPoints(points, direction, frame, { width, height });
+    const old = fitBox(
+      new Box3(new Vector3(-920, -10, -1260), new Vector3(1000, 65, 1300)),
+      direction,
+      frame,
+      { width, height },
+    );
+    assert.ok(
+      fit.position.distanceTo(fit.target) <
+        old.position.distanceTo(old.target) * 0.85,
+    );
+    const camera = new PerspectiveCamera(41, width / height, 1, 30000);
+    camera.setViewOffset(
+      width,
+      height,
+      width / 2 - left - w / 2,
+      height / 2 - top - h / 2,
+      width,
+      height,
+    );
+    camera.position.copy(fit.position);
+    camera.lookAt(fit.target);
+    camera.updateMatrixWorld();
+    for (const point of points) {
+      const p = point.clone().project(camera);
+      const x = ((p.x + 1) * width) / 2,
+        y = ((1 - p.y) * height) / 2;
+      assert.ok(
+        x > left &&
+          x < left + w &&
+          y > top &&
+          y < top + h &&
+          p.z > 0 &&
+          p.z < 1,
+        `${width}x${height}: ${x},${y}`,
+      );
+    }
+  }
+});
 test('手机、桌面及横屏的完整建筑构图避开面板，不截断楼翼或塔楼', () => {
   for (const [width, height, left, top, w, h] of [
     [1280, 720, 368, 106, 816, 572],

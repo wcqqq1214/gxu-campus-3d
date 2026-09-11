@@ -33,7 +33,45 @@ export function fitBox(
   viewport: { width: number; height: number },
   fov = 41,
 ) {
-  const target = box.getCenter(new Vector3());
+  return fitPoints(boxCorners(box), direction, frame, viewport, fov);
+}
+
+function boxCorners(box: Box3) {
+  return [box.min.x, box.max.x].flatMap((x) =>
+    [box.min.y, box.max.y].flatMap((y) =>
+      [box.min.z, box.max.z].map((z) => new Vector3(x, y, z)),
+    ),
+  );
+}
+
+/** Preserve the irregular campus outline and every roof, without fitting empty corners. */
+export function campusOverviewPoints(
+  rings: number[][][],
+  buildings: Building[],
+  landmarks: Landmark[],
+) {
+  return [
+    ...rings.flat().map(([x, y, elevation]) => new Vector3(x, elevation, -y)),
+    ...buildings.flatMap((b) =>
+      boxCorners(
+        new Box3(
+          new Vector3(b.bounds[0], b.elevation, -b.bounds[3]),
+          new Vector3(b.bounds[2], b.elevation + b.height + 10, -b.bounds[1]),
+        ),
+      ),
+    ),
+    ...landmarks.flatMap((l) => boxCorners(landmarkBox(l))),
+  ];
+}
+
+export function fitPoints(
+  points: Vector3[],
+  direction: Vector3,
+  frame: ViewportFrame,
+  viewport: { width: number; height: number },
+  fov = 41,
+) {
+  const target = new Box3().setFromPoints(points).getCenter(new Vector3());
   const back = direction.clone().normalize();
   const right = new Vector3()
     .crossVectors(new Vector3(0, 1, 0), back)
@@ -46,16 +84,14 @@ export function fitBox(
     0.86;
   const usableY = ((tanY * frame.height) / viewport.height) * 0.86;
   let distance = 18;
-  for (const x of [box.min.x, box.max.x])
-    for (const y of [box.min.y, box.max.y])
-      for (const z of [box.min.z, box.max.z]) {
-        const relative = new Vector3(x, y, z).sub(target);
-        distance = Math.max(
-          distance,
-          relative.dot(back) + Math.abs(relative.dot(right)) / usableX,
-          relative.dot(back) + Math.abs(relative.dot(up)) / usableY,
-        );
-      }
+  for (const point of points) {
+    const relative = point.clone().sub(target);
+    distance = Math.max(
+      distance,
+      relative.dot(back) + Math.abs(relative.dot(right)) / usableX,
+      relative.dot(back) + Math.abs(relative.dot(up)) / usableY,
+    );
+  }
   return { target, position: target.clone().addScaledVector(back, distance) };
 }
 

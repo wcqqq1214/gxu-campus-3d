@@ -18,6 +18,8 @@ import {
   bridgeEntrancePose,
   entranceBox,
   fitBox,
+  fitPoints,
+  campusOverviewPoints,
   landmarkBox,
   landmarkDirection,
 } from './camera';
@@ -25,6 +27,7 @@ import { DEFAULT_LAYERS } from './types';
 import { AdaptiveQuality, qualityProfile } from './quality';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
+import type { CampusBoundary } from './boundary';
 import type {
   Building,
   Landmark,
@@ -134,6 +137,7 @@ export function createScene(
   scene.add(fill);
   const layers = { ...DEFAULT_LAYERS };
   const boundaryRoot = new THREE.Group();
+  let overviewPoints: THREE.Vector3[] | null = null;
   scene.add(boundaryRoot);
   let boundaryReady = false,
     boundaryLoading = false,
@@ -536,12 +540,11 @@ export function createScene(
       new THREE.Vector3(-920, -10, -1260),
       new THREE.Vector3(1000, 65, 1300),
     );
-    const { target: t, position: p } = fitBox(
-      box,
-      new THREE.Vector3(0.55, 1.1, 1),
-      frame,
-      { width: host.clientWidth, height: host.clientHeight },
-    );
+    const direction = new THREE.Vector3(0.55, 1.1, 1);
+    const viewport = { width: host.clientWidth, height: host.clientHeight };
+    const { target: t, position: p } = overviewPoints
+      ? fitPoints(overviewPoints, direction, frame, viewport)
+      : fitBox(box, direction, frame, viewport);
     if (animate) moveTo(t, p);
     else {
       controls.target.copy(t);
@@ -996,14 +999,14 @@ export function createScene(
     if (boundaryLoading || boundaryReady || disposed) return;
     boundaryLoading = true;
     try {
-      const response = await fetch(asset('data/campus-boundary.json'), {
-        signal: lifecycle.signal,
-        cache: 'no-cache',
-      });
-      if (!response.ok) throw new Error('boundary');
-      const data = await response.json();
+      const data = await fetchJson<CampusBoundary>(
+        asset('data/campus-boundary.json'),
+        lifecycle.signal,
+      );
       if (disposed) return;
       boundaryRoot.add(createBoundary(data));
+      overviewPoints = campusOverviewPoints(data.rings, buildings, landmarks);
+      if (!selected && autoFramed && !restoredPose?.position) overview();
       boundaryReady = true;
       boundaryFailed = false;
       applyLayers();
