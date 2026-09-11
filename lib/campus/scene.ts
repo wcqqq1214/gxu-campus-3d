@@ -41,7 +41,10 @@ interface Manifest {
 interface Callbacks {
   onStatus: (message: string, error?: boolean, progress?: number) => void;
   onReady: () => void;
-  onSelect: (id: string | null) => void;
+  onSelect: (
+    id: string | null,
+    origin?: import('./types').SelectionOrigin,
+  ) => void;
   onInteract: () => void;
   onMetrics: (m: Metrics) => void;
   onOrbit: (on: boolean) => void;
@@ -346,7 +349,10 @@ export function createScene(
         start: performance.now(),
       };
   }
-  function focus(id: string) {
+  function focus(
+    id: string,
+    origin: import('./types').SelectionOrigin = 'manual',
+  ) {
     const l = landmarks.find((l) => l.id === id);
     if (!l) return;
     selected = id;
@@ -377,7 +383,7 @@ export function createScene(
       mark.geometry.dispose();
       mark.material.dispose();
     } else highlight.add(mark);
-    callbacks.onSelect(id);
+    callbacks.onSelect(id, origin);
     reconcileDetails(true);
   }
   function frameLandmark(animate = true) {
@@ -505,7 +511,7 @@ export function createScene(
   function restoreSnapshot(snapshot: Partial<CameraSnapshot>) {
     if (snapshot.preset) setPreset(snapshot.preset);
     if (snapshot.selected) {
-      focus(snapshot.selected);
+      focus(snapshot.selected, 'restore');
       if (snapshot.view) landmarkView(snapshot.view);
     }
     restoredPose = snapshot.position ? snapshot : null;
@@ -569,7 +575,7 @@ export function createScene(
             m.emissiveIntensity =
               preset === 'night' ? (m.name === 'timeLight' ? 1.8 : 0.16) : 0;
           }
-          if ((/glass$/i.test(m.name) && m.name !== 'courtGlass')) {
+          if (/glass$/i.test(m.name) && m.name !== 'courtGlass') {
             m.emissive.set('#edbd71');
             m.emissiveIntensity = preset === 'night' ? 0.42 : 0;
           }
