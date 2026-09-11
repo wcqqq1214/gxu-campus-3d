@@ -6,6 +6,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 BASE_ONLY='--base-only' in sys.argv
 from geometry import Mesh,material,MATERIALS
 from landmarks import landmark
+from huicui import huicui,compact_source
 from sports import athletics,west_stand
 from infrastructure import road_chunk,bridge,approaches,lake_bridge
 DATA=ROOT/'public/data';MODELS=ROOT/'public/models';MODELS.mkdir(exist_ok=True)
@@ -40,6 +41,8 @@ for name,color,rough,metal in [('tenWall','#e1c7b3',.88,0),('tenTrim','#e8e7de',
     C[name]=material(name,rgb(color),rough,metal)
 for name,color,rough,metal in [('courtGreen','#347e69',.92,0),('courtKey','#bd6447',.92,0),('courtApron','#47746a',.95,0),('courtFrame','#246752',.57,.24),('courtMetal','#879593',.47,.55),('courtOrange','#e5762c',.56,.2),('courtGlass','#a7c7c6',.20,.05)]:
     C[name]=material(name,rgb(color),rough,metal)
+for name,color,rough,metal in [('huicuiWall','#c7b49b',.86,0),('huicuiTrim','#e0d8c8',.78,0),('huicuiGlass','#54747d',.24,.3),('huicuiFrame','#555c5d',.50,.3)]:
+    C[name]=material(name,rgb(color),rough,metal)
 # Original deterministic JPEG textures; packed into both .blend and exported GLBs.
 texture_dir=ROOT/'blender/textures';texture_dir.mkdir(exist_ok=True)
 for name in ['stone','grass','green','road','path','paleRoof','slate','sport','pitch','asphalt']:
@@ -62,6 +65,7 @@ def elevation(x,y):
     return (hh[j*cols+i]*(1-a)+hh[j*cols+i+1]*a)*(1-b)+(hh[(j+1)*cols+i]*(1-a)+hh[(j+1)*cols+i+1]*a)*b
 
 def generic(b,detail):
+    if b.get('customModel')=='huicui':return huicui(b,elevation(*b['center']),C,detail)
     m=Mesh();h=b['height'];cx,cy=b['center'];z=elevation(cx,cy);wall=C['pink'] if b['category']=='living' else C['stone'] if b['category']=='academic' else C['white']
     seed=int(hashlib.sha256(b['id'].encode()).hexdigest()[:8],16)
     if detail and b['category'] in ('academic','living'):
@@ -206,7 +210,9 @@ for index,b in enumerate(buildings):
         for k in range(2):bounds[k]=min(bounds[k],b['bounds'][k]-2);bounds[k+2]=max(bounds[k+2],b['bounds'][k+2]+2)
         if not BASE_ONLY:
             high=generic(b,True);near[key].extend(high)
-            high.object(b['name'],SOURCE,{'featureId':b['id'],'chunk':key,'layer':'buildings','sourceUrl':b['sourceUrl']})
+            obj=high.object('荟萃楼 · 新闻传播学院共用楼体' if b.get('customModel')=='huicui' else b['name'],SOURCE,{'featureId':b['id'],'chunk':key,'layer':'buildings','sourceUrl':b['sourceUrl']})
+            if b.get('customModel')=='huicui':
+                obj['customModel']='huicui';obj['precision']=b['architecture']['precision'];compact_source(obj)
     if index%100==0:print('Buildings',index,'/',len(buildings),flush=True)
 for l in landmarks:
     if l.get('placeKind')=='bridge':
