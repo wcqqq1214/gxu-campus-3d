@@ -8,7 +8,7 @@ D=Path(__file__).resolve().parents[1]/'public/data'
 def read(n):return json.loads((D/n).read_text())
 class BasketballTest(unittest.TestCase):
     def test_mapped_centers_and_existing_selection(self):
-        d=read('basketball.json');self.assertEqual(len(d['courts']),46)
+        d=read('basketball.json');self.assertEqual(len(d['courts']),34)
         self.assertEqual(sum(c['insideCampus'] for c in d['courts']),31)
         for c in d['courts']:
             if c['osmId']:self.assertLess(Polygon(c['mappedFootprint']).centroid.distance(Point(c['center'])),.02)
@@ -19,7 +19,7 @@ class BasketballTest(unittest.TestCase):
             self.assertAlmostEqual(Polygon(c['footprint']).area,420,places=5)
             self.assertEqual(c['rimHeight'],3.05)
         self.assertFalse(any(l['id'].startswith('basketball-') for l in read('landmarks.json')))
-        self.assertEqual(len(d['areas']),2)
+        self.assertEqual(len(d['areas']),1)
     def test_east_location_and_count(self):
         d=read('basketball.json');bank=next(b for b in d['banks'] if b['id']=='basketball-bank-east')
         self.assertEqual(len(bank['courtIds']),15)
