@@ -393,5 +393,7 @@ def prepare_infrastructure():
     prepare_huicui()
     from context_data import prepare_context
     prepare_context()
+    from campus_roads_data import prepare_campus_roads
+    prepare_campus_roads()
 
 if __name__=='__main__':prepare_infrastructure()
