@@ -24,7 +24,7 @@
 
 | 校内建筑 | 紧邻校界建筑 | 精选地标 | 示意树木 |
 | :---: | :---: | :---: | :---: |
-| 435 栋 | 13 栋 | 20 处 | 3,034 株 |
+| 435 栋 | 13 栋 | 20 处 | 3,062 株 |
 
 模型覆盖东、西、北校园，包含两处田径场、31 片室外篮球场，以及农院路和三座主要下穿桥梁。白线标示校园大致范围，农院路按公共道路表示。校外建筑仅保留距校界约 20 米以内的紧邻部分。
 
@@ -38,7 +38,7 @@
 
 建筑轮廓主要来自 **2026-09-09 的 OpenStreetMap 快照**，道路与桥梁使用 2026-09-11 获取的补充数据。建筑外观参考不同年份的公开照片和资料，资料日期不等于当前实景。这是独立开源项目，未经过校园实地测绘。
 
-347 栋建筑使用估算高度；照片没有覆盖的立面、树位及部分设施布局也包含推定。篮球场中 16 片沿用地图定位，东区另有 15 片依据资料估算布置。具体依据与局限见 [数据说明](docs/DATA.md)、[东区篮球场](docs/EAST_BASKETBALL.md) 和 [道路桥梁](docs/INFRASTRUCTURE.md)。
+339 栋建筑仍沿用类型默认高度；另有楼栋按资料层数乘估算层高计算，不能视为实测。照片没有覆盖的立面、树位及部分设施布局也包含推定。篮球场中 16 片沿用地图定位，东区另有 15 片依据资料估算布置。具体依据与局限见 [数据说明](docs/DATA.md)、[东区篮球场](docs/EAST_BASKETBALL.md) 和 [道路桥梁](docs/INFRASTRUCTURE.md)。
 
 ## 本地运行
 
@@ -74,11 +74,11 @@ npm run preview
 ```sh
 python3.12 -m venv work/data-venv
 source work/data-venv/bin/activate
-python -m pip install -r scripts/requirements.txt
+python -m pip install -r scripts/requirements.txt -c scripts/constraints-geodata.txt
 npm run test:data
 ```
 
-[可编辑源文件](blender/gxu-campus.blend) 内含具名对象、材质和打包纹理。修改模型需要 Blender；步骤见 [建模说明](docs/MODELING.md)。[原始数据快照](data/snapshots/) 用于离线恢复，[网页模型](public/models/) 使用 Draco 压缩并按需加载。首屏模型和树木模板约 5.05 MB，脚本、JSON 和解码器另计。
+[可编辑源文件](blender/gxu-campus.blend) 内含具名对象、材质和打包纹理。修改模型需要 Blender；步骤见 [建模说明](docs/MODELING.md)。[原始数据快照](data/snapshots/) 用于离线恢复，[网页模型](public/models/) 使用 Draco 压缩并按需加载。首屏模型和树木模板共 5,012,720 bytes，低于 6 MB（十进制）预算；[省去未使用纹理坐标](docs/EXPORT_ATTRIBUTE_BUDGET.md)后保留原形体与材质，并继续用于[数学学院立面校准](docs/MATHEMATICS_FACADE_PANELS.md)、[数学研究中心校准](docs/MATH_CENTER_CALIBRATION.md)及[东翼外廊](docs/MATH_CENTER_EAST_GALLERIES.md)。脚本、JSON 和解码器另计。
 
 ## 项目文档
 
@@ -87,6 +87,7 @@ npm run test:data
 - [校内主路与汇学堂草地](docs/CAMPUS_ROADS.md)
 - [界面与交互](docs/DESIGN.md)
 - [验证记录](docs/VALIDATION.md) · [近期优化](docs/FIXES.md)
+- [精细校准计划](docs/CAMPUS_REFINEMENT_PLAN.md) · [执行进度](docs/CAMPUS_REFINEMENT_PROGRESS.md) · [楼栋校准依据](docs/BUILDING_CALIBRATIONS.md)
 
 ## 许可
 
