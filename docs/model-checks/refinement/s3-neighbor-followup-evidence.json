@@ -1,0 +1,166 @@
+{
+  "reviewedAt": "2026-09-12T20:19:49.616722+00:00",
+  "scope": "S2/S3 evidence screening; no geometry or visual acceptance claim",
+  "previousGoalTurnClassification": "no-progress: planning document was re-presented without advancing implementation",
+  "sources": [
+    {
+      "id": "maintenance202311",
+      "title": "后勤基建处2023年11月工作简报",
+      "url": "https://ghjjc.gxu.edu.cn/info/1011/2890.htm",
+      "published": "2023-12-22",
+      "photoDate": null,
+      "imageUrl": "https://ghjjc.gxu.edu.cn/__local/4/5F/9A/D3D5DB4F4D85922457D863CD5C0_01D88B10_1093E9.png",
+      "htmlPath": "work/refinement-s3-neighbor-followup/maintenance-2023-11.html",
+      "imagePath": "work/refinement-s3-neighbor-followup/dorm3-maintenance.png",
+      "visualReview": "Both panels show the engineering training center sign; reject association with dormitory 3.",
+      "htmlSha256": "e57c08b42bc059c98f6b59eb2d2d26fd705a26fd454a69efebaeaf35e05fc874",
+      "imageSha256": "4360cf78b85941811967a424f9092f9ae7ac3b3b0452d8e2a8cd40de24c09709",
+      "accessedAt": "2026-09-12T20:19:49.616722+00:00"
+    },
+    {
+      "id": "animalVisit202404",
+      "title": "河南农业大学康相涛院士一行到我院调研交流",
+      "url": "https://dky.gxu.edu.cn/info/1240/3143.htm",
+      "published": "2024-04-18",
+      "photoDate": null,
+      "imageUrl": "https://dky.gxu.edu.cn/__local/5/32/A6/4D5FBB8B5EA9F1485CB96AB11C8_BB1279B6_8B949.jpg",
+      "htmlPath": "work/refinement-s3-neighbor-followup/animal-visit-2024.html",
+      "imagePath": "work/refinement-s3-neighbor-followup/animal-lab-visit.jpg",
+      "visualReview": "Indoor shared laboratory platform with 3F sign; neither external building identity nor total height established.",
+      "htmlSha256": "85fb493ae3bbf091ab70103f05fd7077f6bce8ee91c1ec39c33d6c35f3284137",
+      "imageSha256": "b46ae46d19ebd017138d96bf071cf10a8f08be648d78f40365f346bff7991ecd",
+      "accessedAt": "2026-09-12T20:19:49.616722+00:00"
+    }
+  ],
+  "buildings": [
+    {
+      "id": "way/759158607",
+      "name": "西校园学生宿舍楼3栋",
+      "status": "reviewed-insufficient-exterior-evidence",
+      "sourceRefs": [
+        "maintenance202311"
+      ],
+      "decision": "retain-current-model-pending-locatable-exterior-evidence",
+      "reason": "维修文字同时涉及宿舍和金工车间；紧邻配图两幅均能读到工程训练中心门牌，不能作为宿舍外观依据。",
+      "current": {
+        "levels": 6.0,
+        "height": 19.799999999999997,
+        "heightBasis": "按类型估算",
+        "osmVersion": 1,
+        "tags": {
+          "building": "dormitory",
+          "name": "西校园学生宿舍楼3栋"
+        },
+        "form": {
+          "version": 1,
+          "archetype": "dormitory",
+          "levels": 6.0,
+          "height": 19.799999999999997,
+          "parts": [],
+          "roof": {
+            "type": "flat",
+            "rise": 0,
+            "basis": "默认平顶，未获得逐栋屋顶形制资料",
+            "status": "estimated"
+          },
+          "entrances": [
+            {
+              "id": "fallback-0",
+              "polygon": 0,
+              "center": [
+                73.34405506318588,
+                -527.5120840000848
+              ],
+              "bearing": 180.0695325078848,
+              "width": 2.2,
+              "primary": true,
+              "basis": "最长外边中点的示意入口，位置与朝向待逐栋核对",
+              "status": "estimated"
+            }
+          ]
+        }
+      },
+      "remaining": [
+        "identity-to-footprint correspondence",
+        "total levels and wing heights",
+        "roof",
+        "entrance direction",
+        "visible facades"
+      ],
+      "modelChanged": false,
+      "countsAsCompletedCalibration": false
+    },
+    {
+      "id": "way/880036336",
+      "name": "动物繁殖研究所",
+      "status": "reviewed-insufficient-exterior-evidence",
+      "sourceRefs": [
+        "animalVisit202404"
+      ],
+      "decision": "retain-current-model-pending-locatable-exterior-evidence",
+      "reason": "参访照片展示亚热带农业生物资源保护与利用国家重点实验室的室内共享平台；3F楼层牌不能证明当前地图研究所楼的总层数，也无法定位其外轮廓。",
+      "current": {
+        "levels": 3.0,
+        "height": 9.899999999999999,
+        "heightBasis": "OSM高度或层数",
+        "osmVersion": 2,
+        "tags": {
+          "building": "office",
+          "building:levels": "3",
+          "name": "动物繁殖研究所",
+          "office": "research"
+        },
+        "form": {
+          "version": 1,
+          "archetype": "generic",
+          "levels": 3.0,
+          "height": 9.899999999999999,
+          "parts": [],
+          "roof": {
+            "type": "flat",
+            "rise": 0,
+            "basis": "默认平顶，未获得逐栋屋顶形制资料",
+            "status": "estimated"
+          },
+          "entrances": [
+            {
+              "id": "fallback-0",
+              "polygon": 0,
+              "center": [
+                347.08013357168704,
+                -465.7461819998505
+              ],
+              "bearing": 169.48063579454345,
+              "width": 2.2,
+              "primary": true,
+              "basis": "最长外边中点的示意入口，位置与朝向待逐栋核对",
+              "status": "estimated"
+            }
+          ]
+        }
+      },
+      "remaining": [
+        "identity-to-footprint correspondence",
+        "total levels and wing heights",
+        "roof",
+        "entrance direction",
+        "visible facades"
+      ],
+      "modelChanged": false,
+      "countsAsCompletedCalibration": false
+    }
+  ],
+  "nextCandidate": {
+    "id": "way/759132933",
+    "name": "第三教学楼",
+    "sourceUrl": "https://yjsc.gxu.edu.cn/info/1021/1534.htm",
+    "published": "2022-12-23",
+    "finding": "考场表列出第三教学楼第1至第6层；支持存在六楼，不能仅据最高考场楼层认定建筑恰好六层。",
+    "nextAction": "Locate a named exterior image, cross-check footprint and total floor count, then implement supported height/roof/entrance corrections."
+  },
+  "modelManifestSha256": "01d9b711d2cd5f0e3df83b5c8d7d85206735b489a59de8797454cbfada4f011e",
+  "buildingDataSha256": "f3697d8d92954184681b34817431f227ccf68be33d1bc362c887ed112c86aadf",
+  "completedCalibrationDelta": 0,
+  "wholeS3NeighborsCompleted": 0,
+  "fullPlanCompleted": false
+}

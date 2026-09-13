@@ -1,0 +1,44 @@
+{
+  "emptyOutputFullPreparation": true,
+  "identicalFiles": [
+    "basketball.json",
+    "campus-boundary.json",
+    "campus-roads.json",
+    "infrastructure-map.json",
+    "infrastructure.json",
+    "sites.json",
+    "sources.json",
+    "sports.json",
+    "surfaces.json",
+    "surroundings.json",
+    "terrain.json"
+  ],
+  "changedFiles": {
+    "buildings.json": {
+      "builderOnlyFields": [
+        "chunk",
+        "elevation",
+        "zone"
+      ]
+    },
+    "vegetation-zones.json": "background layout and provenance",
+    "overview.json": [
+      "trees"
+    ],
+    "vegetation.json": "background layout and provenance",
+    "landmarks.json": {
+      "builderOnlyFields": [
+        "elevation",
+        "zone"
+      ]
+    }
+  },
+  "adoptedFiles": [
+    "vegetation.json",
+    "vegetation-zones.json",
+    "overview.json"
+  ],
+  "treesBefore": 3030,
+  "treesAfter": 3111,
+  "passed": true
+}

@@ -1,0 +1,103 @@
+{
+  "reviewedAt": "2026-09-12T13:20:58.141770+00:00",
+  "method": "Direct visual inspection of all eleven saved screenshots; actual loaded representation and quality read from browser report.",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s2-dining/before/dongyuan-southwest-trees-off-day.png",
+      "sha256": "a3692e5c5afdda755928d6691768cacb191672a7c284708afef941516ab1d9ee",
+      "variant": "before",
+      "representation": "near",
+      "scope": "Roof and relative height visible; foreground residential wings partly occlude lower facade. Night lighting renders; not a full entrance review.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/before/bihuyuan-southwest-trees-off-day.png",
+      "sha256": "c2880a3535837f63cfe55f1c2aaf6210d849bb957cac71073631c440f174e8a9",
+      "variant": "before",
+      "representation": "near",
+      "scope": "Two-floor long facade visible after correction. Before view auto-degraded to balanced quality; use only silhouette/row-count evidence, not material or performance comparison.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/before/dongyuan-northeast-trees-off-day.png",
+      "sha256": "c122dd124083c02fc7d9c95f78e035fbca6b05e68205227adfea082218baa121",
+      "variant": "before",
+      "representation": "near",
+      "scope": "Same-quality near comparison: six to four window rows and lower roof relative to residential neighbors visible; generic east entrance remains unverified.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/before/bihuyuan-northeast-trees-off-day.png",
+      "sha256": "dd21d78bbc71cd013fa50239e950e78cdd179fa15ca627f374932b9597d4c347",
+      "variant": "before",
+      "representation": "near",
+      "scope": "Same-quality near comparison: six to two rows on short facade; adjacent foreground roof occludes lower long facade. Flat roof and relative height visible.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/after/dongyuan-southwest-trees-off-day.png",
+      "sha256": "4dc9fde22d9fc554262cd6926f746af584b765a56a87f7a5297931837ef4b065",
+      "variant": "after",
+      "representation": "near",
+      "scope": "Roof and relative height visible; foreground residential wings partly occlude lower facade. Night lighting renders; not a full entrance review.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/after/bihuyuan-southwest-trees-off-day.png",
+      "sha256": "04ce092ab757efa7b824460ffe25d385806256db09508167d9ede638189d622e",
+      "variant": "after",
+      "representation": "near",
+      "scope": "Two-floor long facade visible after correction. Before view auto-degraded to balanced quality; use only silhouette/row-count evidence, not material or performance comparison.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/after/dongyuan-northeast-trees-off-day.png",
+      "sha256": "25d4d4e3d039be9bfcfb48621c91f74517913cde15b44578d6842da6f460551d",
+      "variant": "after",
+      "representation": "near",
+      "scope": "Same-quality near comparison: six to four window rows and lower roof relative to residential neighbors visible; generic east entrance remains unverified.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/after/bihuyuan-northeast-trees-off-day.png",
+      "sha256": "e025f703f9d080efd21403a86526e78f6088f6c254361d53333fe2f28eabe656",
+      "variant": "after",
+      "representation": "near",
+      "scope": "Same-quality near comparison: six to two rows on short facade; adjacent foreground roof occludes lower long facade. Flat roof and relative height visible.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/after/bihuyuan-southwest-trees-on-day.png",
+      "sha256": "4a5178f3e8cfb49fb5491b01cc377ca3ded876dbdbd1f2e9e7a82d133d77edd9",
+      "variant": "after",
+      "representation": "near",
+      "scope": "Two-floor block remains visible with normal vegetation; crowns obscure parts of long facade. Tree locations unchanged.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/after/dongyuan-southwest-trees-off-night.png",
+      "sha256": "dc036e09c56b52787f7dd14d09584ca68b8fcd9ddc50d7bcd33b267852ed81af",
+      "variant": "after",
+      "representation": "near",
+      "scope": "Roof and relative height visible; foreground residential wings partly occlude lower facade. Night lighting renders; not a full entrance review.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-dining/after/dongyuan-southwest-trees-off-day-mobile.png",
+      "sha256": "64cfe71e8a3acb9ee5224a963010f88bfacab15b730d8c5d12eb7659534324fb",
+      "variant": "after",
+      "representation": "base",
+      "scope": "Base representation: flat roof and four-floor mass visible; neighboring roofs partly occlude lower facade; entrance location not verified.",
+      "passedForScope": true
+    }
+  ],
+  "reviewedStates": 11,
+  "scope": "Height, flat roof, relative mass, ordinary canteen facade without residential balconies, mobile base and night rendering.",
+  "limits": [
+    "Unverified entrances and full real facades are not accepted by these screenshots.",
+    "Tree-hidden images diagnose geometry; normal vegetation remains unchanged.",
+    "Bihuyuan southwest before/after quality mismatch is not used for appearance or performance comparison.",
+    "Static frame FPS values are not activity benchmark samples."
+  ],
+  "passed": true
+}

@@ -1,0 +1,420 @@
+{
+  "createdAt": "2026-09-13T01:29:24.688488+00:00",
+  "previousGoalTurnClassification": "progress: implementation-plan verification table updated",
+  "scope": "Mathematics College main entrance three bays/four stone piers and five-storey north end four window columns; retained prior mass partition and grounded landing.",
+  "modelManifestSha256": "e733e7674dacc660d1d4b31df8489fde1d1a3887f6b7f77c57e30566b001b90a",
+  "sourceSha256": "9f9d6d256ff4db53d06a3e17d5dd51b59f93a4aa5c3d63d34f8500554e8a7275",
+  "assets": {
+    "changedBuildingIds": [
+      "way/759129516"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3061,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-n1-n3.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-n1-n3"
+    ],
+    "preservedBaseNodes": 83,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5908320,
+    "initialModelByteChange": 1256,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "e733e7674dacc660d1d4b31df8489fde1d1a3887f6b7f77c57e30566b001b90a",
+    "passed": true
+  },
+  "geometryPassed": true,
+  "visualPassed": true,
+  "cleanPreparationPassed": true,
+  "pythonTests": 89,
+  "negativeControl": "Previous source fails actual north glazing ray check.",
+  "manualImages": 7,
+  "ordinaryBuildingsChecked": 430,
+  "performance": {
+    "browserReport": "s2-mathematics-portal-timed-browser.json",
+    "contextReport": "s2-mathematics-portal-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          50,
+          57,
+          59
+        ],
+        "current": {
+          "medianFPS": 57,
+          "medianTriangles": 4084777,
+          "medianDrawCalls": 544
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 0.95,
+          "medianTriangles": 1.0166913241254485,
+          "medianDrawCalls": 1.0130353817504656
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          28,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1096265,
+          "medianDrawCalls": 283
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0415918441030318,
+          "medianDrawCalls": 1.0559701492537314
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 18368,
+        "observations": 3,
+        "first": {
+          "at": "2026-09-13T01:24:37.965845+00:00",
+          "pid": 18368,
+          "parentPid": 18366,
+          "cpuPercent": 99.9,
+          "elapsed": "00:11",
+          "cumulativeCPUTime": "0:13.78",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:24:58.471769+00:00",
+          "pid": 18368,
+          "parentPid": 18366,
+          "cpuPercent": 80.0,
+          "elapsed": "00:32",
+          "cumulativeCPUTime": "0:32.94",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 20.505924,
+        "cumulativeCPUSecondsAdded": 19.159999999999997
+      },
+      {
+        "pid": 18391,
+        "observations": 5,
+        "first": {
+          "at": "2026-09-13T01:24:48.017106+00:00",
+          "pid": 18391,
+          "parentPid": 90860,
+          "cpuPercent": 97.9,
+          "elapsed": "00:10",
+          "cumulativeCPUTime": "0:08.56",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "last": {
+          "at": "2026-09-13T01:25:28.717452+00:00",
+          "pid": 18391,
+          "parentPid": 90860,
+          "cpuPercent": 76.0,
+          "elapsed": "00:50",
+          "cumulativeCPUTime": "0:44.83",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "observedSeconds": 40.700346,
+        "cumulativeCPUSecondsAdded": 36.269999999999996
+      },
+      {
+        "pid": 18407,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T01:25:08.526394+00:00",
+          "pid": 18407,
+          "parentPid": 18366,
+          "cpuPercent": 100.0,
+          "elapsed": "00:08",
+          "cumulativeCPUTime": "0:09.09",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:25:08.526394+00:00",
+          "pid": 18407,
+          "parentPid": 18366,
+          "cpuPercent": 100.0,
+          "elapsed": "00:08",
+          "cumulativeCPUTime": "0:09.09",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 18422,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T01:25:18.619420+00:00",
+          "pid": 18422,
+          "parentPid": 18366,
+          "cpuPercent": 158.4,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:03.10",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:25:18.619420+00:00",
+          "pid": 18422,
+          "parentPid": 18366,
+          "cpuPercent": 158.4,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:03.10",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 18426,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T01:25:28.717452+00:00",
+          "pid": 18426,
+          "parentPid": 18366,
+          "cpuPercent": 184.5,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:01.98",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:25:28.717452+00:00",
+          "pid": 18426,
+          "parentPid": 18366,
+          "cpuPercent": 184.5,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:01.98",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 18435,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T01:25:38.800785+00:00",
+          "pid": 18435,
+          "parentPid": 18366,
+          "cpuPercent": 95.6,
+          "elapsed": "00:03",
+          "cumulativeCPUTime": "0:04.31",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:25:38.800785+00:00",
+          "pid": 18435,
+          "parentPid": 18366,
+          "cpuPercent": 95.6,
+          "elapsed": "00:03",
+          "cumulativeCPUTime": "0:04.31",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 18447,
+        "observations": 3,
+        "first": {
+          "at": "2026-09-13T01:25:49.084139+00:00",
+          "pid": 18447,
+          "parentPid": 18366,
+          "cpuPercent": 188.5,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:01.12",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:26:09.432253+00:00",
+          "pid": 18447,
+          "parentPid": 18366,
+          "cpuPercent": 77.0,
+          "elapsed": "00:21",
+          "cumulativeCPUTime": "0:19.68",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 20.348114,
+        "cumulativeCPUSecondsAdded": 18.56
+      },
+      {
+        "pid": 18473,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T01:26:19.524449+00:00",
+          "pid": 18473,
+          "parentPid": 18366,
+          "cpuPercent": 60.0,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.33",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:26:19.524449+00:00",
+          "pid": 18473,
+          "parentPid": 18366,
+          "cpuPercent": 60.0,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.33",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 18573,
+        "observations": 3,
+        "first": {
+          "at": "2026-09-13T01:28:10.496299+00:00",
+          "pid": 18573,
+          "parentPid": 18564,
+          "cpuPercent": 396.4,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:01.99",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:28:30.575437+00:00",
+          "pid": 18573,
+          "parentPid": 18564,
+          "cpuPercent": 99.1,
+          "elapsed": "00:21",
+          "cumulativeCPUTime": "0:22.23",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 20.079138,
+        "cumulativeCPUSecondsAdded": 20.240000000000002
+      },
+      {
+        "pid": 18610,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T01:28:40.620304+00:00",
+          "pid": 18610,
+          "parentPid": 18564,
+          "cpuPercent": 496.1,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:02.71",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:28:40.620304+00:00",
+          "pid": 18610,
+          "parentPid": 18564,
+          "cpuPercent": 496.1,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:02.71",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 18619,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T01:28:50.662204+00:00",
+          "pid": 18619,
+          "parentPid": 18564,
+          "cpuPercent": 102.7,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:03.89",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:28:50.662204+00:00",
+          "pid": 18619,
+          "parentPid": 18564,
+          "cpuPercent": 102.7,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:03.89",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 18624,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T01:29:00.713946+00:00",
+          "pid": 18624,
+          "parentPid": 18564,
+          "cpuPercent": 98.8,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:07.31",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T01:29:00.713946+00:00",
+          "pid": 18624,
+          "parentPid": 18564,
+          "cpuPercent": 98.8,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:07.31",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "workPackagePassed": false,
+  "wholeBuildingReviewComplete": false,
+  "fullPlanCompleted": false,
+  "implementationSha256": {
+    "data/building-overrides.json": "e3e5505ff4ac91d42115d081dabf478c5016f1db33f45957f8e0b4b6c2611f15",
+    "data/building-sources.json": "0d14bda86d21534820359427a3e0f2e9f3226de21a5e498fbcbd291eb121724a",
+    "scripts/building_overrides.py": "33d9e1fe4aa4d33bf24a6626070eee9ef899704733bd4cc6d82b131a14551497",
+    "scripts/test_building_overrides.py": "7cc412e83313c4559ebfba79fcb3722cde002beca9a6047fb76f63652a074735",
+    "blender/generic_buildings.py": "75d57e6b9fcd8f4836b22e79d2649d6dd1d8ce1d04c99b321ecd3af08339a16d",
+    "blender/validate_mathematics.py": "cf7d39d660340cd1a6086ed16c110f990df9aa2b9d76747307a0085602509be5",
+    "public/data/buildings.json": "fedc65b193316fca59dcf585fc9f52b6a52a58936fddabdeef07c8347e962da8",
+    "public/data/models.json": "e733e7674dacc660d1d4b31df8489fde1d1a3887f6b7f77c57e30566b001b90a"
+  },
+  "evidenceSha256": {
+    "docs/model-checks/refinement/s2-mathematics-portal-assets.json": "e236ca93eb308a58298f74ac18b12612360a9f53ea677a15b4492febde6abec1",
+    "docs/model-checks/refinement/s2-mathematics-portal-geometry.json": "47d7f5b421ea823cb759ccf921146fb8853e68e23908697d186785bae24b3a28",
+    "docs/model-checks/refinement/s2-mathematics-portal-ordinary-geometry.json": "51a10368ef46cae2a90b25be11a378385f5c9ee9d0a46b935f22f70f0a95e30d",
+    "docs/model-checks/refinement/s2-mathematics-portal-trees-geometry.json": "650de8cedaa7801284d5b46896d05064d1c43d08d27d883f85c8b88d5ca6ed8a",
+    "docs/model-checks/refinement/s2-mathematics-portal-source-preservation.json": "68ede9eccee0d85863dc532416065318bac31b3742ec0ab04de95f2f447b35e0",
+    "docs/model-checks/refinement/s2-mathematics-portal-clean-prepare.json": "72ee5c0c736698d82b7a81b3725c78190c60293d5ac123288bd71833b549be80",
+    "docs/model-checks/refinement/s2-mathematics-portal-visual-review.json": "a7ca39096272413dcc573edf27cd469711e43f0c476c90fe48e4cf66bde37fab",
+    "docs/model-checks/refinement/s2-mathematics-portal-evidence.json": "c9140be59582b9eeb17aa4b39bb1887b92a593f9ef57591c6440725a20e1c75e",
+    "docs/model-checks/refinement/s2-mathematics-portal-before-geometry.json": "13cf4aa89d9177c8f05b0758d46cde4e87916e9b6f39cea4e4a8bfa8f5a85eec",
+    "docs/model-checks/refinement/s2-mathematics-portal-context-browser.json": "c6c5186f594d5074a024e920f34a9eaf9e531f6e0d134e4d4bc5dcde97731b3b",
+    "docs/model-checks/refinement/s2-mathematics-portal-timed-browser.json": "7f90466341cadffbc0c1c112dc93fd176d8a9c197e840f858191df623f987bbe",
+    "docs/model-checks/refinement/s2-mathematics-portal-timed-performance-context.json": "260deb813f903c50ee016df5d92200280fb1fdd510ec77fb006bab0153976f7c"
+  },
+  "limitations": [
+    "Door-bay and window-column counts are photo-supported; dimensions and facade anchoring include estimates.",
+    "Eastern end, complete north portico, staircase lattice and glass strip, actual steps and road-to-door route remain incomplete.",
+    "Existing variable time-gate export preserved from frozen baseline in source and GLBs.",
+    "Performance is the fixed library activity benchmark; mobile viewport is not a physical device test."
+  ],
+  "remaining": [
+    "Complete 20–30 whole ordinary-building reviews, including required library neighbours.",
+    "Complete the library-north sample, remaining S4 courtyard/lakeside work and S5.",
+    "Current-asset same-condition performance acceptance remains pending."
+  ]
+}

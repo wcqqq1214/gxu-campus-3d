@@ -1,0 +1,255 @@
+{
+  "createdAt": "2026-09-13T00:14:29.308631+00:00",
+  "previousGoalTurnClassification": "no progress: plan review only",
+  "scope": "Forestry College south central upper facade: estimated unequal window groups and projecting ledges on solid backing walls.",
+  "modelManifestSha256": "1f46ae82b008f5e0e935283fac9fcee16e619087fa51be3572544672dd65abd5",
+  "sourceSha256": "a89ea19acaa9c993a0e7dd4e35ba373082f9fa80ad1373dd7ff4f09314058b9e",
+  "assets": {
+    "changedBuildingIds": [
+      "relation/11564703"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3061,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-p0-n1.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-p0-n1"
+    ],
+    "preservedBaseNodes": 83,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5905668,
+    "initialModelByteChange": 768,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "1f46ae82b008f5e0e935283fac9fcee16e619087fa51be3572544672dd65abd5",
+    "passed": true
+  },
+  "geometryPassed": true,
+  "visualPassed": true,
+  "cleanPreparationPassed": true,
+  "pythonTests": 83,
+  "nodeTestsRepeated": false,
+  "nodeTestsNote": "No Node/frontend source changed; Python data suite and production Pages build run for this batch.",
+  "manualImages": 7,
+  "ordinaryBuildingsChecked": 430,
+  "performance": {
+    "browserReport": "s2-forestry-facades-timed-browser.json",
+    "contextReport": "s2-forestry-facades-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4086897,
+          "medianDrawCalls": 544
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.017218987106107,
+          "medianDrawCalls": 1.0130353817504656
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          28,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1096839,
+          "medianDrawCalls": 283
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0421372174557477,
+          "medianDrawCalls": 1.0559701492537314
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 13978,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T00:10:56.136339+00:00",
+          "pid": 13978,
+          "parentPid": 90860,
+          "cpuPercent": 28.8,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:00.20",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T00:10:56.136339+00:00",
+          "pid": 13978,
+          "parentPid": 90860,
+          "cpuPercent": 28.8,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:00.20",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 14011,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T00:11:36.309687+00:00",
+          "pid": 14011,
+          "parentPid": 14010,
+          "cpuPercent": 98.2,
+          "elapsed": "00:10",
+          "cumulativeCPUTime": "0:09.04",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "last": {
+          "at": "2026-09-13T00:11:36.309687+00:00",
+          "pid": 14011,
+          "parentPid": 14010,
+          "cpuPercent": 98.2,
+          "elapsed": "00:10",
+          "cumulativeCPUTime": "0:09.04",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 14039,
+        "observations": 2,
+        "first": {
+          "at": "2026-09-13T00:11:46.350666+00:00",
+          "pid": 14039,
+          "parentPid": 14010,
+          "cpuPercent": 97.5,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:04.40",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "last": {
+          "at": "2026-09-13T00:11:56.395802+00:00",
+          "pid": 14039,
+          "parentPid": 14010,
+          "cpuPercent": 98.8,
+          "elapsed": "00:15",
+          "cumulativeCPUTime": "0:14.29",
+          "executable": "(Blender)"
+        },
+        "observedSeconds": 10.045136,
+        "cumulativeCPUSecondsAdded": 9.889999999999999
+      },
+      {
+        "pid": 14138,
+        "observations": 2,
+        "first": {
+          "at": "2026-09-13T00:13:46.962324+00:00",
+          "pid": 14138,
+          "parentPid": 14137,
+          "cpuPercent": 98.2,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:04.91",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "last": {
+          "at": "2026-09-13T00:13:56.995346+00:00",
+          "pid": 14138,
+          "parentPid": 14137,
+          "cpuPercent": 98.1,
+          "elapsed": "00:15",
+          "cumulativeCPUTime": "0:14.68",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "observedSeconds": 10.033022,
+        "cumulativeCPUSecondsAdded": 9.77
+      },
+      {
+        "pid": 14171,
+        "observations": 2,
+        "first": {
+          "at": "2026-09-13T00:14:07.030678+00:00",
+          "pid": 14171,
+          "parentPid": 14137,
+          "cpuPercent": 97.3,
+          "elapsed": "00:06",
+          "cumulativeCPUTime": "0:05.23",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "last": {
+          "at": "2026-09-13T00:14:17.075395+00:00",
+          "pid": 14171,
+          "parentPid": 14137,
+          "cpuPercent": 99.2,
+          "elapsed": "00:16",
+          "cumulativeCPUTime": "0:15.20",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "observedSeconds": 10.044717,
+        "cumulativeCPUSecondsAdded": 9.969999999999999
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "workPackagePassed": false,
+  "wholeBuildingReviewComplete": false,
+  "fullPlanCompleted": false,
+  "implementationSha256": {
+    "data/building-overrides.json": "f9bb237f24e07dfe04e7ef4a50e84cc302fa1927efec017cd4698b0f04a27e99",
+    "scripts/building_overrides.py": "3e3d68f896b0cf743762d4d3c67ec6b31ed1d38d29a6911562d639ef35cf8135",
+    "scripts/facade_bands_data.py": "17684360cab9db67d31e5a2addf450dbd56aab9a90b2c358d0a8199c54a0076f",
+    "scripts/test_building_overrides.py": "93915fefb0bf10e07571e0b0c53b1e3b767775749bc47d9f16a717f5e3d96989",
+    "blender/generic_buildings.py": "f9dbb1e976cbf5c9d2996f3d6ed47bb6066074157a39eae6909b9b6a5399e0f9",
+    "blender/facade_bands.py": "6d49c83775db7de5f8ac0c8c40892c3ceefbbd6ccd5ce31f9717ef85ca8792ee",
+    "blender/validate_forestry_facades.py": "f0a83d1c4322c307947ead485620af37810e2bd13da71963d4c5e40a3c380b20",
+    "blender/build_campus.py": "76927bae5611289bf395ef5bc7a15e0890715b7b90e209771465c2308b0ddaf9",
+    "public/data/buildings.json": "0af1a0aa62cdc3f9938ce511ea8a0592a1d7746fd7806d38e9c25eab3eb245ec"
+  },
+  "evidenceSha256": {
+    "docs/model-checks/refinement/s2-forestry-facades-assets.json": "a6241d7696718039e407ec7b797f914e3c207a6e22fb878ecdf1aea352d1e21e",
+    "docs/model-checks/refinement/s2-forestry-facades-geometry.json": "701d6cdfa0425e174a4207c4415a40f25824371ea9f9ae45e94539b30f1917de",
+    "docs/model-checks/refinement/s2-forestry-facades-entry-geometry.json": "3ebc87aef7907b9ea08f4cd09ed6036f669a904bba51b0a06f8651b33c5a6460",
+    "docs/model-checks/refinement/s2-forestry-facades-ordinary-geometry.json": "3dccdfbd1ff9ab0ddf51a1ad1a68940aed3f50b9856b5345a810a3522c431dc4",
+    "docs/model-checks/refinement/s2-forestry-facades-trees-geometry.json": "65b813f47cfb2e18da369cab3c8f74ad6ef5b0b74bc9051df76d195af49b2cb1",
+    "docs/model-checks/refinement/s2-forestry-facades-source-preservation.json": "541e527cacaf0ff130f2c0db4f3b75f6f2194d67cd1bcc08ac6a6928d49942dd",
+    "docs/model-checks/refinement/s2-forestry-facades-clean-prepare.json": "035e1c021bad31e701eaf44346f2f27245e3895ef2da6c1729e766541b929954",
+    "docs/model-checks/refinement/s2-forestry-facades-visual-review.json": "44904f35969bf44efa3bdd41021a79dce974cbc8f7fa45c84291682761414561",
+    "docs/model-checks/refinement/s2-forestry-facades-evidence.json": "52fecad40a5359ebae3aae842b9a49d7094bcab61d024a42d0a30af140563735",
+    "docs/model-checks/refinement/s2-forestry-facades-before-geometry.json": "fd51dbcce20a53549371298c1d776418d96217a2629fd34c9a3615db0c8814eb",
+    "docs/model-checks/refinement/s2-forestry-facades-accepted-context-browser.json": "b06a76eee6f162414980b7209c0ce5fa18d898a6c95d44b7d9f53b51df5f87f3",
+    "docs/model-checks/refinement/s2-forestry-facades-timed-browser.json": "ba235b68de9385524445fa8ac24f7247e5087c7ec6376136e9c42d38c422878a",
+    "docs/model-checks/refinement/s2-forestry-facades-timed-performance-context.json": "8961f3da5dbcdb9ff045b94a42c9940c8a59babb737cc09091b13ba4a5c3ab59"
+  },
+  "limitations": [
+    "Window counts, splits, positions and dimensions are photo-constrained estimates.",
+    "Ground floor, south ends, entrance stair projection, other facades and roof volumes remain unreviewed.",
+    "Initial near camera occluded lower floors and was replaced; only the final seven originals support visual acceptance.",
+    "Existing non-deterministic time-gate generation was preserved from the frozen baseline in source and GLBs."
+  ],
+  "remaining": [
+    "Complete 20–30 ordinary-building reviews including required library neighbours.",
+    "Complete library-north sample as a whole and remaining S4 courtyard/lakeside work, then S5.",
+    "Current-asset same-condition performance acceptance remains pending."
+  ]
+}

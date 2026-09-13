@@ -1,0 +1,77 @@
+{
+  "reviewedAt": "2026-09-12T22:00:59.512973+00:00",
+  "method": "Individual manual inspection of all seven original before/after PNGs; no composite or generated-image substitutions.",
+  "passed": true,
+  "images": [
+    {
+      "file": "docs/screenshots/refinement/s4-avenue-views/before/bocui-street-trees-on-day.png",
+      "sha256": "11946a5fc7717c3548fa10bfc1b21b577a6e58e38cfe63683b3fb10c0956d5b4",
+      "variant": "before",
+      "mobile": false,
+      "trees": true,
+      "light": "day"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-avenue-views/before/bocui-overhead-trees-on-day.png",
+      "sha256": "3ce9f9420bb86a622e5541b2ac016a881f956c30069f8dcf9d4c9779ff5bfb26",
+      "variant": "before",
+      "mobile": false,
+      "trees": true,
+      "light": "day"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-avenue-views/after/bocui-street-trees-on-day.png",
+      "sha256": "f020efdc848742330cd21f880bb4b376c7a4e6181a1526a1d90e4fa8f4df7e1e",
+      "variant": "after",
+      "mobile": false,
+      "trees": true,
+      "light": "day"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-avenue-views/after/bocui-overhead-trees-on-day.png",
+      "sha256": "1a87a06b8a0870261db2bcc90b93af96476114e248ebd69b75d99a58734fd8f0",
+      "variant": "after",
+      "mobile": false,
+      "trees": true,
+      "light": "day"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-avenue-views/after/bocui-overhead-trees-off-day.png",
+      "sha256": "40fe69146e4e99064f2020df1b2ee5bc4eb768c5af61b3d55c7e4844eff7c9d1",
+      "variant": "after",
+      "mobile": false,
+      "trees": false,
+      "light": "day"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-avenue-views/after/bocui-street-trees-on-night.png",
+      "sha256": "a4d19f0d4c7c1fd0ba19ab5ac548accd881b5c8b85bc306a8ef1f22dfd4758c2",
+      "variant": "after",
+      "mobile": false,
+      "trees": true,
+      "light": "night"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-avenue-views/after/bocui-street-trees-on-day-mobile.png",
+      "sha256": "9e2dedfc93da6edca6293c5dca3644c962149b89341cb1dc251b6de184b8391d",
+      "variant": "after",
+      "mobile": true,
+      "trees": true,
+      "light": "day"
+    }
+  ],
+  "modelManifestSha256": "1e95d2bfbb65f660bf6db04c74ab12b3e6c8b7fc2682f544e7727386a3dc7b00",
+  "observations": [
+    "Matched desktop street and overhead views show aligned tree pairs along the selected road segment, replacing three scattered background trees.",
+    "Junction and mapped path openings remain visible; stems do not visibly occupy carriageways.",
+    "Tree-off overhead preserves the underlying road, auditorium and waterside scene; independent asset checks establish unchanged geometry.",
+    "Night view preserves row placement; mobile desktop-viewport simulation renders the tree rows with the base tree profile."
+  ],
+  "limitations": [
+    "Tree positions, height and spacing are schematic; the captioned reference photo is not geolocated to this exact pilot segment.",
+    "Desktop side panel covers the far-left portion of the scene.",
+    "Static screenshot debug FPS is not an activity performance result.",
+    "Mobile view is a desktop viewport simulation, not a physical-phone check.",
+    "Tree profile metadata identifies the selected quality profile, not proof of loading an individual template asset."
+  ]
+}

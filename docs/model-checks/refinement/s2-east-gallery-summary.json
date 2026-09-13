@@ -1,0 +1,195 @@
+{
+  "buildingId": "way/759129515",
+  "modelManifestSha256": "290489af154933bcb59e669c2d2b2b15a8051e601251d7cbb700968a0fae6360",
+  "sourceSha256": "472acca20878dad3c675cafbb692f51dce75626cc4ac927fb423213e02c518b5",
+  "assets": {
+    "changedBuildingIds": [
+      "way/759129515"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3062,
+    "restoredTreeCandidates": [],
+    "shippingTrees": 3062,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-n1-n3.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-n1-n3"
+    ],
+    "addedBaseNodes": [],
+    "preservedBaseNodes": 87,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5012720,
+    "initialModelByteChange": 3052,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "290489af154933bcb59e669c2d2b2b15a8051e601251d7cbb700968a0fae6360",
+    "passed": true
+  },
+  "pythonTests": 115,
+  "fullOrdinaryBuildingsChecked": 430,
+  "shippingTreesChecked": 3062,
+  "failureBaselines": [
+    {
+      "report": "s2-east-gallery-before-geometry.json",
+      "sourceSha256": "ed72da249d702d7af89bae85d6ffc4246ad594800f9a2c36a14e6929ce9aa8a3",
+      "modelManifestSha256": "207ddda2383c228a675abbf02abab5554461c15eb931425e914eb61e9f792360"
+    },
+    {
+      "report": "s2-east-gallery-unjoined-geometry.json",
+      "sourceSha256": "2f9de4f9b663538d0a9a64847b0e09475797990a3bcbe97aa8dffbaa6c7305fd",
+      "modelManifestSha256": "46e941215f983ec837fd313d5e84a8cf6df629b74e0a3ee44ae14e355297a009"
+    }
+  ],
+  "geometryReport": "s2-east-gallery-joined-geometry.json",
+  "priorCenterRegression": "s2-east-gallery-joined-center-regression-geometry.json",
+  "sourcePreservation": {
+    "passed": true,
+    "nonTreeObjects": 528,
+    "changedObjects": [
+      "第五教学楼"
+    ],
+    "otherNonTreeGeometryUVMaterialsAndTransformsPreserved": true,
+    "sourceTrees": 3062,
+    "allTreeAttributesPreserved": true,
+    "sourceSha256": "472acca20878dad3c675cafbb692f51dce75626cc4ac927fb423213e02c518b5",
+    "previousSourceSha256": "ed72da249d702d7af89bae85d6ffc4246ad594800f9a2c36a14e6929ce9aa8a3"
+  },
+  "visualAcceptancePassed": true,
+  "visualReviewReport": "s2-east-gallery-joined-visual-review.json",
+  "incrementalRoadMaintenancePassed": true,
+  "incrementalReport": "s2-east-gallery-final-incremental-assets.json",
+  "performance": {
+    "browserReport": "s2-east-gallery-timed-browser.json",
+    "contextReport": "s2-east-gallery-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4134737,
+          "medianDrawCalls": 542
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.029126249839461,
+          "medianDrawCalls": 1.0093109869646182
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          30,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1118907,
+          "medianDrawCalls": 286
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0631046375737536,
+          "medianDrawCalls": 1.0671641791044777
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 38278,
+        "observations": 10,
+        "first": {
+          "at": "2026-09-13T06:34:23.052272+00:00",
+          "pid": 38278,
+          "parentPid": 90860,
+          "cpuPercent": 95.1,
+          "elapsed": "00:03",
+          "cumulativeCPUTime": "0:02.26",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T06:35:53.629465+00:00",
+          "pid": 38278,
+          "parentPid": 90860,
+          "cpuPercent": 100.0,
+          "elapsed": "01:33",
+          "cumulativeCPUTime": "1:33.80",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 90.577193,
+        "cumulativeCPUSecondsAdded": 91.53999999999999
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "performanceAcceptancePassed": false,
+  "partialBatchJointAcceptancePassed": false,
+  "partialCalibrationRecords": 12,
+  "newlyAcceptedWholeBuildings": 0,
+  "wholeBuildingAccepted": false,
+  "fullPlanCompleted": false,
+  "pending": [
+    "Current-asset same-condition performance acceptance.",
+    "Remaining main facades, sign-wall openings, precise lower window layout/materials, roof ends and complete road connection.",
+    "20–30 whole ordinary buildings, required library neighbors and complete site sample, remaining S4 courtyard/lakeside and S5."
+  ],
+  "implementationSha256": {
+    "scripts/attached_gallery_data.py": "4a70a307520f0fbc968715301b7f08981c4afcad083a8c7e3585f367d50a5c91",
+    "scripts/building_overrides.py": "8e781cb44900795aae071f144e999bdee2a837688982ac6453b3d581231c4563",
+    "scripts/prepare_geodata.py": "0913cbcf4bc75bd607f8f1eaf27c273d86844091ffab76be846e004fd9558bb4",
+    "scripts/vegetation_exclusions.py": "72b64e1192662fa021be564ff98e57ed484af63d3d555e6b518b8a2d80513410",
+    "scripts/test_attached_gallery_data.py": "758e4043a9f77e85d0355c0685a0ad834295b8e12d07dfcce1a2acc3ba340f7d",
+    "blender/attached_gallery.py": "3218a7c4be57edc5330b38c1d382b224815b0a5ec22d57078a0c1c797425cd45",
+    "blender/generic_buildings.py": "6e333c530f28a7439e44f4ecfb6c42c3cae1ed57cd8268243561dfab18037a82",
+    "blender/gallery_checks.py": "1e60d61ada093abc06491d22b5a611582998e986c551c735cd4611e1b4e92f82",
+    "blender/test_attached_gallery.py": "a588c807f401647b5f7ea15e4a18d4022612528136203da8975194b551cddc6e",
+    "blender/validate_attached_gallery.py": "2f7f2b78093d597a7bec508cebf57ee03a406748f5733b7ab63b6a8c45f04525",
+    "data/building-overrides.json": "f941de2b2f0dd28d672b9945c3bd869c949e913df35600d33989dd23a5881c48",
+    "public/data/buildings.json": "a59941e2ce8cc9cee8c8934c277fb26f56fc8af3fd83407ae29673a6485521c7",
+    "public/data/vegetation.json": "926db97defa43ae0d4031dbe43f9290884c1d8d9861e36cd9daa8c8707ec90f4"
+  },
+  "evidenceSha256": {
+    "s2-east-gallery-joined-geometry.json": "20fed18eb0ee32b6389454a48980c06f14b590b424cd5681dd380331c769c685",
+    "s2-east-gallery-joined-center-regression-geometry.json": "aef7fb17f9bdbc9b1cb1a926347e6e82871c52bb7d68014a13f38bbbd7cdfefc",
+    "s2-east-gallery-joined-ordinary-geometry.json": "c0f97e4f5ff612616955094481c61ea2c11e53c8d3fad9cc79ff6d70d5382118",
+    "s2-east-gallery-joined-trees-geometry.json": "dc969772d038e08f12df3f55ac2e04f018f2994d7c2171307f6559768d9c0d4d",
+    "s2-east-gallery-assets.json": "772bd80f3b5541fce34a080e494dfb11593ee35a78f3ff93feabf472405ca1cb",
+    "s2-east-gallery-source-preservation.json": "226f3ed3e8a0eca9aae373e6edfd138546ffa88da2664d28f8db425646a1569a",
+    "s2-east-gallery-evidence.json": "f0bbc7f41af6e03573388fe661f339d646b8859521989d28cc8e28d213a60e83",
+    "s2-east-gallery-cameras.json": "a845659856532951f93ee267abcbadadd2c093c76983bd8a03776d7f99f77e16",
+    "s2-east-gallery-joined-context-browser.json": "dabb4103cadae1a257bece0269ebe00e7dde6b6162bedb5fb69834c6aed0c197",
+    "s2-east-gallery-final-roads-geometry.json": "09e8071da7fe23dd630f7a435703760c123f1ff792ed2c2d0bd662ebeb103621",
+    "s2-east-gallery-final-incremental-assets.json": "7115b02257007f2f83f88962deecafb665632834c0d2657c87a123685b08040d",
+    "s2-east-gallery-joined-visual-review.json": "dd580c191be728b7a9cf20ca3e100910204faf05dc58ce60475d2d3cd4cfb1f7",
+    "s2-east-gallery-timed-browser.json": "5c48048d120f0ef7e6c7890df7461a7dc8fa08f7fbc77899ac2467c24eb15c2c",
+    "s2-east-gallery-timed-performance-context.json": "3cf2431dccba8e42c74f73ca0d350bb1d6be22bfcc3da285d32cf00d158c208b",
+    "s2-east-gallery-before-geometry.json": "f6b8954a06efe486a6174a8bcb557d104d676969265be333449120c560abaabe",
+    "s2-east-gallery-unjoined-geometry.json": "781f19777c308afde3c4a58be090d144edcf4cfe83c6cc6fc2c3c40a967f4e89"
+  },
+  "logSha256": {
+    "data-tests-joined.log": "c8d1f56c8c0d68193b7ff5290908890724be38cf32f3f35abf80dd92eb599f2e",
+    "gallery-test-final.log": "1ed46d878dd70093a1e136c3154c6e83f302a863cbb9cc24f99e530fa2938125",
+    "build-final.log": "2535c883d90db260f290cef996adcdcc53c2fbed27fda91fd38052e855ad0ef6",
+    "pages-final.log": "22212331c0e4edc98964e15f8686d7472248f15b24d7363fb8c7200d7cb12f41"
+  }
+}

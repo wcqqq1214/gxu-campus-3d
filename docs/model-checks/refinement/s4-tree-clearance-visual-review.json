@@ -1,0 +1,86 @@
+{
+  "date": "2026-09-13",
+  "modelManifestSha256": "89fcd7afbb0af44caf9b5c312ae26ea0dc07f0d04db4ad7a39c14fdffb670704",
+  "vegetationSha256": "e1148d85751eeaf2a2130c539194a7bb62a4d9a14cf00d48e4377b464dcb06a2",
+  "images": [
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-timed/tree-laboratory-collision.png",
+      "sha256": "83a00864703f9e7e834f5b1ac72b8691f04eeafcecdf1684780f014334f667e3",
+      "directlyInspected": true,
+      "observation": "与修改前同镜头相比，实验楼墙面穿出的树冠消除，其他树与建筑保留。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-timed/tree-agriculture-collision.png",
+      "sha256": "a0204fac31ad6eb1e9052f1f26bbb4ca56bedff4f9d27956f638c3ccb1b961bb",
+      "directlyInspected": true,
+      "observation": "与 before-visible 同镜头相比，农学院外墙相交树冠消除，其他庭院树保留。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-timed/library-mobile.png",
+      "sha256": "9916caa8ae35e8da0e4116a1aa84e3b8cc72faedb0dcca450a60810115c8e755",
+      "directlyInspected": true,
+      "observation": "图书馆北入口手机尺寸回归显示正常，非手机真机性能测量。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-layers/near-labels-off.png",
+      "sha256": "0bb06e8d071de97356c786310143785546d325777bebb40ea3a0ea2c66579517",
+      "directlyInspected": true,
+      "observation": "去掉标签后建筑和保留树显示正常。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-layers/roads-off.png",
+      "sha256": "9d0d235964bfc6ad214ea1f6c750b977785bafdedcdb0b32b3d4c1489e05b6d6",
+      "directlyInspected": true,
+      "observation": "道路关闭后保留树位置及建筑净空不变。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-layers/paving-with-buildings-off.png",
+      "sha256": "242ad7f2dff906f1f8754453850b28aa0390a067f5ef300fdfc4f95c00d53a24",
+      "directlyInspected": true,
+      "observation": "建筑关闭时保留树木仍显示。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-layers/layers-restored.png",
+      "sha256": "91f7a1a8a334605913010be4b22cca598ab68767ae92b11f7450cdf801521f4d",
+      "directlyInspected": true,
+      "observation": "建筑/道路恢复后无幽灵树或重复实例。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-layers/vegetation-off.png",
+      "sha256": "a83c436cb96d86eac20be27fff661760115c90cde58a54b4e8f62ecde8a6db86",
+      "directlyInspected": true,
+      "observation": "植被关闭后无残留树冠。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-layers/vegetation-restored.png",
+      "sha256": "91f7a1a8a334605913010be4b22cca598ab68767ae92b11f7450cdf801521f4d",
+      "directlyInspected": true,
+      "observation": "植被恢复后树位及立面净空保持。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-tree-clearance-layers/night-labels-off.png",
+      "sha256": "423caf17fbd43aefd9f1850f719556336162e211617f1772bf4cde67dc346712",
+      "directlyInspected": true,
+      "observation": "夜景显示正常，原穿墙树冠未恢复。",
+      "passed": true
+    }
+  ],
+  "beforeImages": {
+    "laboratory": "docs/screenshots/refinement/s4-tree-clearance-before/tree-laboratory-collision.png",
+    "agriculture": "docs/screenshots/refinement/s4-tree-clearance-before-visible/tree-agriculture-collision.png"
+  },
+  "excludedBeforeImage": "The first agriculture camera was obstructed by a foreground wing; use the corrected before-visible camera.",
+  "browserReport": "s4-tree-clearance-timed-browser.json",
+  "interactionReport": "s4-tree-clearance-layers-interaction.json",
+  "passed": true,
+  "scope": "Manual review of two defect cameras, library mobile viewport and seven layer/night states. Does not replace whole-scene geometry or same-condition performance checks."
+}

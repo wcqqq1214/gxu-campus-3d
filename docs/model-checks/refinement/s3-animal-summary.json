@@ -1,0 +1,135 @@
+{
+  "createdAt": "2026-09-12T18:58:44.795916+00:00",
+  "scope": "Animal college south recessed-entry revision only; not a whole-building or complete-site acceptance.",
+  "buildingId": "relation/11564704",
+  "sourceReport": "s3-animal-evidence.json",
+  "geometryPassed": true,
+  "visualPassed": true,
+  "performance": {
+    "browserReport": "s3-animal-timed-browser.json",
+    "contextReport": "s3-animal-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4059639,
+          "medianDrawCalls": 542
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.010434535442525,
+          "medianDrawCalls": 1.0093109869646182
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          27,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1090521,
+          "medianDrawCalls": 282
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0361343100647038,
+          "medianDrawCalls": 1.0522388059701493
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [],
+    "sameConditionAcceptancePassed": true,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "entryRevisionPassed": true,
+  "wholeBuildingReviewComplete": false,
+  "fullPlanCompleted": false,
+  "assets": {
+    "changedBuildingIds": [
+      "relation/11564704"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3050,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-p0-n1.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-p0-n1"
+    ],
+    "preservedBaseNodes": 82,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5892644,
+    "initialModelByteChange": 548,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "b22befadcf8955dfe9524506840d09afdb2b9a23072265d1cb58ee87119ba046",
+    "passed": true
+  },
+  "sourcePreservation": {
+    "nonTreeObjects": 523,
+    "changedObjects": [
+      "动物科学技术学院"
+    ],
+    "otherNonTreeGeometryUVMaterialsAndTransformsPreserved": true,
+    "sourceTreesBefore": 3050,
+    "sourceTreesAfter": 3050,
+    "removedPositions": [],
+    "survivorAttributesPreserved": true,
+    "passed": true
+  },
+  "tests": {
+    "python": 54,
+    "node": 54,
+    "productionBuildPassed": true
+  },
+  "implementationSha256": {
+    "scripts/building_overrides.py": "008109e33919b1e6ecf9bd5dfb74fdd748ceaa13ba8be493d4e2eba769076e6a",
+    "scripts/test_building_overrides.py": "37e6f41addfaa6fe32aad80d696524010b1f3b0d410506af97660cfd2bd90f01",
+    "blender/generic_buildings.py": "e2b78df9942acfb0cf9545a6b5358eb7898150867b1ef34d5c9959e3a1699838",
+    "blender/validate_animal_entry.py": "887f6ba9be34670baec1508d914c05621fb5650c7bcfcf17bac4e33dc766805f",
+    "data/building-overrides.json": "4f1fa8dbe9e406e7f7ed123c04870deb78c86252c677de0cdd2562f40354f882",
+    "data/building-sources.json": "7abd665566606a19a7ef30a14c81973ee83502ff2d81d9269672e9d6b9ca3e6b",
+    "public/data/buildings.json": "f4302d5a6a2b2e464881a283877d88ba90c755b57b3db5cb45f26c2f98cfd6f7",
+    "public/data/geography.geojson": "e08e4daf64bc6e02eefab5125ab1f4801de8c17b02a71a2e948223acbaa1d400",
+    "public/data/sources.json": "2e26239c5f09c06a0ef5d08c270c1d502e946db40de19106a5c375a192d8853c",
+    "public/data/vegetation.json": "e1148d85751eeaf2a2130c539194a7bb62a4d9a14cf00d48e4377b464dcb06a2",
+    "blender/gxu-campus.blend": "c11b0ae87bb8ed9d75a7a5d4238182dee75fa46f2dd39b7e98395161a688ce10"
+  },
+  "evidenceSha256": {
+    "s3-animal-grounded-portico.json": "6ee5e160406d68221e5806dfe4c85772af02008f244c04febb0d0b8627d49f2b",
+    "s3-animal-geometry.json": "bd2efc51c57a12c690643558d3a761e54df096aec9430771e61272b8046100a7",
+    "s3-animal-tree-clearance.json": "72b46d01abf9bb24702f41b57670d9be06ac9e1e84010514df65d2aee20d703c",
+    "s3-animal-assets.json": "59129d95f0e1bc2bd93d054f382a0e4a506c2f81e8d64fef786c8eba8d6ee10b",
+    "s3-animal-source-preservation.json": "a4f36906ee5fd10d1efe32d9214a67874960151aeb38b8065f6316e73d3a59ee",
+    "s3-animal-agriculture-regression-portico.json": "f7d2c33afddb974c4ed4a90edd96d4c654b96478913aa8f83c1990d7d9f2a8b3",
+    "s3-animal-visual-review.json": "38bcb577c78c9a59e5d8785684632c71c56e448de4ef3d00983218577d15345c",
+    "s3-animal-evidence.json": "ef7a8e057b59c48b62316c0d66b2eb273a75cc7c4e1d9dc6406f310c00b7ef3e"
+  },
+  "pending": [
+    "Resolve questioned five-level wing estimate, rear extent, other entrances and facades.",
+    "Calibrate animal-college forecourt paving and vegetation; normal view still has schematic tree occlusion.",
+    "Complete 20-30 ordinary-building reviews and all six S3 neighbors, then remaining S4 and S5 scope."
+  ]
+}

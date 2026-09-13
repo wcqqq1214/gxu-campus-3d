@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "method": "Isolated copy: displace source hedge upward 3 m, run the actual incremental entry point, then validate source and all shipping assets against terrain and nearby meshes; repeated for each command.",
+  "commands": [
+    {
+      "command": "blender/update_roads.py",
+      "sourceDisplacedByMeters": 3,
+      "actualSourceAndShippingPassed": true,
+      "report": "s4-low-planting-incremental-roads-geometry.json",
+      "reportSha256": "122aace1fcbf0df6c801dd80e0a4daeb2eef92db09a1e8ae2e00d3279cd4e406"
+    },
+    {
+      "command": "blender/update_basketball.py",
+      "sourceDisplacedByMeters": 3,
+      "actualSourceAndShippingPassed": true,
+      "report": "s4-low-planting-incremental-basketball-geometry.json",
+      "reportSha256": "bdc1e803a78d2d3980668b8cbcc89fa3cc0fecb29dc599e2da33783dfee2e200"
+    }
+  ],
+  "mainAssetsUnchanged": true,
+  "mainFingerprints": {
+    "blender/gxu-campus.blend": "7f1b8490f60503232f1f60bd33c03902db1d7f55b9e47c3f9ab527049d2915fb",
+    "public/data/models.json": "8fa197b655efff39378f563ff5af6c97e0531cdc0303835d20675ae7dd9d95ad",
+    "public/models/base.glb": "04157778bd19bc74731cbf0eb589ca76b4d3c965a2ff9ec09979efb9a4aa585a"
+  },
+  "implementationSha256": {
+    "blender/update_roads.py": "4c4a58a94eacb3033881fcef2658aec42034f8583dafd4b6ae10fb3573103230",
+    "blender/update_basketball.py": "178b66ad59eebd08afcca66e775cd955593d71530ad921dde2af3f63e50363f2",
+    "blender/low_planting.py": "e4ff0e0472bee4b6866a4d4ceb31466260dbbc2132903d2b0197456d0e3da08d",
+    "blender/validate_low_planting.py": "d3b3fc6593710ca3cf99a2e902cc2fa9d2c634577a38e80a64250a2df5261996"
+  }
+}

@@ -1,0 +1,518 @@
+{
+  "runs": [
+    {
+      "phase": "s3-corridor-timed",
+      "metrics": {
+        "\u7cbe\u7ec6": {
+          "repeatFPS": [
+            52,
+            53,
+            53
+          ],
+          "medians": {
+            "medianFPS": 53,
+            "medianTriangles": 4060111,
+            "medianDrawCalls": 542
+          }
+        },
+        "\u6d41\u7545": {
+          "repeatFPS": [
+            27,
+            27,
+            27
+          ],
+          "medians": {
+            "medianFPS": 27,
+            "medianTriangles": 1091549,
+            "medianDrawCalls": 282
+          }
+        }
+      },
+      "cpuSamples": 26,
+      "computePids": [
+        90602,
+        90678,
+        90918,
+        90970,
+        91015,
+        91028,
+        91062,
+        91081,
+        91082
+      ],
+      "computeObservations": [
+        {
+          "at": "2026-09-12T19:25:22.066492+00:00",
+          "pid": 90602,
+          "parentPid": 90204,
+          "cpuPercent": 100.0,
+          "elapsed": "00:12",
+          "cumulativeCPUTime": "0:11.39",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:25:32.125402+00:00",
+          "pid": 90602,
+          "parentPid": 90204,
+          "cpuPercent": 98.9,
+          "elapsed": "00:22",
+          "cumulativeCPUTime": "0:20.99",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:25:42.198882+00:00",
+          "pid": 90678,
+          "parentPid": 90204,
+          "cpuPercent": 97.2,
+          "elapsed": "00:03",
+          "cumulativeCPUTime": "0:02.05",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:25:52.235904+00:00",
+          "pid": 90678,
+          "parentPid": 90204,
+          "cpuPercent": 100.0,
+          "elapsed": "00:13",
+          "cumulativeCPUTime": "0:11.01",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:26:13.051538+00:00",
+          "pid": 90678,
+          "parentPid": 90204,
+          "cpuPercent": 94.9,
+          "elapsed": "00:34",
+          "cumulativeCPUTime": "0:28.07",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:26:23.168312+00:00",
+          "pid": 90678,
+          "parentPid": 90204,
+          "cpuPercent": 85.8,
+          "elapsed": "00:44",
+          "cumulativeCPUTime": "0:36.40",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:26:33.494315+00:00",
+          "pid": 90678,
+          "parentPid": 90204,
+          "cpuPercent": 69.2,
+          "elapsed": "00:54",
+          "cumulativeCPUTime": "0:42.66",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:26:43.620981+00:00",
+          "pid": 90678,
+          "parentPid": 90204,
+          "cpuPercent": 88.2,
+          "elapsed": "01:04",
+          "cumulativeCPUTime": "0:50.20",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:26:53.743728+00:00",
+          "pid": 90678,
+          "parentPid": 90204,
+          "cpuPercent": 90.7,
+          "elapsed": "01:14",
+          "cumulativeCPUTime": "0:56.30",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:27:03.883855+00:00",
+          "pid": 90678,
+          "parentPid": 90204,
+          "cpuPercent": 86.8,
+          "elapsed": "01:24",
+          "cumulativeCPUTime": "1:05.20",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:27:14.009888+00:00",
+          "pid": 90678,
+          "parentPid": 90204,
+          "cpuPercent": 88.0,
+          "elapsed": "01:35",
+          "cumulativeCPUTime": "1:13.52",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:27:24.112329+00:00",
+          "pid": 90918,
+          "parentPid": 90204,
+          "cpuPercent": 94.6,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:03.62",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:27:34.270240+00:00",
+          "pid": 90918,
+          "parentPid": 90204,
+          "cpuPercent": 87.1,
+          "elapsed": "00:15",
+          "cumulativeCPUTime": "0:10.27",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:27:44.533415+00:00",
+          "pid": 90918,
+          "parentPid": 90204,
+          "cpuPercent": 287.3,
+          "elapsed": "00:25",
+          "cumulativeCPUTime": "0:28.20",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:27:54.879836+00:00",
+          "pid": 90918,
+          "parentPid": 90204,
+          "cpuPercent": 144.9,
+          "elapsed": "00:35",
+          "cumulativeCPUTime": "0:49.36",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:28:04.936582+00:00",
+          "pid": 90970,
+          "parentPid": 90204,
+          "cpuPercent": 99.4,
+          "elapsed": "00:08",
+          "cumulativeCPUTime": "0:07.73",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:28:14.992076+00:00",
+          "pid": 90970,
+          "parentPid": 90204,
+          "cpuPercent": 99.6,
+          "elapsed": "00:18",
+          "cumulativeCPUTime": "0:17.54",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:28:25.451907+00:00",
+          "pid": 90970,
+          "parentPid": 90204,
+          "cpuPercent": 42.7,
+          "elapsed": "00:29",
+          "cumulativeCPUTime": "0:27.32",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:28:35.499768+00:00",
+          "pid": 91015,
+          "parentPid": 90204,
+          "cpuPercent": 97.8,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:01.98",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:28:45.569114+00:00",
+          "pid": 91028,
+          "parentPid": 90204,
+          "cpuPercent": 46.9,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:01.47",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:28:55.622794+00:00",
+          "pid": 91028,
+          "parentPid": 90204,
+          "cpuPercent": 98.8,
+          "elapsed": "00:12",
+          "cumulativeCPUTime": "0:11.09",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:29:05.686059+00:00",
+          "pid": 91028,
+          "parentPid": 90204,
+          "cpuPercent": 85.5,
+          "elapsed": "00:22",
+          "cumulativeCPUTime": "0:20.96",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:29:15.727017+00:00",
+          "pid": 91062,
+          "parentPid": 90204,
+          "cpuPercent": 99.5,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:07.62",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:29:35.894062+00:00",
+          "pid": 91081,
+          "parentPid": 90860,
+          "cpuPercent": 89.5,
+          "elapsed": "00:04",
+          "cumulativeCPUTime": "0:02.06",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:29:35.894062+00:00",
+          "pid": 91082,
+          "parentPid": 90860,
+          "cpuPercent": 78.7,
+          "elapsed": "00:04",
+          "cumulativeCPUTime": "0:01.95",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        }
+      ],
+      "recordedEnvironmentMatchesOriginal": true,
+      "correctFrozenAssetsVerified": true
+    },
+    {
+      "phase": "s3-corridor-repeat",
+      "metrics": {
+        "\u7cbe\u7ec6": {
+          "repeatFPS": [
+            55,
+            51,
+            48
+          ],
+          "medians": {
+            "medianFPS": 51,
+            "medianTriangles": 4056907,
+            "medianDrawCalls": 554
+          }
+        },
+        "\u6d41\u7545": {
+          "repeatFPS": [
+            28,
+            28,
+            28
+          ],
+          "medians": {
+            "medianFPS": 28,
+            "medianTriangles": 1093525,
+            "medianDrawCalls": 283
+          }
+        }
+      },
+      "cpuSamples": 26,
+      "computePids": [
+        91081,
+        91251,
+        91254,
+        91303
+      ],
+      "computeObservations": [
+        {
+          "at": "2026-09-12T19:30:37.445752+00:00",
+          "pid": 91081,
+          "parentPid": 90860,
+          "cpuPercent": 99.1,
+          "elapsed": "01:06",
+          "cumulativeCPUTime": "1:00.58",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:30:47.526307+00:00",
+          "pid": 91081,
+          "parentPid": 90860,
+          "cpuPercent": 96.6,
+          "elapsed": "01:16",
+          "cumulativeCPUTime": "1:10.67",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:30:57.575816+00:00",
+          "pid": 91081,
+          "parentPid": 90860,
+          "cpuPercent": 98.9,
+          "elapsed": "01:26",
+          "cumulativeCPUTime": "1:18.48",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:31:27.855265+00:00",
+          "pid": 91251,
+          "parentPid": 90860,
+          "cpuPercent": 39.9,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:01.78",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:31:27.855265+00:00",
+          "pid": 91254,
+          "parentPid": 90860,
+          "cpuPercent": 39.6,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:00.25",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:31:37.967816+00:00",
+          "pid": 91254,
+          "parentPid": 90860,
+          "cpuPercent": 86.9,
+          "elapsed": "00:11",
+          "cumulativeCPUTime": "0:10.80",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        {
+          "at": "2026-09-12T19:32:08.640056+00:00",
+          "pid": 91303,
+          "parentPid": 90860,
+          "cpuPercent": 69.0,
+          "elapsed": "00:10",
+          "cumulativeCPUTime": "0:07.20",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:32:18.842380+00:00",
+          "pid": 91303,
+          "parentPid": 90860,
+          "cpuPercent": 63.9,
+          "elapsed": "00:20",
+          "cumulativeCPUTime": "0:16.68",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:32:40.774412+00:00",
+          "pid": 91303,
+          "parentPid": 90860,
+          "cpuPercent": 103.3,
+          "elapsed": "00:42",
+          "cumulativeCPUTime": "0:33.72",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:32:50.946259+00:00",
+          "pid": 91303,
+          "parentPid": 90860,
+          "cpuPercent": 121.1,
+          "elapsed": "00:52",
+          "cumulativeCPUTime": "0:45.90",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:33:01.407171+00:00",
+          "pid": 91303,
+          "parentPid": 90860,
+          "cpuPercent": 93.1,
+          "elapsed": "01:03",
+          "cumulativeCPUTime": "0:56.35",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        {
+          "at": "2026-09-12T19:33:11.706897+00:00",
+          "pid": 91303,
+          "parentPid": 90860,
+          "cpuPercent": 84.2,
+          "elapsed": "01:13",
+          "cumulativeCPUTime": "1:05.21",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        }
+      ],
+      "recordedEnvironmentMatchesOriginal": true,
+      "correctFrozenAssetsVerified": true
+    },
+    {
+      "phase": "s3-corridor-baseline-replay",
+      "metrics": {
+        "\u7cbe\u7ec6": {
+          "repeatFPS": [
+            60,
+            60,
+            60
+          ],
+          "medians": {
+            "medianFPS": 60,
+            "medianTriangles": 4017716,
+            "medianDrawCalls": 547
+          }
+        },
+        "\u6d41\u7545": {
+          "repeatFPS": [
+            28,
+            28,
+            28
+          ],
+          "medians": {
+            "medianFPS": 28,
+            "medianTriangles": 1054422,
+            "medianDrawCalls": 268
+          }
+        }
+      },
+      "cpuSamples": 26,
+      "computePids": [],
+      "computeObservations": [],
+      "recordedEnvironmentMatchesOriginal": true,
+      "correctFrozenAssetsVerified": true
+    },
+    {
+      "phase": "s3-corridor-post-baseline",
+      "metrics": {
+        "\u7cbe\u7ec6": {
+          "repeatFPS": [
+            60,
+            60,
+            60
+          ],
+          "medians": {
+            "medianFPS": 60,
+            "medianTriangles": 4054321,
+            "medianDrawCalls": 542
+          }
+        },
+        "\u6d41\u7545": {
+          "repeatFPS": [
+            29,
+            28,
+            28
+          ],
+          "medians": {
+            "medianFPS": 28,
+            "medianTriangles": 1090757,
+            "medianDrawCalls": 283
+          }
+        }
+      },
+      "cpuSamples": 25,
+      "computePids": [
+        92443
+      ],
+      "computeObservations": [
+        {
+          "at": "2026-09-12T19:43:49.599714+00:00",
+          "pid": 92443,
+          "parentPid": 90860,
+          "cpuPercent": 96.0,
+          "elapsed": "00:03",
+          "cumulativeCPUTime": "0:04.65",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        }
+      ],
+      "recordedEnvironmentMatchesOriginal": true,
+      "correctFrozenAssetsVerified": true
+    }
+  ],
+  "originalBaselineUnchanged": true,
+  "baselineAssetProof": "s3-corridor-baseline-replay-assets.json",
+  "scope": "Diagnostic replay of frozen original S0 assets and preview after two current-asset runs, followed by another current-asset run when available. Runs are sequential; this does not establish the cause of earlier low FPS.",
+  "acceptanceOverride": false,
+  "causalConclusionEstablished": false,
+  "nextAction": "Apply the original S0 performance gate to current assets. Continue planned modeling if it passes; investigate any reproducible regression if it does not. Preserve all earlier conflicting runs.",
+  "evidenceSha256": {
+    "s3-corridor-timed-browser.json": "83526d8edc7929d8f5877daffbd5d0d68a74afbbacc23c722b8dd3ee4c68e9eb",
+    "s3-corridor-timed-performance-context.json": "73d209e893028756eb15878c161b1f9ea97eb612dd5c937100a3f8230cb70fa8",
+    "s3-corridor-repeat-browser.json": "f5241e959c1083c758f4bb997d12ac7f401b9db08a3bca538353a4aa3d46af0f",
+    "s3-corridor-repeat-performance-context.json": "aefa3ce18daf9aeebdd5826bd03f3e48bf268aa2ef9af4a85294702a65d4cb89",
+    "s3-corridor-baseline-replay-browser.json": "4445782e7fef1a3125d2c98dd0797328189f10d0d85f0aa6b3e1eff7472e9b2c",
+    "s3-corridor-baseline-replay-performance-context.json": "4cc79331e32236636eb7875d7e0e94a4bb1be198e554c9b20d992767d4e2b8a5",
+    "s3-corridor-post-baseline-browser.json": "70c330a4e7c97671f53e4f6ce225edbb30981462d790dade016c76db73e05ce9",
+    "s3-corridor-post-baseline-performance-context.json": "6f8bb33b00cf5d0ce4c51ca714c80503362ad2306f27cc1f3cc9bb9eed09ab88"
+  }
+}

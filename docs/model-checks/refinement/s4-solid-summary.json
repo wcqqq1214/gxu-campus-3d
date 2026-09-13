@@ -1,0 +1,142 @@
+{
+  "createdAt": "2026-09-12T21:05:07.780940+00:00",
+  "previousGoalTurnClassification": "progress: third teaching building eight-level calibration implemented and accepted",
+  "scope": "Bidirectional containment in detected closed components, with unchanged current scene assets",
+  "ruleFixPassed": true,
+  "fullPlanCompleted": false,
+  "modelManifestSha256": "1e95d2bfbb65f660bf6db04c74ab12b3e6c8b7fc2682f544e7727386a3dc7b00",
+  "sourceBeforeSha256": "968fa885b408041df1c4e2b68cd94d495e3cefcda27489715a0811c361d90e68",
+  "sourceAfterSha256": "1bab1a4779e65c1693ffa369821657deb090dac0e4b3b78053d0a8eea8325642",
+  "regressionGroups": {
+    "surfaceLODAndStability": 5,
+    "containment": 10,
+    "spatialIndexEquivalence": 2
+  },
+  "completeModelBuildPassed": true,
+  "productionBuildPassed": true,
+  "unchangedGLBFiles": 69,
+  "sourcePreservation": {
+    "nonTreeObjects": 523,
+    "changedObjects": [],
+    "allNonTreeGeometryUVMaterialsAndTransformsPreserved": true,
+    "sourceTreesBefore": 3050,
+    "sourceTreesAfter": 3050,
+    "removedPositions": [],
+    "survivorAttributesPreserved": true,
+    "passed": true
+  },
+  "currentTreeCount": 3050,
+  "generatedClearance": {
+    "inputTrees": 3050,
+    "retainedTrees": 3050,
+    "removed": [],
+    "testedPairs": 1444,
+    "clearanceMeters": 0.03,
+    "treeLODs": [
+      "near",
+      "base"
+    ],
+    "buildingLODs": [
+      "base",
+      "near"
+    ],
+    "testedClosedBuildingComponents": 166498,
+    "testedOpenBuildingComponents": 40682,
+    "method": "Final grounded trees versus buildings in both LODs: 3D AABB, BVH surface overlap, then bidirectional containment in closed orientable components.",
+    "limitations": "Open/non-manifold components are not capped; containment is only established for detected closed shells. Does not replace sourced no-tree masks or final road/sports/water/entrance exclusions."
+  },
+  "decodedAndSourceAudit": {
+    "modelManifestSha256": "1e95d2bfbb65f660bf6db04c74ab12b3e6c8b7fc2682f544e7727386a3dc7b00",
+    "vegetationSha256": "e1148d85751eeaf2a2130c539194a7bb62a4d9a14cf00d48e4377b464dcb06a2",
+    "source": {
+      "trees": 3050,
+      "buildingMeshes": 452,
+      "treeLODs": [
+        "near"
+      ],
+      "testedPairs": 301,
+      "testedClosedBuildingComponents": 140892,
+      "testedOpenBuildingComponents": 4540,
+      "templateClosedComponents": {
+        "near": {
+          "0": 9,
+          "1": 6,
+          "2": 1
+        }
+      },
+      "collisions": [],
+      "passed": true
+    },
+    "shipping": {
+      "trees": 3050,
+      "buildingMeshes": 95,
+      "treeLODs": [
+        "base",
+        "near"
+      ],
+      "testedPairs": 7290,
+      "testedClosedBuildingComponents": 303750,
+      "testedOpenBuildingComponents": 82488,
+      "templateClosedComponents": {
+        "base": {
+          "0": 9,
+          "1": 6,
+          "2": 1
+        },
+        "near": {
+          "0": 9,
+          "1": 6,
+          "2": 1
+        }
+      },
+      "collisions": [],
+      "passed": true
+    },
+    "passed": true,
+    "scope": "Saved source and decoded base/all ordinary near chunks/all landmark meshes versus shipping tree transforms. Surface intersections and bidirectional containment in detected closed orientable components. Shared shell primitive with independent asset loading; no capping of open/non-manifold meshes or whole-site road/sports/water clearance proof.",
+    "sourceSha256": "968fa885b408041df1c4e2b68cd94d495e3cefcda27489715a0811c361d90e68",
+    "meshVolumesSha256": "d05f7eefe65e0f40556fc668122736e21b89d5219fc9c0bf27852f90dea089b9"
+  },
+  "auditApplication": "Audited source geometry before rebuilding is preserved after integration; all audited GLBs and tree rows are byte-identical. Source-file byte hashes differ, so geometry/transform preservation is the explicit bridge.",
+  "changedPublicData": [
+    "vegetation-zones.json: clearance method description only"
+  ],
+  "initialModelBytes": 5897824,
+  "maximumOrdinaryNearBytes": 1684868,
+  "browserAndPerformanceRerun": false,
+  "browserAndPerformanceReason": "No frontend code edited; every model and tree row unchanged. No new FPS or visual-result claim is made.",
+  "interruptedDiagnostic": {
+    "exitCode": 143,
+    "reason": "Stopped the known audit process to add spatial indexing; its incomplete output is not acceptance evidence",
+    "log": "work/refinement-s4-solid-clearance/current-audit.log"
+  },
+  "implementationSha256": {
+    "blender/mesh_volumes.py": "d05f7eefe65e0f40556fc668122736e21b89d5219fc9c0bf27852f90dea089b9",
+    "blender/tree_clearance.py": "3de9108c010c89f6a8613eb39831cdaeec0c65db992bb6b47f3687228a64a7b1",
+    "blender/test_tree_clearance.py": "3597771905d966f2417a58001dc04f980217e8855f49bbb5c0f882689060205f",
+    "blender/validate_tree_clearance.py": "7a218c5e7c7a34852c2107b073de82b8a313f1cf8ca81583c4f0d46cdcda29cb",
+    "blender/build_campus.py": "c007eaac3c28160f518b0a831a0b71dc88a39a9c012fe728c6c6ba37d635a6f6",
+    "blender/gxu-campus.blend": "1bab1a4779e65c1693ffa369821657deb090dac0e4b3b78053d0a8eea8325642",
+    "public/data/models.json": "1e95d2bfbb65f660bf6db04c74ab12b3e6c8b7fc2682f544e7727386a3dc7b00",
+    "public/data/vegetation.json": "e1148d85751eeaf2a2130c539194a7bb62a4d9a14cf00d48e4377b464dcb06a2",
+    "public/data/vegetation-zones.json": "d2d53e7d727e379d51a61b7d3cdca57a7bd16942eebe012684b503d53e5f8f40"
+  },
+  "evidenceSha256": {
+    "s4-solid-before-indexed-geometry.json": "3c6b610d0bf4e7ddcba3328023e5c1c80a03ab9b9a8a8b6fa27bdd4bcd648c61",
+    "s4-solid-source-preservation.json": "0a507fdb9fd65f5e7873304f0d4f8c6dd56f3e644e7ee2eb2b318beda59a497c",
+    "tree-building-clearance.json": "ffb8e4b022bebfdf714c6ca8b0fbd7f7d29e5618292c327905d35ffd56e69347"
+  },
+  "logsSha256": {
+    "before-test.log": "7556786389c73839f2bfda0eed3683eb99bd348a94c7256456cec863194cced0",
+    "final-test.log": "94dff02b58871f0ca4cddd7bbe0b49901eff91a58092e55d470bdde70fbd2ab4",
+    "indexed-audit.log": "a7f89c7427910b3a95642d356bb1c9b7962583690c7e57ac043d6b2b13f93683",
+    "model-build.log": "efeee9bba8848c5a678adcad518113fbbe8280fda529d80719a5bea651dd0a52",
+    "source-preservation.log": "91ba65e77952555e207cacd6eff5ac5f5a78816935f3fadf2643aab30c4a86cc",
+    "pages-build.log": "f439e5e2f418caa51d4417f0839812022e392fbb5c880be8bac7a6554b122ff6"
+  },
+  "remaining": [
+    "Open/non-manifold meshes, including uncapped ordinary bodies, are not proven solid by this check",
+    "Complete unified final road/water/sports/entrance exclusions and sourced planting categories",
+    "Finish S2 20–30 buildings, all S3 neighbors and remaining S4/S5"
+  ]
+}

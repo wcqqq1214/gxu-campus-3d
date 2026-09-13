@@ -1,0 +1,266 @@
+{
+  "createdAt": "2026-09-13T03:37:10.725043+00:00",
+  "buildingId": "way/759129516",
+  "scope": "South entrance three risers and 91.566 m² forward connection to mapped service road.",
+  "modelManifestSha256": "d43eada7f5dc301f9621763061343d729ae374d7d95f8bd5a03dec0717dc8202",
+  "sourceSha256": "073567b60beb8f3f180148f13bc4006485a2b2e8e3a12d7fe75899fb03647352",
+  "assets": {
+    "changedBuildingIds": [
+      "way/759129516"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3061,
+    "restoredTreeCandidates": [
+      [
+        -229.9,
+        -861.4,
+        16.6,
+        0,
+        2.127502
+      ]
+    ],
+    "shippingTrees": 3062,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-n1-n3.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-n1-n3",
+      "roads",
+      "terrain"
+    ],
+    "addedBaseNodes": [
+      "site-mathematics-south-connection"
+    ],
+    "preservedBaseNodes": 82,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5999548,
+    "initialModelByteChange": 25748,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "d43eada7f5dc301f9621763061343d729ae374d7d95f8bd5a03dec0717dc8202",
+    "passed": true
+  },
+  "pythonTests": 101,
+  "syntheticConnectionCases": 4,
+  "roadContactUVRegressionPassed": true,
+  "generatedAndActualOrdinaryBuildings": 430,
+  "sourceAndShippingTreesAudited": 3062,
+  "directFinalGeometryReports": [
+    "s3-mathematics-south-geometry.json",
+    "s3-mathematics-south-north-geometry.json",
+    "s3-mathematics-south-road-uv.json"
+  ],
+  "reusedPreUVReports": [
+    "s3-mathematics-south-building-geometry.json",
+    "s3-mathematics-south-ordinary-geometry.json",
+    "s3-mathematics-south-library-geometry.json",
+    "s3-mathematics-south-trees-geometry.json",
+    "s3-mathematics-south-source-preservation.json"
+  ],
+  "reuseProof": "s3-mathematics-south-uv-preservation.json",
+  "reuseScope": "Reports retain their pre-UV fingerprints. Exact geometry/material/transform equality and unchanged compressed building/tree assets establish applicability after only south contact UV changed. No claim of rerunning the full audits after UV repair.",
+  "negativeControls": [
+    "Old source missing the new connection fails.",
+    "Zero-base stair preflight fails and remains recorded."
+  ],
+  "restoredTreeEvidence": "s3-mathematics-south-restored-tree.json",
+  "visualAcceptancePassed": true,
+  "visualReviewReport": "s3-mathematics-south-visual-review.json",
+  "performance": {
+    "browserReport": "s3-mathematics-south-timed-browser.json",
+    "contextReport": "s3-mathematics-south-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4099783,
+          "medianDrawCalls": 547
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0204262819970351,
+          "medianDrawCalls": 1.0186219739292366
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          28,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1103749,
+          "medianDrawCalls": 275
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0487026004997673,
+          "medianDrawCalls": 1.0261194029850746
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 26715,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T03:32:21.858555+00:00",
+          "pid": 26715,
+          "parentPid": 90860,
+          "cpuPercent": 99.6,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:02.19",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T03:32:21.858555+00:00",
+          "pid": 26715,
+          "parentPid": 90860,
+          "cpuPercent": 99.6,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:02.19",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 26857,
+        "observations": 4,
+        "first": {
+          "at": "2026-09-13T03:35:52.895402+00:00",
+          "pid": 26857,
+          "parentPid": 90860,
+          "cpuPercent": 100.0,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:02.28",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T03:36:23.029094+00:00",
+          "pid": 26857,
+          "parentPid": 90860,
+          "cpuPercent": 100.0,
+          "elapsed": "00:33",
+          "cumulativeCPUTime": "0:32.16",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 30.133692,
+        "cumulativeCPUSecondsAdded": 29.879999999999995
+      },
+      {
+        "pid": 26858,
+        "observations": 4,
+        "first": {
+          "at": "2026-09-13T03:35:52.895402+00:00",
+          "pid": 26858,
+          "parentPid": 90860,
+          "cpuPercent": 100.0,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:02.26",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T03:36:23.029094+00:00",
+          "pid": 26858,
+          "parentPid": 90860,
+          "cpuPercent": 98.8,
+          "elapsed": "00:33",
+          "cumulativeCPUTime": "0:32.14",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 30.133692,
+        "cumulativeCPUSecondsAdded": 29.880000000000003
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "performanceAcceptancePassed": false,
+  "workPackageAccepted": false,
+  "wholeBuildingAccepted": false,
+  "fullPlanCompleted": false,
+  "budgetHeadroomBytes": 452,
+  "pending": [
+    "Current-asset same-condition performance acceptance.",
+    "Free geometry budget before further additions; do not raise the 6 MB limit.",
+    "Mathematics east end/height boundary, stair lattice, vertical glazing and other primary facades remain incomplete.",
+    "Complete 20–30 whole ordinary-building calibrations; 11 partial records do not establish whole-building acceptance.",
+    "Complete required library neighbors and the full north-entrance sample, remaining S4 courtyard/lakeside and S5."
+  ],
+  "implementationSha256": {
+    "data/building-overrides.json": "b567f2b7e5e6dfa88558df539860972bd28556c9359027280ae00e566c840203",
+    "data/site-overrides.json": "0a293b3406fe3d3f995945c8e39a444edc931ef7a32898a774c6fd321b8ee561",
+    "scripts/entrance_stairs_data.py": "c2af94f0e415f652ce7077589113673c7a3e1c085d1b7ca4f6188455787691be",
+    "scripts/front_connection_data.py": "417b280f3f29b06295b342d1c030547ac8e62bf4260398565dcfd979da3c8fcc",
+    "scripts/building_overrides.py": "99cab07bf154ab58b511d6d7508b987bb55de68df20e99879a5a3fa27b4cdb10",
+    "scripts/site_data.py": "e8fdf03036cfd00e4ea0a0390bf8de6a9579ee448faffecaeb9c15a5866cb496",
+    "scripts/side_connection_data.py": "a6221190eedc160a92664e87bcad775963bd89799f3562da0f3ccc9f637257bd",
+    "scripts/vegetation_exclusions.py": "247f07800c35a244a885cf9a280ef14df2b54156634505f4106b1e7e5edbc911",
+    "scripts/low_planting_contract.py": "ceb539402d9f71df576f348b8a0a312ebe7c6bfa50fd667c4684bc9381acbd5d",
+    "scripts/test_building_overrides.py": "86efd2a656dd365dcda26c2efe9ebd32cc8467b9319ae17504fd74b29f848c2c",
+    "scripts/test_front_connection_data.py": "6c9353cff5018f8c7a5f866b25a88f3f8dcab7b63bd5ee42de6a38ce474234ac",
+    "scripts/test_side_connection_data.py": "6b01fda405f7af461d0d8e4117f6f4e33376246f5ed97d7f30224d22006e5dcc",
+    "blender/build_campus.py": "e9072f3048bcd750dcde2de17851f8aecd0aa69d36b7a3b393c1a9df0002a6f7",
+    "blender/generic_buildings.py": "430eb2ce5df72e1a8c8035a24eca8a55b0ad9e9f855d04a5582a02a1efe0ef9b",
+    "blender/geometry.py": "83890c6b80dc5c4e90a627135ba1c7fa546fbb98b713e338b3e1e55e47baa31a",
+    "blender/site_geometry.py": "ebf5ec652d58e44627f0ff6c91dd1feaaa2b88e16a2616883d1c2f5ee681d9e2",
+    "blender/side_connection.py": "2cfce97aecde7e5f77f1b17af6274eaf9ba99257675be781d3b674a8363c7f1a",
+    "blender/test_side_connection.py": "da5640ccc83bf0d4e03253a07c2b0f7172b97fd1f08341e15b96e5bf4d51564c",
+    "blender/validate_mathematics.py": "ba9bde6d9e544b271740d853a7832deb9dc8fe7804e08482da8b05ef0f779891",
+    "blender/validate_generic.py": "cefde8384b4d1af4a34d30e221feb479512502914d4af267ae75d08a6622b7c0",
+    "blender/validate_side_connection.py": "92a5914c4ba89cb6dc5ac233f0df4c567471a0b598f03e78a6aa598cefcbaad8",
+    "public/data/buildings.json": "8491933ee752ccbfaed7e2f876b099fc11ee7f72084a66dbbce5fac5818403af",
+    "public/data/sites.json": "a769afccaf12f4c7edc0f24b8d770f2411986f6228fafad8087f33359358ff2f",
+    "public/data/vegetation.json": "926db97defa43ae0d4031dbe43f9290884c1d8d9861e36cd9daa8c8707ec90f4",
+    "scripts/check-building-context-browser.mjs": "65430aadb9e90230df43c8c2eb741fdc7dac9e99a51ab91dd2afff00fbd43a13",
+    "scripts/check-refinement-browser.mjs": "92f357be4185b9b0514d18f17585c752b675dc44d5aa1636558eac3c98b159fd"
+  },
+  "evidenceSha256": {
+    "s3-mathematics-south-assets.json": "8598df0f99fafd499f8f2388c6d60f9c68357cd78b19f312fbe4473d49347a01",
+    "s3-mathematics-south-geometry.json": "168aaac76b730bfcbe0cfd44d330d4db560998437f019c0d1c776f77ecf5af81",
+    "s3-mathematics-south-north-geometry.json": "b9fd6230dc6d12ae933e3855846e2a48f1c08f1a6ca1c1e72d5271516854d80c",
+    "s3-mathematics-south-road-uv.json": "b79ce31f487acf764630122363d8caffb939ff557b0cad33422c0afba64eedf9",
+    "s3-mathematics-south-uv-preservation.json": "079eaf1f88f96ed1a6b23a3ffd4dcc0692689962795de55b6169bbeba4c8906c",
+    "s3-mathematics-south-clean-prepare.json": "5d8675ccf0a1bca854c1b984835f4a9efcefb63ea5198c4a71ee25ac5ad49579",
+    "s3-mathematics-south-building-geometry.json": "a6bc69ff46c822ad4bc59760588f192439fb3057044229fc6b70608baa6c7ba5",
+    "s3-mathematics-south-ordinary-geometry.json": "dfa15e7d2774bae6f9fb0597efc8ca4664cc2842bfc8a5901e89b9deffa01bf7",
+    "s3-mathematics-south-library-geometry.json": "4a5cace1db855035fd12bbc40d05799f56e2238ae853e4b4ada1ff25fc21096b",
+    "s3-mathematics-south-trees-geometry.json": "d92d758a39e2b27bfa5ac239430d18a103088ed8dbc931faaaa8a83b92af448d",
+    "s3-mathematics-south-source-preservation.json": "28b798b036bd690b74fbe0b705a60313fb16791ae99945e578f5c5dddf96aec6",
+    "s3-mathematics-south-before-geometry.json": "cc36a3e902ddbaf38643f3c5000b9d47c79264d971dbb972f54996e58fda9cdb",
+    "s3-mathematics-south-ground-preflight.json": "36bea138b73b5fce822721ae2e780227c7cd426def51abbdc041fd359abfe97c",
+    "s3-mathematics-south-evidence.json": "11a66e39d6fb1cd3d595b3a8660fb79d1e8dad9621b72689ae5b10c755207412",
+    "s3-mathematics-south-restored-tree.json": "8d448b0a80756bc7f8890aed9f89266260ef8068314fac07b225e1fb9a3d7eb5",
+    "s3-mathematics-south-road-uv-observation.json": "1ecdb2304ae3d1444e522c04bd00fcd964efcabf860cbc6d0399e5ba4235d185",
+    "s3-mathematics-south-final-context-browser.json": "33f51caae646025c9f6c53c00644da2344180d57ec101b7128cd4ae43cdf4d14",
+    "s3-mathematics-south-visual-review.json": "4800a3ab25f2afdd54cd5b9e900ac9f5d563490e60e641a6e356b8df25400137",
+    "s3-mathematics-south-timed-browser.json": "ccc335e26ff876c4a77d5b1293cead55e4876b1afdadf56441095c68abff9ebd",
+    "s3-mathematics-south-timed-performance-context.json": "562a484ca20c4a9eac936e610c910f23fbeb2e3e802a7591fc7046a93f1b1b94"
+  },
+  "testLogSha256": {
+    "data-tests-final.log": "0be32f680c2d20e1451db7bf4431fafcf56a7018a31fbda4d887ee7b82bc025f",
+    "geometry-tests-final.log": "37fb930f13ad186bb3e96859cb657a9019cf342557b89c935e6e12e949ece021"
+  }
+}

@@ -1,0 +1,138 @@
+{
+  "reviewedAt": "2026-09-12T15:00:41.828892+00:00",
+  "stage": "S4 shore evidence and actual pre-change defect reproduction",
+  "progressType": "New primary-source interpretation, mapped candidate and decoded-GLB defect evidence; no shipping geometry change",
+  "candidate": {
+    "id": "jinghu-auditorium-bank",
+    "status": "localized-candidate-with-reproduced-defect-not-implemented",
+    "waterId": "way/685589481",
+    "waterName": "镜湖",
+    "shorelineRevision": "1f5f007df589c951d3288b6bff50ffa04947d913b31fcf3a532862f32890ae84",
+    "edgeIndices": [
+      8,
+      9
+    ],
+    "coordinateSystem": "local meters, X east, Y north, Z up",
+    "coordinates": [
+      [
+        -428.73880596940876,
+        -666.7511399998125
+      ],
+      [
+        -418.551989173849,
+        -673.0741159997472
+      ],
+      [
+        -409.75008704922607,
+        -688.2136359998858
+      ]
+    ],
+    "lengthMeters": 29.50187134911122,
+    "existingWaterLevelMeters": 1.52,
+    "nearbyBuilding": {
+      "id": "way/671978892",
+      "name": "大礼堂",
+      "center": [
+        -380.52,
+        -640.87
+      ]
+    },
+    "nearbyRoad": {
+      "id": "way/699156923",
+      "tags": {
+        "highway": "service",
+        "motor_vehicle": "no"
+      },
+      "minimumDistanceMeters": 7.046879981309174
+    },
+    "adoptionStatus": {
+      "mappedShoreline": "confirmed from existing OSM-derived water polygon",
+      "hardBankForm": "supported by named university photographs, capture dates unknown",
+      "selectedEdgeToPhotoCorrespondence": "inferred from auditorium/lake relationship; no exact camera coordinates",
+      "wallHeight": "not yet adopted; must be marked estimated",
+      "promenadeWidth": "not yet adopted; must be constrained by existing road and terrain",
+      "stonePostPositions": "not adopted",
+      "plantSpeciesAndPositions": "not adopted",
+      "drainPosition": "not adopted"
+    },
+    "remainingImplementation": [
+      "Build a local water–wall–shore-top–terrain connection using the original shoreline and water level.",
+      "Resolve the shore-top relation with the nearby existing route without moving or covering it.",
+      "Make lateral/end transitions close and sample the actual final terrain; do not use display offsets as wall height.",
+      "Apply crown exclusions only within supported new hardscape and update affected final terrain anchors.",
+      "Verify source/GLB geometry, unaffected terrain/road/water, fixed cameras, layer behavior and standard performance."
+    ]
+  },
+  "gallery": [
+    {
+      "title": "大礼堂西侧",
+      "imageUrl": "https://www.gxu.edu.cn/__local/1/AE/F5/16FC88FD2AD3A61C55018652FC3_E30DADC6_96E84.jpg",
+      "file": "work/refinement-s4-shore/gallery-08.jpg",
+      "sha256": "d5bb36e15be8a71d38dfc3905866471f62280970d0483c592898b5cd2bbee16b",
+      "capturedAt": null,
+      "observation": "草坪、低矮植物和树木，远处可见湖面；不支持把大礼堂周围全部铺成硬地。",
+      "sourcePage": "https://www.gxu.edu.cn/info/1021/18800.htm",
+      "publicationDate": null
+    },
+    {
+      "title": "大礼堂前",
+      "imageUrl": "https://www.gxu.edu.cn/__local/F/A4/89/43559AA6386B7F0354E4086374D_8F6064EB_62027.jpg",
+      "file": "work/refinement-s4-shore/gallery-09.jpg",
+      "sha256": "440526f9596b46e4a8837f29b0380b5da058be4d2754d50c470b66c490b76e6a",
+      "capturedAt": null,
+      "observation": "大礼堂及网络楼方向背景前的岸线可见砌石立面、岸顶步行空间与短石柱。通过大礼堂在镜湖东北侧的地图关系推定为其临湖一侧；照片没有坐标，不能据此量测墙高或步道宽度。",
+      "sourcePage": "https://www.gxu.edu.cn/info/1021/18800.htm",
+      "publicationDate": null
+    },
+    {
+      "title": "西校园镜湖",
+      "imageUrl": "https://www.gxu.edu.cn/__local/8/27/73/1E5E22F885CF3225B3CD3789139_0AEB1827_B7865.jpg",
+      "file": "work/refinement-s4-shore/gallery-26.jpg",
+      "sha256": "077bcbe5b5a3bc0eb3b26c0e44536e19dfd4663f9c4de2378d91f66145a5ddd4",
+      "capturedAt": null,
+      "observation": "多个可见岸段有砌石岸壁、岸顶步行空间及短柱；支持镜湖存在硬质岸边，不能单独定位每一个拍摄点。",
+      "sourcePage": "https://www.gxu.edu.cn/info/1021/18800.htm",
+      "publicationDate": null
+    },
+    {
+      "title": "西校园镜湖一角",
+      "imageUrl": "https://www.gxu.edu.cn/__local/D/8F/EC/AEE54F6B49A799F55B6C93513EF_82248B9C_A6790.jpg",
+      "file": "work/refinement-s4-shore/gallery-27.jpg",
+      "sha256": "f2e3329a6888cc2418c756092b9010181bb85eca6e29295b98c763d8f74f5a63",
+      "capturedAt": null,
+      "observation": "对岸砌石岸壁及局部排水开口可见，未将未定位排水口映射到样板。",
+      "sourcePage": "https://www.gxu.edu.cn/info/1021/18800.htm",
+      "publicationDate": null
+    }
+  ],
+  "maintenance": {
+    "page": "https://ghjjc.gxu.edu.cn/info/1046/3406.htm",
+    "publishedAt": "2024-11-07",
+    "capturedAt": null,
+    "caption": "大礼堂西南面镜湖岸边路灯修复",
+    "imageUrl": "https://ghjjc.gxu.edu.cn/__local/C/E0/E8/B8E2AE20041B75FFF62E8F94871_F00A037D_D0B3.jpg",
+    "file": "work/refinement-s4-shore/jinghu-auditorium-southwest-2024.jpg",
+    "sha256": "80654221062a6317b64d40317f76cc873e5c03390c3e37176219a3e117eb1f0b",
+    "observation": "近处草坡及置石、对岸硬边可见。只能限定大礼堂西南的镜湖区域，不能定位到单一映射边。不得将翠湖石柱铁链直接套用。"
+  },
+  "beforeGroundReport": "s4-shore-before-ground.json",
+  "beforeBrowserReport": "s4-shore-before-browser.json",
+  "maximumWaterAboveAdjacentTerrainMeters": 1.2299346923828125,
+  "sampleCount": 12,
+  "sourceSelectionLimits": [
+    "Gallery photos are undated; no claim that they show all 2026 details.",
+    "Selected northeast edges are a bounded modeling sample, not a survey of the exact photo coverage.",
+    "Raw near-road distance is from the mapped surface. Final construction must measure all effective overrides and actual road triangles.",
+    "Previous Cuihu/Jianhu photos remain unlocalized and are not adopted for this bank."
+  ],
+  "geometryImplemented": false,
+  "workPackagePassed": false,
+  "fullS4Completed": false,
+  "inputHashes": {
+    "public/data/surfaces.json": "4b076226431cadc978081656df66b0bc70d99a19fff79d91cea3d6e220a74408",
+    "public/data/terrain.json": "6ea0100e963f3e26c176273fea174ffe3e4ac60d2e131955119be53fd005aa52",
+    "public/models/base.glb": "e7e863959679833830c984066c0b1e1336848301151032a501047ce7f3831bd8",
+    "public/data/buildings.json": "00a933ebcbcd87fe52383dac12f9a1f798789d7109d5037aa08b644bb6241836",
+    "docs/model-checks/refinement/s4-shore-cameras.json": "e8ee75ffb4be9bcca66c2da95489cf145d648d7a92bb6217bb7ff0b3794334c9"
+  }
+}

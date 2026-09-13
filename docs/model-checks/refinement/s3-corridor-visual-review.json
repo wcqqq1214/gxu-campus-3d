@@ -1,0 +1,84 @@
+{
+  "createdAt": "2026-09-12T19:35:21.098978+00:00",
+  "modelManifestSha256": "ecb4f50c96ce1335c0c6bf5cd70edba7c640357ecb89346c8a92f166ee0400b8",
+  "scope": "Manual review of 11 actual production screenshots, limited to the two sourced south corridor facades and associated regressions.",
+  "images": [
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-timed/animal-science.png",
+      "sha256": "99c07276e88a2932e906e9d80cd214eabc4e5c7a4d5c4d74ee786b1da4cbfe09",
+      "visuallyInspected": true,
+      "observation": "High contextual view preserves the original courtyard, building outline and core/wing height relation. External corridor bands are visible; rear facade remains schematic."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-timed/animal-corridor.png",
+      "sha256": "241875b3919fafc0b3d1eb94532986c390e0b978334db90002117e91ffb5033f",
+      "visuallyInspected": true,
+      "observation": "Unobstructed eastern wing shows four continuous upper corridor bands and a solid ground floor. The entrance is partly screened by existing vegetation."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-timed/animal-front.png",
+      "sha256": "18daefaba37b29362e513c182d9fc746fe61e3f59eb0cf75eefec6a9ab0ef7b4",
+      "visuallyInspected": true,
+      "observation": "Both south corridor faces visible around the higher core. Trees screen the lower central entrance; forecourt is still schematic grass."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-timed/library-mobile.png",
+      "sha256": "9916caa8ae35e8da0e4116a1aa84e3b8cc72faedb0dcca450a60810115c8e755",
+      "visuallyInspected": true,
+      "observation": "390x844 library entry and paved approach remain continuous with usable controls; desktop viewport simulation only."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-layers/near-labels-off.png",
+      "sha256": "02c1b7272b24363f1900cc200f23f975a7edbfeaf5db7763d0b646f023b2e3d0",
+      "visuallyInspected": true,
+      "observation": "Wing is legible without labels; existing foreground tree partly hides the core and entry."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-layers/roads-off.png",
+      "sha256": "529ab054226f33e7d4547968ac60e942fcfdd07a68cab5087984e62ea2755bc8",
+      "visuallyInspected": true,
+      "observation": "Background road geometry disappears; building corridor and entrance remain with the building layer."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-layers/buildings-off.png",
+      "sha256": "6eff8a3a42d059db558eefb8c1b56b7b71497c70328dd801a74473dae71027b0",
+      "visuallyInspected": true,
+      "observation": "Campus building geometry including corridor disappears, leaving terrain, roads and vegetation."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-layers/layers-restored.png",
+      "sha256": "ec53b3843dc9b2c5952945a0a10f2b93530eafdebff064eb00c9b1f945736b4c",
+      "visuallyInspected": true,
+      "observation": "Restored building and road layers return the corridor, roof outline and surroundings."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-layers/vegetation-off.png",
+      "sha256": "b21d27244c0cf7069c49fd6c140bb38e8345e0b343e73d33cb115bd93731ffe5",
+      "visuallyInspected": true,
+      "observation": "Clear geometry comparison: four upper corridor bands, recessed rear windows and ground wall are visible; central open entry remains."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-layers/vegetation-restored.png",
+      "sha256": "ec53b3843dc9b2c5952945a0a10f2b93530eafdebff064eb00c9b1f945736b4c",
+      "visuallyInspected": true,
+      "observation": "Original tree locations return; no new tree placement is implied by this batch."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-corridor-layers/night-labels-off.png",
+      "sha256": "1513d8741f552071dc5c077855c61c8095e4f5276116a0de527aa6eabfb16b28",
+      "visuallyInspected": true,
+      "observation": "Night material state keeps corridor banding; rear windows light up and no missing building surfaces are apparent."
+    }
+  ],
+  "passed": true,
+  "comparisonBefore": "docs/screenshots/refinement/s3-corridor-before-visible/vegetation-off.png",
+  "excludedComparisons": [
+    "Obstructed first close cameras in s3-corridor-before and s3-corridor-before-layers"
+  ],
+  "pending": [
+    "Unseen rear massing and facades",
+    "Central glazed facade and exact fenestration",
+    "Forecourt paving, trees and complete route to the entrance"
+  ],
+  "wholeBuildingReviewComplete": false
+}

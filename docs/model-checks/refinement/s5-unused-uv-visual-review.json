@@ -1,0 +1,66 @@
+{
+  "passed": true,
+  "modelManifestSha256": "20553d29f0389410c06c1ade6f7d66f65c96b473bc5a5661ed566b5fea72f94f",
+  "method": "Seven original PNGs inspected individually with view_image; paired RGB pixels compared separately.",
+  "images": [
+    {
+      "file": "docs/screenshots/refinement/s5-unused-uv/before/mathematics-south-approach-trees-off-day.png",
+      "sha256": "bc03cb049c2e3d9059a8f7c9acb1f9c9e7adcf12758334bed095f33865eefbb4",
+      "manuallyInspected": true,
+      "observation": "数学学院台阶、连接、道路纹理与立面保持；手机尺寸为基础模型，夜景门窗效果正常。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s5-unused-uv/before/basketball-attributes-trees-off-day.png",
+      "sha256": "21822e5905a6a184948d9f3b68726a3e2620bed185c2aac6ad2550b2428ea281",
+      "manuallyInspected": true,
+      "observation": "篮球场配色、白线、篮架及周边道路保持；植被开启状态正常。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s5-unused-uv/after/mathematics-south-approach-trees-off-day.png",
+      "sha256": "e22750b444871b4bb227b57f05b6dc613273f22f49f654f25cef30ca37a253bc",
+      "manuallyInspected": true,
+      "observation": "数学学院台阶、连接、道路纹理与立面保持；手机尺寸为基础模型，夜景门窗效果正常。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s5-unused-uv/after/basketball-attributes-trees-off-day.png",
+      "sha256": "bedf6b234d26a0a148a524c66c047e051aae7958aec4e7f6af13fc6341a731c1",
+      "manuallyInspected": true,
+      "observation": "篮球场配色、白线、篮架及周边道路保持；植被开启状态正常。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s5-unused-uv/after/basketball-attributes-trees-on-day.png",
+      "sha256": "533bec8569d6094e96c61ae4650c20fb04be8023df6033dfabc1cef95d704597",
+      "manuallyInspected": true,
+      "observation": "篮球场配色、白线、篮架及周边道路保持；植被开启状态正常。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s5-unused-uv/after/mathematics-south-approach-trees-off-night.png",
+      "sha256": "a9e565e667471f29f5c00abc75a4b90568171901b96a6db2321c0254a9fd2d48",
+      "manuallyInspected": true,
+      "observation": "数学学院台阶、连接、道路纹理与立面保持；手机尺寸为基础模型，夜景门窗效果正常。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s5-unused-uv/after/mathematics-south-approach-trees-off-day-mobile.png",
+      "sha256": "f60c17e5ed26594237447bb30206031bda2260e7a22b628eee191b737bd588e1",
+      "manuallyInspected": true,
+      "observation": "数学学院台阶、连接、道路纹理与立面保持；手机尺寸为基础模型，夜景门窗效果正常。"
+    }
+  ],
+  "pixelComparisons": [
+    {
+      "file": "mathematics-south-approach-trees-off-day.png",
+      "identicalPixels": false,
+      "changedPixels": 13,
+      "totalPixels": 921600,
+      "maximumChannelDifference": 26
+    },
+    {
+      "file": "basketball-attributes-trees-off-day.png",
+      "identicalPixels": false,
+      "changedPixels": 6,
+      "totalPixels": 921600,
+      "maximumChannelDifference": 26
+    }
+  ],
+  "scope": "Representative mixed textured/plain materials, persistent basketball base, night and desktop mobile base. No whole-campus photographic fidelity or physical-phone claim."
+}

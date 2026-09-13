@@ -1,0 +1,286 @@
+{
+  "verifiedAt": "2026-09-12T14:39:59.947668+00:00",
+  "stage": "S4 stable background generation and final-terrain tree anchors",
+  "workPackagePassed": true,
+  "fullS4Completed": false,
+  "fullS2Completed": false,
+  "fullS3Completed": false,
+  "fullPlanCompleted": false,
+  "trees": 3111,
+  "previousTrees": 3030,
+  "oneTimeSchematicLayoutChange": true,
+  "sourceCount": 65,
+  "assets": {
+    "assets": 69,
+    "changedAssets": [
+      "models/base.glb",
+      "models/time-gate.glb"
+    ],
+    "baseChangedNodes": [
+      "landmark-time-gate"
+    ],
+    "allOtherBaseNodeGeometryMaterialsAndTransformsPreserved": true,
+    "allOrdinaryAndLibraryNearAssetsPreserved": true,
+    "initialModelBytes": 5637704,
+    "maxOrdinaryChunkBytes": 1684868,
+    "trees": 3111,
+    "blendBytes": 87709499,
+    "publicAndProductionMatch": true,
+    "passed": true
+  },
+  "locality": {
+    "method": "Execute actual legacy random-generation AST block from the saved pre-change script, then compare the new production function under the same local obstacle edit.",
+    "legacySourceSha256": "dfe4f6af4fad029b8de686322f95227c24f420f7134903a64b86a70e38530522",
+    "bounds": [
+      -130.0,
+      -130.0,
+      130.0,
+      130.0
+    ],
+    "changedMask": [
+      [
+        -65.0,
+        -120.0
+      ],
+      [
+        -65.0,
+        -65.0
+      ],
+      [
+        -120.0,
+        -65.0
+      ],
+      [
+        -120.0,
+        -120.0
+      ],
+      [
+        -65.0,
+        -120.0
+      ]
+    ],
+    "legacyOutsideSymmetricDifference": 566,
+    "newOutsideSymmetricDifference": 0,
+    "newBeforeCount": 321,
+    "newAfterCount": 310,
+    "passed": true
+  },
+  "ground": {
+    "trees": 3111,
+    "maxElevationDifferenceMeters": 4.6972656164712134e-07,
+    "maxRotationDifferenceRadians": 2.3832916085098077e-07,
+    "oldLowerGridNodeVersusFinalSourceTerrain": {
+      "maxAbsoluteDifferenceMeters": 7.7743798828125,
+      "over25cm": 1745
+    },
+    "scope": "Production TypeScript functions versus all saved Blender tree transforms; old lower-grid-node lookup measured at the same new tree positions.",
+    "passed": true
+  },
+  "sourceAndGLBContact": {
+    "trees": 3111,
+    "typesScalesAndRotationsMatch": true,
+    "sourceAnchorMinusActualTerrain": {
+      "minimumMeters": -5.066394805908203e-07,
+      "maximumMeters": 5.066394805908203e-07,
+      "over25cmAbsolute": 0
+    },
+    "passed": true,
+    "scope": "Saved tree attributes and fifth-column elevations against final source terrain triangles.",
+    "shippingGLBTerrain": {
+      "sampledTrees": 3111,
+      "minAnchorOffsetMeters": -0.04728725488281249,
+      "maxAnchorOffsetMeters": 0.04901170996093729,
+      "toleranceMeters": 0.15
+    }
+  },
+  "checks": {
+    "pythonTests": 41,
+    "nodeTests": 54,
+    "blenderGroundCases": 3,
+    "typecheck": true,
+    "lint": true,
+    "productionBuild": true,
+    "emptyOutputFullPreparation": true,
+    "sourceAndActualGLBTerrain": 3111,
+    "layerNightStates": 8
+  },
+  "browser": {
+    "report": "s4-background-timed-browser.json",
+    "captures": 7,
+    "lodCycles": 3,
+    "activityRuns": 6,
+    "errors": [],
+    "captureEquivalence": [
+      {
+        "file": "library-north.png",
+        "matchesDirectlyReviewedCapture": true
+      },
+      {
+        "file": "library-approach.png",
+        "matchesDirectlyReviewedCapture": true
+      },
+      {
+        "file": "library-side.png",
+        "matchesDirectlyReviewedCapture": true
+      },
+      {
+        "file": "library-overhead.png",
+        "matchesDirectlyReviewedCapture": true
+      },
+      {
+        "file": "ordinary-lod.png",
+        "matchesDirectlyReviewedCapture": true
+      },
+      {
+        "file": "huixue-east-lawn.png",
+        "matchesDirectlyReviewedCapture": true
+      },
+      {
+        "file": "library-mobile.png",
+        "matchesDirectlyReviewedCapture": true
+      }
+    ]
+  },
+  "performanceComparison": [
+    {
+      "tier": "精细",
+      "repeatFPS": [
+        60,
+        60,
+        60
+      ],
+      "fps": {
+        "baseline": 60,
+        "current": 60,
+        "changePercent": 0.0,
+        "withinNumericGate": true
+      },
+      "triangles": {
+        "baseline": 4017716,
+        "current": 4105703,
+        "changePercent": 2.1899755980761215,
+        "withinNumericGate": true
+      },
+      "drawCalls": {
+        "baseline": 537,
+        "current": 535,
+        "changePercent": -0.3724394785847296,
+        "withinNumericGate": true
+      }
+    },
+    {
+      "tier": "流畅",
+      "repeatFPS": [
+        30,
+        30,
+        30
+      ],
+      "fps": {
+        "baseline": 30,
+        "current": 30,
+        "changePercent": 0.0,
+        "withinNumericGate": true
+      },
+      "triangles": {
+        "baseline": 1052490,
+        "current": 1089841,
+        "changePercent": 3.5488223166015853,
+        "withinNumericGate": true
+      },
+      "drawCalls": {
+        "baseline": 268,
+        "current": 272,
+        "changePercent": 1.4925373134328401,
+        "withinNumericGate": true
+      }
+    }
+  ],
+  "performanceConditions": {
+    "context": "s4-background-timed-performance-context.json",
+    "samples": 27,
+    "activitySamples": 18,
+    "observedPythonBlenderSamples": [],
+    "desktopPeaksOver80Percent": [
+      {
+        "at": "2026-09-12T14:37:43.685623+00:00",
+        "pid": 90871,
+        "cpuPercent": 99.3,
+        "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+      }
+    ],
+    "classification": "Same-machine normal desktop comparison, including one known Codex Renderer 99.3% sample in smooth repeat 2. No Python/Blender workload observed. All six run medians remain 60/30 FPS. Accepted against the planned FPS/geometry gates with this desktop-load limitation; no isolated benchmark claim.",
+    "previousRun": "s4-background-validated had a Codex Renderer 319.4% sample during fine repeat 2; numerical results retained but not used for same-condition acceptance."
+  },
+  "limits": [
+    "Trees and heights remain schematic, not surveyed.",
+    "Old nearest-grid comparison measured at new 3111 positions, not the historic 3030 positions.",
+    "Full build generated new layout; final baked anchors applied with the same helper through saved-source update, then all instances and shipping terrain checked.",
+    "Source comments clarified after production build; runtime code unchanged.",
+    "Four-column legacy fallback remains bilinear; current shipping rows all have final terrain fifth column.",
+    "Snapshot CPU monitoring cannot establish complete isolation.",
+    "Side-camera foliage still occludes part of the library entrance; future sourced courtyard review remains.",
+    "Desktop mobile viewport is not real phone testing."
+  ],
+  "remaining": [
+    "S2 20–30 complete ordinary building reviews",
+    "S3 neighboring context review",
+    "S4 sourced avenue/courtyard/low planting and unified hard exclusions for future sources",
+    "S4 representative shore and paving connections",
+    "S5 details and whole-plan acceptance"
+  ],
+  "fileHashes": {
+    "data/vegetation-zones.json": "a39419be8fb5a859f40119544c52e6e1373de18b108f5df09aa5f7ae1f19985e",
+    "public/data/vegetation.json": "8a15274def7da44801c730d744f2495b1d811d3afe0bb68f4deeef17e33cae3b",
+    "public/data/vegetation-zones.json": "5f7497f71500a0128dd445108742c4d2fbaab550073e2952fe841a615ab6f749",
+    "public/data/models.json": "6457ca271e35e008d5a52ed55c4c8cd5744f7ba778e7e19d6a469974be30d5e8",
+    "blender/gxu-campus.blend": "817772bf0222cb600e64074e0d956eb25fa0f8d47843b42cea6e0dd647bcf580",
+    "blender/build_campus.py": "a61374f811fd8b950554edcc855baa151df1a085e6a804158d2ac56cbb9e8dca",
+    "blender/tree_layout.py": "a180854f895c7f7c92ec9ab99f03644d951d3b1be95c26be248a268c4d05c604",
+    "blender/update_tree_layout.py": "ac6797187286a3a7c6235deec1f4b4ca0117966d68b0576f9d5b060aa8fb38c7",
+    "blender/update_roads.py": "d328375ea8ffcd934d399798578b0dcaa5872521a280ae4095bb55afac0a38ec",
+    "blender/update_basketball.py": "96560d7956c4499ff34b3e0736ffa7d711fcf05a71a84646da35386c9a740c57",
+    "blender/validate_vegetation.py": "c331d29dfd96fb2e08239cf4ccd565c26c6713d9356e9faec1cf4b1ae145eabe",
+    "blender/test_tree_layout.py": "ee405a0ddb3edab242c34ca89b961a5853203e97982ccedb42236c11a3674f8c",
+    "scripts/prepare_geodata.py": "88bfb5f364f1d330a91db4ebb7d998bcec461516594c50f93dec385de6f8b0a8",
+    "scripts/vegetation_data.py": "5ac27eb6e97eea62bb9cc78d8e221c1b4bfcd8f02b870d8b1d9ef0142ed67480",
+    "scripts/vegetation_layout.py": "939f7b243a3ba25e5d89f5c77b508d26ac0046890a62448f4095e698947b9295",
+    "scripts/test_vegetation_data.py": "edcd553b154cff41db71f5495dec022adc482efe71e9f8a1b6e5f9711e9835ea",
+    "scripts/test-vegetation.mjs": "b452661bd4b6d074b53139e80bc5192d88af9f8ec024244ac2d6cfd5f768f4d9",
+    "scripts/check-site-browser.mjs": "d9d047655161c3a3716ba6d8a6aad96d9fcd6a9b1bbda9b0959b7c4af7be6d8c",
+    "scripts/check-refinement-browser.mjs": "92f357be4185b9b0514d18f17585c752b675dc44d5aa1636558eac3c98b159fd",
+    "lib/campus/vegetation.ts": "4b33008e56413cee16162e75dc6e7441483c69018c98335361243fd4b0b23074",
+    "lib/campus/scene.ts": "aab672182749c582e1e8c022fd9dfef351347f75065ca7e9420898dc22a45a34",
+    "docs/model-checks/refinement/s4-background-assets.json": "686d6c0169f6e519dfc4534ec985271a1b95c1a12b3eab49fe1299e2f49e4872",
+    "docs/model-checks/refinement/s4-background-ground-source.json": "f64ab9f6c19285e60291d7d8bebffb8e04543b4676ad6b97cbfd6a4ab0eb071e",
+    "docs/model-checks/refinement/s4-background-tree-source.json": "7fc7e8858f12eb45d6b0a9e2681b3941ceba228c3411d232de74c2a35c884605",
+    "docs/model-checks/refinement/s4-background-locality.json": "990d5e629ffd13424fceae948f8463d42b0392977190b3c4e19b858422ad7196",
+    "docs/model-checks/refinement/s4-background-preparation.json": "dbd2a1da5e19a8d899bb1a28eecbe4e0c78ba15ed183cfff8f776f09eb5756ab",
+    "docs/model-checks/refinement/s4-background-frontend-parity.json": "b13f41220146759e32f201e5b4e0499200c6bead50d1e8bb475068c8ccb8937e",
+    "docs/model-checks/refinement/s4-background-visual-review.json": "fc0765b8dc4c963e3eddf3e9e3f072feab3dd0844ce4b5c135ae3c6ac0bddde4",
+    "docs/model-checks/refinement/s4-background-layers-review.json": "f38a370c4660c229877dad665beb36a36752c789dfab263558c2cef5511cf6e6",
+    "docs/model-checks/refinement/s4-background-site.json": "9904c2aa288a25225ee581aa49fff67d39226ce1c336fe3bea361b6e7dfae14a",
+    "docs/model-checks/refinement/s4-background-architecture.json": "a3716327574b8122b34fb7b028488f8a00e9fadc5884777e9744b1d8da3d06e0",
+    "docs/model-checks/refinement/s4-background-time-gate.json": "0601bf5815ecb655ce6b54a8cf25c1147b98ba6cf433555abf77aebe55cb061d",
+    "docs/model-checks/refinement/s4-background-timed-browser.json": "fb95c54fab0b88995b3d81bed49d922ab23bb0b095fc34fd820b538fc698b037",
+    "docs/model-checks/refinement/s4-background-timed-performance-context.json": "3df87250fdd66b772b1bcb51ab8267fdc4a037a9cd20d8fc2fdba361b63333d5",
+    "docs/model-checks/refinement/s4-background-validated-browser.json": "2916488b28f7c32ded30e70f4bad52356ca752f225f1bfc0c49747a2867e5a4a",
+    "docs/model-checks/refinement/s4-background-validated-performance-context.json": "6179c81f72d5a3744d15d07dfb53f79fa462f48c4a902dc9b0aebd5f3dcd2ae4",
+    "docs/model-checks/refinement/s4-background-layers-interaction.json": "6f214b26c2913ac67d495aeb4862e2fe6b28364ae51dc7f16fc5ab82bf316f24"
+  },
+  "productionFrontendHashes": {
+    "out/_next/static/4a3dff13-6e7e-4c50-a7f6-c4045b023395/_buildManifest.js": "47f02b34be6dc481257b6efce4c19e19111f37ef5c437f8ffed44f0da97fa9bb",
+    "out/_next/static/4a3dff13-6e7e-4c50-a7f6-c4045b023395/_ssgManifest.js": "653f3e53e89b4f8548ff86c19e92bb3c6b84b6be7485a320b1e00893ed877479",
+    "out/_next/static/chunks/framework-DTZGTDtF.js": "2a1edf81f32a49b1eacafc3546b371bca024c82a9191836e274d90890212e9df",
+    "out/_next/static/chunks/index-Datrq8l8.js": "670b3f058488b84e17028684dea4146a0a52c726cdfb4f6aab5f9e4ac6a71fcd",
+    "out/_next/static/chunks/layout-segment-context-DMyEqv1E.js": "b8d4951be085a2360327a6e474e91b6c538d3ff5b3bc7aa4c355094048ee749d",
+    "out/_next/static/chunks/page-DrJE0qeE.js": "c14b8a0c2357460fa9986246c1991c0e78c5389753ae4b184418d06cc1ad95a6",
+    "out/_next/static/chunks/rolldown-runtime-hePW80VL.js": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+    "out/_next/static/chunks/scene-CnuyQOAj.js": "5cb52bb9f0f3cb5acc76b3fd0dc9f9b36a9570ba68e9957350385118f041e4cb",
+    "out/_next/static/chunks/vinext-_rsX6SCQ.js": "24b251dc5657a47399825443edc9aa57621ac6633400199323c2a59591505b55",
+    "out/_next/static/media/draco_decoder.fzg4nYZr.js": "30e4d486fa020737af10e3c56197693e5b904bdc05b8bfa5d7b06751dec6da04",
+    "out/_next/static/media/draco_wasm_wrapper.DxJM36Ib.js": "e8049906ef3f8f75d3456c22a3f31bfdfe5b5b5bd09ccdec613b9e9a49d554d8",
+    "out/_next/static/media/draco_wasm_wrapper.fZCQGLGb.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6",
+    "out/draco/draco_decoder.js": "8625489da79a805f4f2a7d511c3e52d8b4085608a9d2a4d5f4f9de5db0aea04f",
+    "out/draco/draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
+  }
+}

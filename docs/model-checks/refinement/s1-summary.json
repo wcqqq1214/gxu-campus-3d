@@ -1,0 +1,107 @@
+{
+  "completedAt": "2026-09-12T09:40:43.126933+00:00",
+  "stage": "S1 shared ordinary forms",
+  "passed": true,
+  "assets": {
+    "initialModelBytes": 5585092,
+    "maxOrdinaryChunkBytes": 1684868,
+    "blendBytes": 87374072
+  },
+  "geometry": {
+    "source": {
+      "buildings": 430,
+      "samples": 1446,
+      "maxErrorMeters": 0.00499
+    },
+    "base": {
+      "buildings": 430,
+      "samples": 1446,
+      "maxErrorMeters": 0.02439
+    },
+    "near": {
+      "buildings": 417,
+      "samples": 1398,
+      "maxErrorMeters": 0.007679
+    }
+  },
+  "tolerancesMeters": {
+    "source": 0.011,
+    "baseDraco": 0.05,
+    "nearDraco": 0.02
+  },
+  "performance": [
+    {
+      "tier": "精细",
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4017716,
+        "medianDrawCalls": 537
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4187266,
+        "medianDrawCalls": 532
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.22,
+        "medianDrawCalls": -0.931
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1052490,
+        "medianDrawCalls": 268
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1087384,
+        "medianDrawCalls": 254
+      },
+      "changePercent": {
+        "medianFPS": -6.667,
+        "medianTriangles": 3.315,
+        "medianDrawCalls": -5.224
+      },
+      "passed": true
+    }
+  ],
+  "performanceScope": {
+    "platform": "darwin",
+    "release": "25.5.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "lodCyclesPassed": 3,
+  "browserErrors": [],
+  "checks": {
+    "nodeTests": 51,
+    "pythonTests": 13,
+    "typecheck": "passed",
+    "lint": "passed",
+    "pagesProductionBuild": "passed",
+    "assetManifestHashes": 69
+  },
+  "sha256": {
+    "public/data/models.json": "db29efc9469d2e1a1d99bcec34b67743cfc001038a77acf36ce932b1c420857e",
+    "blender/gxu-campus.blend": "85733802238238299ebceda4283d72adc087d855237ed98432a85383de0ffe4a",
+    "blender/generic_buildings.py": "faceb5fa6bd0bf6e1117423f006f8db596f1d972d2b31799de66515efba2b2c4",
+    "scripts/building_forms.py": "d9aa20ab64c743ceb9d3790ec53a699bf962f25282913bab0a2206719b9d0528",
+    "docs/model-checks/refinement/generic-geometry.json": "d57128870f1dc7150f82f73b3e024221fcf883d08bf2068b6b22a5c74deca9e9",
+    "docs/model-checks/refinement/s1-batched-browser.json": "084c86b321cb361a9d4d21d632bb0a399ab1a1b10eae98a3b835b32ff0d14445"
+  },
+  "remaining": [
+    "S2 field-level evidence and overrides; 20-30 real building calibrations",
+    "S3 library north entrance site connections",
+    "S4 vegetation zones and representative shore/paving connections",
+    "S5 material and small-detail refinement after spatial acceptance"
+  ]
+}

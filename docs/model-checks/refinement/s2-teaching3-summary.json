@@ -1,0 +1,142 @@
+{
+  "createdAt": "2026-09-12T20:36:30.598535+00:00",
+  "buildingId": "way/759132933",
+  "scope": "Historical eight-level body-height calibration; roof, entrance, facade and part review incomplete.",
+  "modelManifestSha256": "1e95d2bfbb65f660bf6db04c74ab12b3e6c8b7fc2682f544e7727386a3dc7b00",
+  "geometryPassed": true,
+  "visualPassed": true,
+  "performance": {
+    "browserReport": "s2-teaching3-timed-browser.json",
+    "contextReport": "s2-teaching3-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4066753,
+          "medianDrawCalls": 542
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0122051931993201,
+          "medianDrawCalls": 1.0093109869646182
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          28,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1092053,
+          "medianDrawCalls": 282
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.037589905842336,
+          "medianDrawCalls": 1.0522388059701493
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [],
+    "sameConditionAcceptancePassed": true,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "heightRevisionPassed": true,
+  "wholeBuildingReviewComplete": false,
+  "fullPlanCompleted": false,
+  "assets": {
+    "changedBuildingIds": [
+      "way/759132933"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3050,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-n1-n2.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-n1-n2"
+    ],
+    "preservedBaseNodes": 82,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5897824,
+    "initialModelByteChange": 1384,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "1e95d2bfbb65f660bf6db04c74ab12b3e6c8b7fc2682f544e7727386a3dc7b00",
+    "passed": true
+  },
+  "sourcePreservation": {
+    "nonTreeObjects": 523,
+    "changedObjects": [
+      "第三教学楼"
+    ],
+    "otherNonTreeGeometryUVMaterialsAndTransformsPreserved": true,
+    "sourceTreesBefore": 3050,
+    "sourceTreesAfter": 3050,
+    "removedPositions": [],
+    "survivorAttributesPreserved": true,
+    "passed": true
+  },
+  "checks": {
+    "pythonDataTests": 24,
+    "genericBuildings": 430,
+    "browserLODCycles": 3,
+    "productionBuildPassed": true,
+    "oldSourceRejectedAtTargetBuilding": true
+  },
+  "implementationSha256": {
+    "data/building-overrides.json": "3bd11138dcf8619cb5e0bce700577923142f821c482d276bfd5b741e2d440ef9",
+    "data/building-sources.json": "896aedc6072dbbf373e8069517ad02966cf26287e0e262bdab44112ff28fb23d",
+    "blender/gxu-campus.blend": "968fa885b408041df1c4e2b68cd94d495e3cefcda27489715a0811c361d90e68",
+    "public/data/buildings.json": "9fe91c89627bd7d367e615b37997b46a8d58245f8417d3647636284a2c9cdd16",
+    "public/data/geography.geojson": "5c97979d926cfd6c586c319107ec316a449bce554fa81d51cec7898d2ea08972",
+    "public/data/overview.json": "273c7ba5ee4dc219967a82e4286c0be781dea6f88dd4def04d39125dfd09cdb4",
+    "public/data/sources.json": "c61a6c107a36083be01e25d6e8fc0c714257ca437c51b4653a47981d1a85d964",
+    "public/data/vegetation.json": "e1148d85751eeaf2a2130c539194a7bb62a4d9a14cf00d48e4377b464dcb06a2"
+  },
+  "evidenceSha256": {
+    "s2-teaching3-generic-geometry.json": "b9966d2cf9ca3a3ed43db98f9d0e7804d900f3849dc2bcef4072c93601d612d6",
+    "s2-teaching3-tree-clearance.json": "fa511bf2e3a9c74372d2ee60ec6db96c695102fc3f6f811183279663b188b399",
+    "s2-teaching3-source-preservation.json": "719ee49f9d897708d120e91c4002384cca5d3c992f713f5fe00408d2228e2866",
+    "s2-teaching3-assets.json": "d3e2722db975a1cdcea2fe7440df47fda6a8606e175eff3993cd9a263aa95e79",
+    "s2-teaching3-evidence.json": "88efba2b6ac1421b45ef0214e4476aebc820bef5f839dd8b190b03cd3000241c",
+    "s2-teaching3-visual-review.json": "92b65389ae00ebe86ba09f07404f1add4b6877327600fe68208453c4a35fa0f9",
+    "s2-teaching3-context-browser.json": "dc1847b30d324ddabf0611626dfee06fe681c06cd83784b421fbbfae7624c0ba",
+    "s2-teaching3-close-context-browser.json": "90d5aab44010f363c3512ddc28de443326385d0abfab5dc8be7dc1f0cab96daf",
+    "s2-teaching3-timed-browser.json": "55343555411f884c0a2bf94398026ecc7e47b125038e98e5ca34d69d68ec0fae",
+    "s2-teaching3-timed-performance-context.json": "7cd8b2e4881cd405a231d7c43c9e4b66285ca1ae40b812d411846c548ebb326f"
+  },
+  "limitations": [
+    "Eight levels are a historical documentary value; 26.4 m uses estimated 3.3 m floor height.",
+    "Unified height does not establish each wing or annex height.",
+    "Ground-level entrances, corridor orientation and full roof remain schematic.",
+    "Tree checks detect surface crossings, not closed-volume containment or complete land-use exclusion.",
+    "Unrelated procedural time-gate source and compressed geometry retained from baseline; global byte determinism unresolved."
+  ],
+  "pending": [
+    "Finish third teaching building roof, parts, entrance and facades",
+    "Complete the 20–30-building calibration scope, six S3 neighbors and remaining S4/S5"
+  ]
+}

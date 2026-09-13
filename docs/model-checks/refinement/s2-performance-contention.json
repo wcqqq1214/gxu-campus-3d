@@ -1,0 +1,14 @@
+{
+  "observedAt": "2026-09-12T10:11:15.647431+00:00",
+  "record": "s2-pilot-browser.json",
+  "performanceUsable": false,
+  "reason": "Concurrent asset validation from another local project was verified during fine-tier samples; keep original metrics but do not use this run as the performance gate.",
+  "externalProcess": {
+    "pid": 39352,
+    "parentPid": 38286,
+    "command": "python scripts/validate_assets.py",
+    "parentCommand": "python work/urban-structure/p2/rebuild.py",
+    "cpuPercentObserved": 70.2
+  },
+  "action": "Do not interrupt the other project; remeasure after verified process completion."
+}

@@ -1,0 +1,52 @@
+{
+  "method": "Direct inspection of all seven current production screenshots by the assistant.",
+  "captures": [
+    {
+      "file": "docs/screenshots/refinement/s4-background-validated/library-north.png",
+      "sha256": "f74c254d640400623be154dab0ccc1282d0c24b24c74da1248b00825fd374908",
+      "observation": "北门六柱、中央入口连接和两侧留白保持；外围示意树位一次性变化。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-background-validated/library-approach.png",
+      "sha256": "651c45262acaf95cfbc8b827be5c5dbd2183d7d598903dfcca87a6931f833847",
+      "observation": "近景门面、台阶及前场连续，中央通行面没有树冠侵入。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-background-validated/library-side.png",
+      "sha256": "4ce414c15bccd5d9bbccc2fc0d8094499cdbe88ad87ab5b5a7555f672c857fc2",
+      "observation": "可见树干与地面接触；外围大树冠继续产生门廊透视遮挡，不能据此认定庭院布局已完成。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-background-validated/library-overhead.png",
+      "sha256": "2c52a59b5a3a3fce7b6d6b3dce781bd582b103c5188e2eb9c8d9955d9de6f2c9",
+      "observation": "中央前场、内院、道路和空地轮廓保留，可辨认背景树位变化。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-background-validated/ordinary-lod.png",
+      "sha256": "31c7eb5d0fc8cc330ffed23beaebb079b5372f87acfe167d72df42382a3bd9dc",
+      "observation": "既有坡屋顶和楼体外轮廓保留，本批未修改普通建筑近景。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-background-validated/huixue-east-lawn.png",
+      "sha256": "7015809d7627f07b73de5c9bf412cb85853ca8e3074419854be1bdbbbfc30788",
+      "observation": "开放草坪保持完整无树，周边道路与建筑关系保留。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-background-validated/library-mobile.png",
+      "sha256": "37727d1584006d2ad0508c289db78cbd08d19c552e10268b2714f57846a49229",
+      "observation": "390×844 桌面模拟中中央入口、台阶和铺地可见；未用于真机性能判断。",
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "limits": [
+    "Images do not prove surveyed tree positions or all-campus ground contact; full instance geometry tests cover numerical contact.",
+    "Side-camera foliage occlusion remains for future sourced courtyard work."
+  ]
+}

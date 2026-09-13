@@ -1,0 +1,49 @@
+{
+  "method": "Direct visual inspection of all eight recorded layer/night states, plus UI switch and geometry-count assertions.",
+  "states": [
+    {
+      "name": "base-labels-off",
+      "observation": "基础形体与入口保留，标签关闭。",
+      "sha256": "ee1a1acee4a7ba021001a17bba3368ee8f1d5aa36b140a05a8a66d60bf69f9a2"
+    },
+    {
+      "name": "near-labels-off",
+      "observation": "近景增加立面细节，主要形体和树位保持。",
+      "sha256": "ba2dbd9c8789716f446ef73a65a894f8f470f007d5c283d9c0df93cf2ca1951a"
+    },
+    {
+      "name": "roads-off",
+      "observation": "道路及前场所属图层随开关隐藏，树木仍正确显示。",
+      "sha256": "86cb7c5267456a9d32f1c3dfcffb7ccc673702dc6555377a39f3a12e777b6e88"
+    },
+    {
+      "name": "paving-with-buildings-off",
+      "observation": "建筑隐藏后铺地和树木保持，无建筑图层依赖。",
+      "sha256": "1ced20cea6e4e509dde56facf8369126ae96aa4d921c8514ad269231adc68f86"
+    },
+    {
+      "name": "layers-restored",
+      "observation": "建筑与道路恢复，前场、台阶和外围树木重新同时显示。",
+      "sha256": "50cc67e0f8020aec58594117bfd299b7c84a61fdc566e7e11278fe17dfc3d612"
+    },
+    {
+      "name": "vegetation-off",
+      "observation": "树木隐藏后入口链清晰，保留建筑及铺地。",
+      "sha256": "84c2e14d4311a5c82e864de62983010166a1b964f9db49200fef5ff3d6581d7b"
+    },
+    {
+      "name": "vegetation-restored",
+      "observation": "缓存树位恢复正常，画面中树干贴合地面。",
+      "sha256": "50cc67e0f8020aec58594117bfd299b7c84a61fdc566e7e11278fe17dfc3d612"
+    },
+    {
+      "name": "night-labels-off",
+      "observation": "夜景中立面亮窗及植被显示正常，入口中央前场仍留空。",
+      "sha256": "e4fa59aa7b6fc2229e76d4b2c85621800bb6b43660e0e6d1f2973ac7c01a526a"
+    }
+  ],
+  "passed": true,
+  "limits": [
+    "Side-camera foliage occlusion remains. Hiding vegetation is a geometry diagnosis, not a proposed normal scene."
+  ]
+}

@@ -1,0 +1,129 @@
+{
+  "verifiedAt": "2026-09-12T10:50:09.048181+00:00",
+  "stage": "S3 preparation repair and north-entry column correction",
+  "workPackagePassed": true,
+  "fullS3Completed": false,
+  "assets": {
+    "verifiedAt": "2026-09-12T10:45:16.668961+00:00",
+    "passed": true,
+    "assetCount": 69,
+    "publicAndProductionDataMatch": true,
+    "manifestSha256": "aa9478f6aeca65016488db7064a1496579a24cfda37ffff8b2e2fe295eb3c36e",
+    "initialModelBytes": 5591192,
+    "maxOrdinaryChunkBytes": 1684868,
+    "blendBytes": 87684251
+  },
+  "entryGeometry": {
+    "source": {
+      "columns": 6,
+      "openBays": 5,
+      "passed": true
+    },
+    "base": {
+      "columns": 6,
+      "openBays": 5,
+      "passed": true
+    },
+    "near": {
+      "columns": 6,
+      "openBays": 5,
+      "passed": true
+    },
+    "passed": true
+  },
+  "ordinaryNearChunksUnchanged": true,
+  "performance": [
+    {
+      "tier": "精细",
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4017716,
+        "medianDrawCalls": 537
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4039386,
+        "medianDrawCalls": 522
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 0.539,
+        "medianDrawCalls": -2.793
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1052490,
+        "medianDrawCalls": 268
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1094791,
+        "medianDrawCalls": 276
+      },
+      "changePercent": {
+        "medianFPS": -6.667,
+        "medianTriangles": 4.019,
+        "medianDrawCalls": 2.985
+      },
+      "passed": true
+    }
+  ],
+  "performanceScope": {
+    "platform": "darwin",
+    "release": "25.5.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "captures": 6,
+  "lodCyclesPassed": 3,
+  "browserErrors": [],
+  "checks": {
+    "pythonTests": 25,
+    "nodeTests": 51,
+    "typecheck": "passed",
+    "lint": "passed",
+    "pagesProductionBuild": "passed",
+    "roadBuildingClearance": "passed",
+    "bridgeJoins": "passed with actual main-road mesh included in source and base GLB",
+    "architecture": "passed",
+    "timeGate": "passed"
+  },
+  "sha256": {
+    "public/data/models.json": "aa9478f6aeca65016488db7064a1496579a24cfda37ffff8b2e2fe295eb3c36e",
+    "data/sources.json": "70205c419a5b7907a74fefc79915c6914ff8297d776b4e735027e3da9f2ecac3",
+    "data/landmarks.json": "8bb342357ac52ec713b28c8566ca388b603207839944b48eeb977263c55a6a34",
+    "scripts/building_overrides.py": "8abe19505327b058221e27abdcced6605d97849200a9502b9e724862135b174b",
+    "scripts/surroundings_data.py": "74ede4c78f6205a8c9e44fd72091c289e34cbb72180e512f00ef1332aad7f19e",
+    "scripts/prepare_geodata.py": "7fba804bfd1513d69998c9dac3f67bf1330577fd39e631d99da261b1e0d010e9",
+    "scripts/huicui_data.py": "725171378d302ede604fb6d3c858e44dc5cff52de901cd825cd8fb088181cdb1",
+    "scripts/test_preparation_pipeline.py": "cd627ef2e69b630b3ff7c26a6fb8a5c5a85b365686c229bdd2ae8910e6418a59",
+    "blender/library.py": "ff8abdde95dfaba08cd56293d60898dd540c43446d9e605f537e87e713b95148",
+    "blender/validate_library_entry.py": "028cece6d231c05c63c0a02c5f26379872d20fed532eef4589a4836b9d8b0d2a",
+    "blender/gxu-campus.blend": "4d63ddcc3d2ab7183e5c8459ad61ba51b136221c6efecb7f9158bb6388a75773",
+    "docs/model-checks/refinement/s3-entry-browser.json": "84a0182de6eb4f82d9bcfc28d97e7fd5359913a0904d4ea831fed2873250d33e",
+    "blender/validate_bridge_joins.py": "251c9877e0ac789546e02f1a05b44201a950e8213df0765eb603841313214e93",
+    "docs/model-checks/bridge-joins-geometry.json": "77b9efcce2c5cf2e68c2a7efe7af73806c794cef16629ccd51f7004ce592a60e",
+    "docs/model-checks/refinement/s3-stair-ground.json": "dd419167c013e31fafae7900d4c768a776bf1ac39b25ada94c10e0d68c987cba"
+  },
+  "remaining": [
+    "Verify library north/south envelope and facade orientation against the north-side sculpture photograph.",
+    "Build north forecourt paving, graded stair foot, road connections and canopy exclusion.",
+    "Complete site fixed-camera and geometry acceptance including night/layers/labels.",
+    "Finish S2 20–30 building calibration and S4–S5."
+  ],
+  "knownIncompleteGeometry": {
+    "northStairsTerrainCoverMeters": [
+      0.2270927429,
+      0.0599555969
+    ]
+  }
+}

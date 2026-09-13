@@ -1,0 +1,66 @@
+{
+  "reviewedAt": "2026-09-12T20:29:38.710722+00:00",
+  "previousGoalTurnClassification": "progress: excluded misattributed neighbor photographs, persisted evidence decisions and located next floor-count source",
+  "buildingId": "way/759132933",
+  "name": "第三教学楼",
+  "osmVersion": 2,
+  "footprintRevision": "cb6bcf2ec88b2f3d5032d41cb66b0a897022016ff50c3ada52451d3e26b771f5",
+  "primaryEvidence": {
+    "sourceId": "gxuDonationProjects",
+    "url": "https://jjh.gxu.edu.cn/__local/A/1C/2D/C94DA67648AB9698A6BE04E1718_D3801DBD_2512297.pdf",
+    "pdfPageOneBased": 34,
+    "printedPage": 30,
+    "title": "西校园第三教学楼",
+    "documentedLevels": 8,
+    "documentedYear": 1985,
+    "documentedAreaSquareMeters": 4696,
+    "publishedAt": null,
+    "photographedAt": null,
+    "fileCreatedAt": "2020-01-15T18:32:30+08:00",
+    "filePath": "work/refinement-s2-evidence/gxu-donation-projects.pdf",
+    "fileSha256": "f168a2a531b51fe07697c496d6dc64427abb30e14d385fa117d536b9a0a0b9d6",
+    "pageRenderPath": "work/refinement-s2-teaching3/booklet-page34.png",
+    "pageRenderSha256": "84bde0e700e33a1a3e7bb7fbc39f02f463db087abde756ccd7ee38b84eb71f6c",
+    "imagePath": "work/refinement-s2-teaching3/page34-0-Im369.jpg",
+    "imageSha256": "846551679818c51fad31adbeae7ce839d63bc5751a3429101736ed079962e2ff",
+    "visualReview": "Viewed the complete original page and embedded named photograph. Eight-level text belongs to item 2; photo top is cropped, so it does not independently establish total floor count. Open corridors are visible but are not yet anchored to OSM edges."
+  },
+  "corroboration": [
+    {
+      "url": "https://yjsc.gxu.edu.cn/info/1021/1534.htm",
+      "publishedAt": "2022-12-23",
+      "finding": "Third teaching building exam rooms include floor 6. This is a lower bound, not a total-floor statement."
+    },
+    {
+      "url": "https://www.gxu.edu.cn/info/1364/40125.htm",
+      "publishedAt": "2026-03-06",
+      "attachmentUrl": "https://www.gxu.edu.cn/system/_content/download.jsp?owner=1556120285&urltype=news.DownloadAttachUrl&wbfileid=14918136",
+      "filePath": "work/refinement-s2-teaching3/building-service-2026.docx",
+      "sha256": "83c58d8d07d4442b41b4478a63b93ae1eccf0a359b53953d5960f9b91d6f20f7",
+      "finding": "Attachment service table names third teaching building, area 4696 square meters; no floor-count column. Supports same named record, not an independent floor-count confirmation."
+    }
+  ],
+  "otherImage": {
+    "url": "https://ghjjc.gxu.edu.cn/info/1045/3566.htm",
+    "imagePath": "work/refinement-s2-teaching3/drain-cleaning.jpg",
+    "imageSha256": "d138f970bb9bac428f4efe4518369a1bdfaba5bcdda727c2eae53f64bfe3ad87",
+    "finding": "Ground-level drainage maintenance photo does not show the roof or establish total floors."
+  },
+  "change": {
+    "beforeLevels": 5,
+    "afterLevels": 8,
+    "beforeBodyHeightMeters": 16.5,
+    "afterBodyHeightMeters": 26.4,
+    "heightBasis": "Documented historical floor count multiplied by estimated 3.3 m floor height",
+    "footprintPreserved": true
+  },
+  "remaining": [
+    "Total measured height and floor heights",
+    "Wing and annex height/extent",
+    "Full roof form",
+    "Entrance position and direction",
+    "Corridor and other facade orientation/extent"
+  ],
+  "wholeBuildingReviewComplete": false,
+  "fullPlanCompleted": false
+}

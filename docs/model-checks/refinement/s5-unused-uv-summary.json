@@ -1,0 +1,151 @@
+{
+  "createdAt": "2026-09-13T04:07:56.490796+00:00",
+  "scope": "Resource-budget prerequisite: omit unused base UV streams; no shape simplification or stage-completion claim.",
+  "assets": {
+    "passed": true,
+    "modelManifestSha256": "20553d29f0389410c06c1ade6f7d66f65c96b473bc5a5661ed566b5fea72f94f",
+    "sourceSha256": "073567b60beb8f3f180148f13bc4006485a2b2e8e3a12d7fe75899fb03647352",
+    "initialModelBytes": 4833592,
+    "budgetHeadroomBytes": 1166408,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "sourceBytePreserved": true,
+    "otherGlbsBytePreserved": 68,
+    "allOtherDerivedDataBytePreserved": true,
+    "maximumOrdinaryNearBytes": 1684868
+  },
+  "decodedEquivalenceReport": "s5-unused-uv-decoded.json",
+  "visualReviewReport": "s5-unused-uv-visual-review.json",
+  "pythonTests": 102,
+  "actualMixedMaterialExportTestPassed": true,
+  "incrementalMaintenancePassed": true,
+  "fullBuildPassed": true,
+  "pagesBuildPassed": true,
+  "lintPassed": true,
+  "removedUVVertices": 1146986,
+  "uvAttributeBytesRemoved": 9175888,
+  "savedInitialBytes": 1165956,
+  "initialSavingPercent": 19.434064032823805,
+  "performance": {
+    "browserReport": "s5-unused-uv-timed-browser.json",
+    "contextReport": "s5-unused-uv-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4097239,
+          "medianDrawCalls": 548
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0197930864202447,
+          "medianDrawCalls": 1.0204841713221602
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          29,
+          29,
+          28
+        ],
+        "current": {
+          "medianFPS": 29,
+          "medianTriangles": 1102957,
+          "medianDrawCalls": 288
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9666666666666667,
+          "medianTriangles": 1.0479500992883544,
+          "medianDrawCalls": 1.0746268656716418
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 28597,
+        "observations": 4,
+        "first": {
+          "at": "2026-09-13T04:01:45.461973+00:00",
+          "pid": 28597,
+          "parentPid": 90860,
+          "cpuPercent": 97.2,
+          "elapsed": "00:04",
+          "cumulativeCPUTime": "0:03.54",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T04:02:15.603974+00:00",
+          "pid": 28597,
+          "parentPid": 90860,
+          "cpuPercent": 100.0,
+          "elapsed": "00:34",
+          "cumulativeCPUTime": "0:33.43",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 30.142001,
+        "cumulativeCPUSecondsAdded": 29.89
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "performanceAcceptancePassed": false,
+  "workPackageAccepted": false,
+  "fullPlanCompleted": false,
+  "geometryEvidenceReuse": "Source and all non-base assets are byte-identical; all base oriented triangle positions/normals and textured payloads are exactly preserved by the decoded comparison. Earlier geometric reports retain original fingerprints and are not presented as rerun.",
+  "previousGeometrySummary": "s3-mathematics-south-summary.json",
+  "implementationSha256": {
+    "blender/export_attributes.py": "27d06503f9561385b48b5a784fffb9f07b1f1fd48efeb732bddb6fc22e09083c",
+    "blender/build_campus.py": "06919078d448a9b68e4361d5a9b76bab2f6cd513494be9cadc26e687f48745a7",
+    "blender/preserve_glb_geometry.py": "c071f5b291761d8db76613d4eda272dd0a38f100f884794c3e7d91c46f8d34d9",
+    "blender/test_export_attributes.py": "3556565aa3d8e200ea958f7d45adc89c71566dbe69828474d7c9d4e8aaf7bb63",
+    "scripts/test_incremental_glb.py": "1c9b34a3ba68530bfc3f2fab1920bb9899cf7d2916393a7cde8273e01f4128c3",
+    "scripts/check-export-attributes.mjs": "e9821f8877f1336c6a502f07b38992b5a35b9f6e7da8cfaedc307330e7df56dc",
+    "public/draco/draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6",
+    "public/draco/draco_decoder.wasm": "a680d927bed9cb864ddbd63521868891af2bfbe755092761b4837487618df8ac"
+  },
+  "evidenceSha256": {
+    "s5-unused-uv-assets.json": "a99666a0f3b82a8f9dbd7a75115f96f42c91338cf8bdb618f98cdf96d67b63d7",
+    "s5-unused-uv-decoded.json": "b4e217bd59f920453938b5bfd8cd2a332f222affc2d55f128339966316948bcc",
+    "s5-unused-uv-incremental.json": "9f7e2e2469f1b20039a0dd8c02c8f74c6292e2f2976c965627080876d2292ad5",
+    "s5-unused-uv-roads-incremental.json": "baa84c5221d4fa57f83fc955f81819d22dd57ce6faba49262d0718e56cab03b1",
+    "s5-unused-uv-basketball-incremental.json": "701ffb89c80896e9a5789ab417a48cab1e6fd1e50bd51c24021fb89b5d4ae094",
+    "s5-unused-uv-visual-review.json": "b6ddc370d267d92002fd75a97c65a48be83b29926be4debc68cc04f9b879c91b",
+    "s5-unused-uv-context-browser.json": "511d5d7160be4e3e67bd422e9c30145a3675349d470b5e80e5306f8d5de283b2",
+    "s5-unused-uv-timed-browser.json": "b9d8c7bcaf48369a00f70e26b6259fe0afe92e2ff26742ab71bf6bfa0bc50665",
+    "s5-unused-uv-timed-performance-context.json": "7dba38c023df7cd6d15d537d0773b8f0e57fab31208eb8f027f770c5c3ae4a7a"
+  },
+  "testLogSha256": {
+    "data-tests.log": "a633a68b3a456a5bf00e09f7050c0eb3ac252b4abba0a82977125662e5a66c8e",
+    "export-test-final.log": "3bc4192505f54c7d1c418d2cfebdc4c0506e4aa119cfb24c7728cf03740e8dac",
+    "preservation-tests.log": "d094b1bd2c8318c96097f80c50da282add5b2972970a77046de8db6c8935f6ca",
+    "lint-final.log": "c627b669cabd980be77c09d4b3d461c78c2d72662f380abeb5ecd031cffee65a",
+    "model-build.log": "925267a0d49335646ab5b716c2f0cebda3ddca00d97775e41e7fedd9543c86b2",
+    "pages.log": "878ddaf3fc40a97d07cf0f77ab3b187027a9c1facc11512b2ab2c522817d1b4c"
+  },
+  "pending": [
+    "Current-asset same-condition performance acceptance.",
+    "Resume remaining Mathematics primary-facade/east-end calibration using the freed budget.",
+    "Complete 20–30 whole ordinary buildings; eleven partial records do not establish full-building acceptance.",
+    "Complete required library neighbors and full north sample, remaining S4 courtyard/lakeside and S5."
+  ]
+}

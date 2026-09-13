@@ -1,0 +1,52 @@
+{
+  "modelManifestSha256": "895dfd344d590be48b3a8c2c5e78341b89757d71129bfa7ebf957db80bd540e3",
+  "vegetationSha256": "926db97defa43ae0d4031dbe43f9290884c1d8d9861e36cd9daa8c8707ec90f4",
+  "source": {
+    "trees": 3062,
+    "buildingMeshes": 452,
+    "treeLODs": [
+      "near"
+    ],
+    "testedPairs": 303,
+    "testedClosedBuildingComponents": 141066,
+    "testedOpenBuildingComponents": 4553,
+    "templateClosedComponents": {
+      "near": {
+        "0": 9,
+        "1": 6,
+        "2": 1
+      }
+    },
+    "collisions": [],
+    "passed": true
+  },
+  "shipping": {
+    "trees": 3062,
+    "buildingMeshes": 95,
+    "treeLODs": [
+      "base",
+      "near"
+    ],
+    "testedPairs": 7341,
+    "testedClosedBuildingComponents": 304719,
+    "testedOpenBuildingComponents": 82459,
+    "templateClosedComponents": {
+      "base": {
+        "0": 9,
+        "1": 6,
+        "2": 1
+      },
+      "near": {
+        "0": 9,
+        "1": 6,
+        "2": 1
+      }
+    },
+    "collisions": [],
+    "passed": true
+  },
+  "passed": true,
+  "scope": "Saved source and decoded base/all ordinary near chunks/all landmark meshes versus shipping tree transforms. Surface intersections and bidirectional containment in detected closed orientable components. Shared shell primitive with independent asset loading; no capping of open/non-manifold meshes or whole-site road/sports/water clearance proof.",
+  "sourceSha256": "a52158a2d2f3ae6697d3ea0ca0d1dcc0a5b7fc91674ff5d348d6ac4ae71a2589",
+  "meshVolumesSha256": "d05f7eefe65e0f40556fc668122736e21b89d5219fc9c0bf27852f90dea089b9"
+}

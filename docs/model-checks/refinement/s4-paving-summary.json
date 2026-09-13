@@ -1,0 +1,442 @@
+{
+  "date": "2026-09-13",
+  "scope": "S4 ordinary paving sample: way/759147083, six-b-plaza",
+  "modelManifestSha256": "89fcd7afbb0af44caf9b5c312ae26ea0dc07f0d04db4ad7a39c14fdffb670704",
+  "baseSha256": "e4e184363cffaf07f8ca2d226d9c7298c5cf8a7f1d28fc0029fd1292199175a3",
+  "sourceSha256": "d7180a9ed028276039c2b1a3f7a6b72892d203bc2e9c3d4ba8d0837ca828a420",
+  "assets": {
+    "assets": 69,
+    "changedAssets": [
+      "models/base.glb",
+      "models/time-gate.glb"
+    ],
+    "baseChangedNodes": [
+      "landmark-time-gate",
+      "roads",
+      "terrain"
+    ],
+    "baseAddedNodes": [
+      "paving-six-b-plaza",
+      "paving-six-b-plaza-contact-0"
+    ],
+    "allOtherBaseNodesAndNearAssetsPreserved": true,
+    "rawWaterTerrainRoadSiteInfrastructureDataPreserved": true,
+    "isolatedFullPreparationMatches": true,
+    "trees": 3111,
+    "treeXYHeightTypePreserved": true,
+    "treeElevationsChanged": 0,
+    "initialModelBytes": 5892096,
+    "maxOrdinaryChunkBytes": 1684868,
+    "blendBytes": 88173818,
+    "publicAndProductionMatch": true,
+    "passed": true
+  },
+  "geometryReport": "s4-paving-precision-geometry.json",
+  "geometryPassed": true,
+  "associatedChecks": [
+    "s4-paving-precision-geometry.json",
+    "s4-paving-precision-site-geometry.json",
+    "s4-paving-precision-shore-geometry.json",
+    "s4-paving-precision-time-gate-geometry.json",
+    "s4-paving-precision-tree-source.json"
+  ],
+  "pythonTests": 52,
+  "geometryScenarios": 4,
+  "nodeTests": 54,
+  "productionBuildPassed": true,
+  "browserCaptureReport": "s4-paving-precision-timed-browser.json",
+  "interactionReport": "s4-paving-precision-final-layers-interaction.json",
+  "automatedInteractionPassed": true,
+  "visualAcceptancePassed": true,
+  "performanceAcceptancePassed": false,
+  "incrementalMaintenancePassed": true,
+  "workPackagePassed": false,
+  "fullPlanCompleted": false,
+  "pending": [
+    "Complete current-asset same-condition activity performance acceptance.",
+    "Complete S2 full-building calibration for 20–30 buildings; partial records are not completed buildings.",
+    "Complete S3 neighboring-building reviews and the full library-north sample.",
+    "Complete remaining S4 sourced avenue/courtyard/low-planting and unified final exclusions, then S5."
+  ],
+  "knownNearbyRoadGaps": {
+    "newMissingComparedWithBaseline": [],
+    "baselineAndCurrentMissingPointsIdentical": true,
+    "samples": 38036,
+    "sourceInteriorMissingCount": 44,
+    "missingExamples": [
+      [
+        -28.891492966375765,
+        -670.8942759998636
+      ],
+      [
+        -28.741492966375766,
+        -671.9442759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.9192759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.8942759998636
+      ],
+      [
+        -28.741492966375766,
+        -671.8692759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.8442759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.8192759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.7942759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.7692759998636
+      ],
+      [
+        -28.741492966375766,
+        -671.7442759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.7192759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.6942759998635
+      ]
+    ],
+    "oldMissingCount": 44,
+    "newIntrusions": 0,
+    "intrusionExamples": []
+  },
+  "terrainTextureReport": "s4-paving-terrain-texture.json",
+  "sourceUVProof": "s4-paving-precision-source.json",
+  "visualReviewReport": "s4-paving-precision-visual-review.json",
+  "performanceRuns": [
+    {
+      "browserReport": "s4-paving-precision-timed-browser.json",
+      "contextReport": "s4-paving-precision-timed-performance-context.json",
+      "metrics": {
+        "精细": {
+          "repeatFPS": [
+            60,
+            60,
+            60
+          ],
+          "current": {
+            "medianFPS": 60,
+            "medianTriangles": 4123177,
+            "medianDrawCalls": 543
+          },
+          "baseline": {
+            "medianFPS": 60,
+            "medianTriangles": 4017716,
+            "medianDrawCalls": 537
+          },
+          "ratios": {
+            "medianFPS": 1.0,
+            "medianTriangles": 1.026248993209077,
+            "medianDrawCalls": 1.011173184357542
+          },
+          "thresholdsPassed": true
+        },
+        "流畅": {
+          "repeatFPS": [
+            30,
+            30,
+            30
+          ],
+          "current": {
+            "medianFPS": 30,
+            "medianTriangles": 1100180,
+            "medianDrawCalls": 272
+          },
+          "baseline": {
+            "medianFPS": 30,
+            "medianTriangles": 1052490,
+            "medianDrawCalls": 268
+          },
+          "ratios": {
+            "medianFPS": 1.0,
+            "medianTriangles": 1.045311594409448,
+            "medianDrawCalls": 1.0149253731343284
+          },
+          "thresholdsPassed": true
+        }
+      },
+      "numericThresholdsPassed": true,
+      "recordedEnvironmentMatchesBaseline": true,
+      "externalComputeObservations": [
+        {
+          "pid": 75650,
+          "observations": 3,
+          "first": {
+            "at": "2026-09-12T17:29:23.264127+00:00",
+            "pid": 75650,
+            "parentPid": 90860,
+            "cpuPercent": 99.5,
+            "elapsed": "00:07",
+            "cumulativeCPUTime": "0:06.06",
+            "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+          },
+          "last": {
+            "at": "2026-09-12T17:29:43.329521+00:00",
+            "pid": 75650,
+            "parentPid": 90860,
+            "cpuPercent": 100.0,
+            "elapsed": "00:27",
+            "cumulativeCPUTime": "0:26.03",
+            "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+          },
+          "observedSeconds": 20.065394,
+          "cumulativeCPUSecondsAdded": 19.970000000000002
+        },
+        {
+          "pid": 75664,
+          "observations": 4,
+          "first": {
+            "at": "2026-09-12T17:29:23.264127+00:00",
+            "pid": 75664,
+            "parentPid": 90860,
+            "cpuPercent": 98.0,
+            "elapsed": "00:06",
+            "cumulativeCPUTime": "0:05.31",
+            "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+          },
+          "last": {
+            "at": "2026-09-12T17:29:53.359961+00:00",
+            "pid": 75664,
+            "parentPid": 90860,
+            "cpuPercent": 100.0,
+            "elapsed": "00:36",
+            "cumulativeCPUTime": "0:36.38",
+            "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+          },
+          "observedSeconds": 30.095834,
+          "cumulativeCPUSecondsAdded": 31.070000000000004
+        },
+        {
+          "pid": 75741,
+          "observations": 1,
+          "first": {
+            "at": "2026-09-12T17:31:03.660360+00:00",
+            "pid": 75741,
+            "parentPid": 90860,
+            "cpuPercent": 120.0,
+            "elapsed": "00:01",
+            "cumulativeCPUTime": "0:03.25",
+            "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+          },
+          "last": {
+            "at": "2026-09-12T17:31:03.660360+00:00",
+            "pid": 75741,
+            "parentPid": 90860,
+            "cpuPercent": 120.0,
+            "elapsed": "00:01",
+            "cumulativeCPUTime": "0:03.25",
+            "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+          },
+          "observedSeconds": 0.0,
+          "cumulativeCPUSecondsAdded": 0.0
+        },
+        {
+          "pid": 75843,
+          "observations": 8,
+          "first": {
+            "at": "2026-09-12T17:31:43.852238+00:00",
+            "pid": 75843,
+            "parentPid": 90860,
+            "cpuPercent": 94.0,
+            "elapsed": "00:02",
+            "cumulativeCPUTime": "0:02.07",
+            "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+          },
+          "last": {
+            "at": "2026-09-12T17:32:54.135548+00:00",
+            "pid": 75843,
+            "parentPid": 90860,
+            "cpuPercent": 97.9,
+            "elapsed": "01:13",
+            "cumulativeCPUTime": "1:11.10",
+            "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+          },
+          "observedSeconds": 70.28331,
+          "cumulativeCPUSecondsAdded": 69.03
+        },
+        {
+          "pid": 75853,
+          "observations": 1,
+          "first": {
+            "at": "2026-09-12T17:31:43.852238+00:00",
+            "pid": 75853,
+            "parentPid": 90860,
+            "cpuPercent": 102.7,
+            "elapsed": "00:01",
+            "cumulativeCPUTime": "0:01.61",
+            "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+          },
+          "last": {
+            "at": "2026-09-12T17:31:43.852238+00:00",
+            "pid": 75853,
+            "parentPid": 90860,
+            "cpuPercent": 102.7,
+            "elapsed": "00:01",
+            "cumulativeCPUTime": "0:01.61",
+            "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+          },
+          "observedSeconds": 0.0,
+          "cumulativeCPUSecondsAdded": 0.0
+        },
+        {
+          "pid": 75944,
+          "observations": 1,
+          "first": {
+            "at": "2026-09-12T17:32:54.135548+00:00",
+            "pid": 75944,
+            "parentPid": 90860,
+            "cpuPercent": 53.5,
+            "elapsed": "00:02",
+            "cumulativeCPUTime": "0:00.83",
+            "executable": ".venv/bin/python"
+          },
+          "last": {
+            "at": "2026-09-12T17:32:54.135548+00:00",
+            "pid": 75944,
+            "parentPid": 90860,
+            "cpuPercent": 53.5,
+            "elapsed": "00:02",
+            "cumulativeCPUTime": "0:00.83",
+            "executable": ".venv/bin/python"
+          },
+          "observedSeconds": 0.0,
+          "cumulativeCPUSecondsAdded": 0.0
+        }
+      ],
+      "sameConditionAcceptancePassed": false,
+      "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+    },
+    {
+      "browserReport": "s4-paving-precision-recheck-browser.json",
+      "contextReport": "s4-paving-precision-recheck-performance-context.json",
+      "metrics": {
+        "精细": {
+          "repeatFPS": [
+            60,
+            60,
+            60
+          ],
+          "current": {
+            "medianFPS": 60,
+            "medianTriangles": 4123177,
+            "medianDrawCalls": 544
+          },
+          "baseline": {
+            "medianFPS": 60,
+            "medianTriangles": 4017716,
+            "medianDrawCalls": 537
+          },
+          "ratios": {
+            "medianFPS": 1.0,
+            "medianTriangles": 1.026248993209077,
+            "medianDrawCalls": 1.0130353817504656
+          },
+          "thresholdsPassed": true
+        },
+        "流畅": {
+          "repeatFPS": [
+            28,
+            27,
+            27
+          ],
+          "current": {
+            "medianFPS": 27,
+            "medianTriangles": 1103170,
+            "medianDrawCalls": 282
+          },
+          "baseline": {
+            "medianFPS": 30,
+            "medianTriangles": 1052490,
+            "medianDrawCalls": 268
+          },
+          "ratios": {
+            "medianFPS": 0.9,
+            "medianTriangles": 1.0481524765080903,
+            "medianDrawCalls": 1.0522388059701493
+          },
+          "thresholdsPassed": true
+        }
+      },
+      "numericThresholdsPassed": true,
+      "recordedEnvironmentMatchesBaseline": true,
+      "externalComputeObservations": [
+        {
+          "pid": 76756,
+          "observations": 1,
+          "first": {
+            "at": "2026-09-12T17:45:36.465522+00:00",
+            "pid": 76756,
+            "parentPid": 90860,
+            "cpuPercent": 97.6,
+            "elapsed": "00:02",
+            "cumulativeCPUTime": "0:03.71",
+            "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+          },
+          "last": {
+            "at": "2026-09-12T17:45:36.465522+00:00",
+            "pid": 76756,
+            "parentPid": 90860,
+            "cpuPercent": 97.6,
+            "elapsed": "00:02",
+            "cumulativeCPUTime": "0:03.71",
+            "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+          },
+          "observedSeconds": 0.0,
+          "cumulativeCPUSecondsAdded": 0.0
+        }
+      ],
+      "sameConditionAcceptancePassed": false,
+      "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+    }
+  ],
+  "performanceThresholdsPassed": true,
+  "acceptedPerformanceReport": null,
+  "incrementalReport": "s4-paving-incremental-summary.json",
+  "implementationSha256": {
+    "blender/build_campus.py": "0a71e2369c3bef99c58104dcc007c200826afe10f6fd59192c82e88c1c788382",
+    "blender/geometry.py": "8e51dbc42120edf2b32c0c3d600018e254688815775d9a950c772620329a17de",
+    "blender/terrain_export.py": "48cec030aec44bb90e18732bbe49b8f0f1b6dfa5ce1355e27e325b26f65a959d",
+    "blender/preserve_glb_geometry.py": "5f80945c0e0c1eacf2fe30b8cd787040df2248d98478c1cbfb1de3eddbe9bba0",
+    "blender/paving_geometry.py": "30fa493d7e525d4502d2697937d3444749e6889b1baf15f5ff042a7991a8c1d8",
+    "blender/update_roads.py": "67a088e4b410afd0a5566358bb912f8706475060757793230228de4c9bbc9221",
+    "blender/update_basketball.py": "0ea1c5dc9e1b30dc6c9da554f941c9c189bd80e8bc25cbec41336ebef3210b9c",
+    "blender/validate_paving.py": "854343c837ccf126b4d26ee082157667af3167e00ea49dc7bf8a9e140df89d4b",
+    "blender/validate_terrain_texture.py": "26ddf833460b5c5bead41471421c3002e74893bb2e293b2e03ed5372751bcf31",
+    "blender/test_paving_geometry.py": "39e90e225d31443e44f657a6757b703ffe1e71bc5f018cbced60ab0bdbf5d47a",
+    "scripts/test_incremental_glb.py": "3b5e433e0700a2db8d37adc0233a5fa841cb9662476ad9c9a7e8c4b3cf182dbc",
+    "scripts/paving_data.py": "a01ad5754c0710b0efa4bddbb4b292a700dc0bca2935e8f09867d56c2dba6cfa",
+    "data/paving-overrides.json": "798e2a209d0a5f4c38519f4a355e38432fd9a28ff8a40ae33fd87a48c4c2aea8",
+    "public/data/pavings.json": "bf38a66b13b7917bd9af0c04d1ba7c5adfa90680979083aba45b957708fd890c",
+    "public/data/vegetation.json": "45338ed29cd6d099b1400217242a7c4db844d93f2966ede47fa031a2ccdcfb6b",
+    "public/data/sources.json": "e8840d31900bffa02faa1cd3b72948d5243692d129ef03d486ffcb786f3695a2",
+    "scripts/check-refinement-browser.mjs": "92f357be4185b9b0514d18f17585c752b675dc44d5aa1636558eac3c98b159fd"
+  },
+  "evidenceSha256": {
+    "s4-paving-precision-geometry.json": "1918d6568a28cadd7cec5c3a6e0ba246575c233f7e293ccb6d67d053192fe03b",
+    "s4-paving-precision-site-geometry.json": "ce3c04ae7ac410269d235f597daaada999dbd15438e3d74f9df25ca2d3919125",
+    "s4-paving-precision-shore-geometry.json": "934ccf8bf8d001247140158f40abd14dd090eb4d0ba6d20c133d27fd91424323",
+    "s4-paving-precision-time-gate-geometry.json": "45850d0980324add9dc375e1d8264c5d381002f64c6b9e4159c29b43d8b6c35e",
+    "s4-paving-precision-tree-source.json": "c29fd1e596f4a26e4d599e3b98a6f2b8e0179129cf1ec03afb6790e7d0bd8735",
+    "s4-paving-terrain-texture.json": "a022f366e27874d6c999006abcd00128af5f1fdb6b08acdf6b28c3011e517e8b",
+    "s4-paving-precision-source.json": "3366876753201cd3a8a35c85043b268d1db5fae658fe0907bbd3db299808ca44",
+    "s4-paving-incremental-summary.json": "c3c7d039b847f91fa00ae70fe65c9d6c94c5d37ad847219d48e3becff813db55",
+    "s4-paving-precision-visual-review.json": "d87b80cf9c7ee50f7daf83b9b48fac176c7175b6f26201de9983d3181a14d472"
+  }
+}

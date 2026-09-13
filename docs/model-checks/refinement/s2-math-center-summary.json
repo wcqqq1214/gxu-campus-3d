@@ -1,0 +1,359 @@
+{
+  "buildingId": "way/759129515",
+  "modelManifestSha256": "207ddda2383c228a675abbf02abab5554461c15eb931425e914eb61e9f792360",
+  "sourceSha256": "ed72da249d702d7af89bae85d6ffc4246ad594800f9a2c36a14e6929ce9aa8a3",
+  "partialCalibrationRecords": 12,
+  "wholeBuildingAccepted": false,
+  "newlyAcceptedWholeBuildings": 0,
+  "assets": {
+    "changedBuildingIds": [
+      "way/759129515"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3062,
+    "restoredTreeCandidates": [],
+    "shippingTrees": 3062,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-n1-n3.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-n1-n3",
+      "terrain"
+    ],
+    "addedBaseNodes": [
+      "site-math-center-gallery-apron",
+      "site-math-center-south-apron"
+    ],
+    "preservedBaseNodes": 84,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5009668,
+    "initialModelByteChange": 162020,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "207ddda2383c228a675abbf02abab5554461c15eb931425e914eb61e9f792360",
+    "passed": true
+  },
+  "pythonTests": 110,
+  "geometryReport": "s2-math-center-grounded-geometry.json",
+  "regression": {
+    "ordinaryBuildings": 430,
+    "shippingTrees": 3062,
+    "method": "Earlier full ordinary/tree checks carried forward by exact non-terrain source/base and remaining GLB preservation; final two apron meshes separately checked against shipping trees. Not a fresh final-asset all-building scan.",
+    "preservationReport": "s2-math-center-gallery-preservation.json",
+    "apronTreeReport": "s2-math-center-apron-trees.json"
+  },
+  "visualAcceptancePassed": true,
+  "visualReviewReport": "s2-math-center-grounded-visual-review.json",
+  "incrementalMaintenance": {
+    "finalBasketballPassed": true,
+    "finalRoadsRechecked": false,
+    "scope": "Paired final assets in isolated basketball copy; 88 base nodes preserved and source/base/near center geometry checked. Earlier road maintenance was tested before gallery grading; not claimed as a final road run."
+  },
+  "performance": {
+    "browserReport": "s2-math-center-timed-browser.json",
+    "contextReport": "s2-math-center-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          29
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4135729,
+          "medianDrawCalls": 541
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0293731562907882,
+          "medianDrawCalls": 1.0074487895716946
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          28,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1121121,
+          "medianDrawCalls": 291
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.065208220505658,
+          "medianDrawCalls": 1.085820895522388
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 36083,
+        "observations": 2,
+        "first": {
+          "at": "2026-09-13T05:51:29.163651+00:00",
+          "pid": 36083,
+          "parentPid": 36082,
+          "cpuPercent": 99.7,
+          "elapsed": "00:07",
+          "cumulativeCPUTime": "0:08.30",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T05:51:39.212778+00:00",
+          "pid": 36083,
+          "parentPid": 36082,
+          "cpuPercent": 100.0,
+          "elapsed": "00:17",
+          "cumulativeCPUTime": "0:18.26",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 10.049127,
+        "cumulativeCPUSecondsAdded": 9.96
+      },
+      {
+        "pid": 36104,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T05:51:49.240834+00:00",
+          "pid": 36104,
+          "parentPid": 36082,
+          "cpuPercent": 101.8,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:03.72",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T05:51:49.240834+00:00",
+          "pid": 36104,
+          "parentPid": 36082,
+          "cpuPercent": 101.8,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:03.72",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 36113,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T05:51:59.277870+00:00",
+          "pid": 36113,
+          "parentPid": 36082,
+          "cpuPercent": 98.8,
+          "elapsed": "00:03",
+          "cumulativeCPUTime": "0:04.58",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T05:51:59.277870+00:00",
+          "pid": 36113,
+          "parentPid": 36082,
+          "cpuPercent": 98.8,
+          "elapsed": "00:03",
+          "cumulativeCPUTime": "0:04.58",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 36121,
+        "observations": 9,
+        "first": {
+          "at": "2026-09-13T05:52:09.326004+00:00",
+          "pid": 36121,
+          "parentPid": 36075,
+          "cpuPercent": 71.2,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:00.74",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "last": {
+          "at": "2026-09-13T05:53:29.988507+00:00",
+          "pid": 36121,
+          "parentPid": 36075,
+          "cpuPercent": 63.8,
+          "elapsed": "01:21",
+          "cumulativeCPUTime": "1:18.19",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "observedSeconds": 80.662503,
+        "cumulativeCPUSecondsAdded": 77.45
+      },
+      {
+        "pid": 36124,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T05:52:09.326004+00:00",
+          "pid": 36124,
+          "parentPid": 36122,
+          "cpuPercent": 351.6,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:02.12",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T05:52:09.326004+00:00",
+          "pid": 36124,
+          "parentPid": 36122,
+          "cpuPercent": 351.6,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:02.12",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 36230,
+        "observations": 6,
+        "first": {
+          "at": "2026-09-13T05:53:40.050696+00:00",
+          "pid": 36230,
+          "parentPid": 36075,
+          "cpuPercent": 74.2,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:00.80",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "last": {
+          "at": "2026-09-13T05:54:30.369183+00:00",
+          "pid": 36230,
+          "parentPid": 36075,
+          "cpuPercent": 134.7,
+          "elapsed": "00:52",
+          "cumulativeCPUTime": "0:50.83",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "observedSeconds": 50.318487,
+        "cumulativeCPUSecondsAdded": 50.03
+      },
+      {
+        "pid": 36284,
+        "observations": 2,
+        "first": {
+          "at": "2026-09-13T05:54:40.408371+00:00",
+          "pid": 36284,
+          "parentPid": 36283,
+          "cpuPercent": 39.7,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.24",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T05:54:50.447896+00:00",
+          "pid": 36284,
+          "parentPid": 36283,
+          "cpuPercent": 100.0,
+          "elapsed": "00:10",
+          "cumulativeCPUTime": "0:10.24",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 10.039525,
+        "cumulativeCPUSecondsAdded": 10.0
+      },
+      {
+        "pid": 36291,
+        "observations": 4,
+        "first": {
+          "at": "2026-09-13T05:55:00.483089+00:00",
+          "pid": 36291,
+          "parentPid": 36283,
+          "cpuPercent": 99.7,
+          "elapsed": "00:08",
+          "cumulativeCPUTime": "0:07.91",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T05:55:30.605778+00:00",
+          "pid": 36291,
+          "parentPid": 36283,
+          "cpuPercent": 99.1,
+          "elapsed": "00:38",
+          "cumulativeCPUTime": "0:37.90",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 30.122689,
+        "cumulativeCPUSecondsAdded": 29.99
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "performanceAcceptancePassed": false,
+  "partialBatchJointAcceptancePassed": false,
+  "fullPlanCompleted": false,
+  "pending": [
+    "Current-asset same-condition activity performance acceptance.",
+    "East upper galleries and remaining major facades, roof ends, sign-wall openings/materials and complete road connection.",
+    "20–30 whole ordinary buildings, required library neighbors and complete north-site sample, remaining S4 courtyard/lakeside and S5."
+  ],
+  "implementationSha256": {
+    "scripts/building_overrides.py": "05f9a3f0c3ed34f0cdcbcc3977d1efef18308e2e63d95eabaf56f035d1efae98",
+    "scripts/entry_apron_data.py": "47ed30925b6ea22d5cd6b5f48f3e71721094f97776c737471caa50a5d70942cc",
+    "scripts/gallery_apron_data.py": "1fece90a6efb2322adc52248ea11d97a74edd10c795c074e34c68208bf1b4b85",
+    "scripts/site_data.py": "85db23f81e4d1102ed6454039d5d64a268eba2a67cbf45fe2ee562dc9a527ab3",
+    "blender/generic_buildings.py": "5f9ff0d8b2f7a86ae2ed75344225fa934299e1fff9b2e3613122effb7ec9210f",
+    "blender/facade_corridors.py": "1fb311dc1429a5e755f599704e8180c656d48113b97fdea7a378b3f759e0dcc8",
+    "blender/entry_apron.py": "6a37410bd3fe628e859105ae97fb017e9a616f8ce7bf8f599b67fa6403cad6f2",
+    "blender/site_geometry.py": "1995795d81d3f18a7725efc606995160bf37b0c544696b6896e3045d1fc6e6b1",
+    "blender/build_campus.py": "05af07d33e95fa86fca580ffb7c7cf4025026dbe7fbd0e33d56f02942a498666",
+    "blender/validate_math_center.py": "74d6caac9c72a8caadfe427df12030d074f4ba18fb24fa852fb312057309f263",
+    "blender/test_entry_apron.py": "34068e2225639f1532355cb8488706fcd54776e9a537274772e3e25b44351df4",
+    "blender/test_math_center_corridor.py": "7ecebd76c4f5c7118c489bc4fac465b353d2e4c467c7d7a38396262a65300d93",
+    "scripts/test_building_overrides.py": "65709f1905bf38a93ae1183766a9b078f826d6c0d7ad10cd278ee9eb2586eec5",
+    "scripts/test_entry_apron_data.py": "25f051a626ae57affefc9fb42094db07d364cf87a7227e12ca71f27d842fd083",
+    "scripts/test_gallery_apron_data.py": "c51f52a1d25f99449a798d595339439ec679358e03c3955cf1ffa902b509523d",
+    "data/building-overrides.json": "4830937378ef88efcf1bb3cb61b945820a3c79c9743766c3789fc47e2756fcdc",
+    "data/building-sources.json": "36dce9c06939e9fe16755ec7a502370a581778f0c8ec83050b20a32bf783f62e",
+    "data/site-overrides.json": "bb1d487441cf2ec6c1a002c3b6f14f4ccacb4d6de2bc14c7f951a89ea00bbacc",
+    "public/data/buildings.json": "6de8f5d4901b1fa610456d4349ceea6332f6afdbca3d437140f5f5ef4368e461",
+    "public/data/sites.json": "d6d239cc96daea5aedd37f160be55e723b740c3b6d908623e8f673e577c50232",
+    "public/data/vegetation.json": "926db97defa43ae0d4031dbe43f9290884c1d8d9861e36cd9daa8c8707ec90f4"
+  },
+  "evidenceSha256": {
+    "s2-math-center-evidence.json": "42e98d60f3a2ad691e0bb0bc6aaba1a8bbe946951e2cacf77b5476a831b47c7f",
+    "s2-math-center-assets.json": "f93bbcbb0d6e2884139b28945fb37738b802cd82436441d32bfc12061de8f684",
+    "s2-math-center-source-preservation.json": "e3e98b9e466139b6ebdfc5cf68b0a1a80849c4742aa5b8e5b673522d53ddea49",
+    "s2-math-center-gallery-preservation.json": "058ca47f38211510660ae1dec56ca8219be806c88ff1102f0c67799118c2d6c6",
+    "s2-math-center-grounded-geometry.json": "98fd22c3b202ec15d1c924868cf31bade29495027356ccbae6d5486c986bb556",
+    "s2-math-center-final-ordinary-geometry.json": "b454f1202b53822f051100eb77c743ff202cab23ca95026dfb06acc0b88a9bce",
+    "s2-math-center-final-trees-geometry.json": "0c6f1bb81950d05fbb7a60fdf213807703b72b9308202f2db77e6fdd956eec11",
+    "s2-math-center-apron-trees.json": "091c0e1a11f02a35656a1cbcf4e9af598865f4e00f36af22a8fc8ba68694fbf6",
+    "s2-math-center-final-incremental-assets.json": "e6526e73b70e1af784db3977c9ad3b38b9263ec9f85df42ebb09144343bf755b",
+    "s2-math-center-final-basketball-geometry.json": "0abe2f10292c3aba5a06998f357a2e9cb4c55d22b133f4af4f5877cbef4b80b4",
+    "s2-math-center-grounded-context-browser.json": "c4d9f43cc944ecb3a2af8d8785cb3856b02b866a501fb3b5ff5934ad779a8719",
+    "s2-math-center-grounded-cameras.json": "c38858b737514a5905927d28fee13f26b555119bd78aa636afd385f0795fd7ae",
+    "s2-math-center-grounded-visual-review.json": "22d6e0acb8bc25947210bd1e4e60751e7858e0ecd8d4a956b39cf7336da41bce",
+    "s2-math-center-timed-browser.json": "54c920bddf4e0c1bb3207e395c6e4536c79e3d327fa5d81755978e8a0a6864a5",
+    "s2-math-center-timed-performance-context.json": "e0a979a214341cb1684184f7a50518bb175248b76e66b751636d53d7b81f0ed7"
+  },
+  "logSha256": {
+    "data-tests-gallery.log": "ba66122813152b1fe26ae3433e52c2462c6eb9e18b0f84d5a143f7a9a6374c3d",
+    "corridor-test.log": "7bbcfa78b3bd4a0f43f61a3eabe55b7b9fd00d1e42c87746c0e9dd3ab2d31c79",
+    "gallery-apron-test.log": "2829ab358bae5b3ae633ff20cea2ad5dd04707211e66949ae087e80f76b9e644",
+    "build-gallery-full.log": "4a4a7a84e383116d0ac22c8e8644014671e25b4948cea1b2e3518fbb221eb0d5",
+    "pages-grounded.log": "0e5ab87c3841db6f0bfba809b5658ed3d8d534032f784dd427c2d81db7cc85da",
+    "lint.log": "c627b669cabd980be77c09d4b3d461c78c2d72662f380abeb5ecd031cffee65a"
+  }
+}

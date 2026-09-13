@@ -1,0 +1,437 @@
+{
+  "capturedAt": "2026-09-12T08:50:29.614984+00:00",
+  "sourceCommit": "10b631dd8f9173009cdbba5f7622b0f18b392940",
+  "environment": {
+    "os": "macOS-26.5.1-arm64-arm-64bit",
+    "python": "3.12.13",
+    "node": "v26.8.2",
+    "blender": [
+      "Blender 5.2.1 LTS",
+      "\tbuild date: 2026-08-25",
+      "\tbuild time: 01:35:57",
+      "\tbuild commit date: 2026-08-24",
+      "\tbuild commit time: 16:50",
+      "\tbuild hash: 9e2066aef7ef",
+      "\tbuild branch: blender-v5.2-release",
+      "\tbuild platform: Darwin"
+    ],
+    "draco": "Blender bundled glTF exporter; compression level 6, base position 15 bits / normal 6 bits, near position 16 / normal 10"
+  },
+  "buildings": 448,
+  "campusBuildings": 435,
+  "heightBasis": {
+    "OSM高度或层数": 96,
+    "参考照片估算": 4,
+    "按类型估算": 347,
+    "北翼按 OSM 8 层乘 3.3 米估算，南部和连接区按照片分区估算": 1
+  },
+  "trees": 3034,
+  "landmarks": 20,
+  "initialModelBytes": 5051912,
+  "maxChunkBytes": 1708364,
+  "oldNearOnlyPitchedRoofIds": [
+    "way/759079684",
+    "way/759132931",
+    "way/759132932",
+    "way/759337807",
+    "way/759337815",
+    "way/759345904",
+    "way/880036323",
+    "way/880036340",
+    "way/880036341",
+    "way/962220882",
+    "way/1544361463",
+    "way/1544361466"
+  ],
+  "assets": {
+    "blender/gxu-campus.blend": {
+      "bytes": 97633604,
+      "sha256": "a0b5839658e4ad004827255dadededa63c4491f4cce112424ab730489068e52d"
+    },
+    "data/snapshots/infrastructure-2026-09-11.json.gz": {
+      "bytes": 63322,
+      "sha256": "9618ca6af181ec1dda79253dd8adc5a7701fb016a26710a9f049e4c629fa2054"
+    },
+    "data/snapshots/infrastructure.overpassql": {
+      "bytes": 136,
+      "sha256": "7a9618d0168945a873502175b3575084d185abbdbb6287d3930915161b6d8e7a"
+    },
+    "data/snapshots/osm-2026-09-09.json.gz": {
+      "bytes": 186922,
+      "sha256": "3f448ad4b6f2c706b22e993bb750e5e4634440993e7469f96acf6cde1f64690e"
+    },
+    "data/snapshots/query.overpassql": {
+      "bytes": 652,
+      "sha256": "b53de03b028db9148cf90351a97d46978203eb501e785861754221e69c1e1ecf"
+    },
+    "data/snapshots/terrain-14-13119-7122.png": {
+      "bytes": 65973,
+      "sha256": "7c4e88cfacdc22b3449b19fe7b45e849613c4571882a4f9f509a9d58c49721e2"
+    },
+    "data/snapshots/terrain-14-13119-7123.png": {
+      "bytes": 75834,
+      "sha256": "f6e084cc1079649cbb9d39908b18c7c03856e2a1169d01aa38d940a1b9b21d95"
+    },
+    "data/snapshots/terrain-14-13119-7124.png": {
+      "bytes": 77094,
+      "sha256": "9b59672cd0b41547dc506648cce6ae45b86e780848b66e443d66f0e246af5c9a"
+    },
+    "data/snapshots/terrain-14-13120-7122.png": {
+      "bytes": 95689,
+      "sha256": "51d41b677d12723ebc0cbc7b6820f7a04ffc66c6ad344b0cf6536353f6443727"
+    },
+    "data/snapshots/terrain-14-13120-7123.png": {
+      "bytes": 75437,
+      "sha256": "ffce0dc9b47776d6f9ef51b3b919f8f89fb3b74d2d7edc0628065e7a3a65f042"
+    },
+    "data/snapshots/terrain-14-13120-7124.png": {
+      "bytes": 78201,
+      "sha256": "d73b93d48e6c7107117f0172f5b1aef6d20c5df609cc32c7944686e21bf4b171"
+    },
+    "data/snapshots/terrain-source.json": {
+      "bytes": 342,
+      "sha256": "8df0ad50ef3c97f9a52944df008e914e529f15f78178263b4d635ba65a6c8f27"
+    },
+    "public/data/basketball.json": {
+      "bytes": 421259,
+      "sha256": "3fbb7bc9b1292c2123a7543d14661b24aa15aedf5096f9d4ab76f07e07066c09"
+    },
+    "public/data/buildings.json": {
+      "bytes": 472508,
+      "sha256": "ae860b8cba190e45d105e3cb6b69d6d01635636bb384abc7f77cf8cb18c51b0a"
+    },
+    "public/data/campus-boundary.json": {
+      "bytes": 38134,
+      "sha256": "7bc7a27929130e6ed1f465325ab58c0667438a88ab64334b1b34cf8bf46ca586"
+    },
+    "public/data/campus-roads.json": {
+      "bytes": 2919966,
+      "sha256": "7f2b87442987343595c51a5df9d5283d9e0c2bb9c944b5d307dc77d5be93d267"
+    },
+    "public/data/geography.geojson": {
+      "bytes": 721641,
+      "sha256": "6d877e23c68b88a6fc3a821f35f0cd1a9464e9b064f58c1555aa8711a9bf3bf8"
+    },
+    "public/data/infrastructure-map.json": {
+      "bytes": 1916,
+      "sha256": "d30ba97dbff9e40bd006e676fe4c29f8e92e56ac617da7b7a9021eb0eb907a68"
+    },
+    "public/data/infrastructure.json": {
+      "bytes": 259170,
+      "sha256": "4322029dd3602011856c89de30f470e9f381ba9bc4f7de92c6c06c493c32fab6"
+    },
+    "public/data/landmarks.json": {
+      "bytes": 39256,
+      "sha256": "a43e51224f7b522b3322030b6d17111f7ba5517166dcbbcbc2fe02497340bb85"
+    },
+    "public/data/models.json": {
+      "bytes": 31384,
+      "sha256": "1ab1452d99e47dbb47ab79d9bc967de3a509b7269a8b2073c922ef8ccca05b76"
+    },
+    "public/data/overview.json": {
+      "bytes": 588,
+      "sha256": "aa248e088048a7e754137959ea1e2d7081fe0222470ba34f55e6bb1b916ba4cc"
+    },
+    "public/data/sources.json": {
+      "bytes": 33362,
+      "sha256": "10a7b41799899ae699ae13243e98232f9d7a7ba2da8519545227ad1ec5561300"
+    },
+    "public/data/sports.json": {
+      "bytes": 11502,
+      "sha256": "28ad41038c44b8360ebb244615c52f0a330563fc1cea4ff78462b0a0fc4576f4"
+    },
+    "public/data/surfaces.json": {
+      "bytes": 372018,
+      "sha256": "4b076226431cadc978081656df66b0bc70d99a19fff79d91cea3d6e220a74408"
+    },
+    "public/data/surroundings.json": {
+      "bytes": 1115720,
+      "sha256": "007b93bea808c728a35252e6997cd5fedd7fdb3c21d036e89ebe2e176f521a14"
+    },
+    "public/data/terrain.json": {
+      "bytes": 324196,
+      "sha256": "6ea0100e963f3e26c176273fea174ffe3e4ac60d2e131955119be53fd005aa52"
+    },
+    "public/data/vegetation.json": {
+      "bytes": 65755,
+      "sha256": "c9b137a3dc00e4abe5dca16b47c6ae8b31362618149460cb0379c1d316378d56"
+    },
+    "public/models/auditorium.glb": {
+      "bytes": 37444,
+      "sha256": "5cf24d114f9872833e624e50301727e04ebcaa261d3ae0439991d1ea5008ca79"
+    },
+    "public/models/base.glb": {
+      "bytes": 5029996,
+      "sha256": "e2159dd2d97931e3aba1baccb43089df8aaef7dabdaf5d5be14bfe7c5aac6833"
+    },
+    "public/models/bocui-bridge.glb": {
+      "bytes": 127380,
+      "sha256": "1bb76f28a111c18537cca37197cdfb76549eab3981c855493d546a8034f26404"
+    },
+    "public/models/chongzuo-bridge.glb": {
+      "bytes": 943412,
+      "sha256": "8dd1195fca9ce8eb2b5cc43e24e9323a25300d318959c2e2fd354517f69cadbc"
+    },
+    "public/models/chunk-n1-n1.glb": {
+      "bytes": 870024,
+      "sha256": "a2add49582660968d31f1974f30421f33b00daf29347419e6e52c505ac050477"
+    },
+    "public/models/chunk-n1-n2.glb": {
+      "bytes": 330148,
+      "sha256": "ed5a2f40b828e007bdfbc684da3b6afa68ffa1759a4511f4165c37f9dd2417b5"
+    },
+    "public/models/chunk-n1-n3.glb": {
+      "bytes": 1253660,
+      "sha256": "eddb58336f185f8a71b9ffc1b9d5a52c9a35cd4f85365cc02102f906d4f3bc56"
+    },
+    "public/models/chunk-n1-n4.glb": {
+      "bytes": 64572,
+      "sha256": "6dfce65a47c5e092cdb84d38405a3e172acb2e23f94ccb047ce780c41fadc997"
+    },
+    "public/models/chunk-n1-p0.glb": {
+      "bytes": 1354752,
+      "sha256": "947371a52829c41bc84bc79e4351f3748552c7ac9614b456eb823c48c5b553c8"
+    },
+    "public/models/chunk-n1-p1.glb": {
+      "bytes": 167620,
+      "sha256": "646d800a446a34fad9f933bb9ea371126549ad632f90de550cd02355f07a0c67"
+    },
+    "public/models/chunk-n1-p2.glb": {
+      "bytes": 556660,
+      "sha256": "3fb608aac825e12ba0e1f69cc8f5149afd4e94bdf29cf78a8e9be48cca4dccce"
+    },
+    "public/models/chunk-n2-n1.glb": {
+      "bytes": 1700064,
+      "sha256": "72da9462a649e494c42cb641656b620d4a56f9256e26e4408ad99f14b7478c04"
+    },
+    "public/models/chunk-n2-n2.glb": {
+      "bytes": 1175952,
+      "sha256": "ef61e6a4514b673f6924789f09f0f54682588982a6ccb3411ad6649268528ea3"
+    },
+    "public/models/chunk-n2-n3.glb": {
+      "bytes": 1162128,
+      "sha256": "6a6654b0c68b351a1bd3fdfeeb25e9aaf090ebcbfd4c4283e1f216c31abc56bc"
+    },
+    "public/models/chunk-n2-n4.glb": {
+      "bytes": 347588,
+      "sha256": "7c668c69ae283855a69c74233c2ed4891e4f9fc3ae899a785110d93227cb5726"
+    },
+    "public/models/chunk-n2-p0.glb": {
+      "bytes": 106236,
+      "sha256": "0523d04a1e49d80d365208ed23c1a187f583474398bc6d8c26081a2730ad3b3b"
+    },
+    "public/models/chunk-n2-p2.glb": {
+      "bytes": 644188,
+      "sha256": "0591f544ea9972f122b10fbc267aee74937b5f8d0a072d4294f852aa45a3888b"
+    },
+    "public/models/chunk-n2-p3.glb": {
+      "bytes": 103356,
+      "sha256": "4125a8968847b5d926b294da32be69796d73f389ad21e4cdce54d17f50533de5"
+    },
+    "public/models/chunk-n3-n1.glb": {
+      "bytes": 627728,
+      "sha256": "3f410e36589507f3c32ff9e829b9de150ae4aca3969a86f4d73eb79ee200e9ca"
+    },
+    "public/models/chunk-n3-n2.glb": {
+      "bytes": 228240,
+      "sha256": "164fcc794bcc3e669d0ed9cbbb73e58708f573a7e55dcf97ed63fb8baa9f217c"
+    },
+    "public/models/chunk-n3-p0.glb": {
+      "bytes": 149412,
+      "sha256": "b62881e08395e9cfe2570fc2f4185ea4a13cacf4ab015a3e44315d12a84c787c"
+    },
+    "public/models/chunk-n3-p2.glb": {
+      "bytes": 223476,
+      "sha256": "8031878d068b71ee6238b6b1add876755680ed544519bfeb358bb254b0f79ab7"
+    },
+    "public/models/chunk-p0-n1.glb": {
+      "bytes": 972500,
+      "sha256": "5a82884e1fb841d5c6fa9a93949d7075aa3c3d2020afd14cda78f5e584f9fdf5"
+    },
+    "public/models/chunk-p0-n2.glb": {
+      "bytes": 869376,
+      "sha256": "24e1f9bf546898e0c3f83a80b8d399df716fd0e9e2f0c10f2c047a95b3f339fb"
+    },
+    "public/models/chunk-p0-n3.glb": {
+      "bytes": 1186140,
+      "sha256": "a999f658708e3daa86b939168322f6f9648adf19a4fbb565dfe7ef6479263762"
+    },
+    "public/models/chunk-p0-p0.glb": {
+      "bytes": 1240984,
+      "sha256": "20ab6284b0ca5d4221ed4f5cdab6c04aefa64a459cb678a516db3be5c2c52526"
+    },
+    "public/models/chunk-p0-p1.glb": {
+      "bytes": 659900,
+      "sha256": "1b0ae775bcfcb4d20730733f3b9cffa64ab109dc2b5c3cb0c73201cd060de6b3"
+    },
+    "public/models/chunk-p0-p2.glb": {
+      "bytes": 209344,
+      "sha256": "a5591aa593955ab6ddbef9087a9097ac2cb177076edb52a8c6533e72cd08927b"
+    },
+    "public/models/chunk-p1-n1.glb": {
+      "bytes": 1020316,
+      "sha256": "295f8f1e2da56a420bca30ac2e0c369bbd784b743247ec1b5c45ebf3d769da6f"
+    },
+    "public/models/chunk-p1-n2.glb": {
+      "bytes": 1045420,
+      "sha256": "bd5059cc4d49e7acd22641dcecee29c6f487865a69b8b09c6ab6f8f4741536a6"
+    },
+    "public/models/chunk-p1-p0.glb": {
+      "bytes": 1708364,
+      "sha256": "d988419b63a187535d099921ce2548b3ffb3dc314171bf85d8957504a624d3a3"
+    },
+    "public/models/chunk-p1-p1.glb": {
+      "bytes": 598944,
+      "sha256": "59e9cb89291069508c5088d730dd4564837bcb59d5089bd6285421857782f520"
+    },
+    "public/models/chunk-p2-n1.glb": {
+      "bytes": 100412,
+      "sha256": "8c03eacb4d25285d2c61cbc278df88422d5d17f1e43060ca5df574a5b6a2d141"
+    },
+    "public/models/chunk-p2-p0.glb": {
+      "bytes": 381900,
+      "sha256": "a14d67206d506eda5a327a3552d050cf1ece09e6adbab175277854b35d261881"
+    },
+    "public/models/computer.glb": {
+      "bytes": 42072,
+      "sha256": "41603c7ca050b724a612c826ead4a92c5519e1c2b55b9f5a05fef3aecb49c33f"
+    },
+    "public/models/east-gate.glb": {
+      "bytes": 437640,
+      "sha256": "87a88b839eda123e6dbc0d5977583be0602b1e7c4fa2e457cfa1a342fd29730d"
+    },
+    "public/models/huicui.glb": {
+      "bytes": 826044,
+      "sha256": "624945c59d21912ed3e5e3cc90ae351da1cdef35fe881afbbe02a679d1701c42"
+    },
+    "public/models/huixian-bridge.glb": {
+      "bytes": 125404,
+      "sha256": "780e84c975ff34065e585d9f3095d134ae719f673a45197b4f20a0fb0f668ac9"
+    },
+    "public/models/huixue.glb": {
+      "bytes": 29020,
+      "sha256": "1bcfb0bc7c9a42c7cb85095e280cc9a84b8c64befb2ed618a12880b7d1b83814"
+    },
+    "public/models/infra-lake-bridge-1492215405.glb": {
+      "bytes": 14488,
+      "sha256": "972688c364d96d36dae974d765e69ba0b025f600515c2ae231ea8903951ffbbe"
+    },
+    "public/models/infra-lake-bridge-760193721.glb": {
+      "bytes": 18804,
+      "sha256": "decf8062363005e439f3d09ea64fcdeafdc1043cb1958bfdc3eaef447f38e0d0"
+    },
+    "public/models/infra-lake-bridge-822812181.glb": {
+      "bytes": 27676,
+      "sha256": "69f8334bd29c857acc855a9f25172048cefbdf18444fed5a598f5fdaaaa73892"
+    },
+    "public/models/infra-lake-bridge-833506388.glb": {
+      "bytes": 9912,
+      "sha256": "a536b723d66f2cdf0aac6b8c1879323b335be06caac061faf8121a7c7c5ddf86"
+    },
+    "public/models/infra-lake-bridge-834160220.glb": {
+      "bytes": 10040,
+      "sha256": "b009fab0ef80d6456eac5a3a6676b4ebe51276b1affe1caa42a80d4abdfce569"
+    },
+    "public/models/infra-lake-bridge-835748952.glb": {
+      "bytes": 9108,
+      "sha256": "8f29c6792d4f6a69276a3a13efd944209696c8ffcca105aa27042cb0d36b835b"
+    },
+    "public/models/infra-lake-bridge-845251806.glb": {
+      "bytes": 19232,
+      "sha256": "3a3aa963367fa0c84781dc422d67a64ba54167bb1d639194faaab627e702d485"
+    },
+    "public/models/infra-road-00.glb": {
+      "bytes": 12864,
+      "sha256": "179884d1344bbb52fc88e76eb1341a60e724c4af19ccef1c0333142a87acff38"
+    },
+    "public/models/infra-road-01.glb": {
+      "bytes": 128116,
+      "sha256": "e4627183c5d5737bec07e2a3c4c74514431c3ab700c333b2920884ae52b68760"
+    },
+    "public/models/infra-road-02.glb": {
+      "bytes": 342468,
+      "sha256": "eabad15b632e65d3815e6aff4e3f2a49e9666636b2c20178421b9e4b745fb244"
+    },
+    "public/models/infra-road-03.glb": {
+      "bytes": 400940,
+      "sha256": "fb2c53affc1c374d9bc75f9500ed6b2b94f65c1cece5b20b53199fc05cdda8bd"
+    },
+    "public/models/infra-road-04.glb": {
+      "bytes": 278408,
+      "sha256": "e268dc7ad6f75599bcfcca9e1d8977246c970d627963ec1171f47421d680b4f8"
+    },
+    "public/models/infra-road-05.glb": {
+      "bytes": 104508,
+      "sha256": "60156b589b222edc1531ca0ad1baf2ddf5ae804603ba8cbbcab02cd3f2a7d1d5"
+    },
+    "public/models/infra-road-06.glb": {
+      "bytes": 74408,
+      "sha256": "26f3aded88b6c6757b422f2815ab3044f6558f9989799f37807d58c36190c214"
+    },
+    "public/models/infra-road-07.glb": {
+      "bytes": 179628,
+      "sha256": "da1afbd7f5f8188b78c39221cd7d063267697849f0405f9f9dd07bad1d44bc2f"
+    },
+    "public/models/infra-road-08.glb": {
+      "bytes": 13300,
+      "sha256": "06a143de0c316012213262ec25006ca78586728abbf9730e01e73e0caf82641d"
+    },
+    "public/models/international-residence.glb": {
+      "bytes": 595516,
+      "sha256": "c33b29cb2cca47adb0b81a1d4a6ee720fe469fa0334eb44588c0e5962728e4d8"
+    },
+    "public/models/laboratory.glb": {
+      "bytes": 71500,
+      "sha256": "6f08291669829175a04a4d135fc124fad2b12153946c53f88166c21f8fb0a8ab"
+    },
+    "public/models/library.glb": {
+      "bytes": 1500060,
+      "sha256": "72f882c2b981b9f344ba0ffff83b0ce36d4b20a02dae9a1dddbadeb6bd334456"
+    },
+    "public/models/new-east-gate.glb": {
+      "bytes": 32788,
+      "sha256": "ae5ac82120334e03e01d5ba28fb54b7a062fb5807f9f2982ac6d67fcfbd9a954"
+    },
+    "public/models/south-gate.glb": {
+      "bytes": 640604,
+      "sha256": "e09895c8e14447e61b68326e25b3aaed30b1173b111b4dd12ddd93847f8affd0"
+    },
+    "public/models/stadium.glb": {
+      "bytes": 39340,
+      "sha256": "f8eb12fd36279989a8fe7487232ed66c2ffc813a70dddeb9e34f17c836a79a1d"
+    },
+    "public/models/student-center.glb": {
+      "bytes": 120764,
+      "sha256": "f5a9ab864d56ec6d7b5062d8b555537141c0cd9dce8c53d1ca7648cd30eb4bac"
+    },
+    "public/models/teaching-six.glb": {
+      "bytes": 238228,
+      "sha256": "0247e94cecc04900e0a6e099274d2fe2de0d52af1d7e1c6f1ae6ce889697cf53"
+    },
+    "public/models/teaching-ten.glb": {
+      "bytes": 415456,
+      "sha256": "ebf560eeb12a30c7d61f86de35bdeff3933c93022d7395a8012adf2a07ba1083"
+    },
+    "public/models/teaching-two.glb": {
+      "bytes": 38808,
+      "sha256": "4434f0254f79883b6256049d75a232fa2ced70f5ab50fdeec17fbae47ce05616"
+    },
+    "public/models/time-gate.glb": {
+      "bytes": 746384,
+      "sha256": "5f9e807069c582db77a926c0caa86764b096c67a004f421c4669b9c00469c08b"
+    },
+    "public/models/trees-near.glb": {
+      "bytes": 41304,
+      "sha256": "fe13967da352d7b82f57ff47aacd5ce4398fe7bb74f206c2dfb4a76fa99ebeff"
+    },
+    "public/models/trees.glb": {
+      "bytes": 21916,
+      "sha256": "dda1d627c9f5196492d3e4c275ec51d0536494f24fa8980dc952dded9b7bb6ed"
+    },
+    "public/models/west-gate.glb": {
+      "bytes": 36188,
+      "sha256": "f8530e2c14323ac8082d9419ccb8c1335631e829177ba6c351cd55a195414fea"
+    }
+  },
+  "scope": "Local data and asset baseline; browser measurements recorded separately."
+}

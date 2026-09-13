@@ -1,0 +1,159 @@
+{
+  "createdAt": "2026-09-13T01:05:29.401976+00:00",
+  "previousGoalTurnClassification": "no progress: plan review only",
+  "scope": "Mathematics College: estimated five/four-storey partition, relocated entrances, grounded southwest landing, enclosed window bands and blank west wall.",
+  "modelManifestSha256": "1d4f4b5a727ab055c06663e594a8d1a8d26c361677ad561f158f2593ae01b20b",
+  "sourceSha256": "e3f543069928b5d808ce824cbc4aab264dddfefa71b30ceb980917928f7d44b6",
+  "assets": {
+    "changedBuildingIds": [
+      "way/759129516"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3061,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-n1-n3.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-n1-n3"
+    ],
+    "preservedBaseNodes": 83,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5907064,
+    "initialModelByteChange": 1396,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "1d4f4b5a727ab055c06663e594a8d1a8d26c361677ad561f158f2593ae01b20b",
+    "passed": true
+  },
+  "geometryPassed": true,
+  "visualPassed": true,
+  "cleanPreparationPassed": true,
+  "pythonTests": 87,
+  "nodeTestsRepeated": false,
+  "nodeTestsNote": "No Node/frontend source changed; Python data suite and production Pages build run for this batch.",
+  "manualImages": 9,
+  "ordinaryBuildingsChecked": 430,
+  "performance": {
+    "browserReport": "s2-mathematics-timed-browser.json",
+    "contextReport": "s2-mathematics-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          59
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4087031,
+          "medianDrawCalls": 538
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0172523393888468,
+          "medianDrawCalls": 1.0018621973929236
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          29,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1097397,
+          "medianDrawCalls": 271
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0426673887637887,
+          "medianDrawCalls": 1.0111940298507462
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 17123,
+        "observations": 10,
+        "first": {
+          "at": "2026-09-13T01:00:24.610017+00:00",
+          "pid": 17123,
+          "parentPid": 90860,
+          "cpuPercent": 96.4,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:04.10",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "last": {
+          "at": "2026-09-13T01:01:55.408565+00:00",
+          "pid": 17123,
+          "parentPid": 90860,
+          "cpuPercent": 99.1,
+          "elapsed": "01:36",
+          "cumulativeCPUTime": "1:31.21",
+          "executable": "/Applications/Blender.app/Contents/MacOS/Blender"
+        },
+        "observedSeconds": 90.798548,
+        "cumulativeCPUSecondsAdded": 87.11000000000001
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "workPackagePassed": false,
+  "wholeBuildingReviewComplete": false,
+  "fullPlanCompleted": false,
+  "implementationSha256": {
+    "data/building-overrides.json": "d1283948ef99557b7207b2cafcd638a771391167c2f56dd0849ced8119b586ff",
+    "scripts/building_overrides.py": "b5da897ccf0fae19eaaad46ca581330ae8cbee79cd9657244e45d46d6e6b2d56",
+    "scripts/facade_bands_data.py": "17684360cab9db67d31e5a2addf450dbd56aab9a90b2c358d0a8199c54a0076f",
+    "scripts/test_building_overrides.py": "677d8e327d500363d4e77c29b0c4c94cbd99212c89fcadb558b8ef135ccaa110",
+    "blender/generic_buildings.py": "56fa926dea3e6797f9e3cc7fba20cbfb0e64a3d82ea6fb31ad6d5fe658c53c35",
+    "blender/facade_bands.py": "6d49c83775db7de5f8ac0c8c40892c3ceefbbd6ccd5ce31f9717ef85ca8792ee",
+    "blender/validate_mathematics.py": "d403f5d91315106a42375ed24640b6b1406175750168546eabe77ae9cc03a337",
+    "blender/build_campus.py": "76927bae5611289bf395ef5bc7a15e0890715b7b90e209771465c2308b0ddaf9",
+    "public/data/buildings.json": "2d1983c4e238b19cbcfb271ec7876116a9f1b329964b2f14ddfe21a164d48b06"
+  },
+  "evidenceSha256": {
+    "docs/model-checks/refinement/s2-mathematics-assets.json": "6d607e99a057da23619fe708e1a0ff34d027478cc589274a0714cc4cc20d3e1f",
+    "docs/model-checks/refinement/s2-mathematics-geometry.json": "ce9f4bee93428bec589cbc4820c77cb9933107537ba395c560d686486ece9fbc",
+    "docs/model-checks/refinement/s2-mathematics-ordinary-geometry.json": "51a10368ef46cae2a90b25be11a378385f5c9ee9d0a46b935f22f70f0a95e30d",
+    "docs/model-checks/refinement/s2-mathematics-trees-geometry.json": "47b228e8a76a294402980d59f0fcb36cbb79ed636dba6addaaab1ba2d67f5d7a",
+    "docs/model-checks/refinement/s2-mathematics-source-preservation.json": "68ede9eccee0d85863dc532416065318bac31b3742ec0ab04de95f2f447b35e0",
+    "docs/model-checks/refinement/s2-mathematics-clean-prepare.json": "824657aa1b389a61e337e070c7d15deaea193f74f95c77f7fdc0430fb544a624",
+    "docs/model-checks/refinement/s2-mathematics-visual-review.json": "7212e163cd358bb851501ca08cd257fe8a0dcdb72ea4e47afccf32833663edbb",
+    "docs/model-checks/refinement/s2-mathematics-evidence.json": "17d360b36f46c8b85fce26cb2b6f15864e73c8cfacdc77da4bc436ee3ff8c5b1",
+    "docs/model-checks/refinement/s2-mathematics-before-geometry.json": "f8301d76117a2033be478111599e7ebdd57d7a0fa85e61741c757bb7849e71c9",
+    "docs/model-checks/refinement/s2-mathematics-accepted-context-browser.json": "f1f6f23725c7baaec2f26d8ab9cd1ca650c27a9ff89c5df32506a9b84b35c18c",
+    "docs/model-checks/refinement/s2-mathematics-north-final-context-browser.json": "4daed3b54c8edee119d70cb7e5d4d5335bf6df005424d78f2ef7a24f9027c061",
+    "docs/model-checks/refinement/s2-mathematics-timed-browser.json": "2a94f71519e05543651433c52f31d8c6d4fb0a441d5d169a95d0f9d0a73a7a50",
+    "docs/model-checks/refinement/s2-mathematics-timed-performance-context.json": "4a6a2943f8851d520517abe7f76dc515bb9c6cd50f4094f45227d40f2a4a7c88"
+  },
+  "limitations": [
+    "West five/four-storey partition, orientation, dimensions and window groups include photo/map-constrained estimates.",
+    "Eastern-end height, northern west-end window counts, staircase strips, full porticos and road-to-door route remain incomplete.",
+    "Initial southwest step was partly buried; final geometry and nine final images replace initial-asset acceptance.",
+    "Existing non-deterministic time-gate generation was preserved from the frozen baseline in source and GLBs."
+  ],
+  "remaining": [
+    "Complete 20–30 ordinary-building reviews including required library neighbours.",
+    "Complete library-north sample as a whole and remaining S4 courtyard/lakeside work, then S5.",
+    "Current-asset same-condition performance acceptance remains pending."
+  ]
+}

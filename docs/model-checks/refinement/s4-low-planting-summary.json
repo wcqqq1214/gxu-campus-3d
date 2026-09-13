@@ -1,0 +1,200 @@
+{
+  "createdAt": "2026-09-12T23:17:35.315691+00:00",
+  "previousGoalTurnClassification": "progress: clarified plan scope; current continuation revalidated assets and completed another measured performance run.",
+  "scope": "One photo-supported, estimated low hedge segment at the library north entrance east side.",
+  "modelManifestSha256": "8fa197b655efff39378f563ff5af6c97e0531cdc0303835d20675ae7dd9d95ad",
+  "sourceSha256": "7f1b8490f60503232f1f60bd33c03902db1d7f55b9e47c3f9ab527049d2915fb",
+  "geometryPassed": true,
+  "visualPassed": true,
+  "incrementalMaintenancePassed": true,
+  "assets": {
+    "passed": true,
+    "modelsVerified": 69,
+    "changedAssets": [
+      "models/base.glb"
+    ],
+    "baseChangedNodes": [],
+    "baseAddedNodes": [
+      "vegetation-low-library-northeast-hedge"
+    ],
+    "existingBaseNodesPreserved": 83,
+    "allOtherBaseGeometryTransformsMaterialsAndNearAssetsPreserved": true,
+    "treeRowsIncludingGroundZPreserved": true,
+    "trees": 3061,
+    "changedPublicData": [
+      "models.json",
+      "vegetation-zones.json"
+    ],
+    "addedPublicData": [
+      "low-planting.json"
+    ],
+    "vegetationZoneChangeOnlyReplacementDiagnosticAndVerifiedGroundZ": true,
+    "productionMatches": true,
+    "initialModelBytes": 5902268,
+    "initialModelBytesAdded": 4444,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "8fa197b655efff39378f563ff5af6c97e0531cdc0303835d20675ae7dd9d95ad",
+    "vegetationSha256": "3ddce76423a20c7289d4f7b46d05b764b7a11a5aa27722e74732138845a1caf8",
+    "sourceSha256": "7f1b8490f60503232f1f60bd33c03902db1d7f55b9e47c3f9ab527049d2915fb"
+  },
+  "performance": {
+    "browserReport": "s4-low-planting-final-check-browser.json",
+    "contextReport": "s4-low-planting-final-check-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4083689,
+          "medianDrawCalls": 544
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0164205235014123,
+          "medianDrawCalls": 1.0130353817504656
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          28,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1092731,
+          "medianDrawCalls": 280
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0382340924854392,
+          "medianDrawCalls": 1.044776119402985
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 9675,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-12T23:13:19.116042+00:00",
+          "pid": 9675,
+          "parentPid": 90860,
+          "cpuPercent": 100.0,
+          "elapsed": "00:09",
+          "cumulativeCPUTime": "0:04.28",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-12T23:13:19.116042+00:00",
+          "pid": 9675,
+          "parentPid": 90860,
+          "cpuPercent": 100.0,
+          "elapsed": "00:09",
+          "cumulativeCPUTime": "0:04.28",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "workPackagePassed": false,
+  "fullPlanCompleted": false,
+  "checks": {
+    "nodeTests": 54,
+    "cleanPreparationPassed": true,
+    "pythonDataTests": 78,
+    "lowPlantingDataTests": 4,
+    "analyticTerrainScenarios": 3,
+    "dracoRoundTrips": 2,
+    "actualModelsRead": 69,
+    "incrementalRepairCommands": 2,
+    "manualScreenshots": 7,
+    "lodCycles": 3,
+    "activityRuns": 6,
+    "productionBuildPassed": true
+  },
+  "implementationSha256": {
+    "data/low-planting.json": "cf2f025de64ed66f46e7a8153b8d06c79c9cb48f1d977afaac8c41d2b9b53804",
+    "scripts/low_planting_data.py": "c6b10e071016aa82593ff1bd7675d15e8ac062901480a7761cc50cd09f8befc5",
+    "scripts/low_planting_contract.py": "8154de840cdbe7d65ecf79ccaeff1ad4b1c41c88205cc0770bcada1a74ccd1a5",
+    "scripts/test_low_planting_data.py": "f5edd41d0806d9ca627317d9663cd4f312c9a5ec3dab88609d7b15d7178b7ebe",
+    "scripts/vegetation_data.py": "169e7c7991fc7e386f03f787c364855c234c1e24cc0173eb2c7bc148825b6511",
+    "blender/build_campus.py": "76927bae5611289bf395ef5bc7a15e0890715b7b90e209771465c2308b0ddaf9",
+    "blender/low_planting.py": "e4ff0e0472bee4b6866a4d4ceb31466260dbbc2132903d2b0197456d0e3da08d",
+    "blender/test_low_planting.py": "6294f4c4cece0c53a4d8b7864668ecd24fe7854fa7c1e6e4daecd3911998bbcc",
+    "blender/validate_low_planting.py": "d3b3fc6593710ca3cf99a2e902cc2fa9d2c634577a38e80a64250a2df5261996",
+    "blender/update_roads.py": "4c4a58a94eacb3033881fcef2658aec42034f8583dafd4b6ae10fb3573103230",
+    "blender/update_basketball.py": "178b66ad59eebd08afcca66e775cd955593d71530ad921dde2af3f63e50363f2",
+    "blender/gxu-campus.blend": "7f1b8490f60503232f1f60bd33c03902db1d7f55b9e47c3f9ab527049d2915fb",
+    "public/data/low-planting.json": "753899562bab98259b0c5e0c07148aaa8b7ac228c89f0748d9aadff29f566538",
+    "public/data/models.json": "8fa197b655efff39378f563ff5af6c97e0531cdc0303835d20675ae7dd9d95ad",
+    "public/data/vegetation.json": "3ddce76423a20c7289d4f7b46d05b764b7a11a5aa27722e74732138845a1caf8",
+    "public/data/vegetation-zones.json": "93ddf84c7d73ca6217de2a98c556a4c8ff3617686db5067e04c70720d42dfc52"
+  },
+  "evidenceSha256": {
+    "s4-low-planting-material-seams.json": "a652f483841095b12e6e9a2f21bcbdca8dbc4c2cade3a68a2de396d34df5df82",
+    "s4-low-planting-recheck-summary.json": "2d2a3ff4740ed792b7b5f0361ec357db3c85afc88d683ebf6c7fe89bd0cca7a4",
+    "s4-low-planting-initial-summary.json": "2ba01e10cce621b5d268da70c5dc0bcff32b34726f1593dfdb9790e804cf9970",
+    "s4-low-planting-timed-browser.json": "29c3af0f63dce62c4131a1973857cf878fe599d7cc04c97a5c13d9ab4fb3ec5b",
+    "s4-low-planting-timed-performance-context.json": "d97d1b2ff98c43b869398afb2eac12a3539676fad480412fb66e12f6f3f6c6e8",
+    "s4-low-planting-clean-prepare.json": "95dbd323f7f0442361c164697ecea0a0264aa14237196606f6d5882d2bf936ea",
+    "s4-low-planting-assets.json": "ae80dda37dd115d5530ed047f868f543b79de5dadc3d08a2b52e164884c1e8f8",
+    "s4-low-planting-source-preservation.json": "f636a8c48c15a94f4d66c2e739e52567154a1aae7c682161e8cd7bad37488d57",
+    "s4-low-planting-geometry.json": "604c4e46d7e21acab0b7276b120087c584b7cfaae05972d7e6bf363b708c75e7",
+    "s4-low-planting-incremental.json": "7673faa78f05b0fed29f26774e4ff3ae763f910d6d71909deea62cec8825788f",
+    "s4-low-planting-visual-review.json": "ec90e6c37ebeb0b208e08a8623ba951d8d7c07727883e939ec0043360dec7e17",
+    "s4-low-planting-evidence.json": "83fbc6b7f4676e01b64250e06922222c7b6bf60d051b9fa652a35df39680ba86",
+    "s4-low-planting-cameras.json": "88e4e500968fe61fe5380120edca3dcea9a2a7ee73b066f2d23dd6785bf00e9c",
+    "s4-low-planting-final-views-context-browser.json": "09a8a4497632f5bcadfc45b256e8930fd13a9f21ed69613b297c5dd49ee921c5",
+    "s4-low-planting-final-check-browser.json": "116740be2eb62b124d5b3389a3d06404b32e2bd70bea46894262a8f7e25f7598",
+    "s4-low-planting-final-check-performance-context.json": "f54b90ac71c35b322dcb1213160365a6ab54a49fd2d6216b3d4b9894afd10c86",
+    "s4-low-planting-quiet-summary.json": "36f73159b7b9c72c90ff095a836318bb11df3b1252b26498f9cf7b32c447bcd5",
+    "s4-low-planting-final-check-summary.json": "a1fa5b9a3c464b599daa199f9d2288e38cc2344aa243ed9e67190f2ec7c1b11e"
+  },
+  "localDiagnosticEvidenceSha256": {
+    "material-seams-probe.json": "a652f483841095b12e6e9a2f21bcbdca8dbc4c2cade3a68a2de396d34df5df82",
+    "data-tests.log": "b8bbda1de709f9f16aa00d9c7b48e21e930dd20359caf595e77a8bbffecbd38d",
+    "node-tests.log": "93895f1d412fdee6be5c78e086e5f458a2c6acce5638fd4cb1d0e86ac729983b",
+    "geometry-tests-roundtrip.log": "79462b392e61b4cf4333efaa8f0cb9b91fbb0945f477f3066aefce1475f57b9d",
+    "pages-build-single-material.log": "67b976c1946fe1de6a9f767dac72d43e2158a4cafb837608f0cee0dabc4beca4",
+    "model-build-single-material.log": "c39da22902bd4cc12669732b5f1f0ba9fe733a986061592b3446a71fdbd48bb3"
+  },
+  "limitations": [
+    "Dimensions and precise planting extent are estimates; the photo establishes orientation and low vegetation only.",
+    "No species, flowers or planter wall asserted.",
+    "Open scene meshes are not capped and no engineering clearance inferred.",
+    "Original front view is partly occluded by preserved trees; complete overhead view supplements it.",
+    "Timed performance is the established library activity view, not a whole-campus or real-phone guarantee.",
+    "Incremental experiment repaired a displaced source object; it did not relocate a real planting or simulate a road redesign.",
+    "Time-gate source and compressed node retained from the batch baseline; full build byte determinism remains unresolved."
+  ],
+  "remaining": [
+    "Low-planting pilot: complete same-condition performance acceptance when concurrent compute is quiet; historical numeric-passing runs retain their failed environment acceptance.",
+    "S2: 20–30 whole-building reviews; partial field records do not count as completed buildings.",
+    "S3: neighboring-building review and complete library-north space acceptance.",
+    "S4: evidence-backed courtyard/lakeside tree organization and remaining area promotion; previous shore/paving performance records need an explicit current-evidence acceptance chain.",
+    "S5: useful details and full plan acceptance."
+  ]
+}

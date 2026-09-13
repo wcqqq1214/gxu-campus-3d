@@ -1,0 +1,140 @@
+{
+  "verifiedAt": "2026-09-12T10:22:58.088668+00:00",
+  "stage": "S2 eight-building pilot implementation validation",
+  "implementationValidationPassed": true,
+  "fullS2Completed": false,
+  "pilot": {
+    "records": 8,
+    "heightChanges": 5,
+    "documentedLevels": 8,
+    "documentedBodyHeights": 0,
+    "multiPartRecords": 1,
+    "scope": "Partial calibrations; entrance and facade review remains incomplete."
+  },
+  "assets": {
+    "verifiedAt": "2026-09-12T10:18:31.545933+00:00",
+    "passed": true,
+    "assetCount": 69,
+    "publicAndProductionDataMatch": true,
+    "manifestSha256": "cc135ac831e96cde1ed48bcfcd8907686cad190c384aadaa3d7f7b88b3d0ec33",
+    "buildingsSha256": "8805c8fb1ad5993bd0c668c00241891d045d2688f9b7faa1a53b0f5860897646",
+    "blendSha256": "c18d263a9aa49714f4b786db02e044c1d22c4bae73c0e8a42885779f7091c869",
+    "initialModelBytes": 5588776,
+    "maxOrdinaryChunkBytes": 1684868,
+    "blendBytes": 87690250
+  },
+  "geometry": {
+    "source": {
+      "buildings": 430,
+      "samples": 1449,
+      "maxErrorMeters": 0.00499
+    },
+    "base": {
+      "buildings": 430,
+      "samples": 1449,
+      "maxErrorMeters": 0.02439
+    },
+    "near": {
+      "buildings": 417,
+      "samples": 1401,
+      "maxErrorMeters": 0.007679
+    }
+  },
+  "tolerancesMeters": {
+    "source": 0.011,
+    "baseDraco": 0.05,
+    "nearDraco": 0.02
+  },
+  "performance": [
+    {
+      "tier": "精细",
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4017716,
+        "medianDrawCalls": 537
+      },
+      "s1": {
+        "medianFPS": 60,
+        "medianTriangles": 4187266,
+        "medianDrawCalls": 532
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4036645,
+        "medianDrawCalls": 532
+      },
+      "changePercentFromBaseline": {
+        "medianFPS": 0.0,
+        "medianTriangles": 0.471,
+        "medianDrawCalls": -0.931
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1052490,
+        "medianDrawCalls": 268
+      },
+      "s1": {
+        "medianFPS": 28,
+        "medianTriangles": 1087384,
+        "medianDrawCalls": 254
+      },
+      "current": {
+        "medianFPS": 27,
+        "medianTriangles": 1093543,
+        "medianDrawCalls": 276
+      },
+      "changePercentFromBaseline": {
+        "medianFPS": -10.0,
+        "medianTriangles": 3.901,
+        "medianDrawCalls": 2.985
+      },
+      "passed": true
+    }
+  ],
+  "performanceScope": {
+    "platform": "darwin",
+    "release": "25.5.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browserCaptures": 9,
+  "lodCyclesPassed": 3,
+  "browserErrors": [],
+  "checks": {
+    "nodeTests": 51,
+    "pythonTests": 22,
+    "typecheck": "passed",
+    "lint": "passed",
+    "pagesProductionBuild": "passed",
+    "roadBuildingClearance": "passed"
+  },
+  "sha256": {
+    "public/data/models.json": "cc135ac831e96cde1ed48bcfcd8907686cad190c384aadaa3d7f7b88b3d0ec33",
+    "public/data/buildings.json": "8805c8fb1ad5993bd0c668c00241891d045d2688f9b7faa1a53b0f5860897646",
+    "data/building-overrides.json": "e774db3e9e7675c0db281238b7f8a267141d16716f5d99e269377946b0ba8189",
+    "data/building-sources.json": "5857849a35212614138e5bcbf06b70326db69feb49e6c2e2f728090bbfe75c93",
+    "scripts/building_overrides.py": "813838a7c1a35f97f9e12881b630714dea7b128fbd5132b291fab9648fc92845",
+    "scripts/building_forms.py": "ab3f3781f47731fb36c775a5cc60462ddefda723ae1e24b7fe5f068f4c83a7ae",
+    "scripts/prepare_geodata.py": "0d4b930d22c0ef35128755d182f95f22b11bec76f66427745b2436a1128a4adb",
+    "blender/generic_buildings.py": "58ec714520f719acd9696bf42e84b77764348a5d03814a0a825eca7275dc3fdc",
+    "blender/gxu-campus.blend": "c18d263a9aa49714f4b786db02e044c1d22c4bae73c0e8a42885779f7091c869",
+    "docs/model-checks/refinement/s2-pilot-geometry.json": "8a762d0cfde68e4c9ed93e7baabab84876cb5340a35299cbe5f85598985f8e23",
+    "docs/model-checks/refinement/s2-validated-browser.json": "286660a101e2ac1703f0bfbddb88e692487349550a7b5785a6bdb27c754a06b4"
+  },
+  "remaining": [
+    "S2 pilot entrance/facade/annex evidence and calibration",
+    "S2 expand to 20–30 completed building calibrations",
+    "S3 full preparation reproducibility and library north site connections",
+    "S4 vegetation zones, shore and paving edge sample",
+    "S5 evidence-backed details and complete acceptance"
+  ]
+}

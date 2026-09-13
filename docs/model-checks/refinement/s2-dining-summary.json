@@ -1,0 +1,185 @@
+{
+  "verifiedAt": "2026-09-12T13:24:31.188302+00:00",
+  "stage": "S2 two dining buildings: historical floor counts and estimated heights",
+  "workPackagePassed": true,
+  "geometryAndVisualPassed": true,
+  "performanceAcceptance": "passed-current-cumulative-assets",
+  "fullBuildingsCalibrated": false,
+  "fullS2Completed": false,
+  "fullS3Completed": false,
+  "fullPlanCompleted": false,
+  "assets": {
+    "verifiedAt": "2026-09-12T13:18:48.011330+00:00",
+    "assetCount": 69,
+    "manifestSha256": "543439ced786470645bcc1b9b2c459df6dd168b017cf2cdac938963752b600af",
+    "changedAssets": [
+      "models/base.glb",
+      "models/chunk-p1-n1.glb",
+      "models/chunk-p1-p0.glb",
+      "models/time-gate.glb"
+    ],
+    "changedBuildingFields": {
+      "way/759191485": [
+        "calibration",
+        "facadeBasis",
+        "form",
+        "height",
+        "heightBasis",
+        "levels",
+        "roofBasis",
+        "sourceRefs"
+      ],
+      "way/759609659": [
+        "calibration",
+        "facadeBasis",
+        "form",
+        "height",
+        "heightBasis",
+        "levels",
+        "roofBasis",
+        "sourceRefs"
+      ]
+    },
+    "originalBuildingOutlinesTagsAndIdentityPreserved": true,
+    "unchangedSpatialData": [
+      "terrain.json",
+      "vegetation.json",
+      "sites.json",
+      "surfaces.json",
+      "campus-roads.json",
+      "surroundings.json",
+      "basketball.json",
+      "infrastructure.json",
+      "sports.json",
+      "campus-boundary.json"
+    ],
+    "initialModelBytes": 5637644,
+    "maxOrdinaryChunkBytes": 1684868,
+    "blendBytes": 87705500,
+    "publicAndProductionDataMatch": true,
+    "passed": true
+  },
+  "sharedGeometry": {
+    "source": {
+      "buildings": 430,
+      "samples": 1451,
+      "maxErrorMeters": 0.00499
+    },
+    "base": {
+      "buildings": 430,
+      "samples": 1451,
+      "maxErrorMeters": 0.02439
+    },
+    "near": {
+      "buildings": 417,
+      "samples": 1403,
+      "maxErrorMeters": 0.007679
+    }
+  },
+  "performanceComparison": [
+    {
+      "tier": "精细",
+      "repeatFPS": [
+        60,
+        60,
+        60
+      ],
+      "fps": {
+        "baseline": 60,
+        "current": 60,
+        "changePercent": 0.0,
+        "withinNumericGate": true
+      },
+      "triangles": {
+        "baseline": 4017716,
+        "current": 4035422,
+        "changePercent": 0.44069814790292927,
+        "withinNumericGate": true
+      },
+      "drawCalls": {
+        "baseline": 537,
+        "current": 538,
+        "changePercent": 0.18621973929235924,
+        "withinNumericGate": true
+      }
+    },
+    {
+      "tier": "流畅",
+      "repeatFPS": [
+        30,
+        30,
+        30
+      ],
+      "fps": {
+        "baseline": 30,
+        "current": 30,
+        "changePercent": 0.0,
+        "withinNumericGate": true
+      },
+      "triangles": {
+        "baseline": 1052490,
+        "current": 1094225,
+        "changePercent": 3.965358340696823,
+        "withinNumericGate": true
+      },
+      "drawCalls": {
+        "baseline": 268,
+        "current": 279,
+        "changePercent": 4.104477611940305,
+        "withinNumericGate": true
+      }
+    }
+  ],
+  "browser": {
+    "report": "s2-dining-validated-browser.json",
+    "captures": 6,
+    "lodCycles": 3,
+    "activityRuns": 6,
+    "errors": []
+  },
+  "visualReview": {
+    "contextStates": 11,
+    "standardRegressionImages": 6,
+    "allDirectlyReviewed": true
+  },
+  "checks": {
+    "pythonTests": 31,
+    "nodeTests": 51,
+    "typecheck": true,
+    "lint": true,
+    "productionBuild": true,
+    "timeGate": true
+  },
+  "coverageLimits": [
+    "Layer heights remain estimated; source conflicts and unknown current condition retained.",
+    "Entrance orientation and full facades unverified; no whole-building completion claimed.",
+    "Current cumulative performance includes agriculture portico but does not retroactively change the contended historical run.",
+    "Ordinary desktop conditions; mobile viewport simulation, not device benchmark.",
+    "No new road clearance test: footprints, entrances and road geometry unchanged; height decreases only."
+  ],
+  "remaining": [
+    "Complete detailed S2 building review and expand to 20–30 buildings",
+    "Complete S3 neighboring building review",
+    "S4 vegetation zones and representative shore/paving sites",
+    "S5 details and complete acceptance"
+  ],
+  "fileHashes": {
+    "data/building-overrides.json": "ca9253b0c66eb58086c37b7b8a2bf4a998d001cd1a639d20f37b5175f6fe2098",
+    "data/building-sources.json": "e5acc2211b6291c3860473aac6f8e938409e4ff293c7302154ef8babaec5f028",
+    "public/data/buildings.json": "00a933ebcbcd87fe52383dac12f9a1f798789d7109d5037aa08b644bb6241836",
+    "public/data/models.json": "543439ced786470645bcc1b9b2c459df6dd168b017cf2cdac938963752b600af",
+    "blender/gxu-campus.blend": "d8985935bb8e333957749ef39159a7ac649252784ae3cb1f1c5c3b842768a568",
+    "scripts/building_overrides.py": "b087a1cea3799178af8d9247d24af5de5976d1dda3b41b62b1e813c56c40c567",
+    "blender/generic_buildings.py": "a64aedd3959b0c60734fdd18a076d600666f81cf474909cb88bb799e8fb84709",
+    "scripts/check-building-context-browser.mjs": "2383fc8d09095cad581c53dc64bc73d982e646913f5e164f84623ad8bda17af1",
+    "scripts/check-refinement-browser.mjs": "cf3549f5136092554d48e27f672c3b74689124bebd58fa03754bf281e9beeb0e",
+    "docs/model-checks/refinement/s2-dining-assets.json": "6ec1455d7378323e2d5297e1749e9dab00c013a39ae03b840855bfa7fe0a5342",
+    "docs/model-checks/refinement/s2-dining-geometry.json": "eba4a19494594ccdb7ab5be1bcd091d191e7f2029c330da6416866dfd213fc4b",
+    "docs/model-checks/refinement/s2-dining-evidence.json": "94983de498b57d16e2a9cb6d7330b96ba2b88dbaa3da5a1a225cc9712a525a8d",
+    "docs/model-checks/refinement/s2-dining-context-browser.json": "1f64288738db1d66fa4ea9e5298e504479de9c96b10ab03b5c2621ee5d7eb128",
+    "docs/model-checks/refinement/s2-dining-visual-review.json": "2111b85b3288a857610861f179a3008e7436cd628750ad1823fa54f5b07ee39d",
+    "docs/model-checks/refinement/s2-dining-time-gate.json": "dfdb4df26e8abfd85e33698523d3740c841ca38b46c90fe3d4c0ede558a8117f",
+    "docs/model-checks/refinement/s2-dining-validated-browser.json": "cf982bd55defb99ec150dccb7c5060a9e78c305c615862691e695b3eb89f46f8",
+    "docs/model-checks/refinement/s2-dining-validated-performance-context.json": "aefc8103e39b6abc1013ae88f1083ea88a6b5a329b27206b33087e537e41b22b"
+  }
+}

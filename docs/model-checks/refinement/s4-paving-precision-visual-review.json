@@ -1,0 +1,93 @@
+{
+  "reviewDate": "2026-09-13",
+  "scope": "6B 铺地四个固定画面（含图书馆手机尺寸回归）与七种图层/光照状态的人工视觉检查。",
+  "modelManifestSha256": "89fcd7afbb0af44caf9b5c312ae26ea0dc07f0d04db4ad7a39c14fdffb670704",
+  "browserReport": "s4-paving-precision-timed-browser.json",
+  "interactionReport": "s4-paving-precision-final-layers-interaction.json",
+  "images": [
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-timed/6b-paving-road-join.png",
+      "sha256": "6bcf017021034f5864fe3fa25dd025565563da03e9f1fea74f048b5a5f5048c3",
+      "directlyInspected": true,
+      "observation": "铺面连接至主路，无原先明显台阶或地形穿出。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-timed/6b-paving-overview.png",
+      "sha256": "d4edf6c4e768a7c802d4cb29a54eec650ae71cc14eb8617606d23c7412033cad",
+      "directlyInspected": true,
+      "observation": "广场保持映射轮廓，周边楼群及开放空间仍在。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-timed/6b-paving-free-edge.png",
+      "sha256": "7a3e63128d6907103659c065969fa32c6cca205ae280e42ffa766220733f9b62",
+      "directlyInspected": true,
+      "observation": "自由边有侧面封口；邻近道路既有细缝单独保留，不计为本次新增问题。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-timed/library-mobile.png",
+      "sha256": "9916caa8ae35e8da0e4116a1aa84e3b8cc72faedb0dcca450a60810115c8e755",
+      "directlyInspected": true,
+      "observation": "桌面手机尺寸下北门、台阶与前场连接显示正常；非手机真机测试。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-final-layers/near-labels-off.png",
+      "sha256": "b6553035a605a5948c96a2b5f27f3f31ba79e1a9e094880eda4fe462dfc79ba7",
+      "directlyInspected": true,
+      "observation": "无标签时铺面完整。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-final-layers/roads-off.png",
+      "sha256": "d68adb4f826eadade14d7cc4bc05db38822c6c42c09afb85accf0727f22206fa",
+      "directlyInspected": true,
+      "observation": "原广场下方成片纹理条带消除，草地纹理连续；不据此声称全校地形无微小压缩线。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-final-layers/paving-with-buildings-off.png",
+      "sha256": "f9b367fd315f83431b4dbfba46b87bd5c70eb3db5338755aae2b533ed0719288",
+      "directlyInspected": true,
+      "observation": "关闭建筑后铺面保留，所属图层正确。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-final-layers/layers-restored.png",
+      "sha256": "d715ae7cca7a2e5c4f3f9752a9aee78258c7f44e2d6100d3cab88176540ecfcb",
+      "directlyInspected": true,
+      "observation": "恢复建筑和道路后无重复或遗漏的铺地。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-final-layers/vegetation-off.png",
+      "sha256": "9652aaa7aebc2eb19a57249dca61c065d600044e417e04d242d11bcf8ccd580f",
+      "directlyInspected": true,
+      "observation": "植被开关不移除铺地或道路。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-final-layers/vegetation-restored.png",
+      "sha256": "d715ae7cca7a2e5c4f3f9752a9aee78258c7f44e2d6100d3cab88176540ecfcb",
+      "directlyInspected": true,
+      "observation": "恢复植被后场地完整。",
+      "passed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-paving-precision-final-layers/night-labels-off.png",
+      "sha256": "5a6538bd41e409cb3534da2dc2a65141c077ea68fd22e8cf40587e566c09e94b",
+      "directlyInspected": true,
+      "observation": "夜景下接口和铺地保持完整。",
+      "passed": true
+    }
+  ],
+  "terrainStripingResolvedInReviewedRegion": true,
+  "limits": [
+    "保留估算高差、宽度及边界说明；未复原无法定位的摊位、花坛或红色铺装。",
+    "固定画面不证明整座校园无缺陷；附近既有道路压缩微缺口见 s4-paving-contact-diagnostic.json。",
+    "该记录不代替活动性能或实际几何检查。"
+  ],
+  "passed": true
+}

@@ -1,0 +1,244 @@
+{
+  "verifiedAt": "2026-09-12T12:58:34.186468+00:00",
+  "stage": "S2/S3 agriculture south portico and recessed entrance",
+  "workPackagePassed": false,
+  "geometryAndVisualPassed": true,
+  "performanceAcceptance": "pending-uncontended-repeat",
+  "fullBuildingCalibrated": false,
+  "fullS3Completed": false,
+  "fullPlanCompleted": false,
+  "assets": {
+    "verifiedAt": "2026-09-12T12:46:24.314238+00:00",
+    "assetCount": 69,
+    "manifestSha256": "56058e37b5c94667272c2fcbc32ef992628cdfd878ae426f156f6bc3d095e107",
+    "changedAssets": [
+      "models/base.glb",
+      "models/chunk-p0-n1.glb",
+      "models/time-gate.glb"
+    ],
+    "changedBuildingFields": {
+      "way/759185166": [
+        "archetype",
+        "calibration",
+        "form",
+        "sourceRefs"
+      ]
+    },
+    "originalBuildingOutlinesTagsAndIdentityPreserved": true,
+    "unchangedSpatialData": [
+      "terrain.json",
+      "vegetation.json",
+      "sites.json",
+      "surfaces.json",
+      "campus-roads.json",
+      "surroundings.json",
+      "basketball.json",
+      "infrastructure.json",
+      "sports.json",
+      "campus-boundary.json"
+    ],
+    "initialModelBytes": 5639720,
+    "maxOrdinaryChunkBytes": 1684868,
+    "blendBytes": 87771880,
+    "publicAndProductionDataMatch": true,
+    "passed": true
+  },
+  "portico": {
+    "buildingId": "way/759185166",
+    "checkedRoot": "/Users/wcqqq1214/Project/gxu-campus-3d",
+    "toleranceBasis": "Source float and Draco position errors; these are model checks, not site measurements.",
+    "passed": true,
+    "source": {
+      "canopyHeight": 3.9985160064697265,
+      "floorHeight": 0.4485167694091796,
+      "openBays": 3,
+      "columns": 4,
+      "rearDoor": true,
+      "exposedWindowAbovePortico": true,
+      "stairHeights": [
+        0.4485167694091796,
+        0.2985171508789062,
+        0.14851705551147454
+      ],
+      "stairClearanceAboveGroundOrPaving": [
+        0.4385223388671875,
+        0.298861026763916,
+        0.1592550277709961
+      ],
+      "passed": true
+    },
+    "base": {
+      "canopyHeight": 3.9985160064697265,
+      "floorHeight": 0.4488619995117187,
+      "openBays": 3,
+      "columns": 4,
+      "rearDoor": true,
+      "exposedWindowAbovePortico": true,
+      "stairHeights": [
+        0.4488619995117187,
+        0.30035869598388665,
+        0.1518544387817382
+      ],
+      "stairClearanceAboveGroundOrPaving": [
+        0.4158053398132324,
+        0.2903451919555664,
+        0.19663715362548828
+      ],
+      "passed": true
+    },
+    "near": {
+      "canopyHeight": 3.9985160064697265,
+      "floorHeight": 0.448792381286621,
+      "openBays": 3,
+      "columns": 4,
+      "rearDoor": true,
+      "exposedWindowAbovePortico": true,
+      "stairHeights": [
+        0.448792381286621,
+        0.3002909851074218,
+        0.14560214996337884
+      ],
+      "stairClearanceAboveGroundOrPaving": [
+        0.41573572158813477,
+        0.29027748107910156,
+        0.1903848648071289
+      ],
+      "passed": true
+    }
+  },
+  "sharedGeometry": {
+    "source": {
+      "buildings": 430,
+      "samples": 1451,
+      "maxErrorMeters": 0.00499
+    },
+    "base": {
+      "buildings": 430,
+      "samples": 1451,
+      "maxErrorMeters": 0.02439
+    },
+    "near": {
+      "buildings": 417,
+      "samples": 1403,
+      "maxErrorMeters": 0.007679
+    }
+  },
+  "browser": {
+    "report": "docs/model-checks/refinement/s3-agriculture-validated-browser.json",
+    "captures": 6,
+    "lodCycles": 3,
+    "performanceRuns": 6,
+    "errors": []
+  },
+  "visualReview": {
+    "agricultureReviewedImages": 8,
+    "agricultureUsableImages": 7,
+    "standardRegressionImagesReviewed": 6,
+    "note": "Library connection and six columns remain visible, courtyards open, reference ordinary hip roof retained; portrait agriculture angle corrected separately."
+  },
+  "observedPerformanceComparison": [
+    {
+      "tier": "精细",
+      "repeatFPS": [
+        60,
+        60,
+        60
+      ],
+      "fps": {
+        "baseline": 60,
+        "current": 60,
+        "changePercent": 0.0,
+        "withinNumericGate": true
+      },
+      "triangles": {
+        "baseline": 4017716,
+        "current": 4049125,
+        "changePercent": 0.7817625735617062,
+        "withinNumericGate": true
+      },
+      "drawCalls": {
+        "baseline": 537,
+        "current": 537,
+        "changePercent": 0.0,
+        "withinNumericGate": true
+      }
+    },
+    {
+      "tier": "流畅",
+      "repeatFPS": [
+        30,
+        30,
+        30
+      ],
+      "fps": {
+        "baseline": 30,
+        "current": 30,
+        "changePercent": 0.0,
+        "withinNumericGate": true
+      },
+      "triangles": {
+        "baseline": 1052490,
+        "current": 1090031,
+        "changePercent": 3.566874744653159,
+        "withinNumericGate": true
+      },
+      "drawCalls": {
+        "baseline": 268,
+        "current": 267,
+        "changePercent": -0.3731343283582045,
+        "withinNumericGate": true
+      }
+    }
+  ],
+  "performanceContext": "docs/model-checks/refinement/s3-agriculture-performance-context.json",
+  "checks": {
+    "pythonTests": 31,
+    "nodeTests": 51,
+    "typecheck": true,
+    "lint": true,
+    "productionBuild": true,
+    "librarySite": true,
+    "timeGate": true,
+    "infrastructureRoadBuildingRegression": true
+  },
+  "coverageLimits": [
+    "Dimensions are image-constrained estimates.",
+    "Agriculture rear terraces and other facades remain unverified.",
+    "Road regression covers infrastructure; actual agriculture stair clearance is covered by the portico verifier.",
+    "Mobile captures are desktop viewport simulation.",
+    "Concurrent load prevents same-condition performance acceptance."
+  ],
+  "remaining": [
+    "Repeat uncontended performance check",
+    "Complete S3 neighboring-building review",
+    "Expand S2 to 20–30 fully reviewed buildings",
+    "S4 vegetation zones and representative shore/paving sites",
+    "S5 details and whole-plan acceptance"
+  ],
+  "fileHashes": {
+    "data/building-overrides.json": "45b4ec48f52c0a0cbeb40ae5c6770974d1c04e9ceb377cebb8a0c6de486e9b74",
+    "data/building-sources.json": "ed62006ef782f498a45c47862a217f84b0671b40c4b33651b25c52a53f9efab2",
+    "scripts/building_overrides.py": "b087a1cea3799178af8d9247d24af5de5976d1dda3b41b62b1e813c56c40c567",
+    "scripts/test_building_overrides.py": "f8f4d6fdc2b6838764e23897b6e97cd170d5ea8749da8ec9b5668c11108150fd",
+    "blender/generic_buildings.py": "a64aedd3959b0c60734fdd18a076d600666f81cf474909cb88bb799e8fb84709",
+    "blender/validate_generic.py": "0940a91afe4fec034b12130307e15a0fff0a7c1499bc7b9433bc5154582a052d",
+    "blender/validate_agriculture.py": "a1833584ab9b15339751d8185d33c3738d609c0783bd181ecbce6d4692795971",
+    "scripts/check-building-context-browser.mjs": "77ae98ab4805b5342e8f151f5a6df8e3da6a39f773db9eeb381eec1236cb3ad6",
+    "scripts/check-refinement-browser.mjs": "cf3549f5136092554d48e27f672c3b74689124bebd58fa03754bf281e9beeb0e",
+    "public/data/buildings.json": "3ece032e6f0ed890808f2c25c970685f46c1e83281e08509939841c0bc24fd41",
+    "public/data/models.json": "56058e37b5c94667272c2fcbc32ef992628cdfd878ae426f156f6bc3d095e107",
+    "blender/gxu-campus.blend": "fa8193baae7daa4a835ac2d8c3c0a0bface2fb5240bb2dace3c8e4812b4c851d",
+    "docs/model-checks/refinement/s3-agriculture-assets.json": "684fc22eb44f23c4f9a4d9173505c333e83b9fd6a8c4e92a371d0da788e428ef",
+    "docs/model-checks/refinement/s3-agriculture-portico.json": "f7d2c33afddb974c4ed4a90edd96d4c654b96478913aa8f83c1990d7d9f2a8b3",
+    "docs/model-checks/refinement/s3-agriculture-geometry.json": "7fc2453d7feea752fbff922af316f724fda95af281f67a8323632690db2747bf",
+    "docs/model-checks/refinement/s3-agriculture-evidence.json": "efcfea3e82f46027dec6110eccb435c2c2b1223c09997c5c55a5b8fabf668428",
+    "docs/model-checks/refinement/s3-agriculture-visual-review.json": "5de1b436d6679ecfaab7abf415dfc4bea54881235f46bdb839c12dbed670f8ff",
+    "docs/model-checks/refinement/s3-agriculture-checked-context-browser.json": "0f5b851533490f0ca01577230b96b91f899df538e414800871759ff92c017292",
+    "docs/model-checks/refinement/s3-agriculture-mobile-context-browser.json": "917172a32c080e472a603b09a7b725ae14267fb96c8a70abbc0d003e599420f0",
+    "docs/model-checks/refinement/s3-agriculture-validated-browser.json": "798f49b0efb34e2b561d587cd39da4cf5cf984ac09187e6ef31c7c5850a56301",
+    "docs/model-checks/refinement/s3-agriculture-performance-context.json": "3ca8392cef631c89f9b80e507f1caa45ed1bca9d848bfd8af0d3576d0cb8492c",
+    "docs/model-checks/refinement/s3-agriculture-library-site.json": "d5a2e48acb34b279e25b46587c2a88efed781c26113f0cc4ffb1ab0365961011",
+    "docs/model-checks/refinement/s3-agriculture-time-gate.json": "638cc23c88da7dd8ca8cf4a8f0f238705fda3ec20b9116c901dd9b8a782c8310",
+    "docs/model-checks/refinement/s3-agriculture-road-building-clearance.json": "485bd34a5be68b53cc1e9f4eccca813520556e811c9211c929c12c681e819c46"
+  }
+}

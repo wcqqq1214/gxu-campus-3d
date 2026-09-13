@@ -1,0 +1,189 @@
+{
+  "createdAt": "2026-09-12T11:55:36.299964+00:00",
+  "scope": "S3 ordinary-building context; calibration evidence still required",
+  "buildings": [
+    {
+      "id": "way/759185166",
+      "name": "农学院",
+      "distanceToWorkScopeMeters": 1.42,
+      "priority": 1,
+      "currentLevels": 5.0,
+      "currentHeightMeters": 16.5,
+      "center": [
+        351.31,
+        -315.06
+      ],
+      "status": "south-portico-geometry-and-visual-verified-rear-review-pending",
+      "toVerify": [
+        "identity and footprint correspondence",
+        "levels and roof",
+        "entrance direction",
+        "visible facade and wings"
+      ],
+      "selectionBasis": "Distance to S0 work-area polygon plus visible context; not a factual plaza boundary.",
+      "adopted": [
+        "South-central recessed entrance",
+        "Low four-pier portico from mapped projection",
+        "Shared base/near canopy, floor, steps and exposed main wall"
+      ],
+      "remaining": [
+        "Rear terrace boundaries",
+        "Other entrances and remaining facade calibration"
+      ],
+      "evidenceReport": "docs/model-checks/refinement/s3-agriculture-evidence.json",
+      "geometryReport": "docs/model-checks/refinement/s3-agriculture-portico.json",
+      "visualReport": "docs/model-checks/refinement/s3-agriculture-visual-review.json",
+      "northContextEvidenceReport": "docs/model-checks/refinement/s3-neighbor-exterior-evidence.json"
+    },
+    {
+      "id": "way/759170251",
+      "name": "野生动物研究所",
+      "distanceToWorkScopeMeters": 9.04,
+      "priority": 1,
+      "currentLevels": 8.0,
+      "currentHeightMeters": 26.4,
+      "center": [
+        321.9,
+        -406.81
+      ],
+      "status": "reviewed-insufficient-exterior-evidence",
+      "toVerify": [
+        "identity and footprint correspondence",
+        "levels and roof",
+        "entrance direction",
+        "visible facade and wings"
+      ],
+      "selectionBasis": "Distance to S0 work-area polygon plus visible context; not a factual plaza boundary.",
+      "note": "保留OSM层数和已有形体；本批未将不对应的研究所或新楼照片套用于此建筑。"
+    },
+    {
+      "id": "way/759140885",
+      "name": "校内建筑 759140885",
+      "distanceToWorkScopeMeters": 21.43,
+      "priority": 1,
+      "currentLevels": 2.0,
+      "currentHeightMeters": 6.6,
+      "center": [
+        297.61,
+        -467.32
+      ],
+      "status": "reviewed-insufficient-exterior-evidence",
+      "toVerify": [
+        "identity and footprint correspondence",
+        "levels and roof",
+        "entrance direction",
+        "visible facade and wings"
+      ],
+      "selectionBasis": "Distance to S0 work-area polygon plus visible context; not a factual plaza boundary.",
+      "note": "保留OSM层数和已有形体；本批未将不对应的研究所或新楼照片套用于此建筑。"
+    },
+    {
+      "id": "way/759158607",
+      "name": "西校园学生宿舍楼3栋",
+      "distanceToWorkScopeMeters": 55.34,
+      "priority": 2,
+      "currentLevels": 6.0,
+      "currentHeightMeters": 19.799999999999997,
+      "center": [
+        73.35,
+        -522.14
+      ],
+      "status": "captioned-local-exterior-found-facade-anchor-pending",
+      "toVerify": [
+        "identity and footprint correspondence",
+        "levels and roof",
+        "entrance direction",
+        "visible facade and wings"
+      ],
+      "selectionBasis": "Distance to S0 work-area polygon plus visible context; not a factual plaza boundary.",
+      "note": "新查2023-10-18具名背面草坪照可见底层窗墙和局部凹角；尚未定位OSM外边，不能确认总层数、屋顶、入口或完整立面。旧工程训练中心照片继续排除。",
+      "evidenceReport": "docs/model-checks/refinement/s3-neighbor-followup-evidence.json",
+      "remaining": [
+        "identity-to-footprint correspondence",
+        "total levels and wing heights",
+        "roof",
+        "entrance direction",
+        "visible facades"
+      ],
+      "reviewedAt": "2026-09-13T06:51:25.371957+00:00",
+      "exteriorEvidenceReport": "docs/model-checks/refinement/s3-neighbor-exterior-evidence.json"
+    },
+    {
+      "id": "way/880036336",
+      "name": "动物繁殖研究所",
+      "distanceToWorkScopeMeters": 67.92,
+      "priority": 2,
+      "currentLevels": 3.0,
+      "currentHeightMeters": 9.899999999999999,
+      "center": [
+        352.3,
+        -454.24
+      ],
+      "status": "reviewed-insufficient-exterior-evidence",
+      "toVerify": [
+        "identity and footprint correspondence",
+        "levels and roof",
+        "entrance direction",
+        "visible facade and wings"
+      ],
+      "selectionBasis": "Distance to S0 work-area polygon plus visible context; not a factual plaza boundary.",
+      "note": "参访照片展示亚热带农业生物资源保护与利用国家重点实验室的室内共享平台；3F楼层牌不能证明当前地图研究所楼的总层数，也无法定位其外轮廓。",
+      "evidenceReport": "docs/model-checks/refinement/s3-neighbor-followup-evidence.json",
+      "remaining": [
+        "identity-to-footprint correspondence",
+        "total levels and wing heights",
+        "roof",
+        "entrance direction",
+        "visible facades"
+      ],
+      "reviewedAt": "2026-09-12T20:19:49.616722+00:00"
+    },
+    {
+      "id": "relation/11564704",
+      "name": "动物科学技术学院",
+      "distanceToWorkScopeMeters": 71.66,
+      "priority": 2,
+      "currentLevels": 7.0,
+      "currentHeightMeters": 23.099999999999998,
+      "center": [
+        245.44,
+        -256.93
+      ],
+      "status": "south-entry-corridors-and-central-window-grid-verified-whole-building-pending",
+      "toVerify": [
+        "identity and footprint correspondence",
+        "levels and roof",
+        "entrance direction",
+        "visible facade and wings"
+      ],
+      "selectionBasis": "Distance to S0 work-area polygon plus visible context; not a factual plaza boundary.",
+      "adopted": [
+        "South projecting core retains upper floors above an open ground-level entrance",
+        "Door recessed to mapped rear wall; two estimated steps grounded against actual terrain",
+        "Five visible wing levels supported by the clearer named university photograph",
+        "Four open upper corridor levels on original outer edges 1 and 9, with shared base/near slabs and railings",
+        "Eight central-front window bays and continuous vertical piers; shared base/near bay layout"
+      ],
+      "remaining": [
+        "Core side and rear facades; rear-wing height and extent",
+        "Other entrances, entrance fascia dimensions and rooftop small volumes",
+        "Forecourt paving and vegetation organization"
+      ],
+      "evidenceReport": "docs/model-checks/refinement/s3-animal-evidence.json",
+      "geometryReport": "docs/model-checks/refinement/s3-animal-grounded-portico.json",
+      "visualReport": "docs/model-checks/refinement/s3-animal-visual-review.json",
+      "summaryReport": "docs/model-checks/refinement/s3-animal-summary.json",
+      "corridorEvidenceReport": "docs/model-checks/refinement/s3-corridor-evidence.json",
+      "corridorGeometryReport": "docs/model-checks/refinement/s3-corridor-final-geometry.json",
+      "corridorSummaryReport": "docs/model-checks/refinement/s3-corridor-summary.json",
+      "corridorPerformanceAccepted": true,
+      "glazingSummaryReport": "docs/model-checks/refinement/s3-glazing-summary.json",
+      "corridorPerformanceAcceptanceScope": {
+        "modelManifestSha256": "01d9b711d2cd5f0e3df83b5c8d7d85206735b489a59de8797454cbfada4f011e",
+        "geometryReport": "docs/model-checks/refinement/s3-glazing-corridor-regression-geometry.json",
+        "performanceReport": "docs/model-checks/refinement/s3-glazing-timed-browser.json"
+      }
+    }
+  ],
+  "completedCount": 0
+}

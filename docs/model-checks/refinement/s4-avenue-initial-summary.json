@@ -1,0 +1,283 @@
+{
+  "createdAt": "2026-09-12T22:04:01.983221+00:00",
+  "previousGoalTurnClassification": "progress: clarified the plan and whole-building completion accounting; the existing avenue implementation still required acceptance.",
+  "scope": "S4 Bocui 120 m avenue pilot; sourced road-wide row organization, estimated individual placement and dimensions.",
+  "roadId": "way/699156911",
+  "avenueId": "bocui-west-pilot",
+  "modelManifestSha256": "1e95d2bfbb65f660bf6db04c74ab12b3e6c8b7fc2682f544e7727386a3dc7b00",
+  "vegetationSha256": "3ddce76423a20c7289d4f7b46d05b764b7a11a5aa27722e74732138845a1caf8",
+  "sourceSha256": "672e70aadf571d8e20647c4f64fa56651ff1610b725bd2a7d614b89cf30a0042",
+  "assets": {
+    "passed": true,
+    "treesBefore": 3050,
+    "treesAfter": 3061,
+    "removedPositions": [
+      [
+        -344.9,
+        -582.5
+      ],
+      [
+        -315.6,
+        -582.4
+      ],
+      [
+        -289.2,
+        -581.5
+      ]
+    ],
+    "addedPositions": [
+      [
+        -398.5,
+        -588.3
+      ],
+      [
+        -398.3,
+        -600.7
+      ],
+      [
+        -386.5,
+        -588.1
+      ],
+      [
+        -386.3,
+        -600.5
+      ],
+      [
+        -374.5,
+        -588.0
+      ],
+      [
+        -374.3,
+        -600.4
+      ],
+      [
+        -338.5,
+        -587.5
+      ],
+      [
+        -338.3,
+        -599.9
+      ],
+      [
+        -326.5,
+        -587.3
+      ],
+      [
+        -326.3,
+        -599.7
+      ],
+      [
+        -314.5,
+        -587.1
+      ],
+      [
+        -314.3,
+        -599.5
+      ],
+      [
+        -290.5,
+        -586.7
+      ],
+      [
+        -290.3,
+        -599.1
+      ]
+    ],
+    "preservedRows": 3047,
+    "survivorRowsIncludingGroundZPreserved": true,
+    "changesInsideReplacementBand": true,
+    "retainedAvenueCandidates": 14,
+    "junctionRejectedCandidates": 6,
+    "sourceCatalogueEntries": 70,
+    "sourceCatalogueMatchesInputs": true,
+    "changedPublicData": [
+      "overview.json",
+      "sources.json",
+      "vegetation-zones.json",
+      "vegetation.json"
+    ],
+    "overviewOnlyTreeCountChanged": true,
+    "modelsVerified": 69,
+    "allGLBBytesPreserved": true,
+    "productionMatches": true,
+    "initialModelBytes": 5897824,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "1e95d2bfbb65f660bf6db04c74ab12b3e6c8b7fc2682f544e7727386a3dc7b00",
+    "vegetationSha256": "3ddce76423a20c7289d4f7b46d05b764b7a11a5aa27722e74732138845a1caf8"
+  },
+  "sourcePreservation": {
+    "nonTreeObjects": 523,
+    "changedObjects": [],
+    "allNonTreeGeometryUVMaterialsAndTransformsPreserved": true,
+    "sourceTreesBefore": 3050,
+    "sourceTreesAfter": 3061,
+    "removedPositions": [
+      "-289.2,-581.5",
+      "-315.6,-582.4",
+      "-344.9,-582.5"
+    ],
+    "addedPositions": [
+      "-290.3,-599.1",
+      "-290.5,-586.7",
+      "-314.3,-599.5",
+      "-314.5,-587.1",
+      "-326.3,-599.7",
+      "-326.5,-587.3",
+      "-338.3,-599.9",
+      "-338.5,-587.5",
+      "-374.3,-600.4",
+      "-374.5,-588.0",
+      "-386.3,-600.5",
+      "-386.5,-588.1",
+      "-398.3,-600.7",
+      "-398.5,-588.3"
+    ],
+    "survivorAttributesPreserved": true,
+    "passed": true
+  },
+  "geometryPassed": true,
+  "visualPassed": true,
+  "performance": {
+    "browserReport": "s4-avenue-timed-browser.json",
+    "contextReport": "s4-avenue-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4085689,
+          "medianDrawCalls": 542
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0169183187661845,
+          "medianDrawCalls": 1.0093109869646182
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          29,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1092441,
+          "medianDrawCalls": 272
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0379585554257047,
+          "medianDrawCalls": 1.0149253731343284
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 3810,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-12T22:01:41.807661+00:00",
+          "pid": 3810,
+          "parentPid": 90860,
+          "cpuPercent": 98.0,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:05.32",
+          "executable": ".venv/bin/python"
+        },
+        "last": {
+          "at": "2026-09-12T22:01:41.807661+00:00",
+          "pid": 3810,
+          "parentPid": 90860,
+          "cpuPercent": 98.0,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:05.32",
+          "executable": ".venv/bin/python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "workPackagePassed": false,
+  "fullPlanCompleted": false,
+  "checks": {
+    "pythonDataTests": 74,
+    "newAvenueTests": 4,
+    "contextViews": 7,
+    "browserLODCycles": 3,
+    "activityRuns": 6,
+    "productionBuildPassed": true
+  },
+  "implementationSha256": {
+    "data/vegetation-avenues.json": "eb273012f5de80b645d9a60e6e9f8f5a0a4b75a65423d042b3cb4307b645a4b9",
+    "data/vegetation-zones.json": "a39419be8fb5a859f40119544c52e6e1373de18b108f5df09aa5f7ae1f19985e",
+    "data/sources.json": "f1c35e1f269a45b39ad51f97269247e35e2d4a7517217da661b95181c397a5a2",
+    "data/building-sources.json": "6fa31a8e9446eec5c3f1283f9e2a84b9b63b3e4d0839336d45de908ece2b086b",
+    "scripts/vegetation_avenues.py": "0ba243df3ce263eb0a0d04691479b2e8ffbcd0d893857be33e57c192fa7a95b1",
+    "scripts/vegetation_data.py": "765575f4cd88122b7acefc5f947f5af64c44c2f25642a62b67c5868a9b59930d",
+    "scripts/vegetation_exclusions.py": "19e675d7d927eebc9dde81b0816183344e426f90fdf74bd389a80084a6440643",
+    "scripts/vegetation_reservations.py": "9ad8f6a10ad10cd273acb9915bf7bd83c93aecef3e93bd90ac13fc2998c50b98",
+    "scripts/test_vegetation_avenues.py": "ab8c4a51190cd71c792a1556ea59803db115cb90a7b571940bad06d2b22e79d4",
+    "scripts/check-avenue-browser.mjs": "d4725f364cfb68d295a1e2cb1e59178d7478a3ef4a777ad04364c331c601e891",
+    "scripts/check-refinement-browser.mjs": "92f357be4185b9b0514d18f17585c752b675dc44d5aa1636558eac3c98b159fd",
+    "blender/build_campus.py": "c007eaac3c28160f518b0a831a0b71dc88a39a9c012fe728c6c6ba37d635a6f6",
+    "blender/tree_clearance.py": "3de9108c010c89f6a8613eb39831cdaeec0c65db992bb6b47f3687228a64a7b1",
+    "blender/tree_mesh_audit.py": "ebdd5695c2066bb2aedd530b32df76fcbdda423a889aaa0e1f8c2e508cf8ad96",
+    "blender/validate_site_tree_clearance.py": "ca7f970c0437899cd21bc206e6dea090d382ac752b79dc3dcdb6275f41887aa9",
+    "blender/validate_tree_clearance.py": "354bdedefbec75797b045307d17e3314843825e88b700826d299fd1526290f20",
+    "blender/mesh_volumes.py": "d05f7eefe65e0f40556fc668122736e21b89d5219fc9c0bf27852f90dea089b9",
+    "blender/gxu-campus.blend": "672e70aadf571d8e20647c4f64fa56651ff1610b725bd2a7d614b89cf30a0042",
+    "public/data/models.json": "1e95d2bfbb65f660bf6db04c74ab12b3e6c8b7fc2682f544e7727386a3dc7b00",
+    "public/data/vegetation.json": "3ddce76423a20c7289d4f7b46d05b764b7a11a5aa27722e74732138845a1caf8",
+    "public/data/vegetation-zones.json": "f7e0f6a0ddb9c1e09ca38255871123f699fcd230dd50f283b0789769514e4adb",
+    "public/data/sources.json": "2f59c2d025f88b5dbe4607ffb2adbd184cc0688d7bc3d00cc4543ebbc3a47d4e"
+  },
+  "evidenceSha256": {
+    "s4-avenue-assets.json": "b0053ebfd92ae5f4f45b30223629704d4bbca9cc3e11764855b283dc09bb9b1a",
+    "s4-avenue-source-preservation.json": "8230c140c1d9044e4d29b24ca165bdd57127372334a2ad9f8f2d629830a394d6",
+    "s4-avenue-tree-source.json": "96931b1ceda5ad59df752344cdf5cf754c2dc48a05acfd2363b48c2f6dba0095",
+    "s4-avenue-buildings-geometry.json": "cefa0591f0712be1fdd0e8128c743b78d4c4c3570f6c6a99d2e37501f1b5a946",
+    "s4-avenue-sites-geometry.json": "f451004411a8761422f2b9ae405aec9e4cdf23e1c49c8babdbd0a9fc726d4d89",
+    "s4-avenue-visual-review.json": "708cd52135fb3a851fa2775220975282212591985575d1f4278bc8c24a06099b",
+    "s4-avenue-evidence.json": "f3ba8f2640567bf99af7c691895517f823cb2f1b110c6b56ecfab7ed7958aa7b",
+    "s4-avenue-cameras.json": "65f5eb613fe2d220626c04f4126991c93cfcd7d854b539d9f0841dcdf212eb20",
+    "s4-avenue-views-context-browser.json": "24483a213f5c5b461e6ab49eb8fd141f0d31654d89af05c5dfb9dc59500e946b",
+    "s4-avenue-timed-browser.json": "302bbece09285942df0367e6cf0b7f5363ff29e5cc23ec2e881c7eb7a9dd0ccc",
+    "s4-avenue-timed-performance-context.json": "8abaea1c7ce0a7613fad5d0d1a74e4675cd79f63f14f5e105af8173cc76fbea9"
+  },
+  "limitations": [
+    "Historical official text and captioned photo establish road-wide tree-row organization, not the exact 120 m pilot tree positions or a current census.",
+    "Spacing, offsets, heights, junction clearance and replacement-band dimensions are estimates; generic broadleaf template does not establish species-specific geometry.",
+    "Closed-component mesh checks detect surface crossings and containment; open meshes are not capped and no engineering overhead clearance is inferred.",
+    "Timed performance uses the established library activity view; pilot-specific static screenshots are not an activity FPS benchmark.",
+    "Mobile capture is desktop viewport simulation, not a physical-phone measurement.",
+    "Time-gate source and compressed assets preserved from baseline; global build byte determinism remains unresolved."
+  ],
+  "pending": [
+    "Current same-condition performance acceptance",
+    "Complete S2 whole-building calibration for 20–30 buildings.",
+    "Complete S3 neighboring buildings and the full library-north sample.",
+    "Complete sourced S4 courtyard/lakeside and low-planting layouts, then S5."
+  ]
+}

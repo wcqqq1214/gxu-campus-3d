@@ -1,0 +1,208 @@
+{
+  "createdAt": "2026-09-12T20:10:44.647099+00:00",
+  "buildingId": "relation/11564704",
+  "scope": "Central south eight-bay window grid and continuous vertical piers; not whole-building completion.",
+  "modelManifestSha256": "01d9b711d2cd5f0e3df83b5c8d7d85206735b489a59de8797454cbfada4f011e",
+  "geometryPassed": true,
+  "visualPassed": true,
+  "performanceRuns": [
+    {
+      "browserReport": "s3-glazing-timed-browser.json",
+      "contextReport": "s3-glazing-timed-performance-context.json",
+      "metrics": {
+        "精细": {
+          "repeatFPS": [
+            60,
+            60,
+            60
+          ],
+          "current": {
+            "medianFPS": 60,
+            "medianTriangles": 4057243,
+            "medianDrawCalls": 542
+          },
+          "baseline": {
+            "medianFPS": 60,
+            "medianTriangles": 4017716,
+            "medianDrawCalls": 537
+          },
+          "ratios": {
+            "medianFPS": 1.0,
+            "medianTriangles": 1.0098381767153277,
+            "medianDrawCalls": 1.0093109869646182
+          },
+          "thresholdsPassed": true
+        },
+        "流畅": {
+          "repeatFPS": [
+            29,
+            29,
+            28
+          ],
+          "current": {
+            "medianFPS": 29,
+            "medianTriangles": 1091717,
+            "medianDrawCalls": 282
+          },
+          "baseline": {
+            "medianFPS": 30,
+            "medianTriangles": 1052490,
+            "medianDrawCalls": 268
+          },
+          "ratios": {
+            "medianFPS": 0.9666666666666667,
+            "medianTriangles": 1.0372706629041606,
+            "medianDrawCalls": 1.0522388059701493
+          },
+          "thresholdsPassed": true
+        }
+      },
+      "numericThresholdsPassed": true,
+      "recordedEnvironmentMatchesBaseline": true,
+      "externalComputeObservations": [],
+      "sameConditionAcceptancePassed": true,
+      "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+    }
+  ],
+  "performance": {
+    "browserReport": "s3-glazing-timed-browser.json",
+    "contextReport": "s3-glazing-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4057243,
+          "medianDrawCalls": 542
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0098381767153277,
+          "medianDrawCalls": 1.0093109869646182
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          29,
+          29,
+          28
+        ],
+        "current": {
+          "medianFPS": 29,
+          "medianTriangles": 1091717,
+          "medianDrawCalls": 282
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9666666666666667,
+          "medianTriangles": 1.0372706629041606,
+          "medianDrawCalls": 1.0522388059701493
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [],
+    "sameConditionAcceptancePassed": true,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "glazingRevisionPassed": true,
+  "currentCorridorRegressionAndPerformancePassed": true,
+  "wholeBuildingReviewComplete": false,
+  "fullPlanCompleted": false,
+  "assets": {
+    "changedBuildingIds": [
+      "relation/11564704"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3050,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-p0-n1.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-p0-n1"
+    ],
+    "preservedBaseNodes": 82,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5896440,
+    "initialModelByteChange": 1432,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "01d9b711d2cd5f0e3df83b5c8d7d85206735b489a59de8797454cbfada4f011e",
+    "passed": true
+  },
+  "sourcePreservation": {
+    "nonTreeObjects": 523,
+    "changedObjects": [
+      "动物科学技术学院"
+    ],
+    "otherNonTreeGeometryUVMaterialsAndTransformsPreserved": true,
+    "sourceTreesBefore": 3050,
+    "sourceTreesAfter": 3050,
+    "removedPositions": [],
+    "survivorAttributesPreserved": true,
+    "passed": true
+  },
+  "tests": {
+    "python": 60,
+    "node": 54,
+    "typecheckPassed": true,
+    "lintPassed": true,
+    "productionBuildPassed": true
+  },
+  "implementationSha256": {
+    "scripts/building_overrides.py": "2ef4baf18adc23d0a178cb6f320730f0c0b1f4314dc9781fbde5b36845fba76f",
+    "scripts/test_building_overrides.py": "52c529489b9252fdf09026006de2db342b807c5aa12b08df2512cf321d2ce8ec",
+    "blender/generic_buildings.py": "9e72ef333890779a6152e69befae19e89f7161c024f0d9139d309d4da18b8f02",
+    "blender/facade_windows.py": "f0fdd7b1a02e1036f11c7d03c9d3a51fb9946d71ca2aa28b05f1c46f0ec4010c",
+    "blender/validate_window_grid.py": "62cea3a5d540c0155801ac0c33d17dfc8b83c3f65815083ccb92c857ced95585",
+    "blender/validate_animal_entry.py": "c5c6b5442840cfd300bf938df7a8e44773b50d0283570c19d00cf961acdaabb5",
+    "data/building-overrides.json": "21ed533ef93a561959a46c0aaca69891d78091f06d1e8b3d9870841c3c830aaa",
+    "public/data/buildings.json": "f3697d8d92954184681b34817431f227ccf68be33d1bc362c887ed112c86aadf",
+    "public/data/geography.geojson": "6a076c6488e9f0a93c5aed922449787d5502bbe4c6fcf39f195d485cee6d05e7",
+    "public/data/sources.json": "7340385d074b3cf70036385dc10cc4ce3651f97868b181aeb11fb33dc14666a5",
+    "public/data/vegetation.json": "e1148d85751eeaf2a2130c539194a7bb62a4d9a14cf00d48e4377b464dcb06a2",
+    "blender/gxu-campus.blend": "60b67a039b29521f5d9bc202278a16d51df89c5d991bb4bdcd95d2b52e1d4c9a"
+  },
+  "evidenceSha256": {
+    "s3-glazing-final-windows.json": "81dbb62f7c5c5277274aeaeb6df33a0b3f6ca20e9b1e57c176c73dbb5c37b568",
+    "s3-glazing-generic-geometry.json": "bd2efc51c57a12c690643558d3a761e54df096aec9430771e61272b8046100a7",
+    "s3-glazing-entry-regression-portico.json": "6ee5e160406d68221e5806dfe4c85772af02008f244c04febb0d0b8627d49f2b",
+    "s3-glazing-corridor-regression-geometry.json": "dd80ce6731459b15465302d2ca7c23052de4960e707b5c45d8dbd1bed6179844",
+    "s3-glazing-tree-clearance.json": "9f88ba0be7e608b2f1e6b803321ae81cbfe2ca687f25a3461fe8ac2f741effd4",
+    "s3-glazing-source-preservation.json": "a4f36906ee5fd10d1efe32d9214a67874960151aeb38b8065f6316e73d3a59ee",
+    "s3-glazing-assets.json": "dcfbc9226b2413c8a35ecc52174e641d180594edd93d3f33e8858690587aef2b",
+    "s3-glazing-evidence.json": "55b42016bfac4429deae7734e1ba58a48a689ef2e9e0d1ffc8e025649989f136",
+    "s3-glazing-visual-review.json": "2694f14d7267ef7b3331d700abfd34a26733a70017aa6aa9618d99ebffdb904e",
+    "s3-glazing-layers-interaction.json": "0119b63922a0c60f1b6ddff592755417d3ba786a8d5cadb5b3c8380f96fbdd20",
+    "s3-glazing-timed-browser.json": "a4f1274151bd36270e659195f793f3b687907185b95611733c7099f8d21a45d0",
+    "s3-glazing-timed-performance-context.json": "395e5903ef6ede5e1fa94e5b89ca28de823f5452b7f0863b16001f098a5a40f2"
+  },
+  "limits": [
+    "Eight visible front columns are photo-supported; heights and member dimensions are estimated.",
+    "Four inner pane rows are a simplified photo-based layout, not exact per-window survey.",
+    "Tree audit covers actual mesh surface crossings, not closed-solid containment or other land-use clearances.",
+    "Unchanged time-gate source and compressed asset were retained after full rebuild; global byte determinism remains unresolved."
+  ],
+  "pending": [
+    "Review side/rear facades, rear-wing height and extent, other entrances and rooftop small volumes.",
+    "Calibrate animal-college forecourt paving, entrance fascia and vegetation organization.",
+    "Complete 20-30 full building reviews, all six S3 neighbors and remaining S4/S5 scope."
+  ]
+}

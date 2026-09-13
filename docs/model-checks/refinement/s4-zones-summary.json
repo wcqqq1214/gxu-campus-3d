@@ -1,0 +1,144 @@
+{
+  "verifiedAt": "2026-09-12T13:52:20.803585+00:00",
+  "stage": "S4 initial sourced open zones and stable tree orientation",
+  "workPackagePassed": true,
+  "dataAndVisualPassed": true,
+  "fullS4Completed": false,
+  "fullS2Completed": false,
+  "fullS3Completed": false,
+  "fullPlanCompleted": false,
+  "zones": 2,
+  "trees": 3030,
+  "treePositionsHeightsTypesPreserved": true,
+  "modelsByteIdentical": 69,
+  "checks": {
+    "pythonTests": 36,
+    "nodeTests": 53,
+    "typecheck": true,
+    "lint": true,
+    "productionBuild": true,
+    "emptyOutputFullPreparation": true,
+    "savedBlenderTreeInstances": 3030,
+    "crossLanguageAngles": 3030
+  },
+  "browser": {
+    "report": "s4-zones-timed-browser.json",
+    "captures": 7,
+    "lodCycles": 3,
+    "activityRuns": 6,
+    "errors": []
+  },
+  "performanceComparison": [
+    {
+      "tier": "精细",
+      "repeatFPS": [
+        60,
+        60,
+        60
+      ],
+      "fps": {
+        "baseline": 60,
+        "current": 60,
+        "changePercent": 0.0,
+        "withinNumericGate": true
+      },
+      "triangles": {
+        "baseline": 4017716,
+        "current": 4041258,
+        "changePercent": 0.5859548061635023,
+        "withinNumericGate": true
+      },
+      "drawCalls": {
+        "baseline": 537,
+        "current": 538,
+        "changePercent": 0.18621973929235924,
+        "withinNumericGate": true
+      }
+    },
+    {
+      "tier": "流畅",
+      "repeatFPS": [
+        30,
+        30,
+        28
+      ],
+      "fps": {
+        "baseline": 30,
+        "current": 30,
+        "changePercent": 0.0,
+        "withinNumericGate": true
+      },
+      "triangles": {
+        "baseline": 1052490,
+        "current": 1096353,
+        "changePercent": 4.1675455348744395,
+        "withinNumericGate": true
+      },
+      "drawCalls": {
+        "baseline": 268,
+        "current": 267,
+        "changePercent": -0.3731343283582045,
+        "withinNumericGate": true
+      }
+    }
+  ],
+  "limits": [
+    "Tree orientation is schematic and changes once during this normalization.",
+    "Background candidate randomness still uses the legacy sequence; local generation remains pending.",
+    "No sourced avenue, courtyard or low-planting geometry added in this batch.",
+    "Phone-size screenshot is desktop emulation, not a hardware benchmark.",
+    "Incremental road/basketball tree-update branches tested separately without rebuilding unrelated road assets."
+  ],
+  "remaining": [
+    "Complete S2 20–30 building review and S3 neighboring context",
+    "Stable local background tree generation",
+    "Sourced avenue/courtyard/low planting zones",
+    "Representative shore and paving connections",
+    "S5 details and whole-plan acceptance"
+  ],
+  "fileHashes": {
+    "data/vegetation-zones.json": "c22c662d46409131e2f124d7ee2b006c721892f7f470ca36af8336edfd76a7dc",
+    "public/data/vegetation-zones.json": "f993f2b242db012f5a2bdd81baf03bd9192c7bd555eb798ded3ccebdda78a649",
+    "public/data/vegetation.json": "1d044d1f0967869a9e80577c12b112d13946a7f1113947ccab0a9ac496bea4ec",
+    "public/data/models.json": "543439ced786470645bcc1b9b2c459df6dd168b017cf2cdac938963752b600af",
+    "lib/campus/scene.ts": "8049a31831aaf06d0249490f5b53e4d3cfbc5c6067583774c72e1208f32f06c9",
+    "lib/campus/vegetation.ts": "30502fc96466e351e09e2bcbcc2ab7068c55f52fa297245f3ec92aec4332cafb",
+    "scripts/vegetation_layout.py": "939f7b243a3ba25e5d89f5c77b508d26ac0046890a62448f4095e698947b9295",
+    "scripts/vegetation_data.py": "d8af80429521c4cf7a2960752e2b54276632179b70a8f2626a12ccec77e9d0da",
+    "scripts/campus_roads_data.py": "e621d5f156ce1b220ed52baceff6bbc8c00ecbed09ef8f592a9504d2a7408f84",
+    "scripts/site_data.py": "ddaca5909d070cf03c83f2756cd1981619a881f2ad2cbb593565498f31d9ae00",
+    "scripts/infrastructure_data.py": "56006711463fb057a8d2ea7523b5ccd8d6b436924a7281c91522f6c9129bf754",
+    "scripts/check-refinement-browser.mjs": "92f357be4185b9b0514d18f17585c752b675dc44d5aa1636558eac3c98b159fd",
+    "blender/build_campus.py": "cc8691478329ce51b399a201645afd83a64832075d63cafb7a4fe3c6462a16f4",
+    "blender/update_tree_layout.py": "af2430a0f4f9ee1723d587d7e546f96c34329dba7ccb4ded07e11dab8b09978b",
+    "blender/update_roads.py": "cc0d1589b351239787dce1dd4b7796678818dd80fc4687db823c78b5aa170a53",
+    "blender/update_basketball.py": "58d45c43c944a14ec493298ff5bf243fc0a2cc81da6b3e1d1d5d535f26f420cf",
+    "blender/gxu-campus.blend": "0c6db9e446d3ade788a04cb8eac909e194785dbdbab08f437d68f43f9be3e233",
+    "scripts/test_vegetation_data.py": "365521dfbee3eb6843e9db742f4a8e219f077e70b981d372683502129263dd2b",
+    "scripts/test-vegetation.mjs": "8f4b01a5deaec482c1328edc5ffe7060d621528749838b78428f19d19aee71d4",
+    "docs/model-checks/refinement/s4-zones-assets.json": "b19eda47b6ca3278af2faed883a4e4bc4d4613fe7535f83e863a827bb9aaca68",
+    "docs/model-checks/refinement/s4-zones-full-prepare.json": "0bd8b328ac738a56a123352384d98a834420657c7eb99f2ad11be8593cbd5ccb",
+    "docs/model-checks/refinement/s4-tree-source.json": "24f8d5c419de65ba79b6a20c36bdd581164185d9e8770ccb55ccde4af4668221",
+    "docs/model-checks/refinement/s4-tree-rotations.json": "b8bef4871f956f9a23e6b47e83b44c025a7163085dc96d23d09d660eb964b572",
+    "docs/model-checks/refinement/s4-zones-visual-review.json": "47dd1deca2157d9a23b8529905468617b296b9e3e4b4a88c3e402611b9fc6ff2",
+    "docs/model-checks/refinement/s4-zones-timed-browser.json": "501982396236be2a805fc7e937afe716bd34460be5e697fec19ec7b3292dd3f8",
+    "docs/model-checks/refinement/s4-zones-timed-performance-context.json": "06645aa830dd3d3c612eba42c5e63f5bd39797b43d00aa49b362516018e91752",
+    "docs/model-checks/refinement/s4-tree-before-reproduction.json": "cf9cb353c570b7c4b88b28a64d8e484dabeeec16a62f9e0a873b475b7c0038b6"
+  },
+  "productionFrontendHashes": {
+    "out/_next/static/chunks/vinext-CMnwgZ5S.js": "889cb96c170fb6c1823fd6ec13e071d8884e27a4b02685341f9109a96d5c16e4",
+    "out/_next/static/chunks/scene-DtBiCANb.js": "812ecd92d3664c8643344fd59d6cc2c38fde2dbe5051ca06fa418e18578a0721",
+    "out/_next/static/chunks/page-45jOv82j.js": "0a7a962dc1a3e7c913d1ec9b5f1b65f2c22ab6311d61e79f86a90e4d1ed49107",
+    "out/_next/static/chunks/index-BEPZ5Rtj.js": "6e18b1280207f8038e63e78ffab38f29c27c8464de858accb258ab795d77aaad",
+    "out/_next/static/chunks/layout-segment-context-Dwu4VwHm.js": "e0cd909c4e4d00f3d2edd446ac5234d1b34e6ccca6b377791a53b1c8158483f2",
+    "out/_next/static/chunks/rolldown-runtime-hePW80VL.js": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+    "out/_next/static/chunks/framework-DTZGTDtF.js": "2a1edf81f32a49b1eacafc3546b371bca024c82a9191836e274d90890212e9df",
+    "out/_next/static/c1f821c4-c442-4a64-9595-042bfef6cdeb/_ssgManifest.js": "653f3e53e89b4f8548ff86c19e92bb3c6b84b6be7485a320b1e00893ed877479",
+    "out/_next/static/c1f821c4-c442-4a64-9595-042bfef6cdeb/_buildManifest.js": "47f02b34be6dc481257b6efce4c19e19111f37ef5c437f8ffed44f0da97fa9bb",
+    "out/_next/static/media/draco_wasm_wrapper.DxJM36Ib.js": "e8049906ef3f8f75d3456c22a3f31bfdfe5b5b5bd09ccdec613b9e9a49d554d8",
+    "out/_next/static/media/draco_decoder.fzg4nYZr.js": "30e4d486fa020737af10e3c56197693e5b904bdc05b8bfa5d7b06751dec6da04",
+    "out/_next/static/media/draco_wasm_wrapper.fZCQGLGb.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6",
+    "out/draco/draco_decoder.js": "8625489da79a805f4f2a7d511c3e52d8b4085608a9d2a4d5f4f9de5db0aea04f",
+    "out/draco/draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
+  }
+}

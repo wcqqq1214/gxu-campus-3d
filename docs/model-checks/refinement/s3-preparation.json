@@ -1,0 +1,96 @@
+{
+  "verifiedAt": "2026-09-12T10:32:28.630009+00:00",
+  "cleanPreparationPassed": true,
+  "startedWithoutPublicData": true,
+  "publicOutputsApplied": true,
+  "mappedBuildingIdentityAndGeometryUnchanged": 448,
+  "ignoredBuildStageFields": [
+    "chunk",
+    "elevation",
+    "zone"
+  ],
+  "unchangedData": {
+    "surfaces.json": true,
+    "terrain.json": true,
+    "vegetation.json": true,
+    "basketball.json": true,
+    "sports.json": true,
+    "campus-boundary.json": true,
+    "infrastructure-map.json": true,
+    "overview.json": true
+  },
+  "sourcesEqualById": true,
+  "sourceRecords": 59,
+  "geometry": {
+    "surroundings.json": {
+      "layers": [
+        {
+          "id": "surrounding-road",
+          "symmetricDifferenceSquareMeters": 0.0
+        },
+        {
+          "id": "surrounding-walk",
+          "symmetricDifferenceSquareMeters": 0.0
+        },
+        {
+          "id": "surrounding-curb",
+          "symmetricDifferenceSquareMeters": 0.0
+        }
+      ],
+      "combinedPavingDifferenceSquareMeters": 0.0
+    },
+    "campus-roads.json": {
+      "layers": [
+        {
+          "id": "校园主路-沥青",
+          "symmetricDifferenceSquareMeters": 0.8455613543950485
+        },
+        {
+          "id": "校园主路-浅色路缘",
+          "symmetricDifferenceSquareMeters": 0.8455613543951689
+        },
+        {
+          "id": "校园主路-中心虚线",
+          "symmetricDifferenceSquareMeters": 1.3189824641091429e-15
+        }
+      ],
+      "combinedPavingDifferenceSquareMeters": 2.1172534786596943e-12,
+      "bridgeLayerMaxDifferenceSquareMeters": 1.096306808684988e-12
+    }
+  },
+  "corrections": [
+    "Perimeter obstacles follow the retained 20m context policy in both full and incremental preparation.",
+    "Source catalogue is derived from data/ inputs without a public/data dependency.",
+    "Huicui navigation no longer renames/reclassifies the entire journalism-building footprint; GeoJSON facade provenance is synchronized."
+  ],
+  "knownDifferences": [
+    "0.845561 square meters are reassigned between existing campus asphalt and curb; combined paved area is unchanged.",
+    "Floating-point differences in bridge geometry remain below 1e-7 square meters per semantic layer.",
+    "Prepared timestamps and source-array order differ; Blender appends runtime elevation/zone/chunk fields.",
+    "Full preparation restores teaching-six additional source references already present in its source catalogue."
+  ],
+  "inputSha256": {
+    "scripts/surroundings_data.py": "74ede4c78f6205a8c9e44fd72091c289e34cbb72180e512f00ef1332aad7f19e",
+    "scripts/building_overrides.py": "8abe19505327b058221e27abdcced6605d97849200a9502b9e724862135b174b",
+    "scripts/prepare_geodata.py": "7fba804bfd1513d69998c9dac3f67bf1330577fd39e631d99da261b1e0d010e9",
+    "scripts/huicui_data.py": "725171378d302ede604fb6d3c858e44dc5cff52de901cd825cd8fb088181cdb1",
+    "data/sources.json": "7dcd9a94f7abe0887a7732665703d029355f1e9f84dfea411c8235c661c7a301"
+  },
+  "appliedAt": "2026-09-12T10:43:45.308055+00:00",
+  "currentSourceRecords": 60,
+  "buildingRecordChanges": [
+    {
+      "id": "relation/11564702",
+      "changedFields": [
+        "facadeBasis"
+      ]
+    }
+  ],
+  "changedAssets": [
+    "models/base.glb",
+    "models/library.glb",
+    "models/time-gate.glb"
+  ],
+  "all30OrdinaryChunksUnchanged": true,
+  "currentModelManifestSha256": "aa9478f6aeca65016488db7064a1496579a24cfda37ffff8b2e2fe295eb3c36e"
+}

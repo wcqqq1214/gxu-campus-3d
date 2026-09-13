@@ -1,0 +1,174 @@
+{
+  "date": "2026-09-13",
+  "scope": "S4 actual tree/building surface clearance in both LODs; full plan remains incomplete.",
+  "treesBefore": 3111,
+  "treesAfter": 3050,
+  "removedTrees": 61,
+  "allRemovedTreesHadConfirmedSourceSurfaceIntersections": true,
+  "survivorsExactlyPreserved": true,
+  "unchangedModelFiles": 69,
+  "initialModelBytes": 5892096,
+  "maxOrdinaryChunkBytes": 1684868,
+  "sourcePreservationReport": "s4-tree-clearance-source-preservation.json",
+  "geometryReport": "s4-tree-clearance-geometry.json",
+  "groundReport": "s4-tree-clearance-tree-source.json",
+  "visualReviewReport": "s4-tree-clearance-visual-review.json",
+  "geometryPassed": true,
+  "visualPassed": true,
+  "incremental": {
+    "roads": {
+      "inputTrees": 3111,
+      "retainedTrees": 3050,
+      "removedTrees": 61,
+      "rowsExactlyMatchProduction": true,
+      "baseGeometryAndMetadataNodesPreserved": 83,
+      "otherModelFilesUnchanged": 68,
+      "initialBytes": 5925300,
+      "sourceReport": "s4-tree-clearance-incremental-roads-source.json",
+      "passed": true
+    },
+    "basketball": {
+      "inputTrees": 3111,
+      "retainedTrees": 3050,
+      "removedTrees": 61,
+      "rowsExactlyMatchProduction": true,
+      "baseGeometryAndMetadataNodesPreserved": 83,
+      "otherModelFilesUnchanged": 68,
+      "initialBytes": 5925300,
+      "sourceReport": "s4-tree-clearance-incremental-basketball-source.json",
+      "passed": true
+    }
+  },
+  "incrementalMaintenancePassed": true,
+  "geometryRegressionCases": 5,
+  "pythonTests": 52,
+  "nodeTests": 54,
+  "productionBuildPassed": true,
+  "performance": {
+    "browserReport": "s4-tree-clearance-timed-browser.json",
+    "contextReport": "s4-tree-clearance-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          58
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4053775,
+          "medianDrawCalls": 543
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0089749997262125,
+          "medianDrawCalls": 1.011173184357542
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          27,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1087494,
+          "medianDrawCalls": 276
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0332582732377504,
+          "medianDrawCalls": 1.0298507462686568
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 80995,
+        "observations": 4,
+        "first": {
+          "at": "2026-09-12T18:17:37.747198+00:00",
+          "pid": 80995,
+          "parentPid": 90860,
+          "cpuPercent": 98.2,
+          "elapsed": "00:10",
+          "cumulativeCPUTime": "0:09.81",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-12T18:18:07.855106+00:00",
+          "pid": 80995,
+          "parentPid": 90860,
+          "cpuPercent": 99.9,
+          "elapsed": "00:40",
+          "cumulativeCPUTime": "0:39.39",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 30.107908,
+        "cumulativeCPUSecondsAdded": 29.58
+      },
+      {
+        "pid": 81270,
+        "observations": 13,
+        "first": {
+          "at": "2026-09-12T18:19:38.439873+00:00",
+          "pid": 81270,
+          "parentPid": 90860,
+          "cpuPercent": 42.5,
+          "elapsed": "00:09",
+          "cumulativeCPUTime": "0:06.81",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-12T18:21:39.286119+00:00",
+          "pid": 81270,
+          "parentPid": 90860,
+          "cpuPercent": 99.7,
+          "elapsed": "02:10",
+          "cumulativeCPUTime": "2:00.68",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 120.846246,
+        "cumulativeCPUSecondsAdded": 113.87
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "performanceAcceptancePassed": false,
+  "workPackagePassed": false,
+  "fullPlanCompleted": false,
+  "remaining": [
+    "Same-condition performance acceptance if flagged incomplete.",
+    "Complete unified sourced planting/exclusion rules, sports/road/water/entrance and solid containment scope.",
+    "Complete S2 20–30 full-building calibrations, S3 neighbors, remaining S4 and S5."
+  ],
+  "hashes": {
+    "blender/build_campus.py": "c007eaac3c28160f518b0a831a0b71dc88a39a9c012fe728c6c6ba37d635a6f6",
+    "blender/tree_clearance.py": "0e1c4101155f37fe2f587bff96364f55ef73dce9e91c94e73922a3c5df4dd945",
+    "blender/test_tree_clearance.py": "176aee078246197cbd8e8e025c5a0cc875bafb2d28cdfb71635273e2dd30be20",
+    "blender/validate_tree_clearance.py": "37d2e55b255ebaa21443f3cc8ca69fbd5f779a718dcdce407b36c0e8c6d41963",
+    "blender/update_roads.py": "67a088e4b410afd0a5566358bb912f8706475060757793230228de4c9bbc9221",
+    "blender/update_basketball.py": "0ea1c5dc9e1b30dc6c9da554f941c9c189bd80e8bc25cbec41336ebef3210b9c",
+    "public/data/vegetation.json": "e1148d85751eeaf2a2130c539194a7bb62a4d9a14cf00d48e4377b464dcb06a2",
+    "public/data/overview.json": "4965e5a491516042bb296c3492cd2db70a213352981392a4353883a669e74c19",
+    "public/data/vegetation-zones.json": "6c8e6b4fc2d1df24c16ccceb2abc7dda6782f7c1201ea43287a76f004d2f10bb",
+    "public/data/models.json": "89fcd7afbb0af44caf9b5c312ae26ea0dc07f0d04db4ad7a39c14fdffb670704",
+    "blender/gxu-campus.blend": "d3501dde367df4092dd5f8151ec2df9361a0d0a533538f1647456cfe63ce09c5"
+  }
+}

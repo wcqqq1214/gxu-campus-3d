@@ -1,0 +1,100 @@
+{
+  "reviewedAt": "2026-09-12T12:33:56.269140+00:00",
+  "buildingId": "way/759185166",
+  "sources": [
+    {
+      "localPath": "work/refinement-s3-neighbors/agriculture-banner-01.jpg",
+      "url": "https://nxy.gxu.edu.cn/images/01-28h.jpg",
+      "sha256": "1532baaf60e948ffb3f92e43516634bbd89a450e5d58bbe09029ead24a2caa73",
+      "observations": "Adopted: named agriculture facade, five-storey main block and lower central portico. Display contains a 2021-12-10 string, not a verified capture date."
+    },
+    {
+      "localPath": "work/refinement-s3-neighbors/agriculture-event-2026.png",
+      "url": "https://www.gxu.edu.cn/__local/F/48/DF/1D9721AEFE3483CC451A479CB49_970EB0FB_213976.png",
+      "sha256": "17cf7d83799fb4d698d23989b08ca7bea99d3d7d882da86850994765e9e57944",
+      "observations": "Adopted: four front piers, three open bays, rear doorway and steps; event equipment obscures parts of facade."
+    },
+    {
+      "localPath": "work/refinement-s3-neighbors/agriculture-banner.png",
+      "url": "https://nxy.gxu.edu.cn/images/sban.png",
+      "sha256": "c0ced106cd77801681dd9b6f3b34aeab95bc661c9f5bade8d2ececad659a6849",
+      "observations": "Not adopted for building calibration: tree-covered road scene, individual mapped building not reliably matched."
+    },
+    {
+      "localPath": "work/refinement-s3-neighbors/agriculture-banner-202503.jpg",
+      "url": "https://nxy.gxu.edu.cn/images/24/202503.jpg",
+      "sha256": "93fd7c025c86a5af7287349cd7c7b9768d5864d8b05680df13a584a5a6296bf3",
+      "observations": "Not adopted for this building: lake panorama, not the agriculture front facade."
+    }
+  ],
+  "videoReview": {
+    "page": "https://nxy.gxu.edu.cn/info/1091/5737.htm",
+    "publishedAt": "2026-06-08",
+    "interval": "Opening 45 seconds, sampled every 5 seconds",
+    "use": "Inspected for context only; frames show campus and farm/laboratory scenes, insufficient to locate agriculture rear terraces. No geometry inferred from an unlocated newer complex.",
+    "frames": [
+      {
+        "file": "work/refinement-s3-neighbors/agriculture-video-01.png",
+        "sha256": "7d4c277bffbf17e658243be24459695b4481ee67269b71ecf0c550a628816d41"
+      },
+      {
+        "file": "work/refinement-s3-neighbors/agriculture-video-02.png",
+        "sha256": "f8b3d7514252084989971e9f64a0f5c0f126e58809f1f5b814f7ecc9a55db4ab"
+      },
+      {
+        "file": "work/refinement-s3-neighbors/agriculture-video-03.png",
+        "sha256": "afba1841f4af592b7d942c1986162d7f80c5df216c0f1b1fa138f4992dd3cef7"
+      },
+      {
+        "file": "work/refinement-s3-neighbors/agriculture-video-04.png",
+        "sha256": "e3a1e36ecc1fb0a506562febefe1e04a8e47e630a1954903bbbec99e9c31806b"
+      },
+      {
+        "file": "work/refinement-s3-neighbors/agriculture-video-05.png",
+        "sha256": "7914beeab44b37d61ef46d53c0579d9407384abfd584ecc1e82692303995ce03"
+      },
+      {
+        "file": "work/refinement-s3-neighbors/agriculture-video-06.png",
+        "sha256": "d68e3e251200422bc2fb231bfdeb84b094441db12679c14e1ae05db3fc8c343e"
+      },
+      {
+        "file": "work/refinement-s3-neighbors/agriculture-video-07.png",
+        "sha256": "541255681e637331fe48b3086dac78c7a7c83cb5371faa1e3c4a76a024acf1ae"
+      },
+      {
+        "file": "work/refinement-s3-neighbors/agriculture-video-08.png",
+        "sha256": "ff7560e607ee7f3f9ec2a2fe9de631a7628f1bed9d343f687904bc85000e61ae"
+      },
+      {
+        "file": "work/refinement-s3-neighbors/agriculture-video-09.png",
+        "sha256": "48ee83368aadd7426b5703b8ee52f87a77204559ccc9bf3dd33bc353ca9e2a7b"
+      }
+    ]
+  },
+  "geometryInference": {
+    "mappedFrontEdge": 9,
+    "mappedPorticoVertexIndices": [
+      8,
+      9,
+      10,
+      11
+    ],
+    "facingBearingDegrees": 167.2933,
+    "canopyWidthMeters": 17.8144,
+    "canopyDepthMeters": 4.7357,
+    "canopyAreaMeters2": 84.3395,
+    "canopyHeightMeters": 4,
+    "soffitHeightMeters": 3.4,
+    "floorHeightMeters": 0.45,
+    "frontPierCount": 4,
+    "doorWidthMeters": 6.8,
+    "status": "Estimated from mapped outline and named photos; dimensions and site grades are not measured."
+  },
+  "unresolved": [
+    "Exact east/west fourth-floor terrace boundaries and rear wings",
+    "Non-front entrances and unobserved facades",
+    "Wildlife research building: searched the OSM name and official site, no reliable whole-building exterior correspondence; retained OSM 8 levels",
+    "Unlabelled two-storey building way/759140885: identity and entrance not established; retained OSM outline and 2 levels"
+  ],
+  "copyright": "All original reference images and video frames remain local under work; not packed in public or documentation images."
+}

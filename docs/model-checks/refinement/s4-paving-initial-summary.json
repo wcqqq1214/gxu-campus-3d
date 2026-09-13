@@ -1,0 +1,120 @@
+{
+  "date": "2026-09-13",
+  "scope": "S4 ordinary paving sample: way/759147083, six-b-plaza",
+  "modelManifestSha256": "e17c878723c8e9adbb29189be8baa7eea696fad925d6f7f2145f4f9b832b1643",
+  "baseSha256": "29c7b52ac880d767ebd824bc7455bc213647afe57040034c31d10d277bda7b0c",
+  "sourceSha256": "69ed151332dcc3d0365a8a12be14f55ddc8769f4682f49a8b93c3e46938c665d",
+  "assets": {
+    "assets": 69,
+    "changedAssets": [
+      "models/base.glb",
+      "models/time-gate.glb"
+    ],
+    "baseChangedNodes": [
+      "landmark-time-gate",
+      "roads",
+      "terrain"
+    ],
+    "baseAddedNodes": [
+      "paving-six-b-plaza",
+      "paving-six-b-plaza-contact-0"
+    ],
+    "allOtherBaseNodesAndNearAssetsPreserved": true,
+    "rawWaterTerrainRoadSiteInfrastructureDataPreserved": true,
+    "isolatedFullPreparationMatches": true,
+    "trees": 3111,
+    "treeXYHeightTypePreserved": true,
+    "treeElevationsChanged": 0,
+    "initialModelBytes": 5742004,
+    "maxOrdinaryChunkBytes": 1684868,
+    "blendBytes": 88179313,
+    "publicAndProductionMatch": true,
+    "passed": true
+  },
+  "geometryReport": "paving-geometry.json",
+  "geometryPassed": true,
+  "associatedChecks": [
+    "s4-paving-site-geometry.json",
+    "s4-paving-shore-geometry.json",
+    "s4-paving-tree-source.json",
+    "s4-paving-time-gate-geometry.json"
+  ],
+  "pythonTests": 51,
+  "geometryScenarios": 3,
+  "nodeTests": 54,
+  "productionBuildPassed": true,
+  "browserCaptureReport": "s4-paving-final-browser.json",
+  "interactionReport": "s4-paving-layers-interaction.json",
+  "automatedInteractionPassed": true,
+  "visualAcceptancePassed": false,
+  "performanceAcceptancePassed": false,
+  "incrementalMaintenancePassed": false,
+  "workPackagePassed": false,
+  "fullPlanCompleted": false,
+  "pending": [
+    "Diagnose and fix terrain texture striping visible when roads layer is disabled; inspect actual source/GLB triangles, overlap, UVs and quantization rather than assuming a cause.",
+    "Repeat affected visual checks after the fix.",
+    "Run current-asset same-condition activity performance acceptance.",
+    "Validate update_roads.py and update_basketball.py with paving configuration changes in isolated copies.",
+    "Continue full S2/S3/S4/S5 plan requirements."
+  ],
+  "knownNearbyRoadGaps": {
+    "newMissingComparedWithBaseline": [],
+    "baselineAndCurrentMissingPointsIdentical": true,
+    "samples": 38036,
+    "sourceInteriorMissingCount": 44,
+    "missingExamples": [
+      [
+        -28.891492966375765,
+        -670.8942759998636
+      ],
+      [
+        -28.741492966375766,
+        -671.9442759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.9192759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.8942759998636
+      ],
+      [
+        -28.741492966375766,
+        -671.8692759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.8442759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.8192759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.7942759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.7692759998636
+      ],
+      [
+        -28.741492966375766,
+        -671.7442759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.7192759998635
+      ],
+      [
+        -28.741492966375766,
+        -671.6942759998635
+      ]
+    ],
+    "oldMissingCount": 44,
+    "newIntrusions": 0,
+    "intrusionExamples": []
+  }
+}

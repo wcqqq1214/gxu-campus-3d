@@ -1,0 +1,159 @@
+{
+  "createdAt": "2026-09-13T01:49:10.186993+00:00",
+  "previousGoalTurnClassification": "progress: three-bay main door and northern four-column window grid implemented and verified",
+  "scope": "Mathematics north entrance: four-column solid flat canopy, platform and three short steps; portico parser permits solid height partitions and an absent parapet.",
+  "modelManifestSha256": "1107db6433f051501fb5c02c030eaddcfddef14d8f59bc48c8d446b6978d81a4",
+  "sourceSha256": "b3543ba05eccf4fcabf69da619dd9ccc4d04597fa0ea255404e79bf223a24e6d",
+  "assets": {
+    "changedBuildingIds": [
+      "way/759129516"
+    ],
+    "footprintsPreserved": true,
+    "treesPreserved": 3061,
+    "changedGLBFiles": [
+      "base.glb",
+      "chunk-n1-n3.glb"
+    ],
+    "changedBaseNodes": [
+      "chunk-n1-n3"
+    ],
+    "preservedBaseNodes": 83,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5909140,
+    "initialModelByteChange": 820,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "1107db6433f051501fb5c02c030eaddcfddef14d8f59bc48c8d446b6978d81a4",
+    "passed": true
+  },
+  "geometryPassed": true,
+  "visualPassed": true,
+  "cleanPreparationPassed": true,
+  "pythonTests": 92,
+  "manualImages": 7,
+  "ordinaryBuildingsChecked": 430,
+  "negativeControl": "Previous source fails the finite ray check for an external north-portico column.",
+  "performance": {
+    "browserReport": "s2-mathematics-north-timed-browser.json",
+    "contextReport": "s2-mathematics-north-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          57,
+          47
+        ],
+        "current": {
+          "medianFPS": 57,
+          "medianTriangles": 4084941,
+          "medianDrawCalls": 542
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 0.95,
+          "medianTriangles": 1.0167321433371597,
+          "medianDrawCalls": 1.0093109869646182
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          28,
+          28,
+          28
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1096347,
+          "medianDrawCalls": 284
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0416697545819913,
+          "medianDrawCalls": 1.0597014925373134
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 19835,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T01:45:34.649624+00:00",
+          "pid": 19835,
+          "parentPid": 90860,
+          "cpuPercent": 97.9,
+          "elapsed": "00:04",
+          "cumulativeCPUTime": "0:03.56",
+          "executable": ".venv/bin/python"
+        },
+        "last": {
+          "at": "2026-09-13T01:45:34.649624+00:00",
+          "pid": 19835,
+          "parentPid": 90860,
+          "cpuPercent": 97.9,
+          "elapsed": "00:04",
+          "cumulativeCPUTime": "0:03.56",
+          "executable": ".venv/bin/python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "workPackagePassed": false,
+  "wholeBuildingReviewComplete": false,
+  "fullPlanCompleted": false,
+  "implementationSha256": {
+    "data/building-overrides.json": "4caf2fc580470e80e50ab6df69be99dfd74b19d058c25df2d09f2a8b68088b14",
+    "scripts/attached_portico_data.py": "69d2c6447ba08c750ccebc32176b3ba356432dd69ef59053b8336fb8883ade05",
+    "scripts/building_overrides.py": "9e5277a2b3defe69d60062c26fecaddabf956cbcb337e97e7be74e061f90bc8b",
+    "scripts/test_building_overrides.py": "92255b55e3a7658d5a1de6496dc707aca3454c0c994c7944f42d193a9703ddb4",
+    "blender/attached_portico.py": "8a4e5b5ff02d4e9794450c68e8ccdc875a754c384f687c2251115ffaa149cded",
+    "blender/validate_mathematics.py": "019f5a8f165a4941e6632f1e0706dd88bf5eeeb59d57b8b881354e048b9c672d",
+    "public/data/buildings.json": "9a64240d87f7d67f12295e92786b950e07ef539e55655205cfec88f7399e2419",
+    "public/data/low-planting.json": "eb970c106480ace010b1818e92917cc73efec4cb97f48c0c7ff73c1944e77a25",
+    "public/data/models.json": "1107db6433f051501fb5c02c030eaddcfddef14d8f59bc48c8d446b6978d81a4"
+  },
+  "evidenceSha256": {
+    "docs/model-checks/refinement/s2-mathematics-north-assets.json": "ccc2ab3f3ce5e028a6a1e5f7c0bd523b77ed6f8699421b2f7a9458561674e6bc",
+    "docs/model-checks/refinement/s2-mathematics-north-geometry.json": "ea28a248c7b7218e370a820241e25b2c7d1d1abc91f99f610adbe15585a15a09",
+    "docs/model-checks/refinement/s2-mathematics-north-ordinary-geometry.json": "c0204d52a27c58842d6e093cbc2ea2fbd3249af4729f7c32da4fc1d043dc77f0",
+    "docs/model-checks/refinement/s2-mathematics-north-trees-geometry.json": "fc5d5476ad508c66074fb4420110652522142b47e1de3e502ec0a3b03bda9460",
+    "docs/model-checks/refinement/s2-mathematics-north-source-preservation.json": "68ede9eccee0d85863dc532416065318bac31b3742ec0ab04de95f2f447b35e0",
+    "docs/model-checks/refinement/s2-mathematics-north-clean-prepare.json": "87e1251177d8fb903d9b355b0f7a9a15d9d786c5cc80fe79f17d6e2e0f01d605",
+    "docs/model-checks/refinement/s2-mathematics-north-visual-review.json": "b20c2ebd7cec2517a18dd8a6e031bc38677de92e1346474a41cbb2f851278025",
+    "docs/model-checks/refinement/s2-mathematics-north-evidence.json": "27ce877d037a04e20114373603ffea47c27e83cf26689ccc9e24530681bbd612",
+    "docs/model-checks/refinement/s2-mathematics-north-before-geometry.json": "6e28c485cf4c0b13e41f7c7be322134f05778974cb3e86430319958ba4d17c17",
+    "docs/model-checks/refinement/s2-mathematics-north-ground-preflight.json": "7a8b66b643f82095197129777d8ba66294bd0daf23508f157800dcedb6989411",
+    "docs/model-checks/refinement/s2-mathematics-north-entry-context-browser.json": "ae481143a7ae6a82c678d3db226dea032d32c34038c98d3239296f4cdad7aebc",
+    "docs/model-checks/refinement/s2-mathematics-north-timed-browser.json": "3f1cc18804713218c04653ee77484fa1c8ab831bf2a57d37d6299a197fd4221f",
+    "docs/model-checks/refinement/s2-mathematics-north-timed-performance-context.json": "463a2cb19f3762f0b5e53ca2ad068802ae352abcc8c966b18a5554e9e891668f"
+  },
+  "limitations": [
+    "Portico dimensions, anchor and step rise are photo/map-constrained estimates, not a survey.",
+    "Eastern end and final height boundary, staircase lattice and vertical glazing, southern actual steps and complete road-to-door paving remain incomplete.",
+    "Golden canopy fascia and panel seams remain simplified.",
+    "Variable time-gate export retained from frozen baseline as paired source and compressed geometry.",
+    "Performance covers the fixed library activity view; mobile viewport is not a physical-phone measurement."
+  ],
+  "remaining": [
+    "Complete 20–30 whole ordinary-building reviews and required library neighbours.",
+    "Complete library-north sample, remaining S4 courtyard/lakeside work and S5.",
+    "Current-asset same-condition performance acceptance remains pending."
+  ]
+}

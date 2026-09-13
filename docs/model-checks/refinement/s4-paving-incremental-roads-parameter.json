@@ -1,0 +1,25 @@
+{
+  "method": "roads",
+  "sampleXY": [
+    -22.0,
+    -656.0
+  ],
+  "distanceFromJoinMeters": 2.8080327821256463,
+  "beforeFeatherMeters": 3,
+  "afterFeatherMeters": 4,
+  "expected4mZ": 6.308459045318268,
+  "expected3mZ": 6.279173160556355,
+  "actual": {
+    "source": {
+      "actualZ": 6.3084564208984375,
+      "errorFrom4mMeters": 2.624419830787872e-06,
+      "differenceFrom3mMeters": 0.029283260342082507
+    },
+    "base": {
+      "actualZ": 6.3086090087890625,
+      "errorFrom4mMeters": 0.00014996347079421213,
+      "differenceFrom3mMeters": 0.029435848232707507
+    }
+  },
+  "passed": true
+}

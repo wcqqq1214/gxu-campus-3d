@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "inspectedAt": "2026-09-13T03:37:10.715529+00:00",
+  "method": "Manually inspected all nine original PNGs with view_image in the current goal turn.",
+  "modelManifestSha256": "d43eada7f5dc301f9621763061343d729ae374d7d95f8bd5a03dec0717dc8202",
+  "browserReport": "s3-mathematics-south-final-context-browser.json",
+  "images": [
+    {
+      "file": "docs/screenshots/refinement/s3-mathematics-south-final/before/mathematics-south-approach-trees-off-day.png",
+      "sha256": "62559daf85cdea2763664e1c1ff0e5a6850933e2a3efe9178203c99b67e06472",
+      "observation": "原两级平台与南侧道路之间隔有草地；作为同镜头修改前状态。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-mathematics-south-final/before/mathematics-south-stairs-trees-off-day.png",
+      "sha256": "4031e206e46fa0c9dbca6582094319f8dca4456a24815bb5c77f1630be3a2441",
+      "observation": "近景显示原两级简化平台，门前没有连接铺地。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-mathematics-south-final/before/mathematics-south-road-join-trees-off-day.png",
+      "sha256": "945cfe5cc3613055bcda82a4da7e65a2ca2f7122aaa7a3208d2603f957b39bdc",
+      "observation": "原服务道路边界连续，门前为草地，作为接口基线。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-mathematics-south-final/after/mathematics-south-approach-trees-off-day.png",
+      "sha256": "bc03cb049c2e3d9059a8f7c9acb1f9c9e7adcf12758334bed095f33865eefbb4",
+      "observation": "三道台阶通过直向铺地接至南侧道路；范围外草地与西侧人行道保留。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-mathematics-south-final/after/mathematics-south-stairs-trees-off-day.png",
+      "sha256": "c4e23a99ff8817c191585dcf9b80205b93bf17f68a9866f8ec31ed62668baa82",
+      "observation": "三道踢面清楚，四柱门面与台阶对齐，最外踏步接铺地。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-mathematics-south-final/after/mathematics-south-road-join-trees-off-day.png",
+      "sha256": "1578006c268ecaa5f328fa570136645a1d738f40c1b8f6e4e74c1834c0b445ff",
+      "observation": "道路接触带没有初版条纹拉伸；铺地与原浅色道路接合，未见缺口。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-mathematics-south-final/after/mathematics-south-stairs-trees-on-day.png",
+      "sha256": "7c57ee7d728035c4941b9d75e1012b4fb5d2a1f00590286c817108bd9a33fac0",
+      "observation": "开启植被后入口、台阶及铺地仍完整；本近景没有可用于核验全校树木的视野。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-mathematics-south-final/after/mathematics-south-approach-trees-off-night.png",
+      "sha256": "e3b9a6819951e8c695632f66e158a8db1f9f075c622ebb1d6e7491d62abb876f",
+      "observation": "夜景保留门面、台阶及道路连接，无缺面；不作照明实测。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-mathematics-south-final/after/mathematics-south-approach-trees-off-day-mobile.png",
+      "sha256": "7e63bdfaea573916e3ab32b6540589f9e2e903ce1723c999fa7dc672774b8af4",
+      "observation": "390×844 桌面模拟使用基础模型，台阶与连接仍在画幅内；不作手机真机性能证据。"
+    }
+  ],
+  "scope": "South stairs, approach, road contact, night and desktop mobile viewport; no whole-building or physical-phone acceptance. Static capture FPS is not the timed performance result."
+}

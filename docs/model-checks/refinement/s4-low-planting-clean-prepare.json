@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "method": "Run the actual prepare_geodata.py with cached raw inputs in an isolated copy, first over existing derived output, then again after moving all public/data away. No model rebuild performed in the clean-output pass.",
+  "cleanDerivedLowPlantingExactlyMatchesCurrent": true,
+  "currentLowPlantingSha256": "753899562bab98259b0c5e0c07148aaa8b7ac228c89f0748d9aadff29f566538",
+  "cleanLowPlantingSha256": "753899562bab98259b0c5e0c07148aaa8b7ac228c89f0748d9aadff29f566538",
+  "cleanContextRevision": "16d4488cc4bb06ff10ee50e271ce21e7e13b46ace5f8b6efd04149971a184f0c",
+  "cleanModelManifestAbsent": true,
+  "plantings": 1,
+  "dataStageTreeCandidates": 3122,
+  "runtimeTrees": 3061,
+  "treeCountExplanation": "Preparation creates 3122 candidates; the subsequent model building-clearance stage determines final trees. This clean-data-only check does not independently verify that stage.",
+  "logs": {
+    "work/refinement-s4-low-planting/full-prepare.log": "0cf14da32bd2605ce15726525a1d65597b35cd15a9d7af5f05a64a6230b15fd7",
+    "work/refinement-s4-low-planting/clean-prepare.log": "0cf14da32bd2605ce15726525a1d65597b35cd15a9d7af5f05a64a6230b15fd7"
+  }
+}

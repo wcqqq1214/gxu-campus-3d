@@ -1,0 +1,49 @@
+{
+  "reviewedAt": "2026-09-12T11:55:36.285118+00:00",
+  "method": "Manual inspection of rendered PNGs plus script assertions and actual source/base geometry sampling; not survey validation.",
+  "observations": [
+    {
+      "image": "docs/screenshots/refinement/s3-site-validated/library-north.png",
+      "finding": "Central hard paving now visibly joins the actual roadway to the north stairs. The higher south body remains behind the north facade; nearby trees do not occupy the central passage.",
+      "sha256": "57d87f06f1a696fe486aaf690703f983e0138589a98652e5fa600a31590bb2c8"
+    },
+    {
+      "image": "docs/screenshots/refinement/s3-site-validated/library-approach.png",
+      "finding": "Stair risers remain visible across the central entrance; paving meets the lowest step. Six portico columns and the door opening are retained.",
+      "sha256": "23afc429c7ecc2a96ec440a8f4fdbdecbb2e14513cafb109edf05f2ec5d8158f"
+    },
+    {
+      "image": "docs/screenshots/refinement/s3-site-validated/library-overhead.png",
+      "finding": "A narrow central connector is visible, not an invented whole-plaza boundary. Existing courtyard and surrounding road layout remain.",
+      "sha256": "5279a94215ff1b2d57d6185505b2cd4f3ba7cf9a58229d02414d97b59e7e06c1"
+    },
+    {
+      "image": "docs/screenshots/refinement/s3-site-validated/library-mobile.png",
+      "finding": "At 390 x 844 the road, connector, lowest stair and doorway are visible together without the former foreground crown obstruction.",
+      "sha256": "2ebfab59ff22a9efe0f2fc1469c63db4038ef71c1311a473082a09e4d5d913bf"
+    },
+    {
+      "image": "docs/screenshots/refinement/s3-site-ui/base-labels-off.png",
+      "finding": "Basic library representation retains the north entrance and connector. The side camera is partly obstructed by an adjacent ordinary building, limiting full-field inspection.",
+      "sha256": "1ff25b9e5a6a73147bf12f891d5f898eea968269ee427c128c798dac84f07055"
+    },
+    {
+      "image": "docs/screenshots/refinement/s3-site-ui/paving-with-buildings-off.png",
+      "finding": "Connector remains with buildings disabled and roads enabled, matching site road-layer ownership.",
+      "sha256": "e1ae5412a00d070f4db67d15c78fe4caf64e1d914a8a27c91d9dfb6ecbea7811"
+    },
+    {
+      "image": "docs/screenshots/refinement/s3-site-ui/night-labels-off.png",
+      "finding": "North entrance and paving remain visible at night with labels disabled; side-angle trees obscure some paving but are outside the central corridor.",
+      "sha256": "55a1a9f6675ba5ef5221b865c8d5d17db9ee32224b6cd29c336c95ad4aa0beac"
+    }
+  ],
+  "limitations": [
+    "Single photos do not establish the complete real plaza outline or surveyed grades.",
+    "Side camera is partially occluded; front and overhead cameras complement it.",
+    "Ordinary-building context calibration remains incomplete.",
+    "The old and new library near GLB hashes match; forecourt is a permanent base object."
+  ],
+  "passedWithinCentralConnectorScope": true,
+  "fullS3Completed": false
+}

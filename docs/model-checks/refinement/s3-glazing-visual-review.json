@@ -1,0 +1,81 @@
+{
+  "createdAt": "2026-09-12T20:09:02.264002+00:00",
+  "passed": true,
+  "modelManifestSha256": "01d9b711d2cd5f0e3df83b5c8d7d85206735b489a59de8797454cbfada4f011e",
+  "images": [
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-timed/animal-science.png",
+      "sha256": "57330186deebc54d16a3bea21b4bc1a4151b7ce191ac470ae4917ece88233568",
+      "visuallyInspected": true,
+      "observation": "Contextual view retains roof outline, courtyard and core/wing heights; central vertical rhythm remains visible at distance."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-timed/animal-corridor.png",
+      "sha256": "45f56781f1252e3a14d5a6a1275b25ce5f1b296d5b2c431354a4aaf12c3806f0",
+      "visuallyInspected": true,
+      "observation": "Closer oblique view shows the central piers and glazed bays next to the previously calibrated upper corridors."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-timed/animal-front.png",
+      "sha256": "8f105670f5fef18a6c1df8c0248c0aa3ff4b16785c20332a1650a48eb3d2f0fc",
+      "visuallyInspected": true,
+      "observation": "Frontal view shows eight repeated bays above the entrance; foreground schematic trees still partly screen lower floors."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-timed/library-mobile.png",
+      "sha256": "9916caa8ae35e8da0e4116a1aa84e3b8cc72faedb0dcca450a60810115c8e755",
+      "visuallyInspected": true,
+      "observation": "Library entry and paved connection remain visible with usable controls in the 390x844 desktop simulation."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-layers/near-labels-off.png",
+      "sha256": "aba479fd103d277488d6c1e011e89627a1f84cff0627fee650e1ebf7e01e106e",
+      "visuallyInspected": true,
+      "observation": "Eight-bay rhythm and vertical piers are identifiable without labels; foreground canopy still obscures the lower center."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-layers/roads-off.png",
+      "sha256": "e692017322485603895c28df0195a310a4eff1ceed38a493cbb5e8cd89f1ade4",
+      "visuallyInspected": true,
+      "observation": "Road layer disappears while central facade and wing corridors remain in the building layer."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-layers/buildings-off.png",
+      "sha256": "9ba4f75a75345731324ce1a91608fc1d6194b689881a5129c2087e1fdd919f6d",
+      "visuallyInspected": true,
+      "observation": "All building geometry including new piers and glazing disappears; terrain, roads and trees remain."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-layers/layers-restored.png",
+      "sha256": "c63f08070e579e5dc655e1110413d541fc416132dd8cee260cdd01d57e7aaaa0",
+      "visuallyInspected": true,
+      "observation": "Building and road geometry restores without missing facade pieces."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-layers/vegetation-off.png",
+      "sha256": "71a0c1b4420bff351850a32d8ed0a5e8bc8e50e739f6fc4a60807629b746fc1b",
+      "visuallyInspected": true,
+      "observation": "Clear before/after comparison: eight bays, continuous vertical piers and small pane bars replace three isolated windows per floor; open entrance is retained."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-layers/vegetation-restored.png",
+      "sha256": "c63f08070e579e5dc655e1110413d541fc416132dd8cee260cdd01d57e7aaaa0",
+      "visuallyInspected": true,
+      "observation": "Original schematic tree positions return with their prior foreground occlusion."
+    },
+    {
+      "path": "docs/screenshots/refinement/s3-glazing-layers/night-labels-off.png",
+      "sha256": "20ca7a5fbc64917896c4200e9dedba5e01e3602523177b3e0dae925b1c276bad",
+      "visuallyInspected": true,
+      "observation": "Glazing changes to the shared night material state while the vertical rhythm and inner pane divisions remain."
+    }
+  ],
+  "scope": "11 individually inspected production views of the central eight-bay front and related layer/mobile regressions.",
+  "comparisonBefore": "docs/screenshots/refinement/s3-glazing-before-layers/vegetation-off.png",
+  "pending": [
+    "Side and rear facades, roof-top small volumes",
+    "Entrance fascia and forecourt paving",
+    "Sourced vegetation organization"
+  ],
+  "wholeBuildingReviewComplete": false
+}

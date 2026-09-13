@@ -1,0 +1,48 @@
+{
+  "passed": true,
+  "method": "All seven original browser screenshots inspected individually; explicit visual judgement, not image-file existence.",
+  "images": [
+    {
+      "file": "docs/screenshots/refinement/s2-forestry-facades-accepted/before/forestry-south-bands-trees-off-day.png",
+      "sha256": "5810a77de70b910c1fedae1ed526b98f7b864bcf5bdfb592aa39ac401d90a58c",
+      "assessment": "修改前中段为统一窄窗；全部五个上层可见。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-forestry-facades-accepted/before/forestry-whole-trees-off-day.png",
+      "sha256": "0e8c0fa7c9a09a3ef4b55cbf7c07c62ccec0688fae9437fd4ef5a1d068506711",
+      "assessment": "修改前整体入口、内院与南立面关系。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-forestry-facades-accepted/after/forestry-south-bands-trees-off-day.png",
+      "sha256": "de75492db22914a8e858e5fcbce4e0a646cd405ad12a95fec8b47d97b6845bb5",
+      "assessment": "修改后五层宽窄窗组、五条挑檐均可见；窗口周围保留实体墙，底层保持。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-forestry-facades-accepted/after/forestry-whole-trees-off-day.png",
+      "sha256": "cffcce7bb6858d39dee75c831c071e2c1fbefda0f9aa847d59187870f5c698a9",
+      "assessment": "修改后整体可见窗带局部范围，门廊和内院保留。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-forestry-facades-accepted/after/forestry-whole-trees-on-day.png",
+      "sha256": "282b9b1441ed130bf4e37dcad2c7fbd270a98189b585ade6afb405b704c4db44",
+      "assessment": "植被开启后校准范围与入口可见，未为拍图改变树位。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-forestry-facades-accepted/after/forestry-south-bands-trees-off-night.png",
+      "sha256": "d23918e0353233e59e6070629095c5c345c716c2b539a690b547e462850d3609",
+      "assessment": "夜景保持窗带和挑檐形体；只作昼夜表现检查。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-forestry-facades-accepted/after/forestry-south-bands-trees-off-day-mobile.png",
+      "sha256": "5586583ddf91c640bddfb4a4cfe14e4cd48bf48244ef8d723623edffdd090662",
+      "assessment": "手机尺寸模拟显示五层窗带及底层；采用基础表达，窗梃省略。"
+    }
+  ],
+  "rejectedReport": "s2-forestry-facades-context-browser.json",
+  "rejectionReason": "Initial closer desktop south camera has foreground roof occluding lower floors. Those near/night images are not visual acceptance evidence. Revised seven-image sequence used instead.",
+  "limitations": [
+    "Photo-constrained estimated windows; not exact real-world window counts",
+    "Mobile is desktop viewport simulation",
+    "Unreviewed end/stair/roof details remain"
+  ]
+}

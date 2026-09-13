@@ -1,0 +1,55 @@
+{
+  "reviewedAt": "2026-09-12T13:39:34.465989+00:00",
+  "method": "Direct inspection of all seven production-browser screenshots.",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s4-zones-validated/huixue-east-lawn.png",
+      "sha256": "8ae1e82c047efe23a34c86f57d3cd1badcdcb17f0fcc3f1a5543dedd5d5d24a0",
+      "finding": "Full mapped lawn is visible and open; perimeter trees stay outside. Nearby trees render normally.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-zones-validated/library-north.png",
+      "sha256": "3a3fcaf967130a51f27b0447f4c53f070a1abb1b856d56fdfb5f5512b97cfd06",
+      "finding": "Central forecourt and approach remain clear; six entrance columns and changed tree orientations visible.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-zones-validated/library-overhead.png",
+      "sha256": "3dfd8e040cf52fc06bc98af1eef0d3c20dc4376a6ce04079519de5e242272196",
+      "finding": "Lawn/forecourt exclusion and open library courtyards preserved.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-zones-validated/library-side.png",
+      "sha256": "74f481aa889f4b702629020406162ab0591c7f839aebc24cfedab3d5f9471df8",
+      "finding": "Forecourt remains visible between peripheral crowns; side view retains some existing foreground occlusion.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-zones-validated/library-approach.png",
+      "sha256": "908dc29e1ae1953220f7bfee185123a5f828109fc93af99d5b6461752d153a6c",
+      "finding": "Paving joins lowest steps and entry; six columns remain clear.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-zones-validated/ordinary-lod.png",
+      "sha256": "9e0b9f2f22bdfea718cbe2fb99a5933ce2eda844932417c8735da76f3ee61444",
+      "finding": "Shared hipped roof retained; no building geometry change.",
+      "passedForScope": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-zones-validated/library-mobile.png",
+      "sha256": "c9af881529e011163aceea8259133c9a0fe3b9c7a2189c7ff90fb19a27911b40",
+      "finding": "Mobile viewport: clear entrance and stairs, six columns; desktop simulation only.",
+      "passedForScope": true
+    }
+  ],
+  "scope": "Open lawn and forecourt retained, stable rendering after schematic orientation normalization, existing architecture regression.",
+  "passed": true,
+  "timedRunVerification": {
+    "allSevenScreenshotsByteIdentical": true,
+    "directory": "docs/screenshots/refinement/s4-zones-timed",
+    "note": "Hash comparison confirms the final timed-run captures are identical to the directly inspected first-run images."
+  }
+}

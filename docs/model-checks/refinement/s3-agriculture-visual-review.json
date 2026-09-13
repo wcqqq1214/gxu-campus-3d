@@ -1,0 +1,69 @@
+{
+  "reviewedAt": "2026-09-12T12:52:19.839890+00:00",
+  "method": "Direct visual inspection of saved PNGs, not screenshot-capture success alone.",
+  "views": [
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-checked/before/agriculture-front-trees-off-day.png",
+      "sha256": "850a79a03c7e3b1126fa0b32a9b1693255fc5d169dfd42846f3395ec4c8b21bf",
+      "representation": "near",
+      "acceptedForEntranceReview": true,
+      "observation": "Five-storey solid projection hides the intended south entrance."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-checked/before/agriculture-oblique-trees-off-day.png",
+      "sha256": "771573969a3856bd67aeab1d33bf42017b832cd85c1845b865ae4f634cb1fa06",
+      "representation": "near",
+      "acceptedForEntranceReview": true,
+      "observation": "Oblique view confirms full-height projection before calibration."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-checked/after/agriculture-front-trees-off-day.png",
+      "sha256": "c09229841c5547eabfb49b4830fcd69d128db2af2db7b95434e29c7818db93d5",
+      "representation": "near",
+      "acceptedForEntranceReview": true,
+      "observation": "Four piers, three open bays, recessed dark door, three steps and windows above the low roof visible."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-checked/after/agriculture-oblique-trees-off-day.png",
+      "sha256": "2bef85548fca715009aa2819fa8ff6b06f0bbed7643d8e1474f123d6fb6a90e8",
+      "representation": "near",
+      "acceptedForEntranceReview": true,
+      "observation": "Low canopy depth, piers and exposed rear wall visible; mapped main outline retained."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-checked/after/agriculture-oblique-trees-on-day.png",
+      "sha256": "ba8d51deb54dcc2c20128ce56f60c4274909ab5e93cfbabb3ca5070bbf0db84a",
+      "representation": "near",
+      "acceptedForEntranceReview": true,
+      "observation": "Normal vegetation partially occludes the portico; no trees were moved or hidden in the delivered scene."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-checked/after/agriculture-front-trees-off-night.png",
+      "sha256": "ba99f0a39d676e9f9a9648e94ff20c6dcc84efa0f8c46e597205a4113a2af084",
+      "representation": "near",
+      "acceptedForEntranceReview": true,
+      "observation": "Night glass and doorway visible; open bays and stairs remain legible."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-checked/after/agriculture-front-trees-off-day-mobile.png",
+      "sha256": "675232c720d65a8acb9d7ee4801ef23f09b185acca27f44094b00b136548a7bd",
+      "representation": "base",
+      "acceptedForEntranceReview": false,
+      "observation": "Rejected for entrance visual review: foreground neighboring roof hides the entrance on the original portrait angle."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-mobile/after/agriculture-front-trees-off-day-mobile.png",
+      "sha256": "c5d424c4d3d68e99457e2a1335d1452075d78b7acc8e0f924c8287f1ae01525e",
+      "representation": "base",
+      "acceptedForEntranceReview": true,
+      "observation": "Explicit higher portrait angle exposes canopy, four piers and stairs in base representation. Rear doorway is obscured by canopy from this angle; desktop oblique and actual base GLB rays cover it."
+    }
+  ],
+  "acceptedViews": 7,
+  "limitations": [
+    "Tree-hidden views diagnose building geometry only.",
+    "Mobile is desktop viewport simulation.",
+    "No whole-building or rear-terrace completion claim."
+  ],
+  "passed": true
+}

@@ -1,0 +1,45 @@
+{
+  "passed": true,
+  "productionModelsSha256": "12ab2fc769f730ae8143fff027ce58d80382d9bf06b65e3263930642f9df2b9b",
+  "results": {
+    "roads": {
+      "geometryReport": "s3-mathematics-path-incremental-roads-geometry.json",
+      "retention": {
+        "changedBaseNodes": [],
+        "retainedBaseNodes": 85,
+        "retainedNearAndTreeGlbs": 65,
+        "trees": 3061,
+        "initialBytes": 5973696,
+        "blendBytes": 86553097
+      },
+      "sourceStartedWithoutConnector": true,
+      "geometryPassed": true,
+      "scriptSha256": {
+        "site_geometry.py": "295742271204907c47e7b21bb561ddbf98da62d508c4190a5d0324d2d8b8bdd2",
+        "update_roads.py": "1053ceffee00df6ef441a73be6fab19f615c306490d960d515d5d4248918f654"
+      }
+    },
+    "basketball": {
+      "geometryReport": "s3-mathematics-path-incremental-basketball-geometry.json",
+      "retention": {
+        "removedNodes": [],
+        "changedExistingNodes": [],
+        "preservedNodeCount": 85,
+        "newNodes": [],
+        "method": "Exact Draco primitive bytes; logical names ignore only Blender numeric suffixes, ambiguous names rejected; all unrelated GLBs retained",
+        "initialBytes": 5973696,
+        "blendBytes": 89997165
+      },
+      "sourceStartedWithoutConnector": true,
+      "geometryPassed": true,
+      "scriptSha256": {
+        "site_geometry.py": "295742271204907c47e7b21bb561ddbf98da62d508c4190a5d0324d2d8b8bdd2",
+        "update_basketball.py": "6ac2fe992c35f8bd37f34698fc097f97003145e9f1750dc7ccd6601bff4261d5"
+      }
+    }
+  },
+  "isolatedCopies": true,
+  "productionAssetsMutatedByTests": false,
+  "priorFailureReport": "s3-mathematics-path-incremental-before-compaction.json",
+  "fix": "Synchronize editable site objects after base-only rebuild; compact unreferenced buffers after preserving the unrelated sculpture."
+}

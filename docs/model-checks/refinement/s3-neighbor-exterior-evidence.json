@@ -1,0 +1,94 @@
+{
+  "reviewedAt": "2026-09-13T06:51:25.371957+00:00",
+  "scope": "S3 mandatory neighbors; captioned local exterior evidence review",
+  "previousGoalTurnClassification": "no-progress: plan document inspection did not advance implementation",
+  "sources": [
+    {
+      "id": "agricultureNorthCleaning2024",
+      "title": "校园环卫绿化服务工作简报（2024年秋季第十周）",
+      "url": "https://ghjjc.gxu.edu.cn/info/1046/3406.htm",
+      "publishedAt": "2024-11-07",
+      "photoDate": null,
+      "htmlPath": "work/refinement-s3-neighbor-exteriors/agriculture-north.html",
+      "htmlSha256": "38ff4d83925f91c027cfd0f2dd13c89a300015f9c6de3fc688af32528688d65d",
+      "imagePath": "work/refinement-s3-neighbor-exteriors/agriculture-north.jpg",
+      "imageSha256": "6936c981a696d73b4039c3a3d4254e9963066e678662de793049022741ce61ac",
+      "imageUrl": "https://ghjjc.gxu.edu.cn/__local/9/B5/4C/4EDC27FA4F8C5A7C78F894DE675_80622A54_F0B5.jpg",
+      "caption": "农学院北面落叶清理",
+      "visualReview": "原图554×415；前景为绿篱、砖铺清扫通路，背景可见停车与楼体底部。",
+      "limitations": "标题定位清扫区域，不能据此认定背景为农学院北立面；未显示屋顶及四层露台，也不能定位绿篱边界。",
+      "modelAdopted": false,
+      "duplicateOf": {
+        "path": "work/refinement-s3-neighbors/agriculture-north-cleaning-2024.jpg",
+        "sha256": "6936c981a696d73b4039c3a3d4254e9963066e678662de793049022741ce61ac",
+        "sameBytes": true
+      }
+    },
+    {
+      "id": "dorm3RearLawn2023",
+      "title": "学生公寓服务工作简报（2023年秋季第五、六周）",
+      "url": "https://ghjjc.gxu.edu.cn/info/1044/2747.htm",
+      "publishedAt": "2023-10-18",
+      "photoDate": null,
+      "htmlPath": "work/refinement-s3-neighbor-exteriors/dorm3-rear.html",
+      "htmlSha256": "7eb7922d504e58a62dc41001fa0cada131e92a557bc9376fc17f15285f9d7779",
+      "imagePath": "work/refinement-s3-neighbor-exteriors/dorm3-rear.jpg",
+      "imageSha256": "19704810deb05dd4691807315f3eb53af88c680f37278830de36fbe516af30a8",
+      "imageUrl": "https://ghjjc.gxu.edu.cn/__local/C/C4/A3/8133CD541DCBF83FDCC15CCFF9B_64826420_FD17.jpg",
+      "caption": "绿化人员修剪西3栋背面草坪",
+      "visualReview": "原图552×414；具名图注将照片关联至西3栋背面草坪。可见浅红墙面、浅色水平分界、底部贴砖墙裙、竖向窗及局部凹角。",
+      "limitations": "只拍到底层和少量上层，屋顶及楼栋尽端均不在画面内；背面不等于地理正北。未完成与OSM外边的匹配，不能确认总层数、入口、楼体高度、全楼材料或草坪范围。",
+      "modelAdopted": false
+    },
+    {
+      "id": "librarySceneryContext",
+      "title": "School Scenery",
+      "url": "https://nxy.gxu.edu.cn/info/1318/4643.htm",
+      "publishedAt": null,
+      "photoDate": null,
+      "htmlPath": "work/refinement-s3-neighbor-exteriors/school-scenery.html",
+      "htmlSha256": "66a48923ee8b434b90d02b6f87d899857179e6aef00dcd35878ce8c38bf45e8d",
+      "imagePath": "work/refinement-s3-neighbor-exteriors/library-context.png",
+      "imageSha256": "c8969ce36025815434575399a58baf392b7c16287d06daed246c67960c020757",
+      "imageUrl": "https://nxy.gxu.edu.cn/__local/8/DF/5B/9D8A04648E1589CF1029683989A_2DC21B45_1734CD.png",
+      "caption": "University Library",
+      "visualReview": "图为图书馆斜向地面视角，能看见门廊、翼部和铺地，远处有另一楼体。",
+      "limitations": "不显示农学院后翼和露台；远处楼体没有具名标注或足够地图定位依据，不能套用到野生动物研究所。",
+      "modelAdopted": false
+    }
+  ],
+  "currentAssetFingerprints": {
+    "public/data/models.json": "290489af154933bcb59e669c2d2b2b15a8051e601251d7cbb700968a0fae6360",
+    "blender/gxu-campus.blend": "472acca20878dad3c675cafbb692f51dce75626cc4ac927fb423213e02c518b5",
+    "data/building-overrides.json": "f941de2b2f0dd28d672b9945c3bd869c949e913df35600d33989dd23a5881c48",
+    "public/data/buildings.json": "a59941e2ce8cc9cee8c8934c277fb26f56fc8af3fd83407ae29673a6485521c7"
+  },
+  "modelChanged": false,
+  "wholeBuildingAcceptancesAdded": 0,
+  "completeS3": false,
+  "decisions": [
+    {
+      "buildingId": "way/759158607",
+      "status": "captioned-local-exterior-found-facade-anchor-pending",
+      "sourceRefs": [
+        "dorm3RearLawn2023"
+      ],
+      "nextAction": "Find a locatable wider exterior showing the same wall/corner and roof, then map its facade edge before changing balcony, wall or height parameters."
+    },
+    {
+      "buildingId": "way/759185166",
+      "status": "north-cleaning-photo-deduplicated-terraces-still-unlocated",
+      "sourceRefs": [
+        "agricultureNorthCleaning2024"
+      ],
+      "nextAction": "Use an elevated or roof-plan source to locate east/west fourth-floor terrace boundaries; this ground-level cleaning photo cannot resolve them."
+    }
+  ],
+  "researchLimitations": [
+    "Official institute directory and college overview establish organizations, not the identity of a particular mapped building.",
+    "Repair notices list multiple dorms or rooms and do not establish total storeys.",
+    "Agriculture English photo gallery is campus scenery, not a complete exterior survey of the college."
+  ],
+  "validationScope": "Caption-to-image association and file hashes checked; no geometry, browser or performance verification added.",
+  "copyright": "Reference photos and HTML remain local under work; not shipped as textures or documentation illustrations."
+}

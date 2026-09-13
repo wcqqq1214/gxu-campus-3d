@@ -1,0 +1,225 @@
+{
+  "verifiedAt": "2026-09-12T11:57:52.037780+00:00",
+  "stage": "S3 central north forecourt, stair grading, road contact and crown exclusion",
+  "workPackagePassed": true,
+  "fullS3Completed": false,
+  "fullPlanCompleted": false,
+  "assets": {
+    "verifiedAt": "2026-09-12T11:44:05.963266+00:00",
+    "passed": true,
+    "assetCount": 69,
+    "publicAndProductionDataMatch": true,
+    "initialModelBytes": 5638612,
+    "maxOrdinaryChunkBytes": 1684868,
+    "blendBytes": 87756697,
+    "manifestSha256": "fe58d233f2e16aaaf38b0ca82eaee74ace5d2a90cd65c92318ef71d247aec1c9",
+    "changedAssets": [
+      "models/base.glb",
+      "models/time-gate.glb"
+    ],
+    "all30OrdinaryChunksUnchanged": true,
+    "buildingsUnchangedExceptSharedLibraryEntryParameters": true,
+    "unchangedSpatialInputs": [
+      "campus-boundary.json",
+      "terrain.json",
+      "surfaces.json",
+      "campus-roads.json",
+      "surroundings.json",
+      "basketball.json",
+      "infrastructure.json",
+      "sports.json"
+    ],
+    "survivingTreePositionsAndOrderPreserved": true,
+    "removedTrees": [
+      [
+        181.4,
+        -447.6,
+        11.3,
+        0
+      ],
+      [
+        187.9,
+        -433.2,
+        14.7,
+        0
+      ],
+      [
+        200.1,
+        -437.0,
+        11.2,
+        2
+      ],
+      [
+        214.3,
+        -433.3,
+        11.8,
+        1
+      ]
+    ],
+    "remainingTrees": 3030,
+    "reverifiedAt": "2026-09-12T11:55:36.284756+00:00"
+  },
+  "geometry": {
+    "source": {
+      "pavingSamples": 310,
+      "minimumTerrainClearance": 0.06427001953125,
+      "firstStepRiseRange": [
+        0.149383544921875,
+        0.15008544921875
+      ],
+      "maxRoadJoinStepPer2cm": 0.0010528564453125,
+      "quantizedMaterialEdgeGapBounds": [],
+      "unchangedTerrainSamples": 20195,
+      "maxOutsideTerrainError": 0,
+      "maxOutsideTolerance": 0.005,
+      "actualTreeCrownsChecked": 3030,
+      "candidateBuildingMeshes": 1,
+      "roadLayerAssigned": true,
+      "passed": true
+    },
+    "base": {
+      "pavingSamples": 310,
+      "minimumTerrainClearance": 0.035369873046875,
+      "firstStepRiseRange": [
+        0.14990234375,
+        0.150604248046875
+      ],
+      "maxRoadJoinStepPer2cm": 0.036346435546875,
+      "quantizedMaterialEdgeGapBounds": [
+        0.001
+      ],
+      "unchangedTerrainSamples": 20195,
+      "maxOutsideTerrainError": 0.0509796142578125,
+      "maxOutsideTolerance": 0.09539785319142115,
+      "actualTreeCrownsChecked": null,
+      "candidateBuildingMeshes": 2,
+      "roadLayerAssigned": true,
+      "passed": true
+    },
+    "toleranceBasis": "Source float precision and 15-bit base GLB position quantization; not surveyed site accuracy.",
+    "passed": true
+  },
+  "browser": {
+    "report": "docs/model-checks/refinement/s3-site-validated-browser.json",
+    "captures": 6,
+    "lodCycles": 3,
+    "performanceRuns": 6,
+    "errors": []
+  },
+  "interaction": {
+    "states": 6,
+    "errors": []
+  },
+  "performanceComparison": [
+    {
+      "tier": "精细",
+      "repeatFPS": [
+        60,
+        60,
+        46
+      ],
+      "fps": {
+        "baseline": 60,
+        "current": 60,
+        "changePercent": 0.0,
+        "passed": true
+      },
+      "triangles": {
+        "baseline": 4017716,
+        "current": 4034002,
+        "changePercent": 0.4053546841040978,
+        "passed": true
+      },
+      "drawCalls": {
+        "baseline": 537,
+        "current": 533,
+        "changePercent": -0.7448789571694592,
+        "passed": true
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "repeatFPS": [
+        29,
+        28,
+        28
+      ],
+      "fps": {
+        "baseline": 30,
+        "current": 28,
+        "changePercent": -6.666666666666665,
+        "passed": true
+      },
+      "triangles": {
+        "baseline": 1052490,
+        "current": 1094273,
+        "changePercent": 3.9699189540993274,
+        "passed": true
+      },
+      "drawCalls": {
+        "baseline": 268,
+        "current": 279,
+        "changePercent": 4.104477611940305,
+        "passed": true
+      },
+      "passed": true
+    }
+  ],
+  "performanceContext": "docs/model-checks/refinement/s3-site-performance-context.json",
+  "checks": {
+    "pythonTests": 29,
+    "nodeTests": 51,
+    "blenderRoadClippingCases": 4,
+    "typecheck": true,
+    "lint": true,
+    "productionBuild": true,
+    "siteSourceAndBaseGLB": true,
+    "architectureSource": true,
+    "bridgeJoinsSourceAndBase": true,
+    "timeGateSourceBaseAndNear": true,
+    "infrastructureRoadBuildingCollisionRegression": true
+  },
+  "coverageLimits": [
+    "Road/building collision regression covers infrastructure roads and bridges; the new forecourt is covered by site footprint checks and source/base vertical sampling.",
+    "Estimated 25.2 m central connector does not establish the whole real plaza boundary or surveyed grades.",
+    "Mobile screenshots are desktop viewport simulation.",
+    "Other tree positions, heights, types and relative order are preserved; existing index-dependent rotations may change.",
+    "General multi-site processing and stable vegetation-zone generation belong to S4."
+  ],
+  "remaining": [
+    "S3 neighboring building heights, entrances, facade and proportion review",
+    "S2 complete 20–30 calibrated ordinary buildings",
+    "S4 vegetation zoning and representative shore/paving sites",
+    "S5 detail improvements and whole-plan acceptance"
+  ],
+  "fileHashes": {
+    "data/site-overrides.json": "8e6d13f2ca7021039b11ef52ee45ccead0c0fc1678d4bae3329cb3b4072d3dac",
+    "scripts/site_data.py": "b5f4b47c589d89e079468f623f8ce2f945a017235d6a227ab9fe966bc972854d",
+    "scripts/infrastructure_data.py": "f9b361a0dab92b52783c61e5c64009a2d352a25054f25e69492d98924837b821",
+    "scripts/architecture_data.py": "33bb5a746052a1a12d6609dbc4cbd6a1ce185764a715709ef8c99bc1df92ba07",
+    "blender/site_geometry.py": "abb4eecbe655001597101a8843f50c7693647469646924f77f9da25b602d0599",
+    "blender/build_campus.py": "29fd995c67c3e95f72d24d8262e83b1c8378ce17d3098e7c5f4bf9b0383246f1",
+    "blender/library.py": "ed1360e3ebc8d569388b862cf9e1890ab290aa91e61fa42982326d049d8b1b82",
+    "blender/validate_site.py": "6335a03079f9bfd5d30adb88b3ce46670b3fff171a199584640f7d3f577c4a37",
+    "blender/test_site_geometry.py": "346c6aa13f4588a41c477e874a0b6481ea4e069768d87e46c1af76b8b8f4d4ef",
+    "scripts/test_site_data.py": "671a77e69fa0240b53ab99b48acbe8e68a01799f1d792de44f76921207ac0327",
+    "scripts/check-site-browser.mjs": "c55d1943d82b17aae87ec0542b819b169bb3ab31aac396eea7bac43d3d7a8597",
+    "scripts/check-refinement-browser.mjs": "cf3549f5136092554d48e27f672c3b74689124bebd58fa03754bf281e9beeb0e",
+    "public/data/sites.json": "b2e515aa01a01d6d87c85210166e37c1feb81e467f515b6c69363f99bf2543a7",
+    "public/data/models.json": "fe58d233f2e16aaaf38b0ca82eaee74ace5d2a90cd65c92318ef71d247aec1c9",
+    "public/data/vegetation.json": "1d044d1f0967869a9e80577c12b112d13946a7f1113947ccab0a9ac496bea4ec",
+    "blender/gxu-campus.blend": "bf97d9e14460b570a0579b7bd7282f61e809815fb14312c25bbb7ed4554ef8aa",
+    "docs/model-checks/refinement/site-geometry.json": "d5a2e48acb34b279e25b46587c2a88efed781c26113f0cc4ffb1ab0365961011",
+    "docs/model-checks/refinement/site-build.json": "4e907daf88b5ce37459972186a02effe72cffa3e721b1e7daf7d2703b7f8666e",
+    "docs/model-checks/refinement/site-preparation.json": "a8a0e7b78ca551a70e01a4d5578f0e4973ed51dbe867ffa666c5b1ac976968f6",
+    "docs/model-checks/refinement/s3-site-validated-browser.json": "8222484f56d699905f248157d18ed8cb51f2086b7873d20d9d75ecafec975941",
+    "docs/model-checks/refinement/s3-site-ui-interaction.json": "d5494bfb0c9a14d284ffaea2d3ddc0e9b9a82c1f2e9a362fd0659840406b1976",
+    "docs/model-checks/refinement/s3-site-performance-context.json": "19d88dba988653cbd1605cad6430a3eb2e268e25ab90a8eb8542206578710604",
+    "docs/model-checks/refinement/s3-site-visual-review.json": "7b88fd9a68d5157dd587ef9bf3c9891aaf2f10ea292d80686b671424f99e177d",
+    "docs/model-checks/road-building-clearance.json": "485bd34a5be68b53cc1e9f4eccca813520556e811c9211c929c12c681e819c46",
+    "docs/model-checks/architecture-check.json": "a3716327574b8122b34fb7b028488f8a00e9fadc5884777e9744b1d8da3d06e0",
+    "docs/model-checks/bridge-joins-geometry.json": "77b9efcce2c5cf2e68c2a7efe7af73806c794cef16629ccd51f7004ce592a60e",
+    "docs/model-checks/time-gate-geometry.json": "194c3f311c632578eb79cba3ff92efc5a35e556cba47cc29dd745092bb1385b6"
+  }
+}

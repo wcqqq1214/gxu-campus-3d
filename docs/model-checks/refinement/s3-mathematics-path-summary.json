@@ -1,0 +1,308 @@
+{
+  "createdAt": "2026-09-13T02:38:21.365381+00:00",
+  "previousGoalTurnClassification": "no progress: plan document checked and delivered; no modeling implementation",
+  "scope": "Mathematics north steps to mapped west footway, 103.74 square meters of estimated connecting paving; repair clipping/Draco cracks and maintain sites in both incremental update paths.",
+  "modelManifestSha256": "12ab2fc769f730ae8143fff027ce58d80382d9bf06b65e3263930642f9df2b9b",
+  "sourceSha256": "b40121725e2d46943c1c3e0c6e7eadbf93913631adf0002942dc2c103a73ca34",
+  "assets": {
+    "changedBuildingIds": [],
+    "footprintsPreserved": true,
+    "treesPreserved": 3061,
+    "changedGLBFiles": [
+      "base.glb"
+    ],
+    "changedBaseNodes": [
+      "roads",
+      "terrain"
+    ],
+    "addedBaseNodes": [
+      "site-mathematics-north-connection"
+    ],
+    "preservedBaseNodes": 82,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5973800,
+    "initialModelByteChange": 64660,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "12ab2fc769f730ae8143fff027ce58d80382d9bf06b65e3263930642f9df2b9b",
+    "passed": true
+  },
+  "geometryPassed": true,
+  "visualPassed": true,
+  "incrementalMaintenancePassed": true,
+  "cleanPreparationPassed": true,
+  "pythonTests": 96,
+  "syntheticGeometryCases": 2,
+  "manualImages": 7,
+  "sourceAndBasePavingSamplesEach": 405,
+  "sourceAndBaseOutsideTerrainSamplesEach": 1355,
+  "ordinaryBuildings": "All 430 ordinary forms and all existing building source/GLB geometry retained; current Math source/base/near check rerun. This batch does not claim a fresh full 430-building geometric audit.",
+  "negativeControls": [
+    "Prior source lacks the connector and fails actual path-object check.",
+    "Initial connector source passed, but decoded GLB failed at a new road crack; old asset had no missing samples there.",
+    "Staged incremental update exceeded budget with orphaned buffer data before compaction."
+  ],
+  "performance": {
+    "browserReport": "s3-mathematics-path-timed-browser.json",
+    "contextReport": "s3-mathematics-path-timed-performance-context.json",
+    "metrics": {
+      "精细": {
+        "repeatFPS": [
+          60,
+          60,
+          58
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4095547,
+          "medianDrawCalls": 545
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4017716,
+          "medianDrawCalls": 537
+        },
+        "ratios": {
+          "medianFPS": 1.0,
+          "medianTriangles": 1.0193719516262474,
+          "medianDrawCalls": 1.0148975791433892
+        },
+        "thresholdsPassed": true
+      },
+      "流畅": {
+        "repeatFPS": [
+          27,
+          28,
+          30
+        ],
+        "current": {
+          "medianFPS": 28,
+          "medianTriangles": 1100714,
+          "medianDrawCalls": 286
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1052490,
+          "medianDrawCalls": 268
+        },
+        "ratios": {
+          "medianFPS": 0.9333333333333333,
+          "medianTriangles": 1.0458189626504766,
+          "medianDrawCalls": 1.0671641791044777
+        },
+        "thresholdsPassed": true
+      }
+    },
+    "numericThresholdsPassed": true,
+    "recordedEnvironmentMatchesBaseline": true,
+    "externalComputeObservations": [
+      {
+        "pid": 22777,
+        "observations": 6,
+        "first": {
+          "at": "2026-09-13T02:36:10.271042+00:00",
+          "pid": 22777,
+          "parentPid": 90860,
+          "cpuPercent": 62.2,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:00.55",
+          "executable": ".venv/bin/python"
+        },
+        "last": {
+          "at": "2026-09-13T02:37:00.914265+00:00",
+          "pid": 22777,
+          "parentPid": 90860,
+          "cpuPercent": 98.7,
+          "elapsed": "00:51",
+          "cumulativeCPUTime": "0:44.24",
+          "executable": ".venv/bin/python"
+        },
+        "observedSeconds": 50.643223,
+        "cumulativeCPUSecondsAdded": 43.690000000000005
+      },
+      {
+        "pid": 23187,
+        "observations": 4,
+        "first": {
+          "at": "2026-09-13T02:37:00.914265+00:00",
+          "pid": 23187,
+          "parentPid": 23184,
+          "cpuPercent": 98.0,
+          "elapsed": "00:08",
+          "cumulativeCPUTime": "0:08.10",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T02:37:31.075823+00:00",
+          "pid": 23187,
+          "parentPid": 23184,
+          "cpuPercent": 98.7,
+          "elapsed": "00:39",
+          "cumulativeCPUTime": "0:37.92",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 30.161558,
+        "cumulativeCPUSecondsAdded": 29.82
+      },
+      {
+        "pid": 23338,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T02:37:41.119759+00:00",
+          "pid": 23338,
+          "parentPid": 23184,
+          "cpuPercent": 99.6,
+          "elapsed": "00:06",
+          "cumulativeCPUTime": "0:07.72",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T02:37:41.119759+00:00",
+          "pid": 23338,
+          "parentPid": 23184,
+          "cpuPercent": 99.6,
+          "elapsed": "00:06",
+          "cumulativeCPUTime": "0:07.72",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 23349,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T02:37:51.186580+00:00",
+          "pid": 23349,
+          "parentPid": 23184,
+          "cpuPercent": 97.8,
+          "elapsed": "00:04",
+          "cumulativeCPUTime": "0:05.24",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T02:37:51.186580+00:00",
+          "pid": 23349,
+          "parentPid": 23184,
+          "cpuPercent": 97.8,
+          "elapsed": "00:04",
+          "cumulativeCPUTime": "0:05.24",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 23374,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T02:38:01.234979+00:00",
+          "pid": 23374,
+          "parentPid": 23184,
+          "cpuPercent": 99.6,
+          "elapsed": "00:04",
+          "cumulativeCPUTime": "0:05.69",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T02:38:01.234979+00:00",
+          "pid": 23374,
+          "parentPid": 23184,
+          "cpuPercent": 99.6,
+          "elapsed": "00:04",
+          "cumulativeCPUTime": "0:05.69",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      },
+      {
+        "pid": 23380,
+        "observations": 1,
+        "first": {
+          "at": "2026-09-13T02:38:11.290442+00:00",
+          "pid": 23380,
+          "parentPid": 23184,
+          "cpuPercent": 98.5,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:06.46",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "last": {
+          "at": "2026-09-13T02:38:11.290442+00:00",
+          "pid": 23380,
+          "parentPid": 23184,
+          "cpuPercent": 98.5,
+          "elapsed": "00:05",
+          "cumulativeCPUTime": "0:06.46",
+          "executable": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Resources/Python.app/Contents/MacOS/Python"
+        },
+        "observedSeconds": 0.0,
+        "cumulativeCPUSecondsAdded": 0.0
+      }
+    ],
+    "sameConditionAcceptancePassed": false,
+    "scope": "Three 30-second production-preview activity runs per tier at the library. Desktop mobile viewport is not a physical-phone measurement. Process snapshots can detect interference but do not prove exclusive CPU/GPU access."
+  },
+  "workPackageAccepted": false,
+  "wholeBuildingAccepted": false,
+  "fullPlanCompleted": false,
+  "pending": [
+    "Current-asset same-condition performance acceptance.",
+    "Mathematics eastern end, height partition boundary, stair lattice and vertical glazing, south steps and south approach.",
+    "Complete 20–30 whole ordinary building calibrations; 11 partial records do not count as whole-building acceptance.",
+    "Complete required library neighboring buildings and full north-entry sample.",
+    "Complete remaining S4 courtyard/lakeside work and S5."
+  ],
+  "implementationSha256": {
+    "data/site-overrides.json": "f0e3fadfa9bccf2234951191d5aa48c5ed8012d3db691565c598b3ba70a47280",
+    "scripts/site_data.py": "4e49f58d6513814332769dceaabae88804079cbbcc4ffac5aa09f93377140b8d",
+    "scripts/side_connection_data.py": "99ece1b9529c7b6da42dc6b97abc2ac4562e8bd24b5c0827df85cc898d5089b8",
+    "scripts/test_side_connection_data.py": "6f94c6c07f3ba5e72dec68d5285eb8cbfb360cabf26ba898de185775351b8182",
+    "blender/site_geometry.py": "295742271204907c47e7b21bb561ddbf98da62d508c4190a5d0324d2d8b8bdd2",
+    "blender/side_connection.py": "c6dbd744312ae8448a58fa0025c36a66fb53259faab7217c9f1288c696b596dc",
+    "blender/paving_geometry.py": "d42576d22be44f2e8e232a336450617de6d03b1948642fdc12757fd71e872663",
+    "blender/build_campus.py": "4bc5285634ff4d6e72b581c3f45269ee2d16e7f3920baa472d305fa564a700cb",
+    "blender/test_side_connection.py": "b01ac66c8743a0fde428ea7e6754f1645ffca861f63cb4b9acc8e568c207a349",
+    "blender/validate_side_connection.py": "0fb95bae0c729719097e809477a6dab09e77c28dc3e2d0e6fe4a53f9082e32c8",
+    "blender/validate_site.py": "77d231f7a380774051eceab6a996e92e2927d0feb29402f2619b924653e3119d",
+    "blender/update_roads.py": "1053ceffee00df6ef441a73be6fab19f615c306490d960d515d5d4248918f654",
+    "blender/update_basketball.py": "6ac2fe992c35f8bd37f34698fc097f97003145e9f1750dc7ccd6601bff4261d5",
+    "public/data/sites.json": "e04a52fecc19c479dad19561a236a06c423fb77bfcfe49c65809335c61c6bfca",
+    "public/data/pavings.json": "e62b7965b3ebe9eb06345488f41ded53422e84b8ceca49c0e03733991919d74f",
+    "public/data/shores.json": "d61867382fed654eead9d9c32b40db9da6577c4d4ed37af9453dc5dc29fc6b6e",
+    "public/data/low-planting.json": "7bc1dbac47697397281ef5b4b0c57c43f57340fa5c33c0c4afaa4d11422a5e12",
+    "public/data/buildings.json": "9a64240d87f7d67f12295e92786b950e07ef539e55655205cfec88f7399e2419",
+    "public/data/vegetation.json": "3ddce76423a20c7289d4f7b46d05b764b7a11a5aa27722e74732138845a1caf8"
+  },
+  "evidenceSha256": {
+    "s3-mathematics-path-geometry.json": "b73a4217a335ae025fe6f29f9c41258e644909747bfc83786dae7b821dde788a",
+    "s3-mathematics-path-assets.json": "334dbc447412d5ac2fdfc49422d2abd50b3087ab13cee0f42db6027ce580f0e8",
+    "s3-mathematics-path-source-preservation.json": "c325b377583cf9daed10111dfdb43428ab087e082ba3255b39201ba04d8bff2b",
+    "s3-mathematics-path-library-geometry.json": "3642c9c3135f83107256c30dff35ac4d1c5dfdf267d225386d67a1dbfb5df067",
+    "s3-mathematics-path-building-geometry.json": "6c83e0c5199bd4d90ce02588a999dd0bd8a430554bb1850f7213faccf323a687",
+    "s3-mathematics-path-trees-geometry.json": "c879406a2d61ce19a5644ab0039bee7343f26c6fdd4e30823ffd59103c284d43",
+    "s3-mathematics-path-clean-prepare.json": "31b088b2de1ab5f2deb9cab12fe0342f55b9617e2d68167f6a83b916b44cbde2",
+    "s3-mathematics-path-visual-review.json": "a35a17351792cdff1cb160928b5705681842f8c48422c47ebf1f1217fada2d2b",
+    "s3-mathematics-path-incremental-summary.json": "ee17f130a1bc67d929306b611eec3039c6b4c176d3f08b6520df5a59ffbe380c",
+    "s3-mathematics-path-before-geometry.json": "7c9a803cba33249de9f6a866b07d39f71cbe117b8e593b78fb59e98c6044e99b",
+    "s3-mathematics-path-preconform-geometry.json": "9e2ad5ff0a83ce2373540b3cca829014896029a8cad2b77420beb2f564d16a73",
+    "s3-mathematics-path-gap-observation.json": "07fb3fe9accc11f3a7f96c2785245a58619397f684ae4a32ed32147a70966810",
+    "s3-mathematics-path-incremental-before-compaction.json": "09677f1e83b2566ec4d9510959f89934671fcf48b3ec2dbcaa35b28ca057eb01",
+    "s3-mathematics-path-incremental-roads-geometry.json": "c05dfeaf992151dbb8c7838ade50d797c1f2a2745c5de6f1184594fa86d56605",
+    "s3-mathematics-path-incremental-basketball-geometry.json": "d941c0a359cf771610f0ff738acd6206206e8bd0a3e8798b46309604b1865cf3",
+    "s3-mathematics-path-final-context-browser.json": "a77d6f8ebf945d214276b329580633e81f0e7c68e5a228cd291ecdccf31d2025",
+    "s3-mathematics-path-timed-browser.json": "0b8784cf3037a155013f2922a159ad2dd885273b95ca9a40aa56e53c3faa1653",
+    "s3-mathematics-path-timed-performance-context.json": "9392df647c4ce31fe7572a2f1164ffef1ca3c2c5b4902e00f2981754c390ce7e"
+  },
+  "testLogsSha256": {
+    "data-tests.log": "55c847e05052e54d55edc8d6a8a4d758d26d4443cc9a823442681f556af35aae",
+    "geometry-tests-final.log": "c96a6fe9b14cd7208d8d8f6ab64b72ee317d5c70d74e51c6a0faae77670de5d5",
+    "site-tests.log": "84219ab1010cdc071dd8a4fc7f8385caa4492c334e6cde5e693d694a3b545436",
+    "paving-tests.log": "e7542976c70db1bea8c6d7ff5a1a73f2c58a6547445d3c95e23330166b2f30a2",
+    "model-build-final.log": "569f70a7846455f7b2e164adeddce1c91a01ff990d784ab8981cb97e63230079",
+    "pages-final.log": "d78446bef1fb6b14f014b391508bcb1d4777dd270c3bd263ff7a64ffee0dd9cc",
+    "incremental-roads-final.log": "9451c44b5c7866f3d6c6452580c1204df417b071237d3a89d2e26c6215b1be52",
+    "incremental-basketball-final.log": "1e30c27f1a29cf3ae92de250983b20a8d992e12be5412402c904bb01be669010"
+  }
+}

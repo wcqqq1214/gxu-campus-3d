@@ -1,0 +1,89 @@
+{
+  "verifiedAt": "2026-09-12T16:01:18.419207+00:00",
+  "scope": "Two actual incremental scripts run end to end on isolated copies, with manual shore freeboard changed and shore data freshly prepared. Actual saved source, decoded base GLB, library site and every tree checked. Test variants were not promoted.",
+  "firstFailures": {
+    "roads": "Missing unused source material stoneWarm after loading saved blend.",
+    "basketball": "Full export numeric object suffix misidentified as missing node."
+  },
+  "fixes": [
+    "Restore missing generated material palette entries while retaining existing source materials.",
+    "Resolve only Blender terminal numeric suffixes; reject ambiguous logical names."
+  ],
+  "pythonTests": 47,
+  "cases": {
+    "roads": {
+      "freeboardBeforeMeters": 0.55,
+      "isolatedFreeboardAfterMeters": 0.65,
+      "changedBaseNodes": [
+        "terrain",
+        "shore-jinghu-auditorium-bank"
+      ],
+      "retainedBaseNodes": 79,
+      "nodeTransformsAndExtrasPreserved": true,
+      "assets": 69,
+      "changedGLBs": [
+        "models/base.glb"
+      ],
+      "assetManifestHashesValid": true,
+      "trees": 3111,
+      "treeLayoutRetained": true,
+      "changedTreeElevationRows": 0,
+      "sourceCapAboveWaterRange": [
+        0.6499676513671875,
+        0.650013427734375
+      ],
+      "glbCapAboveWaterRange": [
+        0.64998291015625,
+        0.650013427734375
+      ],
+      "sourceSha256": "f6aff21305b0eaa1f46755baeeeca537fe0e10200bbaa76cb82e488f3dffda12",
+      "manifestSha256": "9638a6499d7a0e10ae1cfd38cc0648816201d678a756ddb0163765067bc85d8b",
+      "passed": true
+    },
+    "basketball": {
+      "freeboardBeforeMeters": 0.55,
+      "isolatedFreeboardAfterMeters": 0.65,
+      "changedBaseNodes": [
+        "terrain",
+        "shore-jinghu-auditorium-bank"
+      ],
+      "retainedBaseNodes": 79,
+      "nodeTransformsAndExtrasPreserved": true,
+      "assets": 69,
+      "changedGLBs": [
+        "models/base.glb"
+      ],
+      "assetManifestHashesValid": true,
+      "trees": 3111,
+      "treeLayoutRetained": true,
+      "changedTreeElevationRows": 0,
+      "sourceCapAboveWaterRange": [
+        0.6499676513671875,
+        0.650013427734375
+      ],
+      "glbCapAboveWaterRange": [
+        0.64998291015625,
+        0.650013427734375
+      ],
+      "sourceSha256": "0d9773c1a12e903aeff8ba89954202f986d2f5962ddc073812492873f69f7b35",
+      "manifestSha256": "9638a6499d7a0e10ae1cfd38cc0648816201d678a756ddb0163765067bc85d8b",
+      "passed": true
+    }
+  },
+  "originalProductionUnchanged": true,
+  "originalProductionHashes": {
+    "blender/gxu-campus.blend": "80253f17c953297b01441e7678e8e233b4b146d48a3b42c7e675bf6d2797fd44",
+    "public/models/base.glb": "a6b767b583529ae42828b119cdf617d47761b2067a86aa29d3d9eb1ebe632475",
+    "public/data/models.json": "74fd26c76e1f96e4a6ee452259a7105e82b2c4cd74c0a1820106273e30efc3a6",
+    "public/data/vegetation.json": "45338ed29cd6d099b1400217242a7c4db844d93f2966ede47fa031a2ccdcfb6b"
+  },
+  "sourceCodeHashes": {
+    "blender/update_roads.py": "0e650804691f7678923db7a5c967647e6c5e3a75aad0c5a02ffe042ca09dcfb3",
+    "blender/update_basketball.py": "0fb79f03bbea7c5a1cefddb3fcd5f3bdb9f5be94fc80b086ecec9461fc59341b",
+    "blender/preserve_glb_geometry.py": "ae249955c9ff7596135effc9f02b5d6598bee7ba7cce13a6591a7c8a74d03597",
+    "scripts/test_incremental_glb.py": "3d4fef91e718430abab78bc4684fc051502e188c67c1b5f8df70606f330b9b3e"
+  },
+  "passed": true,
+  "shorePerformanceAcceptanceStillPending": true,
+  "fullPlanCompleted": false
+}

@@ -1,0 +1,91 @@
+{
+  "sourceId": "libraryNorthPlaza2026",
+  "sourceUrl": "https://news.gxu.edu.cn/info/1002/43647.htm",
+  "reviewedImages": [
+    {
+      "path": "library-reading-1.png",
+      "sha256": "f98cb07d35abd7482f6dead70759495a3c00fb5e812e8e93bba8688b35a35b65",
+      "observations": [
+        "六根柱体，中央开间明显较宽",
+        "台阶前可见硬质铺地，人群遮挡精确边界"
+      ]
+    },
+    {
+      "path": "library-reading-6.png",
+      "sha256": "009a306e6d1d26a2bf41251249e1c110e9a0dc7d34c2a54ec1de83a676f5be97",
+      "observations": [
+        "室内活动画面，不用于推导广场边界"
+      ]
+    },
+    {
+      "path": "library-history-south-1.jpg",
+      "sha256": "cf172384e4f8a578b62a611a73f7a3d90812cf8811abf10dfb6d60a2c16da7d1",
+      "observations": [
+        "本馆介绍南楼段落配图实际是室内画面，不用于判断外立面方向。"
+      ]
+    },
+    {
+      "path": "library-history-south-2.jpg",
+      "sha256": "4e9a61619fc53ccf4ffb1029f2df63b7a2e523517887052e49a789a2611376fd",
+      "observations": [
+        "本馆介绍南楼段落配图实际是室内画面，不用于判断外立面方向。"
+      ]
+    }
+  ],
+  "excludedReference": {
+    "localFile": "work/references/library-north-official.png",
+    "reason": "图像实际为历史建筑，不能凭文件名认作当前北入口。"
+  },
+  "remaining": [
+    "完整广场真实铺装边界与现场高程",
+    "相邻普通楼栋入口、立面及比例核对",
+    "南侧入口和未见细部的进一步核对"
+  ],
+  "orientationAudit": {
+    "status": "source-and-both-glbs-verified",
+    "sourceId": "campus2026",
+    "sourceUrl": "https://www.gxu.edu.cn/info/1004/40412.htm",
+    "imageUrl": "https://www.gxu.edu.cn/__local/0/E5/3A/B3332A7E36E5CE8C58067432290_9064AA66_6E7940.jpg",
+    "sha256": "031ef1e4943bbe913ed7a040620b5b15bb41ec213bd20f1b101ee1dc4be59563",
+    "libraryRepresentativePoint": [
+      179.13,
+      -485.56
+    ],
+    "timeGatePosition": [
+      193.16994990460262,
+      -345.73765600001764
+    ],
+    "observed": "照片的前景雕塑位于图书馆北侧；可见中央幕墙与退台。",
+    "inference": "位于北侧的时光之门与北门同框；低层北楼在前、高层南楼在后。近处北楼中央略高于两翼，不能把后方南楼高翼当作北楼的高翼。",
+    "nextAction": "南北体量与北幕墙已通过源/远近 GLB 检查；中央场地连接已实现，继续相邻楼栋校准与完整样板验收。",
+    "resolvedEvidence": [
+      {
+        "sourceId": "libraryConstruction2014",
+        "publishedAt": "2014-03-31",
+        "documentLabel": "第 3 版，四、图书馆二期",
+        "localPath": "work/refinement-s3-evidence/library-construction-2014.pdf",
+        "sha256": "34dc6c1da302f71a69159435fff1db15e94adea31d32356821710093edfc31bd",
+        "observed": "建于现图书馆南面，地上十一层；东南面配图为建设设计效果图，不作竣工外观依据。"
+      },
+      {
+        "sourceId": "librarySeats2024",
+        "observed": "南九楼、南十楼阅览区供考研使用，支持在用高层位置在南侧。",
+        "localPath": "work/refinement-s3-evidence/library-seats-2024.html",
+        "sha256": "2fd5b0feaf865dbb9459cd5a07ea63d39aff01c796ba83fa2bb82f479c85c1e9"
+      },
+      {
+        "sourceId": "libraryOpening",
+        "observed": "北楼列出三至六层开放区域；单独不能证明总层数，与照片结合采用六层表达。",
+        "localPath": "work/refinement-s3-evidence/library-opening.html",
+        "sha256": "67b6bb640e86b841329be4fe3aa81fcfdf926de87d50a8a247a288728ef1b2cb"
+      }
+    ],
+    "adopted": "保留 OSM 原外环、内院和轴线；南楼十一层/36 m、北中央六层/27 m、北两翼六层/23.5 m、连廊六层/23.5 m。米制高度、连廊层数及分区仍为照片约束估算。",
+    "geometryReport": "docs/model-checks/refinement/s3-library-envelope.json"
+  },
+  "siteImplementation": {
+    "status": "source-and-base-glb-verified",
+    "report": "docs/model-checks/refinement/site-geometry.json",
+    "limits": "Only the estimated 25.2 m central connection is modeled; complete plaza boundary and surveyed grades remain unknown."
+  }
+}

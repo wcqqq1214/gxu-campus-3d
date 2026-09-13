@@ -1,0 +1,184 @@
+{
+  "verifiedAt": "2026-09-12T11:16:26.901279+00:00",
+  "stage": "S3 library north/south envelope and north curtain-wall correction",
+  "geometryAndVisualPassed": true,
+  "fullS3Completed": false,
+  "assets": {
+    "verifiedAt": "2026-09-12T11:09:37.274093+00:00",
+    "passed": true,
+    "assetCount": 69,
+    "publicAndProductionDataMatch": true,
+    "manifestSha256": "79b0307cdacab97580bf1039807fb62f8b344bc0731980c7c55460e866817bf4",
+    "initialModelBytes": 5588184,
+    "maxOrdinaryChunkBytes": 1684868,
+    "blendBytes": 87556896,
+    "changedFromS3Entry": [
+      "models/base.glb",
+      "models/library.glb",
+      "models/time-gate.glb"
+    ],
+    "all30OrdinaryChunksUnchanged": true
+  },
+  "geometry": {
+    "source": {
+      "roofSamplesMeters": {
+        "south": 36.000003509521484,
+        "northCenter": 26.99999969482422,
+        "northWest": 23.499992065429687,
+        "northEast": 23.50000732421875
+      },
+      "northMotifFrontY": [
+        27.454987079326106,
+        27.455013438425457
+      ],
+      "courtyardOpen": true,
+      "passed": true
+    },
+    "base": {
+      "roofSamplesMeters": {
+        "south": 36.00099151611328,
+        "northCenter": 27.001853637695312,
+        "northWest": 23.50000732421875,
+        "northEast": 23.49999969482422
+      },
+      "northMotifFrontY": [
+        27.454517184658954,
+        27.45523190337611
+      ],
+      "courtyardOpen": true,
+      "passed": true
+    },
+    "near": {
+      "roofSamplesMeters": {
+        "south": 36.00080078125,
+        "northCenter": 26.99982421875,
+        "northWest": 23.49999969482422,
+        "northEast": 23.50000732421875
+      },
+      "northMotifFrontY": [
+        27.454768614375453,
+        27.45566883327741
+      ],
+      "courtyardOpen": true,
+      "passed": true
+    },
+    "toleranceBasis": "0.1 m vertical bounds allow compressed mesh quantization; not survey accuracy.",
+    "passed": true
+  },
+  "dataInvariants": {
+    "stage": "S3 library orientation",
+    "buildingCount": 448,
+    "changedBuildingFields": {
+      "relation/11564702": [
+        "facadeBasis",
+        "sourceRefs",
+        "architecture",
+        "heightBasis"
+      ]
+    },
+    "allBuildingFootprintsAndOverallHeightsUnchanged": true,
+    "unchangedSpatialData": [
+      "terrain.json",
+      "vegetation.json",
+      "surfaces.json",
+      "campus-roads.json",
+      "basketball.json",
+      "infrastructure.json",
+      "campus-boundary.json",
+      "sports.json",
+      "surroundings.json"
+    ],
+    "passed": true
+  },
+  "checks": {
+    "pythonTests": 26,
+    "nodeTests": 51,
+    "typecheck": true,
+    "lint": true,
+    "pagesBuild": true,
+    "architecture": true,
+    "northEntry": true,
+    "roadBuildingCollision": true,
+    "bridgeJoins": true,
+    "timeGate": true
+  },
+  "browser": {
+    "completed": true,
+    "captures": 6,
+    "lodCycles": 3,
+    "errors": []
+  },
+  "performance": [
+    {
+      "tier": "精细",
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4017716,
+        "medianDrawCalls": 537
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4040590,
+        "medianDrawCalls": 545
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 0.569,
+        "medianDrawCalls": 1.49
+      },
+      "observedWithinLimits": true
+    },
+    {
+      "tier": "流畅",
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1052490,
+        "medianDrawCalls": 268
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1088027,
+        "medianDrawCalls": 266
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.376,
+        "medianDrawCalls": -0.746
+      },
+      "observedWithinLimits": true
+    }
+  ],
+  "controlledPerformancePassed": null,
+  "performanceLimit": "Concurrent canopy preparation from another project during recording. Observations satisfy thresholds, but do not claim a clean controlled comparison. Repeat after the site work before full S3 acceptance.",
+  "remaining": [
+    "North forecourt paving and actual road-height join",
+    "Local terrain grading under lowest stair treads",
+    "Crown-aware forecourt exclusion",
+    "Combined site, day/night and layer validation",
+    "Controlled final performance comparison",
+    "South entry and unseen facade details remain estimated"
+  ],
+  "files": {
+    "scripts/architecture_data.py": "d01cac27dc26139909fedfd77b13b9f53d4efff1d499bf2453501d8a1ed304ed",
+    "scripts/prepare_geodata.py": "dfe4f6af4fad029b8de686322f95227c24f420f7134903a64b86a70e38530522",
+    "scripts/test_library_envelope.py": "dc10ab3159fbb1b82e5537fa84e56a294f101cf971b7c9f5cc56b4fe4d3ca91a",
+    "blender/library.py": "26b416b88de4f94377d5f907e7e6fe704ce401a22d3a1d6f3da81189e1d3ff22",
+    "blender/validate_library_envelope.py": "a924c28dfa174b4cdd1c0df031032d338e594d940981f8d07c0c9c7a4d31109d",
+    "blender/validate_architecture.py": "802ac17c858a32736244e9d9668520bcbaeed3d31c4f001d3eabc888e1567920",
+    "data/landmarks.json": "9d946e7c912cfeebc29f835489f364248d45b0220e6cc4ca57891b1f7d7f6b43",
+    "data/sources.json": "76e0c6e414f7b2b54433c1f5586c7e7e35300d150f57e41087e761225734c7a6",
+    "public/data/buildings.json": "c3d812a59266ca8d85ec04f758a5c35b626ca9b70fb0af992389bc00d2b7c0b2",
+    "public/data/geography.geojson": "f655f764a21a0d34c7e857453047cd8f5b3027d898198baf92db658544ed0609",
+    "public/data/models.json": "79b0307cdacab97580bf1039807fb62f8b344bc0731980c7c55460e866817bf4",
+    "blender/gxu-campus.blend": "0b6b33ca78f4c910b5907807e53f3e8a1c4cf69628fe74e83ed9ef4f0f531e1a",
+    "docs/model-checks/refinement/s3-library-envelope.json": "a0f4dce3a14307b20d2597fb044853a5059d2ec0397cc1ed09898dd0bb07f3ed",
+    "docs/model-checks/refinement/s3-library-entry.json": "c5859ff3836d0cec0c211a3501b26dba3ed78875b350a356f2e36b17a3760277",
+    "docs/model-checks/refinement/s3-envelope-assets.json": "f2152e7f740b64680f4e02ef27ee0addd321267095a1d03d800c2a5cece94e7b",
+    "docs/model-checks/refinement/s3-envelope-data-invariants.json": "ceacbd2755a51e7223016c44fcee2acd3509e9e935144e548a435ba8c4624725",
+    "docs/model-checks/refinement/s3-envelope-browser.json": "8209953a9711bb5969cc25bb9d772df252c9fb3ed6b4dc559134fae3e763467b",
+    "docs/model-checks/architecture-check.json": "a3716327574b8122b34fb7b028488f8a00e9fadc5884777e9744b1d8da3d06e0",
+    "docs/model-checks/road-building-clearance.json": "485bd34a5be68b53cc1e9f4eccca813520556e811c9211c929c12c681e819c46",
+    "docs/model-checks/bridge-joins-geometry.json": "77b9efcce2c5cf2e68c2a7efe7af73806c794cef16629ccd51f7004ce592a60e",
+    "docs/model-checks/time-gate-geometry.json": "f207d75846df80410bb9a6d2187b55591a69dc860a175ac439137d1bafcdb940"
+  }
+}
