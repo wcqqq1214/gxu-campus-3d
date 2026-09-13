@@ -10,6 +10,7 @@ import mapbox_earcut as earcut
 from shapely.geometry import Polygon,LineString,shape,Point,box
 from shapely.ops import transform,unary_union
 from shapely import make_valid
+from context_data import select_context
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'public/data'
 def polys(g):return [g] if g.geom_type=='Polygon' else [p for p in getattr(g,'geoms',[]) if p.geom_type=='Polygon']
 def triangulate(g):
@@ -36,12 +37,18 @@ def tiled_triangles(g,step=12):
 def surface_shape(s):
     vs=s['vertices'];ts=s['triangles']
     return unary_union([Polygon([vs[i] for i in ts[k:k+3]]) for k in range(0,len(ts),3)])
+def building_obstacles(buildings,campus):
+    # Full preparation reaches this stage before context_data removes distant
+    # buildings. Use the same display selection as an incremental rebuild so
+    # omitted buildings cannot leave holes in the surrounding road surface.
+    visible,_=select_context(buildings,campus)
+    return unary_union([Polygon(p[0],p[1:]) for b in visible for p in b['polygons']]).buffer(2.2)
 def prepare_surroundings():
     from prepare_geodata import project
     geo=json.loads((OUT/'geography.geojson').read_text());infra=json.loads((OUT/'infrastructure.json').read_text());ss=json.loads((OUT/'surfaces.json').read_text());bs=json.loads((OUT/'buildings.json').read_text());terrain=json.loads((OUT/'terrain.json').read_text())
     campus=transform(project,shape(next(f for f in geo['features'] if f['id']=='campus')['geometry']));clip=campus.buffer(300)
     display=transform(project,shape(next(f for f in geo['features'] if f['id']=='campus-display-area')['geometry']))
-    obstacles=unary_union([Polygon(p[0],p[1:]) for b in bs for p in b['polygons']]).buffer(2.2)
+    obstacles=building_obstacles(bs,campus)
     features={f['id']:f for f in geo['features']};overrides={};groups={'carriageway':[],'walkway':[]};records=[];original=[];skipped=[]
     widths={'trunk':11,'trunk_link':6,'primary':18,'primary_link':6,'secondary':14,'secondary_link':6,'tertiary':12,'residential':8,'unclassified':7,'service':5,'living_street':5,'footway':2.2,'path':2,'steps':2,'pedestrian':5}
     for i,s in enumerate(ss):

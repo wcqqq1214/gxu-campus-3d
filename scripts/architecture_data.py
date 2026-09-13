@@ -22,10 +22,28 @@ def architectural_envelope(b):
     center = list(p.centroid.coords)[0]
     local = translate(rotate(p, -angle, origin=center, use_radians=True), -center[0], -center[1])
     if b['landmark'] == 'library':
-        regions = [('南楼中央阅览区', box(-32,-100,35.5,-12.1),23.5),
-                   ('南楼西翼',box(-100,-100,-32,.5),27),('南楼东翼',box(35.5,-100,100,.5),27),
-                   ('内院两侧连廊',box(-32,-12.1,35.5,.5),27),
-                   ('北楼主体',box(-100,.5,100,100),36)]
+        # The sculpture in the 2026 photograph is NORTH of the library.
+        # The low front building is the 2003 north library; the 2014 school
+        # newspaper places the eleven-storey extension to its SOUTH. Keep the
+        # actual footprint/recesses, rather than rotating either whole outline.
+        link=box(-32,-12.1,35.5,.5)
+        regions=[('北楼中央阅览区',box(-13.38,.5,12.30,100),27,6),
+                 ('北楼西翼',box(-100,.5,-13.38,100),23.5,6),
+                 ('北楼东翼',box(12.30,.5,100,100),23.5,6),
+                 ('内院两侧连廊',link,23.5,6),
+                 ('南楼十一层主体',box(-100,-100,100,.5).difference(link),36,11)]
+        parts=[]
+        for name,region,height,levels in regions:
+            part=pack(local.intersection(region),name,height)
+            part['levels']=levels
+            parts.append(part)
+        return {'origin':center,'angle':angle,'parts':parts,
+                'northEntry':{'id':'north','centerX':-.55,'width':25.2,
+                              'platformFrontY':36.35,'platformDepth':9.3,
+                              'landingHeight':1.2,'stepCount':8,'stepRun':.35,'stepRise':.15},
+                'sourceRefs':['campus2026','libraryHistory','libraryConstruction2014','librarySeats2024','libraryOpening'],
+                'heightBasis':'南楼十一层据 2014 建设资料，2024 在用九、十层交叉核对；北楼六层据校方开放区域。36/27/23.5 米高度及连廊分区按照片估算，非实测。',
+                'orientationBasis':'北侧时光之门同框照片约束北立面，南楼位于原馆以南；保留 OSM 外环与内院。'}
     else:
         # Whole mapped irregular footprint is the four-storey academic podium.
         # Two perpendicular residential wings leave the southeast recess open above it.
@@ -35,28 +53,33 @@ def architectural_envelope(b):
     return {'origin': center, 'angle': angle, 'parts': [pack(local.intersection(region),name,height) for name,region,height in regions]}
 
 
-def clear_entrance_trees(trees, buildings):
-    """Clear crowns from modelled stairs / colonnades, without reseeding other trees."""
-    from shapely.geometry import Point
-    from shapely.ops import unary_union
+def entrance_tree_masks(buildings):
+    """Existing modeled entrance reservations, shared by early and final passes."""
     masks=[]
     for b in buildings:
-        if b['landmark'] not in ('library','international-residence','teaching-ten','teaching-six'):continue
+        if b.get('landmark') not in ('library','international-residence','teaching-ten','teaching-six'):continue
         e=b['architecture']
         if b['landmark']=='teaching-six':
             for ent in e['entrances']:
                 x,y=ent['center'];w=ent['width']+3
                 reach=22 if ent['id'] in ('south','north') else 6
                 local=translate(rotate(box(-w/2,-reach,w/2,0),ent['angle'],origin=(0,0),use_radians=True),x,y)
-                masks.append(translate(rotate(local,e['angle'],origin=(0,0),use_radians=True),*e['origin']))
+                masks.append((f"{b['id']}:{ent['id']}",translate(rotate(local,e['angle'],origin=(0,0),use_radians=True),*e['origin'])))
             continue
         if b['landmark']=='teaching-ten':
-            masks.append(translate(rotate(box(-6,-23,6,-17.5),e['angle'],origin=(0,0),use_radians=True),*e['origin']))
+            masks.append((b['id']+':front',translate(rotate(box(-6,-23,6,-17.5),e['angle'],origin=(0,0),use_radians=True),*e['origin'])))
             continue
         entrances=[(-23,-45.5,27,-35),(-13.3,26.9,12.2,39.2)] if b['landmark']=='library' else [(-3,-32,18,-24)]
-        for bounds in entrances:
-            masks.append(translate(rotate(box(*bounds),e['angle'],origin=(0,0),use_radians=True),*e['origin']))
-    mask=unary_union(masks)
+        for index,bounds in enumerate(entrances):
+            masks.append((f"{b['id']}:{index}",translate(rotate(box(*bounds),e['angle'],origin=(0,0),use_radians=True),*e['origin'])))
+    return masks
+
+
+def clear_entrance_trees(trees, buildings):
+    """Clear crowns from modelled stairs / colonnades, without reseeding other trees."""
+    from shapely.geometry import Point
+    from shapely.ops import unary_union
+    mask=unary_union([geometry for _,geometry in entrance_tree_masks(buildings)])
     return [t for t in trees if mask.distance(Point(t[0],t[1]))>4*t[2]/9+1]
 
 

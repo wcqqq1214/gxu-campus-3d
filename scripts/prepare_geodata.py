@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Normalize OSM geometry, preserve courtyards, and assemble attributable scene data."""
-import collections,datetime,json,math,random
+import collections,datetime,json,math
 from pathlib import Path
 import numpy as np
 from PIL import Image,ImageFilter
@@ -12,6 +12,7 @@ import mapbox_earcut as earcut
 from fetch_geodata import ROOT,CACHE,REGION,tile
 from sports_data import prepare_sports
 from architecture_data import architectural_envelope,clear_entrance_trees
+from building_overrides import load_catalogue,source_catalogue,validate_ids,resolve_building,calibration_stats
 OUT=ROOT/'public/data';OUT.mkdir(parents=True,exist_ok=True)
 LON,LAT=REGION['center'];MX=111320*math.cos(math.radians(LAT));MY=111320
 
@@ -52,6 +53,7 @@ def category(t):
 
 def prepare():
     data=json.loads((CACHE/'osm.json').read_text()); elems=data['elements'];byid={(e['type'],e['id']):e for e in elems}
+    overrides=load_catalogue();sources=source_catalogue();source_ids={s['id'] for s in sources}
     campus=geom(byid[('way',398115378)]);clip=campus.buffer(300)
     # Only suppress member geometry after a usable parent has been assembled.
     skip=set()
@@ -78,10 +80,15 @@ def prepare():
             defaults={'living':6,'academic':5,'culture':2,'service':3}
             try:levels=float(t.get('building:levels',defaults[cat]));height=float(t.get('height','').replace(' m','')) if t.get('height') else levels*3.3
             except ValueError:levels=defaults[cat];height=levels*3.3;estimated=True
-            if lm:height=lm.get('height',height);cat=lm['category']
+            if lm:
+                height=lm.get('height',height)
+                # Huicui is a curated north-wing destination within the mapped
+                # journalism building; its hotel label does not rename/reclassify
+                # the entire shared footprint during a full preparation.
+                if lm['id']!='huicui':cat=lm['category']
             coords=[]
             for p in polygons(g):coords.append([list(p.exterior.coords)]+[list(r.coords) for r in p.interiors])
-            name=lm['name'] if lm else t.get('name') or f"{'校内' if inside else '周边'}建筑 {e['id']}"
+            name=lm['name'] if lm and lm['id']!='huicui' else t.get('name') or f"{'校内' if inside else '周边'}建筑 {e['id']}"
             b={'id':eid,'name':name,'category':cat,'center':[round(c.x,2),round(c.y,2)],'height':height,'levels':levels,'insideCampus':inside,'landmark':lm['id'] if lm else None,'polygons':coords,'bounds':list(g.bounds),'heightBasis':'参考照片估算' if lm and 'height' in lm else '按类型估算' if estimated else 'OSM高度或层数','facadeBasis':'参考照片独立建模' if lm else '按建筑类型推定','osmVersion':e.get('version'),'osmEditedAt':e.get('timestamp'),'sourceUrl':props['sourceUrl'],'tags':t}
             b['constructionStatus']='OSM 标记施工中，完成状态待核对' if t.get('building')=='construction' or t.get('construction') else None
             if lm and lm['id']=='teaching-two':b['facadeBasis']='重点体量，立面按类型推定'
@@ -92,12 +99,24 @@ def prepare():
             if lm and lm['id'] in ('library','international-residence','teaching-ten','teaching-six'):
                 b['architecture']=architectural_envelope(b)
                 b['facadeBasis']=lm['detail']
+                if lm['id']=='library':
+                    b['heightBasis']=b['architecture']['heightBasis']
+                    b['sourceRefs']=['osm',lm['reference']]+lm.get('additionalReferences',[])
                 if lm['id']=='teaching-six':b['sourceRefs']=['osm',lm['reference']]+lm.get('additionalReferences',[])
                 if lm['id']=='teaching-ten':
                     b['heightBasis']=b['architecture']['heightBasis']
                     b['sourceRefs']=['osm',lm['reference']]+lm.get('additionalReferences',[])
-            props.update({k:b[k] for k in ('name','category','height','heightBasis','facadeBasis','landmark')});buildings.append(b)
+            if not b['landmark'] and eid!='way/948683815' and t.get('memorial')!='column':
+                b=resolve_building(b,overrides.get(eid),source_ids)
+            props.update({k:b[k] for k in ('name','category','height','heightBasis','facadeBasis','landmark')})
+            if lm and lm['id']=='library':props['sourceRefs']=b['sourceRefs']
+            if 'archetype' in b:
+                props.update({k:b[k] for k in ('archetype','roofBasis','levels','sourceRefs','calibration') if k in b})
+            buildings.append(b)
         features.append({'type':'Feature','id':eid,'properties':props,'geometry':mapping(transform(inverse,g))})
+    validate_ids(overrides,buildings)
+    from attached_gallery_data import validate_gallery_context
+    validate_gallery_context(buildings)
     # South gate uses the mapped road / campus boundary; its architectural extent is photo-estimated.
     for l in landmarks:
         b=next((b for b in buildings if b['id']==l.get('osmId')),None)
@@ -202,14 +221,9 @@ def prepare():
     sportsmask=unary_union([transform(project,shape(f['geometry'])) for f in features if f['properties']['kind']=='sports'])
     valid=prep(campus.difference(unary_union([bg,waters.buffer(5),roadmask,sportsmask.buffer(3)])))
     greenmask=prep(greenmask)
-    rng=random.Random(1928);trees=[]
-    minx,miny,maxx,maxy=campus.bounds
-    for y in np.arange(miny,maxy,13):
-        for x in np.arange(minx,maxx,13):
-            p=Point(x+rng.uniform(-4,4),y+rng.uniform(-4,4))
-            if valid.contains(p) and rng.random()<(0.94 if greenmask.contains(p) else .55):trees.append([round(p.x,1),round(p.y,1),round(rng.uniform(9,17),1),rng.choices([0,1,2],[.66,.25,.09])[0]])
-    # Filter AFTER generation to retain the random sequence and existing trees
-    # elsewhere. Include canopy radius, not just trunks, at playing-area edges.
+    from vegetation_data import load_background,generate_background
+    trees=generate_background(campus.bounds,valid,greenmask,load_background(ROOT))
+    # Local exclusions never reseed other cells. Include crown radius at edges.
     grounds=unary_union([Polygon(field['ground']) for field in sports])
     west_stand=next(b for b in buildings if b['id']=='way/948683815')
     sx,sy=west_stand['center'];standmask=box(sx-11,sy-40,sx+11,sy+40)
@@ -220,6 +234,8 @@ def prepare():
     trees=[t for t in trees if gate_mask.distance(Point(t[0],t[1]))>4*t[2]/9+1]
     (OUT/'vegetation.json').write_text(json.dumps(trees,separators=(',',':')))
     stats={'snapshotAt':geo['metadata']['snapshotAt'],'buildings':len(buildings),'campusBuildings':sum(b['insideCampus'] for b in buildings),'landmarks':len(landmarks),'trees':len(trees),'layers':dict(collections.Counter(f['properties']['kind'] for f in features)),'estimatedHeights':sum(b['heightBasis']=='按类型估算' for b in buildings),'editYears':dict(sorted(collections.Counter(b['osmEditedAt'][:4] for b in buildings if b['osmEditedAt']).items()))}
+    stats['buildingCalibrations']=calibration_stats(buildings,overrides)
+    (OUT/'sources.json').write_text(json.dumps({'version':1,'sources':sources},ensure_ascii=False,indent=2)+'\n')
     (OUT/'overview.json').write_text(json.dumps(stats,ensure_ascii=False,indent=2));print(json.dumps(stats,ensure_ascii=False))
 if __name__=='__main__':
     prepare()
