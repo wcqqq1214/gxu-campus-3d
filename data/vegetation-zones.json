@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "background": {
+    "id": "campus-background",
+    "seed": 1928,
+    "spacingMeters": 13,
+    "jitterMeters": 4,
+    "heightRangeMeters": [9, 17],
+    "greenDensity": 0.94,
+    "otherDensity": 0.55,
+    "typeWeights": [0.66, 0.25, 0.09],
+    "sourceRefs": ["osm"],
+    "evidence": "背景树位为受地图轮廓约束的示意散点。间距、扰动、密度、树高和模板权重沿用原估算参数；不是现场树位或树种调查。"
+  },
+  "zones": [
+    {
+      "id": "huixue-east-lawn",
+      "type": "no-tree",
+      "stage": "campus-roads",
+      "maskRef": "way/822812174",
+      "sourceRefs": ["osm"],
+      "evidence": "用户现场指正汇学堂正东为开放无树草坪；沿用 OSM 草地边界和既有树冠余量。用户指正是留白依据，OSM 仅约束边界。"
+    },
+    {
+      "id": "library-north-forecourt",
+      "type": "no-tree",
+      "stage": "sites",
+      "maskRef": "library-north",
+      "sourceRefs": ["osm", "libraryNorthPlaza2026"],
+      "evidence": "沿用已验收的图书馆北门中央铺地连接区；铺地存在有校方现场照片依据，完整边界、宽度和高差仍为模型估算。"
+    }
+  ]
+}
