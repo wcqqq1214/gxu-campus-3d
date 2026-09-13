@@ -1,4 +1,5 @@
 import { navigationFootprints } from './navigation';
+import { treeRotation, treeElevation } from './vegetation';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -870,24 +871,6 @@ export function createScene(
         treesRoot.userData.layer = 'vegetation';
         scene.add(treesRoot);
       }
-      const elevation = (x: number, y: number) => {
-        const [x0, y0, x1, y1] = terrain.bounds;
-        const u = Math.max(
-          0,
-          Math.min(
-            terrain.cols - 2,
-            Math.floor(((x - x0) / (x1 - x0)) * (terrain.cols - 1)),
-          ),
-        );
-        const v = Math.max(
-          0,
-          Math.min(
-            terrain.rows - 2,
-            Math.floor(((y - y0) / (y1 - y0)) * (terrain.rows - 1)),
-          ),
-        );
-        return terrain.heights[v * terrain.cols + u];
-      };
       const parts: THREE.Mesh[] = [];
       g.scene.traverse((o) => {
         if (o instanceof THREE.Mesh) parts.push(o);
@@ -943,9 +926,10 @@ export function createScene(
         for (const rows of sectors.values()) {
           const inst = new THREE.InstancedMesh(geometry, material, rows.length);
           const transform = new THREE.Object3D();
-          rows.forEach(([x, y, h], i) => {
-            transform.position.set(x, elevation(x, y), -y);
-            transform.rotation.set(0, i * 2.399, 0);
+          rows.forEach((row, i) => {
+            const [x, y, h] = row;
+            transform.position.set(x, treeElevation(row, terrain), -y);
+            transform.rotation.set(0, treeRotation(x, y), 0);
             transform.scale.setScalar(h / 9);
             transform.updateMatrix();
             inst.setMatrixAt(i, transform.matrix);
