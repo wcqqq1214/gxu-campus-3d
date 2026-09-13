@@ -41,7 +41,11 @@ def prepare_huicui():
     landmarks.sort(key=lambda a:a.get('navigationOrder',0));lp.write_text(json.dumps(landmarks,ensure_ascii=False,separators=(',',':')))
     op=ROOT/'public/data/overview.json';overview=json.loads(op.read_text());overview['landmarks']=len(landmarks);op.write_text(json.dumps(overview,ensure_ascii=False,indent=2)+'\n')
     gp=ROOT/'public/data/geography.geojson';geo=json.loads(gp.read_text())
-    next(f for f in geo['features'] if f['id']==FEATURE_ID)['properties']['landmark']='huicui'
+    # Keep the GeoJSON catalogue aligned with the final shared building record,
+    # including its photo-derived facade provenance. Navigation owns its alias.
+    next(f for f in geo['features'] if f['id']==FEATURE_ID)['properties'].update(
+        {key:b[key] for key in ('name','category','height','heightBasis',
+                                'facadeBasis','landmark','sourceRefs')})
     gp.write_text(json.dumps(geo,ensure_ascii=False,separators=(',',':')))
     path.write_text(json.dumps(buildings, ensure_ascii=False, separators=(',', ':')))
     path = ROOT/'public/data/sources.json'

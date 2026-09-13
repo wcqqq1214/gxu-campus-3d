@@ -12,6 +12,7 @@ from shapely.geometry import Point,LineString,Polygon,box,mapping,shape
 from shapely.geometry.polygon import orient
 from shapely.ops import transform,unary_union,linemerge,substring
 from prepare_geodata import ROOT,OUT,geom,project,inverse,polygons
+from infrastructure_footprints import strip_shape
 
 SNAPSHOT=ROOT/'data/snapshots/infrastructure-2026-09-11.json.gz'
 MAIN_BRIDGES=[
@@ -43,12 +44,6 @@ def path_frames(path):
         dx=b[0]-a[0];dy=b[1]-a[1];length=math.hypot(dx,dy)
         result.append([dx/length,dy/length])
     return result
-
-def strip_shape(path,axes,sections,left=2,right=3,extra=0):
-    edges=[]
-    for p,(ux,uy),section in zip(path,axes,sections):
-        edges.append([(p[0]-uy*off,p[1]+ux*off) for off in [section[left]-extra,section[right]+extra]])
-    return unary_union([Polygon([a[0],b[0],b[1],a[1]]) for a,b in zip(edges,edges[1:])])
 
 def fit_road_sections(path,axes,buildings):
     # Keep mapped building footprints and road axes. Only the unsurveyed road
@@ -397,5 +392,13 @@ def prepare_infrastructure():
     prepare_context()
     from campus_roads_data import prepare_campus_roads
     prepare_campus_roads()
+    from site_data import prepare_sites
+    prepare_sites()
+    from paving_data import prepare_pavings
+    prepare_pavings()
+    from shore_data import prepare_shores
+    prepare_shores()
+    from vegetation_data import prepare_vegetation
+    prepare_vegetation()
 
 if __name__=='__main__':prepare_infrastructure()

@@ -54,7 +54,8 @@ def prepare_campus_roads():
     # User correction: the mapped lawn opposite Huixue's east facade is treeless.
     lawn=transform(project,shape(byid['way/822812174']['geometry']))
     trees=json.loads((OUT/'vegetation.json').read_text())
-    kept=[t for t in trees if lawn.distance(Point(t[:2]))>4*t[2]/9+1]
+    from vegetation_data import apply_stage
+    kept=apply_stage(trees,'campus-roads',{'way/822812174':lawn})
     (OUT/'vegetation.json').write_text(json.dumps(kept,separators=(',',':')))
     overview=json.loads((OUT/'overview.json').read_text());overview['trees']=len(kept)
     (OUT/'overview.json').write_text(json.dumps(overview,ensure_ascii=False,indent=2)+'\n')
