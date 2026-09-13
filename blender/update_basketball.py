@@ -12,8 +12,9 @@ sys.argv.append('--base-only')
 try:exec(compile(script.read_text(),str(script),'exec'),ns)
 except SystemExit as e:
     if e.code not in (0,None):raise
-from preserve_glb_geometry import preserve_geometry
+from preserve_glb_geometry import preserve_geometry,compact_buffer_views
 preserve_geometry(previous_base,ROOT/'public/models/base.glb',['landmark-time-gate'])
+compact_buffer_views(ROOT/'public/models/base.glb')
 manifest=json.loads((ROOT/'public/data/models.json').read_text());blob=(ROOT/'public/models/base.glb').read_bytes();manifest['base'].update(bytes=len(blob),sha256=hashlib.sha256(blob).hexdigest())
 (ROOT/'public/data/models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 records=[(m.name,tuple(m.diffuse_color),m.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value,m.node_tree.nodes['Principled BSDF'].inputs['Metallic'].default_value) for m in MATERIALS]
@@ -41,6 +42,14 @@ for court in ns['basketball']['courts']:
     # Retain UVs and named groups, without storing four copies of every corner.
     from huicui import compact_source
     compact_source(obj)
+from paving_geometry import sync_source_pavings
+sync_source_pavings(ns['base'])
+from site_geometry import sync_source_sites
+sync_source_sites(ns['base'])
+from shore_geometry import sync_source_shores
+sync_source_shores(ns['base'])
+from low_planting import sync_source_low_planting
+sync_source_low_planting(ns['base'])
 from mathutils.kdtree import KDTree
 kd=KDTree(len(ns['trees']))
 for i,t in enumerate(ns['trees']):kd.insert((t[0],t[1],0),i)
@@ -50,14 +59,14 @@ for o in list(bpy.data.objects):
     co,index,distance=kd.find((o.location.x,o.location.y,0))
     if distance>.02:bpy.data.objects.remove(o,do_unlink=True)
     else:o.name='court-tree-temp-'+str(index);survivors.append((o,index))
-for o,i in survivors:o.name=f'树木示意-{i:04}';o.rotation_euler.z=i*2.399
+for o,i in survivors:o.name=f'树木示意-{i:04}';o.rotation_euler.z=ns['tree_rotation'](*ns['trees'][i][:2]);o.location.z=ns['trees'][i][4]
 assert len(survivors)==len(ns['trees'])
 bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'),compress=True)
 print('Basketball updated in editable source and base GLB',flush=True)
 
 assert (ROOT/'blender/gxu-campus.blend').stat().st_size<100*1024*1024
 assert manifest['base']['bytes']+manifest['trees']['bytes']<6_000_000
-from preserve_glb_geometry import unpack
+from preserve_glb_geometry import unpack,mesh_nodes_by_name
 a,ab=unpack(previous_base);c,cb=unpack((ROOT/'public/models/base.glb').read_bytes())
 def signature(doc,binary,node):
     result=[]
@@ -66,16 +75,16 @@ def signature(doc,binary,node):
         result.append((doc['materials'][p['material']]['name'],hashlib.sha256(binary[start:start+v['byteLength']]).hexdigest()))
     return result
 changed=[];retained=[];removed=[]
-for node in a['nodes']:
-    if 'mesh' not in node:continue
-    other=next((n for n in c['nodes'] if n.get('name')==node['name']),None)
+old_nodes=mesh_nodes_by_name(a);new_nodes=mesh_nodes_by_name(c)
+for name,node in old_nodes.items():
+    other=new_nodes.get(name)
     if other is None:
-        assert node['name'].startswith('basketball-bank-') and node['name'] not in {b['id'] for b in ns['basketball']['banks']}
-        removed.append(node['name']);continue
-    if signature(a,ab,node)!=signature(c,cb,other):changed.append(node['name'])
-    else:retained.append(node['name'])
-assert set(changed)<=set(['terrain','roads','sports']),changed
+        assert name.startswith('basketball-bank-') and name not in {b['id'] for b in ns['basketball']['banks']}
+        removed.append(name);continue
+    if signature(a,ab,node)!=signature(c,cb,other):changed.append(name)
+    else:retained.append(name)
+assert set(changed)<=set(['terrain','roads','sports','green'])|{k for k in ns['base'] if k.startswith(('site-','shore-','paving-','vegetation-low-'))},changed
 assert all(hashlib.sha256((ROOT/'public/models'/n).read_bytes()).hexdigest()==h for n,h in before.items() if n!='base.glb')
-report={'removedNodes':removed,'changedExistingNodes':changed,'preservedNodeCount':len(retained),'newNodes':[n['name'] for n in c['nodes'] if n.get('name') not in {o.get('name') for o in a['nodes']}],'method':'Exact Draco primitive bytes; all unrelated GLBs retained','initialBytes':manifest['base']['bytes']+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
+report={'removedNodes':removed,'changedExistingNodes':changed,'preservedNodeCount':len(retained),'newNodes':sorted(set(new_nodes)-set(old_nodes)),'method':'Exact Draco primitive bytes; logical names ignore only Blender numeric suffixes, ambiguous names rejected; all unrelated GLBs retained','initialBytes':manifest['base']['bytes']+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
 (ROOT/'docs/model-checks/basketball-retained-nodes.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(report,flush=True)

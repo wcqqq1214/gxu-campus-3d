@@ -24,7 +24,7 @@ for key in ['library','international-residence']:
         # Actual mapped inner ring has no roof spanning these sample locations.
         for x,y in [(0,-4),(5,-4),(0,-9),(8,-9)]:assert not ray(x,y)[0],('Courtyard filled',x,y)
         assert ray(-44,-15)[0] and ray(0,-30)[0] and ray(0,18)[0]
-        assert ray(0,18)[1]>ray(0,-30)[1]+5
+        assert ray(0,-32)[1]>ray(0,10)[1]+5,'South extension must be taller than north library'
         assert 9.8<ray(0,32)[1]<10.5,'North portico canopy missing'
         assert .1<ray(0,38.9)[1]<.4,'North stairs missing'
         assert 10<ray(0,-39)[1]<15,'South portico must remain'

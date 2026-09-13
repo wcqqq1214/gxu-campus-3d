@@ -4,6 +4,13 @@ from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 R=Path(__file__).resolve().parents[1];joins=json.loads((R/'public/data/campus-roads.json').read_text())['bridgeJoins']
+def owner(o):
+    while o.parent:o=o.parent
+    return o
+def main_road(o):
+    root=owner(o)
+    # Blender appends .001 when the editable roads object owns the plain name.
+    return root.get('layer')=='roads' and root.name.split('.')[0]=='roads'
 def bvh(objects):
     v=[];f=[]
     for o in objects:
@@ -16,6 +23,8 @@ def probe(mesh,x,y,z):
     assert p is not None,('asphalt gap',x,y,z)
     return p.z
 def check(objects,label):
+    main_count=sum(o.type=='MESH' and main_road(o) for o in objects)
+    assert main_count,(label,'main road mesh omitted from interface check')
     mesh=bvh(objects);records=[]
     for j in joins:
         a=j['start'];ux,uy=j['direction'];jump=0
@@ -33,14 +42,12 @@ def check(objects,label):
                 previous=heights;count+=3
         assert maxstep<.25,(label,j['id'],'abrupt rise',maxstep)
         records.append({'id':j['id'],'asphaltSamples':count+10,'entryHeightStep':round(jump,4),'maximumQuarterMeterStep':round(maxstep,4)})
-    return {'representation':label,'joins':records}
+    return {'representation':label,'mainRoadMeshes':main_count,'joins':records}
 bpy.ops.wm.open_mainfile(filepath=str(R/'blender/gxu-campus.blend'))
-report=[check([o for o in bpy.context.scene.objects if o.name=='roads' or o.name.startswith('infra-approach-')],'editable source')]
+report=[check([o for o in bpy.context.scene.objects if main_road(o) or o.name.startswith('infra-approach-')],'editable source')]
 bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(R/'public/models/base.glb'))
 objects=[]
 for o in bpy.context.scene.objects:
-    root=o
-    while root.parent:root=root.parent
-    if root.name=='roads' or root.name.startswith('infra-approach-'):objects.append(o)
+    if main_road(o) or owner(o).name.startswith('infra-approach-'):objects.append(o)
 report.append(check(objects,'base GLB'))
 (R/'docs/model-checks/bridge-joins-geometry.json').write_text(json.dumps(report,indent=2)+'\n');print(report,flush=True)
