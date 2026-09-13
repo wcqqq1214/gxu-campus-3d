@@ -7,7 +7,7 @@ def material(name,color,roughness=.8,metallic=0):
     bs=m.node_tree.nodes.get('Principled BSDF');bs.inputs['Base Color'].default_value=(*color,1);bs.inputs['Roughness'].default_value=roughness;bs.inputs['Metallic'].default_value=metallic
     MATERIALS.append(m);return len(MATERIALS)-1
 class Mesh:
-    def __init__(self):self.v=[];self.f=[];self.m=[];self.parts=[]
+    def __init__(self):self.v=[];self.f=[];self.m=[];self.parts=[];self.ground_uv_bounds=[];self.xy_uv_materials=set()
     def rotate_z(self,x,y,angle):
         c=math.cos(angle);s=math.sin(angle)
         self.v=[(x+(a-x)*c-(b-y)*s,y+(a-x)*s+(b-y)*c,z) for a,b,z in self.v]
@@ -61,7 +61,10 @@ class Mesh:
         # Only textured faces need UVs; the exporter keeps the common layer for batching.
         uv=mesh.uv_layers.new(name='米制平面纹理')
         for p in mesh.polygons:
-            axis=max(range(3),key=lambda i:abs(p.normal[i]));axes=[i for i in range(3) if i!=axis]
+            # Fine paving-ground triangles can have an unstable float32
+            # normal. Preserve other terrain/underpass UV projections.
+            ground=props and props.get('layer')=='terrain' and any(x0<=p.center.x<=x1 and y0<=p.center.y<=y1 for x0,y0,x1,y1 in self.ground_uv_bounds)
+            axis=2 if ground or self.m[p.index] in self.xy_uv_materials else max(range(3),key=lambda i:abs(p.normal[i]));axes=[i for i in range(3) if i!=axis]
             for loop in p.loop_indices:
                 co=mesh.vertices[mesh.loops[loop].vertex_index].co
                 uv.data[loop].uv=(co[axes[0]]/4,co[axes[1]]/4)
