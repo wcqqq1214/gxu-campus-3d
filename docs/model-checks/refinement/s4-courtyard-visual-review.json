@@ -1,0 +1,59 @@
+{
+  "passed": true,
+  "scope": "Seven close before/after, tree-off, night and mobile-size images. Ordinary building forms remain uncalibrated.",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-final/before/arts-court-layout-trees-on-day.png",
+      "sha256": "8c1f51d3e17237fe6aae3583749bab6d989f0651c54dffd6b05b2d9b7a5531b0",
+      "reviewMethod": "byte-identical to individually inspected initial image",
+      "visibleTrees": true,
+      "note": "Paving/open area and tree grouping visible; tree-off view exposes two planting holes."
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-final/before/arts-court-paving-trees-on-day.png",
+      "sha256": "1387b933414409e2b3b2d219a0773f6f92ff2e9cb99464618d057198c01efdc9",
+      "reviewMethod": "byte-identical to individually inspected initial image",
+      "visibleTrees": true,
+      "note": "Paving/open area and tree grouping visible; tree-off view exposes two planting holes."
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-final/after/arts-court-layout-trees-on-day.png",
+      "sha256": "353f1306a1a356adb68f981a36950551eba06cdaf0a8ab2e1784fb1b9616dea2",
+      "reviewMethod": "original image inspected",
+      "visibleTrees": true,
+      "note": "Paving/open area and tree grouping visible; tree-off view exposes two planting holes."
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-final/after/arts-court-paving-trees-on-day.png",
+      "sha256": "2ac4bcc3a4974e61c2bfd68ce53b24e07957a64ba01ae2aef989395c2594285c",
+      "reviewMethod": "byte-identical to individually inspected initial image",
+      "visibleTrees": true,
+      "note": "Paving/open area and tree grouping visible; tree-off view exposes two planting holes."
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-final/after/arts-court-paving-trees-off-day.png",
+      "sha256": "db9a930e3d43368488d068be4f3eec7de10f8b28d272ceafeb18608648218659",
+      "reviewMethod": "byte-identical to individually inspected initial image",
+      "visibleTrees": false,
+      "note": "Paving/open area and tree grouping visible; tree-off view exposes two planting holes."
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-final/after/arts-court-layout-trees-on-night.png",
+      "sha256": "c8519db3d44b9f0be2498e5da11794b6502e3fefd266ee42ffaf8a17ab642477",
+      "reviewMethod": "byte-identical to individually inspected initial image",
+      "visibleTrees": true,
+      "note": "Paving/open area and tree grouping visible; tree-off view exposes two planting holes."
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-final/after/arts-court-layout-trees-on-day-mobile.png",
+      "sha256": "4b70e788e30933c03b016c945bd49954c8930711d41e433b1e7912bf2df0c185",
+      "reviewMethod": "original image inspected",
+      "visibleTrees": true,
+      "note": "Final mobile smooth profile visibly retains both courtyard trees."
+    }
+  ],
+  "mobileInitialFailure": "Initial smooth mobile view hid appended courtyard trees; final priority ordering restores both without increasing per-sector counts.",
+  "initialReport": "s4-courtyard-close-context-browser.json",
+  "finalReport": "s4-courtyard-final-context-browser.json",
+  "notMeasured": "Photos do not establish surveyed tree positions, courtyard elevation, or complete building facades; static screenshot FPS is not the activity benchmark."
+}

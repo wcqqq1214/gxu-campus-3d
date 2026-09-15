@@ -1,0 +1,118 @@
+{
+  "date": "2026-09-15",
+  "siteId": "arts-east-courtyard",
+  "boundedEstimatedCourtyardPilotAccepted": true,
+  "wholeSiteAccepted": false,
+  "wholePlanAccepted": false,
+  "wholeBuildingsAdded": 0,
+  "partialBuildingRecords": 12,
+  "performance": [
+    {
+      "tier": "精细",
+      "fps": [
+        60,
+        60,
+        60
+      ],
+      "medians": {
+        "medianFPS": {
+          "baseline": 60,
+          "current": 60,
+          "changePercent": 0.0
+        },
+        "medianTriangles": {
+          "baseline": 4014819,
+          "current": 4143697,
+          "changePercent": 3.210057539331168
+        },
+        "medianDrawCalls": {
+          "baseline": 537,
+          "current": 552,
+          "changePercent": 2.7932960893854775
+        }
+      },
+      "numericalBudgetPassed": true
+    },
+    {
+      "tier": "流畅",
+      "fps": [
+        27,
+        28,
+        30
+      ],
+      "medians": {
+        "medianFPS": {
+          "baseline": 30,
+          "current": 28,
+          "changePercent": -6.666666666666665
+        },
+        "medianTriangles": {
+          "baseline": 1053826,
+          "current": 1123357,
+          "changePercent": 6.597958296720718
+        },
+        "medianDrawCalls": {
+          "baseline": 269,
+          "current": 289,
+          "changePercent": 7.434944237918217
+        }
+      },
+      "numericalBudgetPassed": true
+    }
+  ],
+  "performanceComparison": {
+    "baseline": "docs/model-checks/refinement/s5-perf-20260915-baseline-browser.json",
+    "current": "docs/model-checks/refinement/s4-courtyard-performance-browser.json",
+    "context": "docs/model-checks/refinement/s4-courtyard-performance-performance-context.json",
+    "sameDeviceBrowserViewportAndProtocol": true,
+    "baselineReplayedAgainThisBatch": false,
+    "normalDesktopConditionsAccepted": true,
+    "processSamples": 24,
+    "manualAssessment": "All owned geometry/build tasks finished before activity measurement. 24 snapshots show no external Python/Blender work; only two short CPU samples of the browser runner Node process. Accepted as normal desktop regression, not isolated GPU/CPU or identical thermal/power conditions.",
+    "scope": "Fixed library activity camera; mobile viewport screenshots are visual checks, not physical phone performance."
+  },
+  "tests": {
+    "pythonFullSuite": 119,
+    "pythonSubsequentPriorityTests": 1,
+    "javascriptSuite": 56,
+    "typecheck": true,
+    "lint": true,
+    "pages": true
+  },
+  "geometryEvidenceSha256": {
+    "docs/model-checks/refinement/s4-courtyard-triangulated-geometry.json": "ac95862bcb6d31e8389e6f779d52a8395a54051fb998c3e709907597fd6bd0f1",
+    "docs/model-checks/refinement/s4-courtyard-source-preservation.json": "21e25b1237e41bc115d547ae5efe083fc980c0d5a47b7e031f9511ce4180ba0c",
+    "docs/model-checks/refinement/s4-courtyard-assets.json": "f07b60e553ad7817b8c9b8c40f98cc77c9f88f5ab24728092d0b1776b24e72ef",
+    "docs/model-checks/refinement/s4-courtyard-trees-geometry.json": "b23aec8c775686228a35638a94ac60f16d82b6f59b4cf3cea6df8ec51cec381b",
+    "docs/model-checks/refinement/s4-courtyard-priority-preservation.json": "990d900b6026e26e517ba83050366633fcb34d5a8fd1924528bc9ed8e44ce160",
+    "docs/model-checks/refinement/s4-courtyard-visual-review.json": "3e125e9d995d1c50d19610bdd804dc7b2c56ba7b2425f17e798713fda1fe6e59",
+    "docs/model-checks/refinement/s4-courtyard-incremental-assets.json": "0a2a40008c29e7a2db752b85c0e6cfbe9ec25a1fadd6a9781d8265e443195f42",
+    "docs/model-checks/refinement/s4-courtyard-incremental-final-geometry.json": "641083497855e9761b9b32e87b10e71c49bf03998ee18e7239fbb19d2265ee42"
+  },
+  "implementationSha256": {
+    "data/site-overrides.json": "6ce63ea4f1352fa10e2b052a8a78ca37f4ba419d1781a73540b7013d7afcdc43",
+    "data/sources.json": "43bf6ac17a16c46d30d238afdfff4b27bf9f58adc8c50005ea6d01ceb9f92981",
+    "scripts/courtyard_data.py": "6bc906385e64974c9bf0b37bb2e0e07b7c858e5d4128f893a329662bc3db78ce",
+    "scripts/site_data.py": "c0994a29e2d38e1166de280bf1179b4a694e1caafe1d985e13108dd3f5f4a35d",
+    "scripts/vegetation_data.py": "efa490c32e89b0d6e8bf09a974112b8fa54176e42634a94a9f942337be9c9a13",
+    "scripts/vegetation_exclusions.py": "8d314d00659459353063e8ca9abec3862280dd7dedf58afcc7d18b940ced6a80",
+    "scripts/vegetation_priorities.py": "48e866549f243b1e4131b3006547aab97bc82f8bf3c3ada1ecfb7ce1cc3436d5",
+    "scripts/low_planting_data.py": "bc201a0f7242db06d7b49a9c915fc3977cbdda228bf8d2a4012b13b31ae5646d",
+    "blender/courtyard.py": "6d2239a3ce966b99e698d396235df281381fb6ea1e3294ee082420f00e760634",
+    "blender/site_geometry.py": "b199bcc884e8fc15b1a68b38380ea923023feba126d58b3bfc5be9be7dd47b78",
+    "blender/build_campus.py": "8e13721368a298eac28bb6cc05b825060ba3a638d2c9f426260faa601ba1f691",
+    "lib/campus/vegetation.ts": "d2597a6f52f19d1a58983bf45d859d3ed9d790a3f44a76e0797c8d315eecc88e",
+    "lib/campus/scene.ts": "1a8b3606a1b4fe583f427ee369c7d34e380f22a372eec04308254cfd4543c49e",
+    "public/data/models.json": "4ab140c462ea9b0bfb1509bada5f181ff8347b6cb6b5169122cec3d0963db5cd",
+    "public/data/sites.json": "7308a9aecee26a7b5191af6cd30f6f057ef8518b1d9dce652540c8ab5a79d960",
+    "public/data/vegetation.json": "82cc9988d641ad307ccffcf73f8fa9308f3c7e857cfe983da2f9c256b4625b26",
+    "blender/gxu-campus.blend": "4dc2540ce47a7a80def3495de4263738ed5c6aa04a2b26887dd7a14843706a95",
+    "public/models/base.glb": "7ad7163c898169c48b0cc22a1a6a23ccc3d910eba5621c49963afb21dcfc5912"
+  },
+  "remaining": [
+    "20–30 ordinary whole buildings",
+    "Six required library neighbours and full site",
+    "Courtyard entrance/road connections and measured elevation",
+    "Lakeside vegetation and remaining S4/S5"
+  ]
+}

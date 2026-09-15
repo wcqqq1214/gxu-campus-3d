@@ -120,6 +120,7 @@ def prepare_vegetation(root=ROOT):
     from vegetation_exclusions import INPUT_NAMES, final_ground_exclusions
     from vegetation_reservations import INPUT_NAMES as RESERVATION_INPUTS, final_crown_reservations
     from vegetation_avenues import derive_avenues, apply_avenues
+    from courtyard_data import apply_courtyards
     out = root / 'public/data'
     read = lambda name: json.loads((out / name).read_text())
     zones = load_zones(root)
@@ -127,9 +128,10 @@ def prepare_vegetation(root=ROOT):
     roads = read('campus-roads.json')
     sites = read('sites.json')['sites']
     masks = {('campus-roads', roads['lawn']['osmId']): Polygon(roads['lawn']['polygon'])}
-    masks.update({('sites', s['id']): Polygon(s['pavingPolygon']) for s in sites})
+    masks.update({('sites', s['id']): Polygon(s['pavingPolygon'], s.get('pavingHoles', [])) for s in sites})
     trees = read('vegetation.json')
     candidates, avenue_records = apply_avenues(trees, derive_avenues(root))
+    candidates, courtyard_records = apply_courtyards(candidates, sites)
     context = {name: read(name+'.json') for name in dict.fromkeys(INPUT_NAMES+RESERVATION_INPUTS)}
     ground_kept, ground_report = final_ground_exclusions(candidates, context)
     reserved_kept, reservation_report = final_crown_reservations(ground_kept, context)
@@ -137,12 +139,19 @@ def prepare_vegetation(root=ROOT):
     kept_positions = {tuple(t[:2]) for t in kept}
     for avenue in avenue_records:
         avenue['retainedCandidates'] = [t for t in avenue['candidates'] if tuple(t[:2]) in kept_positions]
+    for court in courtyard_records:
+        court['retainedCandidates'] = [t for t in court['candidates'] if tuple(t[:2]) in kept_positions]
+        area = Polygon(court['openAreaPolygon'])
+        court['remainingCrownConflicts'] = sum(area.distance(Point(t[:2])) <= 4*t[2]/9+1 for t in kept)
+        if court['remainingCrownConflicts']:
+            raise ValueError('Final tree crown intrudes into courtyard activity area')
     records = [{**z, 'polygon': list(masks[(z['stage'], z['maskRef'])].exterior.coords),
                 'remainingCrownConflicts': sum(masks[(z['stage'], z['maskRef'])].distance(Point(t[:2])) <= 4*t[2]/9+1 for t in kept)} for z in zones]
     overview = read('overview.json'); overview['trees'] = len(kept)
     report = {'schemaVersion': 1, 'zones': records, 'trees': len(kept),
               'removedInFinalPass': len(candidates)-len(kept),
               'avenues': avenue_records,
+              'courtyards': courtyard_records,
               'finalGroundExclusion': ground_report,
               'finalCrownReservations': reservation_report,
               'rotationBasis': 'Position-keyed FNV-1a, decimetres; schematic, not surveyed.',

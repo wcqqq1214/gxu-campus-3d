@@ -86,7 +86,10 @@ def sync_source_sites(base):
 def build_sites(data,C,elevation,terrain,roads):
     meshes={};reports=[]
     for site in data['sites']:
-        if site.get('type') in ('entry-apron','gallery-apron'):
+        if site.get('type') == 'courtyard-paving':
+            from courtyard import build_courtyard
+            terrain,roads,added,rows=build_courtyard(site,C,elevation,terrain,roads)
+        elif site.get('type') in ('entry-apron','gallery-apron'):
             from entry_apron import build_entry_apron
             terrain,roads,added,rows=build_entry_apron(site,C,elevation,terrain,roads)
         elif site.get('type') in ('side-connection','front-connection'):

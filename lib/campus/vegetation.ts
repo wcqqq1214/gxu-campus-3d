@@ -31,3 +31,17 @@ export function treeGroundHeight(terrain: TreeTerrain, x: number, y: number): nu
 export function treeElevation(row: number[], terrain: TreeTerrain): number {
   return Number.isFinite(row[4]) ? row[4] : treeGroundHeight(terrain, row[0], row[1]);
 }
+
+/** Stable partition inside each existing template/sector budget. Sourced groups
+ * must not vanish merely because preparation appends them after background trees.
+ * Counts, transforms and the background's relative order stay unchanged.
+ */
+export function prioritizeTreeRows(rows: number[][], positions: number[][]): number[][] {
+  const keys = new Set(positions.map(([x, y]) => `${x},${y}`));
+  if (!keys.size) return rows;
+  const priority: number[][] = [], background: number[][] = [];
+  for (const row of rows) {
+    (keys.has(`${row[0]},${row[1]}`) ? priority : background).push(row);
+  }
+  return [...priority, ...background];
+}

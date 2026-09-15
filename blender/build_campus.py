@@ -49,6 +49,13 @@ if sites['roadRevision']!=hashlib.sha256(json.dumps(campus_roads['layers'],separ
     raise RuntimeError('Site road boundary is stale; run the full data preparation')
 for site in sites['sites']:
     building=next(b for b in buildings if b['id']==site['buildingId'])
+    if site.get('type')=='courtyard-paving':
+        revisions={site['buildingId']:site['footprintRevision'],**site['contextRevisions']}
+        for ident,revision in revisions.items():
+            other=next((b for b in buildings if b['id']==ident),None)
+            if not other or revision!=hashlib.sha256(json.dumps(other['polygons'],separators=(',',':')).encode()).hexdigest():
+                raise RuntimeError('Courtyard building anchors are stale; run site preparation')
+        continue
     if site.get('type')=='gallery-apron':
         facade=next((f for f in building.get('form',{}).get('facades',[]) if all(f.get(k)==v for k,v in site['facade'].items())),None)
         if site['footprintRevision']!=hashlib.sha256(json.dumps(building['polygons'],separators=(',',':')).encode()).hexdigest() or facade!=site['resolvedFacade']:
@@ -337,6 +344,8 @@ def export(name,groups):
 sizes={};sizes['base.glb']=export('base.glb',base)
 if BASE_ONLY:
     manifest=json.loads((DATA/'models.json').read_text())
+    from vegetation_priorities import priority_positions
+    manifest['treePriorityPositions']=priority_positions(json.loads((DATA/'vegetation-zones.json').read_text()),trees)
     if {z['id'] for z in manifest['zones']}!=set(near):raise RuntimeError('Chunk layout changed; run a full build before --base-only')
     manifest['base'].update(bytes=sizes['base.glb'],sha256=hashlib.sha256((MODELS/'base.glb').read_bytes()).hexdigest())
     (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
@@ -362,6 +371,8 @@ for o in low_templates:
 (DATA/'landmarks.json').write_text(json.dumps(landmarks,ensure_ascii=False,separators=(',',':')))
 manifest={'version':2,'chunkSizeMeters':CHUNK_METERS,'units':'meters','axes':{'x':'east','y':'up','z':'south'},'base':{'url':'models/base.glb','bytes':sizes['base.glb']},'trees':{'url':'models/trees.glb','bytes':(MODELS/'trees.glb').stat().st_size},'treesNear':{'url':'models/trees-near.glb','bytes':(MODELS/'trees-near.glb').stat().st_size},'zones':[{'id':k,'url':f'models/{k}.glb','bytes':sizes[k+'.glb'],'featureIds':zoneids[k],'bounds':chunkbounds[k]} for k in sorted(near)],'landmarks':[{'id':l['id'],'url':f"models/{l['id']}.glb",'bytes':sizes[l['id']+'.glb']} for l in landmarks]}
 manifest['infrastructure']=[{'id':c['id'],'url':f"models/{c['id']}.glb",'bytes':sizes[c['id']+'.glb'],'bounds':c['bounds'],'layer':'roads'} for c in infrastructure['chunks']]
+from vegetation_priorities import priority_positions
+manifest['treePriorityPositions']=priority_positions(json.loads((DATA/'vegetation-zones.json').read_text()),trees)
 for entry in [manifest['base'],manifest['trees'],manifest['treesNear']]+manifest['zones']+manifest['landmarks']+manifest['infrastructure']:
     entry['sha256']=hashlib.sha256((ROOT/'public'/entry['url']).read_bytes()).hexdigest()
 (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
