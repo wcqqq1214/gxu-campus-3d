@@ -473,3 +473,5 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 新增第19条普通楼部分对象校准：`relation/11564999`由类型默认5层改为设计院记载的最高地上11层。设计建筑高度48.9米暂换算成48.1米主体加既有0.8米示意女儿墙，主体和均分层高仍标为估算，保留三个原映射内院。仅本楼源对象与对应基础/近景区块变化，单一挤出体尚未拆分低门廊、连廊与退台，不提高整栋验收完成数。[资料、前后图与局限](MATERIALS_BUILDING_HEIGHT.md)。
 
 2026-09-16：开放柱廊可通过 `openBelow.slattedRoof` 生成透空梁顶。`scripts/slatted_roof_data.py` 校验近直角四边形、梁宽/梁数、最小净空和柱梁对位；Blender 使用同一 `roofGeometry` 生成顶、底和侧面，跳过该段普通女儿墙。资环材学院以共享顶点划分高主体与低框架，两级模型均保留八个几何开孔。详见[框架专项](MATERIALS_BUILDING_FRAME.md)。
+
+2026-09-16：显式入口新增或外扩前，运行 `scripts/audit_entry_road_context.py --report <报告路径>`；候选可用 `--proposal <含buildingId和proposalEntry的JSON>` 检查。平面重叠需先核对定位和层级，不能仅靠通过专用道路网格检查或抬高模型放行。资环材学院被撤回的试制说明见[约束核查](MATERIALS_ENTRY_CONSTRAINTS.md)。
