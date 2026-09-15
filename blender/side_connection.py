@@ -11,9 +11,9 @@ def build_side_connection(site,C,elevation,terrain,roads):
     angle=site['angle'];cs,sn=math.cos(angle),math.sin(angle);ox,oy=site['origin']
     def world(x,y):return ox+x*cs-y*sn,oy+x*sn+y*cs
     origin_z=elevation(*site['buildingCenter'])+site['stairBaseHeight']
-    front=site.get('type')=='front-connection'
+    front=site.get('type') in ('front-connection','canopy-connection')
     columns=site['columns'];ys=[p[0] if front else p[1] for p in columns]
-    half=site['entry']['stairFlight' if front else 'attachedPortico']['width']/2
+    half=site['halfWidth'] if 'halfWidth' in site else site['entry']['stairFlight' if front else 'attachedPortico']['width']/2
     road=BVHTree.FromPolygons(roads.v,[ids for ids,_ in mesh_triangles(roads)],all_triangles=True)
     ground=BVHTree.FromPolygons(terrain.v,[ids for ids,_ in mesh_triangles(terrain)],all_triangles=True)
     heights=[]
@@ -26,9 +26,13 @@ def build_side_connection(site,C,elevation,terrain,roads):
         y=max(ys[0],min(ys[-1],y));i=min(len(ys)-2,max(0,bisect.bisect_right(ys,y)-1));t=(y-ys[i])/(ys[i+1]-ys[i])
         axis=1 if front else 0
         return columns[i][axis]*(1-t)+columns[i+1][axis]*t,heights[i]*(1-t)+heights[i+1]*t
+    def start_at(x):
+        if 'startColumns' not in site:return site['startY']
+        a,b=site['startColumns'];t=(x-a[0])/(b[0]-a[0])
+        return a[1]*(1-t)+b[1]*t
     def point(x,y):
         if front:
-            end,h=road_end(x);t=min(1,max(0,(y-site['startY'])/(end-site['startY'])))
+            end,h=road_end(x);start=start_at(x);t=min(1,max(0,(y-start)/(end-start)))
         else:
             end,h=road_end(y);lead=min(site['leadDistance'],max(0,y-site['startY']))
             t=min(1,max(0,(max(0,-x-half)+lead)/(-end-half+lead)))
@@ -49,7 +53,7 @@ def build_side_connection(site,C,elevation,terrain,roads):
     sides=Mesh();ring=site['localPolygon']
     for a,b in zip(ring,ring[1:]):
         # Leave both real connections open: staircase base and mapped footway.
-        if abs(a[1]-site['startY'])<1e-6 and abs(b[1]-site['startY'])<1e-6:continue
+        if abs(a[1]-start_at(a[0]))<1e-6 and abs(b[1]-start_at(b[0]))<1e-6:continue
         if front:
             if abs(a[1]-road_end(a[0])[0])<1e-6 and abs(b[1]-road_end(b[0])[0])<1e-6:continue
         elif abs(a[0]-road_end(a[1])[0])<1e-6 and abs(b[0]-road_end(b[1])[0])<1e-6:continue

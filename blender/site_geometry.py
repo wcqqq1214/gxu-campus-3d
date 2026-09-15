@@ -92,7 +92,7 @@ def build_sites(data,C,elevation,terrain,roads):
         elif site.get('type') in ('entry-apron','gallery-apron'):
             from entry_apron import build_entry_apron
             terrain,roads,added,rows=build_entry_apron(site,C,elevation,terrain,roads)
-        elif site.get('type') in ('side-connection','front-connection'):
+        elif site.get('type') in ('side-connection','front-connection','canopy-connection'):
             from side_connection import build_side_connection
             terrain,roads,added,rows=build_side_connection(site,C,elevation,terrain,roads)
         else:terrain,roads,added,rows=build_single_site({'sites':[site]},C,elevation,terrain,roads)
