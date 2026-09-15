@@ -76,7 +76,7 @@ def prepare_low_planting(root=ROOT):
                    for m in crown_reservations(data)]
     from vegetation_data import load_zones
     zone_shapes = {('campus-roads', data['campus-roads']['lawn']['osmId']):Polygon(data['campus-roads']['lawn']['polygon'])}
-    zone_shapes.update({('sites', s['id']):Polygon(s['pavingPolygon']) for s in data['sites']['sites']})
+    zone_shapes.update({('sites', s['id']):Polygon(s['pavingPolygon'], s.get('pavingHoles', [])) for s in data['sites']['sites']})
     open_zones = [(z['id'], zone_shapes[(z['stage'], z['maskRef'])]) for z in load_zones(root)]
     geo = read_json(out / 'geography.geojson')
     campus = transform(project, shape(next(f['geometry'] for f in geo['features'] if f['id'] == 'campus')))
