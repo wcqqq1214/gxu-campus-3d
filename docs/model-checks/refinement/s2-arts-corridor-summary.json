@@ -1,0 +1,122 @@
+{
+  "passed": true,
+  "baseCommit": "2a9eae391ce5079289c7ca36ad9e5a7655907bf8",
+  "branch": "dev",
+  "scope": "Arts annex east-end open corridors and eight explicit openings; correct shared corridor face directions in three buildings. Photo-constrained estimates; no new whole-building acceptance",
+  "partialObjectRecords": 16,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 135,
+  "geometryChecks": [
+    "all-geometry",
+    "stair-geometry",
+    "animal-geometry",
+    "normals-geometry",
+    "synthetic-geometry",
+    "trees-geometry",
+    "geometry",
+    "source-preservation",
+    "surface-preservation",
+    "assets",
+    "incremental-assets",
+    "incremental-geometry",
+    "incremental-normals-geometry",
+    "visual-review"
+  ],
+  "negativeControl": "Old annex has solid window wall; prior math-center source and pre-fix annex generator have reversed corridor surfaces",
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4148916,
+        "medianDrawCalls": 556
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.208919580489167,
+        "medianDrawCalls": 1.645338208409508
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        28,
+        28,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1126196,
+        "medianDrawCalls": 290
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 7.058448873277601,
+        "medianDrawCalls": 10.2661596958175
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "baselineReused": true,
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "currentPerformanceReport": "s2-arts-corridor-performance-browser.json",
+  "fingerprints": {
+    "blender/facade_corridors.py": "6f89b1532c8b0c5af651354d597803533aef7a2e5931e090fd215c0633636d46",
+    "blender/generic_buildings.py": "bed1e1a8a62a1605c7c6eed09d92cca41f8b285283ec7707aba980efeb62a17b",
+    "blender/validate_arts_corridor.py": "39737fb382a7b4343954267ed05a42738fe2440231bd32822a164535a19577ca",
+    "blender/test_corridor_normals.py": "b63abe78f1bd0b8194d3fb6a50ad8a61c07ff922228ad8e80e910c01a172487c",
+    "blender/validate_corridor_normals.py": "33b3e7bc934e9f0f3342afdc2849be971e4e61820ad23bb0e4354a9161e984f5",
+    "scripts/building_overrides.py": "f19ae5e1bd92edb6d2e606c66747f2a0f5671995f8ba925e8f2e60dd31cb4c77",
+    "scripts/corridor_detail_data.py": "3a87f0e645bca6b310e8e49fb87fb7c1978dec1aefc567a9f15fdc85e95cd2e8",
+    "scripts/test_corridor_detail_data.py": "1f58737ee78b07f8c8d8a10bb55a44b499b193b5df5a5fa94db9159b6694ed6b",
+    "data/building-overrides.json": "4da75439f3dfa339cbfa6726f6857130e22397fac4c46a3b4b51815e90ab2ab7",
+    "blender/gxu-campus.blend": "bd9624f72ea0493689fcdf63ca2fa992e4b4f34f872e0f65ab6c19c9e1bdd0fe",
+    "public/data/models.json": "ed47d28a91a8b8345ceb8e8ee88dfde0b8ad9e427e5da5db85255094ee40607c"
+  },
+  "performanceConditions": "Reused same-day current-OS S0. All 24 CPU snapshots have no Python/Blender process above the 2% capture threshold; normal desktop workload remains. No claim of exclusive-device or thermal equivalence.",
+  "faceDirectionCombinations": 24,
+  "negativeControlReports": [
+    "s2-arts-corridor-before-model-geometry.json",
+    "s2-arts-corridor-before-normal-fix-geometry.json",
+    "s2-arts-corridor-previous-normals-geometry.json"
+  ]
+}

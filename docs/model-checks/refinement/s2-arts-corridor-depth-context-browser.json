@@ -1,0 +1,117 @@
+{
+  "capturedAt": "2026-09-15T20:08:08.727Z",
+  "method": "UI layer controls; same frontend; before public assets served by local Playwright route fulfillment. Trees are visible in before/after views; a tree-off state checks the underlying scene.",
+  "states": [
+    {
+      "variant": "before",
+      "file": "docs/screenshots/refinement/s2-arts-corridor-depth/before/arts-east-depth-trees-on-day.png",
+      "camera": {
+        "id": "arts-east-depth",
+        "position": [
+          451,
+          34,
+          124
+        ],
+        "target": [
+          418,
+          9,
+          116
+        ],
+        "span": 14
+      },
+      "trees": true,
+      "light": "day",
+      "mobile": false,
+      "representation": "fine-tree-profile",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "readyMs": 370,
+        "heapMiB": 106,
+        "fps": 13,
+        "triangles": 3140155,
+        "drawCalls": 184,
+        "geometries": 465,
+        "textures": 22,
+        "pixelRatio": 1,
+        "quality": "精细",
+        "automaticQualityLevel": 0,
+        "shadows": true,
+        "nearTrees": true,
+        "detailBudgetMiB": 64,
+        "loadedBytes": 8363660,
+        "loadedDetails": [
+          "infra-lake-bridge-845251806",
+          "infra-lake-bridge-822812181",
+          "chunk-p1-n1",
+          "chunk-p0-n1",
+          "chunk-p0-p0"
+        ],
+        "queuedDetails": 0,
+        "residentDetailBytes": 3261572,
+        "detailGeometryMiB": 31.2
+      },
+      "manifestSha256": "3af50d58d8935dad1679591072cdf70c1a84a6193f2f2b5b4f7c65a6464c1c5a",
+      "baseModelSha256": "274d74e728d87a9398280919aa4788a6e113673f254cb3af3e7f63df5cf0a86a"
+    },
+    {
+      "variant": "after",
+      "file": "docs/screenshots/refinement/s2-arts-corridor-depth/after/arts-east-depth-trees-on-day.png",
+      "camera": {
+        "id": "arts-east-depth",
+        "position": [
+          451,
+          34,
+          124
+        ],
+        "target": [
+          418,
+          9,
+          116
+        ],
+        "span": 14
+      },
+      "trees": true,
+      "light": "day",
+      "mobile": false,
+      "representation": "fine-tree-profile",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "metrics": {
+        "readyMs": 294,
+        "heapMiB": 107,
+        "fps": 7,
+        "triangles": 3140579,
+        "drawCalls": 184,
+        "geometries": 465,
+        "textures": 22,
+        "pixelRatio": 1,
+        "quality": "精细",
+        "automaticQualityLevel": 0,
+        "shadows": true,
+        "nearTrees": true,
+        "detailBudgetMiB": 64,
+        "loadedBytes": 8370524,
+        "loadedDetails": [
+          "infra-lake-bridge-822812181",
+          "infra-lake-bridge-845251806",
+          "chunk-p1-n1",
+          "chunk-p0-n1",
+          "chunk-p0-p0"
+        ],
+        "queuedDetails": 0,
+        "residentDetailBytes": 3264540,
+        "detailGeometryMiB": 31.2
+      },
+      "manifestSha256": "1cc741d57db91da1062aea436e321148da71a9dfbcdd11e91ee3867b3e2c4643",
+      "baseModelSha256": "471264a086b0930700fa20f82ae8a4461537d429647017ba6f9702934e88f02a"
+    }
+  ],
+  "errors": [],
+  "completed": true,
+  "acceptance": "Exploratory screenshots before correcting corridor face orientation; retained as observation, superseded by final views."
+}
