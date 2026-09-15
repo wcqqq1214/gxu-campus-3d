@@ -75,6 +75,11 @@ def samples(b):
         return points
     for e in form['entrances']:
         x,y=e['center'];a=math.radians(e['bearing']);nx,ny=math.sin(a),math.cos(a)
+        if 'flushEntrance' in e:
+            p=e['flushEntrance'];expected=z+p['floorHeight']+p['doorHeight']+p['frameWidth']/2
+            points.append({'kind':'flush-door-header','x':x+nx*.13,'y':y+ny*.13,
+                           'top':expected+.2,'expected':expected})
+            continue
         if 'shelter' in e:
             # This building owns the doorway; a separate mapped roof owns
             # its floor and canopy. Probe its stone header below that soffit.

@@ -12,6 +12,9 @@ def add_panels(mesh, facade, z, C):
     for p in facade['rule'].get('panels', []):
         w = (p['to']-p['from'])*length; h = p['top']-p['bottom']; fw = p['frameWidth']
         x, y = point((p['from']+p['to'])/2, .025)
+        if p['type']=='solid':
+            mesh.box(x,y,z+(p['bottom']+p['top'])/2,w,p['depth'],h,C['white'],theta)
+            continue
         mesh.box(x, y, z+(p['bottom']+p['top'])/2, w, .03, h,
                  C['glass'] if p['type']=='glazing' else C['dark'], theta)
 
