@@ -726,3 +726,7 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 2026-09-16 临湖外楼梯：本批新增 `blender/test_stair_tower.py` 小样与 `blender/validate_arts_stair.py` 实际源/基础/近景专项，覆盖60级踏步、净空、侧向留空、顶棚、平台和附楼门口；全量建筑、树木及既有西入口/庭院回归通过。 详见[参数与验收记录](ARTS_LAKESIDE_STAIR.md)。
 
 2026-09-16：新增端面专项与所有外廊法线专项。距离命中不足以证明面方向正确，必须同时检查射线法线；24组正反边方向与转角小样及三栋源/基础/近景已通过。 详见[临湖端面与法线修复](ARTS_LAKESIDE_FACADE.md)。
+
+## 办公南楼逐层高度（2026-09-16）
+
+142项Python测试、56项Node测试、类型/lint/生产构建及普通建筑与树冠检查通过。`blender/validate_office_south.py`检查源、基础和近景的20.4米主体及五层非等距窗带，并保留旧高度与平均分层反例。仅一栋楼改变，首屏增加288 bytes；详细证据见[专项记录](OFFICE_SOUTH_STOREYS.md)。
