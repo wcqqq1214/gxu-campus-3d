@@ -462,4 +462,6 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 
 ## 普通建筑逐层高度（2026-09-16）
 
-`data/building-overrides.json`可用`floorHeights`代替统一层高。未分段主体的基础和近景窗层按累计高度生成；层数、显式总高与层高表必须一致。目前拒绝与分段、外廊、专项窗格等尚采用等层高假设的布局混用。实际使用和边界见[办公南楼校准](OFFICE_SOUTH_STOREYS.md)。
+`data/building-overrides.json`可用`floorHeights`代替统一层高。基础和近景窗层按累计高度生成；层数、显式总高与层高表必须一致。分段可从同一地面基准取前 N 层，分段高度必须等于对应层高之和；外廊、专项窗格等仍采用等层高假设的布局继续拒绝混用。实际使用和边界见[办公南楼校准](OFFICE_SOUTH_STOREYS.md)。
+
+低门厅可用 `openBelow.columns[].shape: cylinder` 表达圆柱，直径由相等的 `width` / `depth` 给出，基础和近景共享 16 边截面。入口台阶宽度限制在所属低门厅实际占据的原轮廓边区间。见[办公南楼门厅](OFFICE_SOUTH_ENTRY.md)。
