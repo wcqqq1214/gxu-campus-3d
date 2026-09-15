@@ -479,6 +479,8 @@ def resolve_building(building, record=None, source_ids=None):
     if 'parts' in record:
         form['parts'] = resolve_parts(b, record['parts'], form['roof'])
     if 'entrances' in record:
+        if not isinstance(record['entrances'],list):
+            raise ValueError('Entrances must be an explicit list')
         entrances = []; ids = set()
         for e in record['entrances']:
             required = {'id','polygon','ring','edge','t','width','primary'}
@@ -549,7 +551,12 @@ def resolve_building(building, record=None, source_ids=None):
             elif 'stepBaseHeight' in e:
                 raise ValueError('Step base requires a recessed entrance')
             entrances.append(resolved)
-        if not entrances or sum(e['primary'] for e in entrances)!=1:
+        # A separately mapped, explicitly supported roof is a canopy, not a
+        # room with its own door. Ordinary enclosed buildings still need one
+        # primary entrance; an empty list must never silently hide that gap.
+        open_roof = (tags.get('building') == 'roof' and bool(form['parts'])
+                     and all('openBelow' in p for p in form['parts']))
+        if (not entrances and not open_roof) or (entrances and sum(e['primary'] for e in entrances)!=1):
             raise ValueError('Exactly one primary entrance is required')
         form['entrances']=entrances
     if 'parts' in record or 'facadeRules' in record:
