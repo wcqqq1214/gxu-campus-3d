@@ -1,0 +1,27 @@
+{
+  "siteId": "office-north-front-connection",
+  "scope": "Actual source/base path width, stair or flush threshold, mapped road plane/contact, clear ground and unchanged ground outside the connector. Dimensions remain estimates.",
+  "passed": false,
+  "source": {
+    "pavingSamples": 623,
+    "minimumGroundClearance": 0.1199798583984375,
+    "outsideTerrainSamples": 1536,
+    "closedPortalEnvelopeDepth": 0.25,
+    "approachObstructionStart": 0.275,
+    "maximumOutsideTerrainError": 3.0517578125e-05,
+    "thresholdOffsetRange": [
+      -0.0030416870117186967,
+      -0.0029577636718749467
+    ],
+    "maximumContactRoadPlaneError": 1.52587890625e-05,
+    "maximumRoadJoinStepPer2cm": 0.00116729736328125,
+    "measuredMaterialGapUpperBounds": [],
+    "passed": true
+  },
+  "failure": "('footway join step', 0.11295318603515625, (-1.7600000000000002, 35.71573138970662, 4.606391906738281, 4.7193450927734375))",
+  "fingerprints": {
+    "blender/gxu-campus.blend": "17a711cc949aedc495cbe39eee37764b2cc5d7bef2e812f5868b0d44d1ea73bf",
+    "public/models/base.glb": "f9293d94847a9322b6142fc94af5f87570cacdbbcc08f2eaf8d51416d3ee99b2",
+    "public/data/models.json": "4e28b81e4e4c1458cbbe7d0f18cdba4cbb7981b7295242b0c673f8d2fb1a5eaa"
+  }
+}
