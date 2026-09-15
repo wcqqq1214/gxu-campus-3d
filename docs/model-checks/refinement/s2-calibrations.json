@@ -1,6 +1,108 @@
 {
   "buildings": [
     {
+      "id": "way/671978896",
+      "name": "办公北楼",
+      "before": {
+        "height": 9.899999999999999,
+        "levels": 3.0
+      },
+      "after": {
+        "height": 13.2,
+        "levels": 4.0
+      },
+      "calibration": {
+        "schemaVersion": 1,
+        "footprintRevision": "357568dd98742e237fa5d3bf2a554e33cabbd8651d42425066531ad63cfb5e78",
+        "evidence": {
+          "levels": {
+            "status": "confirmed",
+            "sourceRefs": [
+              "gxuDonationProjects"
+            ],
+            "note": "校方捐赠项目册PDF第35页（印刷第31页）办公北楼具名条目明确4层，替代整栋按服务建筑默认3层；4层用于最高中央体量，不扩展为所有翼楼均4层。资料为历史项目册，照片拍摄日期及2026年变化未确认。"
+          },
+          "parts": {
+            "status": "estimated",
+            "sourceRefs": [
+              "gxuDonationProjects",
+              "osm"
+            ],
+            "note": "具名照片支持中央门厅4层、可见两侧翼3层。北侧外环第1边约17.994米宽凸部对应高门厅；西南侧网络大楼在照片后方偏右，与北向立面关系一致。中央体量两侧边沿原第0/2边延伸到原第7边所在后墙，分界深度约20.96米为地图约束估算，未取得屋顶测绘；两侧及后部其余轮廓保留3层。全部部分严格覆盖原轮廓。采用3.3米估算层高，即中央13.2米、侧翼9.9米，不作实测高度。"
+          },
+          "height": {
+            "status": "estimated",
+            "sourceRefs": [
+              "gxuDonationProjects"
+            ],
+            "note": "采用层数 × 3.3 米估算层高，非测量高度"
+          },
+          "roof.type": {
+            "status": "estimated",
+            "sourceRefs": [
+              "gxuDonationProjects",
+              "osm"
+            ],
+            "note": "同页具名照片可见中央高体量与较低侧翼的平屋面/女儿墙轮廓；沿用flat简化，不推定屋面设备、背部局部小屋顶或檐口精确尺寸。"
+          },
+          "archetype": {
+            "status": "estimated",
+            "sourceRefs": [
+              "osm"
+            ],
+            "note": "按名称、OSM用途和现有形制规则推定"
+          },
+          "floorHeight": {
+            "status": "estimated",
+            "sourceRefs": [],
+            "note": "默认3.3米层高；独立OSM高度存在时不以此覆盖高度"
+          },
+          "roof.rise": {
+            "status": "estimated",
+            "sourceRefs": [],
+            "note": "平屋面屋脊增量为0；有坡屋面但没有屋脊尺寸时采用2.3米展示估算"
+          },
+          "entrances": {
+            "status": "estimated",
+            "sourceRefs": [],
+            "note": "无定位依据，最长外边中点示意入口；不声称朝向正确"
+          },
+          "facadeRules": {
+            "status": "estimated",
+            "sourceRefs": [],
+            "note": "默认窗距和窗尺寸；资料未覆盖的立面继续按类型推定"
+          }
+        },
+        "review": {
+          "levels": {
+            "status": "reviewed",
+            "note": "校方捐赠项目册PDF第35页（印刷第31页）办公北楼具名条目明确4层，替代整栋按服务建筑默认3层；4层用于最高中央体量，不扩展为所有翼楼均4层。资料为历史项目册，照片拍摄日期及2026年变化未确认。"
+          },
+          "height": {
+            "status": "partial",
+            "note": "中央13.2米、侧翼9.9米均由3.3米层高估算，未测量。"
+          },
+          "roof": {
+            "status": "partial",
+            "note": "同页具名照片可见中央高体量与较低侧翼的平屋面/女儿墙轮廓；沿用flat简化，不推定屋面设备、背部局部小屋顶或檐口精确尺寸。"
+          },
+          "parts": {
+            "status": "partial",
+            "note": "具名照片支持中央门厅4层、可见两侧翼3层。北侧外环第1边约17.994米宽凸部对应高门厅；西南侧网络大楼在照片后方偏右，与北向立面关系一致。中央体量两侧边沿原第0/2边延伸到原第7边所在后墙，分界深度约20.96米为地图约束估算，未取得屋顶测绘；两侧及后部其余轮廓保留3层。全部部分严格覆盖原轮廓。采用3.3米估算层高，即中央13.2米、侧翼9.9米，不作实测高度。"
+          },
+          "entrances": {
+            "status": "pending",
+            "note": "照片支持北侧中央门厅，但门洞、檐口、平台与道路连接尚未完成；本批保留显式标为估算的默认入口，不能把其位置视为实景。"
+          },
+          "facadeRules": {
+            "status": "pending",
+            "note": "只校准高低体量；中央标识墙、窗层分格、侧翼和背立面仍为默认示意，未按照片校准。"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
       "id": "way/759080588",
       "name": "轻工与食品工程学院",
       "before": {

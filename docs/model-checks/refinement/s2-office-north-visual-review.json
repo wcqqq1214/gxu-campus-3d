@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "scope": "Only the central four-storey and side three-storey massing; not facade or entrance fidelity",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s2-office-north-views/before/office-north-context-trees-on-day.png",
+      "passed": true,
+      "review": "前后全景可比较：只抬升办公北楼中央凸部一层，南楼和网络楼保持；高低屋面可辨。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-office-north-views/before/office-north-central-trees-on-day.png",
+      "passed": true,
+      "review": "近景可见中央四层与三层侧翼，植被遮住部分底层但未遮住高低轮廓。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-office-north-views/after/office-north-context-trees-on-day.png",
+      "passed": true,
+      "review": "前后全景可比较：只抬升办公北楼中央凸部一层，南楼和网络楼保持；高低屋面可辨。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-office-north-views/after/office-north-central-trees-on-day.png",
+      "passed": true,
+      "review": "近景可见中央四层与三层侧翼，植被遮住部分底层但未遮住高低轮廓。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-office-north-views/after/office-north-central-trees-off-day.png",
+      "passed": true,
+      "review": "关闭植被后可辨完整三层侧翼、四层中央及屋顶交接；默认窗列和未校准入口属于当前限制。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-office-north-views/after/office-north-context-trees-on-night.png",
+      "passed": true,
+      "review": "夜景保持相同高低体量；仅验证已有夜景显示，不将示意亮窗认定为真实夜景。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-office-north-views/after/office-north-context-trees-on-day-mobile.png",
+      "passed": true,
+      "review": "390×844手机尺寸中高低体量仍可辨；对象较小，窗格及入口细节不作验收，非手机真机性能测试。"
+    }
+  ],
+  "limitations": [
+    "入口仍为默认示意，中央标识墙及窗列未复原",
+    "后部体量分界与层高为估算",
+    "手机尺寸构图中的楼栋较小"
+  ]
+}
