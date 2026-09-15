@@ -738,3 +738,9 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 ## 办公南楼柱后玻璃（2026-09-16）
 
 `blender/validate_office_south_glazing.py` 检查可见首交点，覆盖23处玻璃、17处窗框和3处边界外点，同时检查后墙深度和面法线。旧模型在侧窗的材质检查失败；不能靠隐藏在实墙或框架后的玻璃通过。支持 `--generated-only` 快速检查两级生成器，默认检查源文件及实际基础/近景GLB。原柱廊和逐层高度回归继续执行，详见[本批记录](OFFICE_SOUTH_GLAZING.md)。
+
+## 2026-09-16：资环材学院整体尺度
+
+149项Python、56项Node及完整模型、Pages构建通过。430栋普通建筑源文件/实际GLB和3063株树检查通过；其他447栋数据、530个源对象、90个基础节点及67个GLB保持。首屏5,139,956 bytes，最大普通近景1,684,868 bytes。七张楼栋截图与图书馆手机尺寸回归已核看，入口及局部分段仍未验收。
+
+精细60/60/60 FPS、流畅29/29/29 FPS；相对同系统S0，三角形增加3.59%/7.75%，绘制调用增加2.19%/11.03%，均在原预算内。三次LOD往返无错误，24次CPU快照中计时窗口未记录到超过2%阈值的Python/Blender计算。[本批汇总](model-checks/refinement/s2-materials-height-summary.json)，[范围与对照图](MATERIALS_BUILDING_HEIGHT.md)。

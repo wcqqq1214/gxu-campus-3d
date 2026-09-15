@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "baseCommit": "89d4608443908b05ddf063418dc94362a0daedfa",
+  "branch": "dev",
+  "scope": "Resources, Environment and Materials building: documented maximum eleven above-ground storeys; overall 48.9m design height translated to estimated 48.1m body plus existing 0.8m parapet. Uniform extrusion, detailed massing and entrance remain partial.",
+  "partialObjectRecords": 19,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 149,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "data",
+    "all-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4164188,
+        "medianDrawCalls": 559
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.5888276383609696,
+        "medianDrawCalls": 2.1937842778793515
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        29,
+        29,
+        29
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 29,
+        "medianTriangles": 1133491,
+        "medianDrawCalls": 292
+      },
+      "changePercent": {
+        "medianFPS": -3.3333333333333326,
+        "medianTriangles": 7.751926193859937,
+        "medianDrawCalls": 11.026615969581744
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "fingerprints": {
+    "data/building-overrides.json": "ca346776aa7142031ff0bb877f35b0214c34754d495ab0ba07146d7c2716abc6",
+    "data/building-sources.json": "be12734301670889d91a481e4e26579c0469f74e32ab9a3ebd4a0b2b10e28ff0",
+    "blender/gxu-campus.blend": "b73d591d2feafa726ad9adca39dfabd0841a6a1d01c6e26d472865ce67ce63d4",
+    "public/data/buildings.json": "d575021415b6342c001fd4f3550b55ca98144bbbcc24dbf5cbe1dab414623457",
+    "public/data/models.json": "220567449f00579b50e086963d39ef383377b3758291d8aa0fe72ec204963507"
+  }
+}
