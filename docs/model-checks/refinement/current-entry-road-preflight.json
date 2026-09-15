@@ -1,0 +1,33 @@
+{
+  "status": "no-plan-overlap-in-tested-footprints",
+  "mode": "current-snapshot",
+  "testedEntries": 4,
+  "testedEntryIds": [
+    {
+      "buildingId": "way/759129515",
+      "entranceId": "south-east-main"
+    },
+    {
+      "buildingId": "way/759129516",
+      "entranceId": "southwest-main"
+    },
+    {
+      "buildingId": "way/759129516",
+      "entranceId": "north-west-secondary"
+    },
+    {
+      "buildingId": "relation/11564703",
+      "entranceId": "south-portico"
+    }
+  ],
+  "conflicts": [],
+  "limitations": [
+    "Only explicit attached-portico/stair footprints and mapped motor-vehicle surface roads are tested.",
+    "No overlap is not whole-entrance acceptance; terrain, pedestrian paths, level separation, crown clearance and actual geometry require separate checks.",
+    "A bridge/tunnel/layer tag is retained for review, never silently excluded."
+  ],
+  "fingerprints": {
+    "public/data/buildings.json": "f290a7d4cdf201758bef68cfe2b1a584f87988e3b5a94504a5c259082536e0ab",
+    "public/data/surfaces.json": "4b076226431cadc978081656df66b0bc70d99a19fff79d91cea3d6e220a74408"
+  }
+}

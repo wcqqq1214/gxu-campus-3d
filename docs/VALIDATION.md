@@ -746,3 +746,5 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 精细60/60/60 FPS、流畅29/29/29 FPS；相对同系统S0，三角形增加3.59%/7.75%，绘制调用增加2.19%/11.03%，均在原预算内。三次LOD往返无错误，24次CPU快照中计时窗口未记录到超过2%阈值的Python/Blender计算。[本批汇总](model-checks/refinement/s2-materials-height-summary.json)，[范围与对照图](MATERIALS_BUILDING_HEIGHT.md)。
 
 2026-09-16：新增 `blender/validate_materials_frame.py`，对源文件、基础和近景分别检查7个横梁顶点、8个贯通梁间孔、4个边梁点、4组圆柱轴向命中/侧向净空、3个高主体屋面及3个原内院，共29组检查。旧高挤出体在源文件控制检查中失败；通用屋顶采样改在实际梁面取点。详见[框架专项](MATERIALS_BUILDING_FRAME.md)及其验收报告。
+
+2026-09-16：新增 `scripts/audit_entry_road_context.py`，在完整模型构建前筛查显式入口平台/台阶与地表机动车道路的平面重叠。原 `validate_road_buildings.py` 只覆盖专用 infrastructure 道路/桥梁，不能代替此预检。资环材学院候选入口约60平方米重叠作为失败样本；当前4个适用入口无重叠，5项新增单元测试及159项Python总测试通过。平面预检不证明三维避让，详见[范围及命令](MATERIALS_ENTRY_CONSTRAINTS.md)。

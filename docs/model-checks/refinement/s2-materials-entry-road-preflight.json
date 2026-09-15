@@ -1,0 +1,39 @@
+{
+  "status": "needs-review",
+  "mode": "proposal",
+  "testedEntries": 1,
+  "testedEntryIds": [
+    {
+      "buildingId": "relation/11564999",
+      "entranceId": "east-main-entry"
+    }
+  ],
+  "conflicts": [
+    {
+      "buildingId": "relation/11564999",
+      "entranceId": "east-main-entry",
+      "roadId": "way/842784663",
+      "roadTags": {
+        "highway": "service"
+      },
+      "overlapAreaSquareMeters": 60.00015555101005,
+      "overlapBounds": [
+        -510.1849906275583,
+        -905.4930542935825,
+        -505.1083411277255,
+        -893.4727038516115
+      ],
+      "status": "needs-placement-and-level-review"
+    }
+  ],
+  "limitations": [
+    "Only explicit attached-portico/stair footprints and mapped motor-vehicle surface roads are tested.",
+    "No overlap is not whole-entrance acceptance; terrain, pedestrian paths, level separation, crown clearance and actual geometry require separate checks.",
+    "A bridge/tunnel/layer tag is retained for review, never silently excluded."
+  ],
+  "fingerprints": {
+    "public/data/buildings.json": "f290a7d4cdf201758bef68cfe2b1a584f87988e3b5a94504a5c259082536e0ab",
+    "public/data/surfaces.json": "4b076226431cadc978081656df66b0bc70d99a19fff79d91cea3d6e220a74408",
+    "docs/model-checks/refinement/s2-materials-entry-constraints.json": "3c942d81da00bd580836f729837e9c8511af46110f919967f4848844acb47116"
+  }
+}
