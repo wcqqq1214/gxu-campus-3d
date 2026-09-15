@@ -69,3 +69,21 @@ for p in obj.data.polygons:
         expected=(co.x/4,co.y/4) if p.material_index==0 else (co.y/4,co.z/4)
         assert max(abs(uv[k]-expected[k]) for k in range(2))<1e-7
 print('Contact UV regression passed: XY road texture and preserved unmarked vertical projection',flush=True)
+
+# A mapped canopy edge is almost perpendicular to its doorway, but its two
+# endpoints need not have identical local Y. Every endpoint must meet its floor.
+ring=[[-4,2],[4,2.02],[4,12],[-4,12]]
+indices=[v for tri in tessellate_polygon([[Vector((*p,0)) for p in ring]]) for v in tri]
+canopy={**front,'type':'canopy-connection','entry':{},'halfWidth':4,'stairBaseHeight':.15,
+        'startColumns':ring[:2],'localMesh':{'vertices':ring,'triangles':indices},'localPolygon':ring+[ring[0]]}
+terrain=Mesh();terrain.face([(-10,-5,.25),(10,-5,.25),(10,20,.25),(-10,20,.25)],0)
+roads=Mesh();roads.face([(x,y,.4+.02*x) for x,y in [(-8,12),(8,12),(8,18),(-8,18)]],0)
+ground,rest,meshes,report=build_side_connection(canopy,{'asphalt':0},lambda x,y:0,terrain,roads)
+path=tree(meshes['site-test']);final=tree(ground)
+for x in [-3.9,0,3.9]:
+    y=2+(x+4)/8*.02
+    assert abs(height(path,x,y)-.15)<1e-5
+    assert abs(height(path,x,12.3)-(.4+.02*x))<.0001
+for x,y in [(-3,3),(1,6),(3,11)]:assert height(final,x,y)<=height(path,x,y)-.1199
+assert abs(height(final,6,7)-.25)<1e-5
+print('Mapped-canopy join passed: oblique platform edge, road plane and bounded ground clearance',flush=True)

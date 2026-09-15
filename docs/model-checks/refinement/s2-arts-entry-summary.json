@@ -1,0 +1,134 @@
+{
+  "passed": true,
+  "baseCommit": "1c25f701478f784e48e7e3925941765677f3d006",
+  "branch": "dev",
+  "scope": "Arts west doorway, existing mapped canopy reuse and bounded road connection; no new whole-building acceptance",
+  "partialObjectRecords": 15,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 126,
+  "geometryChecks": [
+    "all-geometry",
+    "bodies-geometry",
+    "trees-geometry",
+    "courtyard-geometry",
+    "geometry",
+    "source-preservation",
+    "assets",
+    "incremental-assets",
+    "incremental-geometry",
+    "visual-review"
+  ],
+  "negativeControl": "Old model hits ordinary window frame instead of first glazed doorway",
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4138464,
+        "medianDrawCalls": 555
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 2.9489144062568418,
+        "medianDrawCalls": 1.4625228519195677
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1119438,
+        "medianDrawCalls": 285
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.416019848946486,
+        "medianDrawCalls": 8.365019011406849
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "baselineReused": true,
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "currentPerformanceReport": "s2-arts-entry-quiet-browser.json",
+  "excludedPerformanceReport": "s2-arts-entry-performance-browser.json",
+  "excludedReason": "External sustained Python load during fine repeat 3; retained without accepting condition equivalence",
+  "fingerprints": {
+    "blender/build_campus.py": "cffdb59d735b3d0bc3e380032754bdce6218914392b7825738af4c3b5a659014",
+    "blender/generic_buildings.py": "2c9ab47443addc85ff4b947ddcb2eb5adc2c2826abc6294c5924d56242d9aa21",
+    "blender/mapped_canopy_entry.py": "f543531c6b17ab4034bd98a6b6bc070a33eb923567fb4105c9b7c56226567aef",
+    "blender/side_connection.py": "c2933db9f846ccc1dc3280c13bcb295ab5450b1c3689dca97274111bdc44afce",
+    "blender/site_geometry.py": "aa7a80439cc3078b46fcc4ebbea5d83c3d4cdb8b3853b0a6e851c521177197a2",
+    "blender/validate_generic.py": "02139ecb2f02ae26fface761e3107b71cc9f79b18ed855d10c999a7931349bd6",
+    "blender/validate_arts_entry.py": "aa24929cfe6f611ad49fa55093017a9ebcaab87ce0565b084f4f7482aead31e0",
+    "blender/test_side_connection.py": "3796f265bc99beaa714c0b79c671482081b9d16e355fa1e8152abaf4bc3c8672",
+    "scripts/building_overrides.py": "ccc6b5e853247e4db98771abcf0fb9bbf005f9ee1abd759e8a8f7af3d8f7abcd",
+    "scripts/prepare_geodata.py": "eaba61939cb75a2b1952553240158c8ed297732782b96040b86e2930980463bb",
+    "scripts/site_data.py": "4afa0f6db5a5c803073b08a52e04417c4bf4209fbf609a4ec1a3af1e4321d58c",
+    "scripts/mapped_canopy_data.py": "421a43250ae2170026ce65d31bfcd2d841f10c05084cb70e15826c1d3deb0dac",
+    "scripts/canopy_connection_data.py": "32a8eb9007a19e14525c5b9dad179b1440630febecdbe581f2323a3a097f5797",
+    "scripts/test_mapped_canopy_data.py": "9418def623b767f6e9c271eba58931c6592475e81f21714bc07cb2aca5367b07",
+    "data/building-overrides.json": "240d6ae7937c7a95a98a3549636c08786b023fb1cbf2f7a52938723fc7cd8270",
+    "data/site-overrides.json": "dd172b38f702dd2a88d143e467f59b3f39d35cf7b43db5bcfb5b1c41bd8d6b74",
+    "data/sources.json": "01a8d9f5ff3978bf6f3e8f961a502f2ec53eefbab8331d84f7160f462f056c59",
+    "blender/gxu-campus.blend": "70bc9a15ba8e91560a6eb651d42dcf1e15ed481269275a2861858ef298b1e113",
+    "public/data/models.json": "0729f9246de48fa36e609caed0994e5bde8dd8b893989a224ea1337de4c18f1c",
+    "scripts/check-refinement-browser.mjs": "92f357be4185b9b0514d18f17585c752b675dc44d5aa1636558eac3c98b159fd"
+  },
+  "performanceConditionAccepted": true,
+  "performanceConditionNote": "24 CPU snapshots contain no Python/Blender computation; normal desktop conditions, not exclusive hardware or controlled thermal state",
+  "validationCommands": [
+    "PYTHONPATH=scripts work/refinement-venv/bin/python -m unittest discover -s scripts -p test_*.py",
+    "blender --background --python-exit-code 1 --python blender/test_side_connection.py",
+    "blender --background --python-exit-code 1 --python blender/validate_generic.py -- --report-prefix=s2-arts-entry-all",
+    "blender --background --python-exit-code 1 --python blender/validate_arts_entry.py",
+    "blender --background --python-exit-code 1 --python blender/validate_arts_buildings.py -- --report-prefix=s2-arts-entry-bodies",
+    "blender --background --python-exit-code 1 --python blender/validate_tree_clearance.py -- --report-prefix=s2-arts-entry-trees",
+    "blender --background --python-exit-code 1 --python blender/validate_courtyard.py -- --report-prefix=s2-arts-entry-courtyard",
+    "npm run build:pages"
+  ]
+}

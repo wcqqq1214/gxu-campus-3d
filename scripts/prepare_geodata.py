@@ -117,6 +117,8 @@ def prepare():
     validate_ids(overrides,buildings)
     from attached_gallery_data import validate_gallery_context
     validate_gallery_context(buildings)
+    from mapped_canopy_data import resolve_mapped_canopy_context
+    resolve_mapped_canopy_context(buildings)
     # South gate uses the mapped road / campus boundary; its architectural extent is photo-estimated.
     for l in landmarks:
         b=next((b for b in buildings if b['id']==l.get('osmId')),None)

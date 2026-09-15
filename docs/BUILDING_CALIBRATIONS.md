@@ -102,3 +102,5 @@ blender --background --python-exit-code 1 --python blender/validate_generic.py -
 [逐镜头检查](model-checks/refinement/s2-visual-review.json)覆盖 8 栋试点及图书馆手机尺寸画面。动物学院的核心与侧翼高差、林学院和生命学院的内院、各楼采用层数均在画面中可见。该历史图书馆画面中的中央草地连接与树冠问题已在 S3 中处理，见[中央前场记录](LIBRARY_NORTH_SITE.md)；农学院后续对照单独见[入口专项记录](AGRICULTURE_BUILDING.md)。
 
 林学院后续已处理[南门门廊](FORESTRY_COLLEGE_ENTRY.md)与[南侧中段窗带](FORESTRY_COLLEGE_FACADES.md)。窗组、分格和挑檐尺寸属于照片约束估算；底层、两端、入口上方竖向突出体和其他立面继续待核对。该楼仍属于部分校准，不能增加整栋验收数量。
+
+艺术学院西主入口后续采用引用独立雨棚的 `mappedCanopy` 规则：门组属于主楼，平台/顶板属于已有roof对象，不重复生成。字段来源、通行约束、前场连接和局部验收见[西入口专项](ARTS_WEST_ENTRY.md)。累计部分对象记录仍15条，整栋验收数不因本次入口细化增加。

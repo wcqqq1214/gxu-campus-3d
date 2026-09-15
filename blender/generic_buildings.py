@@ -86,6 +86,10 @@ def shared_form(b, z, C):
         if 'windowBands' in facade['rule']:
             add_band_ledges(body,facade,z,C)
     for e in form['entrances']:
+        if 'mappedCanopy' in e:
+            from mapped_canopy_entry import add_mapped_canopy_entry
+            add_mapped_canopy_entry(entrance,e,z,C)
+            continue
         if 'attachedPortico' in e:
             add_attached_portico(entrance,e,z,C)
             continue
@@ -205,13 +209,14 @@ def ordinary_building(b, z, C, detail):
                 if zz-wh/2 < z+facade.get('minimumHeight',0): continue
                 blocked_by_door=False
                 for entry in form['entrances']:
-                    if 'attachedPortico' not in entry and 'doorFrame' not in entry:continue
+                    if 'attachedPortico' not in entry and 'doorFrame' not in entry and 'shelter' not in entry:continue
                     bearing=math.radians(entry['bearing']);enx,eny=math.sin(bearing),math.cos(bearing)
-                    ex,ey=entry['center'];floor=z+(entry['attachedPortico']['platformHeight'] if 'attachedPortico' in entry else entry['landingHeight'])
-                    doorway_width=entry['width']+entry.get('doorFrame',{}).get('pierWidth',0)
+                    ex,ey=entry['center'];floor=z+(entry['shelter']['floorHeight'] if 'shelter' in entry else entry['attachedPortico']['platformHeight'] if 'attachedPortico' in entry else entry['landingHeight'])
+                    door_top=entry['shelter']['doorHeight']+entry['shelter']['transomHeight']+.12 if 'shelter' in entry else 2.8
+                    doorway_width=entry['width']+entry.get('shelter',entry.get('doorFrame',{})).get('pierWidth',0)
                     if (nx*enx+ny*eny>.999 and abs((x-ex)*enx+(y-ey)*eny)<.3
                             and abs((x-ex)*eny-(y-ey)*enx)<(doorway_width+ww+.3)/2
-                            and zz-wh/2<floor+2.8 and zz+wh/2>floor):
+                            and zz-wh/2<floor+door_top and zz+wh/2>floor):
                         blocked_by_door=True;break
                 if blocked_by_door:continue
                 if detail:

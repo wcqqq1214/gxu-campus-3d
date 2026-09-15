@@ -31,6 +31,8 @@ campus_roads=json.loads((DATA/'campus-roads.json').read_text())
 sites=json.loads((DATA/'sites.json').read_text())
 pavings=json.loads((DATA/'pavings.json').read_text())
 sys.path.insert(0,str(ROOT/'scripts'))
+from mapped_canopy_data import check_prepared_mapped_canopies
+check_prepared_mapped_canopies(buildings)
 from low_planting_contract import load_prepared
 low_plantings=load_prepared(ROOT)
 # The pure hash is duplicated here to keep Blender independent of Shapely.
@@ -63,11 +65,11 @@ for site in sites['sites']:
         if site['origin']!=[(a+b)/2 for a,b in zip(facade['start'],facade['end'])] or site['angle']!=-math.atan2(*facade['normal']):
             raise RuntimeError('Gallery apron frame is stale; run site preparation')
         continue
-    if site.get('type') in ('side-connection','front-connection','entry-apron'):
+    if site.get('type') in ('side-connection','front-connection','entry-apron','canopy-connection'):
         entry=next((e for e in building.get('form',{}).get('entrances',[]) if e['id']==site['entranceId']),None)
         if site['footprintRevision']!=hashlib.sha256(json.dumps(building['polygons'],separators=(',',':')).encode()).hexdigest() or site['entry']!=entry or site['origin']!=entry['center'] or site['angle']!=-math.radians(entry['bearing']):
             raise RuntimeError('Connection entrance is stale; run site preparation')
-        if site.get('type')=='entry-apron':continue
+        if site.get('type') in ('entry-apron','canopy-connection'):continue
         index,target=next((i,s) for i,s in enumerate(surfaces) if s['id']==site['surfaceId'])
         target={**target,**infrastructure['surfaceOverrides'].get(str(index),{}),**surroundings['surfaceOverrides'].get(str(index),{}),**campus_roads['surfaceOverrides'].get(str(index),{})}
         if hashlib.sha256(json.dumps(target,separators=(',',':'),sort_keys=True).encode()).hexdigest()!=site['surfaceRevision']:
@@ -192,7 +194,7 @@ base.update(paving_meshes)
 from shore_geometry import build_shores
 base['terrain'],base['green'],shore_meshes,shore_report=build_shores(shores,C,base['terrain'],base['green'])
 base.update(shore_meshes)
-base['terrain'].ground_uv_bounds=[[v+(-1 if i<2 else 1) for i,v in enumerate(p['bounds'])] for p in pavings['pavings']]+[s['gradingBounds'] for s in sites['sites'] if s.get('type') in ('side-connection','front-connection','entry-apron','gallery-apron')]
+base['terrain'].ground_uv_bounds=[[v+(-1 if i<2 else 1) for i,v in enumerate(p['bounds'])] for p in pavings['pavings']]+[s['gradingBounds'] for s in sites['sites'] if s.get('type') in ('side-connection','front-connection','entry-apron','gallery-apron','canopy-connection')]
 (ROOT/'docs/model-checks/refinement/shore-build.json').write_text(json.dumps(shore_report,ensure_ascii=False,indent=2)+'\n')
 print('Ground assembled',flush=True)
 infra_near={}
