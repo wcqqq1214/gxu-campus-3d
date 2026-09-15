@@ -38,6 +38,9 @@ def wall_material(b, C):
 
 def shared_form(b, z, C):
     """All silhouette-defining components; never receives a detail flag."""
+    if 'stairTower' in b['form']:
+        from stair_tower import stair_tower_model
+        return stair_tower_model(b,z,C)
     form = b['form']; h = form['height']; roof = form['roof']; wall = wall_material(b, C)
     result = Mesh(); body = Mesh(); top = Mesh(); entrance = Mesh(); panels = Mesh()
     parts = form['parts'] or [{'polygons': b['polygons'], 'triangles': b['roofTriangles'], 'height': h, 'roof':roof}]
@@ -85,6 +88,9 @@ def shared_form(b, z, C):
             add_grid_pilasters(body,facade,z,C)
         if 'windowBands' in facade['rule']:
             add_band_ledges(body,facade,z,C)
+    for door in form.get('stairAccessDoors',[]):
+        from stair_tower import stair_access_door
+        stair_access_door(entrance,door,z,C)
     for e in form['entrances']:
         if 'mappedCanopy' in e:
             from mapped_canopy_entry import add_mapped_canopy_entry
@@ -173,6 +179,7 @@ def ordinary_building(b, z, C, detail):
     if b.get('form', {}).get('version') != 1:
         raise ValueError(f"{b['id']}: run data:prepare before rebuilding ordinary buildings")
     m = shared_form(b, z, C)
+    if 'stairTower' in b['form']:return m
     windows = Mesh(); form = b['form']; h = form['height']; wall = wall_material(b, C)
     seed = int(hashlib.sha256(b['id'].encode()).hexdigest()[:8], 16)
     levels = max(1, round(form['levels']))
@@ -218,6 +225,10 @@ def ordinary_building(b, z, C, detail):
                             and abs((x-ex)*eny-(y-ey)*enx)<(doorway_width+ww+.3)/2
                             and zz-wh/2<floor+door_top and zz+wh/2>floor):
                         blocked_by_door=True;break
+                for door in form.get('stairAccessDoors',[]):
+                    door_angle=math.radians(door['bearing']);dnx,dny=math.sin(door_angle),math.cos(door_angle);ex,ey=door['center']
+                    if nx*dnx+ny*dny>.999 and abs((x-ex)*dnx+(y-ey)*dny)<.3 and abs((x-ex)*dny-(y-ey)*dnx)<(door['width']+ww+.3)/2 and zz-wh/2<z+door['floor']+door['height'] and zz+wh/2>z+door['floor']:
+                        blocked_by_door=True
                 if blocked_by_door:continue
                 if detail:
                     windows.box(x, y, zz, ww+.30, .22, wh+.30, C['white'], theta)
