@@ -33,6 +33,8 @@ pavings=json.loads((DATA/'pavings.json').read_text())
 sys.path.insert(0,str(ROOT/'scripts'))
 from mapped_canopy_data import check_prepared_mapped_canopies
 check_prepared_mapped_canopies(buildings)
+from stair_tower_data import check_prepared_stair_towers
+check_prepared_stair_towers(buildings)
 from low_planting_contract import load_prepared
 low_plantings=load_prepared(ROOT)
 # The pure hash is duplicated here to keep Blender independent of Shapely.
@@ -119,9 +121,12 @@ def elevation(x,y):
     u=max(0,min(cols-1.001,(x-xmin)/(xmax-xmin)*(cols-1)));v=max(0,min(rows-1.001,(y-ymin)/(ymax-ymin)*(rows-1)));i=int(u);j=int(v);a=u-i;b=v-j
     return (hh[j*cols+i]*(1-a)+hh[j*cols+i+1]*a)*(1-b)+(hh[(j+1)*cols+i]*(1-a)+hh[(j+1)*cols+i+1]*a)*b
 
+def building_elevation(b):
+    return elevation(*b.get('form',{}).get('stairTower',{}).get('hostCenter',b['center']))
+
 def generic(b,detail):
     if b.get('customModel')=='huicui':return huicui(b,elevation(*b['center']),C,detail)
-    m=Mesh();h=b['height'];cx,cy=b['center'];z=elevation(cx,cy)
+    m=Mesh();h=b['height'];cx,cy=b['center'];z=building_elevation(b)
     if b['id']=='way/948683815':return west_stand(b,z,C,detail)
     if b['tags'].get('memorial')=='column':
         # The four mapped historic inner-gate piers are monuments, not windowed houses.
@@ -236,7 +241,7 @@ def chunk_key(b):
     def label(v):return ('p' if v>=0 else 'n')+str(abs(v))
     return 'chunk-'+label(ix)+'-'+label(iy)
 for index,b in enumerate(buildings):
-    z=elevation(*b['center']);b['elevation']=round(z,2)
+    z=building_elevation(b);b['elevation']=round(z,2)
     zone='context' if not b['insideCampus'] else 'north' if b['center'][1]>200 else 'west' if b['center'][0]<0 else 'east';b['zone']=zone
     if b['landmark']:
         l=next(l for l in landmarks if l['id']==b['landmark'])
