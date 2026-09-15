@@ -17,7 +17,7 @@ def validate_panels(panels, length, height, levels, band=None):
         if not isinstance(p['id'], str) or not p['id'].strip() or p['id'] in ids:
             raise ValueError('Facade panel IDs must be nonempty and unique within the facade')
         ids.add(p['id'])
-        if p['type'] not in ('glazing', 'lattice'):
+        if p['type'] not in ('glazing', 'lattice', 'solid'):
             raise ValueError('Unknown facade panel type')
         for k in ('from', 'to', 'bottom', 'top', 'frameWidth', 'depth'):
             if type(p[k]) not in (int, float) or not math.isfinite(p[k]):
@@ -25,6 +25,8 @@ def validate_panels(panels, length, height, levels, band=None):
         for k in ('columns', 'rows'):
             if type(p[k]) is not int or not 1 <= p[k] <= 16:
                 raise ValueError('Facade panel cell counts must be integers from 1 to 16')
+        if p['type']=='solid' and (p['columns']!=1 or p['rows']!=1):
+            raise ValueError('Solid panels cannot define glazing or lattice cells')
         # This first contract intentionally covers upper solid walls. Ground
         # doors, porticos and open corridors need their existing dedicated rules.
         if not 0 < p['from'] < p['to'] < 1 or not 3.2 <= p['bottom'] < p['top'] <= height-.1:
@@ -46,4 +48,3 @@ def validate_panels(panels, length, height, levels, band=None):
                 high = (level+.56+band['heightRatio']/2)*fh+.12+band['thickness']
                 if overlaps(rectangle, (band['from']*length-.06, band['to']*length+.06, low, high)):
                     raise ValueError('Facade panel overlaps a window band or ledge')
-

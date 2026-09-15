@@ -75,7 +75,12 @@ def build_side_connection(site,C,elevation,terrain,roads):
         return [world(edge(lo)-site['roadContactDepth']-extra,lo),world(edge(lo)+.05+extra,lo),world(edge(hi)+.05+extra,hi),world(edge(hi)-site['roadContactDepth']-extra,hi)]
     road_triangles=mesh_triangles(roads);outer=contact_outline(site['joinOverlap']);contact_bounds=bounds(outer)
     touched=[roads.v[k] for ids,_ in road_triangles if overlaps(bounds([roads.v[k] for k in ids]),contact_bounds) for k in ids]
-    roads,contact=contact_road(roads,road_triangles,contact_outline(0),outer,site['joinOverlap'],site['groundClearance'])
+    # Separate GLB nodes can quantize the shared cut a few millimetres apart.
+    # The new flush entrance uses a shallow buried overlap so such a crack
+    # cannot expose the 12 cm terrain-clearance drop as a false road step.
+    # This rendering overlap is independent of the clearance under the paving.
+    overlap_drop=.012 if 'flushEntrance' in site['entry'] else site['groundClearance']
+    roads,contact=contact_road(roads,road_triangles,contact_outline(0),outer,site['joinOverlap'],overlap_drop)
     # Clipping introduces vertices on retained long road edges. Split their
     # incident triangles too, or campus-wide Draco quantization opens cracks
     # beyond the small contact node even when the source planes coincide.

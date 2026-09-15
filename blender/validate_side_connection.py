@@ -37,7 +37,10 @@ def check(label):
     assert all(owner(o).get('layer')=='roads' for o in selected)
     path=sampler(selected);ground=sampler([o for o in objects if owner(o).get('layer')=='terrain'])
     roads=sampler([o for o in objects if owner(o).get('layer')=='roads'])
-    building=sampler([o for o in objects if o.get('featureId')==b['id'] or owner(o).name==b['chunk']])
+    building_objects=[o for o in objects if o.get('featureId')==b['id'] or owner(o).name==b['chunk']]
+    building=sampler(building_objects)
+    flush=site['entry'].get('flushEntrance')
+    portal_front=max(flush['pierDepth']-.03,.18) if flush else 0
     tolerance=.004 if label=='source' else .025
     ring=site['localPolygon'];xmin=min(p[0] for p in ring);xmax=max(p[0] for p in ring);ymin=min(p[1] for p in ring);ymax=max(p[1] for p in ring)
     count=0;clearances=[];outside_errors=[]
@@ -47,19 +50,31 @@ def check(label):
             if inside((x,y),ring) and ring_distance((x,y),ring)>.06:
                 h,g=path(wx,wy),ground(wx,wy);assert h is not None and g is not None,('path or ground hole',x,y)
                 clearances.append(h-g);assert h-g>.055,('ground intersects connector',x,y,h-g)
-                obstruction=building(wx,wy);assert obstruction is None or obstruction<=h+.03,('building blocks path',x,y)
+                obstruction=building(wx,wy)
+                if not flush or y>portal_front+.025:
+                    # The approach must be clear beyond the closed door/frame
+                    # envelope. Door leaves and their jambs occupy that envelope
+                    # intentionally; this is not an indoor walk-through test.
+                    assert obstruction is None or obstruction<=h+.03,('building blocks path',x,y)
                 count+=1
             elif ring_distance((x,y),ring)>.2:
                 old,new=old_ground(wx,wy),ground(wx,wy);assert old is not None and new is not None
                 outside_errors.append(abs(old-new));assert abs(old-new)<tolerance,('terrain changed outside connection',x,y,old,new)
-    rises=[];w=site['entry']['stairFlight' if front else 'attachedPortico']['width']
+    flush='flushEntrance' in site['entry']
+    rises=[];w=site['halfWidth']*2 if flush else site['entry']['stairFlight' if front else 'attachedPortico']['width']
     for x in [-w/2+.2,-w/4,0,w/4,w/2-.2]:
+        if flush:
+            paved=path(*world(x,site['startY']+.025))
+            expected=b['elevation']+site['entry']['flushEntrance']['floorHeight']
+            assert paved is not None and abs(paved-expected)<.025,('flush door threshold join',x,paved,expected)
+            rises.append(expected-paved)
+            continue
         paved=path(*world(x,site['startY']+.025));tread=building(*world(x,site['startY']-.15))
         assert paved is not None and tread is not None
         expected=(site['entry']['landingHeight']-site['stairBaseHeight'])/site['entry']['stairFlight']['riserCount'] if front else .12
         rises.append(tread-paved)
         assert (abs(tread-paved-expected)<.03 if front else .085<tread-paved<.15),('stair join height',x,tread-paved)
-    joins=[];max_jump=0;gap_bounds=[]
+    joins=[];max_jump=0;gap_bounds=[];max_jump_at=None
     for a,c in zip(site['columns'],site['columns'][1:]):
         x,y=(a[0]+c[0])/2,(a[1]+c[1])/2
         wx,wy=world(x,y+.05) if front else world(x-.05,y)
@@ -82,15 +97,18 @@ def check(label):
                             found.append((k*spacing,nearby));break
                 assert len(found)==2,('gap across footway contact exceeds precision bound',xx,yy)
                 gap_bounds.append(sum(d for d,_ in found));h=max(v for _,v in found)
-            if previous is not None:max_jump=max(max_jump,abs(h-previous))
+            if previous is not None and abs(h-previous)>max_jump:
+                max_jump=abs(h-previous);max_jump_at=(xx,yy,previous,h)
             previous=h
-        assert max_jump<.06,('footway join step',max_jump)
+        assert max_jump<.06,('footway join step',max_jump,max_jump_at)
     return {'pavingSamples':count,'minimumGroundClearance':min(clearances),'outsideTerrainSamples':len(outside_errors),
-        'maximumOutsideTerrainError':max(outside_errors),'stairRiseRange':[min(rises),max(rises)],
+        'closedPortalEnvelopeDepth':portal_front,'approachObstructionStart':portal_front+.025 if flush else 0,
+        'maximumOutsideTerrainError':max(outside_errors),
+        ('thresholdOffsetRange' if flush else 'stairRiseRange'):[min(rises),max(rises)],
         'maximumContactRoadPlaneError':max(joins),'maximumRoadJoinStepPer2cm':max_jump,
         'measuredMaterialGapUpperBounds':gap_bounds,'passed':True}
 
-report={'siteId':site['id'],'scope':'Actual source/base path width, stair riser, mapped footway plane/contact, clear ground and unchanged ground outside the connector. Dimensions remain estimates.','passed':False}
+report={'siteId':site['id'],'scope':'Actual source/base path width, stair or flush threshold, mapped road plane/contact, clear ground and unchanged ground outside the connector. Dimensions remain estimates.','passed':False}
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'));report['source']=check('source')
     bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(TARGET/'public/models/base.glb'));bpy.context.view_layer.update();report['base']=check('base')
