@@ -23,8 +23,8 @@ DEFAULT_LEVELS = {'living': 6, 'academic': 5, 'culture': 2, 'service': 3}
 ARCHETYPE_LEVELS = {'dormitory':6,'residential-block':6,'teaching-block':5,
                     'courtyard-lab':5,'low-rise-service':2}
 ARCHETYPES = {'generic', 'dormitory', 'residential-block', 'canteen', 'teaching-block',
-              'courtyard-lab', 'low-rise-service'}
-FIELDS = {'archetype', 'levels', 'floorHeight', 'height', 'roof', 'parts', 'entrances', 'facadeRules'}
+              'courtyard-lab', 'low-rise-service', 'external-stair'}
+FIELDS = {'archetype', 'levels', 'floorHeight', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'stairTower'}
 
 
 def ordinary(b):
@@ -476,6 +476,12 @@ def resolve_building(building, record=None, source_ids=None):
                         'status':basis.get('status',form['roof']['status'])}
         if kind != 'flat' and 'parts' not in record:
             form['roof']['geometry'] = roof_geometry(b['polygons'],kind,rise)
+    if 'stairTower' in record:
+        from stair_tower_data import validate_stair_tower
+        validate_stair_tower(record['stairTower'])
+        if archetype!='external-stair' or form['roof']['type']!='flat' or any(k in record for k in ['parts','facadeRules']):raise ValueError('Open stair tower conflicts with generic solid form')
+        form['stairTower']={'config':copy.deepcopy(record['stairTower'])}
+    elif archetype=='external-stair':raise ValueError('External stair requires explicit tower geometry')
     if 'parts' in record:
         form['parts'] = resolve_parts(b, record['parts'], form['roof'])
     if 'entrances' in record:
@@ -602,6 +608,8 @@ def prepare_existing_overrides():
     validate_gallery_context(resolved)
     from mapped_canopy_data import resolve_mapped_canopy_context
     resolve_mapped_canopy_context(resolved)
+    from stair_tower_data import resolve_stair_tower_context
+    resolve_stair_tower_context(resolved)
     geo=read_json(out/'geography.geojson'); features={f['id']:f for f in geo['features']}
     props=('height','levels','heightBasis','facadeBasis','archetype','roofBasis','sourceRefs','calibration')
     for b in resolved:

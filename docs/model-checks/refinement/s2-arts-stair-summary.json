@@ -1,0 +1,117 @@
+{
+  "passed": true,
+  "baseCommit": "2ff3821203de69ea8bd9398d1ae8a3026f58429a",
+  "branch": "dev",
+  "scope": "Open return stair with curved mapped landings, thin roof, supports and three host bridges/doorways; photo-constrained estimates; no new whole-building acceptance",
+  "partialObjectRecords": 16,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 131,
+  "geometryChecks": [
+    "all-geometry",
+    "west-entry-geometry",
+    "bodies-geometry",
+    "trees-geometry",
+    "courtyard-geometry",
+    "geometry",
+    "source-preservation",
+    "assets",
+    "incremental-assets",
+    "incremental-geometry",
+    "visual-review"
+  ],
+  "negativeControl": "Old closed cylinder has no first stair tread",
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4145324,
+        "medianDrawCalls": 556
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.119564568449129,
+        "medianDrawCalls": 1.645338208409508
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        29,
+        29,
+        29
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 29,
+        "medianTriangles": 1125768,
+        "medianDrawCalls": 290
+      },
+      "changePercent": {
+        "medianFPS": -3.3333333333333326,
+        "medianTriangles": 7.017762335483324,
+        "medianDrawCalls": 10.2661596958175
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "baselineReused": true,
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "currentPerformanceReport": "s2-arts-stair-performance-browser.json",
+  "fingerprints": {
+    "blender/build_campus.py": "731440a76ecfbee5e3391503cf2bb3252fe53e869cbcd95e55c6e50f183bf6ca",
+    "blender/generic_buildings.py": "98cfa580c02c4c0c9b0e55f78b5e7f81e46206e4169ea18c46371d224fd62984",
+    "blender/stair_tower.py": "5f158927d88b97d25aae4af371359326fab5b0160b2ff8f3673c6f1f55ebfc68",
+    "blender/test_stair_tower.py": "d5203f14b538ebefa48db875eb1aeec57c7dab15ff803cc35d65396bcceec61e",
+    "blender/validate_generic.py": "d05cc3e941b2de6ccf451e3ca196e36509a2f208f884e5cc85514ecc402d12f4",
+    "blender/validate_arts_stair.py": "44578bc4505fef71aac0e099b45bc3736270723373453a74831f840f09c11c96",
+    "scripts/building_overrides.py": "e1f9f91feeed4b7ec5bad016f5f5ce85cc82ad8d2f69406f2c8ccc9fe3770722",
+    "scripts/prepare_geodata.py": "9147c532940ee4d4b0ba778f025b6d8f3e3762ef667e6c77ecd4d91304ff6b08",
+    "scripts/stair_tower_data.py": "8ea8b671ab68bb9fa8225fc1544c9004eeb5084d62d6ad032a35c1a7125bc5ca",
+    "scripts/test_stair_tower_data.py": "90ce80979bb39fb66843e6044184f1af7abcbafc8a2f9455247b5e065d134a17",
+    "scripts/vegetation_exclusions.py": "42c6f152fcb3448300167db3f4cd725592d32a8e43eea1835e748530f9a282ba",
+    "data/building-overrides.json": "56a34e51b558eedb46b25063d1c0fefe61497224fc6be382dc3977da1bfa1377",
+    "data/sources.json": "eaa644aec6f1239d0de0bec20c4d531337152e7adeb6cd8fc875f724a0759296",
+    "blender/gxu-campus.blend": "5ac6dc7a6bf4c3b79342fce7ba7ee323cb01160049c6b0d354e537c0727cf165",
+    "public/data/models.json": "3af50d58d8935dad1679591072cdf70c1a84a6193f2f2b5b4f7c65a6464c1c5a"
+  },
+  "performanceConditions": "Same-day Darwin 27 / Apple M5 / Chromium 148 / 1280x720 DPR 1 S0 replay reused. Normal desktop workload retained. 24 CPU snapshots: first snapshot only shows sampling wrapper startup (4.6%, cumulative CPU 0.06s); subsequent snapshots show no Python/Blender compute above the 2% capture threshold. Not exclusive-device or thermal equivalence."
+}

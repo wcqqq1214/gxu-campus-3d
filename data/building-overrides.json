@@ -2105,7 +2105,8 @@
           "status": "estimated",
           "sourceRefs": [
             "osm",
-            "artsEnvironment2024"
+            "artsEnvironment2024",
+            "artsLakeArchive"
           ],
           "note": "Environment第二张临湖照显示底层加三层上部楼层，共四层；侧方开放圆形楼梯及湖岸与本楼组合对应，为照片/地图判读。替换原用途默认五层，3.3米层高和总高13.2米仍为估算。"
         },
@@ -2113,7 +2114,8 @@
           "status": "estimated",
           "sourceRefs": [
             "osm",
-            "artsEnvironment2024"
+            "artsEnvironment2024",
+            "artsLakeArchive"
           ],
           "note": "2024年学院Environment照片可见平屋面与女儿墙；背部设备和屋顶小体量未确认，不虚构坡屋顶。"
         }
@@ -2133,7 +2135,7 @@
         },
         "entrances": {
           "status": "partial",
-          "note": "门位及道路连接待校准，现有入口仍为示意。"
+          "note": "北侧主入口仍为未定位示意；南墙上层平台及门由独立外楼梯记录派生，位置与尺寸为照片/地图约束估算。"
         },
         "facadeRules": {
           "status": "partial",
@@ -2331,6 +2333,186 @@
           }
         }
       ]
+    },
+    "way/880089960": {
+      "name": "艺术学院临湖外楼梯",
+      "footprintRevision": "f4ce57f1546a3cf25e5297619e7275daef6afa3ddfa50d3725361a350f001166",
+      "archetype": "external-stair",
+      "levels": 4,
+      "height": 12.65,
+      "roof": {
+        "type": "flat"
+      },
+      "stairTower": {
+        "host": {
+          "buildingId": "way/759165562",
+          "footprintRevision": "075f97f6d68295c4bd2e9be2018351cb957e8ce1dedf2d35b2a53ae93a25eaba",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "t": 0.6064199709709581
+        },
+        "baseHeight": 0.15,
+        "landingCut": 2.2,
+        "flightWidth": 2.0,
+        "wellWidth": 0.8,
+        "risersPerFlight": 10,
+        "slabThickness": 0.18,
+        "parapetHeight": 0.9,
+        "parapetThickness": 0.16,
+        "roofThickness": 0.25,
+        "bridgeWidth": 2.4,
+        "doorWidth": 1.6,
+        "doorHeight": 2.3,
+        "columns": [
+          {
+            "center": [
+              -3,
+              -2.8
+            ],
+            "width": 0.4,
+            "top": "roof"
+          },
+          {
+            "center": [
+              -3,
+              2.8
+            ],
+            "width": 0.4,
+            "top": "roof"
+          },
+          {
+            "center": [
+              3,
+              -2.8
+            ],
+            "width": 0.4,
+            "top": "roof"
+          },
+          {
+            "center": [
+              3,
+              2.8
+            ],
+            "width": 0.4,
+            "top": "roof"
+          },
+          {
+            "center": [
+              -1,
+              7.3
+            ],
+            "width": 0.35,
+            "top": "landing"
+          },
+          {
+            "center": [
+              1,
+              7.3
+            ],
+            "width": 0.35,
+            "top": "landing"
+          }
+        ]
+      },
+      "entrances": [
+        {
+          "id": "ground-access",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 3,
+          "t": 0.5,
+          "width": 2,
+          "primary": true
+        }
+      ],
+      "evidence": {
+        "archetype": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024",
+            "artsCourtyardEvent2024",
+            "artsLakeArchive"
+          ],
+          "note": "历史湖景与近期照片均显示独立支柱、斜向梯段及弧形转角平台，采用开放折返外楼梯，不再生成封闭圆形房间或默认窗户。"
+        },
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024",
+            "artsCourtyardEvent2024",
+            "artsLakeArchive"
+          ],
+          "note": "连接临湖附楼的三处上层平台，加底层共四个使用层；半层平台不计作独立建筑楼层。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024",
+            "artsCourtyardEvent2024",
+            "artsLakeArchive"
+          ],
+          "note": "层间距沿用附楼3.3米估算，底层平台0.15米；顶层平台10.05米、棚底12.40米、薄棚顶12.65米均为照片约束估算，不复原第五层。"
+        },
+        "stairTower": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024",
+            "artsCourtyardEvent2024",
+            "artsLakeArchive"
+          ],
+          "note": "根据湖景中可见重复斜向段和弧形平台，采用每层两跑的开放折返表达；各跑10级、梯宽2米、梯井0.8米、栏板0.9米和柱位均为估算。北向2.4米宽连接平台及1.6米宽上层门按附楼南墙投影定位，原OSM轮廓不改；楼梯与附楼共用附楼地形基准，避免两中心取高造成悬差。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024",
+            "artsCourtyardEvent2024",
+            "artsLakeArchive"
+          ],
+          "note": "底层以圆形平台西侧开放通行口作为示意访问点，不生成假门；底层精确入梯方向与周边铺地范围仍需更多近照。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024",
+            "artsLakeArchive"
+          ],
+          "note": "照片显示低于附楼屋顶的薄平圆棚，沿用原圆形OSM轮廓，不附加常规0.8米女儿墙。"
+        }
+      },
+      "review": {
+        "levels": {
+          "status": "partial",
+          "note": "构件关系已按照片约束表达，精确尺寸、底层路线和遮挡部分仍待现场资料核对。"
+        },
+        "height": {
+          "status": "partial",
+          "note": "构件关系已按照片约束表达，精确尺寸、底层路线和遮挡部分仍待现场资料核对。"
+        },
+        "roof": {
+          "status": "partial",
+          "note": "构件关系已按照片约束表达，精确尺寸、底层路线和遮挡部分仍待现场资料核对。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "构件关系已按照片约束表达，精确尺寸、底层路线和遮挡部分仍待现场资料核对。"
+        },
+        "parts": {
+          "status": "partial",
+          "note": "构件关系已按照片约束表达，精确尺寸、底层路线和遮挡部分仍待现场资料核对。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "构件关系已按照片约束表达，精确尺寸、底层路线和遮挡部分仍待现场资料核对。"
+        }
+      }
     }
   }
 }

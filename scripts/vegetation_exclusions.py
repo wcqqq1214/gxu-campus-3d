@@ -55,6 +55,8 @@ def ground_masks(data):
     for building in data['buildings']:
         for index, rings in enumerate(building['polygons']):
             add('buildings', f"{building['id']}:{index}", Polygon(rings[0], rings[1:]))
+        tower=building.get('form',{}).get('stairTower')
+        if tower:add('stair-bridge',building['id'],Polygon(tower['bridgeFootprint']))
         for facade in building.get('form', {}).get('facades', []):
             if 'attachedGallery' in facade:
                 add('attached-gallery', f"{building['id']}:{facade['polygon']}:{facade['ring']}:{facade['edge']}:{facade['part']}",
