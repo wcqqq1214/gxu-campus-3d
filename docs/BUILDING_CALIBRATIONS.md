@@ -112,3 +112,5 @@ blender --background --python-exit-code 1 --python blender/validate_generic.py -
 2026-09-16：临湖附楼东端面已接入三层开放外廊及显式门窗；`openCorridor.finish` 采用受限共享材质，`openings` 指定门窗位置和楼层，禁止与默认窗列重复生成。 详见[临湖端面与法线修复](ARTS_LAKESIDE_FACADE.md)。
 
 2026-09-16：新增[办公南楼逐层高度](OFFICE_SOUTH_STOREYS.md)。校方文献明确五层、底层4.8米、上层各3.9米，主体由16.5米调整为20.4米；`floorHeights`同步控制基础/近景窗层。文献层高与推导主体高度分别归档，门厅分段和改造后外观仍待核对。
+
+2026-09-16：[办公南楼西侧低门厅](OFFICE_SOUTH_ENTRY.md)依据2025年校方具名照片继续细化，保留五层主体及文献层高，新增两层低门厅、四根圆柱与内退主入口。尺寸和西向映射为估算，仍为第18条部分对象记录，不新增整栋完成数。

@@ -31,7 +31,7 @@ def ray(ts,point,direction,distance):
 
 def check(objects,tolerance):
     ts=trees(objects);glass=trees(objects,True);z=b['elevation'];roofs=[]
-    for x,y in [(-220,-650),(-220,-665),(-205,-675),(-233.5,-660)]:
+    for x,y in [(-220,-650),(-220,-665),(-205,-675)]:
         hit=ray(ts,Vector((x,y,z+24)),Vector((0,0,-1)),30)
         assert hit and abs(hit[0].z-z-20.4)<=tolerance,('body height',x,y,hit[0].z-z if hit else None)
         assert hit[1].z>.98,('roof normal',x,y)
@@ -47,12 +47,7 @@ def check(objects,tolerance):
                 hit=ray(glass,point,-n,1.1)
                 assert bool(hit)==present,('window band',fraction,level,expected+offset,present,bool(hit))
                 samples.append(dict(facadeFraction=fraction,level=level+1,height=expected+offset,glassExpected=present,glassHit=bool(hit)))
-    # Raised first-storey windows must not intersect the schematic entrance
-    # and canopy that still await an evidence-based replacement.
-    for fraction in (.45,.55):
-        point=Vector((a[0]+(c[0]-a[0])*fraction,a[1]+(c[1]-a[1])*fraction,z+3.5))+n*.8+u*.45
-        assert not ray(glass,point,-n,1.1),('window overlaps entrance',fraction)
-    return dict(passed=True,roofToleranceMeters=tolerance,roofs=roofs,windowBandSamples=samples,entranceOverlapProbes=2,
+    return dict(passed=True,roofToleranceMeters=tolerance,roofs=roofs,windowBandSamples=samples,entranceOverlapProbes=0,
                 windowCentersRelativeToDatum=CENTERS,windowDimensionsAreEstimated=True)
 
 def root_name(o):
@@ -60,7 +55,7 @@ def root_name(o):
     return re.sub(r'\.\d+$','',o.name)
 
 report=dict(passed=False,buildingId=b['id'],checkedRoot=str(TARGET),sourceFloorHeights=FLOORS,
-            scope='Four roof probes and forty east-facade glass-presence/absence probes; no entrance or multipart acceptance.')
+            scope='Three main-body roof probes and forty east-facade glass-presence/absence probes; no entrance or multipart acceptance.')
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==b['id']],.006)

@@ -180,7 +180,7 @@ def resolve_parts(b, raw, roof):
             if not isinstance(columns,list) or not 2 <= len(columns) <= 12:
                 raise ValueError('Portico requires 2–12 explicit columns')
             for column in columns:
-                if not isinstance(column,dict) or set(column) != {'center','width','depth','angle'}:
+                if not isinstance(column,dict) or not {'center','width','depth','angle'} <= set(column) or set(column)-{'center','width','depth','angle','shape'}:
                     raise ValueError('Unknown portico column fields')
                 if not isinstance(column['center'],list) or len(column['center']) != 2:
                     raise ValueError('Invalid portico column center')
@@ -188,6 +188,8 @@ def resolve_parts(b, raw, roof):
                 if len(column['center']) != 2 or any(isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) for v in values):
                     raise ValueError('Invalid portico column coordinates')
                 w = positive(column['width'],'column width'); d = positive(column['depth'],'column depth')
+                if column.get('shape','box') not in ('box','cylinder') or (column.get('shape')=='cylinder' and abs(w-d)>1e-6):
+                    raise ValueError('Round portico columns need equal width and depth')
                 support = translate(rotate(box(-w/2,-d/2,w/2,d/2),column['angle'],use_radians=True),*column['center'])
                 if support.difference(shape).area > 1e-5 or any(support.intersection(s).area > 1e-5 for s in supports):
                     raise ValueError('Portico columns leave their footprint or overlap')
@@ -321,7 +323,10 @@ def resolve_facades(b, form, rules):
                                 lo,hi=sorted((line.project(Point(v)),line.project(Point(w))))
                                 if hi-lo>.01:
                                     boundary_segments.append(LineString([line.interpolate(lo),line.interpolate(hi)]))
-                    if not any(s.length > .01 for s in segments):
+                    # The new explicit-storey partition path uses coincident
+                    # boundaries even when GEOS returns a partial interval.
+                    # Preserve the existing equal-storey export path.
+                    if not any(s.length > .01 for s in segments) or ('floorHeights' in part and boundary_segments and abs(sum(s.length for s in segments)-sum(s.length for s in boundary_segments))>1e-5):
                         segments=boundary_segments
                     for s in segments:
                         if s.length < .01: continue
@@ -337,7 +342,7 @@ def resolve_facades(b, form, rules):
                             'start':list(start),'end':list(end),'normal':list(normal),'height':part['height'],
                             'levels':part['levels'],'rule':rule}
                         if 'floorHeights' in form:
-                            facade['floorHeights'] = list(form['floorHeights'])
+                            facade['floorHeights'] = list(part.get('floorHeights',form['floorHeights']))
                         if 'attachedGallery' in rule:
                             from attached_gallery_data import resolve_attached_gallery
                             if abs(s.length-line.length)>1e-5:
@@ -424,6 +429,8 @@ def resolve_facades(b, form, rules):
                             result.append({'polygon':None,'ring':None,'edge':None,'part':part['id'],
                                 'start':list(line.coords[0]),'end':list(line.coords[-1]),'normal':list(n),
                                 'height':part['height'],'levels':part['levels'],'minimumHeight':porch['height'],'rule':{}})
+                            if 'floorHeights' in part:
+                                result[-1]['floorHeights'] = list(part['floorHeights'])
     return result
 
 
@@ -461,10 +468,10 @@ def resolve_building(building, record=None, source_ids=None):
             raise ValueError('Use either floorHeight or floorHeights')
         # Specialized layouts currently use equal-storey geometry. Reject
         # combinations until their geometry also consumes the explicit stack.
-        if 'parts' in record or 'stairTower' in record or any(
-                set(rule) - {'polygon', 'ring', 'edge', 'windows', 'balconies', 'spacing'}
+        if 'stairTower' in record or any(
+                set(rule) - {'polygon', 'ring', 'edge', 'part', 'windows', 'balconies', 'spacing'}
                 for rule in record.get('facadeRules', [])):
-            raise ValueError('floorHeights currently requires an undivided body with ordinary facades')
+            raise ValueError('floorHeights currently requires ordinary facades without specialized layouts')
         total = math.fsum(floors)
         if 'height' in record and not math.isclose(b['height'], total, abs_tol=1e-6, rel_tol=0):
             raise ValueError('Explicit height conflicts with the floorHeights sum')
@@ -513,6 +520,12 @@ def resolve_building(building, record=None, source_ids=None):
     elif archetype=='external-stair':raise ValueError('External stair requires explicit tower geometry')
     if 'parts' in record:
         form['parts'] = resolve_parts(b, record['parts'], form['roof'])
+        if 'floorHeights' in form:
+            for part in form['parts']:
+                count=part['levels']
+                if count!=int(count) or count>len(floors) or not math.isclose(part['height'],math.fsum(floors[:int(count)]),abs_tol=1e-6,rel_tol=0):
+                    raise ValueError('Part must match the documented storeys from the shared ground datum')
+                part['floorHeights']=floors[:int(count)]
     if 'entrances' in record:
         if not isinstance(record['entrances'],list):
             raise ValueError('Entrances must be an explicit list')
@@ -589,6 +602,27 @@ def resolve_building(building, record=None, source_ids=None):
                 if len(porches)!=1 or not body.boundary.buffer(.01).covers(door):
                     raise ValueError('Recessed entrance must cross a portico and meet a main-body wall')
                 porch=porches[0]
+                # A porch may cover only the middle of an original mapped
+                # edge. Its steps must stop at that part's actual side walls.
+                porch_shape=unary_union([Polygon(r[0],r[1:]) for r in porch['polygons']])
+                front_line=LineString([a,c])
+                # Project coincident edges before clipping: oblique coordinates
+                # can otherwise lose half an interval to floating-point error.
+                intervals=[]
+                for rings in porch['polygons']:
+                    for ring in rings:
+                        for v,w in zip(ring,ring[1:]):
+                            if max(front_line.distance(Point(v)),front_line.distance(Point(w)))<=1e-7:
+                                lo,hi=sorted(front_line.project(Point(p)) for p in (v,w))
+                                if hi-lo>1e-6:intervals.append(LineString([front_line.interpolate(lo),front_line.interpolate(hi)]))
+                clipped=unary_union(intervals) if intervals else front_line.intersection(porch_shape)
+                segments=[clipped] if clipped.geom_type=='LineString' else [s for s in getattr(clipped,'geoms',[]) if s.geom_type=='LineString']
+                segments=[s for s in segments if s.distance(Point(front))<1e-6]
+                if len(segments)!=1:raise ValueError('Portico front must occupy one continuous mapped edge interval')
+                lo,hi=sorted(front_line.project(Point(p)) for p in [segments[0].coords[0],segments[0].coords[-1]])
+                width_at_front=2*min(front_line.project(Point(front))-lo,hi-front_line.project(Point(front)))
+                if width_at_front<width:raise ValueError('Recessed doorway exceeds its portico frontage')
+                portico_width=length if abs(width_at_front-length)<1e-6 else width_at_front
                 if 'stepBaseHeight' in e:
                     base = e['stepBaseHeight']
                     if type(base) not in (int,float) or not math.isfinite(base) or not 0 <= base < porch['openBelow']['floorHeight']:
@@ -598,7 +632,7 @@ def resolve_building(building, record=None, source_ids=None):
                     if support.intersects(route.buffer(.6)):
                         raise ValueError('Portico column blocks the central entrance route')
                 resolved.update(center=back,outerCenter=front,porticoId=porch['id'],
-                    platformHeight=porch['openBelow']['floorHeight'],porticoWidth=length)
+                    platformHeight=porch['openBelow']['floorHeight'],porticoWidth=portico_width)
             elif 'stepBaseHeight' in e:
                 raise ValueError('Step base requires a recessed entrance')
             entrances.append(resolved)

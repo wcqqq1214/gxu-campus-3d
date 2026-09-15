@@ -59,7 +59,10 @@ def shared_form(b, z, C):
                     part_body.face([(vertices[k][0],vertices[k][1],z+soffit) for k in reversed(indices[i:i+3])],wall)
             part_body.extrude(part['polygons'],triangles,z-.15,floor+.15,C['stone'],C['stone'])
             for column in opening['columns']:
-                part_body.box(*column['center'],z+(floor+soffit)/2,column['width'],column['depth'],soffit-floor,wall,column['angle'])
+                if column.get('shape')=='cylinder':
+                    part_body.cylinder(*column['center'],z+(floor+soffit)/2,column['width']/2,soffit-floor,wall,n=16)
+                else:
+                    part_body.box(*column['center'],z+(floor+soffit)/2,column['width'],column['depth'],soffit-floor,wall,column['angle'])
         else:
             part_body.extrude(part['polygons'], triangles, z-.5, h+.5, wall, C['paleRoof'])
         for facade in form.get('facades',[]):

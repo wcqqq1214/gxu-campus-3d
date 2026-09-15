@@ -43,7 +43,7 @@ class BuildingOverrideTests(unittest.TestCase):
         ordinary={'polygon':0,'ring':0,'edge':0,'spacing':3,'balconies':False}
         self.assertEqual(self.resolve(b,floorHeights=floors,facadeRules=[ordinary])['form']['facades'][0]['rule'],ordinary)
         for key in ('openCorridor','windowBands','windowGrid','attachedGallery','panels'):
-            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'undivided body'):
+            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'without specialized layouts'):
                 self.resolve(b,floorHeights=floors,facadeRules=[{**ordinary,key:{}}])
 
     def test_only_explicit_open_roof_can_omit_entrance(self):
@@ -371,6 +371,43 @@ class BuildingOverrideTests(unittest.TestCase):
         self.assertEqual(exposed[0]['minimumHeight'],4)
         self.assertEqual(exposed[0]['height'],16.5)
         self.assertAlmostEqual(LineString([exposed[0]['start'],exposed[0]['end']]).length,14)
+
+    def test_portico_parts_share_documented_storeys(self):
+        b,v=self.portico_fixture();floors=[4.8,3.9,3.9,3.9,3.9]
+        v['parts'][0]['height']=20.4
+        v['parts'][1].update(height=8.7,levels=2)
+        r=self.resolve(b,floorHeights=floors,**v)
+        self.assertEqual([p['floorHeights'] for p in r['form']['parts']],[floors,floors[:2]])
+        for f in r['form']['facades']:
+            self.assertEqual(f['floorHeights'],floors if f['part']=='main' else floors[:2])
+        self.assertTrue(any(f.get('minimumHeight')==8.7 for f in r['form']['facades']))
+        for patch in [{'height':8.8},{'levels':2.5},{'levels':6}]:
+            bad=copy.deepcopy(v);bad['parts'][1].update(patch)
+            with self.subTest(patch=patch),self.assertRaisesRegex(ValueError,'shared ground datum'):
+                self.resolve(b,floorHeights=floors,**bad)
+
+    def test_round_portico_columns_validate_shape_and_diameter(self):
+        b,v=self.portico_fixture()
+        for c in v['parts'][1]['openBelow']['columns']:c['shape']='cylinder'
+        r=self.resolve(b,**v)
+        self.assertTrue(all(c['shape']=='cylinder' for c in r['form']['parts'][1]['openBelow']['columns']))
+        for patch in [{'shape':'cone'},{'depth':.7}]:
+            bad=copy.deepcopy(v);bad['parts'][1]['openBelow']['columns'][0].update(patch)
+            with self.subTest(patch=patch),self.assertRaisesRegex(ValueError,'Round portico'):
+                self.resolve(b,**bad)
+
+    def test_oblique_partial_portico_clips_steps_to_its_frontage(self):
+        # This mapped edge previously lost half its interval to floating-point
+        # clipping. The steps must also stop short of the five-storey ends.
+        b=next(b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if b['id']=='way/759132930')
+        record=load_catalogue()[b['id']];sources={s['id'] for s in source_catalogue()}
+        r=resolve_building(b,record,sources);e=r['form']['entrances'][0]
+        self.assertAlmostEqual(e['porticoWidth'],24.754915964340896)
+        front=next(f for f in r['form']['facades'] if f['edge']==5 and f['part']=='west-low-portico')
+        self.assertAlmostEqual(LineString([front['start'],front['end']]).length,e['porticoWidth'])
+        self.assertEqual(r['polygons'],b['polygons'])
+        bad=copy.deepcopy(record);bad['entrances'][0].update(t=.9,width=1)
+        with self.assertRaises(ValueError):resolve_building(b,bad,sources)
 
     def test_portico_rejects_floating_door_blocked_route_and_invalid_supports(self):
         b,values=self.portico_fixture()

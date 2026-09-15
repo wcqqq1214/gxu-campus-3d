@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "baseCommit": "226489bc692575acdedb560dfd7c4bf44a293944",
+  "branch": "dev",
+  "scope": "Office south low west portico, four round columns, recessed entrance and grounded stairs; matching parts use documented storey stack. Dimensions and west-facing photo mapping remain estimates.",
+  "partialObjectRecords": 18,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 145,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "data",
+    "all-geometry",
+    "storeys-geometry",
+    "portico",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4155556,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.374096996955167,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        28,
+        28,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1131907,
+        "medianDrawCalls": 293
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 7.601347979219453,
+        "medianDrawCalls": 11.406844106463886
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "fingerprints": {
+    "blender/generic_buildings.py": "ade4091c070598ad3fc90d6eec045fe5f74005c09cedabee5d6270c5c12a1a39",
+    "blender/validate_office_south.py": "4721a59b709de7cd28d2e1fae4c2d835a21adb37a5eb61a9c5527a55b038d1cd",
+    "blender/validate_office_south_entry.py": "f9114c86d3a24464f0d472914d7d97beb0c46ee4cf8c7ca02a55655c4527a4bf",
+    "scripts/building_overrides.py": "b77ea73690793e83c6df9b8c2cd75dcc944402e638f4555665fe188c563f023f",
+    "scripts/test_building_overrides.py": "67dff2e5680643d05635df0bb85b98a2414448d2fb66ef4baaabad64a1dd4410",
+    "data/building-overrides.json": "5e68dd87c57fa335a5cd715a50a039667b92e72318c98a3625e73b497fd5c3cd",
+    "data/building-sources.json": "bd9c83f705c9368dec574f0ecc7f29a6d8111079ea7c8de105c269a5f0bb3a4c",
+    "blender/gxu-campus.blend": "8fa6e9ac99ab89aeb20ed6ff3f5371f5198462fe7108127778142b1c639c7c32",
+    "public/data/buildings.json": "c8326631e4db6847c3fbae7488aa63717398b342de287aefad0a8b1e9c84554b",
+    "public/data/models.json": "dc0c6a4eb6eefd6de9fad1076ada7ca65f93b0461c07da461588a8bfa849e569"
+  }
+}
