@@ -1,5 +1,5 @@
 import { navigationFootprints } from './navigation';
-import { treeRotation, treeElevation } from './vegetation';
+import { treeRotation, treeElevation, prioritizeTreeRows } from './vegetation';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -43,6 +43,7 @@ import type {
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 export const asset = (path: string) => `${BASE}/${path}`;
 interface Manifest {
+  treePriorityPositions?: number[][];
   base: Asset;
   trees: Asset;
   treesNear?: Asset;
@@ -923,7 +924,8 @@ export function createScene(
           if (!sectors.has(key)) sectors.set(key, []);
           sectors.get(key)!.push(row);
         }
-        for (const rows of sectors.values()) {
+        for (const sectorRows of sectors.values()) {
+          const rows = prioritizeTreeRows(sectorRows, manifest.treePriorityPositions || []);
           const inst = new THREE.InstancedMesh(geometry, material, rows.length);
           const transform = new THREE.Object3D();
           rows.forEach((row, i) => {
