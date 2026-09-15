@@ -12,6 +12,40 @@ from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue
 
 
 class BuildingOverrideTests(unittest.TestCase):
+    def test_documented_storeys_override_osm_height_and_reach_all_facades(self):
+        b=self.building();b['tags']['height']='16.5'
+        floors=[4.8,3.9,3.9,3.9,3.9]
+        r=self.resolve(b,levels=5,floorHeights=floors)
+        self.assertAlmostEqual(r['height'],20.4)
+        self.assertEqual(r['polygons'],b['polygons'])
+        self.assertTrue(all(f['floorHeights']==floors for f in r['form']['facades']))
+        self.assertNotIn('floorHeight',r['calibration']['evidence'])
+        self.assertEqual(r['calibration']['evidence']['height']['status'],'estimated')
+        self.assertTrue(any('OSM height differs' in w for w in r['calibration']['warnings']))
+        # Removing the override must remove the old stack, not retain derived input.
+        reset=resolve_building(r)
+        self.assertAlmostEqual(reset['height'],16.5)
+        self.assertNotIn('floorHeights',reset['form'])
+
+    def test_storey_stack_rejects_inconsistent_or_invalid_values(self):
+        b=self.building();floors=[4.8,3.9,3.9,3.9,3.9]
+        for bad in ([],[4.8]*4,'4.8,3.9',None,[True]*5,[float('nan')]*5,
+                    [float('inf')]*5,[-1]*5,[0]*5,['3.9']*5):
+            with self.subTest(value=bad),self.assertRaises(ValueError):
+                self.resolve(b,levels=5,floorHeights=bad)
+        for values in ({'levels':4.5},{'height':16.5},{'floorHeight':3.3},{'parts':[]}):
+            with self.subTest(values=values),self.assertRaises(ValueError):
+                self.resolve(b,floorHeights=floors,**values)
+        self.assertAlmostEqual(self.resolve(b,height=20.4,floorHeights=floors)['height'],20.4)
+
+    def test_storey_stack_never_silently_uses_equal_floor_specialized_layout(self):
+        b=self.building();floors=[4.8,3.9,3.9,3.9,3.9]
+        ordinary={'polygon':0,'ring':0,'edge':0,'spacing':3,'balconies':False}
+        self.assertEqual(self.resolve(b,floorHeights=floors,facadeRules=[ordinary])['form']['facades'][0]['rule'],ordinary)
+        for key in ('openCorridor','windowBands','windowGrid','attachedGallery','panels'):
+            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'undivided body'):
+                self.resolve(b,floorHeights=floors,facadeRules=[{**ordinary,key:{}}])
+
     def test_only_explicit_open_roof_can_omit_entrance(self):
         buildings={b['id']:b for b in json.loads((ROOT/'public/data/buildings.json').read_text())}
         b=buildings['way/880089961'];record=load_catalogue()[b['id']]
