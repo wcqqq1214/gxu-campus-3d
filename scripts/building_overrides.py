@@ -492,7 +492,7 @@ def resolve_building(building, record=None, source_ids=None):
         entrances = []; ids = set()
         for e in record['entrances']:
             required = {'id','polygon','ring','edge','t','width','primary'}
-            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy'} or not e['id'] or e['id'] in ids:
+            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance'} or not e['id'] or e['id'] in ids:
                 raise ValueError('Invalid or duplicate entrance')
             if 'mappedCanopy' in e:
                 from mapped_canopy_data import validate_mapped_canopy
@@ -529,6 +529,18 @@ def resolve_building(building, record=None, source_ids=None):
             resolved = {**e,'center':[a[i]+(c[i]-a[i])*t for i in (0,1)],
                 'bearing':math.degrees(math.atan2(n[0],n[1]))%360,
                 'status':provenance['entrances']['status'],'basis':provenance['entrances']['note']}
+            if 'flushEntrance' in e:
+                from flush_entrance_data import validate_flush_entrance
+                if set(e)-required-{'flushEntrance'}:
+                    raise ValueError('Flush entrance cannot add stairs, a canopy or a recessed portico')
+                wall_height=form['height']
+                if form['parts']:
+                    door=LineString([[resolved['center'][i]+(c[i]-a[i])/length*offset for i in (0,1)] for offset in (-width/2,width/2)])
+                    matches=[p for p in form['parts'] if unary_union([Polygon(r[0],r[1:]) for r in p['polygons']]).boundary.buffer(1e-6).covers(door)]
+                    if len(matches)!=1 or 'openBelow' in matches[0]:
+                        raise ValueError('Flush entrance must fit one solid building part')
+                    wall_height=matches[0]['height']
+                validate_flush_entrance(e['flushEntrance'],width,wall_height)
             if 'stairFlight' in e:
                 if 'landingHeight' not in e:raise ValueError('Stair flight requires a simple raised landing')
                 from entrance_stairs_data import resolve_stair_flight
@@ -573,6 +585,16 @@ def resolve_building(building, record=None, source_ids=None):
         form['entrances']=entrances
     if 'parts' in record or 'facadeRules' in record:
         form['facades']=resolve_facades(b,form,record.get('facadeRules',[]))
+    for entry in form['entrances']:
+        if 'flushEntrance' not in entry:continue
+        for facade in form.get('facades',[]):
+            if any(facade[k]!=entry[k] for k in ('polygon','ring','edge')):continue
+            rule=facade['rule']
+            if any(k in rule for k in ('openCorridor','windowGrid','windowBands','attachedGallery')):
+                raise ValueError('Flush entrance conflicts with another facade system')
+            # Upper panels are permitted; they must not cover the glazed portal.
+            if any(p['bottom']<entry['flushEntrance']['glazingHeight'] for p in rule.get('panels',[])):
+                raise ValueError('Facade panels overlap the flush entrance glazing')
     provenance.setdefault('archetype',{'status':'estimated','sourceRefs':['osm'],
         'note':'按名称、OSM用途和现有形制规则推定'})
     provenance.setdefault('floorHeight',{'status':'estimated','sourceRefs':[],
