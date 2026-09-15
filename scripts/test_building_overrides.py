@@ -423,6 +423,55 @@ class BuildingOverrideTests(unittest.TestCase):
         for v in bad:
             with self.subTest(v=v),self.assertRaises(ValueError):self.resolve(b,**v)
 
+    def recess_glazing_fixture(self):
+        b,v=self.portico_fixture()
+        v['entrances'][0]['recessGlazing']={'width':13.2,'glazingHeight':2.7,'transomHeight':2.4,
+            'sideColumns':3,'doorWidth':3.2,'doorHeight':2.2,'frameWidth':.075,'bayGap':.3}
+        return b,v
+
+    def test_recess_glazing_preserves_portico_when_rotated(self):
+        import math
+        b,v=self.recess_glazing_fixture();r=self.resolve(b,**v)
+        self.assertEqual(r['form']['entrances'][0]['recessGlazing'],v['entrances'][0]['recessGlazing'])
+        self.assertEqual(r['polygons'],b['polygons'])
+        b['polygons']=[[[[-y,x] for x,y in ring] for ring in poly] for poly in b['polygons']]
+        for p in v['parts']:
+            p['polygons']=[[[[-y,x] for x,y in ring] for ring in poly] for poly in p['polygons']]
+            for c in p.get('openBelow',{}).get('columns',[]):
+                x,y=c['center'];c['center']=[-y,x];c['angle']+=math.pi/2
+        e=self.resolve(b,**v)['form']['entrances'][0]
+        self.assertEqual(e['center'],[0,15]);self.assertEqual(e['bearing'],90)
+
+    def test_recess_glazing_rejects_invalid_dimensions_and_unusable_banks(self):
+        b,v=self.recess_glazing_fixture()
+        for key,value in [('width',14),('width',8),('width',True),('width',float('nan')),
+                          ('glazingHeight',3.1),('glazingHeight',float('inf')),
+                          ('transomHeight',2.2),('transomHeight',2.6),('sideColumns',True),
+                          ('sideColumns',7),('doorWidth',7),('doorHeight',3.1),
+                          ('frameWidth',0),('bayGap',-.1)]:
+            bad=copy.deepcopy(v);bad['entrances'][0]['recessGlazing'][key]=value
+            with self.subTest(key=key,value=value),self.assertRaises(ValueError):self.resolve(b,**bad)
+        for key in ['width','sideColumns']:
+            bad=copy.deepcopy(v);del bad['entrances'][0]['recessGlazing'][key]
+            with self.subTest(missing=key),self.assertRaises(ValueError):self.resolve(b,**bad)
+
+    def test_recess_glazing_requires_portico_and_excludes_other_entry_systems(self):
+        b,v=self.recess_glazing_fixture()
+        bad=copy.deepcopy(v);del bad['entrances'][0]['recess']
+        with self.assertRaisesRegex(ValueError,'only a recessed portico'):self.resolve(b,**bad)
+        for key in ['flushEntrance','attachedPortico','doorFrame','mappedCanopy']:
+            bad=copy.deepcopy(v);bad['entrances'][0][key]={}
+            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'only a recessed portico'):
+                self.resolve(b,**bad)
+
+    def test_recess_glazing_cannot_extend_beyond_a_tapered_portico_rear(self):
+        b,v=self.recess_glazing_fixture()
+        b['polygons']=[[[[0,0],[12,0],[8,-4],[22,-4],[18,0],[30,0],[30,20],[0,20],[0,0]]]]
+        v['parts'][1]['polygons']=[[[[8,-4],[22,-4],[18,0],[12,0],[8,-4]]]]
+        for c,x in zip(v['parts'][1]['openBelow']['columns'],[9.5,12,18,20.5]):c['center'][0]=x
+        v['entrances'][0]['width']=4
+        with self.assertRaisesRegex(ValueError,'main-body rear wall'):self.resolve(b,**v)
+
     def test_multistorey_portico_keeps_upper_windows_and_continuous_roof(self):
         b,values=self.portico_fixture()
         values['parts'][1].update(height=16.5,levels=5)
