@@ -467,3 +467,7 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 低门厅可用 `openBelow.columns[].shape: cylinder` 表达圆柱，直径由相等的 `width` / `depth` 给出，基础和近景共享 16 边截面。入口台阶宽度限制在所属低门厅实际占据的原轮廓边区间。见[办公南楼门厅](OFFICE_SOUTH_ENTRY.md)。
 
 `entrances[].recessGlazing` 在已有内退柱廊后墙表达左右玻璃与中央门区，字段包括 `width`、`glazingHeight`、`transomHeight`、`sideColumns`、`doorWidth`、`doorHeight`、`frameWidth`、`bayGap`。玻璃范围同时受后墙、柱廊后缘和顶棚净高约束；仅允许与 `recess`、`steps`、`stepBaseHeight` 组合。与默认门片二选一，两个细节级别共享门窗分隔，详见[柱后玻璃](OFFICE_SOUTH_GLAZING.md)。
+
+## 2026-09-16：资环材学院整体尺度
+
+新增第19条普通楼部分对象校准：`relation/11564999`由类型默认5层改为设计院记载的最高地上11层。设计建筑高度48.9米暂换算成48.1米主体加既有0.8米示意女儿墙，主体和均分层高仍标为估算，保留三个原映射内院。仅本楼源对象与对应基础/近景区块变化，单一挤出体尚未拆分低门廊、连廊与退台，不提高整栋验收完成数。[资料、前后图与局限](MATERIALS_BUILDING_HEIGHT.md)。
