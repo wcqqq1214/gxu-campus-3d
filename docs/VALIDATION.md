@@ -744,3 +744,5 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 149项Python、56项Node及完整模型、Pages构建通过。430栋普通建筑源文件/实际GLB和3063株树检查通过；其他447栋数据、530个源对象、90个基础节点及67个GLB保持。首屏5,139,956 bytes，最大普通近景1,684,868 bytes。七张楼栋截图与图书馆手机尺寸回归已核看，入口及局部分段仍未验收。
 
 精细60/60/60 FPS、流畅29/29/29 FPS；相对同系统S0，三角形增加3.59%/7.75%，绘制调用增加2.19%/11.03%，均在原预算内。三次LOD往返无错误，24次CPU快照中计时窗口未记录到超过2%阈值的Python/Blender计算。[本批汇总](model-checks/refinement/s2-materials-height-summary.json)，[范围与对照图](MATERIALS_BUILDING_HEIGHT.md)。
+
+2026-09-16：新增 `blender/validate_materials_frame.py`，对源文件、基础和近景分别检查7个横梁顶点、8个贯通梁间孔、4个边梁点、4组圆柱轴向命中/侧向净空、3个高主体屋面及3个原内院，共29组检查。旧高挤出体在源文件控制检查中失败；通用屋顶采样改在实际梁面取点。详见[框架专项](MATERIALS_BUILDING_FRAME.md)及其验收报告。

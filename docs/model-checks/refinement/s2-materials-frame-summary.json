@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "baseCommit": "e082508fd72ee8c2cb6ddf6159c2491ecd718717",
+  "branch": "dev",
+  "scope": "Materials building: estimated east open frame, seven slats, eight sky gaps and four round columns; high body and footprint preserved. Lower entrance canopy, stairs, bridges and terraces remain pending.",
+  "partialObjectRecords": 19,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 154,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "all-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4157866,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.431560827081137,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        29,
+        29,
+        29
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 29,
+        "medianTriangles": 1134697,
+        "medianDrawCalls": 292
+      },
+      "changePercent": {
+        "medianFPS": -3.3333333333333326,
+        "medianTriangles": 7.866570970915787,
+        "medianDrawCalls": 11.026615969581744
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "fingerprints": {
+    "data/building-overrides.json": "9cbb7a26e3a30eb9b6be8279d5f2dbb281c1c8de34a42322c3f615d127ec2f2f",
+    "data/building-sources.json": "be12734301670889d91a481e4e26579c0469f74e32ab9a3ebd4a0b2b10e28ff0",
+    "blender/gxu-campus.blend": "b530deb0a43db12d8b697c527148c4d9fb3db107640ce76e69a2617a18c903ff",
+    "public/data/buildings.json": "f290a7d4cdf201758bef68cfe2b1a584f87988e3b5a94504a5c259082536e0ab",
+    "public/data/models.json": "53ed73ce79c3680c6cdd3dc4ed2efb57c0be82aa95898b54d0e4ca7c6803b846"
+  }
+}
