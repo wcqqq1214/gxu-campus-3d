@@ -1,0 +1,761 @@
+{
+  "reviewedAt": "2026-09-15T11:57:20.907487+00:00",
+  "scope": "Current assets versus replayed S0, fixed library orbit, three 30-second runs per tier; ordinary desktop conditions.",
+  "previousGoalTurnClassification": "progress: dev branch and user merge boundary created and pushed",
+  "modelManifestSha256": "290489af154933bcb59e669c2d2b2b15a8051e601251d7cbb700968a0fae6360",
+  "sourceSha256": "472acca20878dad3c675cafbb692f51dce75626cc4ac927fb423213e02c518b5",
+  "environment": {
+    "platform": "darwin",
+    "release": "25.5.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "environmentFieldsMatch": true,
+  "metrics": {
+    "精细": {
+      "baseline": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "medianFPS": 60,
+        "medianTriangles": 4014819,
+        "medianDrawCalls": 537
+      },
+      "current": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "medianFPS": 60,
+        "medianTriangles": 4134737,
+        "medianDrawCalls": 542
+      },
+      "ratios": {
+        "medianFPS": 1.0,
+        "medianTriangles": 1.029868843402405,
+        "medianDrawCalls": 1.0093109869646182
+      },
+      "passed": true
+    },
+    "流畅": {
+      "baseline": {
+        "repeatFPS": [
+          30,
+          30,
+          30
+        ],
+        "medianFPS": 30,
+        "medianTriangles": 1053826,
+        "medianDrawCalls": 269
+      },
+      "current": {
+        "repeatFPS": [
+          30,
+          30,
+          30
+        ],
+        "medianFPS": 30,
+        "medianTriangles": 1121897,
+        "medianDrawCalls": 291
+      },
+      "ratios": {
+        "medianFPS": 1.0,
+        "medianTriangles": 1.0645941550123075,
+        "medianDrawCalls": 1.0817843866171004
+      },
+      "passed": true
+    }
+  },
+  "assets": {
+    "baseline": {
+      "modelCount": 69,
+      "modelManifestSha256": "1ab1452d99e47dbb47ab79d9bc967de3a509b7269a8b2073c922ef8ccca05b76",
+      "initialBytes": 5051912
+    },
+    "current": {
+      "modelCount": 69,
+      "modelManifestSha256": "290489af154933bcb59e669c2d2b2b15a8051e601251d7cbb700968a0fae6360",
+      "initialBytes": 5012720
+    },
+    "production": {
+      "modelCount": 69,
+      "modelManifestSha256": "290489af154933bcb59e669c2d2b2b15a8051e601251d7cbb700968a0fae6360",
+      "initialBytes": 5012720
+    }
+  },
+  "maxOrdinaryZoneBytes": 1684868,
+  "numericThresholdsPassed": true,
+  "workloadReview": {
+    "samplesPerVariant": {
+      "baseline": 24,
+      "current": 24
+    },
+    "otherProcessPeaksDuringActivities": {
+      "baseline": [
+        {
+          "at": "2026-09-15T11:47:17.845800+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 39.0,
+          "elapsed": "103-19:23:11",
+          "cumulativeCPUTime": "12429:49.64",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:47:27.897928+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 41.2,
+          "elapsed": "103-19:23:21",
+          "cumulativeCPUTime": "12429:53.70",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:47:37.959932+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 36.4,
+          "elapsed": "103-19:23:31",
+          "cumulativeCPUTime": "12429:57.81",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:47:37.959932+00:00",
+          "pid": 5483,
+          "parentPid": 1,
+          "cpuPercent": 77.1,
+          "elapsed": "01-01:12:14",
+          "cumulativeCPUTime": "15:42.30",
+          "executable": "/Applications/CC Switch.app/Contents/MacOS/cc-switch"
+        },
+        {
+          "at": "2026-09-15T11:47:37.959932+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 20.9,
+          "elapsed": "01-14:56:26",
+          "cumulativeCPUTime": "265:48.27",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:47:48.007518+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 41.3,
+          "elapsed": "103-19:23:41",
+          "cumulativeCPUTime": "12430:01.91",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:47:58.053570+00:00",
+          "pid": 545,
+          "parentPid": 1,
+          "cpuPercent": 47.6,
+          "elapsed": "103-19:23:53",
+          "cumulativeCPUTime": "114:58.54",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds"
+        },
+        {
+          "at": "2026-09-15T11:47:58.053570+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 40.7,
+          "elapsed": "103-19:23:52",
+          "cumulativeCPUTime": "12430:06.06",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:47:58.053570+00:00",
+          "pid": 82286,
+          "parentPid": 1,
+          "cpuPercent": 24.3,
+          "elapsed": "01-14:56:51",
+          "cumulativeCPUTime": "21:28.29",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "at": "2026-09-15T11:48:08.158213+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 100.1,
+          "elapsed": "103-19:24:02",
+          "cumulativeCPUTime": "12430:13.24",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:48:08.158213+00:00",
+          "pid": 53787,
+          "parentPid": 82286,
+          "cpuPercent": 58.8,
+          "elapsed": "00:03",
+          "cumulativeCPUTime": "0:01.87",
+          "executable": "/opt/homebrew/bin/git"
+        },
+        {
+          "at": "2026-09-15T11:48:08.158213+00:00",
+          "pid": 82310,
+          "parentPid": 82286,
+          "cpuPercent": 26.8,
+          "elapsed": "01-14:56:59",
+          "cumulativeCPUTime": "161:51.48",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "at": "2026-09-15T11:48:08.158213+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 42.4,
+          "elapsed": "01-14:56:57",
+          "cumulativeCPUTime": "265:56.78",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:48:28.305209+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 39.8,
+          "elapsed": "103-19:24:22",
+          "cumulativeCPUTime": "12430:27.49",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:48:38.346870+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 41.1,
+          "elapsed": "103-19:24:32",
+          "cumulativeCPUTime": "12430:31.52",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:48:38.346870+00:00",
+          "pid": 5483,
+          "parentPid": 1,
+          "cpuPercent": 26.0,
+          "elapsed": "01-01:13:15",
+          "cumulativeCPUTime": "15:43.43",
+          "executable": "/Applications/CC Switch.app/Contents/MacOS/cc-switch"
+        },
+        {
+          "at": "2026-09-15T11:48:48.395197+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 38.4,
+          "elapsed": "103-19:24:42",
+          "cumulativeCPUTime": "12430:35.60",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:48:58.447298+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 37.5,
+          "elapsed": "103-19:24:52",
+          "cumulativeCPUTime": "12430:39.59",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:48:58.447298+00:00",
+          "pid": 740,
+          "parentPid": 1,
+          "cpuPercent": 20.9,
+          "elapsed": "103-19:24:50",
+          "cumulativeCPUTime": "611:08.41",
+          "executable": "/usr/libexec/sysmond"
+        },
+        {
+          "at": "2026-09-15T11:48:58.447298+00:00",
+          "pid": 82310,
+          "parentPid": 82286,
+          "cpuPercent": 22.3,
+          "elapsed": "01-14:57:49",
+          "cumulativeCPUTime": "161:58.42",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "at": "2026-09-15T11:48:58.447298+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 30.2,
+          "elapsed": "01-14:57:47",
+          "cumulativeCPUTime": "266:09.95",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:49:08.497163+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 35.6,
+          "elapsed": "103-19:25:02",
+          "cumulativeCPUTime": "12430:43.58",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:49:18.544231+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 38.7,
+          "elapsed": "103-19:25:12",
+          "cumulativeCPUTime": "12430:47.49",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:49:18.544231+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 23.9,
+          "elapsed": "01-14:58:07",
+          "cumulativeCPUTime": "266:14.20",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:49:28.600543+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 37.7,
+          "elapsed": "103-19:25:22",
+          "cumulativeCPUTime": "12430:51.38",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:49:28.600543+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 25.8,
+          "elapsed": "01-14:58:17",
+          "cumulativeCPUTime": "266:16.54",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:49:38.649392+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 45.2,
+          "elapsed": "103-19:25:32",
+          "cumulativeCPUTime": "12430:55.38",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:49:48.698598+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 35.6,
+          "elapsed": "103-19:25:42",
+          "cumulativeCPUTime": "12430:59.41",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:49:48.698598+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 21.0,
+          "elapsed": "01-14:58:37",
+          "cumulativeCPUTime": "266:21.03",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:49:58.754209+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 40.2,
+          "elapsed": "103-19:25:52",
+          "cumulativeCPUTime": "12431:03.43",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:49:58.754209+00:00",
+          "pid": 63661,
+          "parentPid": 11957,
+          "cpuPercent": 99.3,
+          "elapsed": "01-22:54:54",
+          "cumulativeCPUTime": "2:38.88",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.76/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:49:58.754209+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 22.6,
+          "elapsed": "01-14:58:47",
+          "cumulativeCPUTime": "266:24.65",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:50:08.799697+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 40.9,
+          "elapsed": "103-19:26:02",
+          "cumulativeCPUTime": "12431:07.46",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:50:18.849801+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 41.4,
+          "elapsed": "103-19:26:12",
+          "cumulativeCPUTime": "12431:11.43",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:50:18.849801+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 20.0,
+          "elapsed": "01-14:59:07",
+          "cumulativeCPUTime": "266:29.03",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:50:28.910303+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 37.5,
+          "elapsed": "103-19:26:22",
+          "cumulativeCPUTime": "12431:15.43",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:50:28.910303+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 25.7,
+          "elapsed": "01-14:59:17",
+          "cumulativeCPUTime": "266:31.53",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ],
+      "current": [
+        {
+          "at": "2026-09-15T11:51:20.217752+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 40.6,
+          "elapsed": "103-19:27:14",
+          "cumulativeCPUTime": "12431:36.14",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:51:30.261441+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 39.9,
+          "elapsed": "103-19:27:24",
+          "cumulativeCPUTime": "12431:40.32",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:51:40.305217+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 39.8,
+          "elapsed": "103-19:27:34",
+          "cumulativeCPUTime": "12431:44.35",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:51:50.365393+00:00",
+          "pid": 545,
+          "parentPid": 1,
+          "cpuPercent": 52.2,
+          "elapsed": "103-19:27:45",
+          "cumulativeCPUTime": "115:12.17",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mds"
+        },
+        {
+          "at": "2026-09-15T11:51:50.365393+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 37.7,
+          "elapsed": "103-19:27:44",
+          "cumulativeCPUTime": "12431:48.50",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:52:00.405240+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 36.8,
+          "elapsed": "103-19:27:54",
+          "cumulativeCPUTime": "12431:52.54",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:52:00.405240+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 68.5,
+          "elapsed": "01-15:00:49",
+          "cumulativeCPUTime": "266:51.34",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:52:10.451519+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 43.5,
+          "elapsed": "103-19:28:04",
+          "cumulativeCPUTime": "12431:56.50",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:52:30.563338+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 39.7,
+          "elapsed": "103-19:28:24",
+          "cumulativeCPUTime": "12432:04.61",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:52:40.647117+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 41.6,
+          "elapsed": "103-19:28:34",
+          "cumulativeCPUTime": "12432:08.77",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:52:50.697115+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 41.6,
+          "elapsed": "103-19:28:44",
+          "cumulativeCPUTime": "12432:12.77",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:52:50.697115+00:00",
+          "pid": 11991,
+          "parentPid": 11957,
+          "cpuPercent": 22.6,
+          "elapsed": "03-18:23:22",
+          "cumulativeCPUTime": "13:23.89",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/152.0.7977.76/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:53:00.746193+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 41.4,
+          "elapsed": "103-19:28:54",
+          "cumulativeCPUTime": "12432:16.79",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:53:10.795853+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 38.9,
+          "elapsed": "103-19:29:04",
+          "cumulativeCPUTime": "12432:20.82",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:53:10.795853+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 24.6,
+          "elapsed": "01-15:01:59",
+          "cumulativeCPUTime": "267:06.59",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:53:20.847125+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 38.7,
+          "elapsed": "103-19:29:14",
+          "cumulativeCPUTime": "12432:24.85",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:53:20.847125+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 21.2,
+          "elapsed": "01-15:02:09",
+          "cumulativeCPUTime": "267:08.92",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:53:40.960009+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 39.7,
+          "elapsed": "103-19:29:34",
+          "cumulativeCPUTime": "12432:32.83",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:53:40.960009+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 23.5,
+          "elapsed": "01-15:02:29",
+          "cumulativeCPUTime": "267:13.38",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:53:50.993113+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 40.9,
+          "elapsed": "103-19:29:44",
+          "cumulativeCPUTime": "12432:36.86",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:53:50.993113+00:00",
+          "pid": 54319,
+          "parentPid": 82286,
+          "cpuPercent": 40.6,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.34",
+          "executable": "/opt/homebrew/bin/git"
+        },
+        {
+          "at": "2026-09-15T11:53:50.993113+00:00",
+          "pid": 54320,
+          "parentPid": 82396,
+          "cpuPercent": 74.0,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.47",
+          "executable": ".venv/bin/python"
+        },
+        {
+          "at": "2026-09-15T11:54:01.045611+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 34.3,
+          "elapsed": "103-19:29:55",
+          "cumulativeCPUTime": "12432:40.77",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:54:01.045611+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 27.9,
+          "elapsed": "01-15:02:50",
+          "cumulativeCPUTime": "267:17.88",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:54:11.094138+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 40.2,
+          "elapsed": "103-19:30:05",
+          "cumulativeCPUTime": "12432:44.70",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:54:11.094138+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 22.7,
+          "elapsed": "01-15:03:00",
+          "cumulativeCPUTime": "267:20.20",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:54:21.149569+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 41.4,
+          "elapsed": "103-19:30:15",
+          "cumulativeCPUTime": "12432:48.65",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:54:21.149569+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 20.9,
+          "elapsed": "01-15:03:10",
+          "cumulativeCPUTime": "267:23.49",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "at": "2026-09-15T11:54:31.194770+00:00",
+          "pid": 589,
+          "parentPid": 1,
+          "cpuPercent": 39.1,
+          "elapsed": "103-19:30:25",
+          "cumulativeCPUTime": "12432:52.69",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "at": "2026-09-15T11:54:31.194770+00:00",
+          "pid": 54418,
+          "parentPid": 82396,
+          "cpuPercent": 35.4,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:00.20",
+          "executable": ".venv/bin/python"
+        },
+        {
+          "at": "2026-09-15T11:54:31.194770+00:00",
+          "pid": 82286,
+          "parentPid": 1,
+          "cpuPercent": 25.1,
+          "elapsed": "01-15:03:24",
+          "cumulativeCPUTime": "21:36.90",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "at": "2026-09-15T11:54:31.194770+00:00",
+          "pid": 82408,
+          "parentPid": 82286,
+          "cpuPercent": 27.7,
+          "elapsed": "01-15:03:20",
+          "cumulativeCPUTime": "267:26.01",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/152.0.7977.83/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    "assessment": "Normal desktop activity with transient process starts. No sustained competing Python/Blender computation was observed. Two distinct Python processes were sampled at age 0/1 seconds with 0.47/0.20 seconds accrued CPU and were absent from the subsequent 10-second snapshots; both PIDs were absent in the final process check. Peak percentages alone do not establish sustained computation.",
+    "limitations": "10-second snapshots can miss short tasks and do not measure exclusive GPU access, thermal state or power-mode equivalence. WindowServer, Codex, browser and indexing activity are retained, not described as an idle-machine benchmark."
+  },
+  "sameConditionAcceptancePassed": true,
+  "acceptanceBasis": "Same machine, OS, browser, viewport, DPR, camera/quality controls and protocol in one session; manual review accepts normal desktop transients, with all six per-variant repeat medians stable. This is the existing ordinary-desktop regression gate, not exclusive-machine performance certification.",
+  "sourceAndPriorPartialBatchEvidenceVerified": true,
+  "partialEastGalleryBatchJointAcceptancePassed": true,
+  "acceptanceBoundary": "Closes the current fixed-library performance gate and the existing partial east-gallery batch performance dependency. Does not revalidate other historical versions, unmeasured cameras, unobserved facades or whole-building/site completion.",
+  "screenshotReview": {
+    "baseline": "Historical four-column entrance and front trees; evidence only of loaded baseline view.",
+    "current": "Six-column entrance, double-return facade and paved approach visible; viewport simulation, not physical-phone performance."
+  },
+  "evidenceSha256": {
+    "docs/model-checks/refinement/s5-perf-20260915-baseline-browser.json": "f909ddfb8e79ea48393744bed03e559c6d182896b5fc920f98c93486d3d66f19",
+    "docs/model-checks/refinement/s5-perf-20260915-baseline-performance-context.json": "227257fd8e33d1ade63f980287daddb18105c977f423c86ded6c15210155d53d",
+    "docs/model-checks/refinement/s5-perf-20260915-current-browser.json": "13ca9cde5422278819f877751d3b85e04cd970deb2bb7a5bc03f8296b002bb1e",
+    "docs/model-checks/refinement/s5-perf-20260915-current-performance-context.json": "f406f0c42e9b534af07b777afba89798332dc5accedb01a801f8c394a734ed86",
+    "docs/model-checks/refinement/s2-east-gallery-summary.json": "9c84ac5f79783b32191a2cd353fe62d5ccba8d55755548aafa16e5cd576a247f",
+    "scripts/check-refinement-browser.mjs": "92f357be4185b9b0514d18f17585c752b675dc44d5aa1636558eac3c98b159fd",
+    "work/refinement-s3-neighbors/run_performance.py": "a70ac9acef3c6b2d0ea6f351f199f45df0c969f3fea91d4d45e6dbb24427810d",
+    "work/refinement-perf-20260915/cameras.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "blender/gxu-campus.blend": "472acca20878dad3c675cafbb692f51dce75626cc4ac927fb423213e02c518b5",
+    "docs/screenshots/refinement/s5-perf-20260915-baseline/library-mobile.png": "e813677ebfc66df9830c87625ef846182f2edcdc5b79d0ef25e75c22f28e1eff",
+    "docs/screenshots/refinement/s5-perf-20260915-current/library-mobile.png": "9916caa8ae35e8da0e4116a1aa84e3b8cc72faedb0dcca450a60810115c8e755"
+  },
+  "wholeBuildingAcceptancesAdded": 0,
+  "fullPlanCompleted": false,
+  "remaining": [
+    "20–30 complete ordinary-building calibrations; current 12 records remain partial.",
+    "Six required library neighbors and complete S3 site acceptance.",
+    "S4 courtyard/lakeside organization and remaining S5 work; historical shore/paving/planting geometry acceptance chains are not automatically closed by this performance run."
+  ]
+}
