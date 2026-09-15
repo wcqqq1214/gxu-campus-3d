@@ -24,7 +24,7 @@ ARCHETYPE_LEVELS = {'dormitory':6,'residential-block':6,'teaching-block':5,
                     'courtyard-lab':5,'low-rise-service':2}
 ARCHETYPES = {'generic', 'dormitory', 'residential-block', 'canteen', 'teaching-block',
               'courtyard-lab', 'low-rise-service', 'external-stair'}
-FIELDS = {'archetype', 'levels', 'floorHeight', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'stairTower'}
+FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'stairTower'}
 
 
 def ordinary(b):
@@ -336,6 +336,8 @@ def resolve_facades(b, form, rules):
                         facade = {'polygon':pi,'ring':ri,'edge':ei,'part':part['id'],
                             'start':list(start),'end':list(end),'normal':list(normal),'height':part['height'],
                             'levels':part['levels'],'rule':rule}
+                        if 'floorHeights' in form:
+                            facade['floorHeights'] = list(form['floorHeights'])
                         if 'attachedGallery' in rule:
                             from attached_gallery_data import resolve_attached_gallery
                             if abs(s.length-line.length)>1e-5:
@@ -449,6 +451,29 @@ def resolve_building(building, record=None, source_ids=None):
     b['levels'] = positive(record.get('levels', levels or default_levels), 'levels')
     floor_height = positive(record.get('floorHeight', 3.3), 'floorHeight')
     b['height'] = positive(record.get('height', height or b['levels']*floor_height), 'height')
+    if 'floorHeights' in record:
+        floors = record['floorHeights']
+        if (not isinstance(floors, list) or len(floors) != b['levels'] or not floors
+                or any(type(value) not in (int, float) for value in floors)):
+            raise ValueError('floorHeights needs one numeric height per complete storey')
+        floors = [positive(value, 'floorHeights item') for value in floors]
+        if 'floorHeight' in record:
+            raise ValueError('Use either floorHeight or floorHeights')
+        # Specialized layouts currently use equal-storey geometry. Reject
+        # combinations until their geometry also consumes the explicit stack.
+        if 'parts' in record or 'stairTower' in record or any(
+                set(rule) - {'polygon', 'ring', 'edge', 'windows', 'balconies', 'spacing'}
+                for rule in record.get('facadeRules', [])):
+            raise ValueError('floorHeights currently requires an undivided body with ordinary facades')
+        total = math.fsum(floors)
+        if 'height' in record and not math.isclose(b['height'], total, abs_tol=1e-6, rel_tol=0):
+            raise ValueError('Explicit height conflicts with the floorHeights sum')
+        if height and not math.isclose(height, total, abs_tol=1e-6, rel_tol=0):
+            warnings.append('OSM height differs from the adopted floorHeights sum; explicit storeys take precedence')
+        b['height'] = total
+        provenance.setdefault('height', {'status': 'estimated',
+            'sourceRefs': provenance['floorHeights']['sourceRefs'],
+            'note': '逐层层高之和推导主体高度；不含屋顶突出物，不等同竣工测量高度'})
     if not 2.2 <= b['height']/b['levels'] <= 6:
         warnings.append('body height / floor count is outside 2.2–6.0 m; review this conflict')
     provenance.setdefault('levels', {'status':'osm' if levels else 'estimated',
@@ -460,6 +485,8 @@ def resolve_building(building, record=None, source_ids=None):
     # roof over the complete (possibly concave) building.
     form_input = b if 'parts' not in record else {**b,'tags':{**tags,'roof:shape':'flat'}}
     form = resolve_form(form_input)
+    if 'floorHeights' in record:
+        form['floorHeights'] = floors
     form['archetype'] = archetype
     if form['archetype'] not in ARCHETYPES:
         raise ValueError('Unknown building archetype')
@@ -583,7 +610,7 @@ def resolve_building(building, record=None, source_ids=None):
         if (not entrances and not open_roof) or (entrances and sum(e['primary'] for e in entrances)!=1):
             raise ValueError('Exactly one primary entrance is required')
         form['entrances']=entrances
-    if 'parts' in record or 'facadeRules' in record:
+    if 'parts' in record or 'facadeRules' in record or 'floorHeights' in record:
         form['facades']=resolve_facades(b,form,record.get('facadeRules',[]))
     for entry in form['entrances']:
         if 'flushEntrance' not in entry:continue
@@ -597,8 +624,9 @@ def resolve_building(building, record=None, source_ids=None):
                 raise ValueError('Facade panels overlap the flush entrance glazing')
     provenance.setdefault('archetype',{'status':'estimated','sourceRefs':['osm'],
         'note':'按名称、OSM用途和现有形制规则推定'})
-    provenance.setdefault('floorHeight',{'status':'estimated','sourceRefs':[],
-        'note':'默认3.3米层高；独立OSM高度存在时不以此覆盖高度'})
+    if 'floorHeights' not in record:
+        provenance.setdefault('floorHeight',{'status':'estimated','sourceRefs':[],
+            'note':'默认3.3米层高；独立OSM高度存在时不以此覆盖高度'})
     provenance.setdefault('roof.type',{'status':'osm' if tags.get('roof:shape') in ('flat','hipped','gabled') else 'estimated',
         'sourceRefs':['osm'] if tags.get('roof:shape') in ('flat','hipped','gabled') else [],
         'note':form['roof']['basis']})
