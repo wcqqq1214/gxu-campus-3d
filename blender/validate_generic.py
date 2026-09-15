@@ -69,6 +69,10 @@ def samples(b):
             count+=1
             if count>=3:break
         assert count>0,(b['id'],part['id'],'no usable roof samples')
+    if 'stairTower' in form:
+        s=form['stairTower'];x,y=s['origin'];floor=z+s['config']['baseHeight']
+        points.append({'kind':'stair-ground-platform','x':x,'y':y,'top':floor+.5,'expected':floor})
+        return points
     for e in form['entrances']:
         x,y=e['center'];a=math.radians(e['bearing']);nx,ny=math.sin(a),math.cos(a)
         if 'shelter' in e:
