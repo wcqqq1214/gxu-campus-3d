@@ -2,6 +2,30 @@
 import math
 
 
+def add_corridor_openings(mesh, facade, z, C):
+    """Place explicit doors/windows on ground wall or recessed upper back wall."""
+    rule = facade['rule']['openCorridor']
+    a, b = facade['start'], facade['end']
+    length = math.dist(a, b)
+    u = [(b[k]-a[k])/length for k in (0, 1)]
+    n = facade['normal']; theta = math.atan2(u[1], u[0])
+    fh = facade['height']/facade['levels']
+    for opening in rule.get('openings', []):
+        for level in opening['levels']:
+            depth = rule['depth'] if level >= rule['firstLevel'] else 0
+            x, y = [a[k]+(b[k]-a[k])*opening['t']-n[k]*depth for k in (0, 1)]
+            width, height = opening['width'], opening['height']
+            floor = z+level*fh+opening['sill']
+            mesh.box(x+n[0]*.10,y+n[1]*.10,floor+height/2,width,.08,height,C['glass'],theta)
+            material = C['dark' if opening['kind']=='door' else 'white']
+            for t in (-width/2, width/2):
+                mesh.box(x+u[0]*t+n[0]*.16,y+u[1]*t+n[1]*.16,floor+height/2,.06,.08,height,material,theta)
+            for h in (floor, floor+height):
+                mesh.box(x+n[0]*.16,y+n[1]*.16,h,width+.06,.08,.06,material,theta)
+            if opening['kind']=='window':
+                mesh.box(x+n[0]*.17,y+n[1]*.17,floor+height/2,width,.04,.04,material,theta)
+
+
 def add_corridor(mesh, facade, z, wall, slab, railing, pitched_roof=False):
     """Replace one vertical wall strip; retain ground floor and roof outline.
 
@@ -29,7 +53,11 @@ def add_corridor(mesh, facade, z, wall, slab, railing, pitched_roof=False):
     index,start,end,bottom=candidates[0]
     del mesh.f[index];del mesh.m[index]
 
-    def face(points,material=wall):mesh.face([point(*p) for p in points],material)
+    # Exterior rings may run either way. The local (t, inward depth) frame
+    # must have positive XY handedness for the face templates below.
+    reverse = u[1]*n[0]-u[0]*n[1] < 0
+    def face(points,material=wall):
+        mesh.face([point(*p) for p in (reversed(points) if reverse else points)],material)
     def front(t0,t1,z0,z1):
         if t1-t0>1e-6 and z1-z0>1e-6:
             face([(t0,0,z0),(t1,0,z0),(t1,0,z1),(t0,0,z1)])

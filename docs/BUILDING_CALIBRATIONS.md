@@ -104,3 +104,5 @@ blender --background --python-exit-code 1 --python blender/validate_generic.py -
 林学院后续已处理[南门门廊](FORESTRY_COLLEGE_ENTRY.md)与[南侧中段窗带](FORESTRY_COLLEGE_FACADES.md)。窗组、分格和挑檐尺寸属于照片约束估算；底层、两端、入口上方竖向突出体和其他立面继续待核对。该楼仍属于部分校准，不能增加整栋验收数量。
 
 艺术学院西主入口后续采用引用独立雨棚的 `mappedCanopy` 规则：门组属于主楼，平台/顶板属于已有roof对象，不重复生成。字段来源、通行约束、前场连接和局部验收见[西入口专项](ARTS_WEST_ENTRY.md)。累计部分对象记录仍15条，整栋验收数不因本次入口细化增加。
+
+2026-09-16：临湖附楼东端面已接入三层开放外廊及显式门窗；`openCorridor.finish` 采用受限共享材质，`openings` 指定门窗位置和楼层，禁止与默认窗列重复生成。 详见[临湖端面与法线修复](ARTS_LAKESIDE_FACADE.md)。

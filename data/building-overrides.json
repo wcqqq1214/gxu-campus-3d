@@ -2118,6 +2118,15 @@
             "artsLakeArchive"
           ],
           "note": "2024年学院Environment照片可见平屋面与女儿墙；背部设备和屋顶小体量未确认，不虚构坡屋顶。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024",
+            "artsLakeArchive"
+          ],
+          "note": "校档案馆碧云湖全景与2024年Environment湖景均显示东侧短边三层开放外廊、浅色后墙、暖色实体栏板及两端支承；每个上层南端小窗、北端门，底层北端门及偏中小窗按可见位置估算。凹入1.8米、端退0.35米、栏板1米、门窗位置和尺寸均未测量，重复门窗作简化表达；南北长立面和西端不据此复制外廊。"
         }
       },
       "review": {
@@ -2135,17 +2144,78 @@
         },
         "entrances": {
           "status": "partial",
-          "note": "北侧主入口仍为未定位示意；南墙上层平台及门由独立外楼梯记录派生，位置与尺寸为照片/地图约束估算。"
+          "note": "北侧主入口仍为未定位示意；南墙上层平台及门由独立外楼梯记录派生，位置与尺寸为照片/地图约束估算。 东侧底层次门由端面开口规则表达，主次用途未完全核实，未增加独立雨棚或凭空连接道路。"
         },
         "facadeRules": {
           "status": "partial",
-          "note": "可见窗列与材质待校准，现有立面为示意。"
+          "note": "校档案馆碧云湖全景与2024年Environment湖景均显示东侧短边三层开放外廊、浅色后墙、暖色实体栏板及两端支承；每个上层南端小窗、北端门，底层北端门及偏中小窗按可见位置估算。凹入1.8米、端退0.35米、栏板1米、门窗位置和尺寸均未测量，重复门窗作简化表达；南北长立面和西端不据此复制外廊。 其他主要立面仍待核对。"
         },
         "parts": {
           "status": "partial",
           "note": "照片未覆盖全部背面体量。"
         }
-      }
+      },
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 0,
+          "windows": false,
+          "balconies": false,
+          "openCorridor": {
+            "depth": 1.8,
+            "firstLevel": 1,
+            "railHeight": 1.0,
+            "endInset": 0.35,
+            "piers": {
+              "bays": 1,
+              "width": 0.35,
+              "depth": 0.45
+            },
+            "finish": {
+              "wall": "white",
+              "rail": "pink"
+            },
+            "openings": [
+              {
+                "kind": "door",
+                "t": 0.17,
+                "width": 1.0,
+                "height": 2.15,
+                "sill": 0,
+                "levels": [
+                  0,
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.86,
+                "width": 0.9,
+                "height": 0.8,
+                "sill": 1.35,
+                "levels": [
+                  1,
+                  2,
+                  3
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.4,
+                "width": 0.7,
+                "height": 0.7,
+                "sill": 1.3,
+                "levels": [
+                  0
+                ]
+              }
+            ]
+          }
+        }
+      ]
     },
     "way/880089961": {
       "name": "校内建筑 880089961",
