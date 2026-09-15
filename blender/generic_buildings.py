@@ -51,12 +51,14 @@ def shared_form(b, z, C):
         triangles = part['triangles'] if roof['type'] == 'flat' else [[] for _ in part['polygons']]
         if 'openBelow' in part:
             opening=part['openBelow'];soffit=opening['clearHeight'];floor=opening['floorHeight']
-            part_body.extrude(part['polygons'],triangles,z+soffit,h-soffit,wall,C['paleRoof'])
+            roof_geometry=opening.get('roofGeometry',{'polygons':part['polygons'],'triangles':triangles})
+            roof_wall=C['white'] if 'slattedRoof' in opening else wall
+            part_body.extrude(roof_geometry['polygons'],roof_geometry['triangles'],z+soffit,h-soffit,roof_wall,C['white'] if 'slattedRoof' in opening else C['paleRoof'])
             # Explicit underside and floor; the original footprint remains the canopy outline.
-            for poly,indices in zip(part['polygons'],triangles):
+            for poly,indices in zip(roof_geometry['polygons'],roof_geometry['triangles']):
                 vertices=[p for ring in poly for p in ring[:-1]]
                 for i in range(0,len(indices),3):
-                    part_body.face([(vertices[k][0],vertices[k][1],z+soffit) for k in reversed(indices[i:i+3])],wall)
+                    part_body.face([(vertices[k][0],vertices[k][1],z+soffit) for k in reversed(indices[i:i+3])],roof_wall)
             part_body.extrude(part['polygons'],triangles,z-.15,floor+.15,C['stone'],C['stone'])
             for column in opening['columns']:
                 if column.get('shape')=='cylinder':
@@ -76,7 +78,7 @@ def shared_form(b, z, C):
             for i in range(0, len(geometry['triangles']), 3):
                 top.face([(geometry['vertices'][k][0], geometry['vertices'][k][1], z+h+geometry['vertices'][k][2])
                           for k in geometry['triangles'][i:i+3]], C['red'])
-        else:
+        elif 'slattedRoof' not in part.get('openBelow',{}):
             # Parapets follow each actual terrace elevation in both LODs.
             edges = part.get('parapetEdges', [(a,c) for poly in part['polygons']
                                              for ring in poly for a,c in zip(ring,ring[1:])])
