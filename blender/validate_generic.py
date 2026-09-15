@@ -57,13 +57,15 @@ def samples(b):
             vertices=roof['geometry']['vertices'];indices=roof['geometry']['triangles']
             triangles=[[vertices[k] for k in indices[i:i+3]] for i in range(0,len(indices),3)]
         else:
-            for poly,indices in zip(part['polygons'],part['triangles']):
+            geometry=part.get('openBelow',{}).get('roofGeometry',part)
+            for poly,indices in zip(geometry['polygons'],geometry['triangles']):
                 vertices=[list(p)+[0] for ring in poly for p in ring[:-1]]
                 triangles += [[vertices[k] for k in indices[i:i+3]] for i in range(0,len(indices),3)]
         count=0
         for tri in sorted(triangles,key=area,reverse=True):
             x,y,h=[sum(p[k] for p in tri)/3 for k in range(3)]
-            if area(tri)<.1 or edge_distance(x,y,part['polygons'])<.5:continue
+            clearance=.02 if 'slattedRoof' in part.get('openBelow',{}) else .5
+            if area(tri)<.1 or edge_distance(x,y,part['polygons'])<clearance:continue
             points.append({'kind':'roof','part':part['id'],'x':x,'y':y,
                            'top':z+part['height']+h+4,'expected':z+part['height']+h})
             count+=1

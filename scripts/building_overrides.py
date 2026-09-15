@@ -170,7 +170,7 @@ def resolve_parts(b, raw, roof):
                     'height':height, 'levels':levels, 'roof':part_roof}
         if 'openBelow' in part:
             opening = part['openBelow']
-            if not isinstance(opening, dict) or set(opening) != {'clearHeight','floorHeight','columns'}:
+            if not isinstance(opening, dict) or not {'clearHeight','floorHeight','columns'} <= set(opening) or set(opening)-{'clearHeight','floorHeight','columns','slattedRoof'}:
                 raise ValueError('Open portico needs floor, soffit and explicit columns')
             clear = positive(opening['clearHeight'], 'portico soffit height')
             floor = positive(opening['floorHeight'], 'portico floor height')
@@ -195,6 +195,11 @@ def resolve_parts(b, raw, roof):
                     raise ValueError('Portico columns leave their footprint or overlap')
                 supports.append(support)
             resolved['openBelow'] = copy.deepcopy(opening)
+            if 'slattedRoof' in opening:
+                from slatted_roof_data import resolve_slatted_roof
+                lattice = resolve_slatted_roof(part['polygons'], opening['slattedRoof'], columns)
+                polygons, indices = pack_geometry([lattice])
+                resolved['openBelow']['roofGeometry'] = {'polygons':polygons,'triangles':indices}
         parts.append(resolved)
     if footprint.symmetric_difference(unary_union(covered)).area > 1e-5:
         raise ValueError('Building parts do not cover the complete mapped footprint')
@@ -299,6 +304,7 @@ def resolve_facades(b, form, rules):
     parts = form['parts'] or [{'id':'body', 'polygons':b['polygons'],
                               'height':form['height'], 'levels':form['levels'], 'roof':form['roof']}]
     result = []
+    has_slatted_portico = any('slattedRoof' in p.get('openBelow',{}) for p in parts)
     corridor_strips = []
     matched = {key: 0 for key in indexed}
     for pi, poly in enumerate(b['polygons']):
@@ -323,10 +329,10 @@ def resolve_facades(b, form, rules):
                                 lo,hi=sorted((line.project(Point(v)),line.project(Point(w))))
                                 if hi-lo>.01:
                                     boundary_segments.append(LineString([line.interpolate(lo),line.interpolate(hi)]))
-                    # The new explicit-storey partition path uses coincident
-                    # boundaries even when GEOS returns a partial interval.
-                    # Preserve the existing equal-storey export path.
-                    if not any(s.length > .01 for s in segments) or ('floorHeights' in part and boundary_segments and abs(sum(s.length for s in segments)-sum(s.length for s in boundary_segments))>1e-5):
+                    # Explicit-storey and slatted-portico partitions use
+                    # coincident boundaries when GEOS drops part of an edge.
+                    # Keep other existing equal-storey exports unchanged.
+                    if not any(s.length > .01 for s in segments) or (('floorHeights' in part or has_slatted_portico) and boundary_segments and abs(sum(s.length for s in segments)-sum(s.length for s in boundary_segments))>1e-5):
                         segments=boundary_segments
                     for s in segments:
                         if s.length < .01: continue
@@ -428,7 +434,7 @@ def resolve_facades(b, form, rules):
                             if line.length < .01: continue
                             result.append({'polygon':None,'ring':None,'edge':None,'part':part['id'],
                                 'start':list(line.coords[0]),'end':list(line.coords[-1]),'normal':list(n),
-                                'height':part['height'],'levels':part['levels'],'minimumHeight':porch['height'],'rule':{}})
+                                'height':part['height'],'levels':part['levels'],'minimumHeight':porch['openBelow']['floorHeight'] if 'slattedRoof' in porch['openBelow'] else porch['height'],'rule':{}})
                             if 'floorHeights' in part:
                                 result[-1]['floorHeights'] = list(part['floorHeights'])
     return result

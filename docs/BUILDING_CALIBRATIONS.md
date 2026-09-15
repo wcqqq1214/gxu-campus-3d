@@ -118,3 +118,5 @@ blender --background --python-exit-code 1 --python blender/validate_generic.py -
 2026-09-16：[办公南楼柱后玻璃](OFFICE_SOUTH_GLAZING.md)补齐左右窗面、中央门区与上亮窗，替换两侧通用实墙和未分格门片。照片支持构成，分格及尺寸继续标为估算；整栋验收数不增加。
 
 2026-09-16：新增[资源环境与材料学院整体尺度](MATERIALS_BUILDING_HEIGHT.md)。设计院具名实景与校方照片交叉定位，采用最高地上11层；48.9米建筑高度转为48.1米主体加既有0.8米示意女儿墙，换算仍标为估算。累计19条部分对象记录，局部退台、入口及立面尚未完成，不新增整栋验收完成数。
+
+2026-09-16：[资环材学院东端框架](MATERIALS_BUILDING_FRAME.md)新增 `openBelow.slattedRoof`（`edgeWidth`、`slatWidth`、`slatCount`），仅接受近直角无孔四边形，派生带孔 `roofGeometry` 供两级共享。框架 `levels: 1` 表示开放结构单元；尺寸与横梁数量为估算。校准对象仍19条，未计为整栋完成。
