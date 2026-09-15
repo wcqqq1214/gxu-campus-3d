@@ -39,7 +39,9 @@ def check(objects,ground,tolerance):
         hit=ray(ts,center+up*1.5,up,4)
         assert hit and abs(hit[0].z-z-4.2)<tolerance,('soffit',fraction)
         start=front+u*((fraction-.5)*width)+n*.2+up*1.7
-        bay_hit=ray(ts,start,-n,2.25)
+        # Stop 0.25 m before the rear wall: the closed door's 0.16 m
+        # projecting frame is checked separately, not treated as a blocked bay.
+        bay_hit=ray(ts,start,-n,e['recess']+.2-.25)
         assert not bay_hit,('blocked bay',fraction,tuple(bay_hit[0]) if bay_hit else None,bay_hit[3] if bay_hit else None)
         bays.append(fraction)
     for c in p['openBelow']['columns']:
@@ -67,7 +69,7 @@ def check(objects,ground,tolerance):
     # The first omitted strip is a solid five-storey end, not a stair extension.
     outside=front+u*(width/2+.4)+n*.45+up*1.2
     assert not ray(ts,outside,down,1.25),'steps escaped low-portico frontage'
-    return dict(passed=True,toleranceMeters=tolerance,lowRoofHeights=roofs,openBays=bays,roundColumns=columns,recessedGlassDoor=True,solidUpperFascia=True,steps=steps,lowestRiserGrounded=True,stepsClippedToPortico=True)
+    return dict(passed=True,toleranceMeters=tolerance,lowRoofHeights=roofs,openBays=bays,openBayRearWallMargin=.25,roundColumns=columns,recessedGlassDoor=True,solidUpperFascia=True,steps=steps,lowestRiserGrounded=True,stepsClippedToPortico=True)
 
 def root_name(o):
     while o.parent:o=o.parent

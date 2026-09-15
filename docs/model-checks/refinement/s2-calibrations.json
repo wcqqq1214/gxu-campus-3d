@@ -15,13 +15,13 @@
         "schemaVersion": 1,
         "footprintRevision": "357568dd98742e237fa5d3bf2a554e33cabbd8651d42425066531ad63cfb5e78",
         "evidence": {
-          "entrances": {
+          "facadeRules": {
             "status": "estimated",
             "sourceRefs": [
               "gxuDonationProjects",
               "osm"
             ],
-            "note": "项目册PDF第35页办公北楼具名照片可见北侧中央玻璃入口及两侧玻璃界面，下部跨两层、由竖向实体柱分隔，未见独立外挑雨棚或成组台阶。原第1边中点定位主入口；16.2米玻璃总宽、三开间、0.6米柱宽、6.35米玻璃顶高、3.3米横档、3.2米门宽/2.6米门高及0.15米门槛高均为照片约束估算。门框与分格简化，门后内部不建模，不声称逐扇窗测量。"
+            "note": "同页近照支持中央北面第三层横向玻璃窗带、顶层大面积标识实墙与两端窄窗。仅原第1边中央体量采用：横带区间0.07–0.93、高7.05–9.25米、六列两行；顶层中央实墙0.18–0.82、高9.95–12.9米，两端窄窗各两列两行。数量与尺寸均为可见关系的简化估算，不精确复制金色文字、材料和檐口装饰；其余立面仍待核对。"
           },
           "levels": {
             "status": "confirmed",
@@ -38,13 +38,13 @@
             ],
             "note": "具名照片支持中央门厅4层、可见两侧翼3层。北侧外环第1边约17.994米宽凸部对应高门厅；西南侧网络大楼在照片后方偏右，与北向立面关系一致。中央体量两侧边沿原第0/2边延伸到原第7边所在后墙，分界深度约20.96米为地图约束估算，未取得屋顶测绘；两侧及后部其余轮廓保留3层。全部部分严格覆盖原轮廓。采用3.3米估算层高，即中央13.2米、侧翼9.9米，不作实测高度。"
           },
-          "facadeRules": {
+          "entrances": {
             "status": "estimated",
             "sourceRefs": [
               "gxuDonationProjects",
               "osm"
             ],
-            "note": "同页近照支持中央北面第三层横向玻璃窗带、顶层大面积标识实墙与两端窄窗。仅原第1边中央体量采用：横带区间0.07–0.93、高7.05–9.25米、六列两行；顶层中央实墙0.18–0.82、高9.95–12.9米，两端窄窗各两列两行。数量与尺寸均为可见关系的简化估算，不精确复制金色文字、材料和檐口装饰；其余立面仍待核对。"
+            "note": "项目册PDF第35页办公北楼具名照片可见北侧中央玻璃入口及两侧玻璃界面，下部跨两层、由竖向实体柱分隔，未见独立外挑雨棚或成组台阶。原第1边中点定位主入口；16.2米玻璃总宽、三开间、0.6米柱宽、6.35米玻璃顶高、3.3米横档、3.2米门宽/2.6米门高及0.15米门槛高均为照片约束估算。门框与分格简化，门后内部不建模，不声称逐扇窗测量。"
           },
           "height": {
             "status": "estimated",
@@ -301,14 +301,14 @@
         "schemaVersion": 1,
         "footprintRevision": "8e14f1929a2fd520a067b84dcee70719b35122aee9fa5f29c9c38807c00ca46f",
         "evidence": {
-          "parts": {
-            "status": "estimated",
+          "levels": {
+            "status": "confirmed",
             "sourceRefs": [
               "gxuMathCenterIntro",
               "gxuMathCenterLocation",
               "osm"
             ],
-            "note": "官网明确西楼三层、东楼两层；照片与原轮廓南侧退台共同约束东西分界约X=-248.095米。西侧外廊东端约4.31米单独表达楼梯标识墙，分界X=-252.4米为照片比例估算。各层按3.3米估算；西侧红瓦坡屋面起坡1.5米、东侧1.4米，歇山/四坡的不可见端部仍待核对，采用hipped简化。标识墙顶部采用flat，所有分段完整覆盖原轮廓。"
+            "note": "官网中心简介明确西面三层、东面二层；整栋最高层数采用3，原OSM统一2层不适用于西楼。"
           },
           "entrances": {
             "status": "estimated",
@@ -318,15 +318,6 @@
               "osm"
             ],
             "note": "官网具名近照可见东楼南侧中央凸部的单开间入口及两道踢面；地图南侧三凸部的居中第7边用于定位。门宽4.4米、平台高0.34米、台阶宽6.2米/踏深0.32米及基底0.04米为照片和轮廓约束估算。未测得现场高程，门后空间和木门材质尚未复原。"
-          },
-          "levels": {
-            "status": "confirmed",
-            "sourceRefs": [
-              "gxuMathCenterIntro",
-              "gxuMathCenterLocation",
-              "osm"
-            ],
-            "note": "官网中心简介明确西面三层、东面二层；整栋最高层数采用3，原OSM统一2层不适用于西楼。"
           },
           "facadeRules": {
             "status": "estimated",
@@ -345,6 +336,15 @@
               "osm"
             ],
             "note": "校方办公楼资料与条形外廊形体采用teaching-block；保留原academic分类和地图楼名。"
+          },
+          "parts": {
+            "status": "estimated",
+            "sourceRefs": [
+              "gxuMathCenterIntro",
+              "gxuMathCenterLocation",
+              "osm"
+            ],
+            "note": "官网明确西楼三层、东楼两层；照片与原轮廓南侧退台共同约束东西分界约X=-248.095米。西侧外廊东端约4.31米单独表达楼梯标识墙，分界X=-252.4米为照片比例估算。各层按3.3米估算；西侧红瓦坡屋面起坡1.5米、东侧1.4米，歇山/四坡的不可见端部仍待核对，采用hipped简化。标识墙顶部采用flat，所有分段完整覆盖原轮廓。"
           },
           "height": {
             "status": "estimated",
@@ -424,15 +424,14 @@
         "schemaVersion": 1,
         "footprintRevision": "77893211c246261b60228fdafffe6229b36e4693f5583b4631c9dd897f7d4dfc",
         "evidence": {
-          "entrances": {
+          "facadeRules": {
             "status": "estimated",
             "sourceRefs": [
               "gxuMathEnvironment",
-              "gxuMathGraduation2022",
-              "esriMathContext",
-              "gxuMathAlumni2024"
+              "gxuMathCollegeGallery",
+              "gxuMathGraduation2022"
             ],
-            "note": "Environment第1张与2022门前照片的三窗凸部对应OSM第7边西南凸部，主入口移至该边中点；对侧低雨棚入口对应第1边靠西段t=0.13。南北方位为轮廓/影像/照片联合推断，门宽及锚点估算。主门依2024年照片采用三开间、四根石材门柱和门头；0.55米柱宽与1.2米柱深为照片约束估算。北侧次入口依据Environment第3张采用四根方柱、实心平雨棚及三级短台阶；宽6.4米、深3.2米、板底3.4米、板厚0.6米、平台0.36米与柱宽0.55米均为照片约束估算。Environment第1张及2024年具名主门照片可见三道前向台阶；替换原两级示意平台。平台高0.45米、总宽8.4米、深1.2米、两处下级踏面各0.32米均为照片/地图约束估算，台阶基底相对楼栋基准+0.06米，三道踢面各0.13米；基底参考原地形采样，避免右侧最低踏步仅剩4毫米露出。北门雨棚及西侧人行道连接已另批完成；本批增加南门至映射服务道路的连接铺地。"
+            "note": "西南凸部二至五层三列窗、历史照片端墙实墙和新版照片封闭窗廊用于可见主要立面；玻璃组段、分格、高度比及出挑均估算。按lower-east分段的局部坐标布置封窗，不挖成开放走廊；东端完整立面仍待核对。 北侧五层端部照片可见四列窗，映射为第11边和第1边west-five分段各两列；局部退台和柱距依地图约束估算，合计四列保留，窗框及细分格非测量。 官网Environment第1张显示南门凸部东侧连续玻璃连接面，第3及第5张显示北侧低体量上三层楼梯花格及两侧窗；本批按原轮廓edge6与低体量edge1定位。玻璃跨度、北侧面板约72%位置、尺寸、分格与八角花格简化纹样为照片约束估算；花格为白色浅构件与暗色背板，不表示已重建内部楼梯或凿穿楼体。"
           },
           "levels": {
             "status": "confirmed",
@@ -451,14 +450,15 @@
             ],
             "note": "官网Environment第3张与历史照片显示五层端部、四层窗廊；主入口三窗凸部与OSM西南凸部对应，采用西端五层、其余四层。x=-265米分界及3.3米层高为照片约束估算，东端被裁切，暂按较低主体连续表达，待补东端全景核对；不计整栋验收。"
           },
-          "facadeRules": {
+          "entrances": {
             "status": "estimated",
             "sourceRefs": [
               "gxuMathEnvironment",
-              "gxuMathCollegeGallery",
-              "gxuMathGraduation2022"
+              "gxuMathGraduation2022",
+              "esriMathContext",
+              "gxuMathAlumni2024"
             ],
-            "note": "西南凸部二至五层三列窗、历史照片端墙实墙和新版照片封闭窗廊用于可见主要立面；玻璃组段、分格、高度比及出挑均估算。按lower-east分段的局部坐标布置封窗，不挖成开放走廊；东端完整立面仍待核对。 北侧五层端部照片可见四列窗，映射为第11边和第1边west-five分段各两列；局部退台和柱距依地图约束估算，合计四列保留，窗框及细分格非测量。 官网Environment第1张显示南门凸部东侧连续玻璃连接面，第3及第5张显示北侧低体量上三层楼梯花格及两侧窗；本批按原轮廓edge6与低体量edge1定位。玻璃跨度、北侧面板约72%位置、尺寸、分格与八角花格简化纹样为照片约束估算；花格为白色浅构件与暗色背板，不表示已重建内部楼梯或凿穿楼体。"
+            "note": "Environment第1张与2022门前照片的三窗凸部对应OSM第7边西南凸部，主入口移至该边中点；对侧低雨棚入口对应第1边靠西段t=0.13。南北方位为轮廓/影像/照片联合推断，门宽及锚点估算。主门依2024年照片采用三开间、四根石材门柱和门头；0.55米柱宽与1.2米柱深为照片约束估算。北侧次入口依据Environment第3张采用四根方柱、实心平雨棚及三级短台阶；宽6.4米、深3.2米、板底3.4米、板厚0.6米、平台0.36米与柱宽0.55米均为照片约束估算。Environment第1张及2024年具名主门照片可见三道前向台阶；替换原两级示意平台。平台高0.45米、总宽8.4米、深1.2米、两处下级踏面各0.32米均为照片/地图约束估算，台阶基底相对楼栋基准+0.06米，三道踢面各0.13米；基底参考原地形采样，避免右侧最低踏步仅剩4毫米露出。北门雨棚及西侧人行道连接已另批完成；本批增加南门至映射服务道路的连接铺地。"
           },
           "height": {
             "status": "estimated",
@@ -622,24 +622,6 @@
         "schemaVersion": 1,
         "footprintRevision": "4c0966b274526bf2c5c2496a60c82e4131af6f447d81219ad5f7377d11a6d2ca",
         "evidence": {
-          "parts": {
-            "status": "estimated",
-            "sourceRefs": [
-              "gxuDonationProjects",
-              "gxuOfficeSouthIdentity2022",
-              "gxuOfficeSouthCleanup2025"
-            ],
-            "note": "旧项目册与2025具名照片均支持中央低门厅、四根圆柱。将原轮廓西侧凸条中央76%切为两层门厅，沿用首两层累计8.7米；进深2.2米、净高4.2米、柱径0.8米、分界与柱距均估算，非实测；两端不增加未知屋顶凸出。"
-          },
-          "entrances": {
-            "status": "estimated",
-            "sourceRefs": [
-              "gxuDonationProjects",
-              "gxuOfficeSouthIdentity2022",
-              "gxuOfficeSouthCleanup2025"
-            ],
-            "note": "2025照片支持门后退与门前台阶；以西侧凸条中央为主入口，替代原东侧最长边示意入口。西向映射、内退2.2米、门宽6.8米、平台0.6米与三级台阶均估算，未标为现场测量。"
-          },
           "levels": {
             "status": "confirmed",
             "sourceRefs": [
@@ -649,15 +631,6 @@
             ],
             "note": "项目册第35页与2021公告均记五层，2022报道确认分析测试中心位于原办公南楼的五个楼层。"
           },
-          "facadeRules": {
-            "status": "estimated",
-            "sourceRefs": [
-              "gxuDonationProjects",
-              "gxuOfficeSouthIdentity2022",
-              "gxuOfficeSouthCleanup2025"
-            ],
-            "note": "低门厅正面上部在2025照片中为实体招牌区，取消通用窗；门厅后方侧玻璃、招牌颜色、两端竖向玻璃与其他立面窗列尚未校准。"
-          },
           "floorHeights": {
             "status": "confirmed",
             "sourceRefs": [
@@ -665,6 +638,33 @@
               "gxuOfficeSouthIdentity2022"
             ],
             "note": "2021改造咨询公告明确底层层高4.8米、其他楼层3.9米；2022报道完成楼栋身份对应。采用文献尺寸，不称为竣工测量；不适用于行健文理学院生命科学分中心。"
+          },
+          "facadeRules": {
+            "status": "estimated",
+            "sourceRefs": [
+              "gxuDonationProjects",
+              "gxuOfficeSouthIdentity2022",
+              "gxuOfficeSouthCleanup2025"
+            ],
+            "note": "低门厅正面上部按2025照片保留实体招牌区；柱后左右玻璃和中央门区已用recessGlazing简化表达。招牌颜色、两端竖向玻璃、屋顶凸出与其他立面窗列尚未校准。"
+          },
+          "entrances": {
+            "status": "estimated",
+            "sourceRefs": [
+              "gxuDonationProjects",
+              "gxuOfficeSouthIdentity2022",
+              "gxuOfficeSouthCleanup2025"
+            ],
+            "note": "2025照片支持门后退与门前台阶；以西侧凸条中央为主入口，替代原东侧最长边示意入口。西向映射、内退2.2米、门宽6.8米、平台0.6米与三级台阶均估算，未标为现场测量。 2025校方照片可见柱后左右两片连续玻璃和中央门区。新增左右窗面、中央双扇门及上亮窗；总宽22.8米、玻璃高3.25米、门宽3.2米、高2.35米、每侧四列和框宽0.075米均为照片匹配的简化估算，框色沿用共享材质；不视为实测窗表。"
+          },
+          "parts": {
+            "status": "estimated",
+            "sourceRefs": [
+              "gxuDonationProjects",
+              "gxuOfficeSouthIdentity2022",
+              "gxuOfficeSouthCleanup2025"
+            ],
+            "note": "旧项目册与2025具名照片均支持中央低门厅、四根圆柱。将原轮廓西侧凸条中央76%切为两层门厅，沿用首两层累计8.7米；进深2.2米、净高4.2米、柱径0.8米、分界与柱距均估算，非实测；两端不增加未知屋顶凸出。"
           },
           "height": {
             "status": "estimated",
@@ -713,11 +713,11 @@
           },
           "entrances": {
             "status": "partial",
-            "note": "2025照片支持门后退与门前台阶；以西侧凸条中央为主入口，替代原东侧最长边示意入口。西向映射、内退2.2米、门宽6.8米、平台0.6米与三级台阶均估算，未标为现场测量。"
+            "note": "2025照片支持门后退与门前台阶；以西侧凸条中央为主入口，替代原东侧最长边示意入口。西向映射、内退2.2米、门宽6.8米、平台0.6米与三级台阶均估算，未标为现场测量。 2025校方照片可见柱后左右两片连续玻璃和中央门区。新增左右窗面、中央双扇门及上亮窗；总宽22.8米、玻璃高3.25米、门宽3.2米、高2.35米、每侧四列和框宽0.075米均为照片匹配的简化估算，框色沿用共享材质；不视为实测窗表。"
           },
           "facadeRules": {
             "status": "partial",
-            "note": "低门厅正面上部在2025照片中为实体招牌区，取消通用窗；门厅后方侧玻璃、招牌颜色、两端竖向玻璃与其他立面窗列尚未校准。"
+            "note": "低门厅正面上部按2025照片保留实体招牌区；柱后左右玻璃和中央门区已用recessGlazing简化表达。招牌颜色、两端竖向玻璃、屋顶凸出与其他立面窗列尚未校准。"
           }
         },
         "warnings": []
@@ -829,15 +829,6 @@
         "schemaVersion": 1,
         "footprintRevision": "075f97f6d68295c4bd2e9be2018351cb957e8ce1dedf2d35b2a53ae93a25eaba",
         "evidence": {
-          "levels": {
-            "status": "estimated",
-            "sourceRefs": [
-              "osm",
-              "artsEnvironment2024",
-              "artsLakeArchive"
-            ],
-            "note": "Environment第二张临湖照显示底层加三层上部楼层，共四层；侧方开放圆形楼梯及湖岸与本楼组合对应，为照片/地图判读。替换原用途默认五层，3.3米层高和总高13.2米仍为估算。"
-          },
           "facadeRules": {
             "status": "estimated",
             "sourceRefs": [
@@ -846,6 +837,15 @@
               "artsLakeArchive"
             ],
             "note": "校档案馆碧云湖全景与2024年Environment湖景均显示东侧短边三层开放外廊、浅色后墙、暖色实体栏板及两端支承；每个上层南端小窗、北端门，底层北端门及偏中小窗按可见位置估算。凹入1.8米、端退0.35米、栏板1米、门窗位置和尺寸均未测量，重复门窗作简化表达；南北长立面和西端不据此复制外廊。"
+          },
+          "levels": {
+            "status": "estimated",
+            "sourceRefs": [
+              "osm",
+              "artsEnvironment2024",
+              "artsLakeArchive"
+            ],
+            "note": "Environment第二张临湖照显示底层加三层上部楼层，共四层；侧方开放圆形楼梯及湖岸与本楼组合对应，为照片/地图判读。替换原用途默认五层，3.3米层高和总高13.2米仍为估算。"
           },
           "height": {
             "status": "estimated",
@@ -932,6 +932,14 @@
         "schemaVersion": 1,
         "footprintRevision": "0c70b177f6a4025d91b0758b3e7d0c3fb4a49098e216254aa56f664ced3644ba",
         "evidence": {
+          "levels": {
+            "status": "estimated",
+            "sourceRefs": [
+              "osm",
+              "artsEnvironment2024"
+            ],
+            "note": "Environment第一张具名正面照显示三层窗列及平屋面，两端翼同高；当前OSM标记4层，保留原tag并采用照片约束的三层主体估算。拍摄日期未知，不能排除局部屋顶层；屋顶小体量另待核对。"
+          },
           "entrances": {
             "status": "estimated",
             "sourceRefs": [
@@ -940,14 +948,6 @@
               "artsDoorRepair2024"
             ],
             "note": "学院具名正面照片与西侧独立雨棚轮廓对应，采用主楼西立面雨棚下三组玻璃门。维修照片支持深色门框、上亮窗及石材边框；门组宽9.9米、边框0.6米、门高2.55米与上亮窗0.45米均为估算，沿用独立雨棚平台，不重复生成雨棚或台阶。"
-          },
-          "levels": {
-            "status": "estimated",
-            "sourceRefs": [
-              "osm",
-              "artsEnvironment2024"
-            ],
-            "note": "Environment第一张具名正面照显示三层窗列及平屋面，两端翼同高；当前OSM标记4层，保留原tag并采用照片约束的三层主体估算。拍摄日期未知，不能排除局部屋顶层；屋顶小体量另待核对。"
           },
           "height": {
             "status": "estimated",
@@ -1032,14 +1032,13 @@
         "schemaVersion": 1,
         "footprintRevision": "a5a3603be31f3a387b0def14e747c8927e67f2ef6e2054bffd81d8aca970dc25",
         "evidence": {
-          "entrances": {
+          "archetype": {
             "status": "estimated",
             "sourceRefs": [
               "osm",
-              "gxuAgricultureBanner",
-              "gxuAgricultureEvent2026"
+              "gxuAgricultureBanner"
             ],
-            "note": "正门与南侧中央凸出门廊对应，将最长边示意入口改到外环第9边轴线，门面退至门廊后墙；6.8米门宽、三阶共0.45米及柱距为照片比例估算。定位由OSM轮廓匹配推定，非测绘坐标。"
+            "note": "学院官网正面照片与OSM三向后翼轮廓约束的教学实验楼；用途分类保持academic。"
           },
           "levels": {
             "status": "confirmed",
@@ -1058,13 +1057,14 @@
             ],
             "note": "官网具名正面横幅及2026年活动照片显示中央低门廊，非五层凸楼。对应OSM外环8–11号顶点构成的17.8×4.74米凸部，采用4米顶高、3.4米板底、0.45米地板和四根0.85米方柱，均为照片约束估算。其余主体沿用5层/16.5米，后翼四层露台范围仍待核对。"
           },
-          "archetype": {
+          "entrances": {
             "status": "estimated",
             "sourceRefs": [
               "osm",
-              "gxuAgricultureBanner"
+              "gxuAgricultureBanner",
+              "gxuAgricultureEvent2026"
             ],
-            "note": "学院官网正面照片与OSM三向后翼轮廓约束的教学实验楼；用途分类保持academic。"
+            "note": "正门与南侧中央凸出门廊对应，将最长边示意入口改到外环第9边轴线，门面退至门廊后墙；6.8米门宽、三阶共0.45米及柱距为照片比例估算。定位由OSM轮廓匹配推定，非测绘坐标。"
           },
           "height": {
             "status": "estimated",
@@ -1145,14 +1145,6 @@
         "schemaVersion": 1,
         "footprintRevision": "a1cc0bd1d0e038f29ca59de028bab330b1b7d93b2e6ce601f499272c1a4ea28d",
         "evidence": {
-          "levels": {
-            "status": "confirmed",
-            "sourceRefs": [
-              "gxuResidenceDesign2022",
-              "gxuDonationProjects"
-            ],
-            "note": "设计院2022-05-20研究生公寓项目说明将南邻东苑餐厅明确记为4层；项目册PDF第43页照片也可见四排楼层。项目册文字为3层，保留冲突，采用设计院明确的既有邻楼层数，不将就餐楼层数当作建筑总层数。"
-          },
           "archetype": {
             "status": "estimated",
             "sourceRefs": [
@@ -1160,6 +1152,14 @@
               "gxuDonationProjects"
             ],
             "note": "具名餐厅照片与原餐饮用途支持食堂原型，保持原轮廓；不添加宿舍式阳台。"
+          },
+          "levels": {
+            "status": "confirmed",
+            "sourceRefs": [
+              "gxuResidenceDesign2022",
+              "gxuDonationProjects"
+            ],
+            "note": "设计院2022-05-20研究生公寓项目说明将南邻东苑餐厅明确记为4层；项目册PDF第43页照片也可见四排楼层。项目册文字为3层，保留冲突，采用设计院明确的既有邻楼层数，不将就餐楼层数当作建筑总层数。"
           },
           "height": {
             "status": "estimated",
@@ -1237,13 +1237,6 @@
         "schemaVersion": 1,
         "footprintRevision": "6581f698f77a1551fd0836ef51b782ee2f60179cad30a252b98dbac34e4db158",
         "evidence": {
-          "levels": {
-            "status": "confirmed",
-            "sourceRefs": [
-              "gxuDonationProjects"
-            ],
-            "note": "项目册PDF第43页具名碧湖苑餐厅条目记为2层，照片可见两层大开窗。按历史资料采用，照片拍摄日期及当前局部附属设施仍待核对。"
-          },
           "archetype": {
             "status": "estimated",
             "sourceRefs": [
@@ -1251,6 +1244,13 @@
               "gxuDonationProjects"
             ],
             "note": "具名餐厅照片与原餐饮用途支持食堂原型，保持原轮廓；不添加宿舍式阳台。"
+          },
+          "levels": {
+            "status": "confirmed",
+            "sourceRefs": [
+              "gxuDonationProjects"
+            ],
+            "note": "项目册PDF第43页具名碧湖苑餐厅条目记为2层，照片可见两层大开窗。按历史资料采用，照片拍摄日期及当前局部附属设施仍待核对。"
           },
           "height": {
             "status": "estimated",
@@ -1327,16 +1327,6 @@
         "schemaVersion": 1,
         "footprintRevision": "f4ce57f1546a3cf25e5297619e7275daef6afa3ddfa50d3725361a350f001166",
         "evidence": {
-          "stairTower": {
-            "status": "estimated",
-            "sourceRefs": [
-              "osm",
-              "artsEnvironment2024",
-              "artsCourtyardEvent2024",
-              "artsLakeArchive"
-            ],
-            "note": "根据湖景中可见重复斜向段和弧形平台，采用每层两跑的开放折返表达；各跑10级、梯宽2米、梯井0.8米、栏板0.9米和柱位均为估算。北向2.4米宽连接平台及1.6米宽上层门按附楼南墙投影定位，原OSM轮廓不改；楼梯与附楼共用附楼地形基准，避免两中心取高造成悬差。"
-          },
           "height": {
             "status": "estimated",
             "sourceRefs": [
@@ -1347,16 +1337,6 @@
             ],
             "note": "层间距沿用附楼3.3米估算，底层平台0.15米；顶层平台10.05米、棚底12.40米、薄棚顶12.65米均为照片约束估算，不复原第五层。"
           },
-          "entrances": {
-            "status": "estimated",
-            "sourceRefs": [
-              "osm",
-              "artsEnvironment2024",
-              "artsCourtyardEvent2024",
-              "artsLakeArchive"
-            ],
-            "note": "底层以圆形平台西侧开放通行口作为示意访问点，不生成假门；底层精确入梯方向与周边铺地范围仍需更多近照。"
-          },
           "levels": {
             "status": "estimated",
             "sourceRefs": [
@@ -1366,6 +1346,26 @@
               "artsLakeArchive"
             ],
             "note": "连接临湖附楼的三处上层平台，加底层共四个使用层；半层平台不计作独立建筑楼层。"
+          },
+          "stairTower": {
+            "status": "estimated",
+            "sourceRefs": [
+              "osm",
+              "artsEnvironment2024",
+              "artsCourtyardEvent2024",
+              "artsLakeArchive"
+            ],
+            "note": "根据湖景中可见重复斜向段和弧形平台，采用每层两跑的开放折返表达；各跑10级、梯宽2米、梯井0.8米、栏板0.9米和柱位均为估算。北向2.4米宽连接平台及1.6米宽上层门按附楼南墙投影定位，原OSM轮廓不改；楼梯与附楼共用附楼地形基准，避免两中心取高造成悬差。"
+          },
+          "entrances": {
+            "status": "estimated",
+            "sourceRefs": [
+              "osm",
+              "artsEnvironment2024",
+              "artsCourtyardEvent2024",
+              "artsLakeArchive"
+            ],
+            "note": "底层以圆形平台西侧开放通行口作为示意访问点，不生成假门；底层精确入梯方向与周边铺地范围仍需更多近照。"
           },
           "archetype": {
             "status": "estimated",
@@ -1553,22 +1553,13 @@
         "schemaVersion": 1,
         "footprintRevision": "1a10303f9965a426473446be58d72af6eaac6b01886db45b21a27e839c334300",
         "evidence": {
-          "entrances": {
+          "archetype": {
             "status": "estimated",
             "sourceRefs": [
               "osm",
-              "gxuDonationProjects",
-              "gxuForestryEntranceBanner",
-              "gxuForestrySouthGate2026"
-            ],
-            "note": "学院石资料与横幅交叉定位南门；项目册第39页长立面右端低门廊与OSM南侧长边第5边对应。t=0.16使入口靠东端，9米门廊宽、3.2米外挑、4.2米门宽、相对楼栋基准0.60米平台、0.24米台阶起算标高（按最终模型地面衔接，非测量高差）、3级台阶及柱位均为照片约束估算。四根方柱和两排镂空栏板按可见形制简化；不改变OSM主体和内院，不将边锚点视为测量坐标。"
-          },
-          "levels": {
-            "status": "confirmed",
-            "sourceRefs": [
               "gxuDonationProjects"
             ],
-            "note": "项目册PDF第39页（印刷第35页）具名条目记载6层；按历史楼栋资料采用，未确认照片拍摄日期及2026年外观变化。"
+            "note": "学院用途与OSM内院轮廓共同约束的院落教学实验楼形制；不推定内部房间用途。"
           },
           "facadeRules": {
             "status": "estimated",
@@ -1578,13 +1569,22 @@
             ],
             "note": "项目册PDF第39页林学院具名原图显示南侧长立面中段的宽窗组、较窄间隔窗及水平挑檐，背后保留实体墙，不按开放走廊处理。采用第5边t=0.28–0.84、二至六层的4宽3窄窗组作照片约束简化；窗口边界、宽窄组数、4分格、窗高比0.55及0.38米外挑/0.18米厚度均为估算，非精确窗数或现场尺寸。底层、东西端、其他立面及近入口竖向突出体仍待核对。"
           },
-          "archetype": {
+          "levels": {
+            "status": "confirmed",
+            "sourceRefs": [
+              "gxuDonationProjects"
+            ],
+            "note": "项目册PDF第39页（印刷第35页）具名条目记载6层；按历史楼栋资料采用，未确认照片拍摄日期及2026年外观变化。"
+          },
+          "entrances": {
             "status": "estimated",
             "sourceRefs": [
               "osm",
-              "gxuDonationProjects"
+              "gxuDonationProjects",
+              "gxuForestryEntranceBanner",
+              "gxuForestrySouthGate2026"
             ],
-            "note": "学院用途与OSM内院轮廓共同约束的院落教学实验楼形制；不推定内部房间用途。"
+            "note": "学院石资料与横幅交叉定位南门；项目册第39页长立面右端低门廊与OSM南侧长边第5边对应。t=0.16使入口靠东端，9米门廊宽、3.2米外挑、4.2米门宽、相对楼栋基准0.60米平台、0.24米台阶起算标高（按最终模型地面衔接，非测量高差）、3级台阶及柱位均为照片约束估算。四根方柱和两排镂空栏板按可见形制简化；不改变OSM主体和内院，不将边锚点视为测量坐标。"
           },
           "height": {
             "status": "estimated",
@@ -1652,15 +1652,12 @@
         "schemaVersion": 1,
         "footprintRevision": "ab60e4c791319782664d5134f361ebe26f18461367a016cb8bdfadf65666618c",
         "evidence": {
-          "parts": {
-            "status": "estimated",
+          "levels": {
+            "status": "confirmed",
             "sourceRefs": [
-              "osm",
-              "gxuDonationProjects",
-              "gxuAnimalAlumni2026",
-              "gxuAnimalEnglishFacade"
+              "gxuDonationProjects"
             ],
-            "note": "PDF第40页照片可见入口玻璃核心高于两侧翼。核心采用7层，侧翼按可见窗层估为5层；尺寸使用3.3米估算层高。核心沿OSM外环第11边凸部向内切分，所有部分严格位于原轮廓内并保留内院；不是测绘分段。 2026年门口近照支持核心南凸部底层开放；仅将既有核心拆为同高的后部与前部，前部底层两侧设估算方柱。上层和屋顶高度保持，内部同高屋面不增设女儿墙。侧翼原五层估算在本轮数层复核中存疑，待进一步定位各段后修正，未称为已确认。 本轮英文网页高清照片可以辨认侧翼五层和四层上部外廊，撤销上一轮小图重新计数引起的调高疑问；后部附楼范围和高度仍未确认。"
+            "note": "项目册PDF第40页（印刷第36页）具名条目记载7层；按历史楼栋资料采用，未确认照片拍摄日期及2026年外观变化。"
           },
           "entrances": {
             "status": "estimated",
@@ -1670,13 +1667,6 @@
               "gxuAnimalAlumni2026"
             ],
             "note": "2026-07-31学院官网合影与项目册具名全楼照片共同支持南侧凸部下方的内退入口及两级台阶。原外环第11边锚点保留，内退至第10和第1顶点之间的主体墙，约4.64米；门宽4.4米、平台0.55米、板底3.60米及柱尺寸为模型估算。 Two estimated 0.15 m risers above a 0.25 m local ground datum; platform at 0.55 m relative to the building origin, not a measured site elevation."
-          },
-          "levels": {
-            "status": "confirmed",
-            "sourceRefs": [
-              "gxuDonationProjects"
-            ],
-            "note": "项目册PDF第40页（印刷第36页）具名条目记载7层；按历史楼栋资料采用，未确认照片拍摄日期及2026年外观变化。"
           },
           "facadeRules": {
             "status": "estimated",
@@ -1694,6 +1684,16 @@
               "gxuDonationProjects"
             ],
             "note": "学院用途与OSM内院轮廓共同约束的院落教学实验楼形制；不推定内部房间用途。"
+          },
+          "parts": {
+            "status": "estimated",
+            "sourceRefs": [
+              "osm",
+              "gxuDonationProjects",
+              "gxuAnimalAlumni2026",
+              "gxuAnimalEnglishFacade"
+            ],
+            "note": "PDF第40页照片可见入口玻璃核心高于两侧翼。核心采用7层，侧翼按可见窗层估为5层；尺寸使用3.3米估算层高。核心沿OSM外环第11边凸部向内切分，所有部分严格位于原轮廓内并保留内院；不是测绘分段。 2026年门口近照支持核心南凸部底层开放；仅将既有核心拆为同高的后部与前部，前部底层两侧设估算方柱。上层和屋顶高度保持，内部同高屋面不增设女儿墙。侧翼原五层估算在本轮数层复核中存疑，待进一步定位各段后修正，未称为已确认。 本轮英文网页高清照片可以辨认侧翼五层和四层上部外廊，撤销上一轮小图重新计数引起的调高疑问；后部附楼范围和高度仍未确认。"
           },
           "height": {
             "status": "estimated",
@@ -1764,13 +1764,6 @@
         "schemaVersion": 1,
         "footprintRevision": "7436eb7e45a729f529befda10ffb4c8000de0648597d9370025a51d93310f88f",
         "evidence": {
-          "levels": {
-            "status": "confirmed",
-            "sourceRefs": [
-              "gxuDonationProjects"
-            ],
-            "note": "项目册PDF第40页（印刷第36页）具名条目记载6层；按历史楼栋资料采用，未确认照片拍摄日期及2026年外观变化。"
-          },
           "archetype": {
             "status": "estimated",
             "sourceRefs": [
@@ -1778,6 +1771,13 @@
               "gxuDonationProjects"
             ],
             "note": "学院用途与OSM内院轮廓共同约束的院落教学实验楼形制；不推定内部房间用途。"
+          },
+          "levels": {
+            "status": "confirmed",
+            "sourceRefs": [
+              "gxuDonationProjects"
+            ],
+            "note": "项目册PDF第40页（印刷第36页）具名条目记载6层；按历史楼栋资料采用，未确认照片拍摄日期及2026年外观变化。"
           },
           "height": {
             "status": "estimated",

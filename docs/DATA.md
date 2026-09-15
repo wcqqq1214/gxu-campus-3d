@@ -236,3 +236,5 @@ npm run models:build
 ## 办公南楼改造后入口照片（2026-09-16）
 
 新增 `gxuOfficeSouthCleanup2025`：2025-02-28校方工作简报的分析测试中心入口照片，拍摄日期未知。保存网页与图片指纹，仅本机参照形制；圆柱数量和形状有照片支持，门厅分界、尺寸和入口方向按原轮廓估算。见[取证记录](model-checks/refinement/s2-office-south-entry-evidence.json)。
+
+同一照片进一步用于柱后玻璃校准：左右连续窗面、中央门与横向上亮窗有照片支持；每侧四列、22.8米总宽及门扇尺寸是简化估算，保存于 `recessGlazing`，不作为实测窗表。见[玻璃界面取证](model-checks/refinement/s2-office-south-glazing-evidence.json)。

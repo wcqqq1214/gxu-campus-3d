@@ -1,0 +1,111 @@
+{
+  "passed": true,
+  "baseCommit": "8b0b1e452cfb2f0dbaaedf87c868a72a2f00004f",
+  "branch": "dev",
+  "scope": "Office south rear glazing: two side banks, central double door, frames and transom. Existing portico, storeys and footprint preserved; dimensions and pane counts remain estimates.",
+  "partialObjectRecords": 18,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 149,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "data",
+    "all-geometry",
+    "storeys-geometry",
+    "glazing",
+    "portico",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4156180,
+        "medianDrawCalls": 555
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.3896196939242618,
+        "medianDrawCalls": 1.4625228519195677
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        27,
+        28,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1132219,
+        "medianDrawCalls": 293
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 7.631007324527417,
+        "medianDrawCalls": 11.406844106463886
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "fingerprints": {
+    "blender/recess_glazing.py": "8077289e577eb82375f199d93fa71a0aa521437ef12371413d7b357b63a0eb8f",
+    "blender/validate_office_south_glazing.py": "eb32b87f95b42b8436359ec13cdf9f70a2a952e2dcd09b06726f7b78d8f37586",
+    "scripts/recess_glazing_data.py": "49850fccf315e26edd299451a6e4e2643a45d4baf9f8d392fe578daabed30311",
+    "blender/generic_buildings.py": "b5601b820572cf0b89eca38cbf64bee2b0866d991c6f67f6def544ab1a9c625d",
+    "blender/validate_office_south.py": "4721a59b709de7cd28d2e1fae4c2d835a21adb37a5eb61a9c5527a55b038d1cd",
+    "blender/validate_office_south_entry.py": "de8c101c28609be763ce8284b91e536c85740c5763a024875d49fb9aea327547",
+    "scripts/building_overrides.py": "d61a4534645d6d98d1cd328c680463caaeeacd117e85226dcfaf7bb329bda751",
+    "scripts/test_building_overrides.py": "fef44a6b94c2ecfaa9255ef16553ae85c58bf5cf8dc927b244700bc5ee33615e",
+    "data/building-overrides.json": "a526f14b4b35410fcb3e3351df15f6412fc26da503466952430d0fd957cd393f",
+    "data/building-sources.json": "bd9c83f705c9368dec574f0ecc7f29a6d8111079ea7c8de105c269a5f0bb3a4c",
+    "blender/gxu-campus.blend": "646381b67360f1d644d6149dc670d699e517f1c764d849a9e9b5ba68d0a0b83a",
+    "public/data/buildings.json": "f56d2ac89c3b9ae51d34e4e7e7fe5b5ab1b7012186b165dcbaef23636a690761",
+    "public/data/models.json": "fb7c0d739ff369c538f5d1c7513ab3f4b6bf843230915f4c5ac854ecaa567ffe"
+  }
+}

@@ -532,8 +532,10 @@ def resolve_building(building, record=None, source_ids=None):
         entrances = []; ids = set()
         for e in record['entrances']:
             required = {'id','polygon','ring','edge','t','width','primary'}
-            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance'} or not e['id'] or e['id'] in ids:
+            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance','recessGlazing'} or not e['id'] or e['id'] in ids:
                 raise ValueError('Invalid or duplicate entrance')
+            if 'recessGlazing' in e and ('recess' not in e or set(e)-required-{'recess','steps','stepBaseHeight','recessGlazing'}):
+                raise ValueError('Recess glazing requires only a recessed portico entrance')
             if 'mappedCanopy' in e:
                 from mapped_canopy_data import validate_mapped_canopy
                 validate_mapped_canopy(e['mappedCanopy'])
@@ -633,6 +635,9 @@ def resolve_building(building, record=None, source_ids=None):
                         raise ValueError('Portico column blocks the central entrance route')
                 resolved.update(center=back,outerCenter=front,porticoId=porch['id'],
                     platformHeight=porch['openBelow']['floorHeight'],porticoWidth=portico_width)
+                if 'recessGlazing' in e:
+                    from recess_glazing_data import validate_recess_glazing
+                    validate_recess_glazing(e['recessGlazing'],resolved,porch['openBelow'],body.boundary,porch_shape,tangent)
             elif 'stepBaseHeight' in e:
                 raise ValueError('Step base requires a recessed entrance')
             entrances.append(resolved)
