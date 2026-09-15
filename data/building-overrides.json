@@ -3125,6 +3125,70 @@
           "balconies": false
         }
       ]
+    },
+    "relation/11564999": {
+      "name": "资源环境与材料学院",
+      "footprintRevision": "45ebc66d4707c14423baedc11266da9b8997aaa0336d6b51afa1bca1c2093b94",
+      "levels": 11,
+      "height": 48.1,
+      "roof": {
+        "type": "flat"
+      },
+      "evidence": {
+        "levels": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "gibrdMaterialsBuilding2024",
+            "gxuMaterialsFacade",
+            "gxuMaterialsRenovation2023"
+          ],
+          "note": "设计院具名项目页记载地上11层、地下1层；实景图学院名及东邻综合实验楼、北邻土木楼的位置与当前楼栋匹配。11为建筑最高地上层数，不表示全部楼翼或连廊均11层，局部退台另待分段。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gibrdMaterialsBuilding2024",
+            "gxuMaterialsFacade",
+            "gxuMaterialsRenovation2023"
+          ],
+          "note": "设计院公布建筑高度48.9米，未明确屋面/女儿墙与起算标高的口径。为先纠正五层默认尺度，暂将模型最高女儿墙控制在相对楼栋基准48.9米：主体采用48.1米，另加生成器既有0.8米示意女儿墙。48.1米是建模换算，不是实测或文献直接给出的主体高度；层高采用均分估算，地下层不额外叠加。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gibrdMaterialsBuilding2024",
+            "gxuMaterialsFacade",
+            "gxuMaterialsRenovation2023"
+          ],
+          "note": "设计院与学院首页实景图支持主体平屋面/女儿墙表达；局部退台、连廊、设备和未见背部屋面待进一步分段。"
+        }
+      },
+      "review": {
+        "levels": {
+          "status": "reviewed",
+          "note": "设计院具名项目页记载地上11层、地下1层；实景图学院名及东邻综合实验楼、北邻土木楼的位置与当前楼栋匹配。11为建筑最高地上层数，不表示全部楼翼或连廊均11层，局部退台另待分段。"
+        },
+        "height": {
+          "status": "partial",
+          "note": "设计院公布建筑高度48.9米，未明确屋面/女儿墙与起算标高的口径。为先纠正五层默认尺度，暂将模型最高女儿墙控制在相对楼栋基准48.9米：主体采用48.1米，另加生成器既有0.8米示意女儿墙。48.1米是建模换算，不是实测或文献直接给出的主体高度；层高采用均分估算，地下层不额外叠加。"
+        },
+        "roof": {
+          "status": "partial",
+          "note": "设计院与学院首页实景图支持主体平屋面/女儿墙表达；局部退台、连廊、设备和未见背部屋面待进一步分段。"
+        },
+        "parts": {
+          "status": "pending",
+          "note": "本批只校准最高整体尺度，仍沿用单一挤出体；实景可见低门廊、中段连廊和退台，均尚未落地。保留三个原映射内院，不能以统一11层视为逐翼验收通过。"
+        },
+        "entrances": {
+          "status": "pending",
+          "note": "照片主入口朝向综合实验楼一侧，具体外环锚点、抬高平台和台阶尚未解析；保留明确标为估算的原北侧回退入口。"
+        },
+        "facadeRules": {
+          "status": "pending",
+          "note": "保留默认窗列；实景中的大面积实墙、玻璃带、柱廊和分格待分别核对。"
+        }
+      }
     }
   }
 }
