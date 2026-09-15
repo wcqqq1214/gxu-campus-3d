@@ -459,3 +459,7 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 2026-09-16 临湖外楼梯：普通建筑新增开放外楼梯类型，基础与近景共用折返梯、弧形平台、薄顶棚及支柱；楼梯和附楼共用地形基准，三个上层门口由连接关系生成。 详见[参数与验收记录](ARTS_LAKESIDE_STAIR.md)。
 
 2026-09-16：外廊生成器按局部坐标系方向调整面的顶点顺序，确保后墙朝外、楼板顶朝上、板底朝下；三栋四个外廊已在实际导出中核验。 详见[临湖端面与法线修复](ARTS_LAKESIDE_FACADE.md)。
+
+## 普通建筑逐层高度（2026-09-16）
+
+`data/building-overrides.json`可用`floorHeights`代替统一层高。未分段主体的基础和近景窗层按累计高度生成；层数、显式总高与层高表必须一致。目前拒绝与分段、外廊、专项窗格等尚采用等层高假设的布局混用。实际使用和边界见[办公南楼校准](OFFICE_SOUTH_STOREYS.md)。

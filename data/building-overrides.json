@@ -2855,6 +2855,73 @@
           ]
         }
       ]
+    },
+    "way/759132930": {
+      "name": "办公南楼",
+      "footprintRevision": "4c0966b274526bf2c5c2496a60c82e4131af6f447d81219ad5f7377d11a6d2ca",
+      "levels": 5,
+      "floorHeights": [
+        4.8,
+        3.9,
+        3.9,
+        3.9,
+        3.9
+      ],
+      "roof": {
+        "type": "flat"
+      },
+      "evidence": {
+        "levels": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "gxuDonationProjects",
+            "gxuOfficeSouthStoreys2021",
+            "gxuOfficeSouthIdentity2022"
+          ],
+          "note": "项目册第35页与2021公告均记五层，2022报道确认分析测试中心位于原办公南楼的五个楼层。"
+        },
+        "floorHeights": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "gxuOfficeSouthStoreys2021",
+            "gxuOfficeSouthIdentity2022"
+          ],
+          "note": "2021改造咨询公告明确底层层高4.8米、其他楼层3.9米；2022报道完成楼栋身份对应。采用文献尺寸，不称为竣工测量；不适用于行健文理学院生命科学分中心。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuDonationProjects"
+          ],
+          "note": "PDF第35页改造前照片可见平屋面与女儿墙；本批保留平顶表达，屋顶突出塔体和低门厅分区尚未准确匹配，不能视为完整屋顶校准。"
+        }
+      },
+      "review": {
+        "levels": {
+          "status": "reviewed",
+          "note": "五层由三个校方条目相互支持。"
+        },
+        "height": {
+          "status": "partial",
+          "note": "底层4.8米加四层各3.9米，推导主体20.4米；未计局部屋顶凸出与门厅高低分段，非测得总建筑高度。"
+        },
+        "parts": {
+          "status": "pending",
+          "note": "历史照片支持西向中央低门厅及两侧竖向体量；现有OSM只有西侧凸条，内部边界与2022改造后形态尚待核对。本批不按均匀楼层虚构这些分界。"
+        },
+        "roof": {
+          "status": "partial",
+          "note": "平顶形制有历史照片支持；突出物尺寸与改造后屋面待查。"
+        },
+        "entrances": {
+          "status": "pending",
+          "note": "历史具名照片的中央柱廊可能对应OSM西侧凸部；改造后外观尚未核对，暂保留并标明原东向最长边示意入口，不作为实景入口验收。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "窗层按文献逐层高度排布；窗宽、窗高、列数与各面均仍为通用示意，历史正面照片中的低门厅、双竖向玻璃与上部窗带待分区。"
+        }
+      }
     }
   }
 }
