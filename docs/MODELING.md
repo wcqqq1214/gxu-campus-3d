@@ -465,3 +465,5 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 `data/building-overrides.json`可用`floorHeights`代替统一层高。基础和近景窗层按累计高度生成；层数、显式总高与层高表必须一致。分段可从同一地面基准取前 N 层，分段高度必须等于对应层高之和；外廊、专项窗格等仍采用等层高假设的布局继续拒绝混用。实际使用和边界见[办公南楼校准](OFFICE_SOUTH_STOREYS.md)。
 
 低门厅可用 `openBelow.columns[].shape: cylinder` 表达圆柱，直径由相等的 `width` / `depth` 给出，基础和近景共享 16 边截面。入口台阶宽度限制在所属低门厅实际占据的原轮廓边区间。见[办公南楼门厅](OFFICE_SOUTH_ENTRY.md)。
+
+`entrances[].recessGlazing` 在已有内退柱廊后墙表达左右玻璃与中央门区，字段包括 `width`、`glazingHeight`、`transomHeight`、`sideColumns`、`doorWidth`、`doorHeight`、`frameWidth`、`bayGap`。玻璃范围同时受后墙、柱廊后缘和顶棚净高约束；仅允许与 `recess`、`steps`、`stepBaseHeight` 组合。与默认门片二选一，两个细节级别共享门窗分隔，详见[柱后玻璃](OFFICE_SOUTH_GLAZING.md)。
