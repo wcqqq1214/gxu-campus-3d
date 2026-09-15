@@ -204,6 +204,34 @@
         "dimensions": "树木局部坐标(21,10)/(21,24)米、高11/9米、树池半径1.5/1.2米及11×22米活动区为估算。局部原点取主楼顶点3，X沿3→4；边界扣除相邻建筑并退让0.2米。圆形土质树池为简化表达，照片中的活动涂装及标识暂未复原。",
         "ground": "沿实际现有地形三角面铺设，6厘米为防闪烁显示偏移，外缘封入地面。没有院落测绘标高，不据此宣称地面水平、真实坡度或完整道路/门槛连接。"
       }
+    },
+    {
+      "id": "arts-west-canopy-connection",
+      "type": "canopy-connection",
+      "buildingId": "way/759165563",
+      "footprintRevision": "0c70b177f6a4025d91b0758b3e7d0c3fb4a49098e216254aa56f664ced3644ba",
+      "entranceId": "west-main",
+      "canopyEdge": 4,
+      "roadId": "way/759165561",
+      "roadSearchDistance": [
+        1,
+        20
+      ],
+      "meshStep": 1,
+      "groundClearance": 0.08,
+      "joinOverlap": 0.2,
+      "roadContactDepth": 1,
+      "roadContactSideMargin": 0.5,
+      "sourceRefs": [
+        "osm",
+        "artsEnvironment2024",
+        "artsEntrancePaving2025"
+      ],
+      "evidence": {
+        "location": "主楼西入口、独立雨棚和鸪江路的位置沿用OSM轮廓；连接仅覆盖雨棚中央前缘至现有准备后路面的范围。",
+        "material": "南侧维修照片显示铺砖与沥青相接；中央连接暂以沥青作有边界的示意延续，不宣称整片前场材料及分缝已复原。",
+        "dimensions": "连接宽度沿用雨棚前缘约11.78米，远端取当前道路实际边界；插值坡面连接既有平台与路面，未依据粗DEM虚构台阶或测绘标高。"
+      }
     }
   ]
 }

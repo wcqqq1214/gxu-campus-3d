@@ -107,7 +107,10 @@ def prepare_sites(root=ROOT):
     source_ids={s['id'] for s in read('sources.json')['sources']}
     sites=[];areas=[];gradings=[]
     for config in catalogue['sites']:
-        if config.get('type')=='courtyard-paving':
+        if config.get('type')=='canopy-connection':
+            from canopy_connection_data import derive_canopy_connection
+            site,area,grading=derive_canopy_connection(config,buildings,roads,source_ids)
+        elif config.get('type')=='courtyard-paving':
             from courtyard_data import derive_courtyard
             site,area,grading=derive_courtyard(config,buildings,source_ids)
         elif config.get('type')=='gallery-apron':

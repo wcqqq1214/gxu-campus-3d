@@ -71,6 +71,15 @@ def samples(b):
         assert count>0,(b['id'],part['id'],'no usable roof samples')
     for e in form['entrances']:
         x,y=e['center'];a=math.radians(e['bearing']);nx,ny=math.sin(a),math.cos(a)
+        if 'shelter' in e:
+            # This building owns the doorway; a separate mapped roof owns
+            # its floor and canopy. Probe its stone header below that soffit.
+            p=e['shelter'];expected=z+p['floorHeight']+p['doorHeight']+p['transomHeight']+.12
+            for i in range(p['bays']):
+                offset=-e['width']/2+(i+.5)*e['width']/p['bays']
+                points.append({'kind':'sheltered-door-header','x':x+nx*.10+ny*offset,
+                               'y':y+ny*.10-nx*offset,'top':expected+.03,'expected':expected})
+            continue
         if 'attachedPortico' in e:
             p=e['attachedPortico'];distance=p['depth']/2
             points.append({'kind':'entrance-platform','x':x+nx*distance,'y':y+ny*distance,

@@ -2035,6 +2035,15 @@
             "artsEnvironment2024"
           ],
           "note": "2024年学院Environment照片可见平屋面与女儿墙；背部设备和屋顶小体量未确认，不虚构坡屋顶。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024",
+            "artsDoorRepair2024"
+          ],
+          "note": "学院具名正面照片与西侧独立雨棚轮廓对应，采用主楼西立面雨棚下三组玻璃门。维修照片支持深色门框、上亮窗及石材边框；门组宽9.9米、边框0.6米、门高2.55米与上亮窗0.45米均为估算，沿用独立雨棚平台，不重复生成雨棚或台阶。"
         }
       },
       "review": {
@@ -2052,7 +2061,7 @@
         },
         "entrances": {
           "status": "partial",
-          "note": "门位及道路连接待校准，现有入口仍为示意。"
+          "note": "西主入口已依据照片/地图校准；门宽、门高与框架尺寸为估算，其余入口及背面待核对。"
         },
         "facadeRules": {
           "status": "partial",
@@ -2062,7 +2071,27 @@
           "status": "partial",
           "note": "照片未覆盖全部背面体量。"
         }
-      }
+      },
+      "entrances": [
+        {
+          "id": "west-main",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 10,
+          "t": 0.5228731865187717,
+          "width": 9.9,
+          "primary": true,
+          "mappedCanopy": {
+            "buildingId": "way/880089961",
+            "footprintRevision": "865dc4cff18239c69d013a620bf58402b5c0084e0228bab703b6cf65733c19dd",
+            "partId": "west-entrance-canopy",
+            "bays": 3,
+            "pierWidth": 0.6,
+            "doorHeight": 2.55,
+            "transomHeight": 0.45
+          }
+        }
+      ]
     },
     "way/759165562": {
       "name": "校内建筑 759165562",
