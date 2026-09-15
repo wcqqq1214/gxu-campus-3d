@@ -2,7 +2,7 @@
 import hashlib
 import math
 from geometry import Mesh
-from facade_corridors import add_corridor
+from facade_corridors import add_corridor, add_corridor_openings
 from attached_gallery import add_attached_gallery
 from facade_windows import add_grid_pilasters, add_grid_windows
 from attached_portico import add_attached_portico
@@ -63,7 +63,9 @@ def shared_form(b, z, C):
             part_body.extrude(part['polygons'], triangles, z-.5, h+.5, wall, C['paleRoof'])
         for facade in form.get('facades',[]):
             if facade['part']==part.get('id','body') and 'openCorridor' in facade['rule']:
-                add_corridor(part_body,facade,z,wall,C['white'],C['white'],pitched_roof=roof['type']!='flat')
+                finish=facade['rule']['openCorridor'].get('finish',{})
+                add_corridor(part_body,facade,z,C[finish['wall']] if 'wall' in finish else wall,C['white'],C[finish.get('rail','white')],pitched_roof=roof['type']!='flat')
+                add_corridor_openings(part_body,facade,z,C)
         body.extend(part_body)
         if roof['type'] != 'flat':
             geometry = roof['geometry']

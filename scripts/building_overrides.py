@@ -271,7 +271,7 @@ def resolve_facades(b, form, rules):
         if 'openCorridor' in rule:
             corridor = rule['openCorridor']
             required={'depth','firstLevel','railHeight','endInset'}
-            if not isinstance(corridor,dict) or not required <= set(corridor) or set(corridor)-required-{'piers','balusters'}:
+            if not isinstance(corridor,dict) or not required <= set(corridor) or set(corridor)-required-{'piers','balusters','finish','openings'}:
                 raise ValueError('Open corridor needs depth, firstLevel, railHeight and endInset')
             for parameter in ['depth','railHeight','endInset']:
                 positive(corridor[parameter], 'corridor '+parameter)
@@ -379,6 +379,8 @@ def resolve_facades(b, form, rules):
                             if corridor['firstLevel']>=part['levels'] or corridor['railHeight']>=fh-.5:
                                 raise ValueError('Corridor floors or railing leave no upper opening')
                             length=math.dist(start,end);inset=corridor['endInset']
+                            from corridor_detail_data import validate_corridor_details
+                            validate_corridor_details(facade['rule'],length,part['height'],part['levels'])
                             if length-2*inset<2:
                                 raise ValueError('Corridor end returns leave no usable facade')
                             if 'piers' in corridor:
