@@ -484,8 +484,12 @@ def resolve_building(building, record=None, source_ids=None):
         entrances = []; ids = set()
         for e in record['entrances']:
             required = {'id','polygon','ring','edge','t','width','primary'}
-            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','attachedPortico','landingHeight','doorFrame','stairFlight'} or not e['id'] or e['id'] in ids:
+            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy'} or not e['id'] or e['id'] in ids:
                 raise ValueError('Invalid or duplicate entrance')
+            if 'mappedCanopy' in e:
+                from mapped_canopy_data import validate_mapped_canopy
+                validate_mapped_canopy(e['mappedCanopy'])
+                if set(e)-required-{'mappedCanopy'}:raise ValueError('Mapped canopy cannot duplicate an entrance roof or platform')
             if 'landingHeight' in e:
                 if type(e['landingHeight']) not in (int,float):
                     raise ValueError('Entrance landing height must be numeric')
@@ -596,6 +600,8 @@ def prepare_existing_overrides():
     resolved=[resolve_building(b,catalogue.get(b['id']),source_ids) for b in buildings]
     from attached_gallery_data import validate_gallery_context
     validate_gallery_context(resolved)
+    from mapped_canopy_data import resolve_mapped_canopy_context
+    resolve_mapped_canopy_context(resolved)
     geo=read_json(out/'geography.geojson'); features={f['id']:f for f in geo['features']}
     props=('height','levels','heightBasis','facadeBasis','archetype','roofBasis','sourceRefs','calibration')
     for b in resolved:
