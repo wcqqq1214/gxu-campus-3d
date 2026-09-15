@@ -12,6 +12,25 @@ from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue
 
 
 class BuildingOverrideTests(unittest.TestCase):
+    def test_only_explicit_open_roof_can_omit_entrance(self):
+        buildings={b['id']:b for b in json.loads((ROOT/'public/data/buildings.json').read_text())}
+        b=buildings['way/880089961'];record=load_catalogue()[b['id']]
+        sources={s['id'] for s in source_catalogue()}
+        resolved=resolve_building(b,record,sources)
+        self.assertEqual(resolved['form']['entrances'],[])
+        malformed=copy.deepcopy(record);malformed['entrances']={}
+        with self.assertRaises(ValueError):resolve_building(b,malformed,sources)
+        for kind in ('university','yes'):
+            enclosed=copy.deepcopy(b);enclosed['tags']['building']=kind
+            with self.subTest(kind=kind),self.assertRaises(ValueError):
+                resolve_building(enclosed,record,sources)
+        no_supports=copy.deepcopy(record)
+        del no_supports['parts'][0]['openBelow']
+        with self.assertRaises(ValueError):resolve_building(b,no_supports,sources)
+        no_parts=copy.deepcopy(record)
+        del no_parts['parts'];del no_parts['evidence']['parts']
+        with self.assertRaises(ValueError):resolve_building(b,no_parts,sources)
+
     def test_mixed_part_roofs_preserve_partition_and_reject_conflicts(self):
         b=self.building()
         parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'levels':5,'height':16.5,'roof':{'type':'hipped','rise':1.5}},

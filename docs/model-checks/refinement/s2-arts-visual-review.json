@@ -1,0 +1,62 @@
+{
+  "reviewedAt": "2026-09-16",
+  "passedForBoundedVolumeChange": true,
+  "wholeBuildingAccepted": false,
+  "reviews": [
+    {
+      "file": "docs/screenshots/refinement/s2-arts-close/after/arts-east-bodies-trees-off-day.png",
+      "sha256": "bfb5f05a2b6a2a3ad434e5b068afaeca7409afb7b8e5e07b9cc44b2de27747cd",
+      "reviewed": true,
+      "assessment": "Three/four-storey volume relationship can be compared, original round stair remains unresolved."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-arts-close/after/arts-east-bodies-trees-on-day.png",
+      "sha256": "5c110efbaffb4f8b6ea3f67bfd2a646ac3db7047b3749d131455b76655025c89",
+      "reviewed": true,
+      "assessment": "Three/four-storey volume relationship can be compared, original round stair remains unresolved."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-arts-close/after/arts-west-canopy-trees-on-day.png",
+      "sha256": "42e11d554ed4f28737c9404a821f2fe95f47f1e0f4e82bfe9a9fced419127d1d",
+      "reviewed": true,
+      "assessment": "Four front supports, canopy fascia and open underside visible; original terrain and grass remain beyond the platform."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-arts-close/after/arts-west-canopy-trees-on-night.png",
+      "sha256": "bd65a0134a145d3ae6e886f17e03ccd5aa1b6c17e359553a55d4c29b80ff6f58",
+      "reviewed": true,
+      "assessment": "Four front supports, canopy fascia and open underside visible; original terrain and grass remain beyond the platform."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-arts-close/before/arts-east-bodies-trees-on-day.png",
+      "sha256": "cc6f358a867a640cb7515843b1f332843058f5046954673bb96704cef0aaea0d",
+      "reviewed": true,
+      "assessment": "Three/four-storey volume relationship can be compared, original round stair remains unresolved."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-arts-close/before/arts-west-canopy-trees-on-day.png",
+      "sha256": "906217d6a260bf2ca821ea0fd580d5f18d1d547a1129af46002e80f27c4206c3",
+      "reviewed": true,
+      "assessment": "Old solid extruded roof object blocks the entry frontage."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-arts-mobile/after/arts-west-canopy-trees-on-day-mobile.png",
+      "sha256": "7a7ea54cda3cbfaeb928972e2d8eaeeeea99eeed35cf84b5ec4564936bed1bd9",
+      "reviewed": true,
+      "assessment": "Collapsed mobile panel; oblique view shows near columns and open space beneath roof, other columns partly outside frame. Ground connection to road remains incomplete."
+    }
+  ],
+  "excluded": [
+    {
+      "file": "docs/screenshots/refinement/s2-arts-close/after/arts-west-canopy-trees-on-day-mobile.png",
+      "sha256": "d2b8ac2281912b50c3bb2df3a25d37f67a5dc31c4bb95a1afb240ea71d9878c1",
+      "reason": "Expanded mobile panel reduced usable viewport; restored span pushed eye into western neighbour, showing its wall. Replaced by collapsed-panel oblique mobile capture."
+    }
+  ],
+  "cameraCorrection": "The shared span is half the usable viewport size at target, not an absolute eye distance. Initial broad west views occluded the canopy behind the western building. Reduce desktop span to 8 m and use an oblique collapsed-panel mobile view; no buildings were hidden or changed for the screenshots.",
+  "limits": [
+    "Main entrance is still the uncalibrated fallback; windows behind canopy are not accepted as real doorway layout.",
+    "Round stair is still the old closed five-storey model, explicitly unresolved.",
+    "Mobile view proves visible canopy columns/underside and floor only; not complete whole-building framing or phone performance."
+  ]
+}
