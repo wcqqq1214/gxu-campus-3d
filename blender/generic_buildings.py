@@ -114,8 +114,12 @@ def shared_form(b, z, C):
         width = e['width']
         if e.get('porticoId'):
             floor=e['platformHeight'];front=e['outerCenter'];pw=e['porticoWidth']
-            entrance.box(x+nx*.04,y+ny*.04,z+floor+1.4,width,.10,2.8,C['glass'],theta)
-            entrance.box(x+nx*.06,y+ny*.06,z+floor+2.83,width+.2,.14,.12,C['white'],theta)
+            if 'recessGlazing' in e:
+                from recess_glazing import add_recess_glazing
+                add_recess_glazing(entrance,e,z,C)
+            else:
+                entrance.box(x+nx*.04,y+ny*.04,z+floor+1.4,width,.10,2.8,C['glass'],theta)
+                entrance.box(x+nx*.06,y+ny*.06,z+floor+2.83,width+.2,.14,.12,C['white'],theta)
             # Counts can be sourced separately from estimated dimensions.
             steps=e.get('steps',3)
             step_base=e.get('stepBaseHeight',0)
