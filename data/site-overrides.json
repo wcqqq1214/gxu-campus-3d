@@ -232,6 +232,35 @@
         "material": "南侧维修照片显示铺砖与沥青相接；中央连接暂以沥青作有边界的示意延续，不宣称整片前场材料及分缝已复原。",
         "dimensions": "连接宽度沿用雨棚前缘约11.78米，远端取当前道路实际边界；插值坡面连接既有平台与路面，未依据粗DEM虚构台阶或测绘标高。"
       }
+    },
+    {
+      "id": "office-north-front-connection",
+      "type": "front-connection",
+      "buildingId": "way/671978896",
+      "footprintRevision": "357568dd98742e237fa5d3bf2a554e33cabbd8651d42425066531ad63cfb5e78",
+      "entranceId": "north-central-main",
+      "surfaceId": "way/948683817",
+      "surfaceRevision": "9722393901dbae530875afa7e1adeea065c259ceba4d02e2d32914bc42b462d9",
+      "roadSearchDistance": [
+        25,
+        45
+      ],
+      "pathWidth": 4.4,
+      "meshStep": 1,
+      "groundClearance": 0.12,
+      "joinOverlap": 0.2,
+      "roadContactDepth": 1,
+      "roadContactSideMargin": 0.5,
+      "sourceRefs": [
+        "osm",
+        "gxuDonationProjects"
+      ],
+      "evidence": {
+        "presence": "项目册照片可见门前硬质铺地连至前方通行空间，门口未见成组台阶。",
+        "extent": "仅从已定位北向中央门口，以4.4米估算通行宽（限制于中央两柱之间）连接原映射way/948683817道路边；约35米纵深来自既有地图，不当作照片测得完整广场，未补画车位或移动道路。",
+        "grading": "门口取楼栋基准加0.15米估算门槛，远端接实际道路三角面；连接面下削低粗地形并封闭侧面，不新增台阶或声称符合无障碍标准。",
+        "excluded": "不按照片透视猜测树木精确位置、完整铺地边界或停车标线。"
+      }
     }
   ]
 }

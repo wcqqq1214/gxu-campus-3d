@@ -1,0 +1,117 @@
+{
+  "passed": true,
+  "baseCommit": "d31645ac88688f43b0e8c6ec25c5c38101ac170a",
+  "branch": "dev",
+  "scope": "North office glazed entrance, third-floor band, upper solid sign wall and end windows; limited forward paved connection with shallow contact overlap. Dimensions estimated; side wings, other facades and whole forecourt remain pending",
+  "partialObjectRecords": 17,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 139,
+  "geometryChecks": [
+    "all-geometry",
+    "roofs-geometry",
+    "site-trees-geometry",
+    "geometry",
+    "path-geometry",
+    "source-preservation",
+    "assets",
+    "incremental-assets",
+    "incremental-geometry",
+    "incremental-path-geometry",
+    "visual-review"
+  ],
+  "negativeControl": "Old north facade fails the first glazed-portal sample; initial shipping contact has a 0.113 m height jump before shallow-overlap repair",
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4158694,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.4521582519055016,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        29,
+        29,
+        29
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 29,
+        "medianTriangles": 1128865,
+        "medianDrawCalls": 288
+      },
+      "changePercent": {
+        "medianFPS": -3.3333333333333326,
+        "medianTriangles": 7.312169362466658,
+        "medianDrawCalls": 9.505703422053235
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "baselineReused": true,
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "currentPerformanceReport": "s2-office-entry-performance-browser.json",
+  "fingerprints": {
+    "blender/flush_entrance.py": "18d8f950fcb589031186eb9b0b451e05d879e8df9cb18248e4316b42322093b0",
+    "blender/generic_buildings.py": "a58332876aedd4e92577266ce97e8b81a16cc3a7b4743eebf416309b90db6b0f",
+    "blender/facade_panels.py": "7a16cce1bdffde55190f14f25d80aac37c3b9f4d20ad8841f317374aa7092a74",
+    "blender/side_connection.py": "8f08b4403ac8682d9e35d8ffac71e0e6ba3b8754da104ae3a94b0fbd7c56bc24",
+    "blender/validate_office_entry.py": "101f52229e77518c738b4aa7d867117f6c1e9c8ee11edf94c5a8266062712d18",
+    "blender/validate_side_connection.py": "d0c3be295693d474096f8239b4eb82e52e3d2c3bddc7ccb15c28553f58aabd57",
+    "scripts/flush_entrance_data.py": "ed61a709a56d54a63dfe43d3bc1830af00003dbc8b54728c82818bbfe398c4b3",
+    "scripts/building_overrides.py": "b17566d58b918dbdb7bd1b489b6ae9eca254461a169a18b9a53c897c8c3dab9d",
+    "scripts/front_connection_data.py": "5efbdca4b5a0552f1e9f1fb8247251e9fe83a4a17edfb499814ba3363e812fef",
+    "scripts/facade_panels_data.py": "079a34f910cb1085369ff8fb230c07e928caddac54d0bc758a728ddf384308e8",
+    "scripts/test_flush_entrance_data.py": "5c911e73b854442dacb12e3757089a265bcd4a631f1386677951334377a6a0d4",
+    "data/building-overrides.json": "2e0dacdaa41bd90403481f33770af62ac160c0a52ab756438c8a673f8bbb3be7",
+    "data/site-overrides.json": "9efcbb5d67c6d1ffef96a7b51dd8e2ab4c0d87d98f1282d240851d25333ba5ff",
+    "blender/gxu-campus.blend": "f22254ca068873621e8ccc48b135282aa2d5215e0f2903e0c6736eac1c9f2681",
+    "public/data/buildings.json": "819e561aff69334e8657c7a4969d9ccaf3949f63650a32a1b0ebe9d6fc17c0cb",
+    "public/data/models.json": "694af7bc4024adad9a1340a20f1f331f473ed1928ba6c38cd66266aa55bff919"
+  }
+}

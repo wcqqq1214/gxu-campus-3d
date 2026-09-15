@@ -8,11 +8,20 @@ def derive_front_connection(config,buildings,surface,source_ids):
     from site_data import local_shape,world_shape,road_columns
     keys={'id','type','buildingId','footprintRevision','entranceId','surfaceId','surfaceRevision',
           'roadSearchDistance','meshStep','groundClearance','joinOverlap','roadContactDepth','roadContactSideMargin','sourceRefs','evidence'}
-    if set(config)!=keys or config['type']!='front-connection':raise ValueError('Invalid front connection fields')
+    if not keys <= set(config) or set(config)-keys-{'pathWidth'} or config['type']!='front-connection':raise ValueError('Invalid front connection fields')
     b=next((b for b in buildings if b['id']==config['buildingId']),None)
     if not b or footprint_revision(b)!=config['footprintRevision']:raise ValueError('Stale front connection building')
     entry=next((e for e in b.get('form',{}).get('entrances',[]) if e['id']==config['entranceId']),None)
-    if not entry or 'stairFlight' not in entry:raise ValueError('Front connection requires explicit stairs')
+    if not entry or not any(k in entry for k in ('stairFlight','flushEntrance')):raise ValueError('Front connection requires explicit stairs or a flush entrance')
+    if 'flushEntrance' in entry:
+        width=config.get('pathWidth')
+        portal=entry['flushEntrance'];clear=entry['width']/portal['bays']-portal['pierWidth']
+        if type(width) not in (int,float) or not math.isfinite(width) or not portal['doorWidth']+.2 <= width <= clear-.1:
+            raise ValueError('Flush entrance path width must contain its door and clear its piers')
+        p={'width':width,'front':0,'baseHeight':entry['flushEntrance']['floorHeight']}
+    else:
+        if 'pathWidth' in config:raise ValueError('Stair connection width must match its stairs')
+        p=entry['stairFlight']
     if surface is None or surface['id']!=config['surfaceId'] or hashlib.sha256(json.dumps(surface,sort_keys=True,separators=(',',':')).encode()).hexdigest()!=config['surfaceRevision']:
         raise ValueError('Stale front connection surface')
     tags=surface['tags']
@@ -24,7 +33,7 @@ def derive_front_connection(config,buildings,surface,source_ids):
         if type(config[key]) not in (int,float) or not math.isfinite(config[key]) or not lo<=config[key]<=hi:raise ValueError('Invalid connection '+key)
     search=config['roadSearchDistance']
     if not isinstance(search,list) or len(search)!=2 or any(type(v) not in (int,float) or not math.isfinite(v) for v in search) or not 0<search[0]<search[1]<=80:raise ValueError('Invalid front road search')
-    p=entry['stairFlight'];frame={'origin':entry['center'],'angle':-math.radians(entry['bearing'])}
+    frame={'origin':entry['center'],'angle':-math.radians(entry['bearing'])}
     start=p['front'];half=p['width']/2;target=local_shape(surface_shape(surface),frame)
     columns=road_columns(target,-half,half,start,search,config['meshStep'])
     shape=Polygon([(-half,start),(half,start),*reversed(columns)]);area=world_shape(shape,frame)
@@ -35,6 +44,7 @@ def derive_front_connection(config,buildings,surface,source_ids):
             for kind in ['attachedPortico','stairFlight']:
                 if kind in e and area.intersection(Polygon(e[kind]['footprint'])).area>1e-5:raise ValueError('Connection overlaps an entrance platform')
     return {**copy.deepcopy(config),**frame,'buildingCenter':b['center'],'entry':copy.deepcopy(entry),
+            **({'halfWidth':half} if 'flushEntrance' in entry else {}),
             'startY':start,'stairBaseHeight':p['baseHeight'],'columns':columns,'localPolygon':list(shape.exterior.coords),
             'pavingPolygon':list(area.exterior.coords),'gradingBounds':list(area.bounds),'localMesh':triangulate(shape),
-            'layer':'roads','material':'asphalt'},area,area
+            'layer':'roads','material':'path' if 'flushEntrance' in entry else 'asphalt'},area,area

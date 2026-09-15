@@ -8,6 +8,7 @@ from facade_windows import add_grid_pilasters, add_grid_windows
 from attached_portico import add_attached_portico
 from facade_bands import add_band_ledges, add_band_windows, band_replaces_window
 from facade_panels import add_panels, panel_replaces_window
+from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
 
 
 def compact_form_source(obj):
@@ -94,6 +95,9 @@ def shared_form(b, z, C):
         from stair_tower import stair_access_door
         stair_access_door(entrance,door,z,C)
     for e in form['entrances']:
+        if 'flushEntrance' in e:
+            add_flush_entrance(entrance,e,z,C)
+            continue
         if 'mappedCanopy' in e:
             from mapped_canopy_entry import add_mapped_canopy_entry
             add_mapped_canopy_entry(entrance,e,z,C)
@@ -218,6 +222,8 @@ def ordinary_building(b, z, C, detail):
                 if zz-wh/2 < z+facade.get('minimumHeight',0): continue
                 blocked_by_door=False
                 for entry in form['entrances']:
+                    if flush_entrance_blocks_window(entry,x,y,nx,ny,zz-z-wh/2,zz-z+wh/2,ww):
+                        blocked_by_door=True;break
                     if 'attachedPortico' not in entry and 'doorFrame' not in entry and 'shelter' not in entry:continue
                     bearing=math.radians(entry['bearing']);enx,eny=math.sin(bearing),math.cos(bearing)
                     ex,ey=entry['center'];floor=z+(entry['shelter']['floorHeight'] if 'shelter' in entry else entry['attachedPortico']['platformHeight'] if 'attachedPortico' in entry else entry['landingHeight'])
