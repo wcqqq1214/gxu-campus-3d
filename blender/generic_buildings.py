@@ -203,7 +203,10 @@ def ordinary_building(b, z, C, detail):
         if length < 2: continue
         nx, ny = facade['normal']
         theta = math.atan2(dy, dx); num = max(1, int(length/rule.get('spacing',4)))
+        floor_heights = facade.get('floorHeights')
         for level in range(levels):
+            floor_bottom = math.fsum(floor_heights[:level]) if floor_heights else level*h/levels
+            floor_height = floor_heights[level] if floor_heights else h/levels
             gallery=facade.get('attachedGallery')
             if gallery and level>0:continue
             corridor=rule.get('openCorridor')
@@ -216,7 +219,10 @@ def ordinary_building(b, z, C, detail):
                     if not corridor['endInset']+.2 < f*length < length-corridor['endInset']-.2:
                         continue
                     x-=nx*corridor['depth'];y-=ny*corridor['depth']
-                zz = z+(level+.56)*h/levels; ww = min(2.1, length/num*.60); wh = min(1.9, h/levels*.55)
+                # Preserve the original arithmetic for uncalibrated facades,
+                # keeping unrelated compressed assets reproducible.
+                zz = z+floor_bottom+.56*floor_height if floor_heights else z+(level+.56)*h/levels
+                ww = min(2.1, length/num*.60); wh = min(1.9, floor_height*.55)
                 if band_replaces_window(facade,level,f,ww):continue
                 if panel_replaces_window(facade,f,ww,zz-z,wh):continue
                 if zz-wh/2 < z+facade.get('minimumHeight',0): continue
@@ -224,9 +230,9 @@ def ordinary_building(b, z, C, detail):
                 for entry in form['entrances']:
                     if flush_entrance_blocks_window(entry,x,y,nx,ny,zz-z-wh/2,zz-z+wh/2,ww):
                         blocked_by_door=True;break
-                    if 'attachedPortico' not in entry and 'doorFrame' not in entry and 'shelter' not in entry:continue
+                    if 'attachedPortico' not in entry and 'doorFrame' not in entry and 'shelter' not in entry and not floor_heights:continue
                     bearing=math.radians(entry['bearing']);enx,eny=math.sin(bearing),math.cos(bearing)
-                    ex,ey=entry['center'];floor=z+(entry['shelter']['floorHeight'] if 'shelter' in entry else entry['attachedPortico']['platformHeight'] if 'attachedPortico' in entry else entry['landingHeight'])
+                    ex,ey=entry['center'];floor=z+(entry['shelter']['floorHeight'] if 'shelter' in entry else entry['attachedPortico']['platformHeight'] if 'attachedPortico' in entry else entry.get('landingHeight',0))
                     door_top=entry['shelter']['doorHeight']+entry['shelter']['transomHeight']+.12 if 'shelter' in entry else 2.8
                     doorway_width=entry['width']+entry.get('shelter',entry.get('doorFrame',{})).get('pierWidth',0)
                     if (nx*enx+ny*eny>.999 and abs((x-ex)*enx+(y-ey)*eny)<.3
