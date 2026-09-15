@@ -1,0 +1,209 @@
+{
+  "reviewedAt": "2026-09-16",
+  "previousGoalTurnClassification": "progress: previous courtyard batch committed and pushed to dev",
+  "boundedVolumeCalibrationPassed": true,
+  "wholeBuildingAcceptancesAdded": 0,
+  "partialObjectRecords": 15,
+  "standaloneCanopyRecordsAdded": 1,
+  "wholePlanCompleted": false,
+  "tests": {
+    "pythonFullSuite": 121,
+    "generatedOrdinaryBuildings": 430,
+    "sourceBaseNearOrdinaryBuildings": 430,
+    "pagesBuildPassed": true,
+    "frontendTestsRerun": false,
+    "frontendChanged": false
+  },
+  "metrics": {
+    "精细": {
+      "baseline": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "repeatFPS": [
+          60,
+          60,
+          60
+        ],
+        "medianFPS": 60,
+        "medianTriangles": 4143209,
+        "medianDrawCalls": 552
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.0669515811259984,
+        "medianDrawCalls": 0.9140767824497242
+      },
+      "numericalBudgetPassed": true
+    },
+    "流畅": {
+      "baseline": {
+        "repeatFPS": [
+          30,
+          30,
+          30
+        ],
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "repeatFPS": [
+          28,
+          27,
+          28
+        ],
+        "medianFPS": 28,
+        "medianTriangles": 1119649,
+        "medianDrawCalls": 290
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 6.43607793183103,
+        "medianDrawCalls": 10.2661596958175
+      },
+      "numericalBudgetPassed": true
+    }
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "environmentFieldsMatch": true,
+  "baselineReplayThisBatch": true,
+  "olderBaselineExcludedReason": "2026-09-15 baseline recorded Darwin 25.5.0; current run records 27.0.0. S0 was replayed on current OS rather than calling these matching conditions.",
+  "sourceSha256": "f9e6bf6d29b7be79409307b0224079c9d02feb59c2dfeb246af3940dd06d4c03",
+  "modelManifestSha256": "1639afbd85d48f8754624b45693d8001b8121d51893fdd4631edc927174bb513",
+  "implementationSha256": {
+    "data/building-overrides.json": "db8e5b6b6ef78c4b34ccbd87dcfc41fe87b26d6cac978722cff24df96b95b559",
+    "scripts/building_overrides.py": "4a433c66b3c805e80a61ce2ec4d7d0967d89d2984ea9be08f2b42161e78496eb",
+    "scripts/test_building_overrides.py": "cd4e9d04788b2eac80ea390245e3efd439608a9169350241d734228db045ed33",
+    "blender/validate_arts_buildings.py": "2000d6269308cc727662a2332f156fee5ae4bdc73936eaee9fd07796c49bb223",
+    "blender/generic_buildings.py": "6e333c530f28a7439e44f4ecfb6c42c3cae1ed57cd8268243561dfab18037a82",
+    "blender/build_campus.py": "8e13721368a298eac28bb6cc05b825060ba3a638d2c9f426260faa601ba1f691",
+    "public/data/buildings.json": "bef752ea0d5d29b898778fd0ce49c80127bec5e6b8adf26b7f14fac7c999abc4",
+    "public/data/models.json": "1639afbd85d48f8754624b45693d8001b8121d51893fdd4631edc927174bb513",
+    "public/data/vegetation.json": "82cc9988d641ad307ccffcf73f8fa9308f3c7e857cfe983da2f9c256b4625b26",
+    "public/data/sites.json": "7308a9aecee26a7b5191af6cd30f6f057ef8518b1d9dce652540c8ab5a79d960",
+    "blender/gxu-campus.blend": "f9e6bf6d29b7be79409307b0224079c9d02feb59c2dfeb246af3940dd06d4c03",
+    "public/models/base.glb": "0a293b5a09a0c336226690841ad453836f02d4ba3e2345edf39a0a7ca45aef6b",
+    "public/models/chunk-p0-n1.glb": "479d60d480b140536b5fac25fd3ca4dfbf13a5779c742a8c8c9cfb58838cfa92",
+    "public/models/chunk-p1-n1.glb": "d5d46eba36feb8301b062299ec8e8ac0c2ba3ab5af14d3059053330aa44c3426"
+  },
+  "evidenceSha256": {
+    "docs/model-checks/refinement/s2-arts-evidence.json": "3b3ebe0161484bd811058117fa4a5c2ec88c369dac1fb4d5b81ceb313cd2b273",
+    "docs/model-checks/refinement/s2-arts-all-geometry.json": "9218cd1a5d2c2a26d3d7f7e48d1b5bc80b76f990d232598241774c0df96cd718",
+    "docs/model-checks/refinement/s2-arts-generated.json": "d54c55f4e0fc3498a74fa383195bac1c18c0c72a38bed4a49402f2c694ea41f8",
+    "docs/model-checks/refinement/s2-arts-geometry.json": "1cb3e81755d46272616d5fe948294b7782086632a337359f6475f2a7f3ae647e",
+    "docs/model-checks/refinement/s2-arts-before-model-geometry.json": "f2fe5af04c78470770aea9d955dfb945608ebf629ee061bba23f8c9b8b98411f",
+    "docs/model-checks/refinement/s2-arts-assets.json": "60f36d545cec922d17523dfc32a9b9b34f487ca2a0d1afab965edab031641488",
+    "docs/model-checks/refinement/s2-arts-source-preservation.json": "cf16b4e8240162b772b065609169cdb866b73b18b1a050e25330fa558f1e4c4b",
+    "docs/model-checks/refinement/s2-arts-trees-geometry.json": "89b3ca034558b43d053f696e5b86f500e3f0f9b1878dbb6e9c825360abc5f963",
+    "docs/model-checks/refinement/s2-arts-courtyard-geometry.json": "9e5695b1c37f9c6156d612e3051dc6263d957aabf85bfc1022d4a60658f13361",
+    "docs/model-checks/refinement/s2-arts-incremental-assets.json": "eb400740dbc3f281dad616a81dbae2e78c8adf361b9e109de5a86d8c77cb7876",
+    "docs/model-checks/refinement/s2-arts-incremental-geometry.json": "0bcb08141e24e328820046242c2909cd507048043621372b31904da56ccbc35f",
+    "docs/model-checks/refinement/s2-arts-visual-review.json": "00ec9f4fea76250aaec428db01e2e3a83820f81a6dcf4e452a3f7e7495397cf5",
+    "docs/model-checks/refinement/s2-arts-close-context-browser.json": "a9d989adbf8117a1722e0ec7b4a535be98cd9ba96bab9333460c683dc7d2eb5c",
+    "docs/model-checks/refinement/s2-arts-mobile-context-browser.json": "012a2c4ba9b00da36aea9206b82abb30362751d80e1d82f65994defe4627d96e",
+    "docs/model-checks/refinement/s2-arts-s0-current-os-browser.json": "3e5c82de4f73eef11a551b1e47edbb4a1f6894eedb403982120423c185a0eb99",
+    "docs/model-checks/refinement/s2-arts-s0-current-os-performance-context.json": "ba0e9a94854dc2ba3df037d7df82d59512ffc86b94bf2e9c526d6eca1ab74105",
+    "docs/model-checks/refinement/s2-arts-performance-browser.json": "97862ef25655331fbe03a6d6d6dcd0ec39ea09f2927b4dc89a4f6b6b531ccc7a",
+    "docs/model-checks/refinement/s2-arts-performance-performance-context.json": "2326e1c47f5406cbbfbe0da5ea147987e92a210a1092f539fe644f3771f491b6",
+    "scripts/check-refinement-browser.mjs": "92f357be4185b9b0514d18f17585c752b675dc44d5aa1636558eac3c98b159fd",
+    "docs/screenshots/refinement/s2-arts-performance/library-mobile.png": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4",
+    "docs/screenshots/refinement/s2-arts-s0-current-os/library-mobile.png": "8656c16c1598b2814d1c65cf6998802391d3ce9b96a8c6302419c511fa591208"
+  },
+  "loadReview": {
+    "snapshots": {
+      "baseline": 24,
+      "current": 24
+    },
+    "computeProcessObservations": {
+      "baseline": [
+        {
+          "at": "2026-09-15T16:15:44.200083+00:00",
+          "pid": 10321,
+          "parentPid": 10320,
+          "cpuPercent": 3.6,
+          "elapsed": "00:20",
+          "cumulativeCPUTime": "0:00.43",
+          "executable": "/Users/wcqqq1214/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+        },
+        {
+          "at": "2026-09-15T16:15:54.228138+00:00",
+          "pid": 10318,
+          "parentPid": 2618,
+          "cpuPercent": 4.4,
+          "elapsed": "00:32",
+          "cumulativeCPUTime": "0:00.17",
+          "executable": "/Users/wcqqq1214/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+        },
+        {
+          "at": "2026-09-15T16:17:34.625095+00:00",
+          "pid": 10321,
+          "parentPid": 10320,
+          "cpuPercent": 2.6,
+          "elapsed": "02:10",
+          "cumulativeCPUTime": "0:00.69",
+          "executable": "/Users/wcqqq1214/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+        },
+        {
+          "at": "2026-09-15T16:18:44.961833+00:00",
+          "pid": 10321,
+          "parentPid": 10320,
+          "cpuPercent": 4.0,
+          "elapsed": "03:20",
+          "cumulativeCPUTime": "0:00.86",
+          "executable": "/Users/wcqqq1214/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+        }
+      ],
+      "current": [
+        {
+          "at": "2026-09-15T16:10:04.535521+00:00",
+          "pid": 9983,
+          "parentPid": 9981,
+          "cpuPercent": 2.0,
+          "elapsed": "00:20",
+          "cumulativeCPUTime": "0:00.43",
+          "executable": "/Users/wcqqq1214/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+        },
+        {
+          "at": "2026-09-15T16:11:54.984877+00:00",
+          "pid": 9983,
+          "parentPid": 9981,
+          "cpuPercent": 4.2,
+          "elapsed": "02:10",
+          "cumulativeCPUTime": "0:00.72",
+          "executable": "/Users/wcqqq1214/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+        }
+      ]
+    },
+    "manualAssessmentPending": false,
+    "assessment": "Accepted as an ordinary desktop regression on the same machine/OS/browser/viewport/protocol. All owned Blender/build jobs ended before measurements. Neither 24-snapshot series recorded Python/Blender computation. Browser-runner and static-server Node samples accrued less than one second CPU. Both series retain WindowServer/Codex/proxy activity; current proxy peaks 57.9%, baseline 49.0%, with intermittent low samples and modest cumulative CPU growth. Current transient Git sample accrued 0.44 seconds CPU; baseline Chrome renderer had a 31.9% snapshot. Not an idle or isolated GPU/CPU test, identical thermal/power conditions, or physical-phone measurement."
+  },
+  "remaining": [
+    "20–30 whole ordinary buildings; 15 records include one canopy and remain partial.",
+    "Six required library neighbours and full site.",
+    "Arts west doorway and roadway connection; circular stair; remaining elevations and roof structures.",
+    "Remaining lakeside/vegetation organization and S5."
+  ],
+  "sameConditionPerformanceGatePassed": true,
+  "baselineModelsVerified": 69,
+  "baselineManifestSha256": "1ab1452d99e47dbb47ab79d9bc967de3a509b7269a8b2073c922ef8ccca05b76",
+  "libraryMobileScreenshotsReviewed": "S0 shows four-column portico and front vegetation; current shows six-column portico and paved approach. Used only as loaded-version visual evidence."
+}

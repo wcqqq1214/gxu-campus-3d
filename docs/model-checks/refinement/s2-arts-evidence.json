@@ -1,0 +1,330 @@
+{
+  "reviewedAt": "2026-09-16",
+  "pageUrl": "https://art.gxu.edu.cn/info/1338/4615.htm",
+  "pagePublicationDate": "2024-08-11",
+  "photoDates": null,
+  "sourceRefs": [
+    "osm",
+    "artsEnvironment2024"
+  ],
+  "photos": [
+    {
+      "url": "https://art.gxu.edu.cn/__local/3/F8/09/D61319EB8772FF409BBC7670D66_3BCEEF34_2A020.jpg",
+      "localReference": "work/refinement-s4-courtyard/environment-0.jpg",
+      "sha256": "77dc938ae1037fe3aa178766c1ad519652b43593c00f4d1530c7967073248912",
+      "reviewedThisBatch": true
+    },
+    {
+      "url": "https://art.gxu.edu.cn/__local/B/E0/EC/96CC8936EC1E173FC5111857418_62CE92B4_B8856.jpg",
+      "localReference": "work/refinement-s4-courtyard/environment-1.jpg",
+      "sha256": "da37040f055bb09fd30db686f6475af413d592673a8ed60de289738f56a3ab0d",
+      "reviewedThisBatch": true
+    }
+  ],
+  "mappingBasis": [
+    "具名艺术学院正面、两端翼和西侧中央凸出的狭长roof轮廓对应；保留原轮廓，不以照片重新绘制边界。",
+    "临湖矩形楼体与圆形外楼梯组合对应东侧两处映射轮廓，四层由完整可见立面数层判断。"
+  ],
+  "buildings": [
+    {
+      "id": "way/759165563",
+      "tagsPreserved": true,
+      "footprintPreserved": true,
+      "before": {
+        "height": 13.2,
+        "levels": 4.0,
+        "heightBasis": "OSM高度或层数"
+      },
+      "after": {
+        "height": 9.899999999999999,
+        "levels": 3.0,
+        "heightBasis": "采用层数 × 3.3 米估算层高，非测量高度"
+      },
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "Environment第一张具名正面照显示三层窗列及平屋面，两端翼同高；当前OSM标记4层，保留原tag并采用照片约束的三层主体估算。拍摄日期未知，不能排除局部屋顶层；屋顶小体量另待核对。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "采用层数 × 3.3 米估算层高，非测量高度"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "2024年学院Environment照片可见平屋面与女儿墙；背部设备和屋顶小体量未确认，不虚构坡屋顶。"
+        },
+        "archetype": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm"
+          ],
+          "note": "按名称、OSM用途和现有形制规则推定"
+        },
+        "floorHeight": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "默认3.3米层高；独立OSM高度存在时不以此覆盖高度"
+        },
+        "roof.rise": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "平屋面屋脊增量为0；有坡屋面但没有屋脊尺寸时采用2.3米展示估算"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "无定位依据，最长外边中点示意入口；不声称朝向正确"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "默认窗距和窗尺寸；资料未覆盖的立面继续按类型推定"
+        }
+      },
+      "review": {
+        "levels": {
+          "status": "partial",
+          "note": "Environment第一张具名正面照显示三层窗列及平屋面，两端翼同高；当前OSM标记4层，保留原tag并采用照片约束的三层主体估算。拍摄日期未知，不能排除局部屋顶层；屋顶小体量另待核对。"
+        },
+        "height": {
+          "status": "partial",
+          "note": "层高沿用3.3米估算，非测量高度。"
+        },
+        "roof": {
+          "status": "partial",
+          "note": "可见平屋面；屋顶背面和设备层未完整核对。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "门位及道路连接待校准，现有入口仍为示意。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "可见窗列与材质待校准，现有立面为示意。"
+        },
+        "parts": {
+          "status": "partial",
+          "note": "照片未覆盖全部背面体量。"
+        }
+      }
+    },
+    {
+      "id": "way/759165562",
+      "tagsPreserved": true,
+      "footprintPreserved": true,
+      "before": {
+        "height": 16.5,
+        "levels": 5.0,
+        "heightBasis": "按类型估算"
+      },
+      "after": {
+        "height": 13.2,
+        "levels": 4.0,
+        "heightBasis": "采用层数 × 3.3 米估算层高，非测量高度"
+      },
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "Environment第二张临湖照显示底层加三层上部楼层，共四层；侧方开放圆形楼梯及湖岸与本楼组合对应，为照片/地图判读。替换原用途默认五层，3.3米层高和总高13.2米仍为估算。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "采用层数 × 3.3 米估算层高，非测量高度"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "2024年学院Environment照片可见平屋面与女儿墙；背部设备和屋顶小体量未确认，不虚构坡屋顶。"
+        },
+        "archetype": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm"
+          ],
+          "note": "按名称、OSM用途和现有形制规则推定"
+        },
+        "floorHeight": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "默认3.3米层高；独立OSM高度存在时不以此覆盖高度"
+        },
+        "roof.rise": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "平屋面屋脊增量为0；有坡屋面但没有屋脊尺寸时采用2.3米展示估算"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "无定位依据，最长外边中点示意入口；不声称朝向正确"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "默认窗距和窗尺寸；资料未覆盖的立面继续按类型推定"
+        }
+      },
+      "review": {
+        "levels": {
+          "status": "partial",
+          "note": "Environment第二张临湖照显示底层加三层上部楼层，共四层；侧方开放圆形楼梯及湖岸与本楼组合对应，为照片/地图判读。替换原用途默认五层，3.3米层高和总高13.2米仍为估算。"
+        },
+        "height": {
+          "status": "partial",
+          "note": "层高沿用3.3米估算，非测量高度。"
+        },
+        "roof": {
+          "status": "partial",
+          "note": "可见平屋面；屋顶背面和设备层未完整核对。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "门位及道路连接待校准，现有入口仍为示意。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "可见窗列与材质待校准，现有立面为示意。"
+        },
+        "parts": {
+          "status": "partial",
+          "note": "照片未覆盖全部背面体量。"
+        }
+      }
+    },
+    {
+      "id": "way/880089961",
+      "tagsPreserved": true,
+      "footprintPreserved": true,
+      "before": {
+        "height": 9.899999999999999,
+        "levels": 3.0,
+        "heightBasis": "按类型估算"
+      },
+      "after": {
+        "height": 3.8,
+        "levels": 1.0,
+        "heightBasis": "雨棚顶高3.8米为照片约束估算，不是测量高度；板底3.35米，底平台0.15米。"
+      },
+      "evidence": {
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "雨棚顶高3.8米为照片约束估算，不是测量高度；板底3.35米，底平台0.15米。"
+        },
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "原OSM building=roof、layer=1 轮廓沿主楼西侧延伸并向西中央凸出，对应具名正面照的入口雨棚；不应表达为三层实心房屋。单层仅表示支撑雨棚，不是可居住楼层。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "独立映射的开放雨棚不设门；主楼入口属于相邻way/759165563，尚待单独校准，不在雨棚投影边缘制造假门。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "整个原roof轮廓改为下部通透雨棚，中央正面四根支柱对应照片；窄侧翼两端支撑位置为结构简化估算。柱宽0.6、深0.65米，板底3.35米，平台0.15米，屋顶3.8米。全部构件约束于原轮廓；照片未显示完整侧翼及背部，支撑布置未作实测。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "artsEnvironment2024"
+          ],
+          "note": "2024年学院Environment照片可见平屋面与女儿墙；背部设备和屋顶小体量未确认，不虚构坡屋顶。"
+        },
+        "archetype": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm"
+          ],
+          "note": "按名称、OSM用途和现有形制规则推定"
+        },
+        "floorHeight": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "默认3.3米层高；独立OSM高度存在时不以此覆盖高度"
+        },
+        "roof.rise": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "平屋面屋脊增量为0；有坡屋面但没有屋脊尺寸时采用2.3米展示估算"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [],
+          "note": "默认窗距和窗尺寸；资料未覆盖的立面继续按类型推定"
+        }
+      },
+      "review": {
+        "levels": {
+          "status": "partial",
+          "note": "原OSM building=roof、layer=1 轮廓沿主楼西侧延伸并向西中央凸出，对应具名正面照的入口雨棚；不应表达为三层实心房屋。单层仅表示支撑雨棚，不是可居住楼层。"
+        },
+        "height": {
+          "status": "partial",
+          "note": "雨棚顶高3.8米为照片约束估算，不是测量高度；板底3.35米，底平台0.15米。"
+        },
+        "roof": {
+          "status": "partial",
+          "note": "可见平屋面；屋顶背面和设备层未完整核对。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "独立映射的开放雨棚不设门；主楼入口属于相邻way/759165563，尚待单独校准，不在雨棚投影边缘制造假门。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "可见窗列与材质待校准，现有立面为示意。"
+        },
+        "parts": {
+          "status": "partial",
+          "note": "整个原roof轮廓改为下部通透雨棚，中央正面四根支柱对应照片；窄侧翼两端支撑位置为结构简化估算。柱宽0.6、深0.65米，板底3.35米，平台0.15米，屋顶3.8米。全部构件约束于原轮廓；照片未显示完整侧翼及背部，支撑布置未作实测。"
+        }
+      }
+    }
+  ],
+  "notAccepted": [
+    "Complete entrance or road connection",
+    "Circular stair geometry",
+    "Exact measured heights, columns or platform dimensions",
+    "Whole buildings or whole S2 completion"
+  ],
+  "photosRedistributed": false
+}
