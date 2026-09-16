@@ -1,11 +1,12 @@
 """Check the actual ground UV and fine-triangle regression at the paving site."""
-import bpy,json,math,sys
+import bpy,json,math,sys,hashlib
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from site_geometry import split_convex
 record=json.loads((ROOT/'public/data/pavings.json').read_text())['pavings'][0]
+REPORT_PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s4-paving')
 x0,y0,x1,y1=[math.floor(v) if i<2 else math.ceil(v) for i,v in enumerate(record['bounds'])]
 outline=[(x0,y0),(x1,y0),(x1,y1),(x0,y1)];expected_area=(x1-x0)*(y1-y0)
 results={}
@@ -37,5 +38,6 @@ for kind in ['source','base']:
     assert abs(area-expected_area)<(.05 if kind=='base' else .0001),(kind,'collapsed/overlapping fine triangles',area,expected_area)
     results[kind]={'triangles':count,'maximumGroundUVError':max(errors),'coveredRaySamples':samples,'holes':holes,'expectedProjectedAreaMeters2':expected_area,'summedProjectedAreaMeters2':area,'projectedAreaExcessMeters2':area-expected_area,'passed':True}
 report={'pavingId':record['id'],'scope':'Actual source and decoded terrain at the previously striped region: XY/4 UV projection, matching export precision, dense coverage and projected triangle area. Browser comparison remains required.','bounds':[x0,y0,x1,y1],'results':results,'passed':True}
-(ROOT/'docs/model-checks/refinement/s4-paving-terrain-texture.json').write_text(json.dumps(report,indent=2)+'\n')
+report['fingerprints']={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb','public/data/models.json','public/data/pavings.json']}
+(ROOT/f'docs/model-checks/refinement/{REPORT_PREFIX}-terrain-texture.json').write_text(json.dumps(report,indent=2)+'\n')
 print(report,flush=True)

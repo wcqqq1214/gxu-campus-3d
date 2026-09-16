@@ -1,5 +1,5 @@
 """Check actual saved and shipped shore against the accepted pre-shore model."""
-import bpy,json,math,sys
+import bpy,json,math,sys,hashlib
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
@@ -8,6 +8,7 @@ from site_geometry import polygon_distance
 from shore_geometry import core_stations
 shore=json.loads((ROOT/'public/data/shores.json').read_text())['shores'][0]
 previous=ROOT/'work/refinement-s4-background-complete'
+REPORT_PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'shore')
 
 def root(o):
     while o.parent:o=o.parent
@@ -102,5 +103,6 @@ def check(kind,old,current):
 old=open_model(previous/'blender/gxu-campus.blend');current=open_model(ROOT/'blender/gxu-campus.blend');source=check('source',old,current)
 old=open_model(previous/'public/models/base.glb');current=open_model(ROOT/'public/models/base.glb');base=check('base',old,current)
 report={'shoreId':shore['id'],'source':source,'base':base,'scope':'Actual local terrain, original route and water, cap and waterline closure. Shape/position evidence and estimated dimensions are documented separately.','passed':True}
-(ROOT/'docs/model-checks/refinement/shore-geometry.json').write_text(json.dumps(report,indent=2)+'\n')
+report['fingerprints']={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb','public/data/models.json','public/data/shores.json']}
+(ROOT/f'docs/model-checks/refinement/{REPORT_PREFIX}-geometry.json').write_text(json.dumps(report,indent=2)+'\n')
 print(report,flush=True)

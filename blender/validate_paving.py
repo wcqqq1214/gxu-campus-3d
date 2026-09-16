@@ -1,5 +1,5 @@
 """Inspect saved and decoded paving against the preserved pre-repair assets."""
-import bpy,json,math,sys,re
+import bpy,json,math,sys,re,hashlib
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
@@ -7,6 +7,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from site_geometry import inside
 record=json.loads((ROOT/'public/data/pavings.json').read_text())['pavings'][0]
 previous=ROOT/'work/refinement-s4-shore-complete'
+REPORT_PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'paving')
 ring=record['vertices'];box=record['bounds'];prefix='paving-'+record['id']
 baseline=json.loads((ROOT/'docs/model-checks/refinement/s4-paving-before-geometry.json').read_text())
 def root(o):
@@ -127,5 +128,6 @@ for kind,relative in [('source','blender/gxu-campus.blend'),('base','public/mode
     old=snapshot(previous/relative);new=snapshot(ROOT/relative)
     report['results'][kind]=check(kind,old,new)
 report['passed']=True
-out=ROOT/'docs/model-checks/refinement/paving-geometry.json';out.write_text(json.dumps(report,indent=2)+'\n')
+report['fingerprints']={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb','public/data/models.json','public/data/pavings.json']}
+out=ROOT/f'docs/model-checks/refinement/{REPORT_PREFIX}-geometry.json';out.write_text(json.dumps(report,indent=2)+'\n')
 print(json.dumps(report),flush=True)
