@@ -70,6 +70,8 @@ def ground_masks(data):
         add('sports', sport['id'], Polygon(sport['ground']))
     for site in sites['sites']:
         add('sites', site['id'], Polygon(site['pavingPolygon'], site.get('pavingHoles', [])))
+        if site.get('stairConnection'):
+            add('sites', site['id']+':stair-connection', Polygon(site['stairConnection']['polygon']))
     for paving in data['pavings']['pavings']:
         add('pavings', paving['id'], surface_shape(paving))
     for shore in data['shores']['shores']:

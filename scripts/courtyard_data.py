@@ -1,8 +1,8 @@
 """A bounded courtyard layout anchored to existing building vertices."""
 import copy
 import math
-from shapely.geometry import Point, Polygon
-from shapely.ops import unary_union
+from shapely.geometry import Point, Polygon, LineString
+from shapely.ops import unary_union, nearest_points
 from building_overrides import footprint_revision
 from surroundings_data import triangulate
 
@@ -11,7 +11,7 @@ def derive_courtyard(config, buildings, source_ids):
     keys = {'id', 'type', 'buildingId', 'footprintRevision', 'boundaryVertices',
             'frameVertices', 'contextRevisions', 'buildingClearance', 'surfaceOffset',
             'openAreaLocal', 'trees', 'sourceRefs', 'evidence'}
-    if set(config) != keys or config['type'] != 'courtyard-paving':
+    if set(config)-{'stairConnection'} != keys or config['type'] != 'courtyard-paving':
         raise ValueError('Invalid courtyard fields')
     by_id = {b['id']: b for b in buildings}
     b = by_id.get(config['buildingId'])
@@ -84,7 +84,68 @@ def derive_courtyard(config, buildings, source_ids):
               'openAreaPolygon': list(open_area.exterior.coords),
               'treeCandidates': trees, 'pavingMesh': triangulate(paving),
               'gradingBounds': list(boundary.bounds), 'layer': 'roads', 'material': 'path'}
-    return result, paving, paving
+    area = paving
+    if 'stairConnection' in config:
+        connection, patch = derive_stair_connection(config['stairConnection'], paving, buildings)
+        result['stairConnection'] = connection
+        area = unary_union([paving, patch])
+    return result, area, area
+
+
+def derive_stair_connection(config, paving, buildings):
+    """Close a short gap to an existing stair base, without extending a road."""
+    if not isinstance(config, dict) or set(config) != {'buildingId', 'footprintRevision', 'width', 'evidence'}:
+        raise ValueError('Invalid courtyard stair connection fields')
+    width = config['width']
+    if type(width) not in (int, float) or not math.isfinite(width) or not 1.2 <= width <= 3:
+        raise ValueError('Invalid courtyard stair connection width')
+    if not isinstance(config['evidence'], str) or not config['evidence'].strip():
+        raise ValueError('Missing courtyard stair connection evidence')
+    target = next((b for b in buildings if b['id'] == config['buildingId']), None)
+    stair = target.get('form', {}).get('stairTower') if target else None
+    if not stair or footprint_revision(target) != config['footprintRevision']:
+        raise ValueError('Missing or stale courtyard stair target')
+    cs, sn = math.cos(stair['angle']), math.sin(stair['angle'])
+    ox, oy = stair['origin']
+    def world(p): return (ox+p[0]*cs-p[1]*sn, oy+p[0]*sn+p[1]*cs)
+    ground = unary_union([Polygon([world(p) for p in poly[0]], [[world(p) for p in ring] for ring in poly[1:]]) for poly in stair['ground']['polygons']])
+    p, q = nearest_points(paving, ground)
+    gap = p.distance(q)
+    if not .1 <= gap <= 3:
+        raise ValueError('Courtyard stair connection must span a short separated gap')
+    start = list(p.coords[0]); normal = [(q.x-p.x)/gap, (q.y-p.y)/gap]
+    tangent = [-normal[1], normal[0]]
+    def point(s, d): return [start[i]+tangent[i]*s+normal[i]*d for i in (0, 1)]
+    contact = LineString([point(-width/2, 0), point(width/2, 0)])
+    if paving.boundary.buffer(1e-7).intersection(contact).length < width-1e-6:
+        raise ValueError('Courtyard connection requires a straight full-width paving edge')
+    stations = {-width/2, width/2}
+    for x, y in ground.exterior.coords:
+        s = (x-start[0])*tangent[0]+(y-start[1])*tangent[1]
+        if -width/2 < s < width/2: stations.add(s)
+    sections = []
+    for s in sorted(stations):
+        a = point(s, 0)
+        hit = LineString([a, point(s, gap+width+3)]).intersection(ground)
+        if hit.geom_type != 'LineString' or hit.is_empty:
+            raise ValueError('Courtyard connection does not meet a continuous stair base')
+        end = min(hit.coords, key=lambda v: math.dist(a, v))
+        if not .1 <= math.dist(a, end) <= 3:
+            raise ValueError('Courtyard connection edge exceeds short-gap bounds')
+        sections.append({'station': s, 'start': a, 'end': list(end)})
+    patch = Polygon([sections[0]['start'], sections[-1]['start'], *[s['end'] for s in reversed(sections)]])
+    if not patch.is_valid or patch.area <= 0 or patch.intersection(paving).area > 1e-6:
+        raise ValueError('Invalid courtyard connection footprint')
+    for b in buildings:
+        shape = unary_union([Polygon(poly[0], poly[1:]) for poly in b['polygons']])
+        if patch.intersection(shape).area > 1e-6:
+            raise ValueError('Courtyard connection crosses a mapped building')
+    result = {**copy.deepcopy(config), 'origin': start, 'normal': normal, 'tangent': tangent,
+              'sections': sections, 'polygon': list(patch.exterior.coords),
+              'gapMeters': gap, 'areaMeters2': patch.area,
+              'stairGeometryRevision': stair['geometryRevision'],
+              'hostCenter': stair['hostCenter'], 'platformOffset': stair['config']['baseHeight']}
+    return result, patch
 
 
 def apply_courtyards(trees, sites):

@@ -40,6 +40,35 @@ class CourtyardTests(unittest.TestCase):
         config = copy.deepcopy(self.config); config['trees'][1]['local']=config['trees'][0]['local']
         with self.assertRaises(ValueError): self.derive(config)
 
+    def test_connection_closes_only_the_gap_and_joins_both_edges(self):
+        site, combined, _ = self.derive()
+        c = site['stairConnection']; patch = Polygon(c['polygon'])
+        court = Polygon(site['pavingPolygon'], site['pavingHoles'])
+        stair = next(b for b in self.buildings if b['id'] == c['buildingId'])
+        target = Polygon(stair['polygons'][0][0])
+        self.assertAlmostEqual(court.distance(target), c['gapMeters'])
+        self.assertGreater(patch.boundary.intersection(court.boundary.buffer(1e-7)).length, 2.399)
+        self.assertGreater(patch.boundary.intersection(target.boundary.buffer(1e-7)).length, 2.3)
+        self.assertLess(patch.intersection(court).area, 1e-7)
+        self.assertLess(patch.intersection(target).area, 1e-7)
+        self.assertAlmostEqual(combined.area, court.area+patch.area)
+        self.assertGreater(patch.area, 1.5)
+        self.assertLess(patch.area, 3)
+        without = copy.deepcopy(self.config); without.pop('stairConnection')
+        self.assertEqual(self.derive(without)[0]['pavingMesh'], site['pavingMesh'])
+
+    def test_invalid_connection_or_an_obstacle_cannot_create_paving(self):
+        for key, value in [('width', float('nan')), ('width', 10), ('buildingId', 'missing'),
+                           ('footprintRevision', 'stale'), ('evidence', '')]:
+            config = copy.deepcopy(self.config); config['stairConnection'][key] = value
+            with self.assertRaises(ValueError, msg=key): self.derive(config)
+        site, _, _ = self.derive(); patch = Polygon(site['stairConnection']['polygon'])
+        obstacle = patch.representative_point().buffer(.01)
+        buildings = copy.deepcopy(self.buildings)
+        buildings.append({'id':'test-obstacle', 'polygons':[[list(obstacle.exterior.coords)]]})
+        with self.assertRaisesRegex(ValueError, 'crosses a mapped building'):
+            self.derive(buildings=buildings)
+
     def test_replacement_is_idempotent_and_preserves_outside_tree_attributes(self):
         site, _, _ = self.derive()
         original = [[381.4,-122.5,10,0,2.990891], [0,0,12,1,8.4],
@@ -60,10 +89,11 @@ class CourtyardTests(unittest.TestCase):
                 'pavings':{'pavings':[]}, 'shores':{'shores':[]}}
         masks,_=ground_masks(data)
         centre=Polygon(site['openAreaPolygon']).centroid
-        trees=[*site['treeCandidates'],[centre.x,centre.y,9,0]]
+        connection = Polygon(site['stairConnection']['polygon']).representative_point()
+        trees=[*site['treeCandidates'],[centre.x,centre.y,9,0], [connection.x,connection.y,9,0]]
         kept,removed=filter_ground(trees,masks)
         self.assertEqual(kept,site['treeCandidates'])
-        self.assertEqual(len(removed),1)
+        self.assertEqual(len(removed),2)
 
 
 if __name__=='__main__': unittest.main()

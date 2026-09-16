@@ -762,3 +762,7 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 运行 `blender --background --python-exit-code 1 --python blender/validate_math_stair_windows.py -- --report-prefix=s2-math-stair-windows`，检查源文件及实际基础/近景中的十二处玻璃首交、十二处窗框与十八处保留实墙。可用 `--check-root=<旧资产目录>` 验证缺失小窗的反例。不同专项使用不同报告前缀，避免都写入同一 `<前缀>-geometry.json`。
 
 2026-09-16：166项Python、56项Node及完整构建通过；原数学研究中心形体/场地、附着外廊、430栋普通建筑与实际树冠回归通过。精细60/60/60 FPS、流畅28/27/27 FPS；流畅中位数下降10%，其余预算通过。三次LOD无错误，七张楼栋画面及图书馆手机尺寸已核看。[专项范围](MATH_CENTER_STAIR_WINDOWS.md)与[汇总](model-checks/refinement/s2-math-stair-summary.json)。
+
+## 庭院至楼梯底层接面（2026-09-16）
+
+`blender/validate_courtyard_connection.py -- --report-prefix=<批次>` 读取实际源、基础GLB、基础场地与近景楼梯组合，检查接面、两端接缝、原地形净距及底层至首梯前的有限宽取样路径。可用 `--check-root=<完整资产副本>` 做旧模型反例，报告默认读取当前站点规则作为期望；不要用旧模型自己的缺失规则绕过反例。与 `validate_courtyard.py` 和 `validate_arts_stair.py` 配合，分别覆盖原院落树池及楼梯高层几何。命令经 Blender 的 `--python` 执行，须加 `--python-exit-code 1`。结果与估算边界见[本批记录](ARTS_COURTYARD_CONNECTION.md)。

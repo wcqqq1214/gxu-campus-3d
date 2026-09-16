@@ -54,7 +54,13 @@ if sites['roadRevision']!=hashlib.sha256(json.dumps(campus_roads['layers'],separ
 for site in sites['sites']:
     building=next(b for b in buildings if b['id']==site['buildingId'])
     if site.get('type')=='courtyard-paving':
+        if connection:=site.get('stairConnection'):
+            target=next((b for b in buildings if b['id']==connection['buildingId']),None)
+            stair=target.get('form',{}).get('stairTower',{}) if target else {}
+            if connection['stairGeometryRevision']!=stair.get('geometryRevision') or connection['hostCenter']!=stair.get('hostCenter') or connection['platformOffset']!=stair.get('config',{}).get('baseHeight'):
+                raise RuntimeError('Courtyard stair connection is stale; run site preparation')
         revisions={site['buildingId']:site['footprintRevision'],**site['contextRevisions']}
+        if connection:revisions[connection['buildingId']]=connection['footprintRevision']
         for ident,revision in revisions.items():
             other=next((b for b in buildings if b['id']==ident),None)
             if not other or revision!=hashlib.sha256(json.dumps(other['polygons'],separators=(',',':')).encode()).hexdigest():
