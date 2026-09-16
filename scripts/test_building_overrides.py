@@ -169,7 +169,7 @@ class BuildingOverrideTests(unittest.TestCase):
             rule=self.panel_fixture();rule['panels'][0][key]=value
             with self.subTest(key=key,value=value),self.assertRaises(ValueError):
                 self.resolve(self.building(),facadeRules=[rule])
-        for patch in [{'windows':False},{'balconies':True},{'spacing':4},
+        for patch in [{'balconies':True},{'spacing':4},
                       {'openCorridor':{'depth':1,'firstLevel':1,'railHeight':.9,'endInset':.3}}]:
             with self.subTest(patch=patch),self.assertRaises(ValueError):
                 self.resolve(self.building(),facadeRules=[{**self.panel_fixture(),**patch}])
@@ -181,6 +181,12 @@ class BuildingOverrideTests(unittest.TestCase):
             if not same_id:second['id']='another'
             rule['panels'].append(second)
             with self.assertRaises(ValueError):self.resolve(self.building(),facadeRules=[rule])
+
+    def test_explicit_panels_can_disable_unobserved_generic_window_rows(self):
+        rule={**self.panel_fixture(),'windows':False}
+        facade=self.resolve(self.building(),facadeRules=[rule])['form']['facades'][0]
+        self.assertFalse(facade['rule']['windows'])
+        self.assertEqual(facade['rule']['panels'],rule['panels'])
 
     def test_explicit_stair_flight_preserves_rotated_footprints_and_three_risers(self):
         b=self.building();original=copy.deepcopy(b['polygons'])

@@ -255,7 +255,8 @@ def resolve_facades(b, form, rules):
                     or any(k in rule for k in ('openCorridor', 'windowGrid', 'windowBands', 'panels', 'spacing'))):
                 raise ValueError('Attached gallery requires an exterior facade without conflicting window rules')
         if 'panels' in rule:
-            if (rule['ring'] != 0 or rule.get('windows') is False or rule.get('balconies') is not False
+            # Explicit panels still render when generic window rows are disabled.
+            if (rule['ring'] != 0 or rule.get('balconies') is not False
                     or any(k in rule for k in ('windowGrid', 'openCorridor', 'spacing'))):
                 raise ValueError('Panels need an exterior solid facade with balconies explicitly disabled')
         if 'windowBands' in rule:
