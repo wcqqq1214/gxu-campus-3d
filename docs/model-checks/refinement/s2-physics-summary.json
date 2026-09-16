@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "baseCommit": "438cd1ab53a4ee0ac0383968e41d3899b5082a51",
+  "branch": "dev",
+  "scope": "Physics college: estimated central roof dome shared by base and near models; body height and mapped footprint preserved. Storey reconciliation, galleries and entry remain pending.",
+  "partialObjectRecords": 20,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 163,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "all-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4158440,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.4458397182033362,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        29,
+        29,
+        29
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 29,
+        "medianTriangles": 1135271,
+        "medianDrawCalls": 280
+      },
+      "changePercent": {
+        "medianFPS": -3.3333333333333326,
+        "medianTriangles": 7.921136561322117,
+        "medianDrawCalls": 6.4638783269961975
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "fingerprints": {
+    "data/building-overrides.json": "8f90cce9f53119d2078b98c9c34c3a1dd33bd9d8a7ebbe65a52a1bb30eac6597",
+    "data/building-sources.json": "b6537a9cdf2184abc23af16ba00f397bc133042469183069e691ac35a023cd93",
+    "blender/gxu-campus.blend": "ca0dfc6cb08d447e218b07fcb46f99156acb8fd5bb1bdef84988e55227c5d9fc",
+    "public/data/buildings.json": "489ae5266722095989de47a3eb6b64bf211c12fa30d787649f47e21fe57bd053",
+    "public/data/models.json": "c841ce81510e49a856eca7c73937926524986e4d41ef0c5a51e2058897b7c021"
+  }
+}

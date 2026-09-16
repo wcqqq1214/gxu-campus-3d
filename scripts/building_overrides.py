@@ -24,7 +24,7 @@ ARCHETYPE_LEVELS = {'dormitory':6,'residential-block':6,'teaching-block':5,
                     'courtyard-lab':5,'low-rise-service':2}
 ARCHETYPES = {'generic', 'dormitory', 'residential-block', 'canteen', 'teaching-block',
               'courtyard-lab', 'low-rise-service', 'external-stair'}
-FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'stairTower'}
+FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'stairTower', 'roofDome'}
 
 
 def ordinary(b):
@@ -532,6 +532,9 @@ def resolve_building(building, record=None, source_ids=None):
                 if count!=int(count) or count>len(floors) or not math.isclose(part['height'],math.fsum(floors[:int(count)]),abs_tol=1e-6,rel_tol=0):
                     raise ValueError('Part must match the documented storeys from the shared ground datum')
                 part['floorHeights']=floors[:int(count)]
+    if 'roofDome' in record:
+        from roof_dome_data import resolve_roof_dome
+        form['roofDome'] = resolve_roof_dome(b, form, record['roofDome'])
     if 'entrances' in record:
         if not isinstance(record['entrances'],list):
             raise ValueError('Entrances must be an explicit list')

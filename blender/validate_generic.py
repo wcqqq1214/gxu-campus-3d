@@ -66,11 +66,20 @@ def samples(b):
             x,y,h=[sum(p[k] for p in tri)/3 for k in range(3)]
             clearance=.02 if 'slattedRoof' in part.get('openBelow',{}) else .5
             if area(tri)<.1 or edge_distance(x,y,part['polygons'])<clearance:continue
+            dome = form.get('roofDome')
+            # Probe the supporting slab from inside the drum where covered;
+            # a compact roof can have every triangle centroid below its dome.
+            # The separate apex probe checks the new visible silhouette.
+            covered = dome and math.dist((x,y),dome['center']) < dome['radius']+.1
             points.append({'kind':'roof','part':part['id'],'x':x,'y':y,
-                           'top':z+part['height']+h+4,'expected':z+part['height']+h})
+                           'top':z+part['height']+h+(.05 if covered else 4),'expected':z+part['height']+h})
             count+=1
             if count>=3:break
         assert count>0,(b['id'],part['id'],'no usable roof samples')
+    if 'roofDome' in form:
+        dome=form['roofDome'];x,y=dome['center']
+        apex=z+dome['baseHeight']+dome['drumHeight']+dome['rise']
+        points.append({'kind':'roof-dome-apex','x':x,'y':y,'top':apex+1,'expected':apex})
     if 'stairTower' in form:
         s=form['stairTower'];x,y=s['origin'];floor=z+s['config']['baseHeight']
         points.append({'kind':'stair-ground-platform','x':x,'y':y,'top':floor+.5,'expected':floor})

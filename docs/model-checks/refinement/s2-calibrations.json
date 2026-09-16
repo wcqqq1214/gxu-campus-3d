@@ -1946,6 +1946,104 @@
         },
         "warnings": []
       }
+    },
+    {
+      "id": "way/957404989",
+      "name": "物理科学与工程技术学院",
+      "before": {
+        "height": 29.7,
+        "levels": 9.0
+      },
+      "after": {
+        "height": 29.7,
+        "levels": 9.0
+      },
+      "calibration": {
+        "schemaVersion": 1,
+        "footprintRevision": "5a8b0d2f1e3327ca32d42467f5726ec3433e92e78481ec17467885f93af9b2ba",
+        "evidence": {
+          "roofDome": {
+            "status": "estimated",
+            "sourceRefs": [
+              "hualanInnovationCenter",
+              "gxuPhysicsFacade",
+              "osm"
+            ],
+            "note": "设计方第三张鸟瞰实景显示中央东西向主体屋顶西半部有白色穹顶。以OSM中央翼段定位中心[-678,-860.7]，采用半径7米、0.8米圆柱底座与6.5米上半椭球曲面；位置和全部尺寸为照片约束估算，未作摄影测量。穹顶基准随所支撑主体屋顶高度派生，不计入楼层或主体高度。"
+          },
+          "levels": {
+            "status": "osm",
+            "sourceRefs": [
+              "osm"
+            ],
+            "note": "OSM building:levels"
+          },
+          "height": {
+            "status": "estimated",
+            "sourceRefs": [
+              "osm"
+            ],
+            "note": "采用层数 × 3.3 米估算层高，非测量高度"
+          },
+          "roof.type": {
+            "status": "estimated",
+            "sourceRefs": [
+              "hualanInnovationCenter"
+            ],
+            "note": "设计方鸟瞰照片支持主体平屋面；屋顶穹顶单独表达，设备房、屋顶构架和各段高度仍待核对。"
+          },
+          "archetype": {
+            "status": "estimated",
+            "sourceRefs": [
+              "osm"
+            ],
+            "note": "按名称、OSM用途和现有形制规则推定"
+          },
+          "floorHeight": {
+            "status": "estimated",
+            "sourceRefs": [],
+            "note": "默认3.3米层高；独立OSM高度存在时不以此覆盖高度"
+          },
+          "roof.rise": {
+            "status": "estimated",
+            "sourceRefs": [],
+            "note": "平屋面屋脊增量为0；有坡屋面但没有屋脊尺寸时采用2.3米展示估算"
+          },
+          "entrances": {
+            "status": "estimated",
+            "sourceRefs": [],
+            "note": "无定位依据，最长外边中点示意入口；不声称朝向正确"
+          },
+          "facadeRules": {
+            "status": "estimated",
+            "sourceRefs": [],
+            "note": "默认窗距和窗尺寸；资料未覆盖的立面继续按类型推定"
+          }
+        },
+        "review": {
+          "levels": {
+            "status": "pending",
+            "note": "沿用OSM地上9层；照片存在架空和平台分段，层数口径未由建筑图或竣工资料确认，不把2014年设计阶段9层或电梯停层数作为竣工依据。"
+          },
+          "height": {
+            "status": "pending",
+            "note": "29.7米主体仍为9×3.3米估算，未取得实测或设计高度，不属于本批已确认项。"
+          },
+          "roof": {
+            "status": "partial",
+            "note": "设计方第三张鸟瞰实景显示中央东西向主体屋顶西半部有白色穹顶。以OSM中央翼段定位中心[-678,-860.7]，采用半径7米、0.8米圆柱底座与6.5米上半椭球曲面；位置和全部尺寸为照片约束估算，未作摄影测量。穹顶基准随所支撑主体屋顶高度派生，不计入楼层或主体高度。 其余屋顶构架和设备房未实现。"
+          },
+          "entrances": {
+            "status": "pending",
+            "note": "设计文字支持东侧入口和开放连接，具体开口、台阶与道路标高仍待定位，暂保留示意入口。"
+          },
+          "facades": {
+            "status": "pending",
+            "note": "照片支持五段式体量与多层开放连廊；窗列、分段高度及开敞位置尚未落实。"
+          }
+        },
+        "warnings": []
+      }
     }
   ]
 }
