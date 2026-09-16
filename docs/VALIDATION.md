@@ -748,3 +748,5 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 2026-09-16：新增 `blender/validate_materials_frame.py`，对源文件、基础和近景分别检查7个横梁顶点、8个贯通梁间孔、4个边梁点、4组圆柱轴向命中/侧向净空、3个高主体屋面及3个原内院，共29组检查。旧高挤出体在源文件控制检查中失败；通用屋顶采样改在实际梁面取点。详见[框架专项](MATERIALS_BUILDING_FRAME.md)及其验收报告。
 
 2026-09-16：新增 `scripts/audit_entry_road_context.py`，在完整模型构建前筛查显式入口平台/台阶与地表机动车道路的平面重叠。原 `validate_road_buildings.py` 只覆盖专用 infrastructure 道路/桥梁，不能代替此预检。资环材学院候选入口约60平方米重叠作为失败样本；当前4个适用入口无重叠，5项新增单元测试及159项Python总测试通过。平面预检不证明三维避让，详见[范围及命令](MATERIALS_ENTRY_CONSTRAINTS.md)。
+
+物理学院屋顶穹顶专项：`blender --background --python-exit-code 1 --python blender/validate_physics_roof.py`。分别读取源文件、基础与近景，检查顶部及曲面轮廓、底座外法线、原平屋面和开放庭院。`-- --check-root=目录 --report-prefix=名称`可对保存的旧资产运行缺失穹顶反例；采用尺寸为照片约束估算，不是实测验收。

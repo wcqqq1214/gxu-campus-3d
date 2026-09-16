@@ -475,3 +475,5 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 2026-09-16：开放柱廊可通过 `openBelow.slattedRoof` 生成透空梁顶。`scripts/slatted_roof_data.py` 校验近直角四边形、梁宽/梁数、最小净空和柱梁对位；Blender 使用同一 `roofGeometry` 生成顶、底和侧面，跳过该段普通女儿墙。资环材学院以共享顶点划分高主体与低框架，两级模型均保留八个几何开孔。详见[框架专项](MATERIALS_BUILDING_FRAME.md)。
 
 2026-09-16：显式入口新增或外扩前，运行 `scripts/audit_entry_road_context.py --report <报告路径>`；候选可用 `--proposal <含buildingId和proposalEntry的JSON>` 检查。平面重叠需先核对定位和层级，不能仅靠通过专用道路网格检查或抬高模型放行。资环材学院被撤回的试制说明见[约束核查](MATERIALS_ENTRY_CONSTRAINTS.md)。
+
+2026-09-16：`roofDome`增加受限屋顶穹顶，参数为中心、半径、底座高度和曲面增高；需要一个实体平屋面分段完整支撑，保留0.5米边界/内院净距。基础与近景共享32周向分段、8曲面分带，屋顶基准由支撑分段派生，不改主体层数。详见[物理学院屋顶](PHYSICS_BUILDING_ROOF.md)。
