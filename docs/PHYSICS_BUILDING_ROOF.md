@@ -36,3 +36,5 @@
 最终163项Python测试、56项Node测试通过。430栋普通建筑与3,063株树实际模型回归通过；源文件只有物理学院改变，其他530个非树木对象、90个基础节点和67个GLB保持。首屏5,146,824 bytes，增加4,112 bytes，最大普通近景1,684,868 bytes。
 
 七张固定镜头画面和图书馆手机尺寸回归已核看。精细三轮60 FPS、流畅三轮29 FPS；相对同系统S0，三角形增幅3.45%/7.92%，绘制调用增幅2.38%/6.46%，符合原预算。三次LOD往返无错误，24次CPU快照在六个计时窗口内未记录到超过2%阈值的Python/Blender计算。手机仅为桌面浏览器尺寸模拟。[视觉检查](model-checks/refinement/s2-physics-visual-review.json)、[资产核对](model-checks/refinement/s2-physics-assets.json)及[验收汇总](model-checks/refinement/s2-physics-summary.json)保留完整范围与指纹。
+
+后续[第五层外廊校准](PHYSICS_BUILDING_CORRIDOR.md)通过设计方分层图为九层补充依据，并实现六个外侧立面的中部凹入带；主体实际高度、入口与其他外廊仍待核对。以上保留穹顶批次的历史范围与验收记录。

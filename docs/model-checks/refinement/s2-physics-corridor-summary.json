@@ -1,0 +1,103 @@
+{
+  "passed": true,
+  "baseCommit": "787d077a2edcd7041f458879cfbafb45449bc1c4",
+  "branch": "dev",
+  "scope": "Physics college: fifth-storey recessed corridor on six exterior edges; nine-storey design reference reconciled. Estimated body height, mapped footprint and dome preserved. Lower openings, entries, courtyard facades and roof equipment remain pending.",
+  "partialObjectRecords": 20,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 165,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "all-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review",
+    "normals-geometry",
+    "roof-geometry"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4162678,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.5512647017851062,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        29,
+        29,
+        29
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 29,
+        "medianTriangles": 1135211,
+        "medianDrawCalls": 292
+      },
+      "changePercent": {
+        "medianFPS": -3.3333333333333326,
+        "medianTriangles": 7.915432841070591,
+        "medianDrawCalls": 11.026615969581744
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "fingerprints": {
+    "data/building-overrides.json": "19ce31814ac46a373b7468162c146a086045f51c5006a5da5dda3432baa773f6",
+    "data/building-sources.json": "a8e4c1f0d9b31ed34479c3d8ebc62631f393b90d3988b33d855725ce23b68b03",
+    "blender/gxu-campus.blend": "a2be48a03c8656960d59a28288b9a60e0cdd40147e03fcbd0f789110d7816e10",
+    "public/data/buildings.json": "95f57693411a543f9e51f908f0a102d1103e27739e545607849116ea7cc6102b",
+    "public/data/models.json": "a13fc5886e3f029337fecc0f3bd658f7a283d834b74b1cdef17b6d0b36288a81"
+  }
+}

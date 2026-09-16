@@ -750,3 +750,5 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 2026-09-16：新增 `scripts/audit_entry_road_context.py`，在完整模型构建前筛查显式入口平台/台阶与地表机动车道路的平面重叠。原 `validate_road_buildings.py` 只覆盖专用 infrastructure 道路/桥梁，不能代替此预检。资环材学院候选入口约60平方米重叠作为失败样本；当前4个适用入口无重叠，5项新增单元测试及159项Python总测试通过。平面预检不证明三维避让，详见[范围及命令](MATERIALS_ENTRY_CONSTRAINTS.md)。
 
 物理学院屋顶穹顶专项：`blender --background --python-exit-code 1 --python blender/validate_physics_roof.py`。分别读取源文件、基础与近景，检查顶部及曲面轮廓、底座外法线、原平屋面和开放庭院。`-- --check-root=目录 --report-prefix=名称`可对保存的旧资产运行缺失穹顶反例；采用尺寸为照片约束估算，不是实测验收。
+
+物理学院中部外廊：运行 `blender --background --python-exit-code 1 --python blender/validate_physics_corridor.py`，检查六个外侧立面第五层、上下实墙及窗户、庭院。`blender/test_bounded_corridor.py`核查两个LOD中的普通窗和显式窗是否只在指定楼层内退；`blender/test_corridor_normals.py`与`blender/validate_corridor_normals.py`覆盖全部既有外廊及当前楼层范围。

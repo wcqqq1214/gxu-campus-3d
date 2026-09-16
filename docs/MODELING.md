@@ -477,3 +477,5 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 2026-09-16：显式入口新增或外扩前，运行 `scripts/audit_entry_road_context.py --report <报告路径>`；候选可用 `--proposal <含buildingId和proposalEntry的JSON>` 检查。平面重叠需先核对定位和层级，不能仅靠通过专用道路网格检查或抬高模型放行。资环材学院被撤回的试制说明见[约束核查](MATERIALS_ENTRY_CONSTRAINTS.md)。
 
 2026-09-16：`roofDome`增加受限屋顶穹顶，参数为中心、半径、底座高度和曲面增高；需要一个实体平屋面分段完整支撑，保留0.5米边界/内院净距。基础与近景共享32周向分段、8曲面分带，屋顶基准由支撑分段派生，不改主体层数。详见[物理学院屋顶](PHYSICS_BUILDING_ROOF.md)。
+
+2026-09-16：`openCorridor.lastLevel`可将外廊限制到中间楼层，零基索引包含末层；省略保持原先直至最高层的行为。主体恢复上方实体墙，普通及显式窗户、柱、栏板同步采用该范围。照片约束实例见[物理学院中部外廊](PHYSICS_BUILDING_CORRIDOR.md)。

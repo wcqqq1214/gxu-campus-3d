@@ -122,3 +122,5 @@ blender --background --python-exit-code 1 --python blender/validate_generic.py -
 2026-09-16：[资环材学院东端框架](MATERIALS_BUILDING_FRAME.md)新增 `openBelow.slattedRoof`（`edgeWidth`、`slatWidth`、`slatCount`），仅接受近直角无孔四边形，派生带孔 `roofGeometry` 供两级共享。框架 `levels: 1` 表示开放结构单元；尺寸与横梁数量为估算。校准对象仍19条，未计为整栋完成。
 
 2026-09-16：新增[物理学院中央屋顶穹顶](PHYSICS_BUILDING_ROOF.md)，累计20条部分对象记录。`roofDome`以原屋顶为支撑，基础和近景共享；位置、半径和增高均为照片约束估算。主体9层与29.7米仍待核对，未新增整栋验收完成数。
+
+2026-09-16：[物理学院第五层外廊](PHYSICS_BUILDING_CORRIDOR.md)增加包含末层的 `openCorridor.lastLevel`，仅开放六个外侧立面的第五层。设计方1–2F/3–5F/6–9F分层图补充九层依据，主体29.7米仍为估算。累计20条部分对象记录，整栋验收数不增加。
