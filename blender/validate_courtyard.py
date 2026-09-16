@@ -37,6 +37,10 @@ def check(tolerance):
     for x in range(math.floor(xmin)-1, math.ceil(xmax)+2):
         for y in range(math.floor(ymin)-1, math.ceil(ymax)+2):
             p=(x+.31,y+.17)
+            connection = site.get('stairConnection', {}).get('polygon')
+            # The short graded connector is checked against both actual seams
+            # by validate_courtyard_connection.py, not the uniform court offset.
+            if connection and (inside(p, connection) or ring_distance(p, connection)<.12): continue
             if min(ring_distance(p,r) for r in rings)<.12: continue
             expected=inside(p,rings[0]) and not any(inside(p,r) for r in rings[1:])
             h=height(paving,*p)
