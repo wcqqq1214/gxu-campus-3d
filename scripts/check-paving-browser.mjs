@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const root = fileURLToPath(new URL('../', import.meta.url));
 const phase = process.argv[2];
@@ -21,6 +22,7 @@ const camera = cameras.find((c) => c.id === '6b-paving-road-join');
 const browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
 const report = { capturedAt: new Date().toISOString(), camera, states: [], errors: [], completed: false };
+report.manifestSha256 = createHash('sha256').update(await (await fetch(`${base}data/models.json`)).text()).digest('hex');
 page.on('pageerror', (e) => report.errors.push(String(e)));
 page.on('console', (m) => { if (m.type() === 'error') report.errors.push(m.text()); });
 page.on('response', (r) => { if (r.status() >= 400) report.errors.push(`${r.status()} ${r.url()}`); });

@@ -2,6 +2,8 @@
 
 本工作包属于 [S4 普通场地推广](CAMPUS_REFINEMENT_PLAN.md)。对象为 `way/759147083`（6B 小广场），保留最终道路覆盖链中的五点轮廓，面积约 975.45 平方米。它验证普通铺地与主路的连接、露空边缘封口和内部穿地处理，不能代表全部校园铺地已校准。
 
+2026-09-16补充状态：当前源文件、GLB、地形纹理及七种图层画面复查通过，同一资产集的有效性能测量补齐最后门槛，**该局部工作包已通过**。见[补充验收](S4_SITE_ACCEPTANCE.md)；下文旧受干扰测量和当时状态作为历史证据保留。
+
 ## 资料与精度
 
 - [OpenStreetMap 轮廓](https://www.openstreetmap.org/way/759147083)：名称与位置依据，采用当前固定快照及最终铺面覆盖结果，不根据照片重新扩大广场。
@@ -98,4 +100,4 @@ Python 命令需使用仓库约束环境。专项验证同时读取本机保留�
 
 接续复测为精细 60/60/60、流畅 28/27/27 FPS；流畅中位数比 S0 下降 10%，恰在门槛上。两档三角形增加 2.62%/4.82%，Draw Calls 增加 1.30%/5.22%。本轮又记录到一次外部 Python 97.6% CPU 活动，运行约 2 秒、累计 CPU 3.71 秒；采样不足以确定完整持续时间，不能把它归为持续满载，也不能排除干扰。见[复测报告](model-checks/refinement/s4-paving-precision-recheck-browser.json)及[进程条件](model-checks/refinement/s4-paving-precision-recheck-performance-context.json)。
 
-**铺地几何、视觉和两条增量维护流程通过；同条件性能验收仍待完成，工作包尚未联合通过。** [当前汇总](model-checks/refinement/s4-paving-summary.json)保留两轮全部结果、当前资产与代码哈希；[首次汇总](model-checks/refinement/s4-paving-initial-summary.json)保留修复前的状态。
+**2026-09-13当时状态：铺地几何、视觉和两条增量维护流程通过；同条件性能验收仍待完成。** [历史汇总](model-checks/refinement/s4-paving-summary.json)保留两轮全部结果及当时资产与代码哈希；[首次汇总](model-checks/refinement/s4-paving-initial-summary.json)保留修复前的状态。现有资产的通过依据见[2026-09-16联合验收](model-checks/refinement/s4-site-current-acceptance.json)。

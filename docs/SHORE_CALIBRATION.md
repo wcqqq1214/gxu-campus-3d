@@ -1,6 +1,6 @@
 # 镜湖岸段校准
 
-本页接续 S4 代表性湖岸任务。29.50 米砌石岸壁、岸顶压石和局部陆侧地形已实现，源文件、实际 GLB、原道路及全部树根检查通过。三轮活动测试的数值均达到门槛，但进程记录仍显示其他 Python/Blender CPU 活动，同条件性能验收仍待完成；下文保留修改前证据与估算界限。
+本页接续 S4 代表性湖岸任务。29.50 米砌石岸壁、岸顶压石和局部陆侧地形已实现。2026-09-16重新检查当前源文件、GLB及图层画面，并以同一资产集的有效性能测量补齐最后门槛，**该局部工作包已通过**，详见[补充验收](S4_SITE_ACCEPTANCE.md)。下文保留原实施证据、受干扰测量和当时的待办状态，不把旧测量改判为通过。
 
 ## 样板范围及依据
 
@@ -101,7 +101,7 @@
 
 [首轮浏览器](model-checks/refinement/s4-shore-validated-browser.json) · [首轮并发条件](model-checks/refinement/s4-shore-validated-performance-context.json) · [第二轮浏览器](model-checks/refinement/s4-shore-timed-browser.json) · [第二轮并发条件](model-checks/refinement/s4-shore-timed-performance-context.json) · [汇总与哈希](model-checks/refinement/s4-shore-summary.json) · [人工画面复核](model-checks/refinement/s4-shore-visual-review.json)。
 
-当前状态为“几何、画面、资源已通过，同条件性能验收待完成”。道路/篮球场增量流程已于 2026-09-13 通过[隔离端到端验证](model-checks/refinement/s4-incremental-summary.json)；普通铺地示例、行道树/庭院/低矮景观、S2/S3 整批楼栋及 S5 仍未完成。
+当时状态为“几何、画面、资源已通过，同条件性能验收待完成”。道路/篮球场增量流程已于 2026-09-13 通过[隔离端到端验证](model-checks/refinement/s4-incremental-summary.json)；各后续阶段的当前状态见[执行记录](CAMPUS_REFINEMENT_PROGRESS.md)。
 
 
 ## 增量维护验收（2026-09-13）

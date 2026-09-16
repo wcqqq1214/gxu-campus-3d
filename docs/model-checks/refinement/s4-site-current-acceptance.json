@@ -1,0 +1,118 @@
+{
+  "passed": true,
+  "verifiedAt": "2026-09-16T00:54:50.464357+00:00",
+  "assetCommit": "ba7b95c0bc9ea8cc1293ebf83ee014f87ad7b76e",
+  "branch": "dev",
+  "scope": "Close the pending global performance gates for the existing Jinghu 29.50 m bank and 6B paving sample, after current source/GLB and layer-view revalidation. No model changes in this acceptance batch.",
+  "workPackages": {
+    "jinghuAuditoriumBank": {
+      "workPackagePassed": true,
+      "geometryReport": "s4-shore-current-geometry.json",
+      "visualReport": "s4-shore-current-interaction.json",
+      "incrementalEvidence": "s4-incremental-summary.json"
+    },
+    "sixBPlazaPaving": {
+      "workPackagePassed": true,
+      "geometryReport": "s4-paving-current-geometry.json",
+      "terrainTextureReport": "s4-paving-current-terrain-texture.json",
+      "visualReport": "s4-paving-current-interaction.json",
+      "incrementalEvidence": "s4-paving-incremental-summary.json"
+    }
+  },
+  "performanceAcceptancePassed": true,
+  "performanceReport": "s2-physics-corridor-performance-browser.json",
+  "performanceContextReport": "s2-physics-corridor-performance-performance-context.json",
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "performanceScope": "The original shore and paving budget gate used the same three 30-second library-orbit runs per quality tier. This accepts the current complete asset set against S0 rerun on the current OS/browser, not old measurements and not local shore/paving frame rates.",
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4162678,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.5512647017851062,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        29,
+        29,
+        29
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 29,
+        "medianTriangles": 1135211,
+        "medianDrawCalls": 292
+      },
+      "changePercent": {
+        "medianFPS": -3.3333333333333326,
+        "medianTriangles": 7.915432841070591,
+        "medianDrawCalls": 11.026615969581744
+      },
+      "passed": true
+    }
+  ],
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "historicalEvidencePolicy": "Earlier contaminated measurements and incomplete summaries remain unchanged. Previous successful isolated incremental checks are carried forward, not claimed to have been rerun in this read-only model acceptance batch.",
+  "modelManifestSha256": "a13fc5886e3f029337fecc0f3bd658f7a283d834b74b1cdef17b6d0b36288a81",
+  "sourceSha256": "a2be48a03c8656960d59a28288b9a60e0cdd40147e03fcbd0f789110d7816e10",
+  "initialModelBytes": 5150788,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fullS2Completed": false,
+  "fullS3Completed": false,
+  "fullS4Completed": false,
+  "fullPlanCompleted": false,
+  "limitations": [
+    "Shore dimensions and precise photo-to-edge mapping remain estimated/inferred.",
+    "Other shores and paving areas have not been promoted to calibrated status.",
+    "The historical 44 compressed-road gap samples outside the 6B contact are not fixed or accepted by this batch.",
+    "Desktop mobile screenshots are viewport simulations; no physical-phone test."
+  ],
+  "evidenceSha256": {
+    "s4-shore-current-geometry.json": "469286f92355da2de0360d6122fced60438f65a3f095d65545007ff83d0f68a1",
+    "s4-shore-current-interaction.json": "2c07a0ad40a4904a10ebef8e0ed711218fadb8ad7e1786fa0ca56dae32747a46",
+    "s4-paving-current-geometry.json": "bbf4be92aa7655ba82ef38d1c3fe41edcbf86d854d9dd37fddb70707256c1c43",
+    "s4-paving-current-interaction.json": "16548559ed375fe8972b780d7a794e6e3cdea2c360fe3c3b5266a91b31ca645b",
+    "s4-paving-current-terrain-texture.json": "650481a0dbaea0af7d4c5d100a8c8b8badf63b5a0749464f0f0d04380c4575b2",
+    "s2-physics-corridor-summary.json": "bee97f26cdf761d826b0c16ba959d674f058e5a022617eb1a3b3aa69bdb9e0af",
+    "s2-physics-corridor-performance-browser.json": "397d7816697ebad91c467e6eacd066359fafa86a688cfb7da6d4041512e8a7a3",
+    "s2-physics-corridor-performance-performance-context.json": "0cc02a9645d43dc90568264fcd30b1d35095425dc553bc82637a67f730a1594d",
+    "s2-physics-corridor-assets.json": "9f772e9b3cc6c81f86cfcbeca72c196b0291e03b1815890e48d9aff3a8b353b8",
+    "s4-incremental-summary.json": "42038d41ecc1eb434ec6b000926b8f7ae44eed2763004b5a150a9c0d311248c2",
+    "s4-paving-incremental-summary.json": "c3c7d039b847f91fa00ae70fe65c9d6c94c5d37ad847219d48e3becff813db55",
+    "s4-site-current-visual-review.json": "951cbc9c0df169324bed16e28af84cd3c51c19f47da4f2408e8076c0f26e3f0c"
+  }
+}
