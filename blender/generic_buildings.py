@@ -87,6 +87,9 @@ def shared_form(b, z, C):
                 if length < 2: continue
                 top.box((a[0]+c[0])/2, (a[1]+c[1])/2, z+h+.4, length, .25, .8,
                         C['white'], math.atan2(c[1]-a[1], c[0]-a[0]))
+    if 'roofDome' in form:
+        from roof_dome import add_roof_dome
+        add_roof_dome(top, form['roofDome'], z, C['white'])
     for facade in form.get('facades',[]):
         if 'attachedGallery' in facade:
             add_attached_gallery(body,facade,z,wall,C)
