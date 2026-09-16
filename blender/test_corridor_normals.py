@@ -13,20 +13,31 @@ for b in json.loads((ROOT/'public/data/buildings.json').read_text()):
         for reverse in (False,True):
             for angle in (0,.63,math.pi/2):
                 f=copy.deepcopy(original);cs,sn=math.cos(angle),math.sin(angle)
+                # Exercise rotation about the facade midpoint. Keeping the
+                # campus offset adds float32 translation error to this 0.1 mm
+                # synthetic test; exported world positions are checked apart.
+                ox,oy=[(original['start'][k]+original['end'][k])/2 for k in (0,1)]
                 for key in ('start','end','normal'):
-                    x,y=f[key];f[key]=[x*cs-y*sn,x*sn+y*cs]
+                    x,y=f[key]
+                    if key!='normal':x-=ox;y-=oy
+                    f[key]=[x*cs-y*sn,x*sn+y*cs]
                 if reverse:f['start'],f['end']=f['end'],f['start']
                 a=Vector((*f['start'],0));d=Vector((*f['end'],0))-a;length=d.length;u=d.normalized();n=Vector((*f['normal'],0));h=f['height'];rule=f['rule']['openCorridor'];fh=h/f['levels']
                 mesh=Mesh();mesh.face([(*f['start'],-.5),(*f['end'],-.5),(*f['end'],h),(*f['start'],h)],0)
                 add_corridor(mesh,f,0,0,1,2,pitched_roof=b['form']['roof']['type']!='flat')
                 tree=BVHTree.FromPolygons(mesh.v,mesh.f)
                 t=rule['endInset']+(length-2*rule['endInset'])*.5/rule.get('piers',{}).get('bays',1)
-                for level in range(rule['firstLevel'],int(f['levels'])):
+                for level in range(rule['firstLevel'],rule.get('lastLevel',int(f['levels'])-1)+1):
                     p=a+u*t+Vector((0,0,level*fh+1.8))
                     hit,normal,_,distance=tree.ray_cast(p+n*.3,-n,rule['depth']+.5)
-                    assert hit is not None and abs(distance-rule['depth']-.3)<1e-4 and normal.dot(n)>.99,('rear normal',b['id'],reverse,angle)
+                    assert hit is not None and abs(distance-rule['depth']-.3)<1e-4 and normal.dot(n)>.99,('rear normal',b['id'],f['edge'],reverse,angle,distance,list(normal) if normal else None,list(n))
                     for direction in (-1,1):
                         hit,normal,_,distance=tree.ray_cast(p-n*(rule['depth']/2),Vector((0,0,direction)),2)
                         assert hit is not None and normal.z*direction<-.99,('slab normal',b['id'],reverse,angle,direction)
+                for level in range(int(f['levels'])):
+                    if rule['firstLevel']<=level<=rule.get('lastLevel',int(f['levels'])-1):continue
+                    p=a+u*t+Vector((0,0,level*fh+1.8))
+                    hit,normal,_,distance=tree.ray_cast(p+n*.3,-n,.6)
+                    assert hit is not None and abs(distance-.3)<1e-4 and normal.dot(n)>.99,('retained front wall',b['id'],level,reverse,angle)
                 checks+=1
 print('PASS corridor face directions:',checks,'facade/direction/rotation combinations')
