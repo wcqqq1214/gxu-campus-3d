@@ -12,6 +12,24 @@ from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue
 
 
 class BuildingOverrideTests(unittest.TestCase):
+    def test_bounded_corridor_accepts_one_middle_storey_and_keeps_defaults(self):
+        b=self.building()
+        corridor={'depth':1.4,'firstLevel':2,'lastLevel':2,'railHeight':.9,'endInset':.3}
+        rule={'polygon':0,'ring':0,'edge':0,'balconies':False,'openCorridor':corridor}
+        r=self.resolve(b,facadeRules=[rule])
+        self.assertEqual(r['form']['facades'][0]['rule']['openCorridor'],corridor)
+        self.assertEqual(r['polygons'],b['polygons'])
+        legacy=copy.deepcopy(rule);del legacy['openCorridor']['lastLevel']
+        self.assertNotIn('lastLevel',self.resolve(b,facadeRules=[legacy])['form']['facades'][0]['rule']['openCorridor'])
+
+    def test_bounded_corridor_rejects_reversed_fractional_or_missing_storeys(self):
+        b=self.building()
+        for first,last in [(2,1),(2,2.5),(2,True),(2,5),(2,float('nan')),(5,5),(-1,2)]:
+            rule={'polygon':0,'ring':0,'edge':0,'openCorridor':{
+                'depth':1.4,'firstLevel':first,'lastLevel':last,'railHeight':.9,'endInset':.3}}
+            with self.subTest(first=first,last=last),self.assertRaises(ValueError):
+                self.resolve(b,facadeRules=[rule])
+
     def test_roof_dome_tracks_support_height_and_removes_cleanly(self):
         b=self.building();dome={'center':[15,10],'radius':4,'drumHeight':.8,'rise':4}
         r=self.resolve(b,roofDome=dome)

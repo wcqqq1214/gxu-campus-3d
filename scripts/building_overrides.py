@@ -278,12 +278,14 @@ def resolve_facades(b, form, rules):
         if 'openCorridor' in rule:
             corridor = rule['openCorridor']
             required={'depth','firstLevel','railHeight','endInset'}
-            if not isinstance(corridor,dict) or not required <= set(corridor) or set(corridor)-required-{'piers','balusters','finish','openings'}:
+            if not isinstance(corridor,dict) or not required <= set(corridor) or set(corridor)-required-{'piers','balusters','finish','openings','lastLevel'}:
                 raise ValueError('Open corridor needs depth, firstLevel, railHeight and endInset')
             for parameter in ['depth','railHeight','endInset']:
                 positive(corridor[parameter], 'corridor '+parameter)
             if type(corridor['firstLevel']) is not int or corridor['firstLevel'] < 0:
                 raise ValueError('Corridor firstLevel must be a nonnegative floor index')
+            if 'lastLevel' in corridor and (type(corridor['lastLevel']) is not int or corridor['lastLevel'] < corridor['firstLevel']):
+                raise ValueError('Corridor lastLevel must be an integer at or above firstLevel')
             if corridor['firstLevel']==0 and 'piers' not in corridor:
                 raise ValueError('Ground-level open corridor requires explicit piers')
             if 'piers' in corridor:
@@ -389,7 +391,7 @@ def resolve_facades(b, form, rules):
                             corridor=facade['rule']['openCorridor'];fh=part['height']/part['levels']
                             if part['levels']!=int(part['levels']):
                                 raise ValueError('Corridor requires a solid part with whole floors')
-                            if corridor['firstLevel']>=part['levels'] or corridor['railHeight']>=fh-.5:
+                            if corridor.get('lastLevel',corridor['firstLevel'])>=part['levels'] or corridor['railHeight']>=fh-.5:
                                 raise ValueError('Corridor floors or railing leave no upper opening')
                             length=math.dist(start,end);inset=corridor['endInset']
                             from corridor_detail_data import validate_corridor_details
