@@ -12,6 +12,47 @@ from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue
 
 
 class BuildingOverrideTests(unittest.TestCase):
+    def test_roof_dome_tracks_support_height_and_removes_cleanly(self):
+        b=self.building();dome={'center':[15,10],'radius':4,'drumHeight':.8,'rise':4}
+        r=self.resolve(b,roofDome=dome)
+        self.assertEqual(r['form']['roofDome'],{**dome,'part':'body','baseHeight':16.5})
+        self.assertEqual(r['polygons'],b['polygons'])
+        self.assertEqual(self.resolve(b,height=20,roofDome=dome)['form']['roofDome']['baseHeight'],20)
+        self.assertNotIn('roofDome',resolve_building(r)['form'])
+
+    def test_roof_dome_rejects_courts_edges_open_or_pitched_support(self):
+        b=self.building();dome={'center':[15,10],'radius':4,'drumHeight':.8,'rise':4}
+        for center in ([2,10],[31,10]):
+            with self.subTest(center=center),self.assertRaises(ValueError):
+                self.resolve(b,roofDome={**dome,'center':center})
+        court=copy.deepcopy(b);court['polygons'][0].append([[14,9],[14,11],[16,11],[16,9],[14,9]])
+        with self.assertRaises(ValueError):self.resolve(court,roofDome=dome)
+        with self.assertRaises(ValueError):self.resolve(b,roofDome=dome,roof={'type':'hipped','rise':2})
+        part={'id':'porch','polygons':b['polygons'],'height':16.5,'levels':1,
+              'openBelow':{'clearHeight':16,'floorHeight':.5,'columns':[
+                  {'center':[2,2],'width':1,'depth':1,'angle':0},
+                  {'center':[28,18],'width':1,'depth':1,'angle':0}]}}
+        self.resolve(b,parts=[part])
+        with self.assertRaisesRegex(ValueError,'one solid flat support'):
+            self.resolve(b,roofDome=dome,parts=[part])
+
+    def test_roof_dome_rejects_invalid_dimensions_and_unknown_parameters(self):
+        dome={'center':[15,10],'radius':4,'drumHeight':.8,'rise':4}
+        for patch in ({'radius':True},{'radius':float('nan')},{'drumHeight':0},
+                      {'rise':20},{'center':[15]},{'center':['15',10]},
+                      {'center':[float('inf'),10]},{'segments':100000},{'radius':None}):
+            with self.subTest(patch=patch),self.assertRaises(ValueError):
+                self.resolve(self.building(),roofDome={**dome,**patch})
+
+    def test_roof_dome_uses_one_part_not_overall_building_height(self):
+        b=self.building();dome={'center':[22,10],'radius':4,'drumHeight':.8,'rise':4}
+        parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'levels':5,'height':16.5},
+               {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'levels':3,'height':9.9}]
+        r=self.resolve(b,parts=parts,roofDome=dome)
+        self.assertEqual(r['form']['roofDome']['baseHeight'],9.9)
+        self.assertEqual(r['form']['roofDome']['part'],'east')
+        with self.assertRaises(ValueError):self.resolve(b,parts=parts,roofDome={**dome,'center':[15,10]})
+
     def test_documented_storeys_override_osm_height_and_reach_all_facades(self):
         b=self.building();b['tags']['height']='16.5'
         floors=[4.8,3.9,3.9,3.9,3.9]
