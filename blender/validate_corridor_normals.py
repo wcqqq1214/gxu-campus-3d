@@ -21,7 +21,7 @@ def check(b,meshes,tol):
   def ray(p,d):
    hits=[h for m in meshes if (h:=m.ray_cast(p,d,fh+1))[0] is not None]
    assert hits,'no surface';return min(hits,key=lambda h:h[3])
-  for level in range(r['firstLevel'],int(f['levels'])):
+  for level in range(r['firstLevel'],r.get('lastLevel',int(f['levels'])-1)+1):
    p=a+u*t+Vector((0,0,level*fh+fh-.35));inside=p-n*(r['depth']/2)
    rear=ray(p+n*.3,-n)
    assert abs(rear[3]-(r['depth']+.3))<tol and rear[1].dot(n)>.98,('rear direction',b['id'],f['edge'],level,rear[1],rear[3])
@@ -30,7 +30,7 @@ def check(b,meshes,tol):
     assert hit[1].z*direction<-.98 and abs(hit[0].z-b['elevation']-expected)<tol,('slab direction',b['id'],f['edge'],level,direction,hit[1])
    samples.append(dict(edge=f['edge'],level=level,rearOutwardDot=rear[1].dot(n),floorAndSoffitDirectionsPassed=True))
  return samples
-report={'passed':False,'checkedRoot':str(TARGET),'scope':'Every existing openCorridor: three buildings, four facades; direction plus position of rear walls, floors and soffits in source/base/near.'}
+report={'passed':False,'checkedRoot':str(TARGET),'scope':'Every configured openCorridor floor range: direction plus position of rear walls, floors and soffits in source/base/near.','buildingCount':len(bs),'facadeCount':sum('openCorridor' in f['rule'] for b in bs for f in b['form']['facades'])}
 try:
  bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
  report['source']={b['id']:check(b,tree(o for o in bpy.context.scene.objects if o.get('featureId')==b['id']),.01) for b in bs}
