@@ -752,3 +752,7 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 物理学院屋顶穹顶专项：`blender --background --python-exit-code 1 --python blender/validate_physics_roof.py`。分别读取源文件、基础与近景，检查顶部及曲面轮廓、底座外法线、原平屋面和开放庭院。`-- --check-root=目录 --report-prefix=名称`可对保存的旧资产运行缺失穹顶反例；采用尺寸为照片约束估算，不是实测验收。
 
 物理学院中部外廊：运行 `blender --background --python-exit-code 1 --python blender/validate_physics_corridor.py`，检查六个外侧立面第五层、上下实墙及窗户、庭院。`blender/test_bounded_corridor.py`核查两个LOD中的普通窗和显式窗是否只在指定楼层内退；`blender/test_corridor_normals.py`与`blender/validate_corridor_normals.py`覆盖全部既有外廊及当前楼层范围。
+
+## 岸段与铺地复查记录
+
+`blender/validate_shore.py`、`blender/validate_paving.py` 和 `blender/validate_terrain_texture.py` 支持 `-- --report-prefix=<批次>`，分别写入 `<批次>-geometry.json` 或 `<批次>-terrain-texture.json`，并记录受检源文件、基础模型、清单及对应场地数据的SHA256。省略参数时保留原输出名称。复查时使用新批次前缀保留历史证据；示例与当前结果见 [S4补充验收](S4_SITE_ACCEPTANCE.md)。

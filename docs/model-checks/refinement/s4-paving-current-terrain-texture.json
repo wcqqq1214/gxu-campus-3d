@@ -1,0 +1,39 @@
+{
+  "pavingId": "six-b-plaza",
+  "scope": "Actual source and decoded terrain at the previously striped region: XY/4 UV projection, matching export precision, dense coverage and projected triangle area. Browser comparison remains required.",
+  "bounds": [
+    -25,
+    -669,
+    15,
+    -644
+  ],
+  "results": {
+    "source": {
+      "triangles": 4463,
+      "maximumGroundUVError": 0.0,
+      "coveredRaySamples": 100000,
+      "holes": [],
+      "expectedProjectedAreaMeters2": 1000,
+      "summedProjectedAreaMeters2": 1000.0000117764823,
+      "projectedAreaExcessMeters2": 1.1776482324421522e-05,
+      "passed": true
+    },
+    "base": {
+      "triangles": 4463,
+      "maximumGroundUVError": 0.0,
+      "coveredRaySamples": 100000,
+      "holes": [],
+      "expectedProjectedAreaMeters2": 1000,
+      "summedProjectedAreaMeters2": 1000.025258315912,
+      "projectedAreaExcessMeters2": 0.025258315911969476,
+      "passed": true
+    }
+  },
+  "passed": true,
+  "fingerprints": {
+    "blender/gxu-campus.blend": "a2be48a03c8656960d59a28288b9a60e0cdd40147e03fcbd0f789110d7816e10",
+    "public/models/base.glb": "a90577082f7a2265927816689543ab34e44588fce2c9d5eb6c8f13370808aefc",
+    "public/data/models.json": "a13fc5886e3f029337fecc0f3bd658f7a283d834b74b1cdef17b6d0b36288a81",
+    "public/data/pavings.json": "4648628674ef783b2a4b462d46ecdd4314bc70d249f107626bbdd040dd6cc401"
+  }
+}
