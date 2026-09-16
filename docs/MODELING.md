@@ -479,3 +479,5 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 2026-09-16：`roofDome`增加受限屋顶穹顶，参数为中心、半径、底座高度和曲面增高；需要一个实体平屋面分段完整支撑，保留0.5米边界/内院净距。基础与近景共享32周向分段、8曲面分带，屋顶基准由支撑分段派生，不改主体层数。详见[物理学院屋顶](PHYSICS_BUILDING_ROOF.md)。
 
 2026-09-16：`openCorridor.lastLevel`可将外廊限制到中间楼层，零基索引包含末层；省略保持原先直至最高层的行为。主体恢复上方实体墙，普通及显式窗户、柱、栏板同步采用该范围。照片约束实例见[物理学院中部外廊](PHYSICS_BUILDING_CORRIDOR.md)。
+
+2026-09-16：显式 `facadeRules.panels` 允许与 `windows: false` 并用：仅停止该立面的默认窗列，保留显式面板。用于数学研究中心楼梯墙的稀疏小窗，避免在其余实墙上自动补出大窗；其余面板与立面冲突约束不变，见[专项](MATH_CENTER_STAIR_WINDOWS.md)。
