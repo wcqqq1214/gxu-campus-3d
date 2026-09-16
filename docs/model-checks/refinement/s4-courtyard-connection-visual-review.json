@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "method": "逐张直接查看八张正式记录；俯视与补拍手机角度用于接面外观，遮挡角度只用于上下文回归。",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-connection-visible/before/arts-court-stair-overhead-trees-off-day.png",
+      "sha256": "f61a7185d8758d4a4faa663b331ddbcb319476b65e49f08c43b72afafa8cb66c",
+      "reviewed": true,
+      "usedForSeamAppearance": true,
+      "contextAccepted": true,
+      "note": "旧模型俯视画面可见庭院与楼梯底层之间草地断缝。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-connection-visible/before/arts-court-stair-ground-trees-off-day.png",
+      "sha256": "1e8f1b66cce03e8929f50c15ee182f34c96659ff233fcbb329374d67e1e27801",
+      "reviewed": true,
+      "usedForSeamAppearance": false,
+      "contextAccepted": true,
+      "note": "旧模型斜视背景对照，前景屋顶遮挡接面，不能用于接缝验收。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-connection-visible/after/arts-court-stair-overhead-trees-off-day.png",
+      "sha256": "73027a21a072ba2220a11873529bcfd69bbf11a343373a645b462250e4351da2",
+      "reviewed": true,
+      "usedForSeamAppearance": true,
+      "contextAccepted": true,
+      "note": "俯视近景可直接看到庭院与楼梯底层之间的局部接面；两侧仍保留原未铺范围。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-connection-visible/after/arts-court-stair-ground-trees-off-day.png",
+      "sha256": "7516b3c22967654e6a47106a46fbc2fa198675b0c397457dca005f7749544d66",
+      "reviewed": true,
+      "usedForSeamAppearance": false,
+      "contextAccepted": true,
+      "note": "斜视环境/植被回归；前景屋顶遮挡接面，不用于接缝外观验收。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-connection-visible/after/arts-court-stair-ground-trees-on-day.png",
+      "sha256": "682f4f009984ac932c899ee904f24689ac455d72350695d159574e884d47ee02",
+      "reviewed": true,
+      "usedForSeamAppearance": false,
+      "contextAccepted": true,
+      "note": "斜视环境/植被回归；前景屋顶遮挡接面，不用于接缝外观验收。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-connection-visible/after/arts-court-stair-overhead-trees-off-night.png",
+      "sha256": "eba1c9a5c99751d3acd7151758e905292442b992065be852a54d0d55366baf09",
+      "reviewed": true,
+      "usedForSeamAppearance": true,
+      "contextAccepted": true,
+      "note": "夜间俯视可见短接面，沿用既有材质与光照，无新增灯光。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-connection-visible/after/arts-court-stair-overhead-trees-off-day-mobile.png",
+      "sha256": "d0541d27a90c44809bb72e30704e0e649826fa0449716e720ea258a4af9d17c5",
+      "reviewed": true,
+      "usedForSeamAppearance": false,
+      "contextAccepted": true,
+      "note": "斜视环境/植被回归；前景屋顶遮挡接面，不用于接缝外观验收。"
+    },
+    {
+      "file": "docs/screenshots/refinement/s4-courtyard-connection-mobile/after/arts-court-stair-overhead-trees-off-day-mobile.png",
+      "sha256": "399146be36dce2d1ffc831958160e061e50de38bf29a4752a295c66e72f7c07d",
+      "reviewed": true,
+      "usedForSeamAppearance": true,
+      "contextAccepted": true,
+      "note": "补拍的手机俯视可见局部接面；原手机斜视被前景屋顶遮挡，未用于接缝验收。"
+    }
+  ],
+  "discarded": "work/refinement-s4-courtyard-connection/wrong-coordinate-context.json 坐标方向错误，不参与验收；wide-context.json为过宽初探镜头，仅本机留存。",
+  "modelManifestSha256": "e20e8b356c245cc4a2df55187f31e53dc3e1364e28062ae49bc42a8ea3f31d7d",
+  "libraryMobileRegression": {
+    "file": "docs/screenshots/refinement/s4-courtyard-connection-performance/library-mobile.png",
+    "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4",
+    "reviewed": true,
+    "note": "图书馆入口、台阶和前场仍可见；模拟手机视窗，非真机测试。"
+  }
+}

@@ -51,6 +51,58 @@ def build_courtyard(site, C, elevation, terrain, roads):
                 hp, hq = height(p), height(q)
                 sides.face([(*p, hp+offset), (*q, hq+offset), (*q, hq-.03), (*p, hp-.03)], C[site['material']])
     mesh = Mesh(); mesh.add_part('01_庭院铺地', surface); mesh.add_part('02_外缘与树池收口', sides)
-    return terrain, roads, {'site-'+site['id']: mesh}, [{'id': site['id'],
+    report = {'id': site['id'],
         'pavingFaces': len(surface.f), 'edgeFaces': len(sides.f), 'terrainChanged': False,
-        'surfaceOffsetMeters': offset, 'groundBasis': 'Exact current terrain triangle planes; no surveyed courtyard elevation.'}]
+        'surfaceOffsetMeters': offset, 'groundBasis': 'Exact current terrain triangle planes; no surveyed courtyard elevation.'}
+    if site.get('stairConnection'):
+        connection, detail = build_stair_connection(site, C, elevation, height, nearby)
+        mesh.add_part('03_庭院与楼梯接面', connection)
+        report['stairConnection'] = detail
+    return terrain, roads, {'site-'+site['id']: mesh}, [report]
+
+
+def build_stair_connection(site, C, elevation, ground_height, terrain_triangles):
+    """Match both existing edges; split the court seam at its terrain vertices."""
+    c = site['stairConnection']; sections = c['sections']; half = c['width']/2
+    origin, tangent = c['origin'], c['tangent']
+    def cross(a, b): return a[0]*b[1]-a[1]*b[0]
+    stations = {s['station'] for s in sections}
+    count = math.ceil(c['width']/.2)
+    stations.update(-half+c['width']*i/count for i in range(count+1))
+    for tri in terrain_triangles:
+        for a, b in zip(tri, tri[1:]+tri[:1]):
+            edge = [b[i]-a[i] for i in (0, 1)]
+            denominator = cross(tangent, edge)
+            if abs(denominator) < 1e-12: continue
+            delta = [a[i]-origin[i] for i in (0, 1)]
+            s, t = cross(delta, edge)/denominator, cross(delta, tangent)/denominator
+            if -half < s < half and 0 <= t <= 1: stations.add(s)
+    platform = elevation(*c['hostCenter'])+c['platformOffset']
+    rows = []
+    for station in sorted(stations):
+        left, right = next((a, b) for a, b in zip(sections, sections[1:]) if a['station']-1e-8 <= station <= b['station']+1e-8)
+        t = (station-left['station'])/(right['station']-left['station'])
+        start, end = [[a+(b-a)*t for a, b in zip(left[key], right[key])] for key in ('start', 'end')]
+        rows.append([(*start, ground_height(start)+site['surfaceOffset']), (*end, platform)])
+    mesh = Mesh(); slopes = []; clearance = []
+    for left, right in zip(rows, rows[1:]):
+        if math.dist(left[0], right[0]) < 1e-7: continue
+        for face in [(left[0], left[1], right[0]), (left[1], right[1], right[0])]:
+            mesh.face(face, C[site['material']])
+            # Dense barycentric probes catch a terrain ridge under the short fill.
+            for i in range(9):
+                for j in range(9-i):
+                    p = [face[0][k]*(1-(i+j)/8)+face[1][k]*i/8+face[2][k]*j/8 for k in (0, 1, 2)]
+                    clearance.append(p[2]-ground_height(p[:2]))
+        for start, end in (left, right): slopes.append(abs(end[2]-start[2])/math.dist(start[:2], end[:2]))
+    if min(clearance) < .02 or max(slopes) > .12:
+        raise ValueError('Courtyard connection is buried or has excessive model grade')
+    # End caps are embedded in the two existing surfaces; only the short sides
+    # are exposed. Their bottoms extend into the original terrain.
+    for a, b in [rows[0], list(reversed(rows[-1]))]:
+        mesh.face([a, (*a[:2], ground_height(a[:2])-.03),
+                   (*b[:2], ground_height(b[:2])-.03), b], C[site['material']])
+    return mesh, dict(faces=len(mesh.f), minimumTerrainClearanceMeters=min(clearance),
+                     maximumGrade=max(slopes), platformHeightMeters=platform,
+                     widthMeters=c['width'], areaMeters2=c['areaMeters2'],
+                     note='Estimated model continuity only; no surveyed slope or accessibility claim.')

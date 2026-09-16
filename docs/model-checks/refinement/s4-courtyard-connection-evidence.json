@@ -1,0 +1,40 @@
+{
+  "siteId": "arts-east-courtyard",
+  "targetBuildingId": "way/880089960",
+  "sources": [
+    {
+      "page": "https://ghjjc.gxu.edu.cn/info/1011/3224.htm",
+      "localReference": "work/refinement-s4-courtyard/arts-court.jpeg",
+      "sha256": "38542329e18d049e3ff7e8f2585d5b9b17397bb0e3366aa5a0350bc5ba2cac6e",
+      "observed": "庭院硬质方格铺地、活动空间和树木；未提供楼梯底层的清晰测绘边界。"
+    },
+    {
+      "page": "https://art.gxu.edu.cn/info/1158/4545.htm",
+      "localReference": "work/refinement-s4-courtyard/court-event-0.png",
+      "sha256": "368ad4b59572d94daa17f7affbafa19bcaa89c426030296463250348e75fd3c1",
+      "observed": "合影背后可见独立附楼及右侧圆形外楼梯，硬质铺地相邻；底层接触部位被人群遮挡。"
+    },
+    {
+      "page": "https://art.gxu.edu.cn/info/1158/4545.htm",
+      "localReference": "work/refinement-s4-courtyard/court-event-1.png",
+      "sha256": "a78a39316b7e2476208f4adfcc061b576bfa87894a3f0aa6cf51141dd02ad0a7",
+      "observed": "另一张同场活动照片补充庭院树木、硬铺面和附楼空间关系；不是独立测绘证据。"
+    }
+  ],
+  "reusesEvidence": "s4-courtyard-evidence.json",
+  "newExternalResearch": false,
+  "mapping": "人工将照片中附楼/圆形梯与原地图轮廓对应；不是实测定位。",
+  "inference": "在现有庭院直边与已校准楼梯底层间补一个局部有界接面，改善模型连续性。",
+  "estimated": [
+    "2.4米宽度",
+    "0.7245米最短间隙来自模型原始轮廓，不是现场测量",
+    "2.0299平方米接面范围",
+    "沿两端当前模型标高生成过渡，最大约7.03%坡度"
+  ],
+  "pending": [
+    "完整外部校道连接",
+    "现实门槛与庭院标高",
+    "树池边框、活动涂装与标识"
+  ],
+  "newWholeBuildingsAccepted": 0
+}
