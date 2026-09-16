@@ -1,0 +1,50 @@
+{
+  "passed": true,
+  "method": "Direct review of all seven final screenshots",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s2-math-stair-visible/before/math-stair-close-trees-off-day.png",
+      "sha256": "ae0af1b86e2ba3dc781a61b25a8734901701a1c45e2ad29e2fed232b1cef7659",
+      "accepted": true,
+      "note": "Before: blank south stair wall. After: three groups of four small windows; surrounding solid wall retained."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-math-stair-visible/before/math-center-context-trees-off-day.png",
+      "sha256": "ef4cf70ccdc74bbb95524b77d5980011df78119f41d0c9648faa97e347ed9e1f",
+      "accepted": true,
+      "note": "North-side context confirms retained roofs, footprint and neighboring heights; does not show south stair windows."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-math-stair-visible/after/math-stair-close-trees-off-day.png",
+      "sha256": "4ae97c8eb078a221c1f66b958a674788b9f3b464f2c5ca8cfb9989626047767b",
+      "accepted": true,
+      "note": "Before: blank south stair wall. After: three groups of four small windows; surrounding solid wall retained."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-math-stair-visible/after/math-center-context-trees-off-day.png",
+      "sha256": "7d80aa8976466d9c51e8073d421595e9678a3ddd3345330ad8ebeaf62cc5e6d9",
+      "accepted": true,
+      "note": "North-side context confirms retained roofs, footprint and neighboring heights; does not show south stair windows."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-math-stair-visible/after/math-center-context-trees-on-day.png",
+      "sha256": "5d75f59b53cd1ee33d9465ce9c7621f3695f6043602651cab252596286cb6e1d",
+      "accepted": true,
+      "note": "North-side context confirms retained roofs, footprint and neighboring heights; does not show south stair windows."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-math-stair-visible/after/math-stair-close-trees-off-night.png",
+      "sha256": "230425ba021a91a495a4cf7caa242b39d344f815891f1ae9d120b3613a43a2e0",
+      "accepted": true,
+      "note": "Small windows follow existing night glass behavior; no new illumination system."
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-math-stair-visible/after/math-stair-close-trees-off-day-mobile.png",
+      "sha256": "2fa8ab530ec719216c0eae3f65413c509334d943196bef4f48abaf8f1eb79e61",
+      "accepted": true,
+      "note": "Three small-window groups visible in simulated portrait viewport; foreground roof occludes ground level."
+    }
+  ],
+  "rejectedInitialViews": "work/refinement-s2-math-stair/occluded-context-browser.json and occluded-views/: southern foreground building occluded target; retained locally, not used for facade acceptance",
+  "modelManifestSha256": "8b7b96e603cd45b30bfca9382f069eef3ab0e0307d27be219011b7ce4f4e730c"
+}

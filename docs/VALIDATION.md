@@ -756,3 +756,9 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 ## 岸段与铺地复查记录
 
 `blender/validate_shore.py`、`blender/validate_paving.py` 和 `blender/validate_terrain_texture.py` 支持 `-- --report-prefix=<批次>`，分别写入 `<批次>-geometry.json` 或 `<批次>-terrain-texture.json`，并记录受检源文件、基础模型、清单及对应场地数据的SHA256。省略参数时保留原输出名称。复查时使用新批次前缀保留历史证据；示例与当前结果见 [S4补充验收](S4_SITE_ACCEPTANCE.md)。
+
+## 数学研究中心楼梯墙小窗
+
+运行 `blender --background --python-exit-code 1 --python blender/validate_math_stair_windows.py -- --report-prefix=s2-math-stair-windows`，检查源文件及实际基础/近景中的十二处玻璃首交、十二处窗框与十八处保留实墙。可用 `--check-root=<旧资产目录>` 验证缺失小窗的反例。不同专项使用不同报告前缀，避免都写入同一 `<前缀>-geometry.json`。
+
+2026-09-16：166项Python、56项Node及完整构建通过；原数学研究中心形体/场地、附着外廊、430栋普通建筑与实际树冠回归通过。精细60/60/60 FPS、流畅28/27/27 FPS；流畅中位数下降10%，其余预算通过。三次LOD无错误，七张楼栋画面及图书馆手机尺寸已核看。[专项范围](MATH_CENTER_STAIR_WINDOWS.md)与[汇总](model-checks/refinement/s2-math-stair-summary.json)。
