@@ -1,0 +1,166 @@
+{
+  "reviewedAt": "2026-09-16T01:12:20.449201+00:00",
+  "baselineCommit": "54381f3ed876347508bfb768f483a652ef641574",
+  "scope": "S3 mandatory neighbor historical-name and level-conflict review",
+  "sources": [
+    {
+      "id": "officialPlanningMap",
+      "title": "学校规划图",
+      "url": "https://www.gxu.edu.cn/ggfw/xxght.htm",
+      "imageUrl": "https://www.gxu.edu.cn/images/18/2019ght.jpg",
+      "publishedAt": null,
+      "surveyDate": null,
+      "sourceFamily": "gxu-campus-planning-map",
+      "html": {
+        "localPath": "work/refinement-s3-neighbor-current/planning-page.html",
+        "sha256": "0e1c5fb967d54daacb8b6404c6996fcfbc485c3d00fe7f71b4723642f23d5223",
+        "bytes": 19081
+      },
+      "image": {
+        "localPath": "work/refinement-s3-neighbor-current/map2019-official.jpg",
+        "sha256": "f79d029e4eb3e36f829cc44331880e10b73dfe29e80c19142ddee728deabf63f",
+        "bytes": 2010163
+      },
+      "imageSize": [
+        2048,
+        2552
+      ],
+      "inspectionCropPixels": [
+        1000,
+        1280,
+        1580,
+        1760
+      ],
+      "observations": [
+        "图例区分校园现状建筑与规划新建建筑。",
+        "图书馆东北侧、农学院南侧的浅橙色长条建筑标注环境学院、7F，着色归入图示现状建筑。"
+      ],
+      "limitations": [
+        "2019仅为图像文件名的一部分，不据此断言测绘或竣工日期。",
+        "图示现状与规划混合，不等于当前竣工测绘图；不可据此移除仍在OSM中的宿舍或直接覆盖全部层数。"
+      ]
+    },
+    {
+      "id": "officialMapRepost2024",
+      "title": "校园地图",
+      "url": "https://sef.gxu.edu.cn/info/10856/89260.htm",
+      "imageUrl": "https://sef.gxu.edu.cn/__local/E/74/A2/B8FBE8A150A17C4986EAFCBA539_48DB9B21_E40A7.jpg",
+      "publishedAt": "2024-04-07",
+      "surveyDate": null,
+      "sourceFamily": "gxu-campus-planning-map",
+      "html": {
+        "localPath": "work/refinement-s3-neighbor-current/map-repost-page.html",
+        "sha256": "10f1b140a74c1aafc96566abd27e6d551bde6974a668e08e0fec8c36326c57ae",
+        "bytes": 31838
+      },
+      "image": {
+        "localPath": "work/refinement-s3-neighbor-current/map2024-official.jpg",
+        "sha256": "7b776efb1894ea89243be4b160db6b714d2dc94c0aabbb5c0a940bd634723348",
+        "bytes": 934055
+      },
+      "imageSize": [
+        2048,
+        2539
+      ],
+      "observations": [
+        "页面注明来源为广西大学官网；该区域布局和环境学院7F标注与学校规划图同源。"
+      ],
+      "limitations": [
+        "转载时间不是图中建筑现状的测绘时间。",
+        "不能把两个发布页面计为两次独立观测。"
+      ]
+    },
+    {
+      "id": "formerEnvironmentLab2021",
+      "title": "广西大学生命科学与技术学院实验中心建设方案咨询邀请公告",
+      "url": "https://www.gxu.edu.cn/info/1364/30309.htm",
+      "publishedAt": "2021-03-24",
+      "html": {
+        "localPath": "work/refinement-s3-neighbor-current/lab-consultation-2021.html",
+        "sha256": "dbbcbce4fcbf7f63d2828647f4c3a128db6b031a41b04d67313aab250ecfde45",
+        "bytes": 23263
+      },
+      "observations": [
+        "公告将项目地址设为原环境楼，三至四层实验中心改造总面积2900平方米。"
+      ],
+      "limitations": [
+        "支持历史楼名与部分楼层用途，未提供OSM对应、建筑外观或总层数。",
+        "不把局部改造面积当作整栋占地或层数换算依据。"
+      ]
+    },
+    {
+      "id": "formerEnvironmentOutage2024",
+      "title": "关于开展配电系统预防性试验停电的通知（更新）",
+      "url": "https://www.gxu.edu.cn/info/1365/36263.htm",
+      "publishedAt": "2024-07-25",
+      "html": {
+        "localPath": "work/refinement-s3-neighbor-current/outage-2024.html",
+        "sha256": "726cf77eead103bdbf7348a47ad95b8b70c95b45f689b118a1ad06a7f338793f",
+        "bytes": 32767
+      },
+      "observations": [
+        "东校园停电清单分别列出动物繁殖研究所和原环境学院实验楼，原环境楼称谓在2024年仍见于校方公告。"
+      ],
+      "limitations": [
+        "停电区域清单不能证明精确轮廓、总层数或当前独占使用单位。"
+      ]
+    }
+  ],
+  "decisions": [
+    {
+      "buildingId": "way/759170251",
+      "currentName": "野生动物研究所",
+      "currentLevels": 8.0,
+      "currentHeightMeters": 26.4,
+      "osmVersion": 3,
+      "osmEditedAt": "2020-12-02T08:52:49Z",
+      "osmSourceUrl": "https://www.openstreetmap.org/way/759170251",
+      "candidateHistoricalNames": [
+        "环境学院",
+        "原环境楼",
+        "原环境学院实验楼"
+      ],
+      "correspondenceStatus": "inferred-from-plan-position-and-outline-not-surveyed",
+      "correspondenceBasis": [
+        "目标轮廓位于图书馆东北、农学院南侧。",
+        "两者均为约东西向的细长矩形；本地轮廓长边约107米、短边约18米。",
+        "东侧校路及西侧图书馆前场提供相邻关系辅助；未进行测量控制点配准。"
+      ],
+      "footprintEdgeLengthsMeters": [
+        18.309060945671018,
+        107.44689097144848,
+        18.309060945671018,
+        107.44689097144848
+      ],
+      "levelConflict": {
+        "osm": 8,
+        "historicalMapLabel": 7,
+        "resolved": false
+      },
+      "status": "historical-map-identity-and-level-conflict-unresolved",
+      "adoptedModelChange": false,
+      "nextActions": [
+        "取得能定位该长条楼的完整屋顶及上下层照片，核对是否有局部顶层或不同计层口径。",
+        "优先检索原环境楼、原环境学院实验楼及生命科学学院实验中心改造资料；单位名称不自动视为整栋楼名。",
+        "取得可对应外边的入口照片后再修改当前南侧示意入口。"
+      ],
+      "sourceRefs": [
+        "officialPlanningMap",
+        "officialMapRepost2024",
+        "formerEnvironmentLab2021",
+        "formerEnvironmentOutage2024"
+      ]
+    }
+  ],
+  "currentAssetFingerprints": {
+    "public/data/models.json": "a13fc5886e3f029337fecc0f3bd658f7a283d834b74b1cdef17b6d0b36288a81",
+    "blender/gxu-campus.blend": "a2be48a03c8656960d59a28288b9a60e0cdd40147e03fcbd0f789110d7816e10",
+    "data/building-overrides.json": "19ce31814ac46a373b7468162c146a086045f51c5006a5da5dda3432baa773f6",
+    "public/data/buildings.json": "95f57693411a543f9e51f908f0a102d1103e27739e545607849116ea7cc6102b"
+  },
+  "modelChanged": false,
+  "wholeBuildingAcceptancesAdded": 0,
+  "completeS3": false,
+  "validationScope": "Read official map legend and building label, cross-check local footprint adjacency, verify source hashes and unchanged assets. No new geometry/browser/performance results.",
+  "copyright": "Downloaded maps and HTML remain local in ignored work; no source image redistribution."
+}
