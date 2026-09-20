@@ -240,7 +240,7 @@ def resolve_facades(b, form, rules):
     indexed = {}
     part_ids = {p['id'] for p in form['parts']} or {'body'}
     for rule in rules:
-        if set(rule) - {'polygon','ring','edge','part','windows','balconies','spacing','skipWindowLevels','openCorridor','windowGrid','windowBands','horizontalLedges','panels','attachedGallery'}:
+        if set(rule) - {'polygon','ring','edge','part','windows','balconies','spacing','skipWindowLevels','openCorridor','windowGrid','windowBands','horizontalLedges','panels','attachedGallery','wallFinish'}:
             raise ValueError('Unknown facade rule field')
         anchor(b, rule)
         if 'part' in rule and (not isinstance(rule['part'],str) or rule['part'] not in part_ids):
@@ -254,6 +254,10 @@ def resolve_facades(b, form, rules):
         for key_bool in ('windows','balconies'):
             if key_bool in rule and not isinstance(rule[key_bool], bool):
                 raise ValueError('Facade window/balcony switches must be boolean')
+        if 'wallFinish' in rule:
+            if (rule['wallFinish'] not in ('white','pink','stone') or rule['ring'] != 0
+                    or rule.get('balconies') is not False or any(k in rule for k in ('openCorridor','attachedGallery'))):
+                raise ValueError('Wall finish needs a solid exterior facade and a shared wall colour')
         if 'spacing' in rule:
             positive(rule['spacing'], 'window spacing')
         if 'skipWindowLevels' in rule:
@@ -284,8 +288,14 @@ def resolve_facades(b, form, rules):
             grid=rule['windowGrid']
             if not isinstance(grid,dict) or set(grid)!={'columns','firstLevel','edgeInset','widthRatio','heightRatio','pilasterWidth','pilasterDepth','paneRows'}:
                 raise ValueError('Window grid needs explicit bay, floor, pier and pane dimensions')
-            for parameter in ['edgeInset','widthRatio','heightRatio','pilasterWidth','pilasterDepth']:
+            for parameter in ['edgeInset','widthRatio','heightRatio']:
                 positive(grid[parameter],'window grid '+parameter)
+            for parameter in ['pilasterWidth','pilasterDepth']:
+                value=grid[parameter]
+                if type(value) not in (int,float) or not math.isfinite(value) or value<0:
+                    raise ValueError('Window grid pilaster dimensions must be finite and nonnegative')
+            if (grid['pilasterWidth']==0)!=(grid['pilasterDepth']==0):
+                raise ValueError('Window grid pilaster dimensions must both be zero to omit pilasters')
             for parameter,lower,upper in [('columns',1,32),('paneRows',1,8),('firstLevel',0,49)]:
                 if type(grid[parameter]) is not int or not lower<=grid[parameter]<=upper:
                     raise ValueError('Invalid window grid '+parameter)
@@ -369,6 +379,12 @@ def resolve_facades(b, form, rules):
                             'levels':part['levels'],'rule':rule}
                         if 'floorHeights' in form:
                             facade['floorHeights'] = list(part.get('floorHeights',form['floorHeights']))
+                        if 'wallFinish' in rule:
+                            matching=[(v,w) for rings in part['polygons'] for boundary in rings for v,w in zip(boundary,boundary[1:])
+                                      if ((math.dist(v,start)<1e-6 and math.dist(w,end)<1e-6) or
+                                          (math.dist(w,start)<1e-6 and math.dist(v,end)<1e-6))]
+                            if 'openBelow' in part or len(matching)!=1:
+                                raise ValueError('Wall finish requires one complete solid part wall')
                         if 'skipWindowLevels' in rule:
                             if 'openBelow' in part or part['levels']!=int(part['levels']) or max(rule['skipWindowLevels'])>=part['levels']:
                                 raise ValueError('Skipped window levels must exist on their solid facade part')

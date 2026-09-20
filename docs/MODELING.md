@@ -495,3 +495,5 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 2026-09-21：`panels.type=round-window-wall` 支持有界白墙内1至16个圆孔。准备阶段对带孔墙面三角化，两档共享32边圆孔、孔壁及后退玻璃；默认方窗按外墙面范围移除，原主体墙保留，不生成室内空间。详见[规则与精度范围](CIVIL_ROUND_WINDOWS.md)。
 
 2026-09-21：土木学院北翼中央复用 `openCorridor` 的柱列与显式玻璃规则，坡屋顶保持，廊顶板带完整上下面。源模型及两档LOD共用退进，见[北翼立面](CIVIL_NORTH_WING_FACADE.md)。
+
+2026-09-21：`facadeRules.wallFinish` 直接为完整实体外墙指定共享墙色，不加重叠面。`windowGrid` 两个壁柱尺寸同为零时省略壁柱；基础玻璃按外法线校正绕序，数学学院与动物科学技术学院已有窗格同步修正，见[专项](CIVIL_WING_END_WINDOWS.md)。
