@@ -267,6 +267,62 @@
         "grading": "门口取楼栋基准加0.15米估算门槛，远端接实际道路三角面；连接面下削低粗地形并封闭侧面，不新增台阶或声称符合无障碍标准。",
         "excluded": "不按照片透视猜测树木精确位置、完整铺地边界或停车标线。"
       }
+    },
+    {
+      "buildingId": "relation/12875606",
+      "footprintRevision": "72fe182dc683d230a671305fc6cbe289a811ac34fb1e6fd67e96c9badc7fd04e",
+      "surfaceId": "way/842784664",
+      "surfaceRevision": "ce0c7d39530b36a212a2f655cb4567fbc5a286739af6670951ff4ad6aa556808",
+      "roadSearchDistance": [
+        1,
+        5
+      ],
+      "meshStep": 0.5,
+      "groundClearance": 0.12,
+      "joinOverlap": 0.2,
+      "roadContactDepth": 1,
+      "roadContactSideMargin": 0.5,
+      "sourceRefs": [
+        "osm",
+        "gxuCivilEnglishBanner",
+        "gxuCivilExteriorAsset"
+      ],
+      "id": "civil-main-front-connection",
+      "type": "front-connection",
+      "entranceId": "southeast-main",
+      "pathWidth": 3.6,
+      "evidence": {
+        "presence": "官网宽幅及完整正面图可见主门外硬质铺地，门厅前没有成组外台阶。",
+        "extent": "连接原南侧东端主门中央与既有way/842784664路面边，宽3.6米为门洞与柱间净宽约束估算，纵深约2.3米来自现有模型道路边界；不代表完整前庭及环形园路复原。",
+        "grading": "门槛采用既有基准以上0.1米估算，远端接模型道路三角面；下削连接下方粗地形并封闭侧面，不据此声称现场实测标高或无障碍合规。"
+      }
+    },
+    {
+      "buildingId": "relation/12875606",
+      "footprintRevision": "72fe182dc683d230a671305fc6cbe289a811ac34fb1e6fd67e96c9badc7fd04e",
+      "surfaceId": "way/842784664",
+      "surfaceRevision": "ce0c7d39530b36a212a2f655cb4567fbc5a286739af6670951ff4ad6aa556808",
+      "roadSearchDistance": [
+        1,
+        5
+      ],
+      "meshStep": 0.5,
+      "groundClearance": 0.12,
+      "joinOverlap": 0.2,
+      "roadContactDepth": 1,
+      "roadContactSideMargin": 0.5,
+      "sourceRefs": [
+        "osm",
+        "gxuCivilEnglishBanner",
+        "gxuCivilExteriorAsset"
+      ],
+      "id": "civil-annex-stair-connection",
+      "type": "terraced-stair-connection",
+      "evidence": {
+        "presence": "官网外观照片支持附楼外台阶与前庭通行空间相接，照片不能量取完整前场边界。",
+        "extent": "从既有两段台阶的宽下梯底边连接同一way/842784664路面，宽12米沿用估算梯宽，纵深约2.8米由现有地图约束；作为台阶前短铺地的估算，不扩建整片广场或生成新增导航入口。",
+        "grading": "近端取原台阶baseHeight，最低踏步仍高0.18米，远端接现有道路三角面；仅修整连接面下粗地形，附楼台阶及屋顶不变。"
+      }
     }
   ]
 }

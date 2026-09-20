@@ -24,6 +24,35 @@
         "dimensions": "3米接缝过渡、2米网格与局部接触带均为数值建模参数，封口埋入量为模型估算，不是实际场地高差。",
         "excludedDetails": "未精确定位的花坛、坐台和红色分带不新增，活动摊位不作为常驻设施。"
       }
+    },
+    {
+      "id": "civil-forecourt-service",
+      "surfaceId": "way/842784664",
+      "surfaceRevision": "ad1d2211b48fc6c0043fc80f282484d12e2f53e82f9202494dea38eb19a93b21",
+      "joinEdges": [
+        4,
+        10
+      ],
+      "joinFeather": 3,
+      "meshStep": 1,
+      "contactDepth": 1,
+      "contactSideMargin": 0.5,
+      "joinOverlap": 0.2,
+      "burial": 0.06,
+      "groundedService": {
+        "offset": 0.12
+      },
+      "sourceRefs": [
+        "osm",
+        "gxuCivilEnglishBanner",
+        "gxuCivilExteriorAsset"
+      ],
+      "evidence": {
+        "location": "原way/842784664前庭服务路轮廓，面积约309.606平方米，两端第4和第10边接既有校园主路；不改平面路线。",
+        "surface": "照片支持连续前庭路面；原模型在主门前同一路面内部出现约0.384米三角面突跳。采用实际地形三角面以上0.12米的数值贴地网格，保留道路材质，校道接口3米内过渡。",
+        "dimensions": "1米网格、0.12米地形偏移及3米接缝过渡是消除悬浮和裂缝的建模参数，不是现场测量。",
+        "excludedDetails": "不推断实际道路纵坡、路缘高度、车行管理方式或整片园路铺装边界。"
+      }
     }
   ]
 }

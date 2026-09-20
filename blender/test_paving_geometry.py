@@ -59,3 +59,48 @@ o=m.object('preserved-outside-projection',bpy.context.scene.collection,{'layer':
 for loop,uv in zip(o.data.loops,o.data.uv_layers.active.data):
  co=o.data.vertices[loop.vertex_index].co;assert abs(uv.uv.y-co.z/4)<1e-6
 print('Actual ground sliver uses XY UVs locally; outside projection remains unchanged',flush=True)
+
+# Discontinuous old triangulation must not survive a grounded service repair.
+terrain=quad([(-5,-5,0),(15,-5,0),(15,10,0),(-5,10,0)])
+roads=quad([(-3,-2,.4),(0,-2,.4),(0,8,.4),(-3,8,.4)])
+original=Mesh();original.face([(0,0,1),(10,0,1),(10,6,1)],0);original.face([(0,0,.4),(10,6,.4),(0,6,.4)],0)
+record={**r,'groundedService':{'offset':.12},'meshStep':1}
+ground,rest,meshes,_=build_pavings({'pavings':[record]},{'path':0,'road':0},terrain,roads,{'way/1':original})
+p=tree(meshes['paving-test'])
+for x,y in [(5,2.9),(5,3.1),(8,2),(8,5)]:assert abs(height(p,x,y)-.12)<1e-5
+assert abs(height(p,0,3)-.4)<1e-5
+print('Grounded service repair removes an old 0.6 m triangle discontinuity while retaining its road join',flush=True)
+
+# A terrain crease inside a grid cell must survive in the new road surface.
+terrain=Mesh();peak=(5.3,3.2,.2)
+corners=[(-5,-5,0),(15,-5,0),(15,10,0),(-5,10,0)]
+for a,b in zip(corners,corners[1:]+corners[:1]):terrain.face([a,b,peak],0)
+ground,_,meshes,_=build_pavings({'pavings':[record]},{'path':0,'road':0},terrain,roads,{'way/1':original})
+assert abs(height(tree(meshes['paving-test']),5.3,3.2)-.32)<1e-5
+print('Grounded road follows an off-grid terrain crease without interpolation sag',flush=True)
+
+from paving_geometry import split_grounded_road_exports
+roads=quad([(-20,-20,.3),(30,-20,.3),(30,30,.3),(-20,30,.3)])
+roads.face([(10,0,0),(10,6,0),(10,6,.3),(10,0,.3)],0)
+before=copy.deepcopy((roads.v,roads.f,roads.m))
+split=split_grounded_road_exports({'roads':roads},[record])
+assert (roads.v,roads.f,roads.m)==before
+combined=Mesh()
+for mesh in split.values():combined.extend(mesh)
+for x in [-6,-5.1,-5,-4.9,5,14.9,15,15.1,16]:
+ assert abs(height(tree(combined),x,3)-.3)<1e-5
+patch=split['paving-test-export']
+assert max(v[0] for v in patch.v)-min(v[0] for v in patch.v)<21
+hit=tree(patch).ray_cast(Vector((10.2,3,.15)),Vector((-1,0,0)),.4)[0]
+assert hit is not None,'Local export must retain the vertical edge closure'
+print('Local road export retains surface/vertical closure, bounds quantization, and leaves source intact',flush=True)
+
+from paving_geometry import clear_paving_ground
+terrain=quad([(0,0,4),(10,0,4),(10,6,4),(0,6,4)])
+for error,should_keep in [(.00005,True),(.001,False)]:
+ pavement=quad([(0,0,4.12-error),(10,0,4.12-error),(10,6,4.12-error),(0,6,4.12-error)])
+ result,report=clear_paving_ground(terrain,pavement,record)
+ assert (result is terrain)==should_keep,(error,report)
+ if should_keep:assert 0<report['ignoredRoundoffLoweringMeters']<=.0001
+ else:assert report['maximumLoweringMeters']>.0001
+print('Grounded-road float32 noise preserves original terrain; real clearance intrusion still lowers it',flush=True)
