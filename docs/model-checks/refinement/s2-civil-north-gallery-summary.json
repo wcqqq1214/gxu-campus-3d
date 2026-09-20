@@ -1,0 +1,126 @@
+{
+  "checkedAt": "2026-09-20T20:33:25.091499+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [],
+  "baseCommit": "8cc8281",
+  "branch": "dev",
+  "scope": "Main north courtyard gallery, seven recessed levels with five folded slab/solid-rail groups and rear glazing. All parts, roofs, south facades, entrances and ground preserved; stair volumes and whole-building acceptance remain pending",
+  "partialObjectRecords": 21,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 217,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "gable-geometry",
+    "terrace-geometry",
+    "portal-geometry",
+    "sidewall-geometry",
+    "crown-geometry",
+    "stairs-geometry",
+    "return-geometry",
+    "step-geometry",
+    "recess-geometry",
+    "seventh-geometry",
+    "rear-geometry",
+    "geometry",
+    "retained-geometry",
+    "annex-geometry",
+    "entry-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4199041,
+        "medianDrawCalls": 570
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.45583494198889,
+        "medianDrawCalls": 4.20475319926874
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        28,
+        28,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1160562,
+        "medianDrawCalls": 302
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 10.32534970934793,
+        "medianDrawCalls": 14.828897338403046
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5360892,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/site-overrides.json": "aefc67261b40542d27331cd644362fe52b049c6b82acb5f433626725110ed9e8",
+    "data/paving-overrides.json": "8feb5362b3287525862d2f8775dc24505dbf7edfff3dd168d4a0dc893e199fb8",
+    "public/data/pavings.json": "3f17931e2ef61c05ec66ba7f56d39d589fcc928479f7aee8d197249d1679b3b2",
+    "data/building-overrides.json": "58b040d47f87416d42b28b8431edde306975356050527302fef815a27debd40f",
+    "data/building-sources.json": "f3deafff1590af90ae1bdd28ecda7cb8196d624326b38851c2c4d75df17b39be",
+    "blender/gxu-campus.blend": "45157e22a781b84b70cf03160b3169543aec29adb55f0cb9e47f0ca56af49d8f",
+    "public/data/buildings.json": "fd556886d102c152a7e6fbf8c0a44ac265c912770537fd3cc515f19700a2a9b8",
+    "public/data/models.json": "6d21b88ed8f55409cbafe3c91424fe71987369c48eeb10cf853f4dcfe4e35a3a"
+  }
+}

@@ -84,9 +84,35 @@ def add_corridor(mesh, facade, z, wall, slab, railing, pitched_roof=False):
     for level in range(first,last+2):
         floor=level*fh
         thickness=rule.get('firstSlabThickness',.18) if level==first else .18
-        solid(lo,hi,0,depth,floor-thickness,floor,slab,top=level<=last or (last==levels-1 and pitched_roof))
+        profile=rule.get('frontProfile')
+        if profile and level<=last:
+            # Slabs and solid rails follow the same inward-only folded edge.
+            # Keep the final roof slab straight, preserving the mapped roof.
+            for i,(a0,b0) in enumerate(zip(profile,profile[1:])):
+                t0,t1=lo+(hi-lo)*a0[0],lo+(hi-lo)*b0[0]
+                d0,d1=a0[1],b0[1]
+                def wedge(back0,back1,z0,z1,material):
+                    p=[(t0,d0,z0),(t1,d1,z0),(t1,back1,z0),(t0,back0,z0),
+                       (t0,d0,z1),(t1,d1,z1),(t1,back1,z1),(t0,back0,z1)]
+                    faces=[(3,2,1,0),(0,1,5,4),(2,3,7,6),(4,5,6,7)]
+                    if i==0:faces.append((3,0,4,7))
+                    if i==len(profile)-2:faces.append((1,2,6,5))
+                    for indices in faces:face([p[k] for k in indices],material)
+                wedge(depth,depth,floor-thickness,floor,slab)
+                wedge(d0+.14,d1+.14,floor,floor+rule['railHeight'],railing)
+                if level==first and max(d0,d1)>0:
+                    # Cap the retained ground wall where the first slab folds
+                    # inward; otherwise its top edge would be left open.
+                    cap=[(t0,0,floor-thickness),(t1,0,floor-thickness)]
+                    if d1:cap.append((t1,d1,floor-thickness))
+                    if d0:cap.append((t0,d0,floor-thickness))
+                    face(cap,slab)
+        else:
+            solid(lo,hi,0,depth,floor-thickness,floor,slab,top=level<=last or (last==levels-1 and pitched_roof))
         if 0<level<=last:
-            if 'balusters' in rule:
+            if profile:
+                continue
+            elif 'balusters' in rule:
                 rail=rule['balusters'];width=rail['width']
                 solid(lo,hi,0,.18,floor,floor+.12,railing,ends=False)
                 solid(lo,hi,0,.18,floor+rule['railHeight']-.1,floor+rule['railHeight'],railing,ends=False)
