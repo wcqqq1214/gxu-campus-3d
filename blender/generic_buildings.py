@@ -230,6 +230,10 @@ def ordinary_building(b, z, C, detail):
             gallery=facade.get('attachedGallery')
             if gallery and level>0:continue
             corridor=rule.get('openCorridor')
+            if corridor and any(level in opening['levels'] for opening in corridor.get('openings', [])):
+                # Explicit rear-wall openings replace this complete row only;
+                # ordinary rows and bounded bands on other floors stay intact.
+                continue
             recessed=corridor is not None and corridor['firstLevel']<=level<=corridor.get('lastLevel',levels-1)
             for i in range(num):
                 f = (i+.5)/num; x, y = a[0]+dx*f+nx*.07, a[1]+dy*f+ny*.07
