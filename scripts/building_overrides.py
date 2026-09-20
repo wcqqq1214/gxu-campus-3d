@@ -296,7 +296,7 @@ def resolve_facades(b, form, rules):
         if 'openCorridor' in rule:
             corridor = rule['openCorridor']
             required={'depth','firstLevel','railHeight','endInset'}
-            if not isinstance(corridor,dict) or not required <= set(corridor) or set(corridor)-required-{'piers','balusters','finish','openings','lastLevel','firstSlabThickness'}:
+            if not isinstance(corridor,dict) or not required <= set(corridor) or set(corridor)-required-{'piers','balusters','finish','openings','lastLevel','firstSlabThickness','frontProfile'}:
                 raise ValueError('Open corridor needs depth, firstLevel, railHeight and endInset')
             for parameter in ['depth','railHeight','endInset']:
                 positive(corridor[parameter], 'corridor '+parameter)
@@ -318,8 +318,8 @@ def resolve_facades(b, form, rules):
                 for parameter in ('spacing','width'):positive(rail[parameter],'baluster '+parameter)
                 if not .08<=rail['width']<=.18 or not rail['width']+.12<=rail['spacing']<=.6 or corridor['railHeight']<.5:
                     raise ValueError('Balusters need usable clear gaps and railing height')
-            if rule['ring'] != 0 or rule.get('balconies') is True:
-                raise ValueError('Open corridor requires an exterior facade without added balconies')
+            if rule.get('balconies') is True:
+                raise ValueError('Open corridor requires a boundary facade without added balconies')
         indexed[key] = rule
     parts = form['parts'] or [{'id':'body', 'polygons':b['polygons'],
                               'height':form['height'], 'levels':form['levels'], 'roof':form['roof']}]

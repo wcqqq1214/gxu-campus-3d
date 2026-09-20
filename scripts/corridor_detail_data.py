@@ -4,6 +4,21 @@ import math
 
 def validate_corridor_details(rule, length, height, levels):
     corridor = rule['openCorridor']
+    if 'frontProfile' in corridor:
+        profile = corridor['frontProfile']
+        if (not isinstance(profile, list) or not 3 <= len(profile) <= 64 or
+                any(not isinstance(p, list) or len(p) != 2 or
+                    any(type(v) not in (int, float) or not math.isfinite(v) for v in p) for p in profile)):
+            raise ValueError('Corridor front profile needs 3–64 finite fraction/depth pairs')
+        if profile[0] != [0, 0] or profile[-1] != [1, 0]:
+            raise ValueError('Corridor front profile must meet both original end returns')
+        if (corridor['firstLevel'] < 1 or corridor.get('lastLevel', levels-1) != levels-1
+                or 'piers' in corridor or 'balusters' in corridor):
+            raise ValueError('Profiled corridor needs a retained ground floor, full upper stack and solid rails without piers')
+        span = length-2*corridor['endInset']
+        if (any(not 0 <= t <= 1 or not 0 <= d <= min(.8, corridor['depth']-.6) for t, d in profile) or
+                any((b[0]-a[0])*span < .15 for a, b in zip(profile, profile[1:]))):
+            raise ValueError('Corridor front profile must progress along the facade and leave rear clearance')
     thickness = corridor.get('firstSlabThickness', .18)
     if type(thickness) not in (int, float) or not math.isfinite(thickness) or not .08 <= thickness <= .3:
         raise ValueError('Corridor first slab thickness must be between 0.08 and 0.30 metres')
