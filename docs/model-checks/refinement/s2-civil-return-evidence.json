@@ -1,0 +1,81 @@
+{
+  "checkedAt": "2026-09-20T15:01:40.798312+00:00",
+  "baseCommit": "c1d8b30",
+  "buildingId": "relation/12875606",
+  "footprintRevision": "72fe182dc683d230a671305fc6cbe289a811ac34fb1e6fd67e96c9badc7fd04e",
+  "sources": [
+    {
+      "url": "https://tmjz-en.gxu.edu.cn/images/banner_six.jpg",
+      "localFile": "work/refinement-s2-civil/banner-six.jpg",
+      "sha256": "bd8cbf160a269ed5b0b1f6862e35ea33cb5d8143ef788077192d7080a3d93b9b",
+      "bytes": 520288,
+      "capturedAt": null
+    },
+    {
+      "url": "https://tmjz.gxu.edu.cn/__local/A/7E/69/4A06C7C98FB4DD485911A8F3606_2806A0A4_AFCA6.jpg",
+      "localFile": "work/refinement-s2-civil/old-overview.jpg",
+      "sha256": "1a4d82c5d0305658428dfb077ea784acce62bc4a84cf4610163b1211d83fd0eb",
+      "bytes": 720038,
+      "capturedAt": null
+    }
+  ],
+  "observations": [
+    "Official wide and complete front images show the upper blue glazing turning onto the east face of the southeast entrance volume.",
+    "The existing front-only panel left a 1.50 m solid corner return and generic east windows, unlike this photographed turn."
+  ],
+  "adopted": {
+    "status": "estimated",
+    "frontPanel": {
+      "id": "upper-entry-glazing",
+      "type": "glazing",
+      "from": 0.005995008797291024,
+      "to": 0.91,
+      "bottom": 7.8,
+      "top": 26.0,
+      "columns": 6,
+      "rows": 12,
+      "frameWidth": 0.07,
+      "depth": 0.1
+    },
+    "eastRule": {
+      "polygon": 0,
+      "ring": 0,
+      "edge": 16,
+      "part": "main-and-rear",
+      "balconies": false,
+      "panels": [
+        {
+          "id": "southeast-glazing-return",
+          "type": "glazing",
+          "from": 0.9269826692571324,
+          "to": 0.9980265586285711,
+          "bottom": 7.8,
+          "top": 26,
+          "columns": 2,
+          "rows": 12,
+          "frameWidth": 0.07,
+          "depth": 0.1
+        }
+      ]
+    },
+    "eastWidthMeters": 3.6,
+    "cornerReturnMeters": 0.1
+  },
+  "limitations": [
+    "The 3.60 m east return, 0.10 m corner reveals, two side columns/twelve rows and existing front dimensions are photo-constrained estimates, not measurements.",
+    "The visible white inclined side wall and raised crown lack a located rear/top view; this batch does not infer a whole rooftop mass from perspective. Side portal, remaining facades, annex roof tiers/stairs and road connection remain pending.",
+    "Photograph capture dates unknown; local images are not distributed."
+  ],
+  "followupResearch": [
+    {
+      "url": "https://jwc.gxu.edu.cn/info/1498/3468.htm",
+      "result": "Page is a teaching-project image collection. First two image requests returned HTTP 403; no image evidence used."
+    },
+    {
+      "url": "https://carbon.gxu.edu.cn/info/1032/2253.htm",
+      "published": "2026-03-05",
+      "result": "Official report says the separate comprehensive experimental center has topped out and uses an on-site demolition/rebuild approach. Location image returned HTTP 403. This does not identify the user-requested old hall or establish that it has been demolished; check the footprint and date before that future target."
+    }
+  ],
+  "wholeBuildingAccepted": false
+}
