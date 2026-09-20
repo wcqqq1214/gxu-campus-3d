@@ -1,0 +1,190 @@
+{
+  "checkedAt": "2026-09-20T23:36:31.870171+00:00",
+  "buildingId": "relation/12875606",
+  "baseCommit": "f1cd97ab66ae1f5887f1446332af3c3a95444cf5",
+  "branch": "dev",
+  "passed": true,
+  "acceptance": "first-pass-calibration-with-explicit-unknowns",
+  "criterion": "docs/CAMPUS_REFINEMENT_PLAN.md section 5.3; review levels/height, roofs, entrances and main facades; at least one evidence-based correction implemented; estimates and unknowns retained.",
+  "surveyed": false,
+  "current2026ConditionVerified": false,
+  "productionAssetsChanged": false,
+  "acceptedWholeBuildingIds": [
+    "relation/12875606"
+  ],
+  "calibratedObjectRecords": 21,
+  "firstPassWholeBuildings": 1,
+  "remainingPartialObjects": 20,
+  "domains": [
+    {
+      "domain": "levels-and-height",
+      "reviewed": true,
+      "evidence": "docs/CIVIL_REAR_MASSING_EVIDENCE.md",
+      "implementation": "docs/CIVIL_REAR_MASSING.md",
+      "confirmed": "High south main block, visibly three-storey low north wing; retained OSM eight-level main block.",
+      "estimated": "All metre heights; east/west connectors 10.8/13.2 m and their partition lines.",
+      "unknown": "Precise connector levels/widths; annex half-basement counting."
+    },
+    {
+      "domain": "roofs",
+      "reviewed": true,
+      "evidence": "docs/CIVIL_REAR_MASSING_EVIDENCE.md",
+      "implementation": "docs/CIVIL_ROOF_CROWN.md",
+      "confirmed": "North red pitched roof, main flat roof/crown, annex terrace and gable screen are distinguishable in reference views.",
+      "estimated": "Roof ridge layout/rise and crown/screen heights.",
+      "unknown": "Roof behind southwest annex gable screen remains an unverified flat placeholder."
+    },
+    {
+      "domain": "entrances",
+      "reviewed": true,
+      "evidence": "docs/CIVIL_BUILDING.md",
+      "implementation": "docs/CIVIL_FRONT_CONNECTIONS.md",
+      "confirmed": "Southeast glass entrance and two-flight annex stairs located from official photographs; default middle-of-edge entrance replaced.",
+      "estimated": "Door/stair dimensions, road connections and forecourt path geometry.",
+      "unknown": "Surveyed levels, signs/furniture and other minor accesses."
+    },
+    {
+      "domain": "main-facades",
+      "reviewed": true,
+      "evidence": "docs/CIVIL_REAR_MASSING_EVIDENCE.md",
+      "implementation": "docs/CIVIL_NORTH_GALLERY.md",
+      "confirmed": "South window bands/recesses, glass crown, north main folded gallery, east round stair windows and north-wing gallery/end windows implemented.",
+      "estimated": "Bay counts, window sizes and facade depths where not directly resolved.",
+      "unknown": "West stair/connector grilles and some generic side windows; air-conditioning/equipment not reconstructed."
+    }
+  ],
+  "checks": {
+    "geometrySuite": "docs/model-checks/refinement/s2-civil-whole-geometry-suite.json",
+    "geometryChecks": 23,
+    "browser": "docs/model-checks/refinement/s2-civil-whole-context-browser.json",
+    "visuallyReviewedImages": [
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-south-overview-trees-off-day.png",
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-wing-ends-trees-off-day.png",
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-wing-ends-oblique-trees-off-day.png",
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-wing-wrap-east-trees-off-day.png",
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-garden-trees-off-day.png",
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-garden-overhead-trees-off-day.png",
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-whole-courtyard-trees-off-day.png",
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-wing-ends-trees-on-day.png",
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-south-overview-trees-off-night.png",
+      "docs/screenshots/refinement/s2-civil-whole/after/civil-south-overview-trees-off-day-mobile.png"
+    ],
+    "browserErrors": [],
+    "mobileRepresentation": "base",
+    "desktopRepresentation": "near",
+    "mobileLimit": "Desktop Chromium viewport simulation, not physical-device validation."
+  },
+  "reusedEvidence": {
+    "performance": [
+      {
+        "tier": "精细",
+        "fps": [
+          60,
+          60,
+          60
+        ],
+        "current": {
+          "medianFPS": 60,
+          "medianTriangles": 4199886,
+          "medianDrawCalls": 562
+        },
+        "baseline": {
+          "medianFPS": 60,
+          "medianTriangles": 4019920,
+          "medianDrawCalls": 547
+        },
+        "changePercent": {
+          "medianFPS": 0.0,
+          "medianTriangles": 4.476855260801216,
+          "medianDrawCalls": 2.7422303473491727
+        },
+        "passed": true
+      },
+      {
+        "tier": "流畅",
+        "fps": [
+          29,
+          29,
+          29
+        ],
+        "current": {
+          "medianFPS": 29,
+          "medianTriangles": 1165218,
+          "medianDrawCalls": 298
+        },
+        "baseline": {
+          "medianFPS": 30,
+          "medianTriangles": 1051945,
+          "medianDrawCalls": 263
+        },
+        "changePercent": {
+          "medianFPS": -3.3333333333333326,
+          "medianTriangles": 10.767958400866974,
+          "medianDrawCalls": 13.307984790874517
+        },
+        "passed": true
+      }
+    ],
+    "trees": "docs/model-checks/refinement/s2-civil-garden-trees-geometry.json",
+    "assetPreservation": "docs/model-checks/refinement/s2-civil-garden-source-preservation.json",
+    "reason": "All recorded input and production JavaScript fingerprints match; no runtime or production geometry changes. Performance is reused, not remeasured.",
+    "lodCycles": 3
+  },
+  "fingerprints": {
+    "blender/gxu-campus.blend": "5f9c83d2c47866af3a673a7aea1fc0ca4202d8febdd9b86f768328b954a3a3d6",
+    "public/models/base.glb": "eef739d16d75f03398bcbb824cfc612d324c7877ce7753b572a99d2231b81439",
+    "public/models/chunk-n2-n3.glb": "e45d621f21a36b626b020bb7d52c862100a2de72a5fd78c28d3980dd55ccfde9",
+    "public/data/buildings.json": "3444a3beb23117423fa467e4b2aaf7b9b521191e96a100f82b9fc8f1b3c639ca",
+    "public/data/sites.json": "ce89b08c5429eab0214ec1f7c8f8aaf50ca46099e45023cd4cd25733ddda71c1",
+    "public/data/pavings.json": "18217210e0dadad119d2ac0bca38fae514d1fa1615085bbc95f2f05c02256237",
+    "public/data/models.json": "a0295964c94d36c6275f47bfecf2c6862d111ee1a22fef6a7e5f9783b7627582"
+  },
+  "servedFingerprints": {
+    "data/models.json": "a0295964c94d36c6275f47bfecf2c6862d111ee1a22fef6a7e5f9783b7627582",
+    "models/base.glb": "eef739d16d75f03398bcbb824cfc612d324c7877ce7753b572a99d2231b81439",
+    "models/chunk-n2-n3.glb": "e45d621f21a36b626b020bb7d52c862100a2de72a5fd78c28d3980dd55ccfde9"
+  },
+  "verifiedReusedEvidenceFingerprints": {
+    "data/site-overrides.json": "5ce1c470f124f3b1db6c0933631ff747a1c3700b242e5429cd2a1b33e78fb3d7",
+    "data/paving-overrides.json": "8feb5362b3287525862d2f8775dc24505dbf7edfff3dd168d4a0dc893e199fb8",
+    "public/data/pavings.json": "18217210e0dadad119d2ac0bca38fae514d1fa1615085bbc95f2f05c02256237",
+    "public/data/sites.json": "ce89b08c5429eab0214ec1f7c8f8aaf50ca46099e45023cd4cd25733ddda71c1",
+    "scripts/forecourt_paths_data.py": "36b6a57601cede7b7a6b2788d018319748e96beec236e26f2f80ace27623daf8",
+    "blender/courtyard.py": "06f5d3438824b02d7be1019c7dbd1c587691c5974c69686beadbe4f046c6a80a",
+    "data/building-overrides.json": "2ed66123549ef94d4325a03435e5a25789549acbe8733034033585a61931b246",
+    "data/building-sources.json": "f3deafff1590af90ae1bdd28ecda7cb8196d624326b38851c2c4d75df17b39be",
+    "blender/gxu-campus.blend": "5f9c83d2c47866af3a673a7aea1fc0ca4202d8febdd9b86f768328b954a3a3d6",
+    "public/data/buildings.json": "3444a3beb23117423fa467e4b2aaf7b9b521191e96a100f82b9fc8f1b3c639ca",
+    "public/data/models.json": "a0295964c94d36c6275f47bfecf2c6862d111ee1a22fef6a7e5f9783b7627582",
+    "lib/campus/sports-batching.ts": "b1d1206efc8f40d5fb0e6d5387045e36436e87fb505d141f366d4125151a128b",
+    "lib/campus/scene.ts": "6e69d4ac33ab02dacbf488cbc04c1bb6dd67dd9784ff8394c17db92754adc5a0",
+    "lib/campus/resources.ts": "434f7a585ca2426dfe575a174d6499faec4dde03effb5640a44e373d6fc4ec27",
+    "tsconfig.json": "8e637e4acb7d2ca4e7713d2584c1b5d3ca55a59f4387fd2ea2c1fa80b0218bc1",
+    "public/models/base.glb": "eef739d16d75f03398bcbb824cfc612d324c7877ce7753b572a99d2231b81439",
+    "scripts/test-sports-batching.mjs": "b9df82136b51426eb49390e7e5aa5de7e2bd5a9259265c17849c68dcb44416cc",
+    "scripts/check-sports-batching.mjs": "31beb5e981011c6466e2075563d36b829b7211a2223ce5a5cecba50c485c5136",
+    "scripts/check-sports-batching-browser.mjs": "2ba48b61e4340cbe1c7892ef582290725c1dc0b1fa51432047f179ee5ccc0344",
+    "public/data/vegetation.json": "82cc9988d641ad307ccffcf73f8fa9308f3c7e857cfe983da2f9c256b4625b26"
+  },
+  "productionJavascript": {
+    "out/draco/draco_decoder.js": "8625489da79a805f4f2a7d511c3e52d8b4085608a9d2a4d5f4f9de5db0aea04f",
+    "out/draco/draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6",
+    "out/_next/static/chunks/index-BewT_Tz1.js": "f16531cc2e33916f052300fc147a4e057377b1556458b3dcc0dad437f82b790d",
+    "out/_next/static/chunks/page-BxrK50Rj.js": "05108c6b554bf3ccffd2a9c914f9c308f65e4e96f12e02e7a8cc3a27e43252c6",
+    "out/_next/static/chunks/vinext-CkbA6ZoT.js": "c82bcfb6e31af9f32a1be3250612c84329df7aa90d323bd2b081133d85bbf695",
+    "out/_next/static/chunks/scene-DUGVxP4N.js": "05608a545eb364ae2049ce4e114c596f1314573c67e43e16008297cb993a3146",
+    "out/_next/static/chunks/rolldown-runtime-hePW80VL.js": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+    "out/_next/static/chunks/framework-DTZGTDtF.js": "2a1edf81f32a49b1eacafc3546b371bca024c82a9191836e274d90890212e9df",
+    "out/_next/static/chunks/layout-segment-context-BorVHx7d.js": "49c84af7d3eb088f1190fb23e77c4e327988ec47de9606f80bfdd5a59943b30d",
+    "out/_next/static/2a683c28-08c6-4ba6-9c4a-2f59875cb49a/_ssgManifest.js": "653f3e53e89b4f8548ff86c19e92bb3c6b84b6be7485a320b1e00893ed877479",
+    "out/_next/static/2a683c28-08c6-4ba6-9c4a-2f59875cb49a/_buildManifest.js": "47f02b34be6dc481257b6efce4c19e19111f37ef5c437f8ffed44f0da97fa9bb",
+    "out/_next/static/media/draco_wasm_wrapper.DxJM36Ib.js": "e8049906ef3f8f75d3456c22a3f31bfdfe5b5b5bd09ccdec613b9e9a49d554d8",
+    "out/_next/static/media/draco_decoder.fzg4nYZr.js": "30e4d486fa020737af10e3c56197693e5b904bdc05b8bfa5d7b06751dec6da04",
+    "out/_next/static/media/draco_wasm_wrapper.fZCQGLGb.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
+  },
+  "nextQueue": [
+    "实验大厅：先区分旧结构试验大厅与新平台内部大厅，配准轮廓后建模",
+    "新结构大楼：核对 way/957404988 的高层办公区、低实验区与连接门厅"
+  ],
+  "projectGoalComplete": false
+}
