@@ -10,6 +10,7 @@ from facade_bands import add_band_ledges, add_band_windows, band_replaces_window
 from facade_panels import add_panels, panel_replaces_window
 from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
 from roof_eave import add_roof_eave, replaces_parapet
+from terraced_stairs import blocks_window as stairs_block_window
 
 
 def compact_form_source(obj):
@@ -176,6 +177,9 @@ def shared_form(b, z, C):
         else:
             entrance.box(x+nx*.65, y+ny*.65, z+.12, width+1.2, 1.6, .20, C['stone'], theta)
             entrance.box(x+nx*.9, y+ny*.9, z+.035, width+1.6, 2, .08, C['stone'], theta)
+    if 'terracedStairs' in form:
+        from terraced_stairs import add_terraced_stairs
+        add_terraced_stairs(entrance,form['terracedStairs'],z,C['stone'])
     result.add_part('01_主体轮廓', body)
     result.add_part('02_屋顶轮廓', top)
     result.add_part('03_入口与平台', entrance)
@@ -250,6 +254,8 @@ def ordinary_building(b, z, C, detail):
                 if band_replaces_window(facade,level,f,ww):continue
                 if panel_replaces_window(facade,f,ww,zz-z,wh):continue
                 if zz-wh/2 < z+facade.get('minimumHeight',0): continue
+                if 'terracedStairs' in form and stairs_block_window(form['terracedStairs'],x,y,nx,ny,ww+.3,zz-z-(wh+.3)/2,zz-z+(wh+.3)/2):
+                    continue
                 blocked_by_door=False
                 for entry in form['entrances']:
                     if flush_entrance_blocks_window(entry,x,y,nx,ny,zz-z-wh/2,zz-z+wh/2,ww):

@@ -1,0 +1,13 @@
+{
+  "passed": false,
+  "fingerprints": {
+    "blender/gxu-campus.blend": "fd066e7c89baa172966e6ef5228b6485dc33a08934bd32e3080fa199a3d8b4a0",
+    "public/models/base.glb": "ea1404655b46526e54985e47e54c8c2571372b252ae7ac60d5bc9ae3ce636a40",
+    "public/models/chunk-n2-n3.glb": "a0296637cabd3d4c9ed391a24a6a972d1e7901e8b8be45d4aa4ff4f779675138",
+    "public/data/buildings.json": "e1d68a62d7990f971630245148409378c183dd7b43acc8a1ad781f7109eaf79f"
+  },
+  "issue": "Default low window/frame fragments remain above/intersecting the terrace in the initial built model.",
+  "inspectedImage": "docs/screenshots/refinement/s2-civil-stairs-visible/after/civil-annex-stairs-trees-off-day.png",
+  "imageSha256": "d5008520f16ce4cd51262088726f029b0ded2f0fcadd98d24477df515c338bd3",
+  "nextAction": "Suppress only generic window rectangles intersecting the solid terrace, then rebuild and repeat geometry and visual checks. Do not infer a doorway."
+}

@@ -1,0 +1,115 @@
+{
+  "checkedAt": "2026-09-20T15:43:00.591349+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [],
+  "baseCommit": "86598b0",
+  "branch": "dev",
+  "scope": "Southwest annex east stair terrace: estimated 12 m wide lower flight, 4.8 m offset upper flight, 1.62/2.52 m platforms and 9/5 risers. Original building footprint, parts, roofs, main entrance and prior facade calibrations retained. Roof tiers, stair side walls, door identification and complete road connection remain pending.",
+  "partialObjectRecords": 21,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 193,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "return-geometry",
+    "step-geometry",
+    "recess-geometry",
+    "geometry",
+    "retained-geometry",
+    "annex-geometry",
+    "entry-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4173067,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.809702680650351,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        29,
+        29,
+        29
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 29,
+        "medianTriangles": 1140430,
+        "medianDrawCalls": 293
+      },
+      "changePercent": {
+        "medianFPS": -3.3333333333333326,
+        "medianTriangles": 8.411561440949855,
+        "medianDrawCalls": 11.406844106463886
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5174864,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "eddfb3cbe32b26bcad16845069ea637e8858e2fcb3d81480ef32929a84d61dbc",
+    "data/building-sources.json": "81caab3d15ca39c79440b3527c2a6f0704c3df1772046938bbfdd5fe5383281a",
+    "blender/gxu-campus.blend": "b67f4c0b6ae20ac63787d7bcc4cc549db38312c24e8ff2de7a2ebf64cc9642d2",
+    "public/data/buildings.json": "e1d68a62d7990f971630245148409378c183dd7b43acc8a1ad781f7109eaf79f",
+    "public/data/models.json": "8097418a0aa20de29733baec72db7a7d7e9a913c79bb23d9be440143a1de7fbc"
+  }
+}
