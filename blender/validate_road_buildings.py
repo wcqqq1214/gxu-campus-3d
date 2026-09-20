@@ -115,6 +115,8 @@ def main():
                          [o for o in bpy.context.scene.objects if is_building(o)],'near Draco')
     assert not report['near']['collisions'],'Near road/building LOD collision'
     report['result']='passed'
-    (ROOT/'docs/model-checks/road-building-clearance.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    prefix=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),None)
+    output=ROOT/'docs/model-checks'/('refinement/'+prefix+'-road-building.json' if prefix else 'road-building-clearance.json')
+    output.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 
 if __name__=='__main__':main()

@@ -117,6 +117,8 @@ def prepare():
     validate_ids(overrides,buildings)
     from attached_gallery_data import validate_gallery_context
     validate_gallery_context(buildings)
+    from terraced_stairs_data import validate_terraced_stairs_context
+    validate_terraced_stairs_context(buildings)
     from mapped_canopy_data import resolve_mapped_canopy_context
     resolve_mapped_canopy_context(buildings)
     from stair_tower_data import resolve_stair_tower_context
