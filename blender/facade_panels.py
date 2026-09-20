@@ -10,6 +10,9 @@ from facade_bands import frame
 def add_panels(mesh, facade, z, C):
     length, u, n, theta, point = frame(facade)
     for p in facade['rule'].get('panels', []):
+        if p['type'] == 'round-window-wall':
+            add_round_window_wall(mesh, facade, p, z, C)
+            continue
         w = (p['to']-p['from'])*length; h = p['top']-p['bottom']; fw = p['frameWidth']
         x, y = point((p['from']+p['to'])/2, .025)
         if p['type']=='solid':
@@ -59,6 +62,38 @@ def add_panels(mesh, facade, z, C):
                     key = tuple(sorted(tuple(round(v, 8) for v in q) for q in (a, b)))
                     if key not in edges:
                         edges.add(key); bar(a, b, fw*.55)
+
+
+def add_round_window_wall(mesh, facade, panel, z, C):
+    length, u, n, theta, point = frame(facade)
+    geometry = facade['roundWindowWalls'][panel['id']]
+    rings = geometry['rings']; xy = [v for ring in rings for v in ring]
+    reverse = u[1]*n[0]-u[0]*n[1] < 0
+
+    def at(v, depth):
+        x,y = point(panel['from']+v[0]/length, depth)
+        return (x,y,z+panel['bottom']+v[1])
+
+    def oriented(vertices):
+        return vertices[::-1] if reverse else vertices
+
+    front_depth = .05+panel['depth']; back_depth = .025
+    indices = geometry['triangles']
+    for i in range(0,len(indices),3):
+        triangle = oriented([xy[j] for j in indices[i:i+3]])
+        mesh.face([at(v,front_depth) for v in triangle],C['white'])
+        mesh.face([at(v,back_depth) for v in triangle[::-1]],C['white'])
+    for ring in rings:
+        boundary = oriented(ring)
+        for a,b in zip(boundary,boundary[1:]+boundary[:1]):
+            mesh.face([at(b,front_depth),at(a,front_depth),at(a,back_depth),at(b,back_depth)],C['white'])
+    for ring in rings[1:]:
+        # Hole boundaries are clockwise; glazing fronts face the exterior.
+        boundary = oriented(ring[::-1])
+        mesh.face([at(v,.04) for v in boundary],C['glass'])
+        mesh.face([at(v,.01) for v in boundary[::-1]],C['glass'])
+        for a,b in zip(boundary,boundary[1:]+boundary[:1]):
+            mesh.face([at(b,.04),at(a,.04),at(a,.01),at(b,.01)],C['glass'])
 
 
 def panel_replaces_window(facade, fraction, width, center_height, height):
