@@ -605,9 +605,9 @@ def resolve_building(building, record=None, source_ids=None):
                 'bearing':math.degrees(math.atan2(n[0],n[1]))%360,
                 'status':provenance['entrances']['status'],'basis':provenance['entrances']['note']}
             if 'flushEntrance' in e:
-                from flush_entrance_data import validate_flush_entrance
+                from flush_entrance_data import validate_flush_entrance, validate_flush_canopy_footprint
                 if set(e)-required-{'flushEntrance'}:
-                    raise ValueError('Flush entrance cannot add stairs, a canopy or a recessed portico')
+                    raise ValueError('Flush entrance cannot add other stair, canopy or portico systems')
                 wall_height=form['height']
                 if form['parts']:
                     door=LineString([[resolved['center'][i]+(c[i]-a[i])/length*offset for i in (0,1)] for offset in (-width/2,width/2)])
@@ -616,6 +616,7 @@ def resolve_building(building, record=None, source_ids=None):
                         raise ValueError('Flush entrance must fit one solid building part')
                     wall_height=matches[0]['height']
                 validate_flush_entrance(e['flushEntrance'],width,wall_height)
+                validate_flush_canopy_footprint(b,resolved,length)
             if 'stairFlight' in e:
                 if 'landingHeight' not in e:raise ValueError('Stair flight requires a simple raised landing')
                 from entrance_stairs_data import resolve_stair_flight
@@ -692,7 +693,8 @@ def resolve_building(building, record=None, source_ids=None):
             if any(k in rule for k in ('openCorridor','windowGrid','windowBands','attachedGallery')):
                 raise ValueError('Flush entrance conflicts with another facade system')
             # Upper panels are permitted; they must not cover the glazed portal.
-            if any(p['bottom']<entry['flushEntrance']['glazingHeight'] for p in rule.get('panels',[])):
+            head=entry['flushEntrance']['glazingHeight']+entry['flushEntrance'].get('canopy',{}).get('thickness',0)
+            if any(p['bottom']<head for p in rule.get('panels',[])):
                 raise ValueError('Facade panels overlap the flush entrance glazing')
     provenance.setdefault('archetype',{'status':'estimated','sourceRefs':['osm'],
         'note':'按名称、OSM用途和现有形制规则推定'})

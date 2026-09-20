@@ -1,0 +1,139 @@
+{
+  "checkedAt": "2026-09-20T13:01:08.310391+00:00",
+  "baseCommit": "8e41963",
+  "branch": "dev",
+  "passed": false,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": false,
+  "scope": "Supplementary acceptance of the unchanged civil southeast portal, head canopy and upper glazing; no whole-building acceptance.",
+  "partialObjectRecords": 21,
+  "newWholeBuildingsAccepted": 0,
+  "previousPendingReport": "s2-civil-entry-summary.json",
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "performanceReport": "s2-civil-entry-recheck-browser.json",
+  "performanceContextReport": "s2-civil-entry-recheck-performance-context.json",
+  "geometryEvidenceSha256": {
+    "s2-civil-entry-geometry.json": "d8cd001c5541e6cb62c9280286badec57cc293cd58ca730b2ac3bb441ebd6a72",
+    "s2-civil-entry-office-geometry.json": "9ce95bb406085ebc7421b50d97016e649e09559a344c9d5f6b7afe3bc6672a65",
+    "s2-civil-entry-data.json": "aa30142e237221a66eb4f3381d3019f5d8f9a6bd7dc5397c0470eaeb17913d59",
+    "s2-civil-entry-generic-geometry.json": "da1a609ff48c0f20b442fa79a5bfc8382a631677d84cebc7c796df6922d13117",
+    "s2-civil-entry-trees-geometry.json": "f60a203f02b1d5f818e52411fc2db313c119c8bf2580984be35ba4eec56d5881",
+    "s2-civil-entry-source-preservation.json": "dc72137075ddb6f8a2031928d3b604a343c64e7ae6ea85da20304a78c679d943",
+    "s2-civil-entry-assets.json": "151cfe7e720ad00d29c76fa4c7f175b6c62bc4a69335f14ae9a3a445fe2b2cd9",
+    "s2-civil-entry-visual-review.json": "04b9e8ce76be5b0189a1aa95ac7b4fd1887077286bc3deb836c2c2a556e8a596"
+  },
+  "fingerprints": {
+    "data/building-overrides.json": "e188f7d72abe2c79c8bd006b299bb38e0c11394104c2bca74a157ed1046d75f0",
+    "data/building-sources.json": "81caab3d15ca39c79440b3527c2a6f0704c3df1772046938bbfdd5fe5383281a",
+    "blender/gxu-campus.blend": "befacee383e4aff387968f68afe364249876447daf95f5391b9935f4616aed2a",
+    "public/data/buildings.json": "25cf43d1ba98812bca8dd4a1dcf3bb215f4df857d49ab86f720ba2c768578157",
+    "public/data/models.json": "081a1a7a55b3d7d2a49a6e6e58fc6cbfa8ef7699602a06ae44f76c896e6e67b2"
+  },
+  "productionModelsVerified": 69,
+  "productionDataMatches": true,
+  "initialModelBytes": 5161496,
+  "maximumOrdinaryNearBytes": 1684868,
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4163378,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.568677983641466,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1134805,
+        "medianDrawCalls": 292
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 7.87683766736853,
+        "medianDrawCalls": 11.026615969581744
+      },
+      "passed": true
+    }
+  ],
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "lodCycles": 3,
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [
+    {
+      "at": "2026-09-20T12:58:22.443144+00:00",
+      "pid": 2121,
+      "parentPid": 2094,
+      "cpuPercent": 5.4,
+      "elapsed": "00:02",
+      "cumulativeCPUTime": "0:00.12",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python3"
+    },
+    {
+      "at": "2026-09-20T12:58:22.443144+00:00",
+      "pid": 2129,
+      "parentPid": 2126,
+      "cpuPercent": 66.4,
+      "elapsed": "00:02",
+      "cumulativeCPUTime": "0:00.89",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python3"
+    }
+  ],
+  "samplingLimit": "10-second CPU snapshots with 2% inclusion threshold; does not prove total absence of background activity.",
+  "mobileScreenshot": {
+    "file": "docs/screenshots/refinement/s2-civil-entry-recheck/library-mobile.png",
+    "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4"
+  },
+  "pending": [
+    "Resolve remaining performance or comparability failure"
+  ]
+}

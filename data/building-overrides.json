@@ -4022,6 +4022,102 @@
           }
         }
       ]
+    },
+    "relation/12875606": {
+      "name": "土木建筑工程学院",
+      "footprintRevision": "72fe182dc683d230a671305fc6cbe289a811ac34fb1e6fd67e96c9badc7fd04e",
+      "entrances": [
+        {
+          "id": "southeast-main",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 17,
+          "t": 0.5,
+          "width": 13.8,
+          "primary": true,
+          "flushEntrance": {
+            "floorHeight": 0.1,
+            "glazingHeight": 7.2,
+            "splitHeight": 3.6,
+            "bays": 3,
+            "pierWidth": 0.65,
+            "pierDepth": 0.35,
+            "doorWidth": 3.2,
+            "doorHeight": 2.7,
+            "frameWidth": 0.07,
+            "canopy": {
+              "width": 16.2,
+              "depth": 2.0,
+              "thickness": 0.6
+            }
+          }
+        }
+      ],
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 17,
+          "windows": false,
+          "balconies": false,
+          "panels": [
+            {
+              "id": "upper-entry-glazing",
+              "type": "glazing",
+              "from": 0.09,
+              "to": 0.91,
+              "bottom": 7.8,
+              "top": 26.0,
+              "columns": 6,
+              "rows": 12,
+              "frameWidth": 0.07,
+              "depth": 0.1
+            }
+          ]
+        }
+      ],
+      "evidence": {
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCivilEnglishOverview",
+            "gxuCivilEnglishBanner",
+            "gxuCivilExteriorAsset",
+            "esriCivilContext",
+            "osm"
+          ],
+          "note": "学院英文简介近照、英文首页宽幅与学院域名完整正面图支持两层高玻璃门厅及外挑顶板；俯视影像与OSM内院、南侧资环材楼、西南附楼交叉定位到南立面东端原第17边。原东侧最长边中点入口撤去，改为第17边中点。13.8米玻璃宽、三开间、0.65米柱宽、7.2米顶高、3.6米横档、3.2米门宽/2.7米门高、0.10米门槛及16.2×2.0×0.6米顶板均为照片约束估算。顶板由门厅墙柱处悬挑的外形近似，不还原结构；不凭空增加台阶，完整接路另核对。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCivilEnglishOverview",
+            "gxuCivilEnglishBanner",
+            "gxuCivilExteriorAsset",
+            "esriCivilContext",
+            "osm"
+          ],
+          "note": "同一组具名照片支持门厅上方竖向玻璃界面，锚定原第17边，保留两侧实体边缘。范围0.09–0.91、底7.8米、顶26.0米、六列十二行与窗框0.07米为简化估算；暂不抬高现有26.4米主体或猜测顶部斜墙高度。取消该边通用窗，其他面、低翼分段和玻璃转角仍待校准。"
+        }
+      },
+      "review": {
+        "entrances": {
+          "status": "partial",
+          "note": "学院英文简介近照、英文首页宽幅与学院域名完整正面图支持两层高玻璃门厅及外挑顶板；俯视影像与OSM内院、南侧资环材楼、西南附楼交叉定位到南立面东端原第17边。原东侧最长边中点入口撤去，改为第17边中点。13.8米玻璃宽、三开间、0.65米柱宽、7.2米顶高、3.6米横档、3.2米门宽/2.7米门高、0.10米门槛及16.2×2.0×0.6米顶板均为照片约束估算。顶板由门厅墙柱处悬挑的外形近似，不还原结构；不凭空增加台阶，完整接路另核对。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "同一组具名照片支持门厅上方竖向玻璃界面，锚定原第17边，保留两侧实体边缘。范围0.09–0.91、底7.8米、顶26.0米、六列十二行与窗框0.07米为简化估算；暂不抬高现有26.4米主体或猜测顶部斜墙高度。取消该边通用窗，其他面、低翼分段和玻璃转角仍待校准。"
+        },
+        "height": {
+          "status": "partial",
+          "note": "主体八层来自OSM；26.4米为估算，未确认其余翼段高度。"
+        },
+        "roof": {
+          "status": "partial",
+          "note": "顶部斜墙、低附楼与后翼屋面尚未校准。"
+        }
+      }
     }
   }
 }
