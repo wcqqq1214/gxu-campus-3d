@@ -32,7 +32,7 @@ def number(value, label):
 
 def validate_window_bands(config, length, height, levels):
     fields = {'from', 'to', 'firstLevel', 'heightRatio', 'depth', 'thickness', 'windows'}
-    if not isinstance(config, dict) or set(config) != fields:
+    if not isinstance(config, dict) or not fields <= set(config) or set(config) - fields - {'lastLevel'}:
         raise ValueError('Window bands need a bounded strip, floors, ledges and window spans')
     for key in fields - {'firstLevel', 'windows'}:
         number(config[key], key)
@@ -41,6 +41,9 @@ def validate_window_bands(config, length, height, levels):
     if (type(config['firstLevel']) is not int or levels != int(levels)
             or not 1 <= config['firstLevel'] < levels):
         raise ValueError('Window bands require whole upper floors and preserve the ground floor')
+    if 'lastLevel' in config and (type(config['lastLevel']) is not int
+            or not config['firstLevel'] <= config['lastLevel'] < levels):
+        raise ValueError('Window band lastLevel must be a whole floor within the selected upper floors')
     if not .2 <= config['heightRatio'] <= .75 or not 0 < config['depth'] <= 1:
         raise ValueError('Window band height or ledge depth is not usable')
     fh = height / levels
