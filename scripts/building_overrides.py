@@ -624,6 +624,10 @@ def resolve_building(building, record=None, source_ids=None):
                     wall_height=matches[0]['height']
                 validate_flush_entrance(e['flushEntrance'],width,wall_height)
                 validate_flush_canopy_footprint(b,resolved,length)
+                if 'returnGlazing' in e['flushEntrance']:
+                    from flush_return_data import resolve_flush_return
+                    resolved['flushEntrance']=copy.deepcopy(e['flushEntrance'])
+                    resolved['flushEntrance']['returnGlazing']=resolve_flush_return(b,form,resolved,e['flushEntrance']['returnGlazing'])
             if 'stairFlight' in e:
                 if 'landingHeight' not in e:raise ValueError('Stair flight requires a simple raised landing')
                 from entrance_stairs_data import resolve_stair_flight
@@ -697,6 +701,8 @@ def resolve_building(building, record=None, source_ids=None):
         form.setdefault('facades', []).extend(resolve_exposed_facades(b, form, record['exposedFacadeRules']))
     for entry in form['entrances']:
         if 'flushEntrance' not in entry:continue
+        from flush_return_data import validate_return_facades
+        validate_return_facades(form,entry)
         for facade in form.get('facades',[]):
             if any(facade[k]!=entry[k] for k in ('polygon','ring','edge')):continue
             rule=facade['rule']

@@ -6,6 +6,7 @@ from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1]
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s2-civil-sidewall')
+PORTAL_RETURN_ADDED='--portal-return-added' in sys.argv
 ID,CHUNK,Z='relation/12875606','chunk-n2-n3',4.06
 A=Vector((-476.769698452549,-838.0503560000666,0))
 V=Vector((0.0012146879723256238,0.9999992622662929,0));E=Vector((V.y,-V.x,0))
@@ -43,6 +44,7 @@ def check(objects,tolerance):
   face(depth,h,'white',.08,'covered-window-removed')
  # Keep the side portal strip and stone joints beyond the white wall.
  for depth,h in [(1.5,3.3),(1.5,6.6),(15,3.3),(15,13.2),(15,23.1)]:
+  if PORTAL_RETURN_ADDED and depth==1.5:continue
   face(depth,h,'stone',0,'retained-stone')
  for h in (3.3,9.9,19.8,27.5,33):
   rear=6.2+(34.8-h)*1.8/8.4
@@ -56,6 +58,8 @@ def check(objects,tolerance):
  return dict(passed=True,rayCount=len(samples),samples=samples,toleranceMeters=tolerance)
 
 report=dict(passed=False,scope='White east side wall continues from model base -0.5 m to crown 34.8 m, 0.08 m outward, constant estimated taper; generic windows intersecting it removed, portal return and small openings still pending.')
+if PORTAL_RETURN_ADDED:
+ report['scope']='Retained continuous white side wall and taper; two lower portal stone probes now covered by the dedicated return glazing check. Local small openings remain pending.'
 report['fingerprints']={p:hashlib.sha256((TARGET/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb',f'public/models/{CHUNK}.glb','public/data/buildings.json']}
 try:
  bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
