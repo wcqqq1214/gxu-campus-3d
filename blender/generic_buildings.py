@@ -88,6 +88,9 @@ def shared_form(b, z, C):
             crown = form.get('roofCrown')
             if crown and crown['part'] == part.get('id','body'):
                 edges = crown['retainedParapetEdges']
+            screen=form.get('gableScreen')
+            if screen and screen['part']==part.get('id','body'):
+                edges=screen['retainedParapetEdges']
             for a,c in edges:
                 if replaces_parapet(form.get('roofEave'), part.get('id', 'body'), a, c):
                     continue
@@ -103,6 +106,9 @@ def shared_form(b, z, C):
     if 'roofCrown' in form:
         from roof_crown import add_roof_crown
         add_roof_crown(top, form['roofCrown'], z, C)
+    if 'gableScreen' in form:
+        from gable_screen import add_gable_screen
+        add_gable_screen(top,form['gableScreen'],z,C)
     for facade in form.get('facades',[]):
         if 'attachedGallery' in facade:
             add_attached_gallery(body,facade,z,wall,C)
