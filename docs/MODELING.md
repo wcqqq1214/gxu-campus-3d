@@ -487,3 +487,5 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 2026-09-20：普通建筑共享形体支持 `horizontalLedges` 独立水平挑檐，基础和近景共用构件，不改通用窗列。农学院采用范围、估算尺寸和复现检查见[专项记录](AGRICULTURE_FACADE_LEDGES.md)。
 
 2026-09-20 后续：农学院东侧顶层改为15扇显式窗，其中5扇较矮。`skipWindowLevels=[4]`只跳过该层默认窗，基础/近景共享面板；下部四层仍用原窗规则。面板与水平挑檐组合时检查空间相交，详见[顶层窗列](AGRICULTURE_TOP_WINDOWS.md)。
+
+土木学院顶层将有界 `openCorridor` 用作凹窗槽形体：同边的 `windowBands` 和 `panels` 可位于凹槽以外的楼层，但必须避开其底板至顶板的完整标高范围。保留通用窗时，`openings` 只允许位于凹槽层，且仅替换被明确配置的整行通用窗；其他行继续原规则。已关闭全立面通用窗的旧配置仍允许在凹槽内外配置开口。开口定义最多32项。形体工具名称不证明实际外廊通行用途，详见[土木顶层专项](CIVIL_TOP_RECESS.md)。

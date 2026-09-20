@@ -34,3 +34,29 @@ for face,material in zip(mesh.f,mesh.m):
     assert all(abs(v[1]-((1.4 if level==2 else 0)-.1))<=.041 for v in vertices),(level,vertices)
 assert visited=={1,2,3}
 print('PASS bounded corridor: five storeys in both LODs and explicit openings below/inside/above the recess')
+
+# Mixed facades retain ordinary/band rows while replacing only the explicitly
+# opened recess row. This exercises the actual generator in both LODs.
+f['rule']={'balconies':False,'openCorridor':{
+    'depth':1.1,'firstLevel':4,'lastLevel':4,'railHeight':.9,'endInset':.5,
+    'openings':[{'kind':'window','t':.5,'width':2,'height':1.9,'sill':.9,'levels':[4]}]},
+    'windowBands':{'from':.1,'to':.9,'firstLevel':1,'lastLevel':2,
+        'heightRatio':.55,'depth':.38,'thickness':.18,
+        'windows':[{'from':.15,'to':.4,'panes':3},{'from':.6,'to':.85,'panes':3}]}}
+for detail in (False,True):
+    mesh=ordinary_building(b,0,C,detail)
+    _,start,end=next(p for p in mesh.parts if p[0]=='04_立面窗格')
+    rows=set();explicit=0
+    for face,material in zip(mesh.f,mesh.m):
+        if material not in (C['glass'],C['shadeGlass']):continue
+        vertices=[mesh.v[i] for i in face]
+        level=math.floor(sum(v[2] for v in vertices)/len(vertices)/3.3)
+        if all(start<=i<end for i in face):
+            rows.add(level)
+            assert level!=4,'Generic window duplicates the explicit recessed row'
+            assert all(abs(v[1])<.26 for v in vertices),'Lower windows incorrectly recessed'
+        else:
+            explicit+=1
+            assert level==4 and all(abs(v[1]-1)<.041 for v in vertices),'Explicit rear window missing its depth'
+    assert rows=={0,1,2,3} and explicit==6,(detail,rows,explicit)
+print('PASS mixed facade: preserved lower bands/default rows and one explicit recessed row in both LODs')

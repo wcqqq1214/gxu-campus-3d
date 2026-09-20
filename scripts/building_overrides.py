@@ -268,11 +268,11 @@ def resolve_facades(b, form, rules):
         if 'panels' in rule:
             # Explicit panels still render when generic window rows are disabled.
             if (rule['ring'] != 0 or rule.get('balconies') is not False
-                    or any(k in rule for k in ('windowGrid', 'openCorridor', 'spacing'))):
+                    or any(k in rule for k in ('windowGrid', 'spacing'))):
                 raise ValueError('Panels need an exterior solid facade with balconies explicitly disabled')
         if 'windowBands' in rule:
             if (rule['ring'] != 0 or rule.get('windows') is False or rule.get('balconies') is True
-                    or any(k in rule for k in ('windowGrid', 'openCorridor', 'spacing'))):
+                    or any(k in rule for k in ('windowGrid', 'spacing'))):
                 raise ValueError('Window bands require an exterior solid facade without conflicting rules')
         if 'windowGrid' in rule:
             grid=rule['windowGrid']
@@ -413,8 +413,9 @@ def resolve_facades(b, form, rules):
                             if corridor.get('lastLevel',corridor['firstLevel'])>=part['levels'] or corridor['railHeight']>=fh-.5:
                                 raise ValueError('Corridor floors or railing leave no upper opening')
                             length=math.dist(start,end);inset=corridor['endInset']
-                            from corridor_detail_data import validate_corridor_details
+                            from corridor_detail_data import validate_corridor_details, validate_corridor_facade_layers
                             validate_corridor_details(facade['rule'],length,part['height'],part['levels'])
+                            validate_corridor_facade_layers(facade['rule'],part['height'],part['levels'])
                             if length-2*inset<2:
                                 raise ValueError('Corridor end returns leave no usable facade')
                             if 'piers' in corridor:

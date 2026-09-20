@@ -467,6 +467,36 @@ class BuildingOverrideTests(unittest.TestCase):
             with self.subTest(end=end),self.assertRaisesRegex(ValueError,'lastLevel'):
                 self.resolve(self.building(),facadeRules=[rule])
 
+    def mixed_corridor_fixture(self):
+        rule=self.bands_fixture();rule['balconies']=False
+        rule['windowBands']['lastLevel']=2
+        panel=self.panel_fixture()['panels'][0];panel.update(bottom=11,top=12.8)
+        rule['panels']=[panel]
+        rule['openCorridor']={'depth':1.1,'firstLevel':4,'lastLevel':4,
+            'railHeight':.9,'endInset':.5,'piers':{'bays':6,'width':.4,'depth':1.1},
+            'openings':[{'kind':'window','t':.5,'width':2,'height':1.9,'sill':.9,'levels':[4]}]}
+        return rule
+
+    def test_mixed_corridor_keeps_solid_lower_bands_and_panels(self):
+        rule=self.mixed_corridor_fixture();b=self.building()
+        r=self.resolve(b,facadeRules=[rule])
+        self.assertEqual(r['form']['facades'][0]['rule'],rule)
+        self.assertEqual(r['polygons'],b['polygons'])
+        self.assertTrue(all(not f['rule'] for f in r['form']['facades'][1:]))
+
+    def test_mixed_corridor_rejects_overlapping_bands_panels_and_misplaced_openings(self):
+        for kind in ['band','slab','panel','opening']:
+            rule=self.mixed_corridor_fixture()
+            if kind=='band':
+                rule['windowBands']['lastLevel']=4
+                del rule['panels']
+            if kind=='slab':rule['panels'][0].update(bottom=11.5,top=13.1)
+            if kind=='panel':rule['panels'][0].update(bottom=14,top=15.8)
+            if kind=='opening':rule['openCorridor']['openings'][0]['levels']=[3,4]
+            reason='Mixed explicit openings' if kind=='opening' else 'overlaps the recessed corridor or slab'
+            with self.subTest(kind=kind),self.assertRaisesRegex(ValueError,reason):
+                self.resolve(self.building(),facadeRules=[rule])
+
     def attached_fixture(self):
         return {'id':'south','polygon':0,'ring':0,'edge':0,'t':.5,'width':4.2,'primary':True,
                 'attachedPortico':{'width':9,'depth':3.2,'platformHeight':.36,

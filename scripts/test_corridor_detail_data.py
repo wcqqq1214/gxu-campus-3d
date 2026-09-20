@@ -5,7 +5,7 @@ from corridor_detail_data import validate_corridor_details
 
 class CorridorDetailTests(unittest.TestCase):
     def rule(self):
-        return {'windows': False, 'openCorridor': {'endInset': .35,
+        return {'windows': False, 'openCorridor': {'endInset': .35, 'firstLevel': 1,
             'finish': {'wall': 'white', 'rail': 'pink'},
             'openings': [{'kind': 'door', 't': .2, 'width': 1., 'height': 2.15,
                           'sill': 0., 'levels': [0, 1, 2, 3]}]}}
@@ -40,3 +40,13 @@ class CorridorDetailTests(unittest.TestCase):
         first['levels'] = [0]; second = copy.deepcopy(first); second['levels'] = [1, 2, 3]
         rule['openCorridor']['openings'].append(second)
         self.check(rule)
+
+    def test_explicit_recess_rows_can_coexist_with_default_solid_rows(self):
+        rule=self.rule();rule['windows']=True
+        rule['openCorridor']['openings'][0]['levels']=[1,3]
+        before=copy.deepcopy(rule)
+        self.check(rule)
+        self.assertEqual(rule,before)
+        rule['openCorridor']['lastLevel']=2
+        with self.assertRaisesRegex(ValueError,'within recessed floors'):
+            self.check(rule)
