@@ -493,3 +493,5 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 土木学院顶层将有界 `openCorridor` 用作凹窗槽形体：同边的 `windowBands` 和 `panels` 可位于凹槽以外的楼层，但必须避开其底板至顶板的完整标高范围。保留通用窗时，`openings` 只允许位于凹槽层，且仅替换被明确配置的整行通用窗；其他行继续原规则。已关闭全立面通用窗的旧配置仍允许在凹槽内外配置开口。开口定义最多32项。形体工具名称不证明实际外廊通行用途，详见[土木顶层专项](CIVIL_TOP_RECESS.md)。
 
 2026-09-21：`panels.type=round-window-wall` 支持有界白墙内1至16个圆孔。准备阶段对带孔墙面三角化，两档共享32边圆孔、孔壁及后退玻璃；默认方窗按外墙面范围移除，原主体墙保留，不生成室内空间。详见[规则与精度范围](CIVIL_ROUND_WINDOWS.md)。
+
+2026-09-21：土木学院北翼中央复用 `openCorridor` 的柱列与显式玻璃规则，坡屋顶保持，廊顶板带完整上下面。源模型及两档LOD共用退进，见[北翼立面](CIVIL_NORTH_WING_FACADE.md)。

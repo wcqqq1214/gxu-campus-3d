@@ -14,6 +14,7 @@ const beforeRoot=process.env.BEFORE_ASSETS_ROOT;
 const mobileOnly=process.argv.includes('--mobile-only');
 if (!cameraFile || !beforeRoot) throw new Error('Provide cameras and archived public asset root');
 const cameras=JSON.parse(await fs.readFile(path.resolve(root,cameraFile),'utf8'));
+if(!Array.isArray(cameras)||!cameras.length)throw new Error('At least one camera is required');
 // Match share.ts preconditions so a rejected pose cannot silently capture the overview.
 for(const camera of cameras)for(const pose of [camera,...(camera.mobile?[{...camera,...camera.mobile}]:[])]){
   const p=pose.position,t=pose.target;
@@ -76,7 +77,7 @@ try {
     if(!mobileOnly)for(const camera of cameras)await capture(camera,false);
     if(variant==='after'){
       if(!mobileOnly){
-        await capture(cameras[1],true);
+        await capture(cameras[1]??cameras[0],true);
         await capture(cameras[0],false,'night');
       }
       await capture(cameras[0],false,'day',true);
