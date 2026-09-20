@@ -1,0 +1,194 @@
+{
+  "status": "estimated-partition-proposal-not-production-geometry",
+  "buildingId": "way/957404988",
+  "sourceSha256": "3444a3beb23117423fa467e4b2aaf7b9b521191e96a100f82b9fc8f1b3c639ca",
+  "coordinateSystem": "campus local east/north metres",
+  "sourceAreaM2": 3355.6077403453182,
+  "symmetricDifferenceM2": 1.468603016974157e-12,
+  "overlapM2": 0.0,
+  "topologyPassed": true,
+  "productionReady": false,
+  "cutsFromOriginalVertexPairs": {
+    "north": [
+      11,
+      12
+    ],
+    "south": [
+      0,
+      15
+    ],
+    "west": [
+      3,
+      10
+    ]
+  },
+  "sourceReview": "docs/CIVIL_LAB_IDENTIFICATION.md",
+  "parts": [
+    {
+      "id": "south-hall",
+      "areaM2": 1693.4537046620296,
+      "polygon": [
+        [
+          -656.418777727391,
+          -760.5382399999202
+        ],
+        [
+          -656.4495536085785,
+          -788.1344680000896
+        ],
+        [
+          -717.8064028063193,
+          -788.05654399997
+        ],
+        [
+          -717.7694787226078,
+          -760.4499458086736
+        ],
+        [
+          -656.418777727391,
+          -760.5382399999202
+        ]
+      ],
+      "heightM": null,
+      "levels": null,
+      "basis": "Visible separate mass in school aerial; exact level count and height require part-specific interpretation."
+    },
+    {
+      "id": "middle-labs",
+      "areaM2": 743.4759838277807,
+      "polygon": [
+        [
+          -720.2684733304854,
+          -735.6025599999941
+        ],
+        [
+          -720.2684733304854,
+          -729.3909039997784
+        ],
+        [
+          -695.2908592664412,
+          -729.4103473955927
+        ],
+        [
+          -695.093802217242,
+          -760.4825800000607
+        ],
+        [
+          -656.418777727391,
+          -760.5382399999202
+        ],
+        [
+          -717.4120227129979,
+          -760.4504602492385
+        ],
+        [
+          -720.2684733304854,
+          -735.6025599999941
+        ]
+      ],
+      "heightM": null,
+      "levels": null,
+      "basis": "Visible separate mass in school aerial; exact level count and height require part-specific interpretation."
+    },
+    {
+      "id": "west-foyer",
+      "areaM2": 297.27605282030345,
+      "polygon": [
+        [
+          -727.8290815664487,
+          -764.0893479998925
+        ],
+        [
+          -728.9883441429789,
+          -760.4337999353107
+        ],
+        [
+          -729.901324257379,
+          -757.5548639998591
+        ],
+        [
+          -730.8553765858578,
+          -750.4637800000445
+        ],
+        [
+          -730.6502040426632,
+          -744.0740119997248
+        ],
+        [
+          -729.6243413237747,
+          -738.563671999795
+        ],
+        [
+          -726.936581001803,
+          -732.7193719999174
+        ],
+        [
+          -720.2684733304854,
+          -735.6025599999941
+        ],
+        [
+          -717.4120227129979,
+          -760.4504602492385
+        ],
+        [
+          -717.7694787226078,
+          -760.4499458086736
+        ],
+        [
+          -717.7653682970973,
+          -757.3767519997551
+        ],
+        [
+          -722.362876213445,
+          -760.4433351211028
+        ],
+        [
+          -727.8290815664487,
+          -764.0893479998925
+        ]
+      ],
+      "heightM": null,
+      "levels": null,
+      "basis": "Visible separate mass in school aerial; exact level count and height require part-specific interpretation."
+    },
+    {
+      "id": "north-office",
+      "areaM2": 621.4019990352052,
+      "polygon": [
+        [
+          -720.2684733304854,
+          -729.3909039997784
+        ],
+        [
+          -734.5689996267181,
+          -729.3797720000439
+        ],
+        [
+          -734.5484823735649,
+          -713.5278039998846
+        ],
+        [
+          -695.3913024054572,
+          -713.5723320000095
+        ],
+        [
+          -695.2908592664412,
+          -729.4103473955927
+        ],
+        [
+          -720.2684733304854,
+          -729.3909039997784
+        ]
+      ],
+      "heightM": null,
+      "levels": 9,
+      "basis": "Nine-storey north office from 2014 school newspaper; part boundaries estimated from retained OSM corners."
+    }
+  ],
+  "limitations": [
+    "Topology check does not validate source-photo registration, dimensions or height.",
+    "No new building ID; hall, labs, foyer and office belong to the existing compound.",
+    "Old hall in the 2022 demolition inventory is a different historical building.",
+    "Do not apply the three-level map label as three complete floors through a high-bay experimental hall."
+  ]
+}
