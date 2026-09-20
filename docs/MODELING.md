@@ -485,3 +485,5 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 2026-09-16：`courtyard-paving.stairConnection` 可在庭院直边与已派生的开放楼梯底层之间生成有界短接面，要求目标原轮廓与楼梯几何摘要有效。庭院端沿原地形三角面拆点，平台端采用楼梯共享基准，保持两端贴合及原树池。该字段不推导通向远处道路的路径，详见[庭院接面](ARTS_COURTYARD_CONNECTION.md)。
 
 2026-09-20：普通建筑共享形体支持 `horizontalLedges` 独立水平挑檐，基础和近景共用构件，不改通用窗列。农学院采用范围、估算尺寸和复现检查见[专项记录](AGRICULTURE_FACADE_LEDGES.md)。
+
+2026-09-20 后续：农学院东侧顶层改为15扇显式窗，其中5扇较矮。`skipWindowLevels=[4]`只跳过该层默认窗，基础/近景共享面板；下部四层仍用原窗规则。面板与水平挑檐组合时检查空间相交，详见[顶层窗列](AGRICULTURE_TOP_WINDOWS.md)。

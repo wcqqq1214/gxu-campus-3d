@@ -13,7 +13,7 @@
         351.31,
         -315.06
       ],
-      "status": "south-portico-and-front-ledges-verified-stepped-roof-boundary-pending",
+      "status": "south-portico-front-ledges-and-east-top-windows-geometry-verified-performance-pending",
       "toVerify": [
         "identity and footprint correspondence",
         "levels and roof",
@@ -25,13 +25,14 @@
         "South-central recessed entrance",
         "Low four-pier portico from mapped projection",
         "Shared base/near canopy, floor, steps and exposed main wall",
-        "Five horizontal ledges on each main front wing, original edges 7 and 11; dimensions estimated"
+        "Five horizontal ledges on each main front wing, original edges 7 and 11; dimensions estimated",
+        "East main facade top floor: 15 windows including five smaller windows, replacing nine generic windows; dimensions estimated"
       ],
       "remaining": [
         "Locate the south-end terraces and west-wing stepped-roof boundaries; resolve deck-floor versus supporting-storey count",
         "Confirm east/rear wing roof extent and heights",
         "Other entrances and remaining facade calibration",
-        "Floor-specific front window layout and central upper eave"
+        "Lower four front-storey window layouts, west top-storey windows and central upper eave"
       ],
       "evidenceReport": "docs/model-checks/refinement/s3-agriculture-evidence.json",
       "geometryReport": "docs/model-checks/refinement/s3-agriculture-portico.json",
@@ -41,8 +42,10 @@
       "reviewedAt": "2026-09-16T02:13:31.668886+00:00",
       "frontLedgeReport": "docs/AGRICULTURE_FACADE_LEDGES.md",
       "frontLedgeReviewDate": "2026-09-20",
-      "nextAction": "先在外部重任务结束后复测同一资产性能；随后按清晰正面照片核对逐层窗型和中央上部檐口。屋顶继续按院庆片255秒与招生片25秒线索核对分界。",
-      "frontLedgePerformanceStatus": "pending same-condition rerun; initial measurement overlapped unrelated heavy Python tasks"
+      "nextAction": "在外部重任务结束后对当前完整资产复测性能并解决仍存在的预算问题；继续核对中央上部檐口、底部四层窗列和屋顶分级边界。",
+      "frontLedgePerformanceStatus": "Included in current window assets; fresh geometry/visual regression passed, same-condition performance still pending",
+      "topWindowReport": "docs/AGRICULTURE_TOP_WINDOWS.md",
+      "currentPerformanceReport": "docs/model-checks/refinement/s3-agriculture-windows-summary.json"
     },
     {
       "id": "way/759170251",

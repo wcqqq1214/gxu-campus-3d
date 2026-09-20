@@ -234,7 +234,7 @@ def resolve_facades(b, form, rules):
     indexed = {}
     part_ids = {p['id'] for p in form['parts']} or {'body'}
     for rule in rules:
-        if set(rule) - {'polygon','ring','edge','part','windows','balconies','spacing','openCorridor','windowGrid','windowBands','horizontalLedges','panels','attachedGallery'}:
+        if set(rule) - {'polygon','ring','edge','part','windows','balconies','spacing','skipWindowLevels','openCorridor','windowGrid','windowBands','horizontalLedges','panels','attachedGallery'}:
             raise ValueError('Unknown facade rule field')
         anchor(b, rule)
         if 'part' in rule and (not isinstance(rule['part'],str) or rule['part'] not in part_ids):
@@ -250,9 +250,16 @@ def resolve_facades(b, form, rules):
                 raise ValueError('Facade window/balcony switches must be boolean')
         if 'spacing' in rule:
             positive(rule['spacing'], 'window spacing')
+        if 'skipWindowLevels' in rule:
+            skipped=rule['skipWindowLevels']
+            if (not isinstance(skipped,list) or not skipped or
+                    any(type(v) is not int or v<0 for v in skipped) or skipped!=sorted(set(skipped))):
+                raise ValueError('Skipped window levels must be ordered unique nonnegative floor indices')
+            if rule.get('windows') is False or any(k in rule for k in ('windowGrid','windowBands','openCorridor','attachedGallery')):
+                raise ValueError('Skipped window levels apply only to enabled generic window rows')
         if 'horizontalLedges' in rule:
             if (rule['ring'] != 0 or rule.get('balconies') is not False
-                    or any(k in rule for k in ('openCorridor','windowGrid','windowBands','panels','attachedGallery'))):
+                    or any(k in rule for k in ('openCorridor','windowGrid','windowBands','attachedGallery'))):
                 raise ValueError('Horizontal ledges require an exterior solid facade without conflicting rules')
         if 'attachedGallery' in rule:
             if (rule['ring'] != 0 or rule.get('windows') is False or rule.get('balconies') is not False
@@ -356,6 +363,9 @@ def resolve_facades(b, form, rules):
                             'levels':part['levels'],'rule':rule}
                         if 'floorHeights' in form:
                             facade['floorHeights'] = list(part.get('floorHeights',form['floorHeights']))
+                        if 'skipWindowLevels' in rule:
+                            if 'openBelow' in part or part['levels']!=int(part['levels']) or max(rule['skipWindowLevels'])>=part['levels']:
+                                raise ValueError('Skipped window levels must exist on their solid facade part')
                         if 'attachedGallery' in rule:
                             from attached_gallery_data import resolve_attached_gallery
                             if abs(s.length-line.length)>1e-5:
@@ -373,7 +383,7 @@ def resolve_facades(b, form, rules):
                         if 'panels' in rule:
                             if 'openBelow' in part or ('part' not in rule and abs(s.length-line.length)>1e-5):
                                 raise ValueError('Panels need one undivided solid facade edge')
-                            validate_panels(rule['panels'], s.length, part['height'], part['levels'], rule.get('windowBands'))
+                            validate_panels(rule['panels'], s.length, part['height'], part['levels'], rule.get('windowBands'), rule.get('horizontalLedges'))
                         if 'openBelow' in part:
                             if 'openCorridor' in facade['rule']:
                                 raise ValueError('Corridor requires a solid flat-roofed part with whole floors')

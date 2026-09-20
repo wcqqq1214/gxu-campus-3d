@@ -63,3 +63,9 @@ blender --background --python-exit-code 1 --python blender/validate_agriculture.
 但24次[进程快照](model-checks/refinement/s3-agriculture-ledges-performance-performance-context.json)显示，测量中途有两个其他Python进程持续高占用。本批没有在计时窗口运行自己的建模或测试任务，也未干预其他项目任务。**这些测量不构成同条件性能验收通过**；需在外部重任务结束后，对相同资产指纹重新执行活动协议。原记录保留，不以有干扰的高帧率宣称优化效果。
 
 [本批汇总](model-checks/refinement/s3-agriculture-ledges-summary.json)分别记录几何与画面通过、观测预算通过和性能比较待复测，联合验收 `passed` 保持为 `false`。模型改动可在dev审阅；没有更新主分支。
+
+### 后续复测与顶层窗列
+
+本次接续先对原资产执行了[第二次活动协议](model-checks/refinement/s3-agriculture-ledges-quiet-browser.json)，观测仍为精细60/60/60、流畅30/30/30 FPS。但后半段再次出现其他项目的Python计算，[复测汇总](model-checks/refinement/s3-agriculture-ledges-quiet-summary.json)继续保留未通过同条件比较的结论，没有改写第一次报告。随后推进[东侧顶层15窗校准](AGRICULTURE_TOP_WINDOWS.md)，后续联合验收以包含窗列的新资产版本为准。
+
+该后续扩展允许水平挑檐与显式面板同时配置，并检查两者不相交，替代首版暂不允许面板混用的限制。十道挑檐形体保持不变；挑檐验证器不再将已经专项替换的顶层窗强行按旧通用窗位置检查，顶层改由专用窗列验证器覆盖。

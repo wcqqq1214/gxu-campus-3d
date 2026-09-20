@@ -6,7 +6,7 @@ def overlaps(a, b):
     return a[0] < b[1] and a[1] > b[0] and a[2] < b[3] and a[3] > b[2]
 
 
-def validate_panels(panels, length, height, levels, band=None):
+def validate_panels(panels, length, height, levels, band=None, ledges=None):
     if not isinstance(panels, list) or not 1 <= len(panels) <= 32:
         raise ValueError('Facade panels require 1–32 explicit rectangles')
     fields = {'id', 'type', 'from', 'to', 'bottom', 'top', 'columns', 'rows', 'frameWidth', 'depth'}
@@ -40,6 +40,10 @@ def validate_panels(panels, length, height, levels, band=None):
         if any(overlaps(rectangle, other) for other in rectangles):
             raise ValueError('Facade panels overlap')
         rectangles.append(rectangle)
+        if ledges:
+            for top in ledges['tops']:
+                if overlaps(rectangle, (ledges['from']*length, ledges['to']*length, top-ledges['thickness'], top)):
+                    raise ValueError('Facade panel overlaps a horizontal ledge')
         if band:
             fh = height/levels
             for level in range(band['firstLevel'], int(levels)):

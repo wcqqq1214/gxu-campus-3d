@@ -12,6 +12,36 @@ from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue
 
 
 class BuildingOverrideTests(unittest.TestCase):
+    def test_skipped_window_levels_preserve_other_rows_and_explicit_panels(self):
+        rule=self.panel_fixture();rule['skipWindowLevels']=[4]
+        r=self.resolve(self.building(),facadeRules=[rule])
+        self.assertEqual(r['form']['facades'][0]['rule'],rule)
+        self.assertTrue(all(not f['rule'] for f in r['form']['facades'][1:]))
+        reset=resolve_building(r)
+        self.assertTrue(all('skipWindowLevels' not in f['rule'] for f in reset['form'].get('facades',[])))
+
+    def test_skipped_window_levels_reject_invalid_or_ignored_selection(self):
+        for values in [[],[True],[-1],[1,1],[2,1],[5],[float('nan')],['4'],{},None]:
+            rule={'polygon':0,'ring':0,'edge':0,'skipWindowLevels':values}
+            with self.subTest(values=values),self.assertRaises(ValueError):
+                self.resolve(self.building(),facadeRules=[rule])
+        for key,value in [('windows',False),('windowGrid',{}),('windowBands',{}),('openCorridor',{}),('attachedGallery',{})]:
+            rule={'polygon':0,'ring':0,'edge':0,'skipWindowLevels':[4],key:value}
+            with self.subTest(key=key),self.assertRaises(ValueError):
+                self.resolve(self.building(),facadeRules=[rule])
+        b,values=self.portico_fixture()
+        with self.assertRaises(ValueError):self.resolve(b,**values,facadeRules=[{'polygon':0,'ring':0,'edge':2,'skipWindowLevels':[0]}])
+
+    def test_panels_and_ledges_require_clear_vertical_and_horizontal_separation(self):
+        rule=self.panel_fixture();panel=rule['panels'][0]
+        rule['horizontalLedges']={'from':0,'to':1,'tops':[16.5],'depth':.65,'thickness':.16}
+        self.resolve(self.building(),facadeRules=[rule])
+        rule['horizontalLedges']['tops']=[panel['top']]
+        with self.assertRaisesRegex(ValueError,'overlaps a horizontal ledge'):
+            self.resolve(self.building(),facadeRules=[rule])
+        rule['horizontalLedges']['to']=panel['from']
+        self.resolve(self.building(),facadeRules=[rule])
+
     def ledges_fixture(self):
         return {'polygon':0,'ring':0,'edge':0,'balconies':False,'horizontalLedges':{
             'from':.1,'to':.9,'tops':[3.3,6.6,9.9,13.2,16.5],'depth':.65,'thickness':.16}}
@@ -33,7 +63,7 @@ class BuildingOverrideTests(unittest.TestCase):
             rule=self.ledges_fixture();rule['horizontalLedges'][key]=value
             with self.subTest(key=key,value=value),self.assertRaises(ValueError):
                 self.resolve(self.building(),facadeRules=[rule])
-        for key in ['openCorridor','windowGrid','windowBands','panels','attachedGallery','balconies']:
+        for key in ['openCorridor','windowGrid','windowBands','attachedGallery','balconies']:
             rule=self.ledges_fixture();rule[key]=True if key=='balconies' else {}
             with self.subTest(key=key),self.assertRaises(ValueError):
                 self.resolve(self.building(),facadeRules=[rule])
