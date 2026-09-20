@@ -12,8 +12,8 @@ def validate_corridor_details(rule, length, height, levels):
     if 'openings' not in corridor:
         return
     openings = corridor['openings']
-    if rule.get('windows') is not False or not isinstance(openings, list) or not 1 <= len(openings) <= 12:
-        raise ValueError('Explicit corridor openings require disabled default windows')
+    if not isinstance(openings, list) or not 1 <= len(openings) <= 32:
+        raise ValueError('Explicit corridor openings require 1–32 opening definitions')
     occupied = []
     for opening in openings:
         if not isinstance(opening, dict) or set(opening) != {'kind', 't', 'width', 'height', 'sill', 'levels'}:
@@ -31,6 +31,10 @@ def validate_corridor_details(rule, length, height, levels):
         floors = opening['levels']
         if not isinstance(floors, list) or not floors or any(type(i) is not int or not 0 <= i < levels for i in floors) or len(set(floors)) != len(floors):
             raise ValueError('Invalid corridor opening levels')
+        if rule.get('windows') is not False and any(
+                not corridor['firstLevel'] <= level <= corridor.get('lastLevel', levels-1)
+                for level in floors):
+            raise ValueError('Mixed explicit openings must stay within recessed floors')
         half = opening['width'] / 2 + .06
         left, right = opening['t'] * length - half, opening['t'] * length + half
         bottom, top = opening['sill'], opening['sill'] + opening['height'] + .06
@@ -40,3 +44,20 @@ def validate_corridor_details(rule, length, height, levels):
             if any(level == l and min(right, r) > max(left, a) and min(top, t) > max(bottom, b) for l, a, r, b, t in occupied):
                 raise ValueError('Corridor openings overlap')
             occupied.append((level, left, right, bottom, top))
+
+
+def validate_corridor_facade_layers(rule, height, levels):
+    """Allow solid-wall bands/panels only outside the recessed slab stack."""
+    corridor = rule['openCorridor']; fh = height/levels
+    low = corridor['firstLevel']*fh-.18
+    high = (corridor.get('lastLevel', levels-1)+1)*fh
+    for panel in rule.get('panels', []):
+        if panel['bottom'] < high and panel['top'] > low:
+            raise ValueError('Facade panel overlaps the recessed corridor or slab')
+    band = rule.get('windowBands')
+    if band:
+        for level in range(band['firstLevel'], band.get('lastLevel', int(levels)-1)+1):
+            bottom = (level+.56-band['heightRatio']/2)*fh-.06
+            top = (level+.56+band['heightRatio']/2)*fh+.12+band['thickness']
+            if bottom < high and top > low:
+                raise ValueError('Window band or ledge overlaps the recessed corridor or slab')
