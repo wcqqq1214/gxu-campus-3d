@@ -60,3 +60,24 @@ for detail in (False,True):
             assert level==4 and all(abs(v[1]-1)<.041 for v in vertices),'Explicit rear window missing its depth'
     assert rows=={0,1,2,3} and explicit==6,(detail,rows,explicit)
 print('PASS mixed facade: preserved lower bands/default rows and one explicit recessed row in both LODs')
+
+# A lower recess can stay continuous while deep separators start one storey up.
+from mathutils import Vector
+from mathutils.bvhtree import BVHTree
+for angle in (0,.61):
+    rotate=lambda p:[p[0]*math.cos(angle)-p[1]*math.sin(angle),p[0]*math.sin(angle)+p[1]*math.cos(angle)]
+    b['polygons']=[[list(map(rotate,ring))]]
+    f.update(start=rotate([0,0]),end=rotate([30,0]),normal=rotate([0,-1]))
+    f['rule']={'balconies':False,'openCorridor':{
+        'depth':1.4,'firstLevel':2,'lastLevel':3,'railHeight':.9,'endInset':.5,
+        'piers':{'bays':4,'width':.4,'depth':1.4,'firstLevel':3}}}
+    n=Vector((*f['normal'],0));u=Vector((*rotate([1,0]),0))
+    for detail in (False,True):
+        m=ordinary_building(b,0,C,detail);tree=BVHTree.FromPolygons(m.v,m.f)
+        for i in (1,2,3):
+            t=.5+29*i/4
+            for h,expected in ((8.1,False),(11.4,True)):
+                hit,normal,index,distance=tree.ray_cast(u*t+n*.6+Vector((0,0,h)),-n,.8)
+                assert (hit is not None)==expected,(angle,detail,i,h,hit)
+                if expected:assert abs(hit.dot(n))<1e-5 and normal.dot(n)>.99
+print('PASS storey-limited piers: absent on lower recess, retained above, both LODs and rotated facade')

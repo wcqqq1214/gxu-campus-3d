@@ -14,6 +14,9 @@ TARGET = next((Path(a.split('=', 1)[1]).resolve() for a in sys.argv if a.startsw
 PREFIX = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-facade')
 ID, CHUNK, Z = 'relation/12875606', 'chunk-n2-n3', 4.06
 RETAINED_ONLY = '--retained-only' in sys.argv
+SEVENTH_RECESS = '--seventh-recess-added' in sys.argv
+if SEVENTH_RECESS and not RETAINED_ONLY:
+    raise ValueError('Seventh recess mode requires explicit retained-only scope')
 A = Vector((-493.43996762938485, -834.8777359997714, 0))
 B = Vector((-537.9008578510263, -834.8220759999119, 0))
 U = (B-A).normalized()
@@ -77,7 +80,7 @@ def check(objects, tolerance):
             hit = ray(point(fraction, .68, level*3.3+3.8), Vector((0, 0, -1)), 1)
             assert hit is None, ('ledge extends beyond adopted depth', level, fraction, hit)
             samples.append(dict(kind='ledgeOuterClearance', level=level, fraction=fraction))
-    for level in ((6,) if RETAINED_ONLY else (6, 7)):
+    for level in (() if SEVENTH_RECESS else (6,) if RETAINED_ONLY else (6, 7)):
         for bay in range(13):
             center = .025+(bay+.5)*.95/13
             wall(center+.3/LENGTH, level*3.3+1.15, 'glass')
@@ -88,7 +91,7 @@ def check(objects, tolerance):
             assert hit is None, ('middle ledge duplicated on upper floor', level, fraction, hit)
             samples.append(dict(kind='upperLedgeAbsent', level=level, fraction=fraction))
     # Check backing masonry independently of glass.
-    for level in ((1, 3, 5, 6) if RETAINED_ONLY else (1, 3, 5, 6, 7)):
+    for level in ((1, 3, 5) if SEVENTH_RECESS else (1, 3, 5, 6) if RETAINED_ONLY else (1, 3, 5, 6, 7)):
         origin = point(.5, -.4, level*3.3+1.15)
         # Near frames straddle the wall plane: their back face can be the
         # first hit from indoors. Cross that face, then require the masonry
@@ -104,6 +107,8 @@ def check(objects, tolerance):
 report = dict(passed=False, scope='Original south edge 1: five middle window/ledge rows, 13 estimated bays, two upper rows of narrower panes. Deep upper recesses, western extension above annex, ground and side/rear facades remain pending.')
 if RETAINED_ONLY:
     report['scope'] = 'Retained south edge 1 middle rows and seventh-storey panes only; changed eighth-storey recess is checked separately by validate_civil_recess.py.'
+if SEVENTH_RECESS:
+    report['scope']='Retained five south middle rows and ledges; seventh and eighth storeys independently checked by validate_civil_seventh.py and validate_civil_recess.py.'
 report['fingerprints'] = {p: hashlib.sha256((TARGET/p).read_bytes()).hexdigest() for p in
                           ['blender/gxu-campus.blend', 'public/models/base.glb', f'public/models/{CHUNK}.glb', 'public/data/buildings.json']}
 try:

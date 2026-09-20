@@ -64,7 +64,7 @@ def add_corridor(mesh, facade, z, wall, slab, railing, pitched_roof=False):
         if t1-t0>1e-6 and z1-z0>1e-6:
             face([(t0,0,z0),(t1,0,z0),(t1,0,z1),(t0,0,z1)])
     front(start,lo,bottom,h);front(hi,end,bottom,h)
-    front(lo,hi,bottom,first*fh-.18)
+    front(lo,hi,bottom,first*fh-rule.get('firstSlabThickness',.18))
     front(lo,hi,corridor_top,h)
     for level in range(first,last+1):
         floor=level*fh;ceiling=(level+1)*fh-.18
@@ -83,7 +83,8 @@ def add_corridor(mesh, facade, z, wall, slab, railing, pitched_roof=False):
 
     for level in range(first,last+2):
         floor=level*fh
-        solid(lo,hi,0,depth,floor-.18,floor,slab,top=level<=last or (last==levels-1 and pitched_roof))
+        thickness=rule.get('firstSlabThickness',.18) if level==first else .18
+        solid(lo,hi,0,depth,floor-thickness,floor,slab,top=level<=last or (last==levels-1 and pitched_roof))
         if 0<level<=last:
             if 'balusters' in rule:
                 rail=rule['balusters'];width=rail['width']
@@ -97,6 +98,8 @@ def add_corridor(mesh, facade, z, wall, slab, railing, pitched_roof=False):
                 solid(lo,hi,0,.14,floor,floor+rule['railHeight'],railing,ends=False)
     if 'piers' in rule:
         pier=rule['piers']
+        pier_first=pier.get('firstLevel',first)
+        pier_slab=rule.get('firstSlabThickness',.18) if pier_first==first else .18
         for i in range(pier['bays']+1):
             t=lo+(hi-lo)*i/pier['bays']
-            solid(t-pier['width']/2,t+pier['width']/2,0,pier['depth'],max(bottom,first*fh-.18),corridor_top,wall)
+            solid(t-pier['width']/2,t+pier['width']/2,0,pier['depth'],max(bottom,pier_first*fh-pier_slab),corridor_top,wall)
