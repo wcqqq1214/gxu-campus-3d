@@ -782,3 +782,5 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 顶层凹槽接续后，以 `validate_civil_recess.py` 检查第八层实际进深、窗前净空、后窗/后墙、隔板及底板/顶板/屋面；源和两级GLB分别检查。旧南立面验证器增加 `--retained-only`，只回归保留的中部及第七层，第八层由新专项完整接管，不能省略新检查。`test_bounded_corridor.py`同时覆盖两级生成中的混合立面：显式凹槽窗只替换配置楼层。各命令通过Blender的 `--python`执行、加`--python-exit-code 1`并使用独立报告前缀。详见[顶层专项](CIVIL_TOP_RECESS.md)。
 
 2026-09-21：`blender/validate_civil_round_windows.py -- --report-prefix=<新批次>` 对源、基础、近景分别检查圆窗玻璃、圆外四角白墙、径向孔壁及保留屋顶。`--check-root=<旧资产目录>` 用于缺失圆孔反例；通过Blender执行并加 `--python-exit-code 1`。配合已有北向外廊、后部体量及南立面专项回归，详见[圆窗验收](CIVIL_ROUND_WINDOWS.md)。
+
+2026-09-21：`blender/validate_civil_north_wing.py -- --report-prefix=<新批次>` 对源文件、基础和近景各检查159条记录，覆盖外廊、柱列、底层窗、端墙及内院。通过Blender执行并设置 `--python-exit-code 1`；坡屋顶另由 `validate_civil_rear.py` 回归。圆窗独立生成测试现名 `test_round_window_geometry.py`，避免与数据测试同名。见[北翼专项](CIVIL_NORTH_WING_FACADE.md)。
