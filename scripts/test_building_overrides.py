@@ -12,6 +12,43 @@ from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue
 
 
 class BuildingOverrideTests(unittest.TestCase):
+    def eave_fixture(self):
+        return dict(part='body', polygon=0, edge=0, backDepth=.6,
+                    projection=1.6, sideOverhang=.8, rise=1.6, capThickness=.2)
+
+    def test_roof_eave_support_winding_height_and_reset(self):
+        b=self.building();r=self.resolve(b,roofEave=self.eave_fixture())
+        self.assertEqual(r['form']['roofEave']['normal'],[0,-1])
+        self.assertEqual(r['form']['roofEave']['baseHeight'],16.5)
+        self.assertEqual(r['polygons'],b['polygons'])
+        self.assertNotIn('roofEave',resolve_building(r)['form'])
+        b['polygons'][0][0].reverse()
+        r=self.resolve(b,roofEave=self.eave_fixture(),height=20)
+        self.assertEqual(r['form']['roofEave']['normal'],[-1,0])
+        self.assertEqual(r['form']['roofEave']['baseHeight'],20)
+
+    def test_roof_eave_rejects_bad_anchor_and_dimensions(self):
+        for key,value in [('part','missing'),('polygon',1),('edge',4),('edge',True),
+                          ('edge',-1),('backDepth',0),('projection',4),('rise',float('nan')),
+                          ('capThickness',True),('sideOverhang',-1),('extra',1)]:
+            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
+                self.resolve(self.building(),roofEave={**self.eave_fixture(),key:value})
+        with self.assertRaises(ValueError):
+            self.resolve(self.building(),roofEave=self.eave_fixture(),roof={'type':'gabled','rise':2})
+
+    def test_roof_eave_rejects_courtyard_and_high_adjacent_part(self):
+        b=self.building();b['polygons'][0].append([[5,.3],[5,5],[10,5],[10,.3],[5,.3]])
+        with self.assertRaisesRegex(ValueError,'support crosses'):
+            self.resolve(b,roofEave=self.eave_fixture())
+        b=self.building();parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'height':16.5,'levels':5},
+                                {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'height':16.5,'levels':5}]
+        config={**self.eave_fixture(),'part':'west','edge':1}
+        with self.assertRaisesRegex(ValueError,'equal or taller'):
+            self.resolve(b,parts=parts,roofEave=config)
+        parts[1].update(height=9.9,levels=3)
+        r=self.resolve(b,parts=parts,roofEave=config)
+        self.assertEqual(r['form']['roofEave']['baseHeight'],16.5)
+
     def test_skipped_window_levels_preserve_other_rows_and_explicit_panels(self):
         rule=self.panel_fixture();rule['skipWindowLevels']=[4]
         r=self.resolve(self.building(),facadeRules=[rule])

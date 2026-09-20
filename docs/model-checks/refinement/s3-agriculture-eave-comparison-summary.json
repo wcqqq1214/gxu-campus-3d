@@ -1,0 +1,243 @@
+{
+  "passed": false,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": false,
+  "pending": [
+    "Resolve remaining performance or comparability failure"
+  ],
+  "baseCommit": "d30f6ab",
+  "branch": "dev",
+  "scope": "Central wide eave added on the five-storey part edge; profile and dimensions estimated. Prior portico, windows and ten ledges retained. Stepped wings, other facades and entrances remain pending",
+  "partialObjectRecords": 20,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 177,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "eave-geometry",
+    "windows-geometry",
+    "ledges-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review",
+    "portico"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "baselineFPS": [
+        60,
+        52,
+        49
+      ],
+      "currentFPS": [
+        54,
+        51,
+        57
+      ],
+      "baseline": {
+        "medianFPS": 52,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 542
+      },
+      "current": {
+        "medianFPS": 54,
+        "medianTriangles": 4180063,
+        "medianDrawCalls": 554
+      },
+      "changePercent": {
+        "medianFPS": 3.8461538461538547,
+        "medianTriangles": 3.9837359947461737,
+        "medianDrawCalls": 2.2140221402213944
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "baselineFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1049078,
+        "medianDrawCalls": 253
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1138419,
+        "medianDrawCalls": 280
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 8.51614465273316,
+        "medianDrawCalls": 10.671936758893285
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s3-agriculture-eave-s0-fresh-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": {
+    "baseline": 24,
+    "current": 24
+  },
+  "heavyPythonOrBlenderWithinTimedWindows": [
+    {
+      "variant": "baseline",
+      "at": "2026-09-20T12:02:48.017490+00:00",
+      "pid": 87853,
+      "parentPid": 51634,
+      "cpuPercent": 84.2,
+      "elapsed": "00:08",
+      "cumulativeCPUTime": "0:06.11",
+      "executable": "/Users/wcqqq1214/Project/AstrBot/.venv/bin/python"
+    },
+    {
+      "variant": "baseline",
+      "at": "2026-09-20T12:03:40.823545+00:00",
+      "pid": 88299,
+      "parentPid": 88289,
+      "cpuPercent": 84.8,
+      "elapsed": "00:04",
+      "cumulativeCPUTime": "0:03.07",
+      "executable": "/Users/wcqqq1214/Project/AstrBot/.venv/bin/python"
+    },
+    {
+      "variant": "baseline",
+      "at": "2026-09-20T12:03:40.823545+00:00",
+      "pid": 88254,
+      "parentPid": 51634,
+      "cpuPercent": 81.3,
+      "elapsed": "00:15",
+      "cumulativeCPUTime": "0:03.86",
+      "executable": "/Users/wcqqq1214/Project/AstrBot/.venv/bin/python"
+    },
+    {
+      "variant": "baseline",
+      "at": "2026-09-20T12:04:01.170885+00:00",
+      "pid": 88363,
+      "parentPid": 51634,
+      "cpuPercent": 45.7,
+      "elapsed": "00:09",
+      "cumulativeCPUTime": "0:04.75",
+      "executable": ".venv/bin/python"
+    },
+    {
+      "variant": "baseline",
+      "at": "2026-09-20T12:04:01.170885+00:00",
+      "pid": 88408,
+      "parentPid": 88407,
+      "cpuPercent": 8.2,
+      "elapsed": "00:01",
+      "cumulativeCPUTime": "0:00.16",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python3"
+    },
+    {
+      "variant": "baseline",
+      "at": "2026-09-20T12:04:41.478301+00:00",
+      "pid": 88560,
+      "parentPid": 51634,
+      "cpuPercent": 65.1,
+      "elapsed": "00:06",
+      "cumulativeCPUTime": "0:04.23",
+      "executable": "/Users/wcqqq1214/Project/AstrBot/.venv/bin/python"
+    },
+    {
+      "variant": "current",
+      "at": "2026-09-20T12:08:09.737773+00:00",
+      "pid": 89096,
+      "parentPid": 51634,
+      "cpuPercent": 68.5,
+      "elapsed": "00:03",
+      "cumulativeCPUTime": "0:01.51",
+      "executable": ".venv/bin/python"
+    },
+    {
+      "variant": "current",
+      "at": "2026-09-20T12:08:19.869228+00:00",
+      "pid": 89115,
+      "parentPid": 89110,
+      "cpuPercent": 79.6,
+      "elapsed": "00:10",
+      "cumulativeCPUTime": "0:06.48",
+      "executable": "/Users/wcqqq1214/Project/AstrBot/.venv/bin/python3"
+    },
+    {
+      "variant": "current",
+      "at": "2026-09-20T12:08:30.271010+00:00",
+      "pid": 89115,
+      "parentPid": 89110,
+      "cpuPercent": 13.9,
+      "elapsed": "00:21",
+      "cumulativeCPUTime": "0:09.44",
+      "executable": "/Users/wcqqq1214/Project/AstrBot/.venv/bin/python3"
+    },
+    {
+      "variant": "current",
+      "at": "2026-09-20T12:10:00.856337+00:00",
+      "pid": 89115,
+      "parentPid": 89110,
+      "cpuPercent": 7.8,
+      "elapsed": "01:51",
+      "cumulativeCPUTime": "0:09.61",
+      "executable": "/Users/wcqqq1214/Project/AstrBot/.venv/bin/python3"
+    },
+    {
+      "variant": "current",
+      "at": "2026-09-20T12:10:11.049821+00:00",
+      "pid": 89115,
+      "parentPid": 89110,
+      "cpuPercent": 17.0,
+      "elapsed": "02:02",
+      "cumulativeCPUTime": "0:09.71",
+      "executable": "/Users/wcqqq1214/Project/AstrBot/.venv/bin/python3"
+    }
+  ],
+  "fingerprints": {
+    "data/building-overrides.json": "ca11a89b16cdd10c04be03e5dff382467c7871f9a3a96c3a025e50e2abd294ee",
+    "data/building-sources.json": "af8ad5160cae650c440790eed00978e3bd35314e60b867b8d359950e388dd478",
+    "blender/gxu-campus.blend": "6b57bd582e7aa309e95896738506a2c1b43445e5483401c0fa09c1980e14cd75",
+    "public/data/buildings.json": "518957dc916368ca27a8ab0123e24186ced2e10ce80ea1f5cc85e15ccd9e29cd",
+    "public/data/models.json": "7d129cb2a1d881bfece700c5bcf23cf7052f2dd1be961f85292c1f5fea8bdaaf"
+  },
+  "checkedAt": "2026-09-20T12:11:00.112485+00:00",
+  "currentReport": "s3-agriculture-eave-current-fresh-browser.json",
+  "historicalS0Report": "s2-arts-s0-current-os-browser.json",
+  "originalS0ManifestAnd69ModelsVerified": true,
+  "firstAttemptReport": "s3-agriculture-eave-summary.json",
+  "diagnosticReport": "s3-agriculture-eave-paired-browser.json",
+  "pairedFPS": {
+    "before": [
+      60,
+      60,
+      55
+    ],
+    "after": [
+      60,
+      60,
+      53
+    ]
+  },
+  "method": "Original S0 assets and current assets measured with the same current frontend, local route fulfillment, original LOD protocol and two quality tiers; historical failure retained. The paired fine-only diagnostic does not replace acceptance."
+}
