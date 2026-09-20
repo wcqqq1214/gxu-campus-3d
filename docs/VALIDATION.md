@@ -766,3 +766,7 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 ## 庭院至楼梯底层接面（2026-09-16）
 
 `blender/validate_courtyard_connection.py -- --report-prefix=<批次>` 读取实际源、基础GLB、基础场地与近景楼梯组合，检查接面、两端接缝、原地形净距及底层至首梯前的有限宽取样路径。可用 `--check-root=<完整资产副本>` 做旧模型反例，报告默认读取当前站点规则作为期望；不要用旧模型自己的缺失规则绕过反例。与 `validate_courtyard.py` 和 `validate_arts_stair.py` 配合，分别覆盖原院落树池及楼梯高层几何。命令经 Blender 的 `--python` 执行，须加 `--python-exit-code 1`。结果与估算边界见[本批记录](ARTS_COURTYARD_CONNECTION.md)。
+
+## 农学院正面挑檐（2026-09-20）
+
+`blender/validate_agriculture_ledges.py -- --report-prefix=<新批次>` 对源文件、基础与近景的实际三角网各执行220条射线，包含十道挑檐的顶面、板底、外缘、深度外空区以及保留窗面与层间净空；使用固定验收位置。`--check-root=<旧资产目录>` 可验证缺失构件的反例，仍读取当前校准楼的锚点。与 `validate_agriculture.py` 配合检查原四柱门廊、三个开放柱间、退后门面及台阶。通过Blender的 `--python` 执行并设置 `--python-exit-code 1`，不同专项采用不同报告前缀。尺寸估算与完成边界见[本批记录](AGRICULTURE_FACADE_LEDGES.md)。

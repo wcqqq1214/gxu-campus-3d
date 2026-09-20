@@ -229,12 +229,12 @@ def resolve_parts(b, raw, roof):
 
 
 def resolve_facades(b, form, rules):
-    from facade_bands_data import validate_window_bands
+    from facade_bands_data import validate_window_bands, validate_horizontal_ledges
     from facade_panels_data import validate_panels
     indexed = {}
     part_ids = {p['id'] for p in form['parts']} or {'body'}
     for rule in rules:
-        if set(rule) - {'polygon','ring','edge','part','windows','balconies','spacing','openCorridor','windowGrid','windowBands','panels','attachedGallery'}:
+        if set(rule) - {'polygon','ring','edge','part','windows','balconies','spacing','openCorridor','windowGrid','windowBands','horizontalLedges','panels','attachedGallery'}:
             raise ValueError('Unknown facade rule field')
         anchor(b, rule)
         if 'part' in rule and (not isinstance(rule['part'],str) or rule['part'] not in part_ids):
@@ -250,6 +250,10 @@ def resolve_facades(b, form, rules):
                 raise ValueError('Facade window/balcony switches must be boolean')
         if 'spacing' in rule:
             positive(rule['spacing'], 'window spacing')
+        if 'horizontalLedges' in rule:
+            if (rule['ring'] != 0 or rule.get('balconies') is not False
+                    or any(k in rule for k in ('openCorridor','windowGrid','windowBands','panels','attachedGallery'))):
+                raise ValueError('Horizontal ledges require an exterior solid facade without conflicting rules')
         if 'attachedGallery' in rule:
             if (rule['ring'] != 0 or rule.get('windows') is False or rule.get('balconies') is not False
                     or any(k in rule for k in ('openCorridor', 'windowGrid', 'windowBands', 'panels', 'spacing'))):
@@ -357,6 +361,10 @@ def resolve_facades(b, form, rules):
                             if abs(s.length-line.length)>1e-5:
                                 raise ValueError('Attached gallery needs an undivided mapped facade')
                             facade['attachedGallery'] = resolve_attached_gallery(b, facade, part, rule['attachedGallery'])
+                        if 'horizontalLedges' in rule:
+                            if 'openBelow' in part or ('part' not in rule and abs(s.length-line.length)>1e-5):
+                                raise ValueError('Horizontal ledges need one undivided solid facade edge')
+                            validate_horizontal_ledges(rule['horizontalLedges'], part['height'])
                         if 'windowBands' in facade['rule']:
                             if 'openBelow' in part or ('part' not in rule and abs(s.length-line.length)>1e-5):
                                 raise ValueError('Window bands need one undivided solid facade edge')

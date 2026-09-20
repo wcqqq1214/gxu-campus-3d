@@ -6,7 +6,7 @@ from facade_corridors import add_corridor, add_corridor_openings
 from attached_gallery import add_attached_gallery
 from facade_windows import add_grid_pilasters, add_grid_windows
 from attached_portico import add_attached_portico
-from facade_bands import add_band_ledges, add_band_windows, band_replaces_window
+from facade_bands import add_band_ledges, add_band_windows, band_replaces_window, add_horizontal_ledges
 from facade_panels import add_panels, panel_replaces_window
 from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
 
@@ -99,6 +99,8 @@ def shared_form(b, z, C):
             add_grid_pilasters(body,facade,z,C)
         if 'windowBands' in facade['rule']:
             add_band_ledges(body,facade,z,C)
+        if 'horizontalLedges' in facade['rule']:
+            add_horizontal_ledges(body,facade,z,C)
     for door in form.get('stairAccessDoors',[]):
         from stair_tower import stair_access_door
         stair_access_door(entrance,door,z,C)
