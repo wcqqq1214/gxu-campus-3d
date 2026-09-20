@@ -1,0 +1,79 @@
+{
+  "passed": true,
+  "method": "Direct inspection of all nine saved final screenshots with view_image",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s2-civil-rear-final/before/civil-north-roof-trees-off-day.png",
+      "sha256": "cc839c85b703285672387b97838693a8b458138554e65344a8981707e78107b8",
+      "variant": "before",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-rear-final/before/civil-northwest-overview-trees-off-day.png",
+      "sha256": "b5b309bea8e9e4f610b2b0e211907f1ae965f8c0427e83357702ce9fde23961f",
+      "variant": "before",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-rear-final/before/civil-south-overview-trees-off-day.png",
+      "sha256": "9919df82727209e52048bbcac327ee33f4538c0665af53926a503475ddd4608c",
+      "variant": "before",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-rear-final/after/civil-north-roof-trees-off-day.png",
+      "sha256": "61f8c8c7bf3953a00d1120c12a6041b5c8f1346b5db6b601f73d172dc59b4059",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-rear-final/after/civil-northwest-overview-trees-off-day.png",
+      "sha256": "bbe2e04474125915ca3cd8f239f2c7e22ecc728f21c8b27ef8ebbe05f327de24",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-rear-final/after/civil-south-overview-trees-off-day.png",
+      "sha256": "885f3a6cfcd9055721dd8fd84518aa70c509ea7b5a81960a10eaeacc064e66cb",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-rear-final/after/civil-northwest-overview-trees-on-day.png",
+      "sha256": "d2ab96d17497f59b4bebb477ed592aed33cc3c376a45852d8d28ce48464370eb",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-rear-final/after/civil-north-roof-trees-off-night.png",
+      "sha256": "6a3aa39384d05fe922ef13a1c60ed9fb6652bd90719d359be1f31d8022a5c5a1",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-rear-final/after/civil-north-roof-trees-off-day-mobile.png",
+      "sha256": "dc4d247ed5e172491880a3a384ec0c65a9fb54705f1cad33305bbce513ff2417",
+      "variant": "after",
+      "representation": "base"
+    }
+  ],
+  "observations": [
+    "Northern roof changes from eight-storey flat block to connected low red pitched roof",
+    "Both lower connecting wings and original courtyard remain visible",
+    "South main facade, curtain return, annex terrace and stairs retain their appearance",
+    "Trees-on view keeps the existing landscape; lower wings increase visible courtyard trees",
+    "Day/night and 390x844 portrait viewport show the north wing; portrait is desktop simulation, not a physical device"
+  ],
+  "limitations": [
+    "North facades still have estimated generic window rows; real galleries and stair volumes remain pending",
+    "No survey claim for heights or ridge geometry",
+    "Southwide view does not replace the independent detail geometry probes"
+  ],
+  "libraryMobileRegression": {
+    "file": "docs/screenshots/refinement/s2-civil-rear-performance/library-mobile.png",
+    "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4",
+    "directlyViewed": true,
+    "passed": true,
+    "limitation": "Desktop mobile viewport simulation"
+  }
+}

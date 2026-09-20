@@ -1,0 +1,125 @@
+{
+  "checkedAt": "2026-09-20T20:11:32.034254+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [],
+  "baseCommit": "055c73e",
+  "branch": "dev",
+  "scope": "Estimated north three-storey pitched roof and lower east/west connectors, original footprint/courtyard and southern details retained. Rear facade details and whole-building acceptance remain pending",
+  "partialObjectRecords": 21,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 214,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "gable-geometry",
+    "terrace-geometry",
+    "portal-geometry",
+    "sidewall-geometry",
+    "crown-geometry",
+    "stairs-geometry",
+    "return-geometry",
+    "step-geometry",
+    "recess-geometry",
+    "seventh-geometry",
+    "geometry",
+    "retained-geometry",
+    "annex-geometry",
+    "entry-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4187878,
+        "medianDrawCalls": 569
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.178142848613908,
+        "medianDrawCalls": 4.0219378427788
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        28,
+        28,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1153466,
+        "medianDrawCalls": 302
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 9.650789727599829,
+        "medianDrawCalls": 14.828897338403046
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5331392,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/site-overrides.json": "aefc67261b40542d27331cd644362fe52b049c6b82acb5f433626725110ed9e8",
+    "data/paving-overrides.json": "8feb5362b3287525862d2f8775dc24505dbf7edfff3dd168d4a0dc893e199fb8",
+    "public/data/pavings.json": "3f17931e2ef61c05ec66ba7f56d39d589fcc928479f7aee8d197249d1679b3b2",
+    "data/building-overrides.json": "ddbfeab47d80b1b5305e730b459e6f7358a269fbaaad9b2129f977b6404b9822",
+    "data/building-sources.json": "f3deafff1590af90ae1bdd28ecda7cb8196d624326b38851c2c4d75df17b39be",
+    "blender/gxu-campus.blend": "c569bbd1642a772911e042ba7c670d3e5fbf6179b06332fb21dba7851aa55d4e",
+    "public/data/buildings.json": "0149e35ddf7fc3603880da1dd3df3c586d2ba403c952e141cf31d37c93dac4bb",
+    "public/data/models.json": "da04def881f758c0eac688bdc398558a7ac8c1fc34fd9b9ae9eb8bfa34c99557"
+  }
+}
