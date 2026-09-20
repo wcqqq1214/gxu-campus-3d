@@ -4,6 +4,14 @@ import math
 
 def validate_corridor_details(rule, length, height, levels):
     corridor = rule['openCorridor']
+    thickness = corridor.get('firstSlabThickness', .18)
+    if type(thickness) not in (int, float) or not math.isfinite(thickness) or not .08 <= thickness <= .3:
+        raise ValueError('Corridor first slab thickness must be between 0.08 and 0.30 metres')
+    if 'piers' in corridor:
+        first = corridor['piers'].get('firstLevel', corridor['firstLevel'])
+        if (type(first) is not int or not corridor['firstLevel'] <= first <= corridor.get('lastLevel', levels-1)
+                or (corridor['firstLevel'] == 0 and first != 0)):
+            raise ValueError('Corridor pier firstLevel must lie within its recess and retain ground piers')
     finish = corridor.get('finish', {})
     if not isinstance(finish, dict) or set(finish) - {'wall', 'rail'}:
         raise ValueError('Invalid corridor finish fields')
@@ -49,7 +57,7 @@ def validate_corridor_details(rule, length, height, levels):
 def validate_corridor_facade_layers(rule, height, levels):
     """Allow solid-wall bands/panels only outside the recessed slab stack."""
     corridor = rule['openCorridor']; fh = height/levels
-    low = corridor['firstLevel']*fh-.18
+    low = corridor['firstLevel']*fh-corridor.get('firstSlabThickness', .18)
     high = (corridor.get('lastLevel', levels-1)+1)*fh
     for panel in rule.get('panels', []):
         if panel['bottom'] < high and panel['top'] > low:

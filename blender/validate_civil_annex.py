@@ -63,9 +63,10 @@ def check(objects, tolerance):
         # wall bands. The dedicated step-facade validator checks the details.
         for height in ((12, 16.5, 22.8) if DECORATED_STEP else (12, 19, 24)):
             hit = ray((x, -838, Z + height), (0, 1, 0), 5)
-            assert hit and abs(hit[0].y + 834.82) < .04 + tolerance, ('missing exposed main wall', x, height, hit)
+            expected_y=-834.82+(.95 if height==22.8 and '--seventh-recess-added' in sys.argv else 0)
+            assert hit and abs(hit[0].y-expected_y) < .04 + tolerance, ('missing exposed main wall', x, height, hit)
             assert hit[1].y < -.98, ('reversed seam wall', x, height, list(hit[1]))
-            walls.append(dict(x=x, height=height, actualY=hit[0].y))
+            walls.append(dict(x=x, height=height, expectedY=expected_y, actualY=hit[0].y))
     # Probe the solid storey joint, outside generic window quads/frames, so
     # the base and near representations measure the same structural wall.
     normals = []

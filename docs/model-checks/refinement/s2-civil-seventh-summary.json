@@ -1,0 +1,124 @@
+{
+  "checkedAt": "2026-09-20T19:24:26.122971+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [],
+  "baseCommit": "ec42c0f",
+  "branch": "dev",
+  "scope": "Seventh-storey 0.95 m recess on south and west continuation, top-storey-only dividers and estimated 0.09 m first slab. All other building, roof, annex, stairs and ground retained; rear roof and other pending whole-building requirements remain",
+  "partialObjectRecords": 21,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 209,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "gable-geometry",
+    "terrace-geometry",
+    "portal-geometry",
+    "sidewall-geometry",
+    "crown-geometry",
+    "stairs-geometry",
+    "return-geometry",
+    "step-geometry",
+    "recess-geometry",
+    "geometry",
+    "retained-geometry",
+    "annex-geometry",
+    "entry-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4193262,
+        "medianDrawCalls": 569
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.3120758622062105,
+        "medianDrawCalls": 4.0219378427788
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        28,
+        28,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1152990,
+        "medianDrawCalls": 302
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 9.605540213604314,
+        "medianDrawCalls": 14.828897338403046
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5331048,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/site-overrides.json": "aefc67261b40542d27331cd644362fe52b049c6b82acb5f433626725110ed9e8",
+    "data/paving-overrides.json": "8feb5362b3287525862d2f8775dc24505dbf7edfff3dd168d4a0dc893e199fb8",
+    "public/data/pavings.json": "384f4702eacd519b9ab1d454bfb495e29d41069becdd00a0f3553d82f990a8f8",
+    "data/building-overrides.json": "f07b065ee595ae74f043adc35125580680c40401cabd94227fc6edf3b1b56b68",
+    "data/building-sources.json": "81caab3d15ca39c79440b3527c2a6f0704c3df1772046938bbfdd5fe5383281a",
+    "blender/gxu-campus.blend": "a1d92efd09efa50c349e8baa15c6c6460dc4120c831819672636e08030dd9107",
+    "public/data/buildings.json": "7bf20d0fc7c66cfa5b2715bf68d5d5807917882f7a15e620e4daf87d9816b363",
+    "public/data/models.json": "94429228803bd1a46e1a8a13b71e0d787dfae9a186f9b72b778a8bd42a7f6f6c"
+  }
+}
