@@ -49,10 +49,20 @@
 blender --background --python-exit-code 1 --python blender/validate_agriculture_windows.py -- --report-prefix=<new-prefix>
 ```
 
-## 当前性能与下一步
+## 首次性能记录（保留）
 
 [新版本活动记录](model-checks/refinement/s3-agriculture-windows-performance-browser.json)完成三次LOD往返、图书馆手机尺寸回归及两档各三次30秒环绕，无页面、控制台或HTTP错误。精细档52/56/50 FPS，中位数52，比S0低13.33%，**未通过下降不超过10%的门槛**；流畅档30/30/30 FPS。三角形变化为+3.22%/+7.48%，绘制调用变化为+3.84%/+6.08%。
 
 25次[进程快照](model-checks/refinement/s3-agriculture-windows-performance-performance-context.json)记录到计时窗口内仍有其他Python和Blender计算。不能将本次下降直接归因于窗列，也不能因存在干扰而将不通过的结果改判为通过。待外部重任务结束后，须对相同资产指纹复测，并解决届时仍存在的预算问题。
 
 [联合汇总](model-checks/refinement/s3-agriculture-windows-summary.json)中几何与画面通过，性能观测预算和同条件比较均未通过，整体 `passed=false`。这批可在dev审阅，不更新主分支。此前挑檐两次受干扰记录保留；本版本已经重新检查十道挑檐，后续共同使用当前完整资产进行性能验收。
+
+## 2026-09-20 补充验收：性能通过
+
+对 `9c38430` 的未变资产完成一次独立复测。[新活动记录](model-checks/refinement/s3-agriculture-windows-recheck-browser.json)中，精细档60/60/60 FPS、流畅档30/30/30 FPS；相对同系统S0，三角形增加3.56%/7.48%，绘制调用增加2.38%/2.66%，均通过原预算。三次LOD往返无错误。
+
+24次[CPU快照](model-checks/refinement/s3-agriculture-windows-recheck-performance-context.json)在计时窗口未记录到超过2%阈值的Python/Blender计算。该检查为10秒间隔采样，不表示机器完全没有后台活动。[图书馆手机尺寸回归](screenshots/refinement/s3-agriculture-windows-recheck/library-mobile.png)已直接核看，入口、台阶及前场连接保持可见。
+
+[补充汇总](model-checks/refinement/s3-agriculture-windows-recheck-summary.json)核对源文件、生成输入及模型清单指纹未变，并校验全部69个GLB和生产包一致。沿用匹配这些资产的窗列、挑檐、门廊、普通建筑、树冠与画面检查，当前窗列及保留挑檐的局部联合验收通过。未重新运行已通过的模型构建或单位测试，也未改判、覆盖此前失败报告。
+
+下一步继续核对中央上部檐口、底部窗列和屋面分级边界。20条部分对象记录及新增整栋验收数零保持；本次局部通过不表示农学院整栋或S3场地样板已完成。

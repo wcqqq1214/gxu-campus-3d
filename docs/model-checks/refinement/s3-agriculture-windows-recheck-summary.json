@@ -1,0 +1,121 @@
+{
+  "checkedAt": "2026-09-20T11:33:58.928007+00:00",
+  "checkedCommit": "9c38430",
+  "branch": "dev",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "scope": "Supplementary acceptance of the unchanged east top windows and retained ten ledges; no whole-building acceptance.",
+  "partialObjectRecords": 20,
+  "newWholeBuildingsAccepted": 0,
+  "previousPendingReport": "s3-agriculture-windows-summary.json",
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "performanceReport": "s3-agriculture-windows-recheck-browser.json",
+  "performanceContextReport": "s3-agriculture-windows-recheck-performance-context.json",
+  "geometryEvidenceSha256": {
+    "s3-agriculture-windows-windows-geometry.json": "6b117cca580738afa7245c256fa91ae0d4edf5f2f166143f85d830d43ba08bce",
+    "s3-agriculture-windows-ledges-geometry.json": "0f41b3d9f226b771fe6f68825ae0e4302ca1f8dc6707dd8e482d00a749989d0f",
+    "s3-agriculture-windows-data.json": "be0551e5273363045cad28595966dd5712cdb7605a0511ff6e05d9421c1e0052",
+    "s3-agriculture-windows-generic-geometry.json": "cc96c741f14e209ef6f2f0cc5005d7885a57b786751f11e22878ffb1bd788561",
+    "s3-agriculture-windows-trees-geometry.json": "7fdec885d0e823694cd305d147c7bb5b27b174e29aa5f34bd43b7a10170fd889",
+    "s3-agriculture-windows-source-preservation.json": "9598ad5662e826e4a042fa6e39d86c2828d30d72e40f685a2271193afe32bb30",
+    "s3-agriculture-windows-assets.json": "9466cab598f72e250190e425a62384d8d1a4dc09896a100f2aedabd49be84c61",
+    "s3-agriculture-windows-visual-review.json": "914b40dafeb5264e91ae80e496af1a23778a69f4a8bfa57775bfb74f14f98fe2",
+    "s3-agriculture-windows-portico.json": "5bb65cc2a89e3b5ebac50faee0758a742b7bce773482f5bd3e0c33c222bc342b"
+  },
+  "fingerprints": {
+    "data/building-overrides.json": "fe880d001574fec25d63af6b0184b4b40507eb5cea056a9e64a1c721d931dae5",
+    "data/building-sources.json": "af8ad5160cae650c440790eed00978e3bd35314e60b867b8d359950e388dd478",
+    "blender/gxu-campus.blend": "f583556e884c4bbc96e6a0ff820f336062f5b258a85acee60d31eddb205e6511",
+    "public/data/buildings.json": "8efc6cd654123abf3354b336b138ea38291ab2455ba0376f30c9e0d084d244e7",
+    "public/data/models.json": "ce3f4ee2ebb1d25519c680cb8f00d6bc669940f06fcf3f8c50c2973f59d7b83c"
+  },
+  "productionModelsVerified": 69,
+  "productionDataMatches": true,
+  "initialModelBytes": 5159524,
+  "maximumOrdinaryNearBytes": 1684868,
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4163006,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.5594240681406486,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1130645,
+        "medianDrawCalls": 270
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 7.481379729928839,
+        "medianDrawCalls": 2.6615969581748944
+      },
+      "passed": true
+    }
+  ],
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "lodCycles": 3,
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second CPU snapshots with 2% inclusion threshold; does not prove total absence of background activity.",
+  "mobileScreenshot": {
+    "file": "docs/screenshots/refinement/s3-agriculture-windows-recheck/library-mobile.png",
+    "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4",
+    "accepted": true,
+    "review": "Directly inspected: library entrance, stairs and forecourt connection visible; desktop portrait emulation, not a real-device test."
+  },
+  "pending": []
+}
