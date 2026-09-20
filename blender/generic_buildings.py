@@ -11,6 +11,7 @@ from facade_panels import add_panels, panel_replaces_window
 from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
 from roof_eave import add_roof_eave, replaces_parapet
 from terraced_stairs import blocks_window as stairs_block_window
+from roof_crown import side_wall_blocks_window
 
 
 def compact_form_source(obj):
@@ -261,6 +262,8 @@ def ordinary_building(b, z, C, detail):
                 if panel_replaces_window(facade,f,ww,zz-z,wh):continue
                 if zz-wh/2 < z+facade.get('minimumHeight',0): continue
                 if 'terracedStairs' in form and stairs_block_window(form['terracedStairs'],x,y,nx,ny,ww+.3,zz-z-(wh+.3)/2,zz-z+(wh+.3)/2):
+                    continue
+                if 'roofCrown' in form and side_wall_blocks_window(form['roofCrown'],x,y,nx,ny,ww+.3,zz-z-(wh+.3)/2,zz-z+(wh+.3)/2):
                     continue
                 blocked_by_door=False
                 for entry in form['entrances']:
