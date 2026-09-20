@@ -11,7 +11,7 @@ def build_side_connection(site,C,elevation,terrain,roads):
     angle=site['angle'];cs,sn=math.cos(angle),math.sin(angle);ox,oy=site['origin']
     def world(x,y):return ox+x*cs-y*sn,oy+x*sn+y*cs
     origin_z=elevation(*site['buildingCenter'])+site['stairBaseHeight']
-    front=site.get('type') in ('front-connection','canopy-connection')
+    front=site.get('type') in ('front-connection','terraced-stair-connection','canopy-connection')
     columns=site['columns'];ys=[p[0] if front else p[1] for p in columns]
     half=site['halfWidth'] if 'halfWidth' in site else site['entry']['stairFlight' if front else 'attachedPortico']['width']/2
     road=BVHTree.FromPolygons(roads.v,[ids for ids,_ in mesh_triangles(roads)],all_triangles=True)
@@ -79,7 +79,7 @@ def build_side_connection(site,C,elevation,terrain,roads):
     # The new flush entrance uses a shallow buried overlap so such a crack
     # cannot expose the 12 cm terrain-clearance drop as a false road step.
     # This rendering overlap is independent of the clearance under the paving.
-    overlap_drop=.012 if 'flushEntrance' in site['entry'] else site['groundClearance']
+    overlap_drop=.012 if any(k in site['entry'] for k in ('flushEntrance','terracedStairs')) else site['groundClearance']
     roads,contact=contact_road(roads,road_triangles,contact_outline(0),outer,site['joinOverlap'],overlap_drop)
     # Clipping introduces vertices on retained long road edges. Split their
     # incident triangles too, or campus-wide Draco quantization opens cracks
