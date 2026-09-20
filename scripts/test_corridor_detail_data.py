@@ -50,3 +50,20 @@ class CorridorDetailTests(unittest.TestCase):
         rule['openCorridor']['lastLevel']=2
         with self.assertRaisesRegex(ValueError,'within recessed floors'):
             self.check(rule)
+
+    def test_piers_may_start_above_the_first_recessed_floor(self):
+        rule=self.rule();rule['openCorridor']['piers']={'bays':4,'width':.3,'depth':1,'firstLevel':2}
+        before=copy.deepcopy(rule);self.check(rule);self.assertEqual(rule,before)
+        for first in (0,4,True,1.5):
+            rule['openCorridor']['piers']['firstLevel']=first
+            with self.subTest(first=first),self.assertRaisesRegex(ValueError,'pier firstLevel'):self.check(rule)
+
+    def test_piers_cannot_float_above_an_open_ground_storey(self):
+        rule=self.rule();rule['openCorridor'].update(firstLevel=0,piers={'bays':4,'width':.3,'depth':1,'firstLevel':1})
+        with self.assertRaisesRegex(ValueError,'retain ground piers'):self.check(rule)
+
+    def test_first_slab_thickness_remains_bounded(self):
+        rule=self.rule();rule['openCorridor']['firstSlabThickness']=.09;self.check(rule)
+        for thickness in (True,0,.079,.301,float('nan')):
+            rule['openCorridor']['firstSlabThickness']=thickness
+            with self.subTest(thickness=thickness),self.assertRaisesRegex(ValueError,'first slab thickness'):self.check(rule)
