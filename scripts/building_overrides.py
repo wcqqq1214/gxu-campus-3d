@@ -290,7 +290,7 @@ def resolve_facades(b, form, rules):
         if 'openCorridor' in rule:
             corridor = rule['openCorridor']
             required={'depth','firstLevel','railHeight','endInset'}
-            if not isinstance(corridor,dict) or not required <= set(corridor) or set(corridor)-required-{'piers','balusters','finish','openings','lastLevel'}:
+            if not isinstance(corridor,dict) or not required <= set(corridor) or set(corridor)-required-{'piers','balusters','finish','openings','lastLevel','firstSlabThickness'}:
                 raise ValueError('Open corridor needs depth, firstLevel, railHeight and endInset')
             for parameter in ['depth','railHeight','endInset']:
                 positive(corridor[parameter], 'corridor '+parameter)
@@ -302,7 +302,7 @@ def resolve_facades(b, form, rules):
                 raise ValueError('Ground-level open corridor requires explicit piers')
             if 'piers' in corridor:
                 piers=corridor['piers']
-                if not isinstance(piers,dict) or set(piers)!={'bays','width','depth'} or type(piers['bays']) is not int or not 1<=piers['bays']<=24:
+                if not isinstance(piers,dict) or not {'bays','width','depth'}<=set(piers) or set(piers)-{'bays','width','depth','firstLevel'} or type(piers['bays']) is not int or not 1<=piers['bays']<=24:
                     raise ValueError('Corridor piers need bounded bays, width and depth')
                 for parameter in ('width','depth'):positive(piers[parameter],'corridor pier '+parameter)
             if 'balusters' in corridor:
