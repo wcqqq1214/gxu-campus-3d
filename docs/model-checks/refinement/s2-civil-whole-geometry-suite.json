@@ -1,0 +1,182 @@
+{
+  "passed": true,
+  "scope": "Run the current civil-college geometry checks on one unchanged asset set.\n\nThis validates the implemented estimates. Architectural source review, unknowns,\nbrowser views and performance are separate requirements of whole-building review.",
+  "fingerprints": {
+    "blender/gxu-campus.blend": "5f9c83d2c47866af3a673a7aea1fc0ca4202d8febdd9b86f768328b954a3a3d6",
+    "public/models/base.glb": "eef739d16d75f03398bcbb824cfc612d324c7877ce7753b572a99d2231b81439",
+    "public/models/chunk-n2-n3.glb": "e45d621f21a36b626b020bb7d52c862100a2de72a5fd78c28d3980dd55ccfde9",
+    "public/data/buildings.json": "3444a3beb23117423fa467e4b2aaf7b9b521191e96a100f82b9fc8f1b3c639ca",
+    "public/data/sites.json": "ce89b08c5429eab0214ec1f7c8f8aaf50ca46099e45023cd4cd25733ddda71c1",
+    "public/data/pavings.json": "18217210e0dadad119d2ac0bca38fae514d1fa1615085bbc95f2f05c02256237",
+    "public/data/models.json": "a0295964c94d36c6275f47bfecf2c6862d111ee1a22fef6a7e5f9783b7627582"
+  },
+  "checks": [
+    {
+      "script": "blender/validate_civil_entry.py",
+      "flags": [
+        "--portal-only"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-entry-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_annex.py",
+      "flags": [
+        "--decorated-step",
+        "--terrace-added",
+        "--rear-massing-added",
+        "--seventh-recess-added"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-annex-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_facade.py",
+      "flags": [
+        "--retained-only",
+        "--seventh-recess-added"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-facade-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_recess.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-recess-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_seventh.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-seventh-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_step.py",
+      "flags": [
+        "--seventh-recess-added"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-step-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_return.py",
+      "flags": [
+        "--crown-added",
+        "--side-wall-added",
+        "--portal-return-added"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-return-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_crown.py",
+      "flags": [
+        "--side-wall-added"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-crown-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_sidewall.py",
+      "flags": [
+        "--portal-return-added",
+        "--rear-massing-added"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-sidewall-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_portal_return.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-portal-return-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_stairs.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-stairs-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_annex_terrace.py",
+      "flags": [
+        "--gable-screen-added"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-annex-terrace-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_gable.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-gable-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_rear.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-rear-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_north_gallery.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-north-gallery-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_round_windows.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-round-windows-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_north_wing.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-north-wing-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_wing_ends.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-wing-ends-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_wing_wrap.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-wing-wrap-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_forecourt_road.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-forecourt-road-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_civil_garden.py",
+      "flags": [],
+      "report": "docs/model-checks/refinement/s2-civil-whole-garden-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_side_connection.py",
+      "flags": [
+        "--site-id=civil-main-front-connection",
+        "--baseline=work/refinement-s2-civil-garden-before"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-main-connection-geometry.json",
+      "passed": true
+    },
+    {
+      "script": "blender/validate_side_connection.py",
+      "flags": [
+        "--site-id=civil-annex-stair-connection",
+        "--baseline=work/refinement-s2-civil-garden-before"
+      ],
+      "report": "docs/model-checks/refinement/s2-civil-whole-annex-connection-geometry.json",
+      "passed": true
+    }
+  ]
+}
