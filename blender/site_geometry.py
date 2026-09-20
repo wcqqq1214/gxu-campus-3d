@@ -86,7 +86,7 @@ def sync_source_sites(base):
 def build_sites(data,C,elevation,terrain,roads):
     meshes={};reports=[]
     for site in data['sites']:
-        if site.get('type') == 'courtyard-paving':
+        if site.get('type') in ('courtyard-paving', 'forecourt-paths'):
             from courtyard import build_courtyard
             terrain,roads,added,rows=build_courtyard(site,C,elevation,terrain,roads)
         elif site.get('type') in ('entry-apron','gallery-apron'):
@@ -96,7 +96,14 @@ def build_sites(data,C,elevation,terrain,roads):
             from side_connection import build_side_connection
             terrain,roads,added,rows=build_side_connection(site,C,elevation,terrain,roads)
         else:terrain,roads,added,rows=build_single_site({'sites':[site]},C,elevation,terrain,roads)
-        meshes.update(added);reports.extend(rows)
+        if site.get('type')=='forecourt-paths':
+            target='site-'+site['batchWith']
+            if target not in meshes or not set(added['site-'+site['id']].m)<=set(meshes[target].m):
+                raise ValueError('Forecourt batch is missing or has different materials')
+            meshes[target].add_part('04_'+site['id'],added['site-'+site['id']])
+            rows[0]['batchedWith']=site['batchWith']
+        else:meshes.update(added)
+        reports.extend(rows)
     return terrain,roads,meshes,reports
 
 def build_single_site(data,C,elevation,terrain,roads):

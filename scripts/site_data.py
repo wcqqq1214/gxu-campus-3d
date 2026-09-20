@@ -113,6 +113,16 @@ def prepare_sites(root=ROOT):
         elif config.get('type')=='courtyard-paving':
             from courtyard_data import derive_courtyard
             site,area,grading=derive_courtyard(config,buildings,source_ids)
+        elif config.get('type')=='forecourt-paths':
+            from forecourt_paths_data import derive_forecourt_paths
+            from shore_data import effective_surfaces
+            effective=effective_surfaces(ss,[infra['surfaceOverrides'],surround['surfaceOverrides'],roads['surfaceOverrides']],set(infra['replaceSurfaceIds']))
+            target=next((s for s in effective if s['id']==config['surfaceId']),None)
+            paving=next((p for p in read_json(root/'data/paving-overrides.json')['pavings'] if p['surfaceId']==config['surfaceId']),None)
+            site,area,grading=derive_forecourt_paths(config,buildings,target,paving,source_ids)
+            batch=next((s for s in sites if s['id']==config['batchWith']),None)
+            if not batch or batch.get('material')!='path' or batch['buildingId']!=config['buildingId']:
+                raise ValueError('Forecourt batch must be an earlier path of the same building')
         elif config.get('type')=='gallery-apron':
             from gallery_apron_data import derive_gallery_apron
             site,area,grading=derive_gallery_apron(config,buildings,source_ids)

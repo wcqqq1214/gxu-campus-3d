@@ -788,3 +788,5 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 2026-09-21：`validate_civil_wing_ends.py` 对源、基础、近景各检查138处；`validate_grid_winding.py` 冻结四条既有窗格参数，分别检查数学学院56处与动物科学技术学院96处。通过Blender执行，加 `--python-exit-code 1`；两者支持 `--check-root` 和 `--report-prefix`。独立生成测试为 `test_facade_finish_geometry.py`。见[北翼窗列与法线检查](CIVIL_WING_END_WINDOWS.md)。
 
 2026-09-21：土木学院北翼四面转折墙改色，专项与整栋收尾边界见[记录](CIVIL_WING_WRAP.md)。源文件顶点、拓扑、UV和变换保持，四个原墙面改材质；源/基础/近景固定坐标检查与旧模型反例用于验证目标范围，未把未核实侧窗计作完成。
+
+2026-09-21：`blender/validate_civil_garden.py -- --report-prefix=<新批次>` 检查源文件与实际基础GLB中的前庭环路、草坪留空、固定支路点、两处接缝及浅埋搭接渐变，支持 `--check-root=<旧资产目录>` 反例；通过Blender执行并加 `--python-exit-code 1`。园路与主门铺地合批，原门前连接几何前缀、其他源对象和近景资产另作保持性比较；原主门及附楼台阶连接继续运行 `validate_side_connection.py` 回归。见[园路验收与性能边界](CIVIL_FORECOURT_GARDEN.md)。
