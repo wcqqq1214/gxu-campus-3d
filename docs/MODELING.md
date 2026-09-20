@@ -69,6 +69,8 @@ npm run models:build
 blender --background --python-exit-code 1 --python blender/validate_generic.py -- --report-prefix=s2-pilot
 ```
 
+若分部调整改变了场地所引用的入口或立面记录，在模型构建前依次运行 `scripts/site_data.py`、`scripts/paving_data.py`、`scripts/shore_data.py`、`scripts/low_planting_data.py` 更新依赖。核对场地、树木和地形的实际差异，不手改校验指纹绕过过期检查。土木北翼批次的入口只变更所属分部名称，后续几何保持，见[该批记录](CIVIL_REAR_MASSING.md)。
+
 完整 `prepare_geodata.py` 同样接入形体解析。S3 前置修复已让外围道路复用最终邻近建筑筛选，完整准备不再因已删除的楼栋留下缺口；来源目录可从人工输入独立重建。主路少量沥青/路缘分界仍有重算差异，合并铺地范围不变，详见[重建核验](model-checks/refinement/s3-preparation.json)。不能将依赖版本变动造成的轮廓差异混入楼栋校准。阶段基线、依赖约束、固定视角和待补资料见 [执行记录](CAMPUS_REFINEMENT_PROGRESS.md)。
 
 S2 首批包含 8 条记录；动物学院使用完整覆盖原轮廓的高低分段，每段有自己的屋面和窗层，入口定位在原外边。分段内部交界不生成窗列，原内院边的窗朝向院内空地。默认入口和未校准立面仍为示意；原始 OSM 标签不被覆盖，数据契约、资料局限与记录见 [普通楼校准](BUILDING_CALIBRATIONS.md)。旧 `building_forms.py` 命令仍可用，会转调同一覆盖流程。
