@@ -12,6 +12,44 @@ from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue
 
 
 class BuildingOverrideTests(unittest.TestCase):
+    def ledges_fixture(self):
+        return {'polygon':0,'ring':0,'edge':0,'balconies':False,'horizontalLedges':{
+            'from':.1,'to':.9,'tops':[3.3,6.6,9.9,13.2,16.5],'depth':.65,'thickness':.16}}
+
+    def test_horizontal_ledges_preserve_windows_and_remove_cleanly(self):
+        b=self.building();rule=self.ledges_fixture()
+        r=self.resolve(b,facadeRules=[rule])
+        self.assertEqual(r['form']['facades'][0]['rule'],rule)
+        self.assertNotIn('windows',r['form']['facades'][0]['rule'])
+        self.assertTrue(all(not f['rule'] for f in r['form']['facades'][1:]))
+        self.assertEqual(r['polygons'],b['polygons'])
+        reset=resolve_building(r)
+        self.assertTrue(all(not f['rule'] for f in reset['form'].get('facades',[])))
+
+    def test_horizontal_ledges_reject_invalid_spans_heights_and_conflicts(self):
+        for key,value in [('from',-.1),('to',.1),('depth',True),('depth',float('nan')),
+                          ('thickness',0),('tops',[]),('tops',[True]),('tops',[float('inf')]),
+                          ('tops',[3.3,3.4]),('tops',[6.6,3.3]),('tops',[16.6]),('unknown',1)]:
+            rule=self.ledges_fixture();rule['horizontalLedges'][key]=value
+            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
+                self.resolve(self.building(),facadeRules=[rule])
+        for key in ['openCorridor','windowGrid','windowBands','panels','attachedGallery','balconies']:
+            rule=self.ledges_fixture();rule[key]=True if key=='balconies' else {}
+            with self.subTest(key=key),self.assertRaises(ValueError):
+                self.resolve(self.building(),facadeRules=[rule])
+
+    def test_horizontal_ledges_reject_open_portico_and_split_edge(self):
+        b,values=self.portico_fixture();rule=self.ledges_fixture();rule['edge']=2
+        with self.assertRaises(ValueError):self.resolve(b,**values,facadeRules=[rule])
+        b=self.building();rule=self.ledges_fixture()
+        parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'levels':5,'height':16.5},
+               {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'levels':3,'height':9.9}]
+        with self.assertRaises(ValueError):self.resolve(b,parts=parts,facadeRules=[rule])
+        rule['part']='east'
+        with self.assertRaises(ValueError):self.resolve(b,parts=parts,facadeRules=[rule])
+        rule['part']='west'
+        self.resolve(b,parts=parts,facadeRules=[rule])
+
     def test_bounded_corridor_accepts_one_middle_storey_and_keeps_defaults(self):
         b=self.building()
         corridor={'depth':1.4,'firstLevel':2,'lastLevel':2,'railHeight':.9,'endInset':.3}
