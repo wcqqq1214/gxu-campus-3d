@@ -157,15 +157,21 @@ def resolve_parts(b, raw, roof):
         part_roof = copy.deepcopy(roof)
         if 'roof' in part:
             own = part['roof']
-            if not isinstance(own,dict) or set(own) != {'type','rise'} or own['type'] not in ('flat','hipped','gabled'):
+            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh'} or own['type'] not in ('flat','hipped','gabled'):
                 raise ValueError('Part roof needs an explicit type and rise')
             if type(own['rise']) not in (float,int) or not math.isfinite(own['rise']):
                 raise ValueError('Part roof rise must be finite and numeric')
             if (own['type']=='flat' and own['rise']!=0) or (own['type']!='flat' and own['rise']<=0):
                 raise ValueError('Part roof rise conflicts with its type')
             part_roof={**own,'basis':'Explicit part roof; see attributed parts evidence','status':'estimated'}
+            if 'mesh' in own and own['type']=='flat':
+                raise ValueError('Explicit roof mesh requires a pitched roof')
         if part_roof['type'] != 'flat':
-            part_roof['geometry'] = roof_geometry(coords, part_roof['type'], part_roof['rise'])
+            if 'mesh' in part_roof:
+                from explicit_roof_data import resolve_roof_mesh
+                part_roof['geometry'] = resolve_roof_mesh(coords, part_roof.pop('mesh'), part_roof['rise'])
+            else:
+                part_roof['geometry'] = roof_geometry(coords, part_roof['type'], part_roof['rise'])
         resolved = {'id':part['id'], 'polygons':coords, 'triangles':triangles,
                     'height':height, 'levels':levels, 'roof':part_roof}
         if 'openBelow' in part:

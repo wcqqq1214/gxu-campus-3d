@@ -7,6 +7,7 @@ ROOT=Path(__file__).resolve().parents[1]
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s2-civil-sidewall')
 PORTAL_RETURN_ADDED='--portal-return-added' in sys.argv
+REAR_MASSING_ADDED='--rear-massing-added' in sys.argv
 ID,CHUNK,Z='relation/12875606','chunk-n2-n3',4.06
 A=Vector((-476.769698452549,-838.0503560000666,0))
 V=Vector((0.0012146879723256238,0.9999992622662929,0));E=Vector((V.y,-V.x,0))
@@ -45,10 +46,18 @@ def check(objects,tolerance):
  # Keep the side portal strip and stone joints beyond the white wall.
  for depth,h in [(1.5,3.3),(1.5,6.6),(15,3.3),(15,13.2),(15,23.1)]:
   if PORTAL_RETURN_ADDED and depth==1.5:continue
+  if REAR_MASSING_ADDED and depth==15 and h>10.8:
+   hit=ray(A+V*depth+E*.7+Vector((0,0,Z+h)),-E,1)
+   assert hit is None,('old tall east-connector wall remains',depth,h,hit)
+   samples.append(dict(kind='removed-high-connector-wall',depth=depth,height=h))
+   continue
   face(depth,h,'stone',0,'retained-stone')
  for h in (3.3,9.9,19.8,27.5,33):
   rear=6.2+(34.8-h)*1.8/8.4
-  hit=ray(A+V*16+E*.04+Vector((0,0,Z+h)),-V,12.5)
+  # After splitting, connector window frames lie on the old long ray path.
+  # Inspect the same taper surface locally, before those unrelated frames.
+  start = rear+.4 if REAR_MASSING_ADDED else 16
+  hit=ray(A+V*start+E*.04+Vector((0,0,Z+h)),-V,.8 if REAR_MASSING_ADDED else 12.5)
   assert hit and hit[2]=='white' and abs((hit[0]-A).dot(V)-rear)<tolerance and hit[1].dot(V)>.9,('rear-slope',h,rear,hit)
   samples.append(dict(kind='continuous-rear-slope',height=h,expectedDepth=rear,actualDepth=(hit[0]-A).dot(V)))
  # At storey joints just beyond the sloping edge the original wall remains.
@@ -60,6 +69,8 @@ def check(objects,tolerance):
 report=dict(passed=False,scope='White east side wall continues from model base -0.5 m to crown 34.8 m, 0.08 m outward, constant estimated taper; generic windows intersecting it removed, portal return and small openings still pending.')
 if PORTAL_RETURN_ADDED:
  report['scope']='Retained continuous white side wall and taper; two lower portal stone probes now covered by the dedicated return glazing check. Local small openings remain pending.'
+if REAR_MASSING_ADDED:
+ report['scope']+=' At depth 15 m, retain the lower stone wall but require clearance at 13.2/23.1 m after reducing the east connector; low roofs have their own rear validator.'
 report['fingerprints']={p:hashlib.sha256((TARGET/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb',f'public/models/{CHUNK}.glb','public/data/buildings.json']}
 try:
  bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
