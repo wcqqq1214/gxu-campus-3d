@@ -93,6 +93,11 @@ def samples(b):
             x,y=[c['corner'][k]+c['u'][k]*s+c['v'][k]*t for k in (0,1)]
             apex=z+c['baseHeight']+rise
             points.append({'kind':kind,'x':x,'y':y,'top':apex+1,'expected':apex})
+    if 'gableScreen' in form:
+        c=form['gableScreen'];s=c['length']*c['peakT'];d=c['thickness']/2
+        x,y=[c['start'][k]+c['tangent'][k]*s-c['normal'][k]*d for k in (0,1)]
+        apex=z+c['baseHeight']+c['peakRise']
+        points.append({'kind':'gable-screen-apex','x':x,'y':y,'top':apex+1,'expected':apex})
     if 'stairTower' in form:
         s=form['stairTower'];x,y=s['origin'];floor=z+s['config']['baseHeight']
         points.append({'kind':'stair-ground-platform','x':x,'y':y,'top':floor+.5,'expected':floor})
