@@ -447,6 +447,26 @@ class BuildingOverrideTests(unittest.TestCase):
         rule=self.bands_fixture();rule['edge']=2;values['facadeRules']=[rule]
         with self.assertRaises(ValueError):self.resolve(b,**values)
 
+    def test_bounded_window_bands_leave_upper_floors_for_separate_panels(self):
+        rule=self.bands_fixture();rule['balconies']=False
+        rule['windowBands']['lastLevel']=2
+        panel=self.panel_fixture()['panels'][0]
+        panel.update(bottom=11,top=12.8)
+        rule['panels']=[panel]
+        result=self.resolve(self.building(),facadeRules=[rule])
+        self.assertEqual(result['form']['facades'][0]['rule'],rule)
+        # Omitting the bound restores the legacy all-upper-floors layout,
+        # which must reject this overlapping panel.
+        del rule['windowBands']['lastLevel']
+        with self.assertRaisesRegex(ValueError,'overlaps'):
+            self.resolve(self.building(),facadeRules=[rule])
+
+    def test_bounded_window_bands_reject_invalid_end_floor(self):
+        for end in [0,5,True,2.5,'2',None,float('nan')]:
+            rule=self.bands_fixture();rule['windowBands']['lastLevel']=end
+            with self.subTest(end=end),self.assertRaisesRegex(ValueError,'lastLevel'):
+                self.resolve(self.building(),facadeRules=[rule])
+
     def attached_fixture(self):
         return {'id':'south','polygon':0,'ring':0,'edge':0,'t':.5,'width':4.2,'primary':True,
                 'attachedPortico':{'width':9,'depth':3.2,'platformHeight':.36,
