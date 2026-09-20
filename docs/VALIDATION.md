@@ -784,3 +784,5 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 2026-09-21：`blender/validate_civil_round_windows.py -- --report-prefix=<新批次>` 对源、基础、近景分别检查圆窗玻璃、圆外四角白墙、径向孔壁及保留屋顶。`--check-root=<旧资产目录>` 用于缺失圆孔反例；通过Blender执行并加 `--python-exit-code 1`。配合已有北向外廊、后部体量及南立面专项回归，详见[圆窗验收](CIVIL_ROUND_WINDOWS.md)。
 
 2026-09-21：`blender/validate_civil_north_wing.py -- --report-prefix=<新批次>` 对源文件、基础和近景各检查159条记录，覆盖外廊、柱列、底层窗、端墙及内院。通过Blender执行并设置 `--python-exit-code 1`；坡屋顶另由 `validate_civil_rear.py` 回归。圆窗独立生成测试现名 `test_round_window_geometry.py`，避免与数据测试同名。见[北翼专项](CIVIL_NORTH_WING_FACADE.md)。
+
+2026-09-21：`validate_civil_wing_ends.py` 对源、基础、近景各检查138处；`validate_grid_winding.py` 冻结四条既有窗格参数，分别检查数学学院56处与动物科学技术学院96处。通过Blender执行，加 `--python-exit-code 1`；两者支持 `--check-root` 和 `--report-prefix`。独立生成测试为 `test_facade_finish_geometry.py`。见[北翼窗列与法线检查](CIVIL_WING_END_WINDOWS.md)。

@@ -71,6 +71,9 @@ def shared_form(b, z, C):
         else:
             part_body.extrude(part['polygons'], triangles, z-.5, h+.5, wall, C['paleRoof'])
         for facade in form.get('facades',[]):
+            if facade['part']==part.get('id','body') and 'wallFinish' in facade['rule']:
+                from facade_finish import apply_wall_finish
+                apply_wall_finish(part_body,facade,z,C[facade['rule']['wallFinish']])
             if facade['part']==part.get('id','body') and 'openCorridor' in facade['rule']:
                 finish=facade['rule']['openCorridor'].get('finish',{})
                 add_corridor(part_body,facade,z,C[finish['wall']] if 'wall' in finish else wall,C['white'],C[finish.get('rail','white')],pitched_roof=roof['type']!='flat')
