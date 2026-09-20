@@ -1,0 +1,77 @@
+{
+  "passed": true,
+  "method": "Direct view_image review of all nine before/after captures and library mobile regression",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s2-civil-garden-final/before/civil-garden-trees-off-day.png",
+      "sha256": "58e15dccac0a5435bf5b3aa572595ca54f00a4fade0b1a4729d5157c521d5259",
+      "variant": "before",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-garden-final/before/civil-garden-overhead-trees-off-day.png",
+      "sha256": "b6e26ac6a083b7779375cf5c6a1233fbfa9ae905daecec4b664b83e28ece07ad",
+      "variant": "before",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-garden-final/before/civil-south-overview-trees-off-day.png",
+      "sha256": "8904e54b79c05374c05b83f249dc3abcb426259b6722d63923f7bab748b7795d",
+      "variant": "before",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-garden-final/after/civil-garden-trees-off-day.png",
+      "sha256": "080c759f04c1037a110db5eac59946ceb85638efd9660f479872de3011141800",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-garden-final/after/civil-garden-overhead-trees-off-day.png",
+      "sha256": "d47d8092ed2f2ac07e0f254abeb54b126a86f4bc784bbd3c8066a49a6ec023bf",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-garden-final/after/civil-south-overview-trees-off-day.png",
+      "sha256": "c3fda912480056e9a075c6bfbb1217e1fc44d6cb0cd5bd5428eea16536db8ea7",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-garden-final/after/civil-garden-overhead-trees-on-day.png",
+      "sha256": "622fe54b3cfcafc27bf0f907141ccc9279eb42796e555b9f3c4aaf2e55c7ea1c",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-garden-final/after/civil-garden-trees-off-night.png",
+      "sha256": "e633c81133e5748a84f75c647577679e074c6129f2d0c7c46bdd10e8e7da258a",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-garden-final/after/civil-garden-trees-off-day-mobile.png",
+      "sha256": "6795dcb752f17091cd93794449194873e415a433b78202359395a77e7ad02a73",
+      "variant": "after",
+      "representation": "base"
+    }
+  ],
+  "libraryMobileRegression": {
+    "file": "docs/screenshots/refinement/s2-civil-garden-performance/library-mobile.png",
+    "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4",
+    "directlyViewed": true,
+    "passed": true
+  },
+  "observations": [
+    "A grass island remains inside the loop",
+    "Both branches meet the retained service road",
+    "Doorway, annex stairs and building remain in place",
+    "Trees stay at their prior positions; overhead tree-on view records canopy occlusion"
+  ],
+  "limitations": [
+    "Ring position, radii and branch directions are estimates constrained by photographs and mapped roads",
+    "Peripheral paths, signs and furniture remain unconfirmed",
+    "Mobile capture is a desktop viewport simulation"
+  ]
+}

@@ -3,7 +3,7 @@ import math
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from geometry import Mesh
-from site_geometry import mesh_triangles, split_convex
+from site_geometry import mesh_triangles, split_convex, ring_distance
 
 
 def build_courtyard(site, C, elevation, terrain, roads):
@@ -51,6 +51,22 @@ def build_courtyard(site, C, elevation, terrain, roads):
                 hp, hq = height(p), height(q)
                 sides.face([(*p, hp+offset), (*q, hq+offset), (*q, hq-.03), (*p, hp-.03)], C[site['material']])
     mesh = Mesh(); mesh.add_part('01_庭院铺地', surface); mesh.add_part('02_外缘与树池收口', sides)
+    if site.get('type')=='forecourt-paths':
+        # Bury a short overlap in the unchanged road to cover independent
+        # Draco-node quantization. The visible paving remains on the same plane.
+        lip=Mesh(); sv=site['seamMesh']['vertices']; st=site['seamMesh']['triangles']
+        for k in range(0,len(st),3):
+            outline=[sv[i] for i in st[k:k+3]]
+            a,b,c=outline
+            if (b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0])<0:outline.reverse()
+            for tri in nearby:
+                clipped,_=split_convex(tri,outline)
+                for j in range(1,len(clipped)-1):
+                    points=[clipped[0],clipped[j],clipped[j+1]]
+                    a,b,c=points
+                    if abs((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]))<1e-9:continue
+                    lip.face([(p[0],p[1],p[2]+offset-site['joinBurial']*min(1,ring_distance(p[:2],site['pavingPolygon'])/site['joinOverlap'])) for p in points],C[site['material']])
+        mesh.add_part('03_园路接缝浅埋搭接',lip)
     report = {'id': site['id'],
         'pavingFaces': len(surface.f), 'edgeFaces': len(sides.f), 'terrainChanged': False,
         'surfaceOffsetMeters': offset, 'groundBasis': 'Exact current terrain triangle planes; no surveyed courtyard elevation.'}
