@@ -71,12 +71,15 @@ def check(objects,tolerance):
             front(center,h,'glass',.25 if detailed else .07)
             front(center+BAY*.45,h,'stone',0)
             front(center,(level+.56+.30)*3.3+.24,'white',.55)
-        front(center-BAY*.16,21.05,'glass',.04)
-        front(center,21.05,'white',.17)
+        if '--seventh-recess-added' not in sys.argv:
+            front(center-BAY*.16,21.05,'glass',.04)
+            front(center,21.05,'white',.17)
         front(center,12.0,'stone',0)
     return dict(passed=True,rayCount=len(samples),samples=samples,toleranceMeters=tolerance)
 
 report=dict(passed=False,scope='Western shared step wall: three estimated bays on levels 4–7, two band rows, seventh-storey glazing and top recessed bays with four separators. Lower roof clearance and original roof retained; no surveyed dimensions or whole-building acceptance.')
+if '--seventh-recess-added' in sys.argv:
+    report['scope']='Retained western middle rows, top recess, four top separators and lower roof clearance; seventh-storey geometry covered by validate_civil_seventh.py.'
 report['fingerprints']={p:hashlib.sha256((TARGET/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb',f'public/models/{CHUNK}.glb','public/data/buildings.json']}
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))

@@ -69,7 +69,7 @@ def resolve_exposed_facades(building, form, rules):
             raise ValueError('Exposed panel intersects the lower roof or parapet')
         corridor = rule.get('openCorridor')
         if corridor:
-            if corridor['firstLevel']*fh-.18 < minimum:
+            if corridor['firstLevel']*fh-corridor.get('firstSlabThickness', .18) < minimum:
                 raise ValueError('Exposed recess intersects the lower roof or parapet')
             for opening in corridor.get('openings', []):
                 if any(level*fh+opening.get('sill', 0)-.12 < minimum for level in opening['levels']):
