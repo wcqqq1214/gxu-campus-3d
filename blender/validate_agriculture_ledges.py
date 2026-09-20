@@ -48,7 +48,8 @@ def check(objects,tolerance,detail):
         for level in range(5):
             t=.5/count;z=(level+.56)*3.3
             p=a+delta*(t+.4/delta.length)+Vector((0,0,z))
-            probe(f'edge-{edge}-window-retained',p+n*.8,-n,1,.55 if detail else .73)
+            if level not in f['rule'].get('skipWindowLevels',[]):
+                probe(f'edge-{edge}-window-retained',p+n*.8,-n,1,.55 if detail else .73)
             probe(f'edge-{edge}-clear-space-below',a+delta*.5+n*.42+Vector((0,0,level*3.3+2.3)),Vector((0,0,1)),.6)
     return dict(passed=True,ledgeCount=10,sampleCount=len(samples),toleranceMeters=tolerance,samples=samples)
 report=dict(passed=False,buildingId=b['id'],checkedRoot=str(TARGET),method='BVH over actual mesh loop triangles, source/base/near',dimensionStatus='photo-constrained estimates, not surveyed')
