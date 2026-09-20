@@ -39,7 +39,7 @@ def check(objects,tolerance):
   for inward in (.6,1.6,2.6):roof(along,inward,7.2,'terrace-floor')
   roof(along,4.2,10.8,'retained-upper-roof')
   roof(along,0,8.0,'outer-terrace-parapet')
-  roof(along,3.2,11.6,'upper-roof-parapet')
+  if '--gable-screen-added' not in sys.argv:roof(along,3.2,11.6,'upper-roof-parapet')
   for height in (8.4,9.4,10.4):
    assert ray(point(along,-.5,height),-E,2.8) is None,('old upper wall still fills terrace',along,height)
    samples.append(dict(kind='removed-front-upper-wall',along=along,height=height))
