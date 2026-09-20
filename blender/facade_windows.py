@@ -12,6 +12,8 @@ def layout(facade):
 
 def add_grid_pilasters(mesh, facade, z, C):
     g,bay,fh,theta,point,_,_=layout(facade)
+    if g['pilasterWidth']==0 and g['pilasterDepth']==0:
+        return
     bottom=max(g['firstLevel']*fh,facade.get('minimumHeight',0))
     top=facade['height']
     for column in range(g['columns']+1):
@@ -36,5 +38,8 @@ def add_grid_windows(mesh, facade, z, C, detail):
                              ww,.04,.045,C['white'],theta)
             else:
                 ux,uy=u[0]*ww/2,u[1]*ww/2
-                mesh.face([(x-ux,y-uy,zz-wh/2),(x+ux,y+uy,zz-wh/2),
-                           (x+ux,y+uy,zz+wh/2),(x-ux,y-uy,zz+wh/2)],C['glass'])
+                vertices=[(x-ux,y-uy,zz-wh/2),(x+ux,y+uy,zz-wh/2),
+                          (x+ux,y+uy,zz+wh/2),(x-ux,y-uy,zz+wh/2)]
+                if u[1]*n[0]-u[0]*n[1]<0:
+                    vertices.reverse()
+                mesh.face(vertices,C['glass'])
