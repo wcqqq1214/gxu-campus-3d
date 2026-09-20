@@ -128,3 +128,5 @@ blender --background --python-exit-code 1 --python blender/validate_generic.py -
 2026-09-16：[物理学院第五层外廊](PHYSICS_BUILDING_CORRIDOR.md)增加包含末层的 `openCorridor.lastLevel`，仅开放六个外侧立面的第五层。设计方1–2F/3–5F/6–9F分层图补充九层依据，主体29.7米仍为估算。累计20条部分对象记录，整栋验收数不增加。
 
 2026-09-20：新增独立的 `facadeRules.horizontalLedges`，用原外边范围、显式顶面标高、深度和厚度表达水平挑檐，保留原窗列。限实体外墙、显式关闭阳台，拒绝门廊、切开但未指定分段的边和其他专项立面混用；远近景共享几何。当前仅农学院正面第7、11边使用，参数为估算，见[专项记录](AGRICULTURE_FACADE_LEDGES.md)。
+
+2026-09-20 后续：`facadeRules.skipWindowLevels` 可按有序、不重复的零基层号跳过通用窗列，显式面板继续生成。不能与关闭全部窗、专项窗格/窗带、外廊或附着连廊混用，并按所属实体分段检查层号。水平挑檐现允许搭配显式面板，要求二者在墙面范围内不相交。农学院东侧顶层采用15扇、其中5扇较矮的窗列；底部四层保留通用示意。见[顶层窗列专项](AGRICULTURE_TOP_WINDOWS.md)。

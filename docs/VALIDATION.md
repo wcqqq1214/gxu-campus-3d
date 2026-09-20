@@ -770,3 +770,7 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 ## 农学院正面挑檐（2026-09-20）
 
 `blender/validate_agriculture_ledges.py -- --report-prefix=<新批次>` 对源文件、基础与近景的实际三角网各执行220条射线，包含十道挑檐的顶面、板底、外缘、深度外空区以及保留窗面与层间净空；使用固定验收位置。`--check-root=<旧资产目录>` 可验证缺失构件的反例，仍读取当前校准楼的锚点。与 `validate_agriculture.py` 配合检查原四柱门廊、三个开放柱间、退后门面及台阶。通过Blender的 `--python` 执行并设置 `--python-exit-code 1`，不同专项采用不同报告前缀。尺寸估算与完成边界见[本批记录](AGRICULTURE_FACADE_LEDGES.md)。
+
+## 农学院东侧顶层窗列（2026-09-20）
+
+`blender/validate_agriculture_windows.py -- --report-prefix=<新批次>` 在源、基础与近景实际三角网中各检查84条射线，覆盖15扇窗的玻璃/边框、5个矮窗上部实墙、窗间及端部实墙、下方四层原窗。端部取样避开保留的侧向窗框绕角投影。`--check-root=<旧资产目录>` 可验证原9窗模型，旧版在首个专项窗面检查中失败。仍需运行 `validate_agriculture_ledges.py` 与 `validate_agriculture.py` 回归挑檐及门廊：前者的219条检查保留全部十道挑檐，已经替换的东侧顶层通用窗由新窗列专项覆盖。命令通过Blender的 `--python` 执行并加 `--python-exit-code 1`。见[窗列专项](AGRICULTURE_TOP_WINDOWS.md)。

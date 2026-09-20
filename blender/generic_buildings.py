@@ -219,6 +219,7 @@ def ordinary_building(b, z, C, detail):
         theta = math.atan2(dy, dx); num = max(1, int(length/rule.get('spacing',4)))
         floor_heights = facade.get('floorHeights')
         for level in range(levels):
+            if level in rule.get('skipWindowLevels',[]):continue
             floor_bottom = math.fsum(floor_heights[:level]) if floor_heights else level*h/levels
             floor_height = floor_heights[level] if floor_heights else h/levels
             gallery=facade.get('attachedGallery')
