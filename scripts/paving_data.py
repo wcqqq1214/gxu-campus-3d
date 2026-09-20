@@ -13,10 +13,16 @@ def context_revision(surfaces,infrastructure,surroundings,roads,sites):
 
 def derive_paving(config,surface,neighbors,source_ids):
     fields={'id','surfaceId','surfaceRevision','joinEdges','joinFeather','meshStep','contactDepth','contactSideMargin','joinOverlap','burial','sourceRefs','evidence'}
-    if not isinstance(config,dict) or set(config)!=fields:raise ValueError('Unknown/missing paving field')
+    if not isinstance(config,dict) or not fields<=set(config) or set(config)-fields-{'groundedService'}:raise ValueError('Unknown/missing paving field')
     if not isinstance(config['id'],str) or not config['id'].strip():raise ValueError('Invalid paving ID')
     if surface['id']!=config['surfaceId'] or revision(surface['vertices'])!=config['surfaceRevision']:raise ValueError('Missing/stale paving surface')
-    if surface['kind']!='roads' or surface['tags'].get('highway') not in ('pedestrian','footway','path') or not surface.get('insideCampus'):raise ValueError('Not ordinary campus pavement')
+    grounded=config.get('groundedService')
+    if 'groundedService' in config:
+        if not isinstance(grounded,dict) or set(grounded)!={'offset'} or type(grounded['offset']) not in (int,float) or not math.isfinite(grounded['offset']) or not .08<=grounded['offset']<=.2:
+            raise ValueError('Grounded service paving needs a bounded terrain offset')
+        if surface['tags'].get('highway')!='service':raise ValueError('Grounded service paving requires a mapped service road')
+    allowed=('service',) if grounded is not None else ('pedestrian','footway','path')
+    if surface['kind']!='roads' or surface['tags'].get('highway') not in allowed or not surface.get('insideCampus'):raise ValueError('Not ordinary campus pavement')
     if surface['tags'].get('bridge') or surface['tags'].get('tunnel') or str(surface['tags'].get('layer','0'))!='0':raise ValueError('Paving must be at grade')
     if not isinstance(config['sourceRefs'],list) or not config['sourceRefs'] or any(x not in source_ids for x in config['sourceRefs']):raise ValueError('Unknown paving source')
     if not isinstance(config['evidence'],dict) or set(config['evidence'])!={'location','surface','dimensions','excludedDetails'} or not all(isinstance(v,str) and v.strip() for v in config['evidence'].values()):raise ValueError('Missing paving evidence')
