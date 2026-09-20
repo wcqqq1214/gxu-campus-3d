@@ -24,7 +24,7 @@ ARCHETYPE_LEVELS = {'dormitory':6,'residential-block':6,'teaching-block':5,
                     'courtyard-lab':5,'low-rise-service':2}
 ARCHETYPES = {'generic', 'dormitory', 'residential-block', 'canteen', 'teaching-block',
               'courtyard-lab', 'low-rise-service', 'external-stair'}
-FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'exposedFacadeRules', 'stairTower', 'roofDome', 'roofEave', 'terracedStairs'}
+FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'exposedFacadeRules', 'stairTower', 'roofDome', 'roofEave', 'terracedStairs', 'roofCrown'}
 
 
 def ordinary(b):
@@ -563,6 +563,9 @@ def resolve_building(building, record=None, source_ids=None):
     if 'terracedStairs' in record:
         from terraced_stairs_data import resolve_terraced_stairs
         form['terracedStairs'] = resolve_terraced_stairs(b, form, record['terracedStairs'])
+    if 'roofCrown' in record:
+        from roof_crown_data import resolve_roof_crown
+        form['roofCrown'] = resolve_roof_crown(b, form, record['roofCrown'])
     if 'entrances' in record:
         if not isinstance(record['entrances'],list):
             raise ValueError('Entrances must be an explicit list')
