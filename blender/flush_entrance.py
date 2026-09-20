@@ -1,4 +1,4 @@
-"""Shared low/near glazed portal: no projecting roof, stairs or extra footprint."""
+"""Shared low/near glazed portal and an optional photo-attributed head canopy."""
 import math
 
 
@@ -23,6 +23,9 @@ def add_flush_entrance(mesh, entry, z, C):
     dh,dw=p['doorHeight'],p['doorWidth']
     for u in (-dw/2,dw/2,0):box(u,.13,floor,fw,.10,dh,'white')
     box(0,.13,floor+dh-fw/2,dw+fw,.10,fw,'white')
+    if 'canopy' in p:
+        canopy=p['canopy']
+        box(0,canopy['depth']/2,top,canopy['width'],canopy['depth'],canopy['thickness'],'stone')
 
 
 def flush_entrance_blocks_window(entry,x,y,nx,ny,bottom,top,width):
