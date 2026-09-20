@@ -1,0 +1,2682 @@
+{
+  "startedAt": "2026-09-20T15:07:16.305128+00:00",
+  "intervalSeconds": 10,
+  "method": "CPU snapshots with process elapsed time, cumulative CPU time and parent PID during the browser run. Normal desktop apps remain active; no synthetic isolation. Command arguments are not captured.",
+  "samples": [
+    {
+      "at": "2026-09-20T15:07:16.335087+00:00",
+      "processes": [
+        {
+          "pid": 1,
+          "parentPid": 0,
+          "cpuPercent": 46.4,
+          "elapsed": "05-01:37:41",
+          "cumulativeCPUTime": "114:17.90",
+          "executable": "/sbin/launchd"
+        },
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 34.9,
+          "elapsed": "05-01:36:26",
+          "cumulativeCPUTime": "1047:59.48",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 605,
+          "parentPid": 1,
+          "cpuPercent": 3.4,
+          "elapsed": "05-01:36:26",
+          "cumulativeCPUTime": "9:08.34",
+          "executable": "/System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow"
+        },
+        {
+          "pid": 2147,
+          "parentPid": 1,
+          "cpuPercent": 2.1,
+          "elapsed": "05-00:56:55",
+          "cumulativeCPUTime": "4:25.79",
+          "executable": "/System/Library/CoreServices/UniversalControl.app/Contents/MacOS/UniversalControl"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 8.0,
+          "elapsed": "05-00:56:46",
+          "cumulativeCPUTime": "53:01.21",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 3.9,
+          "elapsed": "05-00:56:43",
+          "cumulativeCPUTime": "100:56.41",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 5.4,
+          "elapsed": "01:59:26",
+          "cumulativeCPUTime": "2:04.85",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 2.1,
+          "elapsed": "01-19:17:05",
+          "cumulativeCPUTime": "27:17.49",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 16.0,
+          "elapsed": "01-19:17:03",
+          "cumulativeCPUTime": "92:46.61",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51634,
+          "parentPid": 51518,
+          "cpuPercent": 5.1,
+          "elapsed": "01-19:17:02",
+          "cumulativeCPUTime": "11:53.35",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 9.8,
+          "elapsed": "01-19:17:02",
+          "cumulativeCPUTime": "122:33.91",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 2.3,
+          "elapsed": "04-00:09:43",
+          "cumulativeCPUTime": "40:42.00",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:07:26.391252+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 37.4,
+          "elapsed": "05-01:36:36",
+          "cumulativeCPUTime": "1048:03.38",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 604,
+          "parentPid": 1,
+          "cpuPercent": 2.5,
+          "elapsed": "05-01:36:36",
+          "cumulativeCPUTime": "4:34.22",
+          "executable": "/usr/sbin/cfprefsd"
+        },
+        {
+          "pid": 923,
+          "parentPid": 1,
+          "cpuPercent": 2.1,
+          "elapsed": "05-01:36:27",
+          "cumulativeCPUTime": "1:34.71",
+          "executable": "/usr/libexec/secd"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 5.1,
+          "elapsed": "05-00:56:53",
+          "cumulativeCPUTime": "100:57.12",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 2.3,
+          "elapsed": "01:59:36",
+          "cumulativeCPUTime": "2:05.61",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 35595,
+          "parentPid": 51518,
+          "cpuPercent": 2.5,
+          "elapsed": "09:17",
+          "cumulativeCPUTime": "0:03.68",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 3.4,
+          "elapsed": "00:09",
+          "cumulativeCPUTime": "0:02.72",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37130,
+          "parentPid": 1,
+          "cpuPercent": 13.0,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:00.47",
+          "executable": "/usr/libexec/promotedcontentd"
+        },
+        {
+          "pid": 37131,
+          "parentPid": 1,
+          "cpuPercent": 47.7,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:00.31",
+          "executable": "/usr/libexec/fairplaydeviceidentityd"
+        },
+        {
+          "pid": 37132,
+          "parentPid": 1,
+          "cpuPercent": 5.9,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.06",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 9.2,
+          "elapsed": "01-19:17:15",
+          "cumulativeCPUTime": "27:18.07",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 21.8,
+          "elapsed": "01-19:17:13",
+          "cumulativeCPUTime": "92:48.33",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51634,
+          "parentPid": 51518,
+          "cpuPercent": 3.6,
+          "elapsed": "01-19:17:12",
+          "cumulativeCPUTime": "11:53.54",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 28.7,
+          "elapsed": "01-19:17:12",
+          "cumulativeCPUTime": "122:35.35",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 3.0,
+          "elapsed": "04-00:09:53",
+          "cumulativeCPUTime": "40:42.42",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        },
+        {
+          "pid": 77251,
+          "parentPid": 76919,
+          "cpuPercent": 3.2,
+          "elapsed": "03:52:33",
+          "cumulativeCPUTime": "0:02.63",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+        },
+        {
+          "pid": 77252,
+          "parentPid": 76919,
+          "cpuPercent": 3.6,
+          "elapsed": "03:52:33",
+          "cumulativeCPUTime": "0:21.78",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
+        },
+        {
+          "pid": 77253,
+          "parentPid": 76919,
+          "cpuPercent": 3.9,
+          "elapsed": "03:52:32",
+          "cumulativeCPUTime": "0:04.82",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:07:36.440389+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 41.2,
+          "elapsed": "05-01:36:46",
+          "cumulativeCPUTime": "1048:07.56",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 946,
+          "parentPid": 1,
+          "cpuPercent": 2.9,
+          "elapsed": "05-01:36:36",
+          "cumulativeCPUTime": "6:59.43",
+          "executable": "/System/Library/CoreServices/WindowManager.app/Contents/MacOS/WindowManager"
+        },
+        {
+          "pid": 1896,
+          "parentPid": 1,
+          "cpuPercent": 19.9,
+          "elapsed": "05-01:27:33",
+          "cumulativeCPUTime": "11:45.37",
+          "executable": "/System/Library/Input Methods/SCIM.app/Contents/PlugIns/SCIM_Extension.appex/Contents/MacOS/SCIM_Extension"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 3.4,
+          "elapsed": "05-00:57:03",
+          "cumulativeCPUTime": "100:57.52",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2334,
+          "parentPid": 2255,
+          "cpuPercent": 5.7,
+          "elapsed": "05-00:57:02",
+          "cumulativeCPUTime": "16:08.30",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 2.1,
+          "elapsed": "00:19",
+          "cumulativeCPUTime": "0:02.95",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 3.7,
+          "elapsed": "00:19",
+          "cumulativeCPUTime": "0:04.41",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 7.0,
+          "elapsed": "01-19:17:25",
+          "cumulativeCPUTime": "27:18.87",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 8.5,
+          "elapsed": "01-19:17:23",
+          "cumulativeCPUTime": "92:49.60",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 27.9,
+          "elapsed": "01-19:17:22",
+          "cumulativeCPUTime": "122:37.25",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:07:46.484730+00:00",
+      "processes": [
+        {
+          "pid": 1,
+          "parentPid": 0,
+          "cpuPercent": 25.6,
+          "elapsed": "05-01:38:11",
+          "cumulativeCPUTime": "114:18.29",
+          "executable": "/sbin/launchd"
+        },
+        {
+          "pid": 578,
+          "parentPid": 1,
+          "cpuPercent": 2.3,
+          "elapsed": "05-01:36:56",
+          "cumulativeCPUTime": "8:55.53",
+          "executable": "/usr/libexec/locationd"
+        },
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 37.0,
+          "elapsed": "05-01:36:56",
+          "cumulativeCPUTime": "1048:11.40",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 605,
+          "parentPid": 1,
+          "cpuPercent": 2.5,
+          "elapsed": "05-01:36:56",
+          "cumulativeCPUTime": "9:08.58",
+          "executable": "/System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 4.3,
+          "elapsed": "05-00:57:13",
+          "cumulativeCPUTime": "100:57.91",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2837,
+          "parentPid": 1,
+          "cpuPercent": 5.2,
+          "elapsed": "05-00:55:34",
+          "cumulativeCPUTime": "5:25.56",
+          "executable": "/Applications/Visual Studio Code.app/Contents/MacOS/Code"
+        },
+        {
+          "pid": 2920,
+          "parentPid": 2837,
+          "cpuPercent": 7.5,
+          "elapsed": "05-00:55:32",
+          "cumulativeCPUTime": "2:31.39",
+          "executable": "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper.app/Contents/MacOS/Code Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 3.1,
+          "elapsed": "01:59:56",
+          "cumulativeCPUTime": "2:06.01",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 21417,
+          "parentPid": 2837,
+          "cpuPercent": 31.2,
+          "elapsed": "04-20:04:45",
+          "cumulativeCPUTime": "9:27.00",
+          "executable": "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Renderer).app/Contents/MacOS/Code Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 24.8,
+          "elapsed": "00:29",
+          "cumulativeCPUTime": "0:04.97",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 2.1,
+          "elapsed": "00:29",
+          "cumulativeCPUTime": "0:06.18",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 27.4,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:01.33",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 2.6,
+          "elapsed": "01-19:17:35",
+          "cumulativeCPUTime": "27:19.55",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 10.2,
+          "elapsed": "01-19:17:33",
+          "cumulativeCPUTime": "92:50.67",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 8.2,
+          "elapsed": "01-19:17:32",
+          "cumulativeCPUTime": "122:38.80",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:07:56.532026+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 40.8,
+          "elapsed": "05-01:37:06",
+          "cumulativeCPUTime": "1048:15.23",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 5.8,
+          "elapsed": "05-00:57:26",
+          "cumulativeCPUTime": "53:02.25",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 3.0,
+          "elapsed": "05-00:57:23",
+          "cumulativeCPUTime": "100:58.29",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 26.8,
+          "elapsed": "00:39",
+          "cumulativeCPUTime": "0:06.53",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 19.6,
+          "elapsed": "00:12",
+          "cumulativeCPUTime": "0:02.67",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 2.9,
+          "elapsed": "01-19:17:45",
+          "cumulativeCPUTime": "27:20.36",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 15.0,
+          "elapsed": "01-19:17:43",
+          "cumulativeCPUTime": "92:52.08",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 9.7,
+          "elapsed": "01-19:17:42",
+          "cumulativeCPUTime": "122:40.65",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 52350,
+          "parentPid": 1,
+          "cpuPercent": 4.2,
+          "elapsed": "04-12:27:52",
+          "cumulativeCPUTime": "45:51.50",
+          "executable": "/usr/libexec/sysmond"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:08:06.583227+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 41.7,
+          "elapsed": "05-01:37:16",
+          "cumulativeCPUTime": "1048:19.34",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 673,
+          "parentPid": 1,
+          "cpuPercent": 3.3,
+          "elapsed": "05-01:37:16",
+          "cumulativeCPUTime": "20:34.62",
+          "executable": "/usr/libexec/airportd"
+        },
+        {
+          "pid": 1115,
+          "parentPid": 1,
+          "cpuPercent": 7.9,
+          "elapsed": "05-01:36:59",
+          "cumulativeCPUTime": "16:27.58",
+          "executable": "/System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 3.5,
+          "elapsed": "05-00:57:33",
+          "cumulativeCPUTime": "100:58.67",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2837,
+          "parentPid": 1,
+          "cpuPercent": 3.5,
+          "elapsed": "05-00:55:54",
+          "cumulativeCPUTime": "5:26.25",
+          "executable": "/Applications/Visual Studio Code.app/Contents/MacOS/Code"
+        },
+        {
+          "pid": 2920,
+          "parentPid": 2837,
+          "cpuPercent": 16.5,
+          "elapsed": "05-00:55:52",
+          "cumulativeCPUTime": "2:32.24",
+          "executable": "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper.app/Contents/MacOS/Code Helper"
+        },
+        {
+          "pid": 21417,
+          "parentPid": 2837,
+          "cpuPercent": 28.4,
+          "elapsed": "04-20:05:05",
+          "cumulativeCPUTime": "9:28.97",
+          "executable": "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Renderer).app/Contents/MacOS/Code Helper (Renderer)"
+        },
+        {
+          "pid": 21896,
+          "parentPid": 2837,
+          "cpuPercent": 2.0,
+          "elapsed": "04-20:02:56",
+          "cumulativeCPUTime": "1:22.30",
+          "executable": "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Plugin).app/Contents/MacOS/Code Helper (Plugin)"
+        },
+        {
+          "pid": 24996,
+          "parentPid": 2255,
+          "cpuPercent": 3.1,
+          "elapsed": "01:11:26",
+          "cumulativeCPUTime": "1:03.78",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 28.3,
+          "elapsed": "00:49",
+          "cumulativeCPUTime": "0:09.26",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 22.7,
+          "elapsed": "00:22",
+          "cumulativeCPUTime": "0:04.82",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 16.9,
+          "elapsed": "01-19:17:53",
+          "cumulativeCPUTime": "92:53.79",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 8.3,
+          "elapsed": "01-19:17:52",
+          "cumulativeCPUTime": "122:43.75",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 52350,
+          "parentPid": 1,
+          "cpuPercent": 15.7,
+          "elapsed": "04-12:28:02",
+          "cumulativeCPUTime": "45:51.62",
+          "executable": "/usr/libexec/sysmond"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 2.2,
+          "elapsed": "04-00:10:33",
+          "cumulativeCPUTime": "40:43.20",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        },
+        {
+          "pid": 72889,
+          "parentPid": 1,
+          "cpuPercent": 6.1,
+          "elapsed": "03-19:16:08",
+          "cumulativeCPUTime": "48:17.75",
+          "executable": "/System/Applications/Utilities/Activity Monitor.app/Contents/MacOS/Activity Monitor"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:08:16.619144+00:00",
+      "processes": [
+        {
+          "pid": 1,
+          "parentPid": 0,
+          "cpuPercent": 13.0,
+          "elapsed": "05-01:38:41",
+          "cumulativeCPUTime": "114:18.52",
+          "executable": "/sbin/launchd"
+        },
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 35.9,
+          "elapsed": "05-01:37:26",
+          "cumulativeCPUTime": "1048:23.33",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 605,
+          "parentPid": 1,
+          "cpuPercent": 2.0,
+          "elapsed": "05-01:37:26",
+          "cumulativeCPUTime": "9:08.88",
+          "executable": "/System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow"
+        },
+        {
+          "pid": 673,
+          "parentPid": 1,
+          "cpuPercent": 2.6,
+          "elapsed": "05-01:37:26",
+          "cumulativeCPUTime": "20:34.74",
+          "executable": "/usr/libexec/airportd"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 3.7,
+          "elapsed": "05-00:57:43",
+          "cumulativeCPUTime": "100:59.05",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2837,
+          "parentPid": 1,
+          "cpuPercent": 7.2,
+          "elapsed": "05-00:56:04",
+          "cumulativeCPUTime": "5:26.72",
+          "executable": "/Applications/Visual Studio Code.app/Contents/MacOS/Code"
+        },
+        {
+          "pid": 2920,
+          "parentPid": 2837,
+          "cpuPercent": 11.7,
+          "elapsed": "05-00:56:02",
+          "cumulativeCPUTime": "2:32.94",
+          "executable": "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper.app/Contents/MacOS/Code Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 2.0,
+          "elapsed": "02:00:26",
+          "cumulativeCPUTime": "2:06.67",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 21417,
+          "parentPid": 2837,
+          "cpuPercent": 17.2,
+          "elapsed": "04-20:05:15",
+          "cumulativeCPUTime": "9:30.36",
+          "executable": "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Renderer).app/Contents/MacOS/Code Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 24.7,
+          "elapsed": "00:59",
+          "cumulativeCPUTime": "0:11.75",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 2.2,
+          "elapsed": "00:59",
+          "cumulativeCPUTime": "0:06.92",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 19.7,
+          "elapsed": "00:32",
+          "cumulativeCPUTime": "0:06.84",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 2.1,
+          "elapsed": "01-19:18:05",
+          "cumulativeCPUTime": "27:21.10",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 16.2,
+          "elapsed": "01-19:18:03",
+          "cumulativeCPUTime": "92:55.45",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 14.3,
+          "elapsed": "01-19:18:02",
+          "cumulativeCPUTime": "122:45.48",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 4.6,
+          "elapsed": "04-00:10:43",
+          "cumulativeCPUTime": "40:43.48",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:08:26.666398+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 38.1,
+          "elapsed": "05-01:37:36",
+          "cumulativeCPUTime": "1048:27.37",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 1063,
+          "parentPid": 1,
+          "cpuPercent": 2.2,
+          "elapsed": "05-01:37:21",
+          "cumulativeCPUTime": "3:49.55",
+          "executable": "/System/Library/CoreServices/MenuBarAgent.app/Contents/MacOS/MenuBarAgent"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 18.5,
+          "elapsed": "05-00:57:56",
+          "cumulativeCPUTime": "53:02.67",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 10.6,
+          "elapsed": "05-00:57:53",
+          "cumulativeCPUTime": "100:59.51",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2262,
+          "parentPid": 2255,
+          "cpuPercent": 5.4,
+          "elapsed": "05-00:57:53",
+          "cumulativeCPUTime": "7:44.98",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2304,
+          "parentPid": 2255,
+          "cpuPercent": 5.8,
+          "elapsed": "05-00:57:53",
+          "cumulativeCPUTime": "2:58.45",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 21.2,
+          "elapsed": "02:00:36",
+          "cumulativeCPUTime": "2:07.05",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 10371,
+          "parentPid": 1,
+          "cpuPercent": 4.1,
+          "elapsed": "01:47:38",
+          "cumulativeCPUTime": "0:03.91",
+          "executable": "/opt/homebrew/Cellar/node/26.8.2/bin/node"
+        },
+        {
+          "pid": 35651,
+          "parentPid": 2255,
+          "cpuPercent": 2.9,
+          "elapsed": "09:21",
+          "cumulativeCPUTime": "0:01.87",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 24.3,
+          "elapsed": "01:09",
+          "cumulativeCPUTime": "0:14.00",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 18.4,
+          "elapsed": "00:42",
+          "cumulativeCPUTime": "0:08.62",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 47.8,
+          "elapsed": "01-19:18:15",
+          "cumulativeCPUTime": "27:22.33",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 10.1,
+          "elapsed": "01-19:18:13",
+          "cumulativeCPUTime": "92:56.84",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 8.1,
+          "elapsed": "01-19:18:12",
+          "cumulativeCPUTime": "122:47.66",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:08:36.704017+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 38.2,
+          "elapsed": "05-01:37:46",
+          "cumulativeCPUTime": "1048:31.38",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 605,
+          "parentPid": 1,
+          "cpuPercent": 2.5,
+          "elapsed": "05-01:37:46",
+          "cumulativeCPUTime": "9:09.09",
+          "executable": "/System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow"
+        },
+        {
+          "pid": 606,
+          "parentPid": 1,
+          "cpuPercent": 3.4,
+          "elapsed": "05-01:37:46",
+          "cumulativeCPUTime": "13:19.41",
+          "executable": "/usr/libexec/runningboardd"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 2.5,
+          "elapsed": "05-00:58:03",
+          "cumulativeCPUTime": "101:00.10",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 17.4,
+          "elapsed": "01:19",
+          "cumulativeCPUTime": "0:16.58",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 12.5,
+          "elapsed": "00:52",
+          "cumulativeCPUTime": "0:10.59",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37409,
+          "parentPid": 37381,
+          "cpuPercent": 14.8,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.09",
+          "executable": "npm run check"
+        },
+        {
+          "pid": 37427,
+          "parentPid": 37409,
+          "cpuPercent": 29.4,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.21",
+          "executable": "node"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 5.8,
+          "elapsed": "01-19:18:23",
+          "cumulativeCPUTime": "92:57.84",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51634,
+          "parentPid": 51518,
+          "cpuPercent": 2.2,
+          "elapsed": "01-19:18:22",
+          "cumulativeCPUTime": "11:54.68",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 7.6,
+          "elapsed": "01-19:18:22",
+          "cumulativeCPUTime": "122:48.57",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:08:46.762587+00:00",
+      "processes": [
+        {
+          "pid": 1,
+          "parentPid": 0,
+          "cpuPercent": 6.4,
+          "elapsed": "05-01:39:11",
+          "cumulativeCPUTime": "114:18.74",
+          "executable": "/sbin/launchd"
+        },
+        {
+          "pid": 535,
+          "parentPid": 1,
+          "cpuPercent": 2.1,
+          "elapsed": "05-01:37:56",
+          "cumulativeCPUTime": "8:36.31",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/FSEvents.framework/Versions/A/Support/fseventsd"
+        },
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 43.2,
+          "elapsed": "05-01:37:56",
+          "cumulativeCPUTime": "1048:36.67",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 6.0,
+          "elapsed": "05-00:58:16",
+          "cumulativeCPUTime": "53:04.57",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 4.1,
+          "elapsed": "05-00:58:13",
+          "cumulativeCPUTime": "101:00.64",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 11.9,
+          "elapsed": "02:00:56",
+          "cumulativeCPUTime": "2:08.51",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 21895,
+          "parentPid": 2837,
+          "cpuPercent": 31.3,
+          "elapsed": "04-20:03:36",
+          "cumulativeCPUTime": "1:11.91",
+          "executable": "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper.app/Contents/MacOS/Code Helper"
+        },
+        {
+          "pid": 24974,
+          "parentPid": 1,
+          "cpuPercent": 2.4,
+          "elapsed": "01:12:13",
+          "cumulativeCPUTime": "0:29.05",
+          "executable": "/opt/homebrew/Cellar/node/26.8.2/bin/node"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 27.2,
+          "elapsed": "01:29",
+          "cumulativeCPUTime": "0:20.67",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 2.7,
+          "elapsed": "01:29",
+          "cumulativeCPUTime": "0:07.60",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 21.0,
+          "elapsed": "01:02",
+          "cumulativeCPUTime": "0:13.90",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37464,
+          "parentPid": 37446,
+          "cpuPercent": 156.2,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:01.70",
+          "executable": "node"
+        },
+        {
+          "pid": 37466,
+          "parentPid": 37464,
+          "cpuPercent": 12.2,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.05",
+          "executable": "/Users/wcqqq1214/Project/wcqqq1214-site/node_modules/astro/node_modules/@esbuild/darwin-arm64/bin/esbuild"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 3.0,
+          "elapsed": "01-19:18:35",
+          "cumulativeCPUTime": "27:23.13",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 11.7,
+          "elapsed": "01-19:18:33",
+          "cumulativeCPUTime": "92:59.49",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 10.5,
+          "elapsed": "01-19:18:32",
+          "cumulativeCPUTime": "122:50.68",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:08:56.808993+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 39.9,
+          "elapsed": "05-01:38:06",
+          "cumulativeCPUTime": "1048:41.08",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 10.3,
+          "elapsed": "05-00:58:26",
+          "cumulativeCPUTime": "53:05.64",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 5.5,
+          "elapsed": "05-00:58:23",
+          "cumulativeCPUTime": "101:01.36",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 11.4,
+          "elapsed": "02:01:06",
+          "cumulativeCPUTime": "2:09.45",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 6.4,
+          "elapsed": "01:39",
+          "cumulativeCPUTime": "0:23.69",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 2.8,
+          "elapsed": "01:39",
+          "cumulativeCPUTime": "0:07.87",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 8.4,
+          "elapsed": "01:12",
+          "cumulativeCPUTime": "0:16.44",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 14.9,
+          "elapsed": "01-19:18:43",
+          "cumulativeCPUTime": "93:00.76",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 13.7,
+          "elapsed": "01-19:18:42",
+          "cumulativeCPUTime": "122:51.90",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:09:06.869041+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 39.7,
+          "elapsed": "05-01:38:16",
+          "cumulativeCPUTime": "1048:45.04",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 1122,
+          "parentPid": 1,
+          "cpuPercent": 5.6,
+          "elapsed": "05-01:37:59",
+          "cumulativeCPUTime": "32:30.02",
+          "executable": "/usr/libexec/duetexpertd"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 3.6,
+          "elapsed": "05-00:58:33",
+          "cumulativeCPUTime": "101:01.88",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 33777,
+          "parentPid": 1,
+          "cpuPercent": 2.0,
+          "elapsed": "19:47",
+          "cumulativeCPUTime": "0:02.19",
+          "executable": "/usr/libexec/routined"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 30.6,
+          "elapsed": "01:49",
+          "cumulativeCPUTime": "0:26.50",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 2.2,
+          "elapsed": "01:49",
+          "cumulativeCPUTime": "0:08.10",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 23.1,
+          "elapsed": "01:22",
+          "cumulativeCPUTime": "0:18.57",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 3.3,
+          "elapsed": "01-19:18:55",
+          "cumulativeCPUTime": "27:24.21",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 17.7,
+          "elapsed": "01-19:18:53",
+          "cumulativeCPUTime": "93:02.54",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51634,
+          "parentPid": 51518,
+          "cpuPercent": 7.4,
+          "elapsed": "01-19:18:52",
+          "cumulativeCPUTime": "11:55.29",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 10.5,
+          "elapsed": "01-19:18:52",
+          "cumulativeCPUTime": "122:53.38",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:09:17.010687+00:00",
+      "processes": [
+        {
+          "pid": 1,
+          "parentPid": 0,
+          "cpuPercent": 3.0,
+          "elapsed": "05-01:39:41",
+          "cumulativeCPUTime": "114:19.09",
+          "executable": "/sbin/launchd"
+        },
+        {
+          "pid": 582,
+          "parentPid": 1,
+          "cpuPercent": 3.1,
+          "elapsed": "05-01:38:26",
+          "cumulativeCPUTime": "335:36.51",
+          "executable": "/usr/libexec/dasd"
+        },
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 66.0,
+          "elapsed": "05-01:38:26",
+          "cumulativeCPUTime": "1048:49.63",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 946,
+          "parentPid": 1,
+          "cpuPercent": 3.5,
+          "elapsed": "05-01:38:16",
+          "cumulativeCPUTime": "7:00.25",
+          "executable": "/System/Library/CoreServices/WindowManager.app/Contents/MacOS/WindowManager"
+        },
+        {
+          "pid": 973,
+          "parentPid": 1,
+          "cpuPercent": 5.4,
+          "elapsed": "05-01:38:15",
+          "cumulativeCPUTime": "0:30.92",
+          "executable": "/usr/sbin/usernoted"
+        },
+        {
+          "pid": 999,
+          "parentPid": 1,
+          "cpuPercent": 4.6,
+          "elapsed": "05-01:38:15",
+          "cumulativeCPUTime": "2:12.10",
+          "executable": "/System/Library/PrivateFrameworks/IDS.framework/identityservicesd.app/Contents/MacOS/identityservicesd"
+        },
+        {
+          "pid": 1046,
+          "parentPid": 1,
+          "cpuPercent": 2.3,
+          "elapsed": "05-01:38:14",
+          "cumulativeCPUTime": "14:51.46",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/corespotlightd"
+        },
+        {
+          "pid": 1060,
+          "parentPid": 1,
+          "cpuPercent": 24.0,
+          "elapsed": "05-01:38:11",
+          "cumulativeCPUTime": "12:03.62",
+          "executable": "/System/Library/CoreServices/NotificationCenter.app/Contents/MacOS/NotificationCenter"
+        },
+        {
+          "pid": 1972,
+          "parentPid": 1,
+          "cpuPercent": 18.8,
+          "elapsed": "05-01:00:41",
+          "cumulativeCPUTime": "4:08.81",
+          "executable": "/System/Applications/Siri AI.app/Contents/MacOS/Siri AI"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 4.1,
+          "elapsed": "05-00:58:43",
+          "cumulativeCPUTime": "101:02.34",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2837,
+          "parentPid": 1,
+          "cpuPercent": 3.1,
+          "elapsed": "05-00:57:04",
+          "cumulativeCPUTime": "5:27.41",
+          "executable": "/Applications/Visual Studio Code.app/Contents/MacOS/Code"
+        },
+        {
+          "pid": 2971,
+          "parentPid": 2837,
+          "cpuPercent": 2.0,
+          "elapsed": "05-00:57:01",
+          "cumulativeCPUTime": "8:09.99",
+          "executable": "/Applications/Visual Studio Code.app/Contents/Frameworks/Code Helper (Renderer).app/Contents/MacOS/Code Helper (Renderer)"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 2.8,
+          "elapsed": "02:01:26",
+          "cumulativeCPUTime": "2:10.24",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 45.5,
+          "elapsed": "02:00",
+          "cumulativeCPUTime": "0:29.89",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 2.6,
+          "elapsed": "02:00",
+          "cumulativeCPUTime": "0:08.36",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 33.9,
+          "elapsed": "01:33",
+          "cumulativeCPUTime": "0:21.21",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 13.1,
+          "elapsed": "01-19:19:06",
+          "cumulativeCPUTime": "27:25.64",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 24.6,
+          "elapsed": "01-19:19:04",
+          "cumulativeCPUTime": "93:04.71",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 18.9,
+          "elapsed": "01-19:19:03",
+          "cumulativeCPUTime": "122:55.39",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 51903,
+          "parentPid": 51518,
+          "cpuPercent": 2.0,
+          "elapsed": "01-19:18:56",
+          "cumulativeCPUTime": "4:32.95",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:09:27.175016+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 68.3,
+          "elapsed": "05-01:38:37",
+          "cumulativeCPUTime": "1048:57.99",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 605,
+          "parentPid": 1,
+          "cpuPercent": 2.2,
+          "elapsed": "05-01:38:37",
+          "cumulativeCPUTime": "9:09.60",
+          "executable": "/System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 4.8,
+          "elapsed": "05-00:58:54",
+          "cumulativeCPUTime": "101:02.93",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 2.3,
+          "elapsed": "02:01:37",
+          "cumulativeCPUTime": "2:10.54",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 60.4,
+          "elapsed": "02:10",
+          "cumulativeCPUTime": "0:36.53",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 2.9,
+          "elapsed": "02:10",
+          "cumulativeCPUTime": "0:08.70",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37203,
+          "parentPid": 37085,
+          "cpuPercent": 46.9,
+          "elapsed": "01:43",
+          "cumulativeCPUTime": "0:26.24",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 16.9,
+          "elapsed": "01-19:19:16",
+          "cumulativeCPUTime": "27:29.13",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 11.6,
+          "elapsed": "01-19:19:14",
+          "cumulativeCPUTime": "93:07.78",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51634,
+          "parentPid": 51518,
+          "cpuPercent": 2.8,
+          "elapsed": "01-19:19:13",
+          "cumulativeCPUTime": "11:56.71",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 114.4,
+          "elapsed": "01-19:19:13",
+          "cumulativeCPUTime": "123:08.03",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 5.4,
+          "elapsed": "04-00:11:54",
+          "cumulativeCPUTime": "40:45.25",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:09:37.224742+00:00",
+      "processes": [
+        {
+          "pid": 578,
+          "parentPid": 1,
+          "cpuPercent": 2.6,
+          "elapsed": "05-01:38:47",
+          "cumulativeCPUTime": "8:55.95",
+          "executable": "/usr/libexec/locationd"
+        },
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 39.8,
+          "elapsed": "05-01:38:47",
+          "cumulativeCPUTime": "1049:02.24",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 1122,
+          "parentPid": 1,
+          "cpuPercent": 10.7,
+          "elapsed": "05-01:38:30",
+          "cumulativeCPUTime": "32:30.20",
+          "executable": "/usr/libexec/duetexpertd"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 8.8,
+          "elapsed": "05-00:59:07",
+          "cumulativeCPUTime": "53:06.73",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 5.2,
+          "elapsed": "05-00:59:04",
+          "cumulativeCPUTime": "101:03.55",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 5.9,
+          "elapsed": "02:01:47",
+          "cumulativeCPUTime": "2:11.04",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 24996,
+          "parentPid": 2255,
+          "cpuPercent": 99.9,
+          "elapsed": "01:12:57",
+          "cumulativeCPUTime": "1:07.79",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 33777,
+          "parentPid": 1,
+          "cpuPercent": 4.3,
+          "elapsed": "20:18",
+          "cumulativeCPUTime": "0:02.22",
+          "executable": "/usr/libexec/routined"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 12.9,
+          "elapsed": "02:20",
+          "cumulativeCPUTime": "0:38.51",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 10.9,
+          "elapsed": "00:10",
+          "cumulativeCPUTime": "0:03.42",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 10.7,
+          "elapsed": "01-19:19:24",
+          "cumulativeCPUTime": "93:09.77",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51634,
+          "parentPid": 51518,
+          "cpuPercent": 3.8,
+          "elapsed": "01-19:19:23",
+          "cumulativeCPUTime": "11:56.89",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 17.1,
+          "elapsed": "01-19:19:23",
+          "cumulativeCPUTime": "123:14.01",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 2.3,
+          "elapsed": "04-00:12:04",
+          "cumulativeCPUTime": "40:45.51",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:09:47.277539+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 39.1,
+          "elapsed": "05-01:38:57",
+          "cumulativeCPUTime": "1049:06.44",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 7.0,
+          "elapsed": "05-00:59:17",
+          "cumulativeCPUTime": "53:07.97",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 7.3,
+          "elapsed": "05-00:59:14",
+          "cumulativeCPUTime": "101:04.26",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 9.4,
+          "elapsed": "02:01:57",
+          "cumulativeCPUTime": "2:11.91",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 24996,
+          "parentPid": 2255,
+          "cpuPercent": 18.0,
+          "elapsed": "01:13:07",
+          "cumulativeCPUTime": "1:09.29",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 22.4,
+          "elapsed": "02:30",
+          "cumulativeCPUTime": "0:40.77",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 3.7,
+          "elapsed": "02:30",
+          "cumulativeCPUTime": "0:09.35",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 17.9,
+          "elapsed": "00:20",
+          "cumulativeCPUTime": "0:05.22",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 17.1,
+          "elapsed": "01-19:19:34",
+          "cumulativeCPUTime": "93:11.51",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 13.9,
+          "elapsed": "01-19:19:33",
+          "cumulativeCPUTime": "123:15.44",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 52350,
+          "parentPid": 1,
+          "cpuPercent": 11.3,
+          "elapsed": "04-12:29:43",
+          "cumulativeCPUTime": "45:52.87",
+          "executable": "/usr/libexec/sysmond"
+        },
+        {
+          "pid": 72889,
+          "parentPid": 1,
+          "cpuPercent": 11.0,
+          "elapsed": "03-19:17:49",
+          "cumulativeCPUTime": "48:19.15",
+          "executable": "/System/Applications/Utilities/Activity Monitor.app/Contents/MacOS/Activity Monitor"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:09:57.328099+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 39.2,
+          "elapsed": "05-01:39:07",
+          "cumulativeCPUTime": "1049:10.53",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 1063,
+          "parentPid": 1,
+          "cpuPercent": 6.2,
+          "elapsed": "05-01:38:52",
+          "cumulativeCPUTime": "3:50.60",
+          "executable": "/System/Library/CoreServices/MenuBarAgent.app/Contents/MacOS/MenuBarAgent"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 31.0,
+          "elapsed": "05-00:59:27",
+          "cumulativeCPUTime": "53:08.88",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 14.3,
+          "elapsed": "05-00:59:24",
+          "cumulativeCPUTime": "101:05.01",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2262,
+          "parentPid": 2255,
+          "cpuPercent": 8.0,
+          "elapsed": "05-00:59:24",
+          "cumulativeCPUTime": "7:45.56",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2304,
+          "parentPid": 2255,
+          "cpuPercent": 7.5,
+          "elapsed": "05-00:59:24",
+          "cumulativeCPUTime": "2:58.89",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 2334,
+          "parentPid": 2255,
+          "cpuPercent": 13.7,
+          "elapsed": "05-00:59:23",
+          "cumulativeCPUTime": "16:08.87",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 29.4,
+          "elapsed": "02:02:07",
+          "cumulativeCPUTime": "2:12.89",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 10371,
+          "parentPid": 1,
+          "cpuPercent": 18.5,
+          "elapsed": "01:49:09",
+          "cumulativeCPUTime": "0:04.37",
+          "executable": "/opt/homebrew/Cellar/node/26.8.2/bin/node"
+        },
+        {
+          "pid": 35651,
+          "parentPid": 2255,
+          "cpuPercent": 3.6,
+          "elapsed": "10:52",
+          "cumulativeCPUTime": "0:02.38",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 15.4,
+          "elapsed": "02:40",
+          "cumulativeCPUTime": "0:42.68",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 2.3,
+          "elapsed": "02:40",
+          "cumulativeCPUTime": "0:09.61",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 11.6,
+          "elapsed": "00:30",
+          "cumulativeCPUTime": "0:06.68",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 11.4,
+          "elapsed": "01-19:19:44",
+          "cumulativeCPUTime": "93:13.06",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 9.0,
+          "elapsed": "01-19:19:43",
+          "cumulativeCPUTime": "123:17.14",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 72889,
+          "parentPid": 1,
+          "cpuPercent": 4.9,
+          "elapsed": "03-19:17:59",
+          "cumulativeCPUTime": "48:19.26",
+          "executable": "/System/Applications/Utilities/Activity Monitor.app/Contents/MacOS/Activity Monitor"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:10:07.380027+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 39.0,
+          "elapsed": "05-01:39:17",
+          "cumulativeCPUTime": "1049:14.64",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 6.0,
+          "elapsed": "02:02:17",
+          "cumulativeCPUTime": "2:13.84",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 24.3,
+          "elapsed": "02:50",
+          "cumulativeCPUTime": "0:44.75",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 3.4,
+          "elapsed": "02:50",
+          "cumulativeCPUTime": "0:09.93",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 18.3,
+          "elapsed": "00:40",
+          "cumulativeCPUTime": "0:08.25",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 19.1,
+          "elapsed": "01-19:19:54",
+          "cumulativeCPUTime": "93:14.52",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 18.4,
+          "elapsed": "01-19:19:53",
+          "cumulativeCPUTime": "123:18.74",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 72889,
+          "parentPid": 1,
+          "cpuPercent": 4.9,
+          "elapsed": "03-19:18:09",
+          "cumulativeCPUTime": "48:19.40",
+          "executable": "/System/Applications/Utilities/Activity Monitor.app/Contents/MacOS/Activity Monitor"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:10:17.434564+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 41.3,
+          "elapsed": "05-01:39:27",
+          "cumulativeCPUTime": "1049:18.65",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 7.9,
+          "elapsed": "05-00:59:47",
+          "cumulativeCPUTime": "53:10.70",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 3.1,
+          "elapsed": "05-00:59:44",
+          "cumulativeCPUTime": "101:06.12",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2480,
+          "parentPid": 2255,
+          "cpuPercent": 26.4,
+          "elapsed": "05-00:59:20",
+          "cumulativeCPUTime": "19:15.02",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 3.5,
+          "elapsed": "02:02:27",
+          "cumulativeCPUTime": "2:14.30",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 27.3,
+          "elapsed": "03:00",
+          "cumulativeCPUTime": "0:47.39",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 3.8,
+          "elapsed": "03:00",
+          "cumulativeCPUTime": "0:10.27",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 21.0,
+          "elapsed": "00:50",
+          "cumulativeCPUTime": "0:10.18",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 2.3,
+          "elapsed": "01-19:20:06",
+          "cumulativeCPUTime": "27:31.43",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 16.5,
+          "elapsed": "01-19:20:04",
+          "cumulativeCPUTime": "93:16.15",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 14.4,
+          "elapsed": "01-19:20:03",
+          "cumulativeCPUTime": "123:20.24",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:10:27.494532+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 35.2,
+          "elapsed": "05-01:39:37",
+          "cumulativeCPUTime": "1049:22.57",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 605,
+          "parentPid": 1,
+          "cpuPercent": 3.3,
+          "elapsed": "05-01:39:37",
+          "cumulativeCPUTime": "9:09.87",
+          "executable": "/System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 6.5,
+          "elapsed": "05-00:59:57",
+          "cumulativeCPUTime": "53:11.35",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 4.7,
+          "elapsed": "05-00:59:54",
+          "cumulativeCPUTime": "101:06.69",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 6.0,
+          "elapsed": "02:02:37",
+          "cumulativeCPUTime": "2:14.81",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 22.7,
+          "elapsed": "03:10",
+          "cumulativeCPUTime": "0:49.32",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37106,
+          "parentPid": 37085,
+          "cpuPercent": 3.2,
+          "elapsed": "03:10",
+          "cumulativeCPUTime": "0:10.55",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 17.4,
+          "elapsed": "01:00",
+          "cumulativeCPUTime": "0:11.67",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 18.2,
+          "elapsed": "01-19:20:14",
+          "cumulativeCPUTime": "93:17.58",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 17.5,
+          "elapsed": "01-19:20:13",
+          "cumulativeCPUTime": "123:22.04",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 2.1,
+          "elapsed": "04-00:12:54",
+          "cumulativeCPUTime": "40:46.73",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        },
+        {
+          "pid": 72889,
+          "parentPid": 1,
+          "cpuPercent": 3.4,
+          "elapsed": "03-19:18:29",
+          "cumulativeCPUTime": "48:19.68",
+          "executable": "/System/Applications/Utilities/Activity Monitor.app/Contents/MacOS/Activity Monitor"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:10:37.531344+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 42.6,
+          "elapsed": "05-01:39:47",
+          "cumulativeCPUTime": "1049:26.72",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 653,
+          "parentPid": 1,
+          "cpuPercent": 2.0,
+          "elapsed": "05-01:39:47",
+          "cumulativeCPUTime": "51:48.37",
+          "executable": "/System/Library/PrivateFrameworks/CoreAnalytics.framework/Support/analyticsd"
+        },
+        {
+          "pid": 946,
+          "parentPid": 1,
+          "cpuPercent": 5.2,
+          "elapsed": "05-01:39:37",
+          "cumulativeCPUTime": "7:00.97",
+          "executable": "/System/Library/CoreServices/WindowManager.app/Contents/MacOS/WindowManager"
+        },
+        {
+          "pid": 1070,
+          "parentPid": 1,
+          "cpuPercent": 2.4,
+          "elapsed": "05-01:39:32",
+          "cumulativeCPUTime": "1:01.31",
+          "executable": "/System/Library/PrivateFrameworks/ViewBridge.framework/Versions/A/XPCServices/ViewBridgeAuxiliary.xpc/Contents/MacOS/ViewBridgeAuxiliary"
+        },
+        {
+          "pid": 1896,
+          "parentPid": 1,
+          "cpuPercent": 28.0,
+          "elapsed": "05-01:30:34",
+          "cumulativeCPUTime": "11:47.33",
+          "executable": "/System/Library/Input Methods/SCIM.app/Contents/PlugIns/SCIM_Extension.appex/Contents/MacOS/SCIM_Extension"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 3.6,
+          "elapsed": "05-01:00:04",
+          "cumulativeCPUTime": "101:07.11",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 4680,
+          "parentPid": 2255,
+          "cpuPercent": 2.0,
+          "elapsed": "02:02:47",
+          "cumulativeCPUTime": "2:15.08",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 24996,
+          "parentPid": 2255,
+          "cpuPercent": 44.7,
+          "elapsed": "01:13:57",
+          "cumulativeCPUTime": "1:13.09",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 12.0,
+          "elapsed": "03:20",
+          "cumulativeCPUTime": "0:50.71",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 8.3,
+          "elapsed": "01:10",
+          "cumulativeCPUTime": "0:12.68",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 9.9,
+          "elapsed": "01-19:20:26",
+          "cumulativeCPUTime": "27:33.04",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 10.8,
+          "elapsed": "01-19:20:24",
+          "cumulativeCPUTime": "93:18.77",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 22.0,
+          "elapsed": "01-19:20:23",
+          "cumulativeCPUTime": "123:25.99",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 72889,
+          "parentPid": 1,
+          "cpuPercent": 3.5,
+          "elapsed": "03-19:18:39",
+          "cumulativeCPUTime": "48:19.81",
+          "executable": "/System/Applications/Utilities/Activity Monitor.app/Contents/MacOS/Activity Monitor"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:10:47.563902+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 37.7,
+          "elapsed": "05-01:39:57",
+          "cumulativeCPUTime": "1049:30.82",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 606,
+          "parentPid": 1,
+          "cpuPercent": 4.0,
+          "elapsed": "05-01:39:57",
+          "cumulativeCPUTime": "13:19.83",
+          "executable": "/usr/libexec/runningboardd"
+        },
+        {
+          "pid": 2255,
+          "parentPid": 1,
+          "cpuPercent": 2.5,
+          "elapsed": "05-01:00:17",
+          "cumulativeCPUTime": "53:11.95",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 8.5,
+          "elapsed": "05-01:00:14",
+          "cumulativeCPUTime": "101:07.77",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 24974,
+          "parentPid": 1,
+          "cpuPercent": 4.8,
+          "elapsed": "01:14:14",
+          "cumulativeCPUTime": "0:29.09",
+          "executable": "/opt/homebrew/Cellar/node/26.8.2/bin/node"
+        },
+        {
+          "pid": 24996,
+          "parentPid": 2255,
+          "cpuPercent": 35.0,
+          "elapsed": "01:14:07",
+          "cumulativeCPUTime": "1:20.21",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 10.9,
+          "elapsed": "03:30",
+          "cumulativeCPUTime": "0:52.19",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 7.5,
+          "elapsed": "01:20",
+          "cumulativeCPUTime": "0:13.78",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37776,
+          "parentPid": 37774,
+          "cpuPercent": 23.7,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.08",
+          "executable": "npm run format"
+        },
+        {
+          "pid": 37788,
+          "parentPid": 37776,
+          "cpuPercent": 3.0,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.12",
+          "executable": "node"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 10.9,
+          "elapsed": "01-19:20:34",
+          "cumulativeCPUTime": "93:20.04",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51634,
+          "parentPid": 51518,
+          "cpuPercent": 2.9,
+          "elapsed": "01-19:20:33",
+          "cumulativeCPUTime": "11:58.31",
+          "executable": "/Applications/ChatGPT.app/Contents/Resources/codex"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 30.7,
+          "elapsed": "01-19:20:33",
+          "cumulativeCPUTime": "123:28.33",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 2.4,
+          "elapsed": "04-00:13:14",
+          "cumulativeCPUTime": "40:47.29",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:10:57.606001+00:00",
+      "processes": [
+        {
+          "pid": 573,
+          "parentPid": 1,
+          "cpuPercent": 3.3,
+          "elapsed": "05-01:40:07",
+          "cumulativeCPUTime": "4:22.85",
+          "executable": "/System/Library/CoreServices/launchservicesd"
+        },
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 43.6,
+          "elapsed": "05-01:40:07",
+          "cumulativeCPUTime": "1049:34.95",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 605,
+          "parentPid": 1,
+          "cpuPercent": 4.9,
+          "elapsed": "05-01:40:07",
+          "cumulativeCPUTime": "9:10.11",
+          "executable": "/System/Library/CoreServices/loginwindow.app/Contents/MacOS/loginwindow"
+        },
+        {
+          "pid": 606,
+          "parentPid": 1,
+          "cpuPercent": 5.2,
+          "elapsed": "05-01:40:07",
+          "cumulativeCPUTime": "13:19.98",
+          "executable": "/usr/libexec/runningboardd"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 8.1,
+          "elapsed": "05-01:00:24",
+          "cumulativeCPUTime": "101:08.69",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 24996,
+          "parentPid": 2255,
+          "cpuPercent": 42.2,
+          "elapsed": "01:14:17",
+          "cumulativeCPUTime": "1:24.63",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 11.3,
+          "elapsed": "03:40",
+          "cumulativeCPUTime": "0:53.41",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 7.9,
+          "elapsed": "01:30",
+          "cumulativeCPUTime": "0:14.69",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37907,
+          "parentPid": 1,
+          "cpuPercent": 2.8,
+          "elapsed": "00:02",
+          "cumulativeCPUTime": "0:00.11",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared"
+        },
+        {
+          "pid": 37913,
+          "parentPid": 1,
+          "cpuPercent": 5.6,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.05",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared"
+        },
+        {
+          "pid": 37914,
+          "parentPid": 1,
+          "cpuPercent": 5.5,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.05",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared"
+        },
+        {
+          "pid": 37915,
+          "parentPid": 1,
+          "cpuPercent": 5.9,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.05",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared"
+        },
+        {
+          "pid": 37916,
+          "parentPid": 1,
+          "cpuPercent": 5.7,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.05",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared"
+        },
+        {
+          "pid": 37917,
+          "parentPid": 1,
+          "cpuPercent": 5.3,
+          "elapsed": "00:00",
+          "cumulativeCPUTime": "0:00.05",
+          "executable": "/System/Library/Frameworks/CoreServices.framework/Versions/A/Frameworks/Metadata.framework/Versions/A/Support/mdworker_shared"
+        },
+        {
+          "pid": 51518,
+          "parentPid": 1,
+          "cpuPercent": 10.1,
+          "elapsed": "01-19:20:46",
+          "cumulativeCPUTime": "27:34.97",
+          "executable": "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 11.8,
+          "elapsed": "01-19:20:44",
+          "cumulativeCPUTime": "93:21.05",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 73.6,
+          "elapsed": "01-19:20:43",
+          "cumulativeCPUTime": "123:31.04",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 3.5,
+          "elapsed": "04-00:13:24",
+          "cumulativeCPUTime": "40:47.69",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T15:11:07.647954+00:00",
+      "processes": [
+        {
+          "pid": 601,
+          "parentPid": 1,
+          "cpuPercent": 40.0,
+          "elapsed": "05-01:40:17",
+          "cumulativeCPUTime": "1049:39.11",
+          "executable": "/System/Library/PrivateFrameworks/SkyLight.framework/Resources/WindowServer"
+        },
+        {
+          "pid": 2261,
+          "parentPid": 2255,
+          "cpuPercent": 5.7,
+          "elapsed": "05-01:00:34",
+          "cumulativeCPUTime": "101:09.34",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper.app/Contents/MacOS/Google Chrome Helper"
+        },
+        {
+          "pid": 2336,
+          "parentPid": 826,
+          "cpuPercent": 2.8,
+          "elapsed": "05-01:00:33",
+          "cumulativeCPUTime": "60:24.96",
+          "executable": "/Applications/Clash Verge.app/Contents/MacOS/verge-mihomo"
+        },
+        {
+          "pid": 24996,
+          "parentPid": 2255,
+          "cpuPercent": 29.8,
+          "elapsed": "01:14:27",
+          "cumulativeCPUTime": "1:28.34",
+          "executable": "/Applications/Google Chrome.app/Contents/Frameworks/Google Chrome Framework.framework/Versions/153.0.8010.36/Helpers/Google Chrome Helper (Renderer).app/Contents/MacOS/Google Chrome Helper (Renderer)"
+        },
+        {
+          "pid": 37096,
+          "parentPid": 37085,
+          "cpuPercent": 7.5,
+          "elapsed": "03:50",
+          "cumulativeCPUTime": "0:54.39",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (GPU).app/Contents/MacOS/Google Chrome for Testing Helper (GPU)"
+        },
+        {
+          "pid": 37653,
+          "parentPid": 37085,
+          "cpuPercent": 5.2,
+          "elapsed": "01:40",
+          "cumulativeCPUTime": "0:15.39",
+          "executable": "/Users/wcqqq1214/Library/Caches/ms-playwright/chromium-1223/chrome-mac-arm64/Google Chrome for Testing.app/Contents/Frameworks/Google Chrome for Testing Framework.framework/Versions/148.0.7778.96/Helpers/Google Chrome for Testing Helper (Renderer).app/Contents/MacOS/Google Chrome for Testing Helper (Renderer)"
+        },
+        {
+          "pid": 37995,
+          "parentPid": 51518,
+          "cpuPercent": 92.1,
+          "elapsed": "00:01",
+          "cumulativeCPUTime": "0:00.71",
+          "executable": "/opt/homebrew/bin/git"
+        },
+        {
+          "pid": 51546,
+          "parentPid": 51518,
+          "cpuPercent": 7.4,
+          "elapsed": "01-19:20:54",
+          "cumulativeCPUTime": "93:22.09",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Service).app/Contents/MacOS/Codex (Service)"
+        },
+        {
+          "pid": 51646,
+          "parentPid": 51518,
+          "cpuPercent": 7.0,
+          "elapsed": "01-19:20:53",
+          "cumulativeCPUTime": "123:35.17",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 52096,
+          "parentPid": 51518,
+          "cpuPercent": 3.3,
+          "elapsed": "01-19:20:41",
+          "cumulativeCPUTime": "0:29.89",
+          "executable": "/Applications/ChatGPT.app/Contents/Frameworks/Codex Framework.framework/Versions/153.0.8010.48/Helpers/Codex (Renderer).app/Contents/MacOS/Codex (Renderer)"
+        },
+        {
+          "pid": 61952,
+          "parentPid": 1,
+          "cpuPercent": 4.6,
+          "elapsed": "04-00:13:34",
+          "cumulativeCPUTime": "40:48.09",
+          "executable": "/System/Library/DriverExtensions/AppleCentauriAlpha.dext/AppleCentauriAlpha"
+        }
+      ]
+    }
+  ],
+  "browserRunnerPid": 37083,
+  "finishedAt": "2026-09-20T15:11:11.637241+00:00",
+  "exitCode": 0
+}
