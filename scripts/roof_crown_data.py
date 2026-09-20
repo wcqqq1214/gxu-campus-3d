@@ -9,7 +9,7 @@ def resolve_roof_crown(building, form, config):
     fields = {'part', 'polygon', 'vertex', 'width', 'depth', 'rise', 'glassBottom',
               'glassTop', 'frontEnd', 'sideEnd', 'columns', 'sideColumns', 'rows',
               'screenRise', 'screenBottomDepth', 'screenTopDepth', 'screenThickness'}
-    if not isinstance(config, dict) or set(config) != fields:
+    if not isinstance(config, dict) or not fields <= set(config) or set(config)-fields-{'sideWall'}:
         raise ValueError('Roof crown needs complete corner, glazing and screen dimensions')
     if any(k in form for k in ('stairTower', 'roofDome', 'roofEave')):
         raise ValueError('Roof crown conflicts with another roof feature')
@@ -58,6 +58,25 @@ def resolve_roof_crown(building, form, config):
     support = unary_union([Polygon(p[0],p[1:]) for p in part['polygons']])
     if not support.buffer(1e-7).covers(footprint):
         raise ValueError('Roof crown leaves its support or enters a courtyard')
+    side_wall = None
+    if 'sideWall' in c:
+        sw = c['sideWall']
+        if not isinstance(sw, dict) or set(sw) != {'baseHeight', 'projection'}:
+            raise ValueError('Side wall needs base height and outward projection')
+        if any(type(value) not in (int, float) or not math.isfinite(value) for value in sw.values()):
+            raise ValueError('Side wall dimensions must be finite numbers')
+        if not -.5 <= sw['baseHeight'] <= part['height']-1 or not .02 <= sw['projection'] <= min(.12,c['screenThickness']/2):
+            raise ValueError('Side wall base/projection outside supported bounds')
+        slope = (c['screenBottomDepth']-c['screenTopDepth'])/c['screenRise']
+        bottom_depth = c['screenBottomDepth']+(part['height']-sw['baseHeight'])*slope
+        if bottom_depth > min(depth_limit,18):
+            raise ValueError('Extended side wall exceeds its corner edge')
+        backing = Polygon([point(0,c['depth']),point(c['screenThickness'],c['depth']),
+                           point(c['screenThickness'],bottom_depth),point(0,bottom_depth)])
+        line = LineString([point(0,c['depth']),point(0,bottom_depth)])
+        if not support.buffer(1e-7).covers(backing) or not support.boundary.buffer(1e-7).covers(line):
+            raise ValueError('Extended side wall must follow one complete solid facade')
+        side_wall = {**copy.deepcopy(sw), 'bottomDepth':bottom_depth}
     # Delete only the portions of the old roof parapet under the new body/screen.
     edges = part.get('parapetEdges', [(p,q) for poly in part['polygons'] for r in poly for p,q in zip(r,r[1:])])
     retained = []
@@ -65,5 +84,8 @@ def resolve_roof_crown(building, form, config):
         line = LineString([p,q]).difference(footprint.buffer(1e-7))
         pieces = [line] if line.geom_type == 'LineString' else list(getattr(line, 'geoms', []))
         retained.extend([list(s.coords[0]), list(s.coords[-1])] for s in pieces if s.geom_type == 'LineString' and s.length > .01)
-    return {**copy.deepcopy(c), 'corner':list(a), 'u':u, 'v':v, 'baseHeight':part['height'],
-            'footprint':[list(p) for p in footprint.exterior.coords], 'retainedParapetEdges':retained}
+    result = {**copy.deepcopy(c), 'corner':list(a), 'u':u, 'v':v, 'baseHeight':part['height'],
+              'footprint':[list(p) for p in footprint.exterior.coords], 'retainedParapetEdges':retained}
+    if side_wall is not None:
+        result['sideWall'] = side_wall
+    return result

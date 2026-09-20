@@ -45,5 +45,18 @@ class RoofCrownTests(unittest.TestCase):
         c.update(vertex=4,width=5,depth=3,frontEnd=4.8,sideEnd=2.8,screenTopDepth=4,screenBottomDepth=5)
         with self.assertRaisesRegex(ValueError,'support|courtyard'):self.resolve(b,c)
 
+    def test_side_wall_continues_roof_slope_and_requires_backing(self):
+        b,c=self.fixture();c['sideWall']=dict(baseHeight=-.5,projection=.08)
+        r=self.resolve(b,c)['form']['roofCrown'];sw=r['sideWall']
+        self.assertAlmostEqual(sw['bottomDepth'],8+17*1.8/8.4)
+        for bad in [dict(baseHeight=-1,projection=.08),dict(baseHeight=16,projection=.08),
+                    dict(baseHeight=0,projection=.5),dict(baseHeight=0,projection=True),
+                    dict(baseHeight=0,projection=float('nan')),dict(baseHeight=0),{}]:
+            with self.subTest(bad=bad),self.assertRaises(ValueError):self.resolve(b,{**c,'sideWall':bad})
+        # The roof-level screen fits; a setback below its wider foot does not.
+        b['polygons']=[[[[0,0],[0,30],[-30,30],[-30,8.5],[-8.5,8.5],[-8.5,0],[0,0]]]]
+        without=dict(c);without.pop('sideWall');self.resolve(b,without)
+        with self.assertRaisesRegex(ValueError,'corner edge|complete solid facade'):self.resolve(b,c)
+
 
 if __name__=='__main__':unittest.main()

@@ -8,6 +8,7 @@ ROOT=Path(__file__).resolve().parents[1]
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s2-civil-return')
 CROWN_ADDED='--crown-added' in sys.argv
+SIDE_WALL_ADDED='--side-wall-added' in sys.argv
 ID,CHUNK,Z='relation/12875606','chunk-n2-n3',4.06
 CORNER=Vector((-476.769698452549,-838.0503560000666,0))
 WEST=Vector((-493.45022625596147,-838.0280919998064,0))
@@ -57,6 +58,7 @@ def check(objects,tolerance):
             face(label,u,n,(start+end)/2,26.2,'stone',0)
     # Keep the rest of the east facade and both lower storey joints intact.
     for distance,height in [(4.2,16.5),(8,16.5),(1.5,3.3),(1.5,6.6)]:
+        if SIDE_WALL_ADDED and distance in (4.2,8):continue
         face('east-retained',SIDE,E,distance,height,'stone',0)
     return dict(passed=True,rayCount=len(samples),samples=samples,toleranceMeters=tolerance)
 
@@ -64,6 +66,8 @@ def check(objects,tolerance):
 report=dict(passed=False,scope='South upper glazing extends to a 0.10 m corner return; 3.60 m estimated east return, two columns/twelve rows, same 7.8–26.0 m heights. Roof crown and side portal remain pending.')
 if CROWN_ADDED:
     report['scope']='Retained 7.8–26.0 m south/east glazing; the two former solid roof-strip probes are superseded by the separate crown validator.'
+if SIDE_WALL_ADDED:
+    report['scope']+=' Two east-wall stone probes at distances 4.2/8 m are superseded by explicit white side-wall checks.'
 report['fingerprints']={p:hashlib.sha256((TARGET/p).read_bytes()).hexdigest() for p in
     ['blender/gxu-campus.blend','public/models/base.glb',f'public/models/{CHUNK}.glb','public/data/buildings.json']}
 try:

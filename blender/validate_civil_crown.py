@@ -6,6 +6,7 @@ from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1]
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s2-civil-crown')
+SIDE_WALL_ADDED='--side-wall-added' in sys.argv
 ID,CHUNK,Z='relation/12875606','chunk-n2-n3',4.06
 A=Vector((-476.769698452549,-838.0503560000666,0))
 U=Vector((-0.9999991092491528,0.0013347287742266436,0))
@@ -55,7 +56,7 @@ def check(objects,tolerance):
   assert hit and abs(hit[0].z-Z-h)<tolerance and hit[1].z>.98,('screen/retained roof',s,t,h,hit)
   samples.append(dict(kind='screen-or-retained-roof',u=s,v=t,height=hit[0].z-Z))
  for t in (4,5,6):
-  for h in (27.5,30,34):face('white-screen',V,E,t,h,'white',0)
+  for h in (27.5,30,34):face('white-screen',V,E,t,h,'white',.08 if SIDE_WALL_ADDED else 0)
  for h in (27,30,34):
   expected=8-(h-26.4)*1.8/8.4
   hit=ray(A+U*.175+V*8.8+Vector((0,0,Z+h)),-V,4)
@@ -68,6 +69,8 @@ def check(objects,tolerance):
  return dict(passed=True,rayCount=len(samples),samples=samples,toleranceMeters=tolerance)
 
 report=dict(passed=False,scope='Estimated corner crown roof 32.4 m, glazing 26.0–32.2 m and tapered east roof screen 34.8 m; lower tower fin and side portal pending.')
+if SIDE_WALL_ADDED:
+ report['scope']='Retained crown height/glazing, white screen top/taper and unchanged roof; screen outer plane moves 0.08 m outward to join the extended lower side wall, checked separately.'
 report['fingerprints']={p:hashlib.sha256((TARGET/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb',f'public/models/{CHUNK}.glb','public/data/buildings.json']}
 try:
  bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
