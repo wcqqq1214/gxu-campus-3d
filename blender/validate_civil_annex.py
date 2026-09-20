@@ -12,9 +12,14 @@ ROOT = Path(__file__).resolve().parents[1]
 TARGET = next((Path(a.split('=', 1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')), ROOT)
 PREFIX = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-annex')
 DECORATED_STEP = '--decorated-step' in sys.argv
+TERRACE_ADDED = '--terrace-added' in sys.argv
 ID, CHUNK, Z = 'relation/12875606', 'chunk-n2-n3', 4.06
 LOW = [(-545, y, 10.8) for y in (-839, -843, -848, -856, -860)]
 LOW += [(x, y, 10.8) for x in (-541, -535, -529, -523, -516) for y in (-851, -856, -861)]
+if TERRACE_ADDED:
+    # The old -516 samples now touch the new upper roof edge/parapet.
+    # Probe the retained roof farther inside; the terrace has its own validator.
+    LOW = [(-518 if x == -516 else x, y, h) for x, y, h in LOW]
 HIGH = [(x, -830, 26.4) for x in (-545, -540, -535, -522, -509, -500)]
 HIGH += [(x, -800, 26.4) for x in (-525, -520, -510, -500, -490)]
 HIGH += [(-480, y, 26.4) for y in (-795, -805, -815, -825)]
@@ -77,6 +82,8 @@ def check(objects, tolerance):
 
 report = dict(passed=False, scope='Estimated 10.8 m southwest C wing, retained 26.4 m main/rear roof, shared boundary, original courtyard and forecourt voids; detailed roof tiers remain pending.')
 report['exposedWallProbeMode'] = 'retained solid bands beside explicit details' if DECORATED_STEP else 'original undecorated wall'
+if TERRACE_ADDED:
+    report['scope'] = 'Retained 10.8 m inner annex roof, 26.4 m main/rear roof, shared boundary and original voids; east terrace and its new upper roof edge checked separately.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET / 'blender/gxu-campus.blend'))
     report['source'] = check([o for o in bpy.context.scene.objects if o.get('featureId') == ID], .006)
