@@ -2,6 +2,28 @@
 import math
 
 
+def validate_horizontal_ledges(config, height):
+    """Independent eaves, with explicit top heights above the building datum."""
+    fields = {'from', 'to', 'tops', 'depth', 'thickness'}
+    if not isinstance(config, dict) or set(config) != fields:
+        raise ValueError('Horizontal ledges need bounds, top heights, depth and thickness')
+    for key in fields - {'tops'}:
+        number(config[key], key)
+    if not 0 <= config['from'] < config['to'] <= 1:
+        raise ValueError('Horizontal ledges must stay on their facade')
+    if not .1 <= config['depth'] <= 1 or not .06 <= config['thickness'] <= .3:
+        raise ValueError('Horizontal ledge dimensions are not usable')
+    tops = config['tops']
+    if not isinstance(tops, list) or not 1 <= len(tops) <= 50:
+        raise ValueError('Horizontal ledges need explicit top heights')
+    previous = 0
+    for top in tops:
+        number(top, 'top height')
+        if not previous + config['thickness'] + .1 <= top <= height:
+            raise ValueError('Horizontal ledges must be ordered, separate and within the wall height')
+        previous = top
+
+
 def number(value, label):
     if type(value) not in (int, float) or not math.isfinite(value):
         raise ValueError('Window bands need a finite ' + label)
@@ -43,4 +65,3 @@ def validate_window_bands(config, length, height, levels):
         previous = end
     if (config['to']-previous)*length < .16:
         raise ValueError('Last window frame crosses the band boundary')
-

@@ -1,0 +1,56 @@
+{
+  "passed": true,
+  "method": "Direct review of seven final building screenshots plus library mobile regression",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-ledges-visible/before/agriculture-front-ledges-trees-off-day.png",
+      "sha256": "15acc87ff5a022159761e5f0868709440e87ae01e44f8419992c6f176b08d875",
+      "accepted": true,
+      "note": "Baseline lacks the continuous projecting strips; counterpart uses identical final camera."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-ledges-visible/before/agriculture-west-ledges-trees-off-day.png",
+      "sha256": "b8e00da4e7f52f7c2ee811cac7b264f08fc4641ccf898b0c90a50cbb007bb59c",
+      "accepted": true,
+      "note": "Baseline lacks the continuous projecting strips; counterpart uses identical final camera."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-ledges-visible/after/agriculture-front-ledges-trees-off-day.png",
+      "sha256": "4535377511dd1f3f8d944a6c9ee709024114c05282225e013d57a0689a897adc",
+      "accepted": true,
+      "note": "Elevated front view: both ledged wings and retained low portico visible; original generic window layout retained."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-ledges-visible/after/agriculture-west-ledges-trees-off-day.png",
+      "sha256": "4fb9875d5dbec6b096cbacd19589c35fb99a85e83c5751b350d1e0445adca356",
+      "accepted": true,
+      "note": "Oblique west wall: five projecting strips distinguish the corrected main wall; end block remains uncalibrated, portico retained."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-ledges-visible/after/agriculture-west-ledges-trees-on-day.png",
+      "sha256": "28ce6931a9e4c4e0555ba60485055ced4bdcd11601ea1b1034a29417c9216bc6",
+      "accepted": true,
+      "note": "Oblique west wall: five projecting strips distinguish the corrected main wall; end block remains uncalibrated, portico retained. Vegetation enabled through UI; no tree removal in this batch."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-ledges-visible/after/agriculture-front-ledges-trees-off-night.png",
+      "sha256": "4a6bc50d79922ef1b57625212bc07fb464b941a9b35246c60bc09b78724823d9",
+      "accepted": true,
+      "note": "Elevated front view: both ledged wings and retained low portico visible; original generic window layout retained. Existing night appearance remains, no new lighting."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-ledges-visible/after/agriculture-front-ledges-trees-off-day-mobile.png",
+      "sha256": "a5d0b8a433265610c4e32b3028c351b717e97ae2c1dfa8713b896e358a9671ad",
+      "accepted": true,
+      "note": "Five ledges on the east wing remain visible in actual base LOD at portrait viewport. Partial facade view, not entire building; desktop simulation, not a device test."
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-agriculture-ledges-performance/library-mobile.png",
+      "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4",
+      "accepted": true,
+      "note": "Library mobile regression: stairs, entrance and foreground connection remain visible in portrait viewport."
+    }
+  ],
+  "initialViews": "work/refinement-s3-agriculture-ledges/initial-context-browser.json and initial-views: first front view obscured ground level behind southern neighbor; not used for final acceptance",
+  "modelManifestSha256": "eba45577b2a196bb8c26f52617695130bed63cdacacd684c60844b591d84c09e"
+}

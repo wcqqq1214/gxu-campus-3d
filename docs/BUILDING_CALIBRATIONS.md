@@ -126,3 +126,5 @@ blender --background --python-exit-code 1 --python blender/validate_generic.py -
 2026-09-16：新增[物理学院中央屋顶穹顶](PHYSICS_BUILDING_ROOF.md)，累计20条部分对象记录。`roofDome`以原屋顶为支撑，基础和近景共享；位置、半径和增高均为照片约束估算。主体9层与29.7米仍待核对，未新增整栋验收完成数。
 
 2026-09-16：[物理学院第五层外廊](PHYSICS_BUILDING_CORRIDOR.md)增加包含末层的 `openCorridor.lastLevel`，仅开放六个外侧立面的第五层。设计方1–2F/3–5F/6–9F分层图补充九层依据，主体29.7米仍为估算。累计20条部分对象记录，整栋验收数不增加。
+
+2026-09-20：新增独立的 `facadeRules.horizontalLedges`，用原外边范围、显式顶面标高、深度和厚度表达水平挑檐，保留原窗列。限实体外墙、显式关闭阳台，拒绝门廊、切开但未指定分段的边和其他专项立面混用；远近景共享几何。当前仅农学院正面第7、11边使用，参数为估算，见[专项记录](AGRICULTURE_FACADE_LEDGES.md)。

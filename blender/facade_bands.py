@@ -24,6 +24,16 @@ def add_band_ledges(mesh, facade, z, C):
                  band['thickness'], C['white'], theta)
 
 
+def add_horizontal_ledges(mesh, facade, z, C):
+    ledges = facade['rule']['horizontalLedges']
+    length, _, _, theta, point = frame(facade)
+    x, y = point((ledges['from']+ledges['to'])/2, ledges['depth']/2)
+    for top in ledges['tops']:
+        mesh.box(x, y, z+top-ledges['thickness']/2,
+                 (ledges['to']-ledges['from'])*length, ledges['depth'],
+                 ledges['thickness'], C['white'], theta)
+
+
 def add_band_windows(mesh, facade, z, C, detail):
     band = facade['rule']['windowBands']
     length, u, n, theta, point = frame(facade)
