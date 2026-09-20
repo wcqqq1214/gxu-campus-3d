@@ -53,6 +53,17 @@ if sites['roadRevision']!=hashlib.sha256(json.dumps(campus_roads['layers'],separ
     raise RuntimeError('Site road boundary is stale; run the full data preparation')
 for site in sites['sites']:
     building=next(b for b in buildings if b['id']==site['buildingId'])
+    if site.get('type')=='forecourt-paths':
+        config=next(s for s in json.loads((ROOT/'data/site-overrides.json').read_text())['sites'] if s['id']==site['id'])
+        index,target=next((i,s) for i,s in enumerate(surfaces) if s['id']==site['surfaceId'])
+        target={**target,**infrastructure['surfaceOverrides'].get(str(index),{}),**surroundings['surfaceOverrides'].get(str(index),{}),**campus_roads['surfaceOverrides'].get(str(index),{})}
+        paving=next(p for p in pavings['pavings'] if p['surfaceId']==site['surfaceId'])
+        if (any(site.get(k)!=v for k,v in config.items())
+            or site['footprintRevision']!=hashlib.sha256(json.dumps(building['polygons'],separators=(',',':')).encode()).hexdigest()
+            or site['surfaceRevision']!=hashlib.sha256(json.dumps(target,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+            or site['surfaceOffset']!=paving.get('groundedService',{}).get('offset')):
+            raise RuntimeError('Forecourt path context is stale; run site preparation')
+        continue
     if site.get('type')=='courtyard-paving':
         if connection:=site.get('stairConnection'):
             target=next((b for b in buildings if b['id']==connection['buildingId']),None)
