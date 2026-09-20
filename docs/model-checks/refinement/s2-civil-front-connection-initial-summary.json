@@ -1,0 +1,127 @@
+{
+  "checkedAt": "2026-09-20T17:55:48.599924+00:00",
+  "passed": false,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": false,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [
+    "Resolve remaining performance or comparability failure"
+  ],
+  "baseCommit": "5b9dc00",
+  "branch": "dev",
+  "scope": "Grounded repair of mapped forecourt service road and two bounded estimated paving connectors: southeast doorway to mapped service surface and annex lower stair toe to the same surface. Buildings and stair geometry retained. Whole forecourt, planting, remaining annex roof and other facades not accepted",
+  "partialObjectRecords": 21,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 203,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "road-grade-geometry",
+    "annex-path-geometry",
+    "terrace-geometry",
+    "portal-geometry",
+    "sidewall-geometry",
+    "crown-geometry",
+    "stairs-geometry",
+    "return-geometry",
+    "step-geometry",
+    "recess-geometry",
+    "geometry",
+    "retained-geometry",
+    "annex-geometry",
+    "entry-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        48,
+        60,
+        48
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 48,
+        "medianTriangles": 4228163,
+        "medianDrawCalls": 569
+      },
+      "changePercent": {
+        "medianFPS": -19.999999999999996,
+        "medianTriangles": 5.18027721944716,
+        "medianDrawCalls": 4.0219378427788
+      },
+      "passed": false
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1176594,
+        "medianDrawCalls": 300
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 11.849383760557819,
+        "medianDrawCalls": 14.068441064638781
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5586592,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/site-overrides.json": "aefc67261b40542d27331cd644362fe52b049c6b82acb5f433626725110ed9e8",
+    "data/paving-overrides.json": "8feb5362b3287525862d2f8775dc24505dbf7edfff3dd168d4a0dc893e199fb8",
+    "public/data/pavings.json": "384f4702eacd519b9ab1d454bfb495e29d41069becdd00a0f3553d82f990a8f8",
+    "data/building-overrides.json": "41d05e2a477b6774dbffd97716f70fc67aae69ae1949f635569bcbc962256411",
+    "data/building-sources.json": "81caab3d15ca39c79440b3527c2a6f0704c3df1772046938bbfdd5fe5383281a",
+    "blender/gxu-campus.blend": "fc5551bab0a12eeebcffd3f51e25ec40c92229096efde5c86cb546684accb287",
+    "public/data/buildings.json": "fccdf423db44fe2933bf711b898a39fff22c92e0c2330111111c9b6c8cfe59be",
+    "public/data/models.json": "7f16fab9212239a74e5168af9cebced3c3a370af147a73d8b43c3c2b76cbb7ed"
+  }
+}

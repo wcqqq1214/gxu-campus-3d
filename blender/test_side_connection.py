@@ -87,3 +87,16 @@ for x in [-3.9,0,3.9]:
 for x,y in [(-3,3),(1,6),(3,11)]:assert height(final,x,y)<=height(path,x,y)-.1199
 assert abs(height(final,6,7)-.25)<1e-5
 print('Mapped-canopy join passed: oblique platform edge, road plane and bounded ground clearance',flush=True)
+
+# A terraced-stair toe uses an explicit exterior anchor, with no synthetic door.
+terraced={**front,'type':'terraced-stair-connection','entry':{'terracedStairs':{}},'halfWidth':4,'material':'path'}
+terrain=Mesh();terrain.face([(-10,-5,.25),(10,-5,.25),(10,20,.25),(-10,20,.25)],0)
+roads=Mesh();roads.face([(x,y,.4+.02*x) for x,y in [(-8,12),(8,12),(8,18),(-8,18)]],0)
+ground,rest,meshes,_=build_side_connection(terraced,{'path':0},lambda x,y:0,terrain,roads)
+path=tree(meshes['site-test']);final=tree(ground)
+for x in [-3.9,0,3.9]:
+    assert abs(height(path,x,2))<1e-5
+    assert abs(height(path,x,12.3)-(.4+.02*x))<.0001
+for x,y in [(-3,3),(1,6),(3,11)]:assert height(final,x,y)<=height(path,x,y)-.1199
+assert abs(height(final,6,7)-.25)<1e-5
+print('Terraced-stair connection passed: full toe width, road plane and no door dependency',flush=True)

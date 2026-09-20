@@ -119,13 +119,13 @@ def prepare_sites(root=ROOT):
         elif config.get('type')=='entry-apron':
             from entry_apron_data import derive_entry_apron
             site,area,grading=derive_entry_apron(config,buildings,source_ids)
-        elif config.get('type') in ('side-connection','front-connection'):
+        elif config.get('type') in ('side-connection','front-connection','terraced-stair-connection'):
             from side_connection_data import derive_side_connection
             from front_connection_data import derive_front_connection
             from shore_data import effective_surfaces
             effective=effective_surfaces(ss,[infra['surfaceOverrides'],surround['surfaceOverrides'],roads['surfaceOverrides']],set(infra['replaceSurfaceIds']))
             target=next((s for s in effective if s['id']==config['surfaceId']),None)
-            derive=derive_front_connection if config['type']=='front-connection' else derive_side_connection
+            derive=derive_front_connection if config['type'] in ('front-connection','terraced-stair-connection') else derive_side_connection
             site,area,grading=derive(config,buildings,target,source_ids)
         else:site,area,grading=derive_site(config,buildings,roads,source_ids)
         if any(grading.intersects(previous) for previous in gradings):raise ValueError('Overlapping site grading areas')

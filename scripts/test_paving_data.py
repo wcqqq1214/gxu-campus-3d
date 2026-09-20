@@ -24,4 +24,15 @@ class PavingDataTests(unittest.TestCase):
         with self.assertRaises(ValueError):derive_paving(c,bad,n,{'osm'})
     def test_context_changes_with_final_road_overlay(self):
         self.assertNotEqual(context_revision([],{}, {},{'layers':[]},{}),context_revision([],{}, {},{'layers':[1]},{}))
+    def test_grounded_service_is_explicit_bounded_and_at_grade(self):
+        c,s,n=self.fixture()
+        with self.assertRaises(ValueError):derive_paving({**c,'groundedService':None},s,n,{'osm'})
+        s['tags']['highway']='service'
+        with self.assertRaises(ValueError):derive_paving(c,s,n,{'osm'})
+        c['groundedService']={'offset':.12}
+        self.assertEqual(derive_paving(c,s,n,{'osm'})['groundedService'],{'offset':.12})
+        for bad in [None,{}, {'offset':True},{'offset':float('nan')},{'offset':.4}]:
+            with self.subTest(bad=bad),self.assertRaises(ValueError):derive_paving({**c,'groundedService':bad},s,n,{'osm'})
+        s['tags']['bridge']='yes'
+        with self.assertRaises(ValueError):derive_paving(c,s,n,{'osm'})
 if __name__=='__main__':unittest.main()

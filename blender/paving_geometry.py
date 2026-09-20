@@ -1,5 +1,6 @@
 """Join one mapped pavement to real road triangles and close exposed sides."""
 import math
+from functools import lru_cache
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from geometry import Mesh
@@ -45,6 +46,10 @@ def clear_paving_ground(terrain,paving,record):
             remaining=leftovers
         for part in remaining:triangles_into(result,part,terrain.m[face])
     if not lowered:return terrain,{'loweredPieces':0,'maximumLoweringMeters':0}
+    # A grounded road already follows this very terrain. BVH float32 sampling
+    # can produce micrometre deltas; do not retessellate it for that roundoff.
+    if 'groundedService' in record and maximum<=.0001:
+        return terrain,{'loweredPieces':0,'maximumLoweringMeters':0,'ignoredRoundoffLoweringMeters':maximum}
     touched=bounds([terrain.v[k] for i in selected for k in terrain.f[i]])
     result=conform_edges(result,tuple(v+(-1 if i<2 else 1) for i,v in enumerate(touched)))
     return result,{'loweredPieces':lowered,'maximumLoweringMeters':maximum,'pavingClearanceMeters':clearance}
@@ -62,11 +67,24 @@ def split_at_feather(piece,join,feather):
 
 def build_pavings(data,C,terrain,roads,originals):
     output={};reports=[]
-    ground=BVHTree.FromPolygons(terrain.v,[t for t,_ in mesh_triangles(terrain)],all_triangles=True)
+    ground_faces=mesh_triangles(terrain)
+    ground=BVHTree.FromPolygons(terrain.v,[t for t,_ in ground_faces],all_triangles=True)
     for record in data['pavings']:
         original=originals[record['surfaceId']];triangles=[[original.v[k] for k in ids] for ids,_ in mesh_triangles(original)]
+        ground_pieces=[]
+        if 'groundedService' in record:
+            for ids,_ in ground_faces:
+                piece=[terrain.v[k] for k in ids];area=bounds(piece)
+                if not overlaps(area,record['bounds']):continue
+                if (piece[1][0]-piece[0][0])*(piece[2][1]-piece[0][1])-(piece[1][1]-piece[0][1])*(piece[2][0]-piece[0][0])<0:piece.reverse()
+                ground_pieces.append((piece,area))
         neighboring=BVHTree.FromPolygons(roads.v,[t for t,_ in mesh_triangles(roads)],all_triangles=True)
+        @lru_cache(maxsize=None)
         def old_height(x,y):
+            if 'groundedService' in record:
+                hit=ground.ray_cast(Vector((x,y,200)),Vector((0,0,-1)),400)[0]
+                if hit is None:raise ValueError('Missing terrain beneath grounded service road')
+                return hit.z+record['groundedService']['offset']
             for a,b,c in triangles:
                 den=(b[1]-c[1])*(a[0]-c[0])+(c[0]-b[0])*(a[1]-c[1])
                 if abs(den)<1e-12:continue
@@ -98,13 +116,19 @@ def build_pavings(data,C,terrain,roads,originals):
                     x,y=ix*step,iy*step
                     piece,_=split_convex(tri,[(x,y),(x+step,y),(x+step,y+step),(x,y+step)])
                     pieces=[piece] if len(piece)>=3 else []
+                    if ground_pieces:
+                        # Sampling a grid alone bridges terrain creases. Split
+                        # at actual ground triangle edges before sampling Z.
+                        pieces=[cut for p in pieces for outline,area in ground_pieces
+                                if overlaps(bounds(p),area)
+                                for cut in [split_convex(p,outline)[0]] if len(cut)>=3]
                     for join in record['joins']:
                         pieces=[part for piece in pieces for part in split_at_feather(piece,join,record['joinFeather'])]
                     for piece in pieces:
                         for i in range(1,len(piece)-1):
                             a,b,c=piece[0],piece[i],piece[i+1]
                             if abs((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]))>1e-9:
-                                paving.face([(p[0],p[1],top(p[0],p[1])) for p in [a,b,c]],C['path'])
+                                paving.face([(p[0],p[1],top(p[0],p[1])) for p in [a,b,c]],C['road' if 'groundedService' in record else 'path'])
         # Partial road openings also split the top edge, so compressed side and
         # top faces share the exact same boundary segments.
         for line in record['freeEdges']:
@@ -133,7 +157,7 @@ def build_pavings(data,C,terrain,roads,originals):
                     if hit is None:raise ValueError('No terrain beneath paving edge')
                     z=top(x,y);bottom=min(hit.z-record['burial'],z-record['burial']);stations.append(((x,y,bottom),(x,y,z)))
                 for a,b in zip(stations,stations[1:]):
-                    face=[a[0],b[0],b[1],a[1]];side.face(face if ccw else list(reversed(face)),C['path']);side_count+=1
+                    face=[a[0],b[0],b[1],a[1]];side.face(face if ccw else list(reversed(face)),C['road' if 'groundedService' in record else 'path']);side_count+=1
         mesh=Mesh();mesh.add_part('01_原轮廓铺面及局部接缝过渡',paving);mesh.add_part('02_露出边缘封口',side)
         output['paving-'+record['id']]=mesh
         for index,join in enumerate(record['joins']):
@@ -158,3 +182,30 @@ def sync_source_pavings(base):
             if data.users==0:bpy.data.meshes.remove(data)
     for key,mesh in base.items():
         if key.startswith('paving-'):mesh.object(key,collection,{'layer':'roads'})
+
+def split_grounded_road_exports(groups,records):
+    """Bound road quantization locally; retain buried overlap at export seams."""
+    result=dict(groups)
+    for record in records:
+        if 'groundedService' not in record:continue
+        x0,y0,x1,y1=record['bounds']
+        def rectangle(extra):
+            return [(x0-extra,y0-extra),(x1+extra,y0-extra),(x1+extra,y1+extra),(x0-extra,y1+extra)]
+        # Include neighboring road contacts well beyond the 3 m end blends.
+        outline=rectangle(5);outer=rectangle(5.2);original=result['roads']
+        triangles=mesh_triangles(original)
+        selected={face for ids,face in triangles if overlaps(bounds([original.v[i] for i in ids]),bounds(outer))}
+        rest,local=contact_road(original,triangles,outline,outer,.2,.06)
+        # The contact splitter works in XY and omits vertical closure faces.
+        # Keep each such face once, in the node containing its midpoint.
+        for ids,face in triangles:
+            if face not in selected:continue  # already in rest
+            points=[original.v[i] for i in ids]
+            normal=(Vector(points[1])-Vector(points[0])).cross(Vector(points[2])-Vector(points[0]))
+            if abs(normal.z)>1e-9:continue
+            cx=sum(p[0] for p in points)/3;cy=sum(p[1] for p in points)/3
+            target=local if x0-5<=cx<=x1+5 and y0-5<=cy<=y1+5 else rest
+            target.face(points,original.m[face])
+        result['roads']=rest
+        result['paving-'+record['id']+'-export']=local
+    return result

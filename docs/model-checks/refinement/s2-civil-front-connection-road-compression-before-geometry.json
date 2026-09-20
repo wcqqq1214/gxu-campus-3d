@@ -1,0 +1,66 @@
+{
+  "passed": false,
+  "scope": "Mapped 309.606 square metre service road repaired to original rendered terrain plus estimated 0.12 m offset; both campus road contacts preserved through 3 m blends. Fixed old discontinuity scan included.",
+  "source": {
+    "passed": true,
+    "interiorSamples": 1024,
+    "maximumGroundedHeightError": 4.089355468750444e-05,
+    "minimumGroundClearance": 0.1199798583984375,
+    "formerFailureProfiles": [
+      {
+        "x": -1.125,
+        "maximumStepPer2cm": 0.00042724609375
+      },
+      {
+        "x": 0,
+        "maximumStepPer2cm": 0.00042724609375
+      },
+      {
+        "x": 1.125,
+        "maximumStepPer2cm": 0.00042724609375
+      }
+    ],
+    "joins": [
+      {
+        "edge": 4,
+        "t": 0.2,
+        "maximumStepPer2cm": 0.0101165771484375,
+        "measuredGapUpperBounds": [
+          0.0001
+        ]
+      },
+      {
+        "edge": 4,
+        "t": 0.5,
+        "maximumStepPer2cm": 0.01006317138671875,
+        "measuredGapUpperBounds": []
+      },
+      {
+        "edge": 4,
+        "t": 0.8,
+        "maximumStepPer2cm": 0.00988006591796875,
+        "measuredGapUpperBounds": []
+      },
+      {
+        "edge": 10,
+        "t": 0.2,
+        "maximumStepPer2cm": 0.00310516357421875,
+        "measuredGapUpperBounds": []
+      },
+      {
+        "edge": 10,
+        "t": 0.5,
+        "maximumStepPer2cm": 0.00337982177734375,
+        "measuredGapUpperBounds": []
+      },
+      {
+        "edge": 10,
+        "t": 0.8,
+        "maximumStepPer2cm": 0.003387451171875,
+        "measuredGapUpperBounds": []
+      }
+    ],
+    "tolerance": 0.008
+  },
+  "failure": "('join gap exceeds precision bound', 4, 0.2, 0.01999999999999999)"
+}

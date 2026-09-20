@@ -73,9 +73,17 @@ for site in sites['sites']:
         if site['origin']!=[(a+b)/2 for a,b in zip(facade['start'],facade['end'])] or site['angle']!=-math.atan2(*facade['normal']):
             raise RuntimeError('Gallery apron frame is stale; run site preparation')
         continue
-    if site.get('type') in ('side-connection','front-connection','entry-apron','canopy-connection'):
-        entry=next((e for e in building.get('form',{}).get('entrances',[]) if e['id']==site['entranceId']),None)
-        if site['footprintRevision']!=hashlib.sha256(json.dumps(building['polygons'],separators=(',',':')).encode()).hexdigest() or site['entry']!=entry or site['origin']!=entry['center'] or site['angle']!=-math.radians(entry['bearing']):
+    if site.get('type') in ('side-connection','front-connection','terraced-stair-connection','entry-apron','canopy-connection'):
+        if site['type']=='terraced-stair-connection':
+            stairs=building.get('form',{}).get('terracedStairs')
+            entry={'terracedStairs':stairs}
+            origin=stairs['center'] if stairs else None
+            angle=math.atan2(stairs['tangent'][1],stairs['tangent'][0]) if stairs else None
+        else:
+            entry=next((e for e in building.get('form',{}).get('entrances',[]) if e['id']==site['entranceId']),None)
+            origin=entry['center'] if entry else None
+            angle=-math.radians(entry['bearing']) if entry else None
+        if site['footprintRevision']!=hashlib.sha256(json.dumps(building['polygons'],separators=(',',':')).encode()).hexdigest() or site['entry']!=entry or site['origin']!=origin or site['angle']!=angle:
             raise RuntimeError('Connection entrance is stale; run site preparation')
         if site.get('type') in ('entry-apron','canopy-connection'):continue
         index,target=next((i,s) for i,s in enumerate(surfaces) if s['id']==site['surfaceId'])
@@ -194,18 +202,25 @@ for si,original in enumerate(surfaces):
 from surroundings import surroundings_mesh
 base['roads'].extend(surroundings_mesh(surroundings,C,elevation,base['terrain']))
 base['roads'].extend(surroundings_mesh(campus_roads,C,elevation,base['terrain']))
+from paving_geometry import build_pavings
+# Grounded service roads must be repaired before their doorway/stair aprons
+# sample the road. Merge repaired surfaces and their contact strips into roads
+# so subsequent site clipping operates on the actual final road plane.
+early_pavings=[p for p in pavings['pavings'] if 'groundedService' in p]
+base['terrain'],base['roads'],early_meshes,early_report=build_pavings({'pavings':early_pavings},C,base['terrain'],base['roads'],paving_originals)
+for mesh in early_meshes.values():base['roads'].extend(mesh)
 from site_geometry import build_sites
 base['terrain'],base['roads'],site_meshes,site_report=build_sites(sites,C,elevation,base['terrain'],base['roads'])
 base.update(site_meshes)
 (ROOT/'docs/model-checks/refinement/site-build.json').write_text(json.dumps(site_report,ensure_ascii=False,indent=2)+'\n')
-from paving_geometry import build_pavings
-base['terrain'],base['roads'],paving_meshes,paving_report=build_pavings(pavings,C,base['terrain'],base['roads'],paving_originals)
+base['terrain'],base['roads'],paving_meshes,paving_report=build_pavings({'pavings':[p for p in pavings['pavings'] if 'groundedService' not in p]},C,base['terrain'],base['roads'],paving_originals)
+paving_report=early_report+paving_report
 base.update(paving_meshes)
 (ROOT/'docs/model-checks/refinement/paving-build.json').write_text(json.dumps(paving_report,ensure_ascii=False,indent=2)+'\n')
 from shore_geometry import build_shores
 base['terrain'],base['green'],shore_meshes,shore_report=build_shores(shores,C,base['terrain'],base['green'])
 base.update(shore_meshes)
-base['terrain'].ground_uv_bounds=[[v+(-1 if i<2 else 1) for i,v in enumerate(p['bounds'])] for p in pavings['pavings']]+[s['gradingBounds'] for s in sites['sites'] if s.get('type') in ('side-connection','front-connection','entry-apron','gallery-apron','canopy-connection')]
+base['terrain'].ground_uv_bounds=[[v+(-1 if i<2 else 1) for i,v in enumerate(p['bounds'])] for p in pavings['pavings']]+[s['gradingBounds'] for s in sites['sites'] if s.get('type') in ('side-connection','front-connection','terraced-stair-connection','entry-apron','gallery-apron','canopy-connection')]
 (ROOT/'docs/model-checks/refinement/shore-build.json').write_text(json.dumps(shore_report,ensure_ascii=False,indent=2)+'\n')
 print('Ground assembled',flush=True)
 infra_near={}
@@ -336,6 +351,9 @@ scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.samples=24;sce
 scene.view_settings.view_transform='AgX';scene.unit_settings.system='METRIC';scene.unit_settings.scale_length=1
 # Export aggregated geometry for low draw-call counts, retain individual editable source objects above.
 def export(name,groups):
+    if name=='base.glb':
+        from paving_geometry import split_grounded_road_exports
+        groups=split_grounded_road_exports(groups,pavings['pavings'])
     bpy.ops.object.select_all(action='DESELECT');objs=[]
     for key,mesh in groups.items():
         if not mesh.v:continue

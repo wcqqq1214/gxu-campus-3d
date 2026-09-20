@@ -10,7 +10,8 @@ BASELINE=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswi
 TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)
 SITE_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--site-id=')),'mathematics-north-connection')
 site=next(s for s in json.loads((ROOT/'public/data/sites.json').read_text())['sites'] if s['id']==SITE_ID)
-front=site.get('type')=='front-connection'
+grounded=next((p for p in json.loads((ROOT/'public/data/pavings.json').read_text())['pavings'] if p['surfaceId']==site.get('surfaceId') and 'groundedService' in p),None)
+front=site.get('type') in ('front-connection','terraced-stair-connection')
 b=next(b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if b['id']==site['buildingId'])
 angle=site['angle'];cs,sn=math.cos(angle),math.sin(angle);ox,oy=site['origin']
 def world(x,y):return ox+x*cs-y*sn,oy+x*sn+y*cs
@@ -22,8 +23,8 @@ def sampler(objects):
     for o in objects:
         if o.type!='MESH':continue
         o.data.calc_loop_triangles();ts.append(BVHTree.FromPolygons([o.matrix_world@v.co for v in o.data.vertices],[tuple(t.vertices) for t in o.data.loop_triangles],all_triangles=True))
-    def height(x,y):
-        hits=[t.ray_cast(Vector((x,y,100)),Vector((0,0,-1)),200)[0] for t in ts]
+    def height(x,y,bottom=-100,top=100):
+        hits=[t.ray_cast(Vector((x,y,top)),Vector((0,0,-1)),top-bottom)[0] for t in ts]
         return max((h.z for h in hits if h is not None),default=None)
     return height
 bpy.ops.wm.open_mainfile(filepath=str(BASELINE/'blender/gxu-campus.blend'))
@@ -50,18 +51,20 @@ def check(label):
             if inside((x,y),ring) and ring_distance((x,y),ring)>.06:
                 h,g=path(wx,wy),ground(wx,wy);assert h is not None and g is not None,('path or ground hole',x,y)
                 clearances.append(h-g);assert h-g>.055,('ground intersects connector',x,y,h-g)
-                obstruction=building(wx,wy)
+                # Check usable approach headroom, allowing a real high canopy.
+                # Footprint validation separately excludes solid building bodies.
+                obstruction=building(wx,wy,bottom=h+.03,top=h+2.1)
                 if not flush or y>portal_front+.025:
                     # The approach must be clear beyond the closed door/frame
                     # envelope. Door leaves and their jambs occupy that envelope
                     # intentionally; this is not an indoor walk-through test.
-                    assert obstruction is None or obstruction<=h+.03,('building blocks path',x,y)
+                    assert obstruction is None,('building blocks approach headroom',x,y,obstruction,h)
                 count+=1
             elif ring_distance((x,y),ring)>.2:
                 old,new=old_ground(wx,wy),ground(wx,wy);assert old is not None and new is not None
                 outside_errors.append(abs(old-new));assert abs(old-new)<tolerance,('terrain changed outside connection',x,y,old,new)
     flush='flushEntrance' in site['entry']
-    rises=[];w=site['halfWidth']*2 if flush else site['entry']['stairFlight' if front else 'attachedPortico']['width']
+    rises=[];w=site['halfWidth']*2 if 'halfWidth' in site else site['entry']['stairFlight' if front else 'attachedPortico']['width']
     for x in [-w/2+.2,-w/4,0,w/4,w/2-.2]:
         if flush:
             paved=path(*world(x,site['startY']+.025))
@@ -71,16 +74,25 @@ def check(label):
             continue
         paved=path(*world(x,site['startY']+.025));tread=building(*world(x,site['startY']-.15))
         assert paved is not None and tread is not None
-        expected=(site['entry']['landingHeight']-site['stairBaseHeight'])/site['entry']['stairFlight']['riserCount'] if front else .12
+        if 'terracedStairs' in site['entry']:
+            stairs=site['entry']['terracedStairs']
+            expected=(stairs['intermediateHeight']-stairs['baseHeight'])/stairs['lowerRisers']
+        else:expected=(site['entry']['landingHeight']-site['stairBaseHeight'])/site['entry']['stairFlight']['riserCount'] if front else .12
         rises.append(tread-paved)
         assert (abs(tread-paved-expected)<.03 if front else .085<tread-paved<.15),('stair join height',x,tread-paved)
     joins=[];max_jump=0;gap_bounds=[];max_jump_at=None
     for a,c in zip(site['columns'],site['columns'][1:]):
         x,y=(a[0]+c[0])/2,(a[1]+c[1])/2
         wx,wy=world(x,y+.05) if front else world(x-.05,y)
-        expected=old_roads(wx,wy);contact=path(wx,wy)
+        if grounded:
+            # These civil contacts lie outside the target road's end blends;
+            # the separate road validator checks those blends and both joins.
+            assert all(ring_distance((wx,wy),[j['a'],j['b'],j['a']])>grounded['joinFeather'] for j in grounded['joins']), 'Contact lies in road end blend'
+            expected=old_ground(wx,wy)+grounded['groundedService']['offset']
+        else:expected=old_roads(wx,wy)
+        contact=path(wx,wy)
         assert expected is not None and contact is not None
-        joins.append(abs(expected-contact));assert abs(expected-contact)<tolerance,('road plane changed at contact',x,y)
+        joins.append(abs(expected-contact));assert abs(expected-contact)<tolerance,('road contact differs from reference plane',x,y)
         previous=None
         for i in range(101):
             xx,yy=(x,y-.3+i*.02) if front else (x+.3-i*.02,y)
@@ -102,6 +114,7 @@ def check(label):
             previous=h
         assert max_jump<.06,('footway join step',max_jump,max_jump_at)
     return {'pavingSamples':count,'minimumGroundClearance':min(clearances),'outsideTerrainSamples':len(outside_errors),
+        'approachHeadroomCheckedMeters':2.1,
         'closedPortalEnvelopeDepth':portal_front,'approachObstructionStart':portal_front+.025 if flush else 0,
         'maximumOutsideTerrainError':max(outside_errors),
         ('thresholdOffsetRange' if flush else 'stairRiseRange'):[min(rises),max(rises)],
