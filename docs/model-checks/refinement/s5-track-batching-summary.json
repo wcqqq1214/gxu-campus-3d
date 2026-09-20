@@ -1,0 +1,155 @@
+{
+  "checkedAt": "2026-09-20T23:24:01.566118+00:00",
+  "baseCommit": "d8a7642",
+  "branch": "dev",
+  "passed": true,
+  "scope": "Runtime colour-only surface batching within two existing track nodes; no production geometry changes or newly accepted buildings.",
+  "nodeTests": 59,
+  "checks": {
+    "typecheck": true,
+    "lint": true,
+    "pagesBuild": true,
+    "decodedGeometry": true,
+    "visual": true,
+    "layers": true,
+    "lodCycles": 3
+  },
+  "newWholeBuildingsAccepted": 0,
+  "partialObjectRecords": 21,
+  "unchangedGlbFiles": 69,
+  "initialModelBytes": 5386884,
+  "maximumOrdinaryNearBytes": 1684868,
+  "addedColourBytes": 167544,
+  "pixelComparisons": [
+    {
+      "before": "docs/screenshots/refinement/s5-track-batching/before/west-track-day.png",
+      "after": "docs/screenshots/refinement/s5-track-batching/after/west-track-day.png",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "beforeDraws": 382,
+      "afterDraws": 374,
+      "trianglesUnchanged": true
+    },
+    {
+      "before": "docs/screenshots/refinement/s5-track-batching/before/east-track-day.png",
+      "after": "docs/screenshots/refinement/s5-track-batching/after/east-track-day.png",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "beforeDraws": 242,
+      "afterDraws": 234,
+      "trianglesUnchanged": true
+    },
+    {
+      "before": "docs/screenshots/refinement/s5-track-batching/before/west-track-night.png",
+      "after": "docs/screenshots/refinement/s5-track-batching/after/west-track-night.png",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "beforeDraws": 418,
+      "afterDraws": 410,
+      "trianglesUnchanged": true
+    },
+    {
+      "before": "docs/screenshots/refinement/s5-track-batching/before/west-track-day-mobile.png",
+      "after": "docs/screenshots/refinement/s5-track-batching/after/west-track-day-mobile.png",
+      "changedPixels": 0,
+      "maxChannelDelta": 0,
+      "beforeDraws": 142,
+      "afterDraws": 138,
+      "trianglesUnchanged": true
+    }
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "fps": [
+        60,
+        60,
+        60
+      ],
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4199886,
+        "medianDrawCalls": 562
+      },
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.476855260801216,
+        "medianDrawCalls": 2.7422303473491727
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "fps": [
+        29,
+        29,
+        29
+      ],
+      "current": {
+        "medianFPS": 29,
+        "medianTriangles": 1165218,
+        "medianDrawCalls": 298
+      },
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "changePercent": {
+        "medianFPS": -3.3333333333333326,
+        "medianTriangles": 10.767958400866974,
+        "medianDrawCalls": 13.307984790874517
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "browser": "148.0.7778.96",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots and 2% CPU inclusion threshold; not proof of absence of all background activity.",
+  "fingerprints": {
+    "lib/campus/sports-batching.ts": "b1d1206efc8f40d5fb0e6d5387045e36436e87fb505d141f366d4125151a128b",
+    "lib/campus/scene.ts": "6e69d4ac33ab02dacbf488cbc04c1bb6dd67dd9784ff8394c17db92754adc5a0",
+    "lib/campus/resources.ts": "434f7a585ca2426dfe575a174d6499faec4dde03effb5640a44e373d6fc4ec27",
+    "tsconfig.json": "8e637e4acb7d2ca4e7713d2584c1b5d3ca55a59f4387fd2ea2c1fa80b0218bc1",
+    "public/data/models.json": "a0295964c94d36c6275f47bfecf2c6862d111ee1a22fef6a7e5f9783b7627582",
+    "public/models/base.glb": "eef739d16d75f03398bcbb824cfc612d324c7877ce7753b572a99d2231b81439",
+    "blender/gxu-campus.blend": "5f9c83d2c47866af3a673a7aea1fc0ca4202d8febdd9b86f768328b954a3a3d6",
+    "scripts/test-sports-batching.mjs": "b9df82136b51426eb49390e7e5aa5de7e2bd5a9259265c17849c68dcb44416cc",
+    "scripts/check-sports-batching.mjs": "31beb5e981011c6466e2075563d36b829b7211a2223ce5a5cecba50c485c5136",
+    "scripts/check-sports-batching-browser.mjs": "2ba48b61e4340cbe1c7892ef582290725c1dc0b1fa51432047f179ee5ccc0344"
+  },
+  "productionJavascript": {
+    "out/draco/draco_decoder.js": "8625489da79a805f4f2a7d511c3e52d8b4085608a9d2a4d5f4f9de5db0aea04f",
+    "out/draco/draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6",
+    "out/_next/static/chunks/index-BewT_Tz1.js": "f16531cc2e33916f052300fc147a4e057377b1556458b3dcc0dad437f82b790d",
+    "out/_next/static/chunks/page-BxrK50Rj.js": "05108c6b554bf3ccffd2a9c914f9c308f65e4e96f12e02e7a8cc3a27e43252c6",
+    "out/_next/static/chunks/vinext-CkbA6ZoT.js": "c82bcfb6e31af9f32a1be3250612c84329df7aa90d323bd2b081133d85bbf695",
+    "out/_next/static/chunks/scene-DUGVxP4N.js": "05608a545eb364ae2049ce4e114c596f1314573c67e43e16008297cb993a3146",
+    "out/_next/static/chunks/rolldown-runtime-hePW80VL.js": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+    "out/_next/static/chunks/framework-DTZGTDtF.js": "2a1edf81f32a49b1eacafc3546b371bca024c82a9191836e274d90890212e9df",
+    "out/_next/static/chunks/layout-segment-context-BorVHx7d.js": "49c84af7d3eb088f1190fb23e77c4e327988ec47de9606f80bfdd5a59943b30d",
+    "out/_next/static/2a683c28-08c6-4ba6-9c4a-2f59875cb49a/_ssgManifest.js": "653f3e53e89b4f8548ff86c19e92bb3c6b84b6be7485a320b1e00893ed877479",
+    "out/_next/static/2a683c28-08c6-4ba6-9c4a-2f59875cb49a/_buildManifest.js": "47f02b34be6dc481257b6efce4c19e19111f37ef5c437f8ffed44f0da97fa9bb",
+    "out/_next/static/media/draco_wasm_wrapper.DxJM36Ib.js": "e8049906ef3f8f75d3456c22a3f31bfdfe5b5b5bd09ccdec613b9e9a49d554d8",
+    "out/_next/static/media/draco_decoder.fzg4nYZr.js": "30e4d486fa020737af10e3c56197693e5b904bdc05b8bfa5d7b06751dec6da04",
+    "out/_next/static/media/draco_wasm_wrapper.fZCQGLGb.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
+  }
+}
