@@ -1,0 +1,113 @@
+{
+  "checkedAt": "2026-09-20T14:52:31.174127+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [],
+  "baseCommit": "00505f2",
+  "branch": "dev",
+  "scope": "Western shared step wall above low annex: three estimated bays across two middle band rows, seventh-storey glazing and top recess. Original exterior facades, footprint, parts and entrance retained. Lower western row, seventh-storey depth, other facades, roofs, stairs and road connection remain pending.",
+  "partialObjectRecords": 21,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 189,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "recess-geometry",
+    "geometry",
+    "retained-geometry",
+    "annex-geometry",
+    "entry-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        56,
+        51
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 56,
+        "medianTriangles": 4172715,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 3.800946287488305,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1140870,
+        "medianDrawCalls": 292
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 8.453388722794442,
+        "medianDrawCalls": 11.026615969581744
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5172812,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "bce65f194090cb7e54a1b0073f814874bf0d5ee349fa180bd7314f71dd3f49f0",
+    "data/building-sources.json": "81caab3d15ca39c79440b3527c2a6f0704c3df1772046938bbfdd5fe5383281a",
+    "blender/gxu-campus.blend": "f7cf5c2a7c1be1c873caffe5e3d6c3620b386294c8d28d80430fcf9f712f670a",
+    "public/data/buildings.json": "f255dec665c89b48487a9668e6c8af345ee2482cefaec2a1981e91152c013f7e",
+    "public/data/models.json": "8ba624fcf22cd59e681bb45c3788e0075bfb9fb7e6167c5ca451891ad48f0baf"
+  }
+}
