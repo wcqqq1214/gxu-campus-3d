@@ -17,7 +17,7 @@ def add_band_ledges(mesh, facade, z, C):
     length, _, _, theta, point = frame(facade)
     fh = facade['height']/facade['levels']
     x, y = point((band['from']+band['to'])/2, band['depth']/2)
-    for level in range(band['firstLevel'], int(facade['levels'])):
+    for level in range(band['firstLevel'], band.get('lastLevel', int(facade['levels'])-1)+1):
         top = z+(level+.56+band['heightRatio']/2)*fh+.12
         mesh.box(x, y, top+band['thickness']/2,
                  (band['to']-band['from'])*length, band['depth'],
@@ -38,7 +38,7 @@ def add_band_windows(mesh, facade, z, C, detail):
     band = facade['rule']['windowBands']
     length, u, n, theta, point = frame(facade)
     fh = facade['height']/facade['levels']; wh = fh*band['heightRatio']
-    for level in range(band['firstLevel'], int(facade['levels'])):
+    for level in range(band['firstLevel'], band.get('lastLevel', int(facade['levels'])-1)+1):
         zz = z+(level+.56)*fh
         for window in band['windows']:
             ww = (window['to']-window['from'])*length
@@ -58,7 +58,7 @@ def add_band_windows(mesh, facade, z, C, detail):
 
 def band_replaces_window(facade, level, fraction, width):
     band = facade['rule'].get('windowBands')
-    if band is None or level < band['firstLevel']:
+    if band is None or level < band['firstLevel'] or level > band.get('lastLevel', facade['levels']-1):
         return False
     half = (width+.30)/2/math.dist(facade['start'], facade['end'])
     return fraction+half > band['from'] and fraction-half < band['to']
