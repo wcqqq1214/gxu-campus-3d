@@ -414,7 +414,7 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 
 ### 实体外墙上的宽窄窗带
 
-林学院南侧中段使用 `facadeRules.windowBands`：以原外边的 `from/to` 分数和 `firstLevel` 限定校准范围，再明确各窗组的局部起止点、近景分格及水平挑檐。范围外和底层沿用现有规则。`scripts/facade_bands_data.py` 检查窗框间隔、楼层和尺寸，`blender/facade_bands.py` 生成两级共同的挑檐及宽窄玻璃面；细窗框、窗梃仅在近景增加。
+林学院南侧中段使用 `facadeRules.windowBands`：以原外边的 `from/to` 分数和 `firstLevel` 限定校准范围，再明确各窗组的局部起止点、近景分格及水平挑檐。可选 `lastLevel`（含该层，零起始）在指定楼层终止窗组、挑檐及通用窗替换；省略时继续至最高层。上方可配置独立面板，重叠检查采用同一楼层范围。范围外和底层沿用现有规则。`scripts/facade_bands_data.py` 检查窗框间隔、楼层和尺寸，`blender/facade_bands.py` 生成两级共同的挑檐及宽窄玻璃面；细窗框、窗梃仅在近景增加。
 
 该配置保留背后实体墙，不等同于 `openCorridor`。不能同时使用开放走廊、阳台、另一种窗格布局，也不能跨越高度分段或占据开放门廊。使用 `blender/validate_forestry_facades.py` 核对实际源文件和导出 GLB 的窗宽、墙体、窗间留白与挑檐。[立面记录](FORESTRY_COLLEGE_FACADES.md)说明照片支持范围及估算参数。
 

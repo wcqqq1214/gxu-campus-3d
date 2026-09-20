@@ -774,3 +774,7 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 ## 农学院东侧顶层窗列（2026-09-20）
 
 `blender/validate_agriculture_windows.py -- --report-prefix=<新批次>` 在源、基础与近景实际三角网中各检查84条射线，覆盖15扇窗的玻璃/边框、5个矮窗上部实墙、窗间及端部实墙、下方四层原窗。端部取样避开保留的侧向窗框绕角投影。`--check-root=<旧资产目录>` 可验证原9窗模型，旧版在首个专项窗面检查中失败。仍需运行 `validate_agriculture_ledges.py` 与 `validate_agriculture.py` 回归挑檐及门廊：前者的219条检查保留全部十道挑檐，已经替换的东侧顶层通用窗由新窗列专项覆盖。命令通过Blender的 `--python` 执行并加 `--python-exit-code 1`。见[窗列专项](AGRICULTURE_TOP_WINDOWS.md)。
+
+## 土木学院南立面（2026-09-20）
+
+`blender/validate_civil_facade.py -- --report-prefix=<新批次>` 对源文件和实际基础/近景各检查250处：五层窗面与窗间实墙、挑檐顶底及深度外空区、顶部窄窗和侧边实墙、顶部不重复挑檐、窗后主体墙。固定原第1边地图坐标和期望标高；`--check-root=<旧资产目录>` 检验缺失窗型反例，并记录失败资产哈希。通过Blender的 `--python` 执行，加 `--python-exit-code 1`。配合 `validate_civil_annex.py` 与 `validate_civil_entry.py` 回归体量及门厅，各用不同报告前缀。见[本批范围](CIVIL_SOUTH_FACADE.md)。
