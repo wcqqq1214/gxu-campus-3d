@@ -84,6 +84,9 @@ def shared_form(b, z, C):
             # Parapets follow each actual terrace elevation in both LODs.
             edges = part.get('parapetEdges', [(a,c) for poly in part['polygons']
                                              for ring in poly for a,c in zip(ring,ring[1:])])
+            crown = form.get('roofCrown')
+            if crown and crown['part'] == part.get('id','body'):
+                edges = crown['retainedParapetEdges']
             for a,c in edges:
                 if replaces_parapet(form.get('roofEave'), part.get('id', 'body'), a, c):
                     continue
@@ -96,6 +99,9 @@ def shared_form(b, z, C):
         add_roof_dome(top, form['roofDome'], z, C['white'])
     if 'roofEave' in form:
         add_roof_eave(top, form['roofEave'], z, C['white'])
+    if 'roofCrown' in form:
+        from roof_crown import add_roof_crown
+        add_roof_crown(top, form['roofCrown'], z, C)
     for facade in form.get('facades',[]):
         if 'attachedGallery' in facade:
             add_attached_gallery(body,facade,z,wall,C)
