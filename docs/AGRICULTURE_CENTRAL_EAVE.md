@@ -61,3 +61,11 @@
 但两轮共48次CPU快照显示，计时期间仍有其他项目的Python计算：[S0负载](model-checks/refinement/s3-agriculture-eave-s0-fresh-performance-context.json)、[当前负载](model-checks/refinement/s3-agriculture-eave-current-fresh-performance-context.json)。因此不能将受负载影响的S0下降当成放宽门槛的理由，也不能从+3.85%推断新檐口提高了性能。[最终对照汇总](model-checks/refinement/s3-agriculture-eave-comparison-summary.json)保留 `performanceBudgetNumbersPassed=true`、`sameConditionPerformanceAccepted=false`、`passed=false`。
 
 本批几何与画面通过，性能联合验收仍待无外部重任务的完整复测。首次失败、交替诊断和S0/当前完整对照均原样保留，不通过降低模型真实性或放宽预算消除失败。下一步继续补充低翼/退台定位及剩余立面资料，在具备条件时补齐性能门槛。
+
+## 2026-09-20 补充验收：当前局部工作包通过
+
+对 `21f2143` 的未变模型完成[完整复测](model-checks/refinement/s3-agriculture-eave-recheck-browser.json)：精细60/60/60 FPS，流畅30/30/30 FPS。相对原同系统S0，三角形增加3.73%/7.84%，绘制调用增加2.38%/11.03%，均通过原预算；三次LOD往返无浏览器错误。24次[CPU快照](model-checks/refinement/s3-agriculture-eave-recheck-performance-context.json)在计时窗口未记录到超过2%阈值的Python/Blender计算。10秒采样不证明完全没有后台活动。
+
+[补充汇总](model-checks/refinement/s3-agriculture-eave-recheck-summary.json)核对源文件、生成输入、模型清单指纹未变，验证69个GLB及生产数据一致；沿用匹配当前资产的几何和画面检查。[图书馆手机尺寸回归](screenshots/refinement/s3-agriculture-eave-recheck/library-mobile.png)已直接核看。首屏仍5,159,656字节，最大普通近景1,684,868字节；未重建模型或重复运行单位测试。
+
+中央檐口及保留门廊、挑檐、东侧顶层窗列的本批局部联合验收通过，历史失败报告原样保留。低翼、退台及其他立面仍未校准，不计为整栋完成。按照用户顺序，接下来优先开展土木建筑工程学院，农学院剩余项继续在六栋邻楼队列中跟踪。

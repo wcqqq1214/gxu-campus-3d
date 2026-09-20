@@ -1,0 +1,511 @@
+{
+  "checkedAt": "2026-09-20T12:28:40.745244+00:00",
+  "branch": "dev",
+  "status": "named-photo-found-footprint-anchors-pending",
+  "modelChanged": false,
+  "newWholeBuildingsAccepted": 0,
+  "target": {
+    "id": "relation/12875606",
+    "name": "土木建筑工程学院",
+    "chunk": "chunk-n2-n3",
+    "center": [
+      -504.59,
+      -825.94
+    ],
+    "height": 26.4,
+    "levels": 8.0,
+    "elevation": 4.06,
+    "polygons": [
+      [
+        [
+          [
+            -493.45022625596147,
+            -838.0280919998064
+          ],
+          [
+            -493.43996762938485,
+            -834.8777359997714
+          ],
+          [
+            -537.9008578510263,
+            -834.8220759999119
+          ],
+          [
+            -537.9111164790608,
+            -846.9225599997346
+          ],
+          [
+            -512.5723073303868,
+            -846.9559559997294
+          ],
+          [
+            -512.5928245849979,
+            -863.6539559998882
+          ],
+          [
+            -548.7339681602731,
+            -863.6094279997634
+          ],
+          [
+            -548.692933651051,
+            -827.5974079997228
+          ],
+          [
+            -532.4330095620621,
+            -827.619671999983
+          ],
+          [
+            -532.4124923074511,
+            -808.7286679999032
+          ],
+          [
+            -528.9553349455841,
+            -808.7286679999032
+          ],
+          [
+            -528.9348176909731,
+            -791.2069000000049
+          ],
+          [
+            -514.4291188515459,
+            -791.2180319997395
+          ],
+          [
+            -514.4393774781225,
+            -795.13649600005
+          ],
+          [
+            -488.57737834342777,
+            -795.1698920000447
+          ],
+          [
+            -488.56711971539335,
+            -787.3663599998142
+          ],
+          [
+            -476.70814668871594,
+            -787.3774919999443
+          ],
+          [
+            -476.769698452549,
+            -838.0503560000666
+          ],
+          [
+            -493.45022625596147,
+            -838.0280919998064
+          ]
+        ],
+        [
+          [
+            -486.1666009550603,
+            -824.2800719997139
+          ],
+          [
+            -486.14608370044925,
+            -806.4911359998574
+          ],
+          [
+            -512.1004104801647,
+            -806.4577399998626
+          ],
+          [
+            -512.1209277347757,
+            -824.2466759997192
+          ],
+          [
+            -486.1666009550603,
+            -824.2800719997139
+          ]
+        ]
+      ]
+    ],
+    "tags": {
+      "building": "university",
+      "building:levels": "8",
+      "faculty": "civil_engineering;architecture",
+      "name": "土木建筑工程学院",
+      "office": "educational_institution",
+      "operator": "广西大学",
+      "type": "multipolygon",
+      "website": "https://tmjz.gxu.edu.cn/"
+    },
+    "sourceUrl": "https://www.openstreetmap.org/relation/12875606"
+  },
+  "baselineCaveat": "Eight floors from OSM tag; 26.4 m is model conversion, not measured height. Existing flat roof and entrance are defaults.",
+  "sources": [
+    {
+      "id": "college-overview",
+      "page": "https://tmjz.gxu.edu.cn/info/1019/2987.htm",
+      "publishedAt": "2025-10-11",
+      "capturedAt": null,
+      "imageUrl": "https://tmjz.gxu.edu.cn/__local/7/BC/6D/911F703A11995BE3EDDC88147EF_C60DF7C0_E388.jpg",
+      "photo": {
+        "localFile": "work/refinement-s2-civil/911F703A11995BE3EDDC88147EF_C60DF7C0_E388.jpg",
+        "sha256": "9280dd33fec2a1d98767c0419243474e12ad109892f8ed9551d81a01ea270464",
+        "bytes": 58248,
+        "pixels": [
+          333,
+          229
+        ]
+      },
+      "observation": "Readable college name on entrance canopy; tall blue glazed vertical volume, entrance canopy and continuous side galleries visible. Low resolution and perspective do not establish storey counts, dimensions or footprint anchors."
+    },
+    {
+      "id": "admissions-video",
+      "page": "https://tmjz.gxu.edu.cn/index/zsxcsp.htm",
+      "videoUrl": "https://tmjz.gxu.edu.cn/zsxcsp/sp.mp4",
+      "publishedAt": null,
+      "capturedAt": null,
+      "video": {
+        "localFile": "work/refinement-s2-civil/admissions.mp4",
+        "sha256": "6ad1ae7aa01f3105b61a47028fb1c0c52e3a40f32b753c00eddff939104a8859",
+        "bytes": 71123261
+      },
+      "durationSeconds": 327.52,
+      "pixels": [
+        560,
+        240
+      ],
+      "fps": 50,
+      "sampling": "Full stream decoded with fps=1/10,scale=480:-2; 33 evenly spaced samples visually inspected via three contact sheets. Not frame-by-frame review. Frame index is not an exact source timestamp.",
+      "review": "Samples show campus establishing views, indoor teaching/labs and professional projects; no unambiguous full exterior/roof view of the target usable for calibration.",
+      "frames": [
+        {
+          "localFile": "work/refinement-s2-civil/frame-001.jpg",
+          "sha256": "deafb12f18d91a194e7327986634153b697c45a649ffb3425c39a44ad7302930",
+          "bytes": 21717,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-002.jpg",
+          "sha256": "3d60919ad387f53bae905b3390bfeb9feb928f2fe0dec2f005322f893a0a645e",
+          "bytes": 14446,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-003.jpg",
+          "sha256": "9b839abd3dc178a8a2472c0bdce20d396950f3195211bd7d417bb028fb6ff220",
+          "bytes": 13404,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-004.jpg",
+          "sha256": "8988944b5ff792536195df7b87d261a42be73e7d9944e073713211d4cd8f171a",
+          "bytes": 11840,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-005.jpg",
+          "sha256": "888cb1c662d545ec56f9daa1eedee279d0ecae89d6baa7ef464bbeeb546a7e5c",
+          "bytes": 17902,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-006.jpg",
+          "sha256": "f2f7405119f1ff1a4452a45ecb74b6c9fc23aee4692b3c55423b7afebf2548cb",
+          "bytes": 3458,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-007.jpg",
+          "sha256": "58041cb913ca5e2ba5ba570e4d98b7c0045a2e2a72f4263b461afd84656ef8c0",
+          "bytes": 13515,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-008.jpg",
+          "sha256": "c13f853b60a1f9140ad1cba7eb5577064c1a803c57f2cc000e31f0ac5c1cb505",
+          "bytes": 19787,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-009.jpg",
+          "sha256": "b1a35cd782dad4ad1ea7f6db7b4b3f2c297c510238cf78b9f421739e0bf57724",
+          "bytes": 17331,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-010.jpg",
+          "sha256": "20790aefe59cc8f371c81f54251a8b2e14794a4366e7661f4b806941059814e2",
+          "bytes": 19425,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-011.jpg",
+          "sha256": "b85dea3eb573aa1609a221d6ae259cc81226cd15f22c42a8d0f767f3f7dbfe5e",
+          "bytes": 23506,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-012.jpg",
+          "sha256": "c41c6a4f49e116639ad1b273b6f10157bfb9547d600963d4546a51df669fb2d2",
+          "bytes": 13430,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-013.jpg",
+          "sha256": "6261317bb30d78f959d6ff70b91fff70c4734f92464796d2a7f7cf838ea6c886",
+          "bytes": 16811,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-014.jpg",
+          "sha256": "ae3af343c97bfb0f6afac604986a28b10fa6140f626d8c38a74de2b2a86dcde8",
+          "bytes": 16977,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-015.jpg",
+          "sha256": "409bfb762701d4e792385a83238bd8cae81ca601ca477ad6e9a1a3943228c208",
+          "bytes": 20194,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-016.jpg",
+          "sha256": "3869eff381c92f5a25c1e68810d7055a3fee822021d9b0bf6395b2bc2f368a40",
+          "bytes": 20816,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-017.jpg",
+          "sha256": "d681fe2f42ff9ce12afb2635e9e83126eaffaaa4b88ccab369ece4d037508d7e",
+          "bytes": 7529,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-018.jpg",
+          "sha256": "00737279550be036079feeacc01301e7d03dd002a6dfdbb53b3899c63e1b14d0",
+          "bytes": 17271,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-019.jpg",
+          "sha256": "830c5b4c3114e9937c78c73a9667d418078c9963c0521fb92559caf988fd4d10",
+          "bytes": 25456,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-020.jpg",
+          "sha256": "6eacc7a60fb298bbae11c7910aeafefe924446620605dcd4da63bf4c8b090ee5",
+          "bytes": 25170,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-021.jpg",
+          "sha256": "c45851fd18c132b1d9575da3508ee14c4debd28ea65ef6bf4c5a3bcdc76b4737",
+          "bytes": 24429,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-022.jpg",
+          "sha256": "f8853880631b44fd4897fe8986c47b264a205962edff4de97850653a9213f118",
+          "bytes": 18467,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-023.jpg",
+          "sha256": "9808ad19aac94e0fec160d034a2c14074dda8a417dce85a0e79bf38cee40ee61",
+          "bytes": 15983,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-024.jpg",
+          "sha256": "10b4628176535b7a0f662a3848c55f3f240e05e594575e57be293f75e607bb93",
+          "bytes": 20744,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-025.jpg",
+          "sha256": "c99ccb43fd1ba887bed65e2ff26f9328818144cd672d3baf6e92d3068c6ffd24",
+          "bytes": 24906,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-026.jpg",
+          "sha256": "ca8a260ba5268f3c8e5e451dda54d3765e62fce695924bdc62d92ffc2ca937cc",
+          "bytes": 21630,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-027.jpg",
+          "sha256": "39e5fb7ec5c27978ddd0ab8c153a887c137b9a11456516458b5817ca6ab6fe93",
+          "bytes": 19543,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-028.jpg",
+          "sha256": "ec8bff9dbb98356df7ee07a3dcc69f6d48539473d31c776290d6e85bcb4a4163",
+          "bytes": 17734,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-029.jpg",
+          "sha256": "3afb0e76edf7df546e288f07ff9de017b23af1014d2ca14ef43652f420a46253",
+          "bytes": 15809,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-030.jpg",
+          "sha256": "4785cd82dcec487c6cab89a99c1d2f708ee4e9fedb18ba25b70f324aa5c60700",
+          "bytes": 20986,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-031.jpg",
+          "sha256": "46ea13a3a4156c41f426c47ed97ab8f65c0420449fb8032d8143959211a0c34f",
+          "bytes": 14147,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-032.jpg",
+          "sha256": "0aab4a79900678e176a34c66528e77bb46e20a199aece0456db645168017b738",
+          "bytes": 21347,
+          "pixels": [
+            480,
+            206
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/frame-033.jpg",
+          "sha256": "5a3a6c258bfb0547bf5721f534f32b3b8f6e10c363ba7fcb43595f1ff0b00086",
+          "bytes": 9916,
+          "pixels": [
+            480,
+            206
+          ]
+        }
+      ]
+    },
+    {
+      "id": "alumni",
+      "page": "https://tmjz.gxu.edu.cn/info/1452/8581.htm",
+      "publishedAt": null,
+      "capturedAt": null,
+      "images": [
+        {
+          "localFile": "work/refinement-s2-civil/alumni-0.jpg",
+          "sha256": "cdf22bd5ba92c2996514ce19d3fa2463e9e973c6d8dc848249be81c9f31b6381",
+          "bytes": 134951,
+          "pixels": [
+            546,
+            248
+          ]
+        },
+        {
+          "localFile": "work/refinement-s2-civil/alumni-1.jpg",
+          "sha256": "6a829417ba19f01c95f02bcf3c575925d1a009c51910777b80a4a6f3cfbf3d9d",
+          "bytes": 165914,
+          "pixels": [
+            544,
+            266
+          ]
+        }
+      ],
+      "review": "Indoor auditorium and outdoor group photograph; no confirmed correspondence of outdoor stairs to target footprint. Not adopted for entrance geometry."
+    },
+    {
+      "id": "separate-new-experimental-center",
+      "page": "https://ghjjc.gxu.edu.cn/info/1011/3517.htm",
+      "review": "Bulletin describes a separate construction project beginning in September 2024, eight floors with local six-floor parts and total height 31.75 m. Not transferred to existing college building."
+    }
+  ],
+  "nextAction": "Find a higher resolution, locatable exterior/aerial view; anchor glazed volume, canopy and gallery wing to existing footprint, then calibrate form and entrance.",
+  "fingerprints": {
+    "public/data/buildings.json": "518957dc916368ca27a8ab0123e24186ced2e10ce80ea1f5cc85e15ccd9e29cd",
+    "public/data/models.json": "7d129cb2a1d881bfece700c5bcf23cf7052f2dd1be961f85292c1f5fea8bdaaf",
+    "data/building-overrides.json": "ca11a89b16cdd10c04be03e5dff382467c7871f9a3a96c3a025e50e2abd294ee"
+  }
+}

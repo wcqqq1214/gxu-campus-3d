@@ -1,0 +1,123 @@
+{
+  "checkedAt": "2026-09-20T12:22:56.024525+00:00",
+  "checkedCommit": "21f2143",
+  "branch": "dev",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "scope": "Supplementary acceptance of the unchanged central wide eave and retained portico, east top windows and ten ledges; no whole-building acceptance.",
+  "partialObjectRecords": 20,
+  "newWholeBuildingsAccepted": 0,
+  "previousPendingReport": "s3-agriculture-eave-comparison-summary.json",
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "performanceReport": "s3-agriculture-eave-recheck-browser.json",
+  "performanceContextReport": "s3-agriculture-eave-recheck-performance-context.json",
+  "geometryEvidenceSha256": {
+    "s3-agriculture-eave-eave-geometry.json": "85ba0e405df0d7f6f21a83e139308ce1774adc6bde475040f05548c1902908b9",
+    "s3-agriculture-eave-windows-geometry.json": "2f992d17b2268b1ffd96ef47218c9512a551a817da6f65465f3747c03e2165de",
+    "s3-agriculture-eave-ledges-geometry.json": "d3a4f1186a2fd0de1311d00997f0d866b5ee7124b6fdc3bc29e05f4beea5f9e3",
+    "s3-agriculture-eave-data.json": "d5b83998f6cdd5da4dfe53f1d8b8b89ae0101ad006f00ed182ba0566a24689df",
+    "s3-agriculture-eave-generic-geometry.json": "cc96c741f14e209ef6f2f0cc5005d7885a57b786751f11e22878ffb1bd788561",
+    "s3-agriculture-eave-trees-geometry.json": "32446d27af4f2137f560f5185263c9f1e820f67039de4e24f1ce260bcfc6e2c0",
+    "s3-agriculture-eave-source-preservation.json": "16f01cd69a306eee1f43ed1c265e685f2afa5bf9cab875921499d225ca0e0c83",
+    "s3-agriculture-eave-assets.json": "b7bbcfa34222cd454511544b2bd94efaed2a05efb8df6c3b1c327fcc0f432dc8",
+    "s3-agriculture-eave-visual-review.json": "af9226f51d4434eb31f1ae0abd1dc11e6fb136db5170fcc0df1f2f79c812a928",
+    "s3-agriculture-eave-portico.json": "5bb65cc2a89e3b5ebac50faee0758a742b7bce773482f5bd3e0c33c222bc342b"
+  },
+  "fingerprints": {
+    "data/building-overrides.json": "ca11a89b16cdd10c04be03e5dff382467c7871f9a3a96c3a025e50e2abd294ee",
+    "data/building-sources.json": "af8ad5160cae650c440790eed00978e3bd35314e60b867b8d359950e388dd478",
+    "blender/gxu-campus.blend": "6b57bd582e7aa309e95896738506a2c1b43445e5483401c0fa09c1980e14cd75",
+    "public/data/buildings.json": "518957dc916368ca27a8ab0123e24186ced2e10ce80ea1f5cc85e15ccd9e29cd",
+    "public/data/models.json": "7d129cb2a1d881bfece700c5bcf23cf7052f2dd1be961f85292c1f5fea8bdaaf"
+  },
+  "productionModelsVerified": 69,
+  "productionDataMatches": true,
+  "initialModelBytes": 5159656,
+  "maximumOrdinaryNearBytes": 1684868,
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4169758,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.7273876097036807,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1134449,
+        "medianDrawCalls": 292
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 7.842995593876112,
+        "medianDrawCalls": 11.026615969581744
+      },
+      "passed": true
+    }
+  ],
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "lodCycles": 3,
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second CPU snapshots with 2% inclusion threshold; does not prove total absence of background activity.",
+  "mobileScreenshot": {
+    "file": "docs/screenshots/refinement/s3-agriculture-eave-recheck/library-mobile.png",
+    "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4",
+    "accepted": true,
+    "review": "Directly inspected: library entrance, stairs and forecourt connection visible; desktop portrait emulation, not a real-device test."
+  },
+  "pending": [],
+  "firstAttemptReport": "s3-agriculture-eave-summary.json"
+}
