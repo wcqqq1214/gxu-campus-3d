@@ -12,7 +12,8 @@ if (!phase || !/^[a-z0-9-]+$/.test(phase)) throw new Error('A recording phase is
 const cameraFile=process.env.REFINEMENT_CAMERAS;
 const beforeRoot=process.env.BEFORE_ASSETS_ROOT;
 const mobileOnly=process.argv.includes('--mobile-only');
-if (!cameraFile || !beforeRoot) throw new Error('Provide cameras and archived public asset root');
+const currentOnly=process.argv.includes('--current-only');
+if (!cameraFile || (!beforeRoot && !currentOnly && !mobileOnly)) throw new Error('Provide cameras and archived public asset root');
 const cameras=JSON.parse(await fs.readFile(path.resolve(root,cameraFile),'utf8'));
 if(!Array.isArray(cameras)||!cameras.length)throw new Error('At least one camera is required');
 // Match share.ts preconditions so a rejected pose cannot silently capture the overview.
@@ -27,10 +28,10 @@ for(const camera of cameras)for(const pose of [camera,...(camera.mobile?[{...cam
 const target=path.join(root,'docs/model-checks/refinement',`${phase}-context-browser.json`);
 try { await fs.access(target); throw new Error('Recording already exists'); } catch(e) { if(e.code!=='ENOENT') throw e; }
 const browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH});
-const report={capturedAt:new Date().toISOString(),method:'UI layer controls; same frontend; before public assets served by local Playwright route fulfillment. Tree-hidden images inspect building geometry only.',states:[],errors:[],completed:false};
+const report={capturedAt:new Date().toISOString(),method:'UI layer controls; same frontend; before public assets served by local Playwright route fulfillment. Tree-hidden images inspect building geometry only.',currentOnly,states:[],errors:[],completed:false};
 const base=process.env.REFINEMENT_URL || 'http://127.0.0.1:4300/gxu-campus-3d/';
 try {
-  for (const variant of mobileOnly?['after']:['before','after']) {
+  for (const variant of mobileOnly||currentOnly?['after']:['before','after']) {
     const assets=path.resolve(root,variant==='before'?beforeRoot:'public');
     const manifestBytes=await fs.readFile(path.join(assets,'data/models.json'));
     const manifest=JSON.parse(manifestBytes);
