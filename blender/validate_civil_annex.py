@@ -13,6 +13,7 @@ TARGET = next((Path(a.split('=', 1)[1]).resolve() for a in sys.argv if a.startsw
 PREFIX = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-annex')
 DECORATED_STEP = '--decorated-step' in sys.argv
 TERRACE_ADDED = '--terrace-added' in sys.argv
+REAR_MASSING_ADDED = '--rear-massing-added' in sys.argv
 ID, CHUNK, Z = 'relation/12875606', 'chunk-n2-n3', 4.06
 LOW = [(-545, y, 10.8) for y in (-839, -843, -848, -856, -860)]
 LOW += [(x, y, 10.8) for x in (-541, -535, -529, -523, -516) for y in (-851, -856, -861)]
@@ -23,6 +24,10 @@ if TERRACE_ADDED:
 HIGH = [(x, -830, 26.4) for x in (-545, -540, -535, -522, -509, -500)]
 HIGH += [(x, -800, 26.4) for x in (-525, -520, -510, -500, -490)]
 HIGH += [(-480, y, 26.4) for y in (-795, -805, -815, -825)]
+if REAR_MASSING_ADDED:
+    # New low wings and pitched northern roof have independent fixed probes in
+    # validate_civil_rear.py. Keep the southern main roof coverage here.
+    HIGH = [p for p in HIGH if p[1] <= -825]
 SEAM = [(x, y, h) for x in (-546, -542) for y, h in [(-835.6, 10.8), (-834.0, 26.4)]]
 VOIDS = [(-530, -840), (-520, -840), (-500, -815), (-505, -820), (-490, -810)]
 
@@ -74,9 +79,10 @@ def check(objects, tolerance):
               ((-535, -816), (1, 0), 5), ((-512, -836), (0, 1), 3)]
     probes += [((-500, -815), direction, 16) for direction in [(1, 0), (-1, 0), (0, 1), (0, -1)]]
     for (x, y), (dx, dy), distance in probes:
-        hit = ray((x, y, Z + 16.5), (dx, dy, 0), distance)
+        height = 7.2 if REAR_MASSING_ADDED else 16.5
+        hit = ray((x, y, Z + height), (dx, dy, 0), distance)
         assert hit and hit[1].x * dx + hit[1].y * dy < -.98, ('wrong outer/courtyard normal', x, y, dx, dy, hit)
-        normals.append(dict(origin=[x, y, Z + 16.5], direction=[dx, dy, 0], normal=list(hit[1])))
+        normals.append(dict(origin=[x, y, Z + height], direction=[dx, dy, 0], normal=list(hit[1])))
     return dict(passed=True, roofSamples=samples, openVoidSamples=VOIDS, exposedWallSamples=walls,
                 normalSamples=normals, rayCount=len(samples) + len(VOIDS) + len(walls) + len(normals), toleranceMeters=tolerance)
 
@@ -85,6 +91,8 @@ report = dict(passed=False, scope='Estimated 10.8 m southwest C wing, retained 2
 report['exposedWallProbeMode'] = 'retained solid bands beside explicit details' if DECORATED_STEP else 'original undecorated wall'
 if TERRACE_ADDED:
     report['scope'] = 'Retained 10.8 m inner annex roof, 26.4 m main/rear roof, shared boundary and original voids; east terrace and its new upper roof edge checked separately.'
+if REAR_MASSING_ADDED:
+    report['scope'] = 'Retained annex and southern main roof, shared annex boundary, original voids and outer/courtyard wall normals at 7.2 m. Northern roof and low connectors require validate_civil_rear.py.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET / 'blender/gxu-campus.blend'))
     report['source'] = check([o for o in bpy.context.scene.objects if o.get('featureId') == ID], .006)
