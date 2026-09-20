@@ -14,6 +14,14 @@ def root_name(o):
     while o.parent:o=o.parent
     return re.sub(r'\.\d+$','',o.name)
 
+def ground_objects():
+    result=[]
+    for o in bpy.context.scene.objects:
+        owner=o
+        while owner.parent:owner=owner.parent
+        if owner.get('layer') in ('terrain','roads'):result.append(o)
+    return result
+
 def trees(objects):
     result=[]
     for o in objects:
@@ -82,17 +90,17 @@ def ground_check(objects,tolerance):
             if v>=6.48:
                 assert .02-tolerance<=.18-ground<=.25+tolerance,('first step to ground',u,v,ground)
             samples.append(dict(u=u,v=v,groundHeightRelativeToBuilding=ground,material=hit[3],firstStepRise=.18-ground if v>=6.48 else None))
-    return dict(passed=True,samples=samples,scope='Existing terrain and generic road surfaces beneath/at the stair toe; does not prove a full paved connection to the campus road.')
+    return dict(passed=True,samples=samples,scope='Terrain and all road-layer paving beneath/at the stair toe, including a calibrated apron when present; full road connection requires separate validation.')
 
 report=dict(passed=False,scope='Estimated two-flight annex stairs: 12 m lower, 4.8 m upper offset north, 1.62/2.52 m platforms, 9/5 risers. Checks stairs, retained lower wall and adjacent ground only; annex roof and complete road connection require separate validation.')
 report['fingerprints']={p:hashlib.sha256((TARGET/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb',f'public/models/{CHUNK}.glb','public/data/buildings.json']}
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
-    report['sourceGround']=ground_check([o for o in bpy.context.scene.objects if root_name(o) in ('terrain','roads')],.015)
+    report['sourceGround']=ground_check(ground_objects(),.015)
     bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(TARGET/'public/models/base.glb'));bpy.context.view_layer.update()
     report['base']=check([o for o in bpy.context.scene.objects if root_name(o)==CHUNK],.05)
-    report['baseGround']=ground_check([o for o in bpy.context.scene.objects if root_name(o) in ('terrain','roads')],.05)
+    report['baseGround']=ground_check(ground_objects(),.05)
     bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(TARGET/'public/models'/f'{CHUNK}.glb'));bpy.context.view_layer.update()
     report['near']=check(list(bpy.context.scene.objects),.02)
     report['passed']=True
