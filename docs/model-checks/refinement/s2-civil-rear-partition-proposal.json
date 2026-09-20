@@ -1,0 +1,219 @@
+{
+  "status": "evidence-backed-partition-candidate-not-production-model",
+  "productionReady": false,
+  "buildingId": "relation/12875606",
+  "coordinateSystem": "Campus east/north metres; north up",
+  "existingPart": "main-and-rear",
+  "boundaryMethod": "Extend the existing courtyard south and north edges; retain original outer footprint. These are candidate massing seams, not surveyed construction joints.",
+  "regions": [
+    {
+      "id": "south-main",
+      "polygons": [
+        [
+          [
+            [
+              -476.7529865550247,
+              -824.2921847032766
+            ],
+            [
+              -476.769698452549,
+              -838.0503560000666
+            ],
+            [
+              -493.45022625596147,
+              -838.0280919998064
+            ],
+            [
+              -493.43996762938485,
+              -834.8777359997714
+            ],
+            [
+              -537.9008578510263,
+              -834.8220759999119
+            ],
+            [
+              -548.7011505155482,
+              -834.8085552565082
+            ],
+            [
+              -548.692933651051,
+              -827.5974079997228
+            ],
+            [
+              -532.4330095620621,
+              -827.619671999983
+            ],
+            [
+              -532.4293178176083,
+              -824.2205447499721
+            ],
+            [
+              -512.1209277347757,
+              -824.2466759997192
+            ],
+            [
+              -486.1666009550603,
+              -824.2800719997139
+            ],
+            [
+              -476.7529865550247,
+              -824.2921847032766
+            ]
+          ]
+        ]
+      ],
+      "areaMeters2": 760.3645072412087,
+      "levels": 8,
+      "height": 26.4,
+      "roofType": "flat",
+      "adoption": "Retain current south main parameters; proposed split line, not a measured joint."
+    },
+    {
+      "id": "east-connector",
+      "polygons": [
+        [
+          [
+            [
+              -476.73137853418905,
+              -806.503250106933
+            ],
+            [
+              -476.7529865550247,
+              -824.2921847032766
+            ],
+            [
+              -486.1666009550603,
+              -824.2800719997139
+            ],
+            [
+              -486.14608370044925,
+              -806.4911359998574
+            ],
+            [
+              -476.73137853418905,
+              -806.503250106933
+            ]
+          ]
+        ]
+      ],
+      "areaMeters2": 167.46813440866111,
+      "levels": null,
+      "height": null,
+      "roofType": "flat",
+      "adoption": "Low connecting volume visible. Storey count and height unresolved; do not ship a guessed count as confirmed."
+    },
+    {
+      "id": "west-connector",
+      "polygons": [
+        [
+          [
+            [
+              -532.4293178176083,
+              -824.2205447499721
+            ],
+            [
+              -532.4124923074511,
+              -808.7286679999032
+            ],
+            [
+              -528.9553349455841,
+              -808.7286679999032
+            ],
+            [
+              -528.9526503930254,
+              -806.4360558541392
+            ],
+            [
+              -512.1004104801647,
+              -806.4577399998626
+            ],
+            [
+              -512.1209277347757,
+              -824.2466759997192
+            ],
+            [
+              -532.4293178176083,
+              -824.2205447499721
+            ]
+          ]
+        ]
+      ],
+      "areaMeters2": 353.34199946740534,
+      "levels": null,
+      "height": null,
+      "roofType": "flat",
+      "adoption": "Low flat connecting volume visible. Four-storey reading remains tentative; height unresolved."
+    },
+    {
+      "id": "north-rear",
+      "polygons": [
+        [
+          [
+            [
+              -528.9526503930254,
+              -806.4360558541392
+            ],
+            [
+              -528.9348176909731,
+              -791.2069000000049
+            ],
+            [
+              -514.4291188515459,
+              -791.2180319997395
+            ],
+            [
+              -514.4393774781225,
+              -795.13649600005
+            ],
+            [
+              -488.57737834342777,
+              -795.1698920000447
+            ],
+            [
+              -488.56711971539335,
+              -787.3663599998142
+            ],
+            [
+              -476.70814668871594,
+              -787.3774919999443
+            ],
+            [
+              -476.73137853418905,
+              -806.503250106933
+            ],
+            [
+              -486.14608370044925,
+              -806.4911359998574
+            ],
+            [
+              -512.1004104801647,
+              -806.4577399998626
+            ],
+            [
+              -528.9526503930254,
+              -806.4360558541392
+            ]
+          ]
+        ]
+      ],
+      "areaMeters2": 740.3964309517665,
+      "levels": 3,
+      "height": 10.8,
+      "roofType": "hipped",
+      "roofRise": null,
+      "adoption": "Three visible storeys; 10.8 m from the existing 3.6 m annex estimate, not measured. Hip/valley arrangement visible; ridge height and exact segmentation unresolved."
+    }
+  ],
+  "partitionChecks": {
+    "symmetricalDifferenceArea": 1.280940631342986e-12,
+    "maximumPairOverlapArea": 0.0,
+    "courtyardFilledArea": 0.0,
+    "passed": true
+  },
+  "remainingBeforeProduction": [
+    "Resolve connector storey/height estimates explicitly and document uncertainty.",
+    "Resolve ridge/hip/valley topology against visible roof, not a flat or arbitrary plateau substitute.",
+    "Migrate facade/roof/exposed-edge anchors by coordinates after repartitioning; preserve all south facade and annex details.",
+    "Validate source and decoded base/near models, new exposed walls, tree clearance, fixed cameras and original performance budget."
+  ]
+}
