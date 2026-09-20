@@ -71,6 +71,12 @@ def samples(b):
             # a compact roof can have every triangle centroid below its dome.
             # The separate apex probe checks the new visible silhouette.
             covered = dome and math.dist((x,y),dome['center']) < dome['radius']+.1
+            crown = form.get('roofCrown')
+            if crown and crown['part'] == part['id']:
+                dx,dy=x-crown['corner'][0],y-crown['corner'][1]
+                u,v=crown['u'],crown['v'];det=u[0]*v[1]-u[1]*v[0]
+                s,t=(dx*v[1]-dy*v[0])/det,(u[0]*dy-u[1]*dx)/det
+                covered = covered or (0<=s<=crown['width'] and 0<=t<=crown['depth']) or (0<=s<=crown['screenThickness'] and crown['depth']<=t<=crown['screenBottomDepth'])
             points.append({'kind':'roof','part':part['id'],'x':x,'y':y,
                            'top':z+part['height']+h+(.05 if covered else 4),'expected':z+part['height']+h})
             count+=1
@@ -80,6 +86,13 @@ def samples(b):
         dome=form['roofDome'];x,y=dome['center']
         apex=z+dome['baseHeight']+dome['drumHeight']+dome['rise']
         points.append({'kind':'roof-dome-apex','x':x,'y':y,'top':apex+1,'expected':apex})
+    if 'roofCrown' in form:
+        c=form['roofCrown']
+        for kind,s,t,rise in [('curtain-crown',c['width']/2,c['depth']/2,c['rise']),
+                              ('crown-screen',c['screenThickness']/2,(c['depth']+c['screenTopDepth'])/2,c['screenRise'])]:
+            x,y=[c['corner'][k]+c['u'][k]*s+c['v'][k]*t for k in (0,1)]
+            apex=z+c['baseHeight']+rise
+            points.append({'kind':kind,'x':x,'y':y,'top':apex+1,'expected':apex})
     if 'stairTower' in form:
         s=form['stairTower'];x,y=s['origin'];floor=z+s['config']['baseHeight']
         points.append({'kind':'stair-ground-platform','x':x,'y':y,'top':floor+.5,'expected':floor})
