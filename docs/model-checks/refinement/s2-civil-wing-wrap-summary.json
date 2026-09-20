@@ -1,0 +1,117 @@
+{
+  "checkedAt": "2026-09-20T22:01:54.002835+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [],
+  "baseCommit": "6f611c2",
+  "branch": "dev",
+  "scope": "Four north-wing side/return walls recoloured white. Exact source geometry, windows, UV and transforms preserved; generic side windows remain uncalibrated. Whole-building acceptance remains pending",
+  "partialObjectRecords": 21,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 224,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "geometry",
+    "ends-geometry",
+    "central-geometry",
+    "gallery-geometry",
+    "round-geometry",
+    "rear-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4203768,
+        "medianDrawCalls": 569
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.573424346753163,
+        "medianDrawCalls": 4.0219378427788
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        28,
+        27,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1163496,
+        "medianDrawCalls": 302
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 10.604261629647937,
+        "medianDrawCalls": 14.828897338403046
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5374956,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/site-overrides.json": "aefc67261b40542d27331cd644362fe52b049c6b82acb5f433626725110ed9e8",
+    "data/paving-overrides.json": "8feb5362b3287525862d2f8775dc24505dbf7edfff3dd168d4a0dc893e199fb8",
+    "public/data/pavings.json": "3f17931e2ef61c05ec66ba7f56d39d589fcc928479f7aee8d197249d1679b3b2",
+    "data/building-overrides.json": "2ed66123549ef94d4325a03435e5a25789549acbe8733034033585a61931b246",
+    "data/building-sources.json": "f3deafff1590af90ae1bdd28ecda7cb8196d624326b38851c2c4d75df17b39be",
+    "blender/gxu-campus.blend": "d55215acb1a092aaf72c804bf875de957fac1528e5882e704e2d53f4ac50d427",
+    "public/data/buildings.json": "3444a3beb23117423fa467e4b2aaf7b9b521191e96a100f82b9fc8f1b3c639ca",
+    "public/data/models.json": "5bcb540baf9119dbc18895aa40601d108bb436c91d442168f836145a2f5bc1f2"
+  }
+}
