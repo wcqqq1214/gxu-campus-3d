@@ -9,6 +9,7 @@ from attached_portico import add_attached_portico
 from facade_bands import add_band_ledges, add_band_windows, band_replaces_window, add_horizontal_ledges
 from facade_panels import add_panels, panel_replaces_window
 from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
+from roof_eave import add_roof_eave, replaces_parapet
 
 
 def compact_form_source(obj):
@@ -83,6 +84,8 @@ def shared_form(b, z, C):
             edges = part.get('parapetEdges', [(a,c) for poly in part['polygons']
                                              for ring in poly for a,c in zip(ring,ring[1:])])
             for a,c in edges:
+                if replaces_parapet(form.get('roofEave'), part.get('id', 'body'), a, c):
+                    continue
                 length = math.dist(a, c)
                 if length < 2: continue
                 top.box((a[0]+c[0])/2, (a[1]+c[1])/2, z+h+.4, length, .25, .8,
@@ -90,6 +93,8 @@ def shared_form(b, z, C):
     if 'roofDome' in form:
         from roof_dome import add_roof_dome
         add_roof_dome(top, form['roofDome'], z, C['white'])
+    if 'roofEave' in form:
+        add_roof_eave(top, form['roofEave'], z, C['white'])
     for facade in form.get('facades',[]):
         if 'attachedGallery' in facade:
             add_attached_gallery(body,facade,z,wall,C)
