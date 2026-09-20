@@ -1,0 +1,7 @@
+{
+  "passed": false,
+  "scope": "Estimated 10.8 m southwest C wing, retained 26.4 m main/rear roof, shared boundary, original courtyard and forecourt voids; detailed roof tiers remain pending.",
+  "failure": "('reversed seam wall', -546, 12, [0.001254576607607305, 0.9999992251396179, 0.0])",
+  "failedModelSha256": "6ce9979e2525cbc0d78efdaec7581cb79951bd412ba04f910601d74a583c1be9",
+  "cause": "New part polygons copied clockwise original outer ring; Mesh.extrude expects CCW outer ring and CW holes for outward side faces."
+}
