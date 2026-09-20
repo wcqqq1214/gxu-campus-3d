@@ -1,0 +1,174 @@
+{
+  "status": "location-screening-only-not-registered-or-production-ready",
+  "productionReady": false,
+  "source": "public/data/buildings.json",
+  "sourceSha256": "3444a3beb23117423fa467e4b2aaf7b9b521191e96a100f82b9fc8f1b3c639ca",
+  "buildingCount": 448,
+  "coordinateSystem": "campus local east/north metres",
+  "searchBounds": [
+    -650,
+    -780,
+    -470,
+    -695
+  ],
+  "searchBasis": "Manual search rectangle north of the civil college and east of the new platform, guided by the school construction location map. Not a traced or registered footprint.",
+  "sourceUrls": [
+    "https://www.gxu.edu.cn/info/1365/36792.htm",
+    "https://www.gxu.edu.cn/info/1364/36271.htm",
+    "https://tmjz.gxu.edu.cn/info/1452/5053.htm"
+  ],
+  "sensitivityCases": [
+    {
+      "outwardMarginM": 0,
+      "hits": []
+    },
+    {
+      "outwardMarginM": 5,
+      "hits": []
+    },
+    {
+      "outwardMarginM": 10,
+      "hits": [
+        {
+          "id": "way/957404988",
+          "name": "大型结构试验研究平台综合楼",
+          "intersectionAreaM2": 98.404801
+        },
+        {
+          "id": "relation/12875606",
+          "name": "土木建筑工程学院",
+          "intersectionAreaM2": 31.166641
+        }
+      ]
+    }
+  ],
+  "nearbyBuildings": [
+    {
+      "id": "way/759096564",
+      "name": "校内建筑 759096564",
+      "bounds": [
+        -440.5772617414752,
+        -790.1716239997712,
+        -403.21534153215134,
+        -778.0377439999538
+      ],
+      "chunk": "chunk-n2-n3"
+    },
+    {
+      "id": "way/759096576",
+      "name": "校内建筑 759096576",
+      "bounds": [
+        -587.1422683430965,
+        -851.6981879997793,
+        -555.6072483733273,
+        -837.1820599998068
+      ],
+      "chunk": "chunk-n2-n3"
+    },
+    {
+      "id": "way/759337787",
+      "name": "君武文化艺术教育中心",
+      "bounds": [
+        -535.9517186863044,
+        -651.8231279997725,
+        -474.4820245903898,
+        -606.4490959998767
+      ],
+      "chunk": "chunk-n2-n2"
+    },
+    {
+      "id": "way/759337788",
+      "name": "校内建筑 759337788",
+      "bounds": [
+        -507.7610111802284,
+        -653.3370800000632,
+        -497.9435049632936,
+        -643.6299759997347
+      ],
+      "chunk": "chunk-n2-n2"
+    },
+    {
+      "id": "way/759337790",
+      "name": "校内建筑 759337790",
+      "bounds": [
+        -571.477344630538,
+        -638.6984999998463,
+        -540.0346523057896,
+        -619.8631560000215
+      ],
+      "chunk": "chunk-n2-n2"
+    },
+    {
+      "id": "way/842784665",
+      "name": "国际学院",
+      "bounds": [
+        -441.2235552537043,
+        -880.7861039999793,
+        -401.66628882578414,
+        -867.182799999996
+      ],
+      "chunk": "chunk-n2-n3"
+    },
+    {
+      "id": "way/957404988",
+      "name": "大型结构试验研究平台综合楼",
+      "bounds": [
+        -734.5689996267181,
+        -788.1344680000896,
+        -656.418777727391,
+        -713.5278039998846
+      ],
+      "chunk": "chunk-n2-n3"
+    },
+    {
+      "id": "way/957404989",
+      "name": "物理科学与工程技术学院",
+      "bounds": [
+        -701.7003581247263,
+        -907.825731999972,
+        -636.9684205835626,
+        -809.3854560000642
+      ],
+      "chunk": "chunk-n2-n3"
+    },
+    {
+      "id": "relation/11564999",
+      "name": "资源环境与材料学院",
+      "bounds": [
+        -607.1465913541332,
+        -919.8816880000653,
+        -510.13075406083175,
+        -879.3389440000736
+      ],
+      "chunk": "chunk-n2-n3"
+    },
+    {
+      "id": "relation/12875606",
+      "name": "土木建筑工程学院",
+      "bounds": [
+        -548.7339681602731,
+        -863.6539559998882,
+        -476.70814668871594,
+        -787.3663599998142
+      ],
+      "chunk": "chunk-n2-n3"
+    },
+    {
+      "id": "relation/12875607",
+      "name": "邵逸夫楼",
+      "bounds": [
+        -450.2716644322017,
+        -841.0893919999871,
+        -389.4482638485162,
+        -813.2593919998543
+      ],
+      "chunk": "chunk-n2-n3"
+    }
+  ],
+  "limitations": [
+    "An empty search rectangle is not proof of demolition or current absence.",
+    "The old hall may be absent from this source dataset; identity, historical footprint and current existence remain unconfirmed.",
+    "Do not create a building, assign a height or rename an existing object from this rectangle.",
+    "The new platform candidate way/957404988 is one existing compound footprint; its internal hall must not be duplicated as another whole building."
+  ]
+}
