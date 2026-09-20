@@ -11,6 +11,7 @@ from mathutils.bvhtree import BVHTree
 ROOT = Path(__file__).resolve().parents[1]
 TARGET = next((Path(a.split('=', 1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')), ROOT)
 PREFIX = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-annex')
+DECORATED_STEP = '--decorated-step' in sys.argv
 ID, CHUNK, Z = 'relation/12875606', 'chunk-n2-n3', 4.06
 LOW = [(-545, y, 10.8) for y in (-839, -843, -848, -856, -860)]
 LOW += [(x, y, 10.8) for x in (-541, -535, -529, -523, -516) for y in (-851, -856, -861)]
@@ -53,7 +54,9 @@ def check(objects, tolerance):
         assert ray((x, y, Z + 35), (0, 0, -1), 34.8) is None, ('filled original void', x, y)
     walls = []
     for x in (-546, -542):
-        for height in (12, 19, 24):
+        # After explicit windows/recesses are added, probe retained solid
+        # wall bands. The dedicated step-facade validator checks the details.
+        for height in ((12, 16.5, 22.8) if DECORATED_STEP else (12, 19, 24)):
             hit = ray((x, -838, Z + height), (0, 1, 0), 5)
             assert hit and abs(hit[0].y + 834.82) < .04 + tolerance, ('missing exposed main wall', x, height, hit)
             assert hit[1].y < -.98, ('reversed seam wall', x, height, list(hit[1]))
@@ -73,6 +76,7 @@ def check(objects, tolerance):
 
 
 report = dict(passed=False, scope='Estimated 10.8 m southwest C wing, retained 26.4 m main/rear roof, shared boundary, original courtyard and forecourt voids; detailed roof tiers remain pending.')
+report['exposedWallProbeMode'] = 'retained solid bands beside explicit details' if DECORATED_STEP else 'original undecorated wall'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET / 'blender/gxu-campus.blend'))
     report['source'] = check([o for o in bpy.context.scene.objects if o.get('featureId') == ID], .006)
