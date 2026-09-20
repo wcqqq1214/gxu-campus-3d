@@ -1,0 +1,79 @@
+{
+  "passed": true,
+  "method": "Direct view_image review of all nine saved before/after captures and library regression",
+  "states": [
+    {
+      "file": "docs/screenshots/refinement/s2-civil-wing-ends-final/before/civil-wing-ends-trees-off-day.png",
+      "sha256": "4192262c397ad92ccc5ea38ee8bfae74173a6be95738bea9db81136f07d4f802",
+      "variant": "before",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-wing-ends-final/before/civil-wing-ends-oblique-trees-off-day.png",
+      "sha256": "88044cf9aef42abaa12f8b3510608fe970ea68745773fd80642a2a98a9e411a2",
+      "variant": "before",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-wing-ends-final/before/civil-south-overview-trees-off-day.png",
+      "sha256": "d25f6bbcbbc7051bddeeacd82cb7e1b87f1c866b169f546e6f1ebca63775267b",
+      "variant": "before",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-wing-ends-final/after/civil-wing-ends-trees-off-day.png",
+      "sha256": "ee1b4b8d45acef15fc4057f64706d387e3ed9be897f34af569ad5b4228bd4390",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-wing-ends-final/after/civil-wing-ends-oblique-trees-off-day.png",
+      "sha256": "9b7be2cbadee586d4147c0c693f7430c08ce8c02aac3f6a5a95e167891ce84e8",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-wing-ends-final/after/civil-south-overview-trees-off-day.png",
+      "sha256": "b4e9f718447ed99e159e985a749ad1d3d36d802d3a06a8cf57175f2a1f9a1804",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-wing-ends-final/after/civil-wing-ends-oblique-trees-on-day.png",
+      "sha256": "496aac87be6b3956403be956b0947ff285767eed806972b6ae1dc45df3db84c9",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-wing-ends-final/after/civil-wing-ends-trees-off-night.png",
+      "sha256": "ae30221d97cfcaff41de0e5bae97ac4d14525afff5a4c13889dd88ef5544787c",
+      "variant": "after",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-civil-wing-ends-final/after/civil-wing-ends-trees-off-day-mobile.png",
+      "sha256": "a420e419ee7b014bc6c929f575e95161374c5daaf1fa08cd5a1ac4313597bc3d",
+      "variant": "after",
+      "representation": "base"
+    }
+  ],
+  "libraryMobileRegression": {
+    "file": "docs/screenshots/refinement/s2-civil-wing-ends-performance/library-mobile.png",
+    "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4",
+    "directlyViewed": true,
+    "passed": true
+  },
+  "observations": [
+    "Both north-facing end walls are white with sparse independent window rows",
+    "Western face has five narrow columns, eastern face has three wider columns",
+    "No continuous pilasters were added",
+    "Red roof, central gallery and original footprint remain intact",
+    "South facade and main round-window wall remain in context"
+  ],
+  "limitations": [
+    "Column counts and all dimensions are estimated from limited-resolution reference images",
+    "Only the two north-facing end walls are calibrated; side returns and detailed equipment are pending",
+    "Mobile views are desktop simulations",
+    "Existing grid winding regression is verified by source/base/near probes and primitive metadata, not new facade calibration"
+  ]
+}
