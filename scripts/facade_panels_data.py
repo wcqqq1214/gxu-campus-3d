@@ -46,7 +46,7 @@ def validate_panels(panels, length, height, levels, band=None, ledges=None):
                     raise ValueError('Facade panel overlaps a horizontal ledge')
         if band:
             fh = height/levels
-            for level in range(band['firstLevel'], int(levels)):
+            for level in range(band['firstLevel'], band.get('lastLevel', int(levels)-1)+1):
                 # Include the near frame and upper projecting ledge.
                 low = (level+.56-band['heightRatio']/2)*fh-.06
                 high = (level+.56+band['heightRatio']/2)*fh+.12+band['thickness']
