@@ -5,7 +5,7 @@ import math
 def validate_flush_entrance(config, width, height):
     fields = {'floorHeight', 'glazingHeight', 'splitHeight', 'bays', 'pierWidth',
               'pierDepth', 'doorWidth', 'doorHeight', 'frameWidth'}
-    if not isinstance(config, dict) or not fields <= set(config) or set(config)-fields-{'canopy'}:
+    if not isinstance(config, dict) or not fields <= set(config) or set(config)-fields-{'canopy','returnGlazing'}:
         raise ValueError('Flush entrance needs explicit glazing, door and frame dimensions')
     if type(config['bays']) is not int or config['bays'] not in (1, 3, 5):
         raise ValueError('Flush entrance needs an odd number of bays with a central door')

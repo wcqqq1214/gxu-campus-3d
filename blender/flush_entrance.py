@@ -26,12 +26,18 @@ def add_flush_entrance(mesh, entry, z, C):
     if 'canopy' in p:
         canopy=p['canopy']
         box(0,canopy['depth']/2,top,canopy['width'],canopy['depth'],canopy['thickness'],'stone')
+    if 'returnGlazing' in p:
+        from flush_return import add_flush_return
+        add_flush_return(mesh,entry,z,C)
 
 
 def flush_entrance_blocks_window(entry,x,y,nx,ny,bottom,top,width):
     if 'flushEntrance' not in entry:return False
     p=entry['flushEntrance'];a=math.radians(entry['bearing']);ex,ey=entry['center']
     en=(math.sin(a),math.cos(a));dx,dy=x-ex,y-ey
-    return (nx*en[0]+ny*en[1]>.999 and abs(dx*en[0]+dy*en[1])<.3
+    front = (nx*en[0]+ny*en[1]>.999 and abs(dx*en[0]+dy*en[1])<.3
             and abs(dx*en[1]-dy*en[0])<(entry['width']+width+.3)/2
             and bottom<p['glazingHeight'] and top>p['floorHeight'])
+    if front:return True
+    from flush_return import return_blocks_window
+    return return_blocks_window(entry,x,y,nx,ny,bottom,top,width)
