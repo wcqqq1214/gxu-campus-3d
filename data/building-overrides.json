@@ -4497,6 +4497,17 @@
             "osm"
           ],
           "note": "具名正面照片支持西南附楼低于八层主楼，可辨下部低窗、台阶以上房间和上层带外廊房间；暂以三层、每层3.6米得到10.8米主体高度表达，层数与尺寸均为照片约束估算，未视为实测或完整竣工层数。沿原外环第1边经第2顶点向西延长，与第6边相交，南侧C形原轮廓作为低附楼；分界为外观与原轮廓约束估算，未使用偏移屋顶投影改轮廓。原内院、八层主楼/后翼及东南玻璃入口保留。局部高屋面、低附楼内部更细分级、平台和台阶仍待核对。"
+        },
+        "exposedFacadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCivilEnglishOverview",
+            "gxuCivilEnglishBanner",
+            "gxuCivilExteriorAsset",
+            "esriCivilContext",
+            "osm"
+          ],
+          "note": "主楼与西南低附楼的约10.80米内部高差边界补充上部南立面：两排中层窗带（零索引4–5）、第7层窄窗、第8层0.95米凹窗槽延续到西端，采用3个估算开间/4道隔板。照片证实窗排延续，具体开间数、0.40米端墙和尺寸为估算；低附楼高度10.8米及其0.8米女儿墙以下不增加窗面，未完整露出的第4层窗仍待屋顶层次核对。锚点位于main-and-rear本地外环第12边，不是OSM地面外边；原占地、体块和入口保持。"
         }
       },
       "review": {
@@ -4519,6 +4530,10 @@
         "parts": {
           "status": "partial",
           "note": "具名正面照片支持西南附楼低于八层主楼，可辨下部低窗、台阶以上房间和上层带外廊房间；暂以三层、每层3.6米得到10.8米主体高度表达，层数与尺寸均为照片约束估算，未视为实测或完整竣工层数。沿原外环第1边经第2顶点向西延长，与第6边相交，南侧C形原轮廓作为低附楼；分界为外观与原轮廓约束估算，未使用偏移屋顶投影改轮廓。原内院、八层主楼/后翼及东南玻璃入口保留。局部高屋面、低附楼内部更细分级、平台和台阶仍待核对。"
+        },
+        "exposedFacadeRules": {
+          "status": "partial",
+          "note": "主楼与西南低附楼的约10.80米内部高差边界补充上部南立面：两排中层窗带（零索引4–5）、第7层窄窗、第8层0.95米凹窗槽延续到西端，采用3个估算开间/4道隔板。照片证实窗排延续，具体开间数、0.40米端墙和尺寸为估算；低附楼高度10.8米及其0.8米女儿墙以下不增加窗面，未完整露出的第4层窗仍待屋顶层次核对。锚点位于main-and-rear本地外环第12边，不是OSM地面外边；原占地、体块和入口保持。 整栋未验收，侧后立面、塔冠、附楼屋顶及两段台阶继续推进。"
         }
       },
       "parts": [
@@ -4657,6 +4672,130 @@
           ],
           "height": 10.8,
           "levels": 3
+        }
+      ],
+      "exposedFacadeRules": [
+        {
+          "part": "main-and-rear",
+          "adjacentPart": "southwest-annex",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 12,
+          "rule": {
+            "balconies": false,
+            "windowBands": {
+              "from": 0.005,
+              "to": 0.995,
+              "firstLevel": 4,
+              "lastLevel": 5,
+              "heightRatio": 0.6,
+              "depth": 0.55,
+              "thickness": 0.24,
+              "windows": [
+                {
+                  "from": 0.0679003,
+                  "to": 0.3148144,
+                  "panes": 3
+                },
+                {
+                  "from": 0.3765429,
+                  "to": 0.6234571,
+                  "panes": 3
+                },
+                {
+                  "from": 0.6851856,
+                  "to": 0.9320997,
+                  "panes": 3
+                }
+              ]
+            },
+            "panels": [
+              {
+                "id": "west-level-6-bay-1",
+                "type": "glazing",
+                "from": 0.09259168386480998,
+                "to": 0.29012298865762937,
+                "bottom": 20.52,
+                "top": 22.68,
+                "columns": 2,
+                "rows": 2,
+                "frameWidth": 0.075,
+                "depth": 0.12
+              },
+              {
+                "id": "west-level-6-bay-2",
+                "type": "glazing",
+                "from": 0.4012343476035903,
+                "to": 0.5987656523964098,
+                "bottom": 20.52,
+                "top": 22.68,
+                "columns": 2,
+                "rows": 2,
+                "frameWidth": 0.075,
+                "depth": 0.12
+              },
+              {
+                "id": "west-level-6-bay-3",
+                "type": "glazing",
+                "from": 0.7098770113423707,
+                "to": 0.90740831613519,
+                "bottom": 20.52,
+                "top": 22.68,
+                "columns": 2,
+                "rows": 2,
+                "frameWidth": 0.075,
+                "depth": 0.12
+              }
+            ],
+            "openCorridor": {
+              "depth": 0.95,
+              "firstLevel": 7,
+              "lastLevel": 7,
+              "railHeight": 0.95,
+              "endInset": 0.4,
+              "piers": {
+                "bays": 3,
+                "width": 0.42,
+                "depth": 0.95
+              },
+              "finish": {
+                "wall": "stone",
+                "rail": "white"
+              },
+              "openings": [
+                {
+                  "kind": "window",
+                  "t": 0.19135733626121967,
+                  "width": 2.133397573917521,
+                  "height": 1.85,
+                  "sill": 1.05,
+                  "levels": [
+                    7
+                  ]
+                },
+                {
+                  "kind": "window",
+                  "t": 0.5,
+                  "width": 2.133397573917521,
+                  "height": 1.85,
+                  "sill": 1.05,
+                  "levels": [
+                    7
+                  ]
+                },
+                {
+                  "kind": "window",
+                  "t": 0.8086426637387804,
+                  "width": 2.133397573917521,
+                  "height": 1.85,
+                  "sill": 1.05,
+                  "levels": [
+                    7
+                  ]
+                }
+              ]
+            }
+          }
         }
       ]
     }

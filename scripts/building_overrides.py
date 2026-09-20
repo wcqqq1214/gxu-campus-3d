@@ -24,7 +24,7 @@ ARCHETYPE_LEVELS = {'dormitory':6,'residential-block':6,'teaching-block':5,
                     'courtyard-lab':5,'low-rise-service':2}
 ARCHETYPES = {'generic', 'dormitory', 'residential-block', 'canteen', 'teaching-block',
               'courtyard-lab', 'low-rise-service', 'external-stair'}
-FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'stairTower', 'roofDome', 'roofEave'}
+FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'exposedFacadeRules', 'stairTower', 'roofDome', 'roofEave'}
 
 
 def ordinary(b):
@@ -686,6 +686,9 @@ def resolve_building(building, record=None, source_ids=None):
         form['entrances']=entrances
     if 'parts' in record or 'facadeRules' in record or 'floorHeights' in record:
         form['facades']=resolve_facades(b,form,record.get('facadeRules',[]))
+    if 'exposedFacadeRules' in record:
+        from exposed_facades_data import resolve_exposed_facades
+        form.setdefault('facades', []).extend(resolve_exposed_facades(b, form, record['exposedFacadeRules']))
     for entry in form['entrances']:
         if 'flushEntrance' not in entry:continue
         for facade in form.get('facades',[]):
