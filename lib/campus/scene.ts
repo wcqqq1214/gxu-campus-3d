@@ -5,6 +5,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { batchSportsSurfaces } from './sports-batching';
 import { isTap } from './math';
 import type { CameraSnapshot } from './share';
 import {
@@ -676,6 +677,7 @@ export function createScene(
       }
       loadedBytes += a.bytes;
       styleMeshes(gltf.scene);
+      batchSportsSurfaces(gltf.scene);
       return gltf;
     } finally {
       progresses.delete(key);
