@@ -1,0 +1,119 @@
+{
+  "checkedAt": "2026-09-20T16:57:04.669473+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [],
+  "baseCommit": "2e0660f",
+  "branch": "dev",
+  "scope": "Estimated 3.2 m setback of east annex upper wall, 7.2 m terrace and retained 10.8 m upper roof with three upper glazing groups. Original ground footprint, main body, tower and entrances retained. Triangular roof wall, remaining roof tiers and full road connections pending",
+  "partialObjectRecords": 21,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 200,
+  "nodeTests": 56,
+  "geometryChecks": [
+    "portal-geometry",
+    "sidewall-geometry",
+    "crown-geometry",
+    "stairs-geometry",
+    "return-geometry",
+    "step-geometry",
+    "recess-geometry",
+    "geometry",
+    "retained-geometry",
+    "annex-geometry",
+    "entry-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4173773,
+        "medianDrawCalls": 560
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 3.8272652192083534,
+        "medianDrawCalls": 2.376599634369292
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1136822,
+        "medianDrawCalls": 282
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 8.068577729824277,
+        "medianDrawCalls": 7.2243346007604625
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 24,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5178172,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "41d05e2a477b6774dbffd97716f70fc67aae69ae1949f635569bcbc962256411",
+    "data/building-sources.json": "81caab3d15ca39c79440b3527c2a6f0704c3df1772046938bbfdd5fe5383281a",
+    "blender/gxu-campus.blend": "536874bc4987e8d3da48115ac888b6360e3b6d2604b5b502db1cab2645c65e7a",
+    "public/data/buildings.json": "fccdf423db44fe2933bf711b898a39fff22c92e0c2330111111c9b6c8cfe59be",
+    "public/data/models.json": "05309ac0d598297b821ff70cc26bdbc481cfac5f73330e744a8cbc1f08108e20"
+  }
+}
