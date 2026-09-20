@@ -390,6 +390,10 @@ def resolve_facades(b, form, rules):
                             if 'openBelow' in part or ('part' not in rule and abs(s.length-line.length)>1e-5):
                                 raise ValueError('Panels need one undivided solid facade edge')
                             validate_panels(rule['panels'], s.length, part['height'], part['levels'], rule.get('windowBands'), rule.get('horizontalLedges'))
+                            from facade_panels_data import resolve_round_window_walls
+                            round_walls = resolve_round_window_walls(rule['panels'], s.length)
+                            if round_walls:
+                                facade['roundWindowWalls'] = round_walls
                         if 'openBelow' in part:
                             if 'openCorridor' in facade['rule']:
                                 raise ValueError('Corridor requires a solid flat-roofed part with whole floors')
