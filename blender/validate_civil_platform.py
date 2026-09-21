@@ -1,0 +1,108 @@
+"""Fixed-position checks for estimated civil platform parts in source/base/near.
+
+Expected values are independent of the production override. These are adopted
+photo-constrained estimates, not measured heights or whole-building acceptance.
+"""
+import bpy, sys, json, re, hashlib
+from pathlib import Path
+from mathutils import Vector
+from mathutils.bvhtree import BVHTree
+ROOT = Path(__file__).resolve().parents[1]
+TARGET = next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')), ROOT)
+PREFIX = next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-platform')
+ID, CHUNK, Z = 'way/957404988', 'chunk-n2-n3', -4.76
+
+def root_name(obj):
+    while obj.parent:
+        obj = obj.parent
+    return re.sub(r'\.\d+$', '', obj.name)
+
+
+def check(objects, tolerance):
+    trees = []
+    for obj in objects:
+        if obj.type != 'MESH':
+            continue
+        obj.data.calc_loop_triangles()
+        triangles = list(obj.data.loop_triangles)
+        trees.append((BVHTree.FromPolygons(
+            [obj.matrix_world @ v.co for v in obj.data.vertices],
+            [tuple(t.vertices) for t in triangles], all_triangles=True),
+            [obj.data.materials[t.material_index].name.split('.')[0] for t in triangles]))
+
+    def ray(origin, direction, distance):
+        hits = []
+        for tree, materials in trees:
+            loc, normal, index, length = tree.ray_cast(Vector(origin), Vector(direction), distance)
+            if loc is not None:
+                hits.append((length, loc, normal, materials[index]))
+        return min(hits, key=lambda h: h[0]) if hits else None
+
+    samples = []
+    def roof(x, y, height, material, kind):
+        hit = ray((x,y,Z+40),(0,0,-1),40)
+        assert hit and hit[3] == material, (kind,x,y,'material',hit)
+        assert abs(hit[1].z-Z-height) < tolerance, (kind,x,y,height,hit)
+        assert hit[2].z > .99, (kind,'roof normal',hit)
+        samples.append(dict(kind=kind,position=[x,y],expectedHeight=height,actualHeight=hit[1].z-Z,material=material))
+    for x,y,h,mat,kind in [
+        (-680,-775,13.2,'blueRoof','hall'),(-710,-780,13.2,'blueRoof','hall'),
+        (-660,-765,13.2,'blueRoof','hall'),(-706,-744,10.8,'paleRoof','labs'),
+        (-705,-757,10.8,'paleRoof','labs'),(-725,-747,7.2,'paleRoof','foyer'),
+        (-726,-738,7.2,'paleRoof','foyer'),(-715,-721,29.7,'paleRoof','office'),
+        (-731,-716,29.7,'paleRoof','office'),(-698,-723,29.7,'paleRoof','office')]:
+        roof(x,y,h,mat,kind)
+    # Both sides of three independent part junctions; no lost slivers or roofs.
+    for x,y,h,mat in [(-710,-760.65,13.2,'blueRoof'),(-710,-760.25,10.8,'paleRoof'),
+                       (-709,-729.65,10.8,'paleRoof'),(-709,-729.15,29.7,'paleRoof'),
+                       (-719.7,-744,7.2,'paleRoof'),(-719.1,-744,10.8,'paleRoof')]:
+        roof(x,y,h,mat,'part-junction')
+    # Outward-facing hall east and south walls and office north wall.
+    for origin,direction,distance in [((-654,-776,Z+5),(-1,0,0),4),
+                                       ((-680,-790,Z+6),(0,1,0),4),
+                                       ((-716,-711,Z+17),(0,-1,0),4)]:
+        hit=ray(origin,direction,distance)
+        assert hit and hit[3]=='white' and hit[2].dot(Vector(direction))<-.98,('outer-wall',origin,hit)
+        samples.append(dict(kind='outward-white-wall',position=list(hit[1])))
+    # Hall upper glazing: first, middle and last estimated two-row strip.
+    # The north edge is independent fixed endpoints, not read from the override.
+    a=Vector((-695.093802217242,-760.4825800000607,0))
+    b=Vector((-656.418777727391,-760.5382399999202,0))
+    outward=Vector((-(b-a).y,(b-a).x,0)).normalized()
+    for i in (0,10,21):
+        p=a.lerp(b,.025+i*.95/22+.0125)
+        for h in (8.375,11.125):
+            origin=p+outward*2;origin.z=Z+h
+            hit=ray(origin,-outward,3)
+            assert hit and hit[3]=='glass',('upper-hall-glass',i,h,hit)
+            samples.append(dict(kind='upper-hall-glass',strip=i,height=h))
+        origin=p+outward*2;origin.z=Z+4
+        hit=ray(origin,-outward,3)
+        assert hit and hit[3]=='white',('no-lower-generic-window',i,hit)
+        samples.append(dict(kind='hall-lower-solid-wall',strip=i))
+    # A clearspan is not filled with intermediate generic floor plates.
+    for h in (3.3,6.6,9.9):
+        assert ray((-682,-774,Z+h-.1),(0,0,1),.2) is None,('hall-floor',h)
+        samples.append(dict(kind='clearspan-no-intermediate-floor',height=h))
+    return dict(passed=True,rayCount=len(samples),samples=samples,toleranceMeters=tolerance)
+
+report = dict(passed=False, scope='Estimated hall 13.2 m blue roof, labs 10.8 m, foyer 7.2 m, north nine-storey office 29.7 m; fixed junctions, white walls and upper glazing. Entry and remaining facades pending; not whole-building acceptance.')
+try:
+    bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
+    report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    bpy.ops.import_scene.gltf(filepath=str(TARGET/'public/models/base.glb'))
+    bpy.context.view_layer.update()
+    report['base']=check([o for o in bpy.context.scene.objects if root_name(o)==CHUNK],.05)
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    bpy.ops.import_scene.gltf(filepath=str(TARGET/'public/models'/f'{CHUNK}.glb'))
+    bpy.context.view_layer.update()
+    report['near']=check(list(bpy.context.scene.objects),.02)
+    report['fingerprints']={p:hashlib.sha256((TARGET/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb',f'public/models/{CHUNK}.glb','public/data/buildings.json']}
+    report['passed']=True
+except Exception as error:
+    report['failure']=str(error)
+    raise
+finally:
+    (ROOT/'docs/model-checks/refinement'/f'{PREFIX}-geometry.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    print('Civil platform:',report['passed'],flush=True)
