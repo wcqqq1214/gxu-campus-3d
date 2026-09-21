@@ -241,6 +241,22 @@ class BuildingOverrideTests(unittest.TestCase):
             changed=copy.deepcopy(parts);changed[0]['roof']=bad
             with self.subTest(roof=bad),self.assertRaises(ValueError):self.resolve(b,parts=changed)
 
+    def test_part_blue_roof_is_local_and_rejects_unsupported_finish(self):
+        b=self.building()
+        parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'levels':5,'height':16.5,'roof':{'type':'flat','rise':0,'finish':'blue-metal'}},
+               {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'levels':3,'height':9.9}]
+        r=self.resolve(b,parts=parts)
+        self.assertEqual(r['form']['parts'][0]['roof']['finish'],'blue-metal')
+        self.assertNotIn('finish',r['form']['parts'][1]['roof'])
+        self.assertNotIn('finish',r['form']['roof'])
+        self.assertEqual(resolve_building(r)['form']['parts'],[])
+        for roof in [{'type':'flat','rise':0,'finish':'red'},
+                     {'type':'flat','rise':0,'finish':None},
+                     {'type':'hipped','rise':1,'finish':'blue-metal'}]:
+            bad=copy.deepcopy(parts);bad[0]['roof']=roof
+            with self.subTest(roof=roof),self.assertRaisesRegex(ValueError,'finish'):
+                self.resolve(b,parts=bad)
+
     def test_ground_corridor_with_pitched_roof_requires_fitting_piers(self):
         corridor={'depth':1.8,'firstLevel':0,'railHeight':.9,'endInset':.3,
                   'piers':{'bays':8,'width':.42,'depth':.5},'balusters':{'spacing':.32,'width':.11}}
