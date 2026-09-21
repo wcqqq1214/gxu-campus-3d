@@ -2250,21 +2250,6 @@
         "schemaVersion": 1,
         "footprintRevision": "51ade29b126e3eb8ddea57d77d010ce4b0fa7f6bb9efb2d526ac7904e38b5165",
         "evidence": {
-          "height": {
-            "status": "estimated",
-            "sourceRefs": [
-              "gxuCivilPlatformDesign2014",
-              "gxuCivilDemolitionAerial2022"
-            ],
-            "note": "北楼九层乘3.3米得29.7米；不含局部屋顶突出物，非竣工高度。"
-          },
-          "levels": {
-            "status": "confirmed",
-            "sourceRefs": [
-              "gxuCivilPlatformDesign2014"
-            ],
-            "note": "2014年校报明确北综合楼九层，最高层数采用9；不套给南大厅。"
-          },
           "parts": {
             "status": "estimated",
             "sourceRefs": [
@@ -2272,7 +2257,7 @@
               "gxuCivilPlatformDesign2014",
               "gxuCivilDemolitionAerial2022"
             ],
-            "note": "保留原OSM轮廓，按其转折点估算划分四块。南大厅采用13.2米单跨高空间（levels=1，不表达室内完整楼板），北面两排高窗不当作两个楼层；中间低实验区按三层10.8米、西侧门厅按两层7.2米估算。北板式楼九层有2014年校报设计依据，主体29.7米按3.3米层高估算。蓝顶用平面简化，实际小坡度及女儿墙尺寸未测量。连接部实际楼层、用途和全部分界未测绘确认；3F底图标注不能用于给高空间大厅添加整层楼板。"
+            "note": "保留原OSM轮廓，按其转折点估算划分四块。南大厅采用13.2米单跨高空间（levels=1，不表达室内完整楼板），北面两排高窗不当作两个楼层；中间低实验区按三层10.8米、西侧门厅按两层7.2米估算。北板式楼九层有2014年校报设计依据，主体29.7米按3.3米层高估算。蓝顶用平面简化，实际小坡度及女儿墙尺寸未测量。连接部实际楼层、用途和全部分界未测绘确认；3F底图标注不能用于给高空间大厅添加整层楼板。 航拍显示南大厅蓝顶四周内缩并有深色边带；采用等宽1.2米内缩估算，蓝面与边带分割为无重叠共面顶面，原主体高度和白色女儿墙保持。实际排水坡度及边带宽度未测绘。"
           },
           "facadeRules": {
             "status": "estimated",
@@ -2281,13 +2266,28 @@
             ],
             "note": "航拍可见浅白墙和南大厅北立面两排窄高窗；仅原外环第15边采用22列估算窗组，7至12.5米范围及分格尺寸为简化估算。厅体其余三面先停用原五层通用窗，入口和其他立面继续核对。低翼和北综合楼暂保留按分部层数的通用窗，不视为立面校准。"
           },
+          "levels": {
+            "status": "confirmed",
+            "sourceRefs": [
+              "gxuCivilPlatformDesign2014"
+            ],
+            "note": "2014年校报明确北综合楼九层，最高层数采用9；不套给南大厅。"
+          },
+          "height": {
+            "status": "estimated",
+            "sourceRefs": [
+              "gxuCivilPlatformDesign2014",
+              "gxuCivilDemolitionAerial2022"
+            ],
+            "note": "北楼九层乘3.3米得29.7米；不含局部屋顶突出物，非竣工高度。"
+          },
           "roof.type": {
             "status": "estimated",
             "sourceRefs": [
               "gxuCivilPlatformDesign2014",
               "gxuCivilDemolitionAerial2022"
             ],
-            "note": "航拍可见平面屋顶及南大厅蓝色覆盖层，未量取排水坡度，按平顶及原通用女儿墙简化。"
+            "note": "航拍可见平面屋顶及南大厅蓝色覆盖层，未量取排水坡度，按平顶及原通用女儿墙简化。 南大厅四周新增1.2米估算深色屋面边带，蓝色覆盖层内缩，仍采用平面简化。"
           },
           "archetype": {
             "status": "estimated",
@@ -2323,7 +2323,7 @@
           },
           "roof": {
             "status": "partial",
-            "note": "蓝顶和平屋面主体已表达；坡度和屋顶突出物待核对。"
+            "note": "已表达大厅内缩蓝顶、深色屋面边带和原白色女儿墙；内缩1.2米为估算，真实坡度、女儿墙尺寸及其他分部屋顶突出物待核对。"
           },
           "entrance": {
             "status": "pending",

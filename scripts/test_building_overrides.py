@@ -257,6 +257,48 @@ class BuildingOverrideTests(unittest.TestCase):
             with self.subTest(roof=roof),self.assertRaisesRegex(ValueError,'finish'):
                 self.resolve(b,parts=bad)
 
+    def test_blue_roof_inset_partitions_top_without_filling_courtyard(self):
+        from shapely.geometry import Polygon
+        from shapely.ops import unary_union
+        b=self.building()
+        b['polygons'][0].append([[10,5],[10,15],[20,15],[20,5],[10,5]])
+        part={'id':'hall','polygons':b['polygons'],'height':16.5,'levels':5,
+              'roof':{'type':'flat','rise':0,'finish':'blue-metal','inset':1.2}}
+        r=self.resolve(b,parts=[part]);roof=r['form']['parts'][0]['roof']
+        shape=lambda key:unary_union([Polygon(p[0],p[1:]) for p in roof[key]['polygons']])
+        center=shape('centerGeometry');border=shape('borderGeometry')
+        original=Polygon(b['polygons'][0][0],b['polygons'][0][1:])
+        self.assertAlmostEqual(center.intersection(border).area,0)
+        self.assertLess(center.union(border).symmetric_difference(original).area,1e-8)
+        self.assertAlmostEqual(center.boundary.distance(original.boundary),1.2)
+        self.assertEqual(len(center.interiors),1)
+        self.assertEqual(resolve_building(r)['form']['parts'],[])
+        for key in ('centerGeometry','borderGeometry'):
+            geometry=roof[key];area=0
+            for poly,indices in zip(geometry['polygons'],geometry['triangles']):
+                points=[p for ring in poly for p in ring[:-1]]
+                for i in range(0,len(indices),3):
+                    a,c,d=[points[k] for k in indices[i:i+3]]
+                    signed=((c[0]-a[0])*(d[1]-a[1])-(c[1]-a[1])*(d[0]-a[0]))/2
+                    self.assertGreater(signed,0)
+                    area+=signed
+            self.assertAlmostEqual(area,shape(key).area)
+
+    def test_blue_roof_inset_rejects_invalid_and_collapsed_geometry(self):
+        b=self.building()
+        part={'id':'hall','polygons':b['polygons'],'height':16.5,'levels':5,
+              'roof':{'type':'flat','rise':0,'finish':'blue-metal','inset':1.2}}
+        for value in (None,True,0,.1,3.1,float('nan'),float('inf')):
+            bad=copy.deepcopy(part);bad['roof']['inset']=value
+            with self.subTest(value=value),self.assertRaisesRegex(ValueError,'inset'):
+                self.resolve(b,parts=[bad])
+        bad=copy.deepcopy(part);del bad['roof']['finish']
+        with self.assertRaisesRegex(ValueError,'inset'):self.resolve(b,parts=[bad])
+        # An accepted in-range width can still erase a narrow footprint.
+        narrow=copy.deepcopy(b);narrow['polygons']=[[[[0,0],[2,0],[2,20],[0,20],[0,0]]]]
+        bad=copy.deepcopy(part);bad['polygons']=narrow['polygons']
+        with self.assertRaisesRegex(ValueError,'collapses'):self.resolve(narrow,parts=[bad])
+
     def test_ground_corridor_with_pitched_roof_requires_fitting_piers(self):
         corridor={'depth':1.8,'firstLevel':0,'railHeight':.9,'endInset':.3,
                   'piers':{'bays':8,'width':.42,'depth':.5},'balusters':{'spacing':.32,'width':.11}}
