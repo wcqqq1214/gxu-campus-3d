@@ -1,0 +1,121 @@
+{
+  "checkedAt": "2026-09-21T01:34:06.165330+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [
+    "Hall roof slope, south delivery entrance and road connection",
+    "North office remaining elevations, actual rooftop use/details and personnel entrance",
+    "Low labs and foyer levels and dimensions",
+    "Separate historical old hall footprint and demolition timing"
+  ],
+  "baseCommit": "3db855f85a1c73a25d1cfc605060885463bf3566",
+  "branch": "dev",
+  "scope": "Four estimated rectangular rooftop masses on the north office: two long strips, west return and southeast block. Original masses, supporting roofs, facades, hall glazing and entrances retained. Partial implementation only.",
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 236,
+  "nodeTests": 59,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4201776,
+        "medianDrawCalls": 563
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.523871121813361,
+        "medianDrawCalls": 2.925045703839113
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        28,
+        28,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1166327,
+        "medianDrawCalls": 287
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 10.873382163516144,
+        "medianDrawCalls": 9.125475285171092
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 27,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5394580,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "bb6e33520d008fc0425aac1ee99b7a7b7fbabdc9224bf0514bd286ee1b3c325f",
+    "data/building-sources.json": "b89c7bd1766ea1c04b4dd59383a6b8032a94994011ef68efecfc7ef16492b1e8",
+    "blender/gxu-campus.blend": "1b328eb1d36c4bdc874074037d2b56e56b8585ac3ad99249c8c228d4784110c0",
+    "blender/generic_buildings.py": "a183379109c18b6b322e8522b7c67ba137f8847fb8f72a9b1bd88854093cdd17",
+    "scripts/building_overrides.py": "c3258446c67b591abf4f0f9d347e327079742ced73f9ab2e2be10a3c7c406aeb",
+    "scripts/roof_volumes_data.py": "d97e7359e1be7150d33e07285b36aae7b7d9984309a934a0932c6ec4de946cb8",
+    "blender/validate_generic.py": "a13873c9f4f1d4e9bf25db53bd80b6d0c41577b360f4b183d78680f7cba6041c",
+    "blender/validate_civil_platform.py": "b93feb5a623b3b85999bfec62639bcae2047395937aa5ff2b9287def8d7d2c75",
+    "public/data/buildings.json": "0829c1135d9fc5cb78cc03c324973444ef4bfec13b377057f12766c33c6c5334",
+    "public/data/models.json": "edc67cc797c1b4ece11ba6fec535921457ec2233f69cea70a60447c8ee0614cc"
+  }
+}

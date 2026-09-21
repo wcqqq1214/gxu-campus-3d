@@ -2,7 +2,7 @@
 
 2026-09-21，接续[新旧大厅识别](CIVIL_LAB_IDENTIFICATION.md)，将现有“大型结构试验研究平台综合楼” `way/957404988` 从统一五层拆分为四个高低体量。蓝顶实验大厅与九层北楼采用同一稳定 ID，不重复计算建筑数量。旧结构实验大厅仍是另一个待核对的历史对象。
 
-后续已补入[大厅内缩蓝顶与深色屋面边带](CIVIL_PLATFORM_ROOF.md)、[北楼北窗网与东端实墙](CIVIL_PLATFORM_NORTH_FACADE.md)，并继续核对[圆柱玻璃门厅](CIVIL_PLATFORM_ENTRY_EVIDENCE.md)。下文保留首批体量验收记录；最新资产指纹与验证见后续专项。
+后续已补入[大厅内缩蓝顶与深色屋面边带](CIVIL_PLATFORM_ROOF.md)、[北楼北窗网与东端实墙](CIVIL_PLATFORM_NORTH_FACADE.md)及[北楼屋顶附加体](CIVIL_PLATFORM_ROOFTOP.md)，并继续核对[圆柱玻璃门厅](CIVIL_PLATFORM_ENTRY_EVIDENCE.md)。下文保留首批体量验收记录；最新资产指纹与验证见后续专项。
 
 ## 本批模型
 
