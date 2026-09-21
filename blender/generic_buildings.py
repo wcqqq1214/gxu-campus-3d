@@ -70,7 +70,16 @@ def shared_form(b, z, C):
                     part_body.box(*column['center'],z+(floor+soffit)/2,column['width'],column['depth'],soffit-floor,wall,column['angle'])
         else:
             roof_material = C['blueRoof'] if roof.get('finish') == 'blue-metal' else C['paleRoof']
-            part_body.extrude(part['polygons'], triangles, z-.5, h+.5, wall, roof_material)
+            top_indices = [[] for _ in part['polygons']] if 'inset' in roof else triangles
+            part_body.extrude(part['polygons'], top_indices, z-.5, h+.5, wall, roof_material)
+            if 'inset' in roof:
+                for key, material in [('borderGeometry',C['dark']),('centerGeometry',roof_material)]:
+                    geometry = roof[key]
+                    for poly, indices in zip(geometry['polygons'],geometry['triangles']):
+                        points = [p for ring in poly for p in ring[:-1]]
+                        for i in range(0,len(indices),3):
+                            part_body.face([(points[k][0],points[k][1],z+h)
+                                            for k in indices[i:i+3]],material)
         for facade in form.get('facades',[]):
             if facade['part']==part.get('id','body') and 'wallFinish' in facade['rule']:
                 from facade_finish import apply_wall_finish
