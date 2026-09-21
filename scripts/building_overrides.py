@@ -157,7 +157,7 @@ def resolve_parts(b, raw, roof):
         part_roof = copy.deepcopy(roof)
         if 'roof' in part:
             own = part['roof']
-            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh','finish'} or own['type'] not in ('flat','hipped','gabled'):
+            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh','finish','inset'} or own['type'] not in ('flat','hipped','gabled'):
                 raise ValueError('Part roof needs an explicit type and rise')
             if 'finish' in own and (own['finish'] != 'blue-metal' or own['type'] != 'flat' or 'openBelow' in part):
                 raise ValueError('Blue metal finish requires a solid flat part roof')
@@ -168,6 +168,29 @@ def resolve_parts(b, raw, roof):
             part_roof={**own,'basis':'Explicit part roof; see attributed parts evidence','status':'estimated'}
             if 'mesh' in own and own['type']=='flat':
                 raise ValueError('Explicit roof mesh requires a pitched roof')
+            if 'inset' in own:
+                width = own['inset']
+                if (own.get('finish') != 'blue-metal' or type(width) not in (int,float)
+                        or not math.isfinite(width) or not .2 <= width <= 3):
+                    raise ValueError('Roof inset requires blue metal and a 0.2–3 m width')
+                # Partition the top instead of overlaying coplanar colored faces.
+                # Preserve each component and courtyard; a narrow neck that
+                # disappears under this estimate needs an explicit roof model.
+                centers = [p.buffer(-width,join_style=2) for p in polys]
+                if any(p.is_empty or p.geom_type != 'Polygon' or p.area < 1
+                       or len(p.interiors) != len(original.interiors)
+                       for original,p in zip(polys,centers)):
+                    raise ValueError('Roof inset collapses or splits a roof component')
+                border = [p.difference(center) for p,center in zip(polys,centers)]
+                borders = [q for p in border for q in ([p] if p.geom_type=='Polygon' else p.geoms)]
+                for key, surfaces in [('centerGeometry',centers),('borderGeometry',borders)]:
+                    # Exact shared wall anchors can be collinear. Earcut may
+                    # retain a zero-area triangle that flips after float32
+                    # export. Remove only sub-micrometre top-boundary noise;
+                    # the body's facade anchors remain untouched.
+                    surfaces = [p.simplify(1e-7,preserve_topology=True) for p in surfaces]
+                    vertices, indices = pack_geometry(surfaces)
+                    part_roof[key] = {'polygons':vertices,'triangles':indices}
         if part_roof['type'] != 'flat':
             if 'mesh' in part_roof:
                 from explicit_roof_data import resolve_roof_mesh
