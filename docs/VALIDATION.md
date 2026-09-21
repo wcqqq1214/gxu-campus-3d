@@ -1,6 +1,6 @@
 # 验收记录
 
-2026-09-21接续：最新逐批校准状态见[执行记录](CAMPUS_REFINEMENT_PROGRESS.md)，下文保留历史验收日期和当时计数。结构平台的屋顶附加体使用[专项记录](CIVIL_PLATFORM_ROOFTOP.md)及 `validate_civil_platform.py -- --inset-roof --north-facade --roof-volumes` 检查；`validate_generic.py` 同时检查原支撑屋面和新增构件顶面。几何结果不等于照片尺寸或整栋现状得到实测确认。
+2026-09-21接续：最新逐批校准状态见[执行记录](CAMPUS_REFINEMENT_PROGRESS.md)，下文保留历史验收日期和当时计数。结构平台最新[东端窄玻璃带](CIVIL_PLATFORM_EAST_SLIT.md)使用 `validate_civil_platform.py -- --inset-roof --north-facade --roof-volumes --east-slit` 检查，包含此前屋顶和北窗网；`validate_generic.py` 同时检查原支撑屋面和附加体顶面。几何结果不等于照片尺寸或整栋现状得到实测确认。
 
 首次验收日期：2026-09-09；优化验收更新至 2026-09-13，最新结果见文末。实现和模型检查在 Apple M5、16 GB 内存、macOS 26.5.1 上完成。桌面浏览器为 Codex 内置 Chromium 预览，通常为 1280 × 720；移动检查使用同一设备上的 390 × 844 视口，**不是手机真机测试**。
 

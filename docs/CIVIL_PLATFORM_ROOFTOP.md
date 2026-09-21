@@ -2,6 +2,8 @@
 
 2026-09-21，接续[北楼窗网与东端实墙](CIVIL_PLATFORM_NORTH_FACADE.md)，补充北楼平屋顶上可辨认的长条和局部小体量。所属对象仍为 `way/957404988`；新增四个屋顶构件，不增加楼栋或层数，不改变原九层主体和南大厅。
 
+后续已补入[东端竖向窄玻璃带](CIVIL_PLATFORM_EAST_SLIT.md)。下文保留本屋顶批次的独立验收，最新资产见东端立面批次。
+
 ## 依据与简化范围
 
 [学校2022年拆除采购公告](https://www.gxu.edu.cn/info/1364/30576.htm)的[航拍附件](https://www.gxu.edu.cn/system/_content/download.jsp?urltype=news.DownloadAttachUrl&owner=1556120285&wbfileid=3792656)展示北楼屋面上的平行长条及端部小体量。结合全图的蓝顶大厅和北楼位置，把两条长条按东西向布置，端部小体量放在北楼东南部。西端连接及四块边界是对低分辨率影像的简化解释，不宣称已完成构件测绘或确认实际设备用途。
