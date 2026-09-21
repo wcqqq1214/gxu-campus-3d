@@ -15,6 +15,7 @@ INSET_ROOF = '--inset-roof' in sys.argv
 NORTH_FACADE = '--north-facade' in sys.argv
 ROOF_VOLUMES = '--roof-volumes' in sys.argv
 EAST_SLIT = '--east-slit' in sys.argv
+LAB_FACADE = '--lab-facade' in sys.argv
 
 def root_name(obj):
     while obj.parent:
@@ -170,6 +171,32 @@ def check(objects, tolerance):
             hit=ray(origin,-n,3)
             assert hit and hit[3]=='white',('east-slit-upper-lower-margin',height,hit)
             samples.append(dict(kind='east-slit-upper-lower-margin',height=height))
+    if LAB_FACADE:
+        # Fixed east-side low-lab segment, separate from the nine-storey office.
+        # Adopted grid dimensions are not loaded from production metadata.
+        a=Vector((-695.2908592664412,-729.4103473955927,0))
+        b=Vector((-695.093802217242,-760.4825800000607,0))
+        u=(b-a).normalized();n=Vector((-u.y,u.x,0));bay=((b-a).length-1.3)/18
+        for floor in range(3):
+            for col in range(18):
+                p=a+u*(.65+(col+.5)*bay+.20)
+                origin=p+n*2;origin.z=Z+(floor+.56)*3.6+.30
+                hit=ray(origin,-n,3)
+                assert hit and hit[3]=='glass' and hit[2].dot(n)>.98,('lab-east-glass',floor,col,hit)
+                samples.append(dict(kind='lab-east-glass',floor=floor,column=col))
+            for distance in (.25,(b-a).length-.25):
+                p=a+u*distance;origin=p+n*2;origin.z=Z+(floor+.56)*3.6
+                hit=ray(origin,-n,3)
+                assert hit and hit[3]=='white',('lab-east-end-margin',floor,distance,hit)
+                samples.append(dict(kind='lab-east-end-margin',floor=floor,distance=distance))
+        for col in (0,6,12,18):
+            p=a+u*(.65+col*bay)
+            for height in (1.,5.,9.8):
+                origin=p+n*2;origin.z=Z+height
+                hit=ray(origin,-n,3)
+                assert hit and hit[3]=='white' and hit[2].dot(n)>.98,('lab-east-pier',col,height,hit)
+                assert abs((hit[1]-p).dot(n)-.14)<tolerance,('lab-east-pier-depth',col,height,hit)
+                samples.append(dict(kind='lab-east-continuous-pier',column=col,height=height))
     if ROOF_VOLUMES:
         a=Vector((-734.5484823735649,-713.5278039998846,0))
         b=Vector((-695.3913024054572,-713.5723320000095,0))
@@ -201,12 +228,15 @@ report['insetRoofChecked']=INSET_ROOF
 report['northFacadeChecked']=NORTH_FACADE
 report['roofVolumesChecked']=ROOF_VOLUMES
 report['eastSlitChecked']=EAST_SLIT
+report['labFacadeChecked']=LAB_FACADE
 if NORTH_FACADE:
     report['scope']+=' Includes estimated 22-column north grid, continuous white piers and upper solid east end; ground entry, other elevations and roof structures remain pending.'
 if ROOF_VOLUMES:
     report['scope']+=' Includes two 1.1 m raised roof strips, west connection and 2.6 m southeast block, with open roof gaps. Roof dimensions and use remain estimates.'
 if EAST_SLIT:
     report['scope']+=' Includes the photo-constrained narrow east glazing strip with eight estimated divisions and surrounding solid wall. Ground openings, corner return and use remain unverified.'
+if LAB_FACADE:
+    report['scope']+=' Includes the low-lab east 18-column three-row window grid and continuous white piers. Counts, dimensions and ground-row continuation are estimates; entry positions remain pending.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)

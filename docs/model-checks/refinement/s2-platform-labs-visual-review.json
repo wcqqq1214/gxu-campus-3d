@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "date": "2026-09-21",
+  "buildingId": "way/957404988",
+  "scope": "Estimated dense east-facing grid on the low laboratory segment; not whole-building acceptance.",
+  "browserReport": "s2-platform-labs-final-context-browser.json",
+  "modelManifestSha256": "a0774e2ba11098cc475804c293394fb697bc36f16cf0658d2a1174e39a5ef693",
+  "reviewMethod": "All 11 screenshots individually viewed; compared with the official aerial detail and original GX720 panorama tile.",
+  "checks": [
+    {
+      "views": [
+        "labs-east before/after",
+        "labs-roof before/after"
+      ],
+      "finding": "Three rows of dense windows and white vertical framing replace sparse generic windows on the low lab only. The strip terminates before the office and hall junctions.",
+      "passed": true
+    },
+    {
+      "views": [
+        "platform-northeast before/after"
+      ],
+      "finding": "Full compound retains hall roof, office east slit, north window grid and rooftop structures; low facade change is visible in context.",
+      "passed": true
+    },
+    {
+      "views": [
+        "office-north before/after"
+      ],
+      "finding": "Office north elevation unchanged; this view does not expose the low east facade.",
+      "passed": true
+    },
+    {
+      "views": [
+        "platform-northeast trees-on",
+        "labs-east night"
+      ],
+      "finding": "New window pattern remains legible with normal trees and follows shared night glass lighting.",
+      "passed": true
+    },
+    {
+      "views": [
+        "labs-east mobile"
+      ],
+      "finding": "Base model preserves three rows and dense bay rhythm above the mobile panel; viewport simulation only.",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Counts and dimensions estimated; three floors not independently surveyed.",
+    "Ground windows do not confirm door positions.",
+    "Other low-wing elevations, roofs and foyer connection pending.",
+    "No current-condition or physical-phone verification."
+  ],
+  "newWholeBuildingsAccepted": 0
+}
