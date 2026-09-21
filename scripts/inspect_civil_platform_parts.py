@@ -44,6 +44,19 @@ def main():
     sides = sorted(split(middle, west_cut).geoms, key=lambda p: p.centroid.x)
     assert len(sides) == 2
     west, east = sides
+    # Overlay roundoff can leave a zero-width tail on the hall's north edge.
+    # Reconstruct the same partition from shared cut intersections and exact
+    # mapped vertices so facade anchors retain a single continuous wall.
+    q = list(LineString([ring[2], ring[3]]).intersection(south_cut).coords)[0]
+    m = list(west_cut.intersection(south_cut).coords)[0]
+    n = list(LineString([ring[14], ring[15]]).intersection(north_cut).coords)[0]
+    clean = [Polygon([ring[0], ring[1], ring[2], q, ring[15]]),
+             Polygon([ring[15], n, ring[11], ring[10], m]),
+             Polygon([*ring[3:11], m, q]),
+             Polygon([*ring[11:15], n])]
+    assert all(a.symmetric_difference(b).area < 1e-7
+               for a, b in zip([south, east, west, north], clean))
+    south, east, west, north = clean
     parts = [('south-hall', south), ('middle-labs', east),
              ('west-foyer', west), ('north-office', north)]
     union = unary_union([p for _, p in parts])

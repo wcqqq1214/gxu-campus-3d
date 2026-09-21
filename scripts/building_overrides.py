@@ -157,8 +157,10 @@ def resolve_parts(b, raw, roof):
         part_roof = copy.deepcopy(roof)
         if 'roof' in part:
             own = part['roof']
-            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh'} or own['type'] not in ('flat','hipped','gabled'):
+            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh','finish'} or own['type'] not in ('flat','hipped','gabled'):
                 raise ValueError('Part roof needs an explicit type and rise')
+            if 'finish' in own and (own['finish'] != 'blue-metal' or own['type'] != 'flat' or 'openBelow' in part):
+                raise ValueError('Blue metal finish requires a solid flat part roof')
             if type(own['rise']) not in (float,int) or not math.isfinite(own['rise']):
                 raise ValueError('Part roof rise must be finite and numeric')
             if (own['type']=='flat' and own['rise']!=0) or (own['type']!='flat' and own['rise']<=0):
