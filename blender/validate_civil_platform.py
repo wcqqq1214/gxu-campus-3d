@@ -13,6 +13,7 @@ PREFIX = next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-pre
 ID, CHUNK, Z = 'way/957404988', 'chunk-n2-n3', -4.76
 INSET_ROOF = '--inset-roof' in sys.argv
 NORTH_FACADE = '--north-facade' in sys.argv
+ROOF_VOLUMES = '--roof-volumes' in sys.argv
 
 def root_name(obj):
     while obj.parent:
@@ -147,13 +148,40 @@ def check(objects, tolerance):
         for floor in range(1,9):
             for col in range(3):
                 wall_sample(a.lerp(b,(col+.5)/3),n,(floor+.56)*3.3,'white','east-upper-solid')
+    if ROOF_VOLUMES:
+        a=Vector((-734.5484823735649,-713.5278039998846,0))
+        b=Vector((-695.3913024054572,-713.5723320000095,0))
+        length=(b-a).length;u=(b-a).normalized();v=Vector((u.y,-u.x,0))
+        def at(s,d):return a+u*s+v*d
+        # Adopted footprints/heights, independent of resolved roof volume data.
+        for name,s,d,width,depth,rise in [
+                ('north-strip',.455*length,3.2,.73*length,.4,1.1),
+                ('south-strip',.455*length,9.2,.73*length,.4,1.1),
+                ('west-return',.09*length+.2,6.2,.4,5.6,1.1),
+                ('southeast-block',.89*length,12.2,.14*length,3.8,2.6)]:
+            p=at(s,d);roof(p.x,p.y,29.7+rise,'white',name+'-top')
+            sides=[(u,width/2),(-u,width/2)]
+            # The return's short ends meet the strips; test exposed faces only.
+            if name!='west-return':sides += [(v,depth/2),(-v,depth/2)]
+            for outward,extent in sides:
+                face=p+outward*extent;origin=face+outward;origin.z=Z+29.7+rise/2
+                hit=ray(origin,-outward,2)
+                assert hit and hit[3]=='white' and hit[2].dot(outward)>.98,(name,'side',hit)
+                assert abs((hit[1]-face).dot(outward))<tolerance,(name,'side position',hit)
+                samples.append(dict(kind=name+'-outward-side',position=list(hit[1])))
+        for s,d in [(.455*length,6.2),(.455*length,1.5),(.455*length,12.5),
+                    (.86*length,6.2),(.05*length,6.2)]:
+            p=at(s,d);roof(p.x,p.y,29.7,'paleRoof','roof-volume-clear-gap')
     return dict(passed=True,rayCount=len(samples),samples=samples,toleranceMeters=tolerance)
 
 report = dict(passed=False, scope='Estimated hall 13.2 m blue roof, labs 10.8 m, foyer 7.2 m, north nine-storey office 29.7 m; fixed junctions, white walls and upper glazing. Entry and remaining facades pending; not whole-building acceptance.')
 report['insetRoofChecked']=INSET_ROOF
 report['northFacadeChecked']=NORTH_FACADE
+report['roofVolumesChecked']=ROOF_VOLUMES
 if NORTH_FACADE:
     report['scope']+=' Includes estimated 22-column north grid, continuous white piers and upper solid east end; ground entry, other elevations and roof structures remain pending.'
+if ROOF_VOLUMES:
+    report['scope']+=' Includes two 1.1 m raised roof strips, west connection and 2.6 m southeast block, with open roof gaps. Roof dimensions and use remain estimates.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
