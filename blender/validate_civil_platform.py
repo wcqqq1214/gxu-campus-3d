@@ -12,6 +12,7 @@ TARGET = next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswi
 PREFIX = next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-platform')
 ID, CHUNK, Z = 'way/957404988', 'chunk-n2-n3', -4.76
 INSET_ROOF = '--inset-roof' in sys.argv
+NORTH_FACADE = '--north-facade' in sys.argv
 
 def root_name(obj):
     while obj.parent:
@@ -112,10 +113,47 @@ def check(objects, tolerance):
         assert abs(sum(areas.values())-1693.454)<tolerance*150,('roof area overlap or gap',areas)
         assert 205<areas['dark']<210 and 1483<areas['blueRoof']<1489,('inset color areas',areas)
         samples.append(dict(kind='single-covered-inset-top',areasMeters2=areas))
+    if NORTH_FACADE:
+        # Fixed original north/east endpoints and adopted dimensions, independent
+        # of the override resolver. Probe every north bay and floor, plus piers
+        # and the newly solid upper east wall; a sparse generic grid must fail.
+        a=Vector((-734.5484823735649,-713.5278039998846,0))
+        b=Vector((-695.3913024054572,-713.5723320000095,0))
+        u=(b-a).normalized();n=Vector((-u.y,u.x,0))
+        bay=((b-a).length-2)/22
+        def wall_sample(p,normal,height,material,kind):
+            origin=p+normal*2;origin.z=Z+height
+            hit=ray(origin,-normal,3)
+            assert hit and hit[3]==material,(kind,list(p),height,hit)
+            assert hit[2].dot(normal)>.98,(kind,'outward face',hit)
+            samples.append(dict(kind=kind,position=list(p)[:2],height=height,material=material))
+        for floor in range(9):
+            for col in range(22):
+                # Offset from vertical mullion and horizontal pane divider.
+                p=a+u*(1+(col+.5)*bay+.24)
+                wall_sample(p,n,(floor+.56)*3.3+.30,'glass','north-window-grid')
+            wall_sample(a+u*.45,n,(floor+.56)*3.3,'white','north-edge-margin')
+        for col in (0,7,14,22):
+            p=a+u*(1+col*bay)
+            for height in (2.,14.,28.):
+                wall_sample(p,n,height,'white','north-continuous-pier')
+                origin=p+n*2;origin.z=Z+height
+                hit=ray(origin,-n,3)
+                assert abs((hit[1]-p).dot(n)-.18)<tolerance,('pier depth',col,height,hit)
+        # Upper east side of the office only; low-lab section shares edge 14.
+        a=Vector((-695.3913024054572,-713.5723320000095,0))
+        b=Vector((-695.2908592664412,-729.4103473955927,0))
+        u=(b-a).normalized();n=Vector((-u.y,u.x,0))
+        for floor in range(1,9):
+            for col in range(3):
+                wall_sample(a.lerp(b,(col+.5)/3),n,(floor+.56)*3.3,'white','east-upper-solid')
     return dict(passed=True,rayCount=len(samples),samples=samples,toleranceMeters=tolerance)
 
 report = dict(passed=False, scope='Estimated hall 13.2 m blue roof, labs 10.8 m, foyer 7.2 m, north nine-storey office 29.7 m; fixed junctions, white walls and upper glazing. Entry and remaining facades pending; not whole-building acceptance.')
 report['insetRoofChecked']=INSET_ROOF
+report['northFacadeChecked']=NORTH_FACADE
+if NORTH_FACADE:
+    report['scope']+=' Includes estimated 22-column north grid, continuous white piers and upper solid east end; ground entry, other elevations and roof structures remain pending.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
