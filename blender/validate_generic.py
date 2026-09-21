@@ -71,6 +71,12 @@ def samples(b):
             # a compact roof can have every triangle centroid below its dome.
             # The separate apex probe checks the new visible silhouette.
             covered = dome and math.dist((x,y),dome['center']) < dome['radius']+.1
+            for volume in form.get('roofVolumes', []):
+                if volume['part'] != part['id']:continue
+                dx,dy=x-volume['center'][0],y-volume['center'][1]
+                cs,sn=math.cos(volume['angle']),math.sin(volume['angle'])
+                covered = covered or (abs(dx*cs+dy*sn)<=volume['width']/2+.01 and
+                                      abs(-dx*sn+dy*cs)<=volume['depth']/2+.01)
             crown = form.get('roofCrown')
             if crown and crown['part'] == part['id']:
                 dx,dy=x-crown['corner'][0],y-crown['corner'][1]
@@ -86,6 +92,9 @@ def samples(b):
         dome=form['roofDome'];x,y=dome['center']
         apex=z+dome['baseHeight']+dome['drumHeight']+dome['rise']
         points.append({'kind':'roof-dome-apex','x':x,'y':y,'top':apex+1,'expected':apex})
+    for volume in form.get('roofVolumes', []):
+        x,y=volume['center'];apex=z+volume['baseHeight']+volume['rise']
+        points.append({'kind':'roof-volume-top','x':x,'y':y,'top':apex+1,'expected':apex})
     if 'roofCrown' in form:
         c=form['roofCrown']
         for kind,s,t,rise in [('curtain-crown',c['width']/2,c['depth']/2,c['rise']),
