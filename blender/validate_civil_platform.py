@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TARGET = next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')), ROOT)
 PREFIX = next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-platform')
 ID, CHUNK, Z = 'way/957404988', 'chunk-n2-n3', -4.76
+INSET_ROOF = '--inset-roof' in sys.argv
 
 def root_name(obj):
     while obj.parent:
@@ -53,7 +54,7 @@ def check(objects, tolerance):
         (-731,-716,29.7,'paleRoof','office'),(-698,-723,29.7,'paleRoof','office')]:
         roof(x,y,h,mat,kind)
     # Both sides of three independent part junctions; no lost slivers or roofs.
-    for x,y,h,mat in [(-710,-760.65,13.2,'blueRoof'),(-710,-760.25,10.8,'paleRoof'),
+    for x,y,h,mat in [(-710,-760.65,13.2,'dark' if INSET_ROOF else 'blueRoof'),(-710,-760.25,10.8,'paleRoof'),
                        (-709,-729.65,10.8,'paleRoof'),(-709,-729.15,29.7,'paleRoof'),
                        (-719.7,-744,7.2,'paleRoof'),(-719.1,-744,10.8,'paleRoof')]:
         roof(x,y,h,mat,'part-junction')
@@ -84,9 +85,37 @@ def check(objects, tolerance):
     for h in (3.3,6.6,9.9):
         assert ray((-682,-774,Z+h-.1),(0,0,1),.2) is None,('hall-floor',h)
         samples.append(dict(kind='clearspan-no-intermediate-floor',height=h))
+    if INSET_ROOF:
+        # Independent coordinates on the four 1.2 m border strips, their inner
+        # transitions and a corner. These are not resolved from roof metadata.
+        for x,y in [(-680,-760.99),(-680,-787.60),(-656.95,-775),
+                    (-717.25,-775),(-657,-787.5),(-680,-761.55),
+                    (-657.45,-775),(-716.80,-775),(-680,-787.05)]:
+            roof(x,y,13.2,'dark','hall-inset-border')
+        for x,y in [(-680,-762.1),(-680,-786.5),(-658,-775),(-716,-775),
+                    (-680,-761.85),(-657.80,-775),(-716.40,-775),(-680,-786.75)]:
+            roof(x,y,13.2,'blueRoof','hall-inset-center')
+        # Sum all horizontal top triangles at the adopted hall height. Two
+        # coplanar overlays can pass closest-hit rays but fail this area check.
+        areas={'dark':0.,'blueRoof':0.}
+        for obj in objects:
+            if obj.type!='MESH':continue
+            obj.data.calc_loop_triangles()
+            for tri in obj.data.loop_triangles:
+                material=obj.data.materials[tri.material_index].name.split('.')[0]
+                if material not in areas:continue
+                a,b,c=[obj.matrix_world@obj.data.vertices[k].co for k in tri.vertices]
+                if all(abs(p.z-Z-13.2)<tolerance for p in (a,b,c)) and all(-720<p.x<-653 and -790<p.y<-759 for p in (a,b,c)):
+                    signed=(b-a).cross(c-a).z/2
+                    assert signed>0,('inset-top-normal',material,signed)
+                    areas[material]+=signed
+        assert abs(sum(areas.values())-1693.454)<tolerance*150,('roof area overlap or gap',areas)
+        assert 205<areas['dark']<210 and 1483<areas['blueRoof']<1489,('inset color areas',areas)
+        samples.append(dict(kind='single-covered-inset-top',areasMeters2=areas))
     return dict(passed=True,rayCount=len(samples),samples=samples,toleranceMeters=tolerance)
 
 report = dict(passed=False, scope='Estimated hall 13.2 m blue roof, labs 10.8 m, foyer 7.2 m, north nine-storey office 29.7 m; fixed junctions, white walls and upper glazing. Entry and remaining facades pending; not whole-building acceptance.')
+report['insetRoofChecked']=INSET_ROOF
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
