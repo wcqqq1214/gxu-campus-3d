@@ -159,7 +159,7 @@ def main():
     prefix=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'generic')
     if not re.fullmatch('[a-z0-9-]+',prefix):raise ValueError('Invalid report prefix')
     bs = [b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if ordinary(b)]
-    colors = ['pink','livingWarm','livingCool','stone','stoneWarm','stoneCool','white','paleRoof','red','dark','path','shadeGlass','glass']
+    colors = ['pink','livingWarm','livingCool','stone','stoneWarm','stoneCool','white','paleRoof','blueRoof','red','dark','path','shadeGlass','glass']
     C = {k:i for i,k in enumerate(colors)}
     MATERIALS[:]=[bpy.data.materials.new('generic-check-'+name) for name in colors]
     generated = []
