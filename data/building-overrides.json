@@ -5935,14 +5935,43 @@
           "ring": 0,
           "edge": 13,
           "balconies": false,
-          "wallFinish": "white"
+          "wallFinish": "white",
+          "windowGrid": {
+            "columns": 22,
+            "firstLevel": 0,
+            "edgeInset": 1.0,
+            "widthRatio": 0.78,
+            "heightRatio": 0.75,
+            "pilasterWidth": 0.22,
+            "pilasterDepth": 0.18,
+            "paneRows": 2
+          }
         },
         {
           "polygon": 0,
           "ring": 0,
           "edge": 14,
           "balconies": false,
-          "wallFinish": "white"
+          "wallFinish": "white",
+          "part": "middle-labs"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 14,
+          "part": "north-office",
+          "balconies": false,
+          "wallFinish": "white",
+          "skipWindowLevels": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8
+          ]
         },
         {
           "polygon": 0,
@@ -6258,7 +6287,7 @@
           "sourceRefs": [
             "gxuCivilDemolitionAerial2022"
           ],
-          "note": "航拍可见浅白墙和南大厅北立面两排窄高窗；仅原外环第15边采用22列估算窗组，7至12.5米范围及分格尺寸为简化估算。厅体其余三面先停用原五层通用窗，入口和其他立面继续核对。低翼和北综合楼暂保留按分部层数的通用窗，不视为立面校准。"
+          "note": "航拍可见浅白墙和南大厅北立面两排窄高窗；原外环第15边采用22列估算窗组，7至12.5米范围及分格尺寸为简化估算。北综合楼北立面（原边13）按航拍密集白框采用22列九层窗网，端部留1米、窗宽占跨0.78、窗高占层0.75、竖框宽0.22米/凸出0.18米均为照片约束估算，未逐窗测绘。东端墙（原边14的北楼分段）上八层按可见大块白色实墙停用通用窗，底层继续保留示意窗。北楼底层窗网为估算延续，不代表入口已定位；其他侧面、屋顶突出物和低翼立面仍待核对。"
         }
       },
       "review": {
@@ -6280,7 +6309,7 @@
         },
         "facade": {
           "status": "partial",
-          "note": "南大厅北窗组简化已落实，其余立面仍待校准。"
+          "note": "南大厅北窗组与北综合楼北面密集窗网、东端上层实墙已表达；北楼窗列与尺度估算，底层入口、其他侧面及低翼仍待校准。"
         }
       }
     }
