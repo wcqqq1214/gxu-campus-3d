@@ -14,6 +14,7 @@ ID, CHUNK, Z = 'way/957404988', 'chunk-n2-n3', -4.76
 INSET_ROOF = '--inset-roof' in sys.argv
 NORTH_FACADE = '--north-facade' in sys.argv
 ROOF_VOLUMES = '--roof-volumes' in sys.argv
+EAST_SLIT = '--east-slit' in sys.argv
 
 def root_name(obj):
     while obj.parent:
@@ -148,6 +149,27 @@ def check(objects, tolerance):
         for floor in range(1,9):
             for col in range(3):
                 wall_sample(a.lerp(b,(col+.5)/3),n,(floor+.56)*3.3,'white','east-upper-solid')
+    if EAST_SLIT:
+        # Independent adopted east-end endpoints, not production panel metadata.
+        # The large white margins must remain solid around the narrow glazing.
+        a=Vector((-695.3913024054572,-713.5723320000095,0))
+        b=Vector((-695.2908592664412,-729.4103473955927,0))
+        u=(b-a).normalized();n=Vector((-u.y,u.x,0))
+        for row in range(8):
+            height=3.8+(row+.5)*(26.4-3.8)/8
+            for t,material,kind in [(.6,'glass','east-slit-glass'),
+                                    (.53,'white','east-slit-north-margin'),
+                                    (.67,'white','east-slit-south-margin')]:
+                p=a.lerp(b,t);origin=p+n*2;origin.z=Z+height
+                hit=ray(origin,-n,3)
+                assert hit and hit[3]==material,(kind,row,hit)
+                assert hit[2].dot(n)>.98,(kind,'outward normal',hit)
+                samples.append(dict(kind=kind,row=row,height=height,material=material))
+        for height in (3.5,27.):
+            p=a.lerp(b,.6);origin=p+n*2;origin.z=Z+height
+            hit=ray(origin,-n,3)
+            assert hit and hit[3]=='white',('east-slit-upper-lower-margin',height,hit)
+            samples.append(dict(kind='east-slit-upper-lower-margin',height=height))
     if ROOF_VOLUMES:
         a=Vector((-734.5484823735649,-713.5278039998846,0))
         b=Vector((-695.3913024054572,-713.5723320000095,0))
@@ -178,10 +200,13 @@ report = dict(passed=False, scope='Estimated hall 13.2 m blue roof, labs 10.8 m,
 report['insetRoofChecked']=INSET_ROOF
 report['northFacadeChecked']=NORTH_FACADE
 report['roofVolumesChecked']=ROOF_VOLUMES
+report['eastSlitChecked']=EAST_SLIT
 if NORTH_FACADE:
     report['scope']+=' Includes estimated 22-column north grid, continuous white piers and upper solid east end; ground entry, other elevations and roof structures remain pending.'
 if ROOF_VOLUMES:
     report['scope']+=' Includes two 1.1 m raised roof strips, west connection and 2.6 m southeast block, with open roof gaps. Roof dimensions and use remain estimates.'
+if EAST_SLIT:
+    report['scope']+=' Includes the photo-constrained narrow east glazing strip with eight estimated divisions and surrounding solid wall. Ground openings, corner return and use remain unverified.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
