@@ -1,0 +1,118 @@
+{
+  "checkedAt": "2026-09-21T01:12:29.426343+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [
+    "Hall roof slope, south delivery entrance and road connection",
+    "North office remaining elevations, roof structures and personnel entrance",
+    "Low labs and foyer levels and dimensions",
+    "Separate historical old hall footprint and demolition timing"
+  ],
+  "baseCommit": "633951fe265264d4050f0add0889aefd3457d163",
+  "branch": "dev",
+  "scope": "Estimated 22-column north office facade grid and upper solid east wall; original masses, roofs, hall glazing and entrances retained. Partial implementation only.",
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 231,
+  "nodeTests": 59,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4201728,
+        "medianDrawCalls": 562
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.522677068200354,
+        "medianDrawCalls": 2.7422303473491727
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        28,
+        27,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 28,
+        "medianTriangles": 1166279,
+        "medianDrawCalls": 299
+      },
+      "changePercent": {
+        "medianFPS": -6.666666666666665,
+        "medianTriangles": 10.868819187314926,
+        "medianDrawCalls": 13.688212927756659
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 27,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5394280,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "8fb8661fcd849feed3b8ea8576c8dc571573e8ac14e229cfa1e5475eb16c211a",
+    "data/building-sources.json": "b89c7bd1766ea1c04b4dd59383a6b8032a94994011ef68efecfc7ef16492b1e8",
+    "blender/gxu-campus.blend": "0314a763ef492825fbcb5004e0f81ca09fe78b6ef09e6bb49a498e584ed48ef0",
+    "blender/generic_buildings.py": "89ef538175d868af5fc850fb4f762f7ac321ea154cad2f720fd60a90dbb60733",
+    "scripts/building_overrides.py": "5d196443a119d9575a212d134f4154be2e71a0f80dd51946f9c6c85589f1e197",
+    "public/data/buildings.json": "d8baff76d26e98bcfea683e041b66c712b3223c46bcd79af853a7b251ed25e17",
+    "public/data/models.json": "8475b04bb5ea559c6815f329529ff483345cfb45f57b262805b272f1dac5bb69"
+  }
+}

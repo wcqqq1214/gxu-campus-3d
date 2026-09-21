@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "date": "2026-09-21",
+  "buildingId": "way/957404988",
+  "scope": "North office estimated north window grid and upper east solid wall only; not whole-building acceptance.",
+  "browserReport": "s2-platform-north-final-context-browser.json",
+  "modelManifestSha256": "8475b04bb5ea559c6815f329529ff483345cfb45f57b262805b272f1dac5bb69",
+  "reviewMethod": "All 11 browser images inspected as contact sheet and individually at returned full screenshot size; compared north facade with official aerial context and office detail crop.",
+  "checks": [
+    {
+      "views": ["office-north before and after"],
+      "finding": "Sparse generic windows replaced by dense narrow bays and continuous white piers across the north face; top height and footprint unchanged.",
+      "passed": true
+    },
+    {
+      "views": ["platform-northeast before and after"],
+      "finding": "Upper east office wall becomes solid white. Its ground windows and adjoining three-storey laboratory windows remain; image-left east end is not confused with the west end.",
+      "passed": true
+    },
+    {
+      "views": ["office-northwest before and after", "office-northwest trees-on"],
+      "finding": "West end windows and curved foyer remain. Existing trees partially obscure the lower facade in normal vegetation-on view; no vegetation removed for these additions.",
+      "passed": true
+    },
+    {
+      "views": ["hall-roof-regression before and after"],
+      "finding": "Inset blue roof, dark edge band, hall upper glazing and lower laboratory form remain. Office north facade is partially cropped in this hall-focused view, so it is not the primary office comparison.",
+      "passed": true
+    },
+    {
+      "views": ["office-north night", "office-north mobile"],
+      "finding": "Night glazing follows existing lighting. Portrait view retains the main north grid in base representation above the panel; fine near mullions are intentionally absent from base LOD.",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "22 bays and dimensions are photo-constrained estimates, not a surveyed window count.",
+    "North ground-floor grid is illustrative; personnel entrance remains unregistered.",
+    "Other elevations, office rooftop volumes and low-wing detail remain uncalibrated.",
+    "Mobile is a desktop browser viewport simulation, not a physical-phone test.",
+    "Historical aerial source does not prove unchanged 2026 appearance."
+  ],
+  "newWholeBuildingsAccepted": 0
+}
