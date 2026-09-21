@@ -1,0 +1,122 @@
+{
+  "checkedAt": "2026-09-21T02:15:50.143350+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [
+    "Hall roof slope, south delivery entrance and road connection",
+    "North office remaining elevations, actual rooftop use/details and personnel entrance",
+    "Low labs and foyer levels and dimensions",
+    "Separate historical old hall footprint and demolition timing"
+  ],
+  "baseCommit": "ea71c812f702f52b36b67493aedf317481a40473",
+  "branch": "dev",
+  "scope": "Estimated 18-column three-row grid with continuous white piers on the low laboratory east facade. Original masses, roofs, office facades, hall glazing and entrances retained. Partial implementation only.",
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 236,
+  "nodeTests": 59,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4198301,
+        "medianDrawCalls": 563
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.437426615455031,
+        "medianDrawCalls": 2.925045703839113
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        27,
+        27,
+        28
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 27,
+        "medianTriangles": 1166765,
+        "medianDrawCalls": 299
+      },
+      "changePercent": {
+        "medianFPS": -9.999999999999998,
+        "medianTriangles": 10.915019321352348,
+        "medianDrawCalls": 13.688212927756659
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5396508,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "9dd3354ead6340cb2b15781e749bd46a83050126226e005304b4caf3f60b45ba",
+    "data/building-sources.json": "dd25067d6c0af395fd22f18fa605cd374799eff783d1bc625f2e5b9838004712",
+    "blender/gxu-campus.blend": "f3937522558239d8c5aaf677d99574f0b58c9fabbfa936cf21c4ecbdfd40b269",
+    "blender/generic_buildings.py": "a183379109c18b6b322e8522b7c67ba137f8847fb8f72a9b1bd88854093cdd17",
+    "scripts/building_overrides.py": "c3258446c67b591abf4f0f9d347e327079742ced73f9ab2e2be10a3c7c406aeb",
+    "scripts/roof_volumes_data.py": "d97e7359e1be7150d33e07285b36aae7b7d9984309a934a0932c6ec4de946cb8",
+    "blender/validate_generic.py": "a13873c9f4f1d4e9bf25db53bd80b6d0c41577b360f4b183d78680f7cba6041c",
+    "blender/validate_civil_platform.py": "65537aba56f9239a406125d0cdd7b258cbc5450391d27a4bfa7b7ca8493f09ce",
+    "public/data/buildings.json": "1d89b477733e353151ed82a651677bcdb07f6fd265ac8cc810e2f7ef581e23e2",
+    "public/data/sources.json": "fdc8f5484b919a271503a5f34e445467df6488f5ea8776a9f150962c3a537c1f",
+    "public/data/models.json": "a0774e2ba11098cc475804c293394fb697bc36f16cf0658d2a1174e39a5ef693"
+  }
+}
