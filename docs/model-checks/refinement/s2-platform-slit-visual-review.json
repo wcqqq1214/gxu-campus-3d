@@ -1,0 +1,55 @@
+{
+  "passed": true,
+  "date": "2026-09-21",
+  "buildingId": "way/957404988",
+  "scope": "Photo-constrained estimated narrow east-end glazing strip; partial building calibration.",
+  "browserReport": "s2-platform-slit-final-context-browser.json",
+  "modelManifestSha256": "a29b65901ac0df7e282cc0a16c7876ccbdeec61139ec659a98384309006ba357",
+  "reviewMethod": "All 11 browser screenshots individually viewed; shape and east-end placement compared with the GX720 source tiles and full panorama context.",
+  "checks": [
+    {
+      "views": [
+        "office-east before and after"
+      ],
+      "finding": "One narrow vertical glass strip visible inside broad white wall margins; lower generic windows retained.",
+      "passed": true
+    },
+    {
+      "views": [
+        "platform-northeast before and after",
+        "office-roof before and after"
+      ],
+      "finding": "Glazing stays on the office east end; existing roofs and lower laboratory facade unchanged.",
+      "passed": true
+    },
+    {
+      "views": [
+        "office-north before and after"
+      ],
+      "finding": "North window grid and roof silhouette unchanged; east slit naturally hidden by this angle.",
+      "passed": true
+    },
+    {
+      "views": [
+        "platform-northeast trees-on",
+        "office-east night"
+      ],
+      "finding": "Glazing visible above nearby trees; night appearance follows existing shared glass lighting.",
+      "passed": true
+    },
+    {
+      "views": [
+        "office-east mobile"
+      ],
+      "finding": "Base representation retains narrow slit above mobile panel; left hall is partially cropped, not used for whole-hall acceptance.",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Width, height, position and eight divisions are estimates, not measurements.",
+    "South-corner strip and entry registration unresolved.",
+    "Historical panorama capture date and present-day appearance unknown.",
+    "Mobile viewport simulation is not a physical phone test."
+  ],
+  "newWholeBuildingsAccepted": 0
+}
