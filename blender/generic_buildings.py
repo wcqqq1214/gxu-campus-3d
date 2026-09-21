@@ -114,6 +114,9 @@ def shared_form(b, z, C):
     if 'roofDome' in form:
         from roof_dome import add_roof_dome
         add_roof_dome(top, form['roofDome'], z, C['white'])
+    for volume in form.get('roofVolumes', []):
+        top.box(*volume['center'], z+volume['baseHeight']+volume['rise']/2,
+                volume['width'], volume['depth'], volume['rise'], C['white'], volume['angle'])
     if 'roofEave' in form:
         add_roof_eave(top, form['roofEave'], z, C['white'])
     if 'roofCrown' in form:

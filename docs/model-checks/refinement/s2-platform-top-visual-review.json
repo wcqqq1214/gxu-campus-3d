@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "date": "2026-09-21",
+  "buildingId": "way/957404988",
+  "scope": "Four photo-constrained estimated rooftop masses on the north office; not whole-building or surveyed acceptance.",
+  "browserReport": "s2-platform-top-final-context-browser.json",
+  "modelManifestSha256": "edc67cc797c1b4ece11ba6fec535921457ec2233f69cea70a60447c8ee0614cc",
+  "reviewMethod": "All 11 browser screenshots viewed individually; matched major roof arrangement to previously acquired official aerial and north-office detail.",
+  "checks": [
+    {"views": ["office-roof before and after"], "finding": "Two parallel strips, western return and southeast block visible within the existing parapet. Open central and perimeter roof areas remain.", "passed": true},
+    {"views": ["office-roof-northeast before and after", "office-roof-southwest before and after"], "finding": "Raised masses follow the slightly rotated roof edge and retain consistent positions from opposing directions; no extension into the low laboratory roof or hall.", "passed": true},
+    {"views": ["office-north-regression before and after"], "finding": "North window grid and main height unchanged; only rooftop silhouette added.", "passed": true},
+    {"views": ["office-roof-northeast trees-on", "office-roof night"], "finding": "Normal vegetation and night lighting preserve visible roof structures without changing hall roof or facade lighting.", "passed": true},
+    {"views": ["office-roof mobile"], "finding": "Rooftop arrangement remains visible in base representation above the mobile panel; this is desktop viewport simulation, not a physical-phone performance test.", "passed": true}
+  ],
+  "limitations": ["Dimensions, western connection and block footprint are estimates from historical imagery.", "Actual equipment/room use and 2026 condition remain unconfirmed.", "Existing south-facing exposed wall and other uncalibrated elevations remain outside this work package.", "Personnel entrance, delivery opening and road connection remain pending."],
+  "newWholeBuildingsAccepted": 0
+}

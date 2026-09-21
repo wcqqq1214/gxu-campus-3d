@@ -2,6 +2,8 @@
 
 2026-09-21，接续[入口定位取证](CIVIL_PLATFORM_ENTRY_EVIDENCE.md)，细化 `way/957404988` 的九层北综合楼。原四分部、内缩蓝顶、南大厅高窗、楼高与入口位置保持；本批不增加整栋完成数。
 
+后续已补入[屋顶平行长条与端部小体量](CIVIL_PLATFORM_ROOFTOP.md)。下文保留立面批次的独立验收，最新资产以屋顶批次为准。
+
 ## 依据和方位
 
 [学校2022年拆除采购公告](https://www.gxu.edu.cn/info/1364/30576.htm)的[标号航拍附件](https://www.gxu.edu.cn/system/_content/download.jsp?urltype=news.DownloadAttachUrl&owner=1556120285&wbfileid=3792656)展示蓝顶大厅以北的板式高楼：北长立面有密集白色窗框，露出的东端墙上部为大块浅色实墙。拍摄者从北侧看向校园内部，不能把画面左侧直接当作地理西侧。本批将北长立面对应到原外环第13边，东端实墙对应到第14边中属于 `north-office` 的分段；同一原边上的低实验区保留原窗列。
