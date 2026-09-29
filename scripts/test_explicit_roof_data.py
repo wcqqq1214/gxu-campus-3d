@@ -52,6 +52,32 @@ class ExplicitRoofTests(unittest.TestCase):
         part['roof'].update(type='flat',rise=0)
         with self.assertRaisesRegex(ValueError,'pitched'):resolve_parts(b,[part],dict(type='flat',rise=0))
 
+    def test_profiled_roof_closes_raised_rim_and_keeps_legacy_eaves_strict(self):
+        poly, _ = self.fixture()
+        mesh={'vertices':[[0,0,0],[12,0,0],[12,8,2],[0,8,2]],'triangles':[0,1,2,0,2,3]}
+        with self.assertRaisesRegex(ValueError,'zero rise'):resolve_roof_mesh(poly,mesh,2)
+        result=resolve_roof_mesh(poly,mesh,2,raised_eaves=True)
+        self.assertEqual(len(result['boundaryWalls']),3)
+        for face in result['boundaryWalls']:
+            a,b,c=face[:3];u=[b[k]-a[k] for k in range(3)];v=[c[k]-a[k] for k in range(3)]
+            normal=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2]]
+            center=[sum(p[k] for p in face)/len(face) for k in range(2)]
+            self.assertGreater(normal[0]*(center[0]-6)+normal[1]*(center[1]-4),0)
+        part=dict(id='roof',polygons=poly,height=10,levels=3,roof=dict(type='profiled',rise=2,mesh=mesh))
+        resolved=resolve_parts({'polygons':poly,'height':10},[part],dict(type='flat',rise=0))
+        self.assertEqual(resolved[0]['roof']['geometry'],result)
+        self.assertEqual(resolved[0]['polygons'],poly)
+
+    def test_profiled_roof_requires_explicit_surface_and_body_contact(self):
+        poly,_=self.fixture()
+        part=dict(id='roof',polygons=poly,height=10,levels=3,roof=dict(type='profiled',rise=2))
+        with self.assertRaisesRegex(ValueError,'explicit mesh'):
+            resolve_parts({'polygons':poly,'height':10},[part],dict(type='flat',rise=0))
+        mesh={'vertices':[[0,0,.5],[12,0,.5],[12,8,2],[0,8,2]],'triangles':[0,1,2,0,2,3]}
+        with self.assertRaisesRegex(ValueError,'lowest eave'):resolve_roof_mesh(poly,mesh,2,raised_eaves=True)
+        mesh['vertices'][0][2]=0;mesh['triangles'].pop()
+        with self.assertRaises(ValueError):resolve_roof_mesh(poly,mesh,2,raised_eaves=True)
+
     def test_rejects_unjoined_ridge_edge_despite_complete_projection(self):
         poly,mesh=self.fixture()
         mesh['vertices'].append([6,4,2])

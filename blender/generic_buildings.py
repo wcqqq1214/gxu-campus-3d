@@ -92,9 +92,12 @@ def shared_form(b, z, C):
         body.extend(part_body)
         if roof['type'] != 'flat':
             geometry = roof['geometry']
+            for face in geometry.get('boundaryWalls', []):
+                top.face([(x,y,z+h+up) for x,y,up in face], part_wall)
+            roof_material = C['paleRoof'] if roof['type']=='profiled' else C['red']
             for i in range(0, len(geometry['triangles']), 3):
                 top.face([(geometry['vertices'][k][0], geometry['vertices'][k][1], z+h+geometry['vertices'][k][2])
-                          for k in geometry['triangles'][i:i+3]], C['red'])
+                          for k in geometry['triangles'][i:i+3]], roof_material)
         elif 'slattedRoof' not in part.get('openBelow',{}):
             # Parapets follow each actual terrace elevation in both LODs.
             edges = part.get('parapetEdges', [(a,c) for poly in part['polygons']
