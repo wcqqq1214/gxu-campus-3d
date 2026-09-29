@@ -218,7 +218,7 @@ def resolve_parts(b, raw, roof):
             if not isinstance(columns,list) or not 2 <= len(columns) <= 12:
                 raise ValueError('Portico requires 2–12 explicit columns')
             for column in columns:
-                if not isinstance(column,dict) or not {'center','width','depth','angle'} <= set(column) or set(column)-{'center','width','depth','angle','shape','base','finish'}:
+                if not isinstance(column,dict) or not {'center','width','depth','angle'} <= set(column) or set(column)-{'center','width','depth','angle','shape','base','finish','capital'}:
                     raise ValueError('Unknown portico column fields')
                 if not isinstance(column['center'],list) or len(column['center']) != 2:
                     raise ValueError('Invalid portico column center')
@@ -240,6 +240,16 @@ def resolve_parts(b, raw, roof):
                         if type(v) not in (int,float) or not math.isfinite(v) or not lo<=v<=hi:raise ValueError('Invalid column base '+key)
                     if base['height']<=base['capHeight'] or base['height']>=clear-floor:raise ValueError('Column base must fit its shaft')
                     spread=base['projection']+.03
+                if 'capital' in column:
+                    capital=column['capital']
+                    if column.get('shape')!='cylinder' or not isinstance(capital,dict) or set(capital)!={'height','projection','taperHeight'}:
+                        raise ValueError('Round column capital requires height, projection and taper height')
+                    for key,lo,hi in [('height',.15,.6),('projection',.03,.15),('taperHeight',.04,.15)]:
+                        v=capital[key]
+                        if type(v) not in (int,float) or not math.isfinite(v) or not lo<=v<=hi:raise ValueError('Invalid column capital '+key)
+                    if capital['taperHeight']>=capital['height'] or capital['height']+column.get('base',{}).get('height',0)>=clear-floor:
+                        raise ValueError('Column capital must leave a clear shaft')
+                    spread=max(spread,capital['projection'])
                 support = translate(rotate(box(-w/2-spread,-d/2-spread,w/2+spread,d/2+spread),column['angle'],use_radians=True),*column['center'])
                 if support.difference(shape).area > 1e-5 or any(support.intersection(s).area > 1e-5 for s in supports):
                     raise ValueError('Portico columns leave their footprint or overlap')

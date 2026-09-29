@@ -41,12 +41,13 @@ class Mesh:
             for i in range(n):
                 a0=math.tau*i/n;a1=math.tau*(i+1)/n
                 self.face([(x+rx*math.sin(t)*math.cos(a),y+ry*math.sin(t)*math.sin(a),z+rz*math.cos(t)) for t,a in [(t0,a0),(t1,a0),(t1,a1),(t0,a1)]],mat)
-    def extrude(self,polys,triangles,z,h,wall,roof=None):
+    def extrude(self,polys,triangles,z,h,wall,roof=None,*,exterior_wall=None):
         for poly,tri in zip(polys,triangles):
             flat=[v for ring in poly for v in ring[:-1]]
             for i in range(0,len(tri),3):self.face([(flat[k][0],flat[k][1],z+h) for k in tri[i:i+3]],wall if roof is None else roof)
-            for ring in poly:
-                for a,b in zip(ring,ring[1:]):self.face([(a[0],a[1],z),(b[0],b[1],z),(b[0],b[1],z+h),(a[0],a[1],z+h)],wall)
+            for index,ring in enumerate(poly):
+                finish=exterior_wall if index==0 and exterior_wall is not None else wall
+                for a,b in zip(ring,ring[1:]):self.face([(a[0],a[1],z),(b[0],b[1],z),(b[0],b[1],z+h),(a[0],a[1],z+h)],finish)
     def extend(self,other):
         offset=len(self.v);self.v+=other.v;self.f += [tuple(i+offset for i in f) for f in other.f];self.m+=other.m
     def object(self,name,collection,props=None):

@@ -101,8 +101,12 @@ def resolve_exposed_facades(building, form, rules):
                 for column in low['openBelow']['columns']:
                     radius = (column['width']/2 if column.get('shape') == 'cylinder'
                               else math.hypot(column['width'], column['depth'])/2)
+                    spread=0
                     if 'base' in column and panel['bottom']<low['openBelow']['floorHeight']+column['base']['height']:
-                        radius+=column['base']['projection']+.03
+                        spread=column['base']['projection']+.03
+                    if 'capital' in column and panel['top']>low['openBelow']['clearHeight']-column['capital']['height']:
+                        spread=max(spread,column['capital']['projection'])
+                    radius+=spread
                     if strip.distance(Point(column['center'])) < radius:
                         raise ValueError('Under-portico glazing overlaps a support column')
         fh = high['height']/high['levels']
