@@ -263,7 +263,7 @@ def resolve_parts(b, raw, roof):
     return parts
 
 
-def resolve_facades(b, form, rules):
+def resolve_facades(b, form, rules, *, panel_minimum_bottom=3.2):
     from facade_bands_data import validate_window_bands, validate_horizontal_ledges
     from facade_panels_data import validate_panels
     indexed = {}
@@ -441,7 +441,7 @@ def resolve_facades(b, form, rules):
                         if 'panels' in rule:
                             if 'openBelow' in part or ('part' not in rule and abs(s.length-line.length)>1e-5):
                                 raise ValueError('Panels need one undivided solid facade edge')
-                            validate_panels(rule['panels'], s.length, part['height'], part['levels'], rule.get('windowBands'), rule.get('horizontalLedges'))
+                            validate_panels(rule['panels'], s.length, part['height'], part['levels'], rule.get('windowBands'), rule.get('horizontalLedges'), minimum_bottom=panel_minimum_bottom)
                             from facade_panels_data import resolve_round_window_walls
                             round_walls = resolve_round_window_walls(rule['panels'], s.length)
                             if round_walls:

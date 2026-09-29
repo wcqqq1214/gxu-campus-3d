@@ -71,5 +71,51 @@ class ExposedFacadeTests(unittest.TestCase):
         r['parts'].append(dict(id='other', polygons=[[[[15,10],[30,10],[30,20],[15,20],[15,10]]]], height=6.6, levels=2))
         with self.assertRaisesRegex(ValueError, 'complete internal'): self.resolve(b, r)
 
+    def portico_fixture(self):
+        b, r = self.fixture()
+        r['parts'][1]['openBelow'] = dict(clearHeight=6.2, floorHeight=.24,
+            columns=[dict(center=[28,y], width=.6, depth=.6, angle=0, shape='cylinder') for y in [5,15]])
+        r['exposedFacadeRules'][0].update(region='under-portico', rule=dict(
+            windows=False, balconies=False, panels=[dict(id='back-glass',type='glazing',
+                **{'from':.05,'to':.95}, bottom=.6, top=5.8, columns=6, rows=3,
+                frameWidth=.12,depth=.1)]))
+        return b,r
+
+    def test_glazing_behind_portico_preserves_floor_slab_and_footprint(self):
+        b,r=self.portico_fixture(); result=self.resolve(b,r)
+        face=result['form']['facades'][-1]
+        self.assertEqual(face['region'],'under-portico')
+        self.assertEqual(face['normal'],[1,0])
+        self.assertAlmostEqual(face['minimumHeight'],.34)
+        self.assertAlmostEqual(face['maximumHeight'],6.1)
+        self.assertEqual(face['rule']['panels'][0]['bottom'],.6)
+        self.assertEqual(result['polygons'],b['polygons'])
+        self.assertEqual(result,self.resolve(result,r))
+        self.assertEqual(result['form']['parts'][1]['openBelow']['floorHeight'],.24)
+
+    def test_portico_glazing_rejects_floor_slab_and_column_collisions(self):
+        b,r=self.portico_fixture()
+        for key,value in [('bottom',.2),('top',6.3)]:
+            bad=copy.deepcopy(r);bad['exposedFacadeRules'][0]['rule']['panels'][0][key]=value
+            with self.subTest(key=key),self.assertRaises(ValueError):self.resolve(b,bad)
+        bad=copy.deepcopy(r);bad['parts'][1]['openBelow']['columns'][0]['center']=[15.32,5]
+        with self.assertRaisesRegex(ValueError,'support column'):self.resolve(b,bad)
+
+    def test_portico_glazing_cannot_bypass_solid_wall_or_exterior_panel_rules(self):
+        b,r=self.portico_fixture()
+        bad=copy.deepcopy(r);del bad['parts'][1]['openBelow']
+        with self.assertRaisesRegex(ValueError,'open flat slab'):self.resolve(b,bad)
+        bad=copy.deepcopy(r);del bad['exposedFacadeRules'][0]['region']
+        with self.assertRaisesRegex(ValueError,'higher solid'):self.resolve(b,bad)
+        for update in [dict(region='anything'),dict(region=None)]:
+            bad=copy.deepcopy(r);bad['exposedFacadeRules'][0].update(update)
+            with self.assertRaises(ValueError):self.resolve(b,bad)
+        for update in [dict(windows=True),dict(balconies=True),dict(openCorridor={})]:
+            bad=copy.deepcopy(r);bad['exposedFacadeRules'][0]['rule'].update(update)
+            with self.assertRaises(ValueError):self.resolve(b,bad)
+        bad=copy.deepcopy(r);rule=bad.pop('exposedFacadeRules')[0]['rule']
+        bad['facadeRules']=[dict(rule,polygon=0,ring=0,edge=0,part='high')]
+        with self.assertRaisesRegex(ValueError,'upper solid facade'):self.resolve(b,bad)
+
 
 if __name__ == '__main__': unittest.main()
