@@ -1,5 +1,7 @@
 # 结构平台门廊：玻璃、顶高与上部窗带联合候选
 
+> 后续已补入[曲线前缘与加深门廊候选](CIVIL_PLATFORM_CURVED_ENTRY.md)。本文保留历史尺寸和图片；复现本批需加 `--straight-roof`。
+
 2026-09-30，接续[中央石色围合](CIVIL_PLATFORM_ENTRY_SURROUND.md)。复核完整合影发现上一候选中央玻璃明显偏扁，本批调整其比例，并解决抬高门廊顶后上部窗带消失的问题。**此方案仍为估算候选，未替换正式校园模型；照片位置与相机尚未配准。**
 
 ![联合候选](screenshots/refinement/s2-platform-entry-proportions/candidate-entry.png)
@@ -37,7 +39,7 @@
 ```sh
 mkdir -p work/refinement-s2-platform-entry-proportions
 work/refinement-venv/bin/python scripts/preview_civil_platform_entry.py \
-  --output work/refinement-s2-platform-entry-proportions/proposal.json
+  --straight-roof --output work/refinement-s2-platform-entry-proportions/proposal.json
 work/refinement-venv/bin/python scripts/inspect_civil_entry_proportions.py \
   --output work/refinement-s2-platform-entry-proportions/image-rerun.json
 blender --background --python-exit-code 1 \
@@ -46,7 +48,7 @@ blender --background --python-exit-code 1 \
   --report work/refinement-s2-platform-entry-proportions/geometry-rerun.json
 ```
 
-`--low-roof` 复现上轮石色围合候选；`--without-surround` 复现更早的整片玻璃候选。生成本批前后对照JSON时用 `r=proposal(); r['original']=proposal(tall_surround=False)['candidate']`，然后交给已有 `render_civil_entry_proposal.py`，输出至独立目录。
+`--low-roof` 复现上轮石色围合候选；`--without-surround` 复现更早的整片玻璃候选。生成本批前后对照JSON时用 `r=proposal(curved_roof=False); r['original']=proposal(tall_surround=False)['candidate']`，然后交给已有 `render_civil_entry_proposal.py`，输出至独立目录。
 
 ## 下一步
 

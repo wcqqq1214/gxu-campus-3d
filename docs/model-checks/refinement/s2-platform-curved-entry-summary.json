@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "baseCommit": "9a251935ca67f9355919e853cc0fbb9e02101a55",
+  "scope": "Independent curved/deeper portico candidate, not a fitted photo camera or production model",
+  "photoRegistrationAccepted": false,
+  "productionReady": false,
+  "wholeBuildingAccepted": false,
+  "checks": {
+    "pythonTests": 269,
+    "blenderRecords": 166,
+    "detailModes": 2,
+    "previousThreeCandidatesReproduced": true,
+    "prior114RecordMeshRegression": true,
+    "previousProportionScreenPreserved": true
+  },
+  "partition": {
+    "totalFootprintDifferenceM2": 8.528334288770978e-13,
+    "otherFourPartFootprintsPreserved": true,
+    "partsOverlapM2": 4.547473508864641e-13,
+    "porchAreaBeforeM2": 111.85800502321099,
+    "porchAreaAfterM2": 186.4232270144043,
+    "entryRecessM": 5.999935666370805,
+    "outerEntryAndStairParametersPreserved": true
+  },
+  "production": {
+    "all448ResolvedRecordsPreserved": true,
+    "modelsVerifiedInPublicAndOut": 69,
+    "productionDataAndSourceBlendUnchanged": true,
+    "modelManifestSHA256": "4772183e55d1a68ef286890737cf57fd19e69e362318e37a3be618044933c721"
+  },
+  "captures": [
+    {
+      "path": "docs/screenshots/refinement/s2-platform-curved-entry/candidate-entry.png",
+      "sha256": "d222d03683981671e854b6299980b2e69a03b7ed48541d2dfba239dee7efd144",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-curved-entry/candidate-eye.png",
+      "sha256": "1441f31a2305639b47fc653825077a4bace0d449a0c990f664a09c83f04cf265",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-curved-entry/candidate-oblique.png",
+      "sha256": "8a8aaaad88f82cb5de06fabbf555c4844e97ad28a0393de28e39d14b93ef5361",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-curved-entry/candidate-roof.png",
+      "sha256": "baeed052078970154cc01fdb954345fab87716fa63702e194e4ce49ea7c68ad4",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-curved-entry/original-entry.png",
+      "sha256": "1fee8f3181039890239fc162fa8aa15d22a4bd19402000edb400c9c093fceb78",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-curved-entry/original-eye.png",
+      "sha256": "fc2ffd5629eca2fceb73bec0d17955817c87206045f0d184b9f5ae6476a56221",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-curved-entry/original-oblique.png",
+      "sha256": "d05e91e949908ec61123437d0392205ffd1622fe3d943371a93a7b356ab43911",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-curved-entry/original-roof.png",
+      "sha256": "01c2febd85039009c805aa80a8dc2060a33f7165e1a9a584f85ae72264a45322",
+      "directlyViewed": true
+    }
+  ],
+  "assumptions": [
+    "D remains the OSM-supported location hypothesis.",
+    "Front columns follow the estimated curved edge with 0.6m clearance; pair at +/-5.2m.",
+    "Two rear columns at +/-2.8m along entry and 4.7m setback are estimates, not a surveyed count.",
+    "5.99994m porch depth, central five solid bays and side lattice spacing are unverified estimates.",
+    "Stone-framed central glass bay is estimated: inner piers +/-2.8m, outer piers +/-5.225m; upper beam 7.45–8m.",
+    "Front roof edge uses an estimated 18m-wide parabolic recess, 0.8m inset at its center, entirely inside the original footprint; not a recovered circular radius.",
+    "8.6m roof and 8.25m clear height form a proportional alternative, not a measured height."
+  ],
+  "initialVisualRejection": {
+    "reason": "Outward bow appeared higher at the center in the provisional eye view, opposite to the reference composition.",
+    "directory": "work/refinement-s2-platform-curved-entry/outward-initial",
+    "geometryReport": "work/refinement-s2-platform-curved-entry/outward-geometry.json",
+    "geometryReportSHA256": "9f3b10f26898ab58838a67958d1ac3d9530e886255c7838f1acac9f17d6f6d9f",
+    "note": "Passing numerical checks did not establish photographic fidelity."
+  },
+  "camera": {
+    "kind": "provisional perspective, not fitted",
+    "outwardDistanceM": 8.7,
+    "heightM": 2.75,
+    "lookAtSetbackM": 6,
+    "lookAtHeightM": 6.3,
+    "lensMM": 22.5,
+    "sensorWidthMM": 36
+  },
+  "visualFindings": [
+    "Central inward curve now appears lower than the ends in the near-eye view.",
+    "Greater depth separates front and rear columns and increases the visible side openings.",
+    "Retained eight-column count and lateral spacing still produce an extra side column in this camera; full spacing and photo pose remain unverified.",
+    "Fascia is still plain white, without verified stone finish, column capitals or lettering."
+  ],
+  "notRun": [
+    "Campus GLB export",
+    "Pages rebuild",
+    "Runtime performance benchmark"
+  ],
+  "inputs": {
+    "scripts/slatted_roof_data.py": "3632f3d7d6bb608c0a488a487f4be09ac8f172063f2f37cc4b8957862ee796b5",
+    "scripts/preview_civil_platform_entry.py": "7f53e606dcb045dd51cf12169afa7084339181c8cc398d6204a0d269f5e76949",
+    "scripts/test_slatted_roof_data.py": "f23ec987c0d4e39f4a8eb8c4fba6a04b4bf21950577f8e95cebbf8bc9a315f91",
+    "blender/validate_civil_entry_proposal.py": "4553b0f9d33039e79288c819d13f765fe5e6f0035830458bf951b8107f7fd500",
+    "blender/render_civil_entry_proposal.py": "0e4ef74a59a6f393243fd7605931d49307ef3af397a32cfe714a3424cf4e45be",
+    "work/refinement-s2-platform-curved-entry/proposal.json": "c3e6a3c6b0856bd3d61f0ff8aeaab39ba03b7ab0836c671e82c13914e32d2f26",
+    "work/refinement-s2-platform-curved-entry/comparison.json": "67ed10f5d4237022a9f95297ad4c200953d5a3c0df958215e6d759fe736897fa",
+    "scripts/inspect_civil_entry_proportions.py": "de331fe657118794013d315f86024a7300bd57eaac01b8484105845ebd7786cf"
+  }
+}
