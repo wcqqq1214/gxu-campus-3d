@@ -17,7 +17,7 @@ def add_panels(mesh, facade, z, C):
         frame_material=C[p.get('frameFinish','white')]
         x, y = point((p['from']+p['to'])/2, .025)
         if p['type']=='solid':
-            mesh.box(x,y,z+(p['bottom']+p['top'])/2,w,p['depth'],h,C['white'],theta)
+            mesh.box(x,y,z+(p['bottom']+p['top'])/2,w,p['depth'],h,C[p.get('finish','white')],theta)
             continue
         mesh.box(x, y, z+(p['bottom']+p['top'])/2, w, .03, h,
                  C['glass'] if p['type']=='glazing' else C['dark'], theta)
