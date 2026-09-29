@@ -1,5 +1,7 @@
 # 结构平台：低翼与门厅配准返工
 
+> **2026-09-29接续：** [六分部估算模型已实施](CIVIL_PLATFORM_REPARTITION.md)，低翼窗列移到大厅北侧长边，连接体东侧改为柱廊。当前方向检查见[新分区记录](model-checks/refinement/s2-platform-alignment-current.json)及[平面图](model-checks/refinement/s2-platform-alignment-current.svg)。下文保留返工前发现；精确墙线和尺寸仍未得到测绘确认。
+
 2026-09-29，重新对照校方设计效果图、建成航拍与生产模型，**撤回“密集窗低翼已定位到原边14东立面”的结论**。已同步修正输入及公开数据中的证据说明。现有几何保留为待纠正占位，本批没有声称完成新体量或整栋验收。
 
 ## 发现与依据

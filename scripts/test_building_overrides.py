@@ -1,12 +1,13 @@
 """Reject unsupported calibration, preserve courts, and exercise real precedence."""
 import copy
 import json
+import math
 import tempfile
 import unittest
 from pathlib import Path
 
 from shapely.geometry import Polygon, Point, LineString, box
-from shapely.ops import unary_union
+from shapely.ops import split, unary_union
 from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue,
     resolve_building, resolve_parts, source_catalogue, validate_ids, unique_object)
 
@@ -426,6 +427,45 @@ class BuildingOverrideTests(unittest.TestCase):
         self.assertEqual(len(segments),2)
         self.assertAlmostEqual(sum(s.length for s in segments),line.length,places=8)
         self.assertLess(segments[0].intersection(segments[1]).length,1e-8)
+
+    def test_partial_oblique_edge_recovers_missing_interval_in_solid_parts(self):
+        b=self.building()
+        a=[-656.418777727391,-760.5382399999202]
+        c=[-656.4495536085785,-788.1344680000896]
+        d=[-717.8064028063193,-788.05654399997]
+        q=[-717.7694787226078,-760.4499458086736]
+        corner=[-717.7653682970973,-757.3767519997551]
+        p=[-695.093802217242,-760.4825800000607]
+        b['polygons']=[[[a,c,d,corner,p,a]]]
+        length=math.dist(p,a);u=[(a[k]-p[k])/length for k in (0,1)];n=[-u[1],u[0]]
+        cut=LineString([[p[k]-n[k]*6+sign*u[k]*200 for k in (0,1)] for sign in [-1,1]])
+        shapes=sorted(split(Polygon([a,c,d,q,p,a]),cut).geoms,key=lambda p:p.centroid.y)
+        parts=[dict(id=str(i),polygons=[[list(map(list,p.exterior.coords))]],
+                    height=16.5 if i==0 else 6.6,levels=5 if i==0 else 2) for i,p in enumerate(shapes)]
+        parts.append(dict(id='return',polygons=[[[q,corner,p,q]]],height=6.6,levels=2))
+        line=LineString([d,corner])
+        clipped=[line.intersection(Polygon(p['polygons'][0][0])).length for p in parts]
+        self.assertGreater(clipped[1],1)  # Nonempty yet incomplete: the old empty-only recovery misses it.
+        self.assertLess(sum(clipped),line.length-10)
+        r=self.resolve(b,parts=parts)
+        segments=[LineString([f['start'],f['end']]) for f in r['form']['facades'] if f['edge']==2]
+        self.assertAlmostEqual(sum(p.length for p in segments),line.length,places=8)
+        self.assertAlmostEqual(unary_union(segments).length,line.length,places=8)
+        self.assertEqual(r['polygons'],b['polygons'])
+
+    def test_part_white_finish_preserves_geometry_and_rejects_unknown_palette(self):
+        b=self.building()
+        part=dict(id='body',polygons=b['polygons'],height=16.5,levels=5)
+        plain=self.resolve(b,parts=[part])
+        painted=self.resolve(b,parts=[{**part,'wallFinish':'white'}])
+        resolved=painted['form']['parts'][0]
+        self.assertEqual(resolved['wallFinish'],'white')
+        self.assertEqual(resolved['polygons'],plain['form']['parts'][0]['polygons'])
+        self.assertEqual(resolved['triangles'],plain['form']['parts'][0]['triangles'])
+        self.assertNotIn('wallFinish',plain['form']['parts'][0])
+        for value in ['glass',True,None,{}]:
+            with self.subTest(value=value),self.assertRaises(ValueError):
+                self.resolve(b,parts=[{**part,'wallFinish':value}])
 
     def test_part_specific_glazing_uses_local_segment_and_height(self):
         b=self.building()

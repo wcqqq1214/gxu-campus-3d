@@ -1,0 +1,76 @@
+{
+  "reviewedAt": "2026-09-29",
+  "buildingId": "way/957404988",
+  "productionBuildingsSHA256": "5e27015fb350ed0b0493b31169d2f46418a882a47531c9c7501bb7308d2eaffd",
+  "coordinateSystem": "Campus local x east, y north; metres; not scene x/y/z",
+  "hallNorthFace": {
+    "part": "south-hall",
+    "originalEdge": null,
+    "start": [
+      -656.4254690470157,
+      -766.5382365836045
+    ],
+    "end": [
+      -717.7775037716817,
+      -766.4499404728923
+    ],
+    "lengthMeters": 61.352098261264025,
+    "axisDegreesFromEastModulo180": 179.9175415938333
+  },
+  "currentlyAssignedLowWingFace": {
+    "part": "north-low-wing",
+    "originalEdge": 15,
+    "start": [
+      -695.093802217242,
+      -760.4825800000607
+    ],
+    "end": [
+      -656.418777727391,
+      -760.5382399999202
+    ],
+    "lengthMeters": 38.675064541977946,
+    "axisDegreesFromEastModulo180": 179.91754159383333
+  },
+  "productionUndirectedAxisDifferenceDegrees": 2.842170943040401e-14,
+  "manualSourceObservation": "The dense-window low wing follows the hall long front in the 2014 design rendering and the official aerial; the connected entrance canopy turns toward the office.",
+  "relativeOrientationConsistentWithReviewedImages": true,
+  "finding": "The low-wing facade now follows the recessed hall long wall; depths and heights remain estimates.",
+  "photoRegistrationAccepted": false,
+  "replacementGeometryImplemented": true,
+  "doNotInfer": [
+    "Metric dimensions from perspective-image pixels",
+    "A new courtyard hole inside the mapped footprint",
+    "As-built dimensions or present condition from a 2014 design rendering"
+  ],
+  "sourceRefs": [
+    "gxuCivilPlatformDesign2014",
+    "gxuCivilDemolitionAerial2022",
+    "gx720CivilNorthPanorama"
+  ],
+  "localEvidence": [
+    {
+      "file": "work/refinement-s3-evidence/library-construction-2014.pdf",
+      "sha256": "34dc6c1da302f71a69159435fff1db15e94adea31d32356821710093edfc31bd",
+      "bytes": 496547,
+      "reviewScope": "Platform text and embedded image xref 17; text about the library courtyard belongs to a different project"
+    },
+    {
+      "file": "work/refinement-s2-civil-labs/new-platform-detail.png",
+      "sha256": "ec641cc368fa12462f9497557f612e903b3d1ea99968930af34707b30b26430e",
+      "bytes": 715423,
+      "reviewScope": "Hall roof, lower dense-window wing, connecting canopy and office relationship"
+    },
+    {
+      "file": "work/refinement-s2-civil-location/pano-tiles/b-6-7.jpg",
+      "sha256": "3086429877ab24eab15b4e2984b477b3249fd008a994eed876e869a1954e6f34",
+      "bytes": 56508,
+      "reviewScope": "Windowed low wing and columned canopy turn"
+    },
+    {
+      "file": "work/refinement-s2-civil-plan-evidence/temporary-utilities.pdf",
+      "sha256": "5df1451daa47fd16d01cac778e39375256f5f054525c530ac9ee72786df10213",
+      "bytes": 26523963,
+      "reviewScope": "PDF pages 4 and 39; platform crop incomplete, not a replacement surveyed footprint"
+    }
+  ]
+}
