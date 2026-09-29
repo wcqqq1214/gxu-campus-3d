@@ -1,5 +1,7 @@
 # 验收记录
 
+2026-09-29真实性复核：[结构平台低翼方向配准更正](CIVIL_PLATFORM_ALIGNMENT_REVIEW.md)撤回“密集窗翼已对应东立面”的判断。此前413项源/基础/近景检查仅证明几何生成一致，该部位需重新配准后返工。性能通过不代表真实性验收通过。
+
 2026-09-29接续：[流畅档限帧修正](FRAME_PACING.md)通过62项Node测试、类型检查、lint、Pages构建及同场景前后六轮活动复测。流畅档29/28/29 → 30/30/30 FPS，精细档保持60/60/60；69个模型资产保持，原预算通过。[汇总](model-checks/refinement/s5-frame-pacing-summary.json)包含本次Darwin 27.0.0环境和指纹；以下系统描述保留其历史时点。
 
 2026-09-21接续：最新逐批校准状态见[执行记录](CAMPUS_REFINEMENT_PROGRESS.md)，下文保留历史验收日期和当时计数。结构平台最新[低实验区东立面](CIVIL_PLATFORM_LAB_FACADE.md)使用 `validate_civil_platform.py -- --inset-roof --north-facade --roof-volumes --east-slit --lab-facade` 检查，包含此前屋顶、北窗网和东端窄玻璃带；`validate_generic.py` 同时检查原支撑屋面和附加体顶面。几何结果不等于照片尺寸或整栋现状得到实测确认。
