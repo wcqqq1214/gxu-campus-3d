@@ -1,5 +1,7 @@
 # Blender 模型与重建
 
+2026-09-30：[结构平台首轮整栋状态](CIVIL_PLATFORM_WHOLE_REVIEW.md)覆盖六分部、屋顶、主要立面和D区入口接路。本轮未改生产模型；通用背面窗格、西门厅平顶及未定位运输口保留明确限制。大厅与北楼不拆分计数。
+
 源文件 `blender/gxu-campus.blend` 由 Blender 5.2.1 LTS 构建，使用米制坐标；建筑、树木与道路水体为具名对象，建筑带 `featureId` / `landmark` / `sourceUrl` 属性。材质与自制 JPEG 纹理均打包在 .blend 内，不需要额外下载摄影贴图。
 
 树木朝向由树位稳定计算，网页与 Blender 共用同一角度约定，局部删树不影响其余树的朝向。已有开放区域由 `data/vegetation-zones.json` 配置，完整与增量准备复用分区解析器。仅更新源文件朝向使用 `blender/update_tree_layout.py`；完整建模也采用同一公式，详见[植被分区与稳定朝向](VEGETATION_ZONES.md)。背景候选按世界网格独立种子生成；完整建模通过 `blender/tree_layout.py` 采样最终地形三角面，将高程写入树位第五列并应用到源实例。数据准备后须完成模型构建再发布树位；只校正既有源实例高程时，可对上述增量命令添加 `-- --ground`，再更新网页生产包。
