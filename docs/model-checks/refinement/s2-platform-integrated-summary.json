@@ -1,0 +1,113 @@
+{
+  "checkedAt": "2026-09-29T21:18:22.364347+00:00",
+  "passed": true,
+  "productionIntegrated": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "baseCommit": "9ceef6c100cdb9940b2ca4215e6c7d9fdc04993c",
+  "branch": "dev",
+  "scope": "Integrated estimated complete D portico candidate: deeper partition, front/rear columns, curved mixed roof, stone surround, glazing, capitals and side lattice. Includes actual source/base/near, ground/path and runtime checks; not a survey or whole-building acceptance.",
+  "photoRegistrationAccepted": false,
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 278,
+  "nodeTests": 65,
+  "checks": [
+    "geometry",
+    "entry-geometry",
+    "portico",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "connection-geometry",
+    "assets",
+    "terrain-delta",
+    "visual-review",
+    "performance-visual-review"
+  ],
+  "platformContextChecksPerAsset": 442,
+  "entryChecksPerAsset": 88,
+  "porticoChecksAcrossThreeAssets": 420,
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.088852514477905,
+        "medianDrawCalls": 3.4734917733089565
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 14.257019140734538,
+        "medianDrawCalls": 12.547528517110273
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "performanceReport": "s2-platform-integrated-performance-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of complete isolation.",
+  "initialModelBytes": 5828040,
+  "maximumOrdinaryNearBytes": 1684868,
+  "pending": [
+    "C hall transport opening and remaining elevations/roofs",
+    "Separate old hall location/time evidence",
+    "Lettering, joints, complete column count and measured dimensions"
+  ],
+  "fingerprints": {
+    "data/building-overrides.json": "06d4d0b55a2caf01fc9f97336a83a41335a858ff8c605d9e584b235ea35d87f0",
+    "data/refinement/civil-platform-entry-baseline.json": "93546fad7ff382d4f43f056a45a6929f4d508f2736ad64ac86b0729ab01c71a0",
+    "blender/gxu-campus.blend": "c65ee1d45529073b0cf4a65b1aa31e63b389ca9f438c478dd28e1cb1aa1ceb0e",
+    "blender/validate_civil_entry_proposal.py": "9dc1ab8246d659ce00a3e1a8595488e58ba1ba8e08b6508f72807d3d450c231f",
+    "blender/validate_civil_platform.py": "7007aae5b32734548bc11ed76ced175f48e2e84fd2cf9ce33c16ad1f340d0bc0",
+    "blender/validate_civil_platform_entry.py": "00523f8606cbd9ff6d140311bd43e0265cd7506255e8ef093f6380c20d1fdfe2",
+    "scripts/preview_civil_platform_entry.py": "d5e3c6664f4a4ec604bbe2602ec81b7f573e9c12df929e50937324278f221a0e",
+    "scripts/test_recessed_connection_data.py": "dbd0e82a46db13c9ee77ae42190698b9686f76bb442e19c7b7ccdfa97552209a",
+    "public/data/buildings.json": "ea5570b5b6525d3b50e77300cfee5084b6237ec736635ab619a167f5cf3a7b13",
+    "public/data/models.json": "a6bbc03d11f0c30985fcc4686b0ee27729cbbbe7c409c9ba7b10d795e3a9f20b",
+    "public/data/sites.json": "51bdb13b94182aa599418232b30434e0dc26f51b08debc9918a9bcf6c0ed8be1"
+  }
+}

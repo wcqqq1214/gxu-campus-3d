@@ -7,6 +7,8 @@ ROOT=Path(__file__).resolve().parents[1]
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s2-platform-door-entry')
 TRIM='--entry-trim' in sys.argv
+INTEGRATED='--integrated-portico' in sys.argv
+if INTEGRATED and not TRIM:raise ValueError('--integrated-portico requires --entry-trim')
 Z=-4.76;ID='way/957404988';CHUNK='chunk-n2-n3'
 FRONT=Vector((-695.20838278471,-742.4153550071646,Z))
 U=Vector((.0063417743114130036,-.9999798907471006,0));N=Vector((-U.y,U.x,0))
@@ -32,15 +34,15 @@ def check(objects,ground,tol):
     # Cover the full adopted 3.6 m door width, including the side nearest a column.
     for u in [-1.7,-.8,.2 if TRIM else 0,.8,1.7]:
         for h in [1.3,2.5,3.7]:
-            hit=ray(group,point(u,.5,h),-N,4.3)
-            assert hit and hit[3]=='glass' and abs(hit[0]-4.01)<tol*2,('door or approach blocked',u,h,hit)
+            hit=ray(group,point(u,.5,h),-N,6.7 if INTEGRATED else 4.3)
+            assert hit and hit[3]=='glass' and abs(hit[0]-(6.41 if INTEGRATED else 4.01))<tol*2,('door or approach blocked',u,h,hit)
             records.append(dict(kind='door-and-full-width-approach',offset=u,height=h,distance=hit[0]))
     for u in [-1.7,0,1.7]:
-        hit=ray(group,point(u,-2.6,3.88),-N,1.2)
+        hit=ray(group,point(u,-5 if INTEGRATED else -2.6,3.88),-N,1.2)
         assert hit and hit[3]==('stone' if TRIM else 'white') and abs(hit[0]-.87)<tol*2,('door-header',u,hit)
         records.append(dict(kind='door-header',offset=u,distance=hit[0]))
     for u in [-1.7,0,1.7]:
-        for v in [-.4,-1.8,-3.3]:
+        for v in ([-.4,-1.8,-3.3,-4.5,-5.7] if INTEGRATED else [-.4,-1.8,-3.3]):
             hit=ray(group,point(u,v,2),(0,0,-1),2)
             assert hit and hit[3]=='stone' and abs(hit[1].z-Z-1.05)<tol,('raised landing',u,v,hit)
             records.append(dict(kind='landing',offset=u,depth=v,actualHeight=hit[1].z-Z))
@@ -68,10 +70,15 @@ def check(objects,ground,tol):
         records.append(dict(kind='old-fallback-removed',height=h,distance=hit[0]))
     if TRIM:
         for u,h in [(-1.765,2.45),(0,2.45),(1.765,2.45),(-.8,1.085),(.8,3.815)]:
-            hit=ray(group,point(u,.5,h),-N,4.3)
-            assert hit and hit[3]=='dark' and abs(hit[0]-3.91)<tol*2,('closed leaf frame',u,h,hit)
+            hit=ray(group,point(u,.5,h),-N,6.7 if INTEGRATED else 4.3)
+            assert hit and hit[3]=='dark' and abs(hit[0]-(6.31 if INTEGRATED else 3.91))<tol*2,('closed leaf frame',u,h,hit)
             records.append(dict(kind='dark-door-frame',offset=u,height=h,distance=hit[0]))
         columns=[(-696.2781556085655,-731.4166489513983),(-696.2495406165732,-735.9287011249783),(-696.1923106325887,-744.952805472138),(-696.1636956405964,-749.464857645718),(-696.1350806486042,-753.9769098192979),(-696.1064656566119,-758.4889619928779)]
+        if INTEGRATED:
+            columns=[(-696.2781556085655,-731.4166489513983),(-696.8756921717008,-738.4258484810085),
+                     (-696.8249579772096,-746.4256876069854),(-696.4737327628577,-749.4668238707148),
+                     (-696.1350806486042,-753.9769098192979),(-696.1064656566119,-758.4889619928779),
+                     (-699.0232095391808,-740.0895010062923),(-698.9934031999172,-744.7894064928037)]
         for index,(x,y) in enumerate(columns):
             for h,radius in [(1.25,.405),(1.56,.435),(1.75,.325)]:
                 p=Vector((x,y,Z+h))+N*2;hit=ray(group,p,-N,3)
@@ -81,6 +88,8 @@ def check(objects,ground,tol):
 report=dict(passed=False,scope='Estimated D personnel entry at mapped OSM projection: 3.6 m door, 1.05 m platform, seven 0.3 m treads at 12 m width, 0.15 m foundation. Source/base ground and full adopted doorway approach checked. Not an interior, surveyed reconstruction, accessible route or completed road connection.')
 if TRIM:
     report['scope']='Estimated D personnel entry with dark two-leaf closed door, stone header, six stone columns and widened bases. Fixed doorway, platform, seven stairs and foundation retained. Source/base ground and full adopted doorway approach checked; existing road connection checked separately. Leaf count, dimensions and exact photo registration are estimates. No interior, accessible-route or whole-building acceptance.'
+if INTEGRATED:
+    report['scope']='Integrated estimated D entry: approximately 6m recess, eight columns, unchanged 3.6m door and seven steps. Checks full adopted door width, extended landing and ground; not surveyed, accessible-route or whole-building acceptance.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     ground=meshes([o for o in bpy.context.scene.objects if o.get('layer') in ('terrain','roads')])

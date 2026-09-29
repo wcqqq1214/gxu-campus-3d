@@ -1,5 +1,7 @@
 # 结构平台门廊：石色前缘、柱帽与侧格栅
 
+后续整体方案已进入[正式模型集成与联合验收](CIVIL_PLATFORM_PORTICO_INTEGRATION.md)。本文保留本批独立候选状态及参数；生产状态以集成记录为准。
+
 2026-09-30，接续[相机与柱距候选](CIVIL_PLATFORM_CAMERA_ALIGNMENT.md)，完成进入正式构建前的门廊细化。参考已核看的[2023年校方合影](https://tmjz.gxu.edu.cn/info/1452/6575.htm)，补入可见的石色外缘、圆柱帽和较密侧格栅。构件尺度及重复数量仍为估算；本批完成独立候选检查，尚未导出校园模型或通过整栋验收。
 
 ![同一拟合相机下的当前候选](screenshots/refinement/s2-platform-finish/candidate-photo.png)
