@@ -1,0 +1,101 @@
+{
+  "status": "needs-photo-composition-review",
+  "buildingId": "way/957404988",
+  "calculationPassed": true,
+  "scope": "Current D portico composition versus manually reviewed wide photograph; no automatic image measurement or registration.",
+  "model": {
+    "columns": [
+      {
+        "center": [
+          -696.2781556085655,
+          -731.4166489513983
+        ],
+        "alongMeters": -11.00526913781805,
+        "setbackMeters": 1.000000000000009
+      },
+      {
+        "center": [
+          -696.2495406165732,
+          -735.9287011249783
+        ],
+        "alongMeters": -6.49312622841522,
+        "setbackMeters": 0.9999999999999756
+      },
+      {
+        "center": [
+          -696.1923106325887,
+          -744.952805472138
+        ],
+        "alongMeters": 2.531159590390325,
+        "setbackMeters": 1.000000000000022
+      },
+      {
+        "center": [
+          -696.1636956405964,
+          -749.464857645718
+        ],
+        "alongMeters": 7.043302499793154,
+        "setbackMeters": 0.9999999999999886
+      },
+      {
+        "center": [
+          -696.1350806486042,
+          -753.9769098192979
+        ],
+        "alongMeters": 11.555445409195983,
+        "setbackMeters": 1.0000000000000688
+      },
+      {
+        "center": [
+          -696.1064656566119,
+          -758.4889619928779
+        ],
+        "alongMeters": 16.067588318598816,
+        "setbackMeters": 1.0000000000000355
+      }
+    ],
+    "columnCount": 6,
+    "depthRowsAtTwoCentimeterTolerance": 1,
+    "rowSetbacksMeters": [
+      0.9999999999999756
+    ],
+    "porticoRoofType": "flat",
+    "slattedRoofConfigured": false,
+    "porticoRoofRingCount": 1,
+    "doorCenter": [
+      -698.8083103913996,
+      -742.4381853946857
+    ],
+    "outerCenter": [
+      -695.20838278471,
+      -742.4153550071646
+    ],
+    "entryRecessMeters": 3.6
+  },
+  "photoObservation": {
+    "source": "https://tmjz.gxu.edu.cn/info/1452/6575.htm",
+    "image": "https://tmjz.gxu.edu.cn/__local/B/11/E5/A12DDA85D1E7598DA582B485BE1_12A98A97_61751.png",
+    "method": "Direct human visual interpretation of the full 855 by 570 image, not a surveyed count.",
+    "visibleRoundColumnsAtLeast": 4,
+    "visibleDepthRowsAtLeast": 2,
+    "sideSlattedRoofVisible": true,
+    "namedFrontFasciaAppearsCurved": true,
+    "centralUpperGlazingFramedByStoneBeamAndPiers": true,
+    "exactTotalColumns": null,
+    "metricDimensions": null
+  },
+  "mismatches": [
+    "The modeled columns form one depth row; the photograph shows front and rear columns.",
+    "The modeled solid portico roof has no side grille openings visible in the photograph."
+  ],
+  "photoRegistrationAccepted": false,
+  "productionChangeReady": false,
+  "wholeBuildingAccepted": false,
+  "limitations": [
+    "The OSM entrance node supports the D area but does not resolve column rows, canopy shape or doorway dimensions.",
+    "A curved fascia in perspective alone does not establish the A west outline as the photographed location.",
+    "Visible front/rear columns do not establish the total count or depth without a geometric photo fit.",
+    "Indoor hall openings have not been registered to the C south wall or proven to be separate doors."
+  ],
+  "buildingSha256": "8dfe4738b096cafbb9f829e6359b638db5d6dc62f5ded5a1567c2f9b7e6a07a6"
+}

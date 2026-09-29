@@ -1,8 +1,6 @@
 # 结构平台：人员入口与构件入口定位接续
 
-> 当前模型已接续[东侧人员入口与台阶估算](CIVIL_PLATFORM_PERSONNEL_ENTRY.md)：按OSM投影落门，并协调地坪和玻璃分格；没有完成实测照片配准或完整道路连接。下述“入口尚未实现”“南侧黑点”的文字为历史阶段；最新诊断黑点对应当前估算门面，并单独记录 `estimatedPersonnelEntryImplemented`。
-
-> 最新接续：重新核看全景柱廊后，已将等距六柱改为[北侧宽跨的六柱估算布置](CIVIL_PLATFORM_ENTRY_BAY.md)，中央探测通路已清空。以下冲突是修改前的诊断，保存在[原始冲突报告](model-checks/refinement/s2-platform-entry-bay-prior-candidates.json)；最新定位图以绿色显示中央通路。实际门洞、台阶及道路连接尚未实现，入口位置也未完成精确照片配准。
+> 最新状态（2026-09-30）：[后退人员门与台阶](CIVIL_PLATFORM_PERSONNEL_ENTRY.md)、[服务路连接](CIVIL_PLATFORM_ENTRY_CONNECTION.md)、[框与柱基](CIVIL_PLATFORM_ENTRY_TRIM.md)均已按估算实现，旧南墙默认门已移除。新找到的[完整门廊合影复核](CIVIL_PLATFORM_WIDE_ENTRY_REVIEW.md)显示当前单排柱和整板顶须重新校准，优先完成门廊整体位置与构成核对；C运输口尚未定位。以下按时间保留历史诊断，不代表当前入口尚未实现或已精确匹配照片。
 
 ## 2026-09-30：找到OSM入口节点，优先核对D区
 
