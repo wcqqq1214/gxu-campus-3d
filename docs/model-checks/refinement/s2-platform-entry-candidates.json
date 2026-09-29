@@ -1,6 +1,6 @@
 {
   "buildingId": "way/957404988",
-  "sourceSha256": "ef0e46d79e494ab06561807cd4a150c461f0c159151c520a7c767a3205408e0c",
+  "sourceSha256": "ea5570b5b6525d3b50e77300cfee5084b6237ec736635ab619a167f5cf3a7b13",
   "coordinateSystem": "campus local east/north metres",
   "status": "mapped-entrance-and-portico-constraint-review",
   "productionReady": false,
@@ -51,24 +51,24 @@
         "ring": 0,
         "edge": 0,
         "start": [
-          -698.6939074704767,
-          -760.4773988305454
+          -701.0939074704767,
+          -760.4739448185203
         ],
         "end": [
-          -698.8909494339341,
-          -729.4075449670695
+          -701.2909494339341,
+          -729.4056767281803
         ],
         "outwardNormal": [
-          0.9999798907471006,
-          0.0063417743114130036
+          0.9999798886942944,
+          0.00634209799250199
         ]
       },
-      "boundaryLengthM": 31.070478667589175,
+      "boundaryLengthM": 31.06889292634356,
       "porticoOuterEdge": {
         "part": "link-portico",
         "polygon": 0,
         "ring": 0,
-        "edge": 2,
+        "edge": 1,
         "originalEdge": 14,
         "start": [
           -695.093802217242,
@@ -80,10 +80,14 @@
         ],
         "lengthM": 31.072857456416916
       },
-      "wallToOuterEdgeAtMidpointM": 3.600000000000002,
+      "wallToOuterEdgeAtMidpointM": 5.999934861535956,
       "photoRegistered": false,
-      "doorAnchor": null,
-      "note": "Search wall behind the open portico; roof edge is not a door anchor."
+      "doorAnchor": [
+        -701.2081977968571,
+        -742.4534052450438
+      ],
+      "note": "Current personnel entry is estimated on the recessed wall; exact photo registration remains unresolved.",
+      "status": "implemented-estimate-not-photo-registered"
     }
   ],
   "originalExteriorEdges": [
@@ -368,10 +372,10 @@
       -742.4153550071646
     ],
     "projectedRearWallPosition": [
-      -698.8083103913996,
-      -742.4381853946858
+      -701.2081977845401,
+      -742.4534071871095
     ],
-    "modelRecessM": 3.6000000000000005,
+    "modelRecessM": 5.999935666370451,
     "preferredSearchArea": "D",
     "columnClearance": [
       {
@@ -380,35 +384,39 @@
           -696.2781556085655,
           -731.4166489513983
         ],
-        "distanceToRouteM": 10.678214596674,
-        "blocksCentralRoute": false
+        "distanceToRouteM": 10.567519397296378,
+        "blocksCentralRoute": false,
+        "blocksModeledDoorWidth": false
       },
       {
         "columnIndex": 1,
         "center": [
-          -696.2495406165732,
-          -735.9287011249783
+          -696.8756921717008,
+          -738.4258484810085
         ],
-        "distanceToRouteM": 6.1660716872711685,
-        "blocksCentralRoute": false
+        "distanceToRouteM": 3.5622504672781683,
+        "blocksCentralRoute": false,
+        "blocksModeledDoorWidth": false
       },
       {
         "columnIndex": 2,
         "center": [
-          -696.1923106325887,
-          -744.952805472138
+          -696.8249579772096,
+          -746.4256876069854
         ],
-        "distanceToRouteM": 2.2041050492462406,
-        "blocksCentralRoute": false
+        "distanceToRouteM": 3.562249404304103,
+        "blocksCentralRoute": false,
+        "blocksModeledDoorWidth": false
       },
       {
         "columnIndex": 3,
         "center": [
-          -696.1636956405964,
-          -749.464857645718
+          -696.4737327628577,
+          -749.4668238707148
         ],
-        "distanceToRouteM": 6.71624795864907,
-        "blocksCentralRoute": false
+        "distanceToRouteM": 6.605552011539285,
+        "blocksCentralRoute": false,
+        "blocksModeledDoorWidth": false
       },
       {
         "columnIndex": 4,
@@ -416,8 +424,9 @@
           -696.1350806486042,
           -753.9769098192979
         ],
-        "distanceToRouteM": 11.2283908680519,
-        "blocksCentralRoute": false
+        "distanceToRouteM": 11.117695021299065,
+        "blocksCentralRoute": false,
+        "blocksModeledDoorWidth": false
       },
       {
         "columnIndex": 5,
@@ -425,17 +434,39 @@
           -696.1064656566119,
           -758.4889619928779
         ],
-        "distanceToRouteM": 15.740533777454727,
-        "blocksCentralRoute": false
+        "distanceToRouteM": 15.629837930701655,
+        "blocksCentralRoute": false,
+        "blocksModeledDoorWidth": false
+      },
+      {
+        "columnIndex": 6,
+        "center": [
+          -699.0232095391808,
+          -740.0895010062923
+        ],
+        "distanceToRouteM": 1.9122511658041321,
+        "blocksCentralRoute": false,
+        "blocksModeledDoorWidth": false
+      },
+      {
+        "columnIndex": 7,
+        "center": [
+          -698.9934031999172,
+          -744.7894064928037
+        ],
+        "distanceToRouteM": 1.9122487057782356,
+        "blocksCentralRoute": false,
+        "blocksModeledDoorWidth": false
       }
     ],
-    "probeWidthM": 2.2,
-    "probePurpose": "Exercise existing parser only; not a proposed or measured doorway width.",
-    "candidateParserRejection": null,
+    "modeledDoorWidthM": 3.6,
+    "modeledDoorRecessM": 5.999935666370805,
+    "currentProductionParserRejection": null,
+    "modeledDoorWidthApproachClear": true,
     "centralApproachClear": true,
     "locationAccuracy": "Unspecified OSM mapping accuracy; no surveyed or photo-registered door anchor."
   },
-  "existingIllustrativeEntrances": [
+  "currentEstimatedEntrances": [
     {
       "id": "east-personnel",
       "polygon": 0,
@@ -444,17 +475,22 @@
       "t": 0.6148554790655477,
       "width": 3.6,
       "primary": true,
-      "recess": 3.6,
+      "recess": 5.999935666370805,
       "steps": 7,
       "stepWidth": 12,
       "stepFoundationDepth": 0.15,
+      "recessDoor": {
+        "frameWidth": 0.07,
+        "leafCount": 2,
+        "lintelHeight": 0.4
+      },
       "center": [
-        -698.8083103913996,
-        -742.4381853946857
+        -701.2081977968571,
+        -742.4534052450438
       ],
       "bearing": 89.63664066170013,
       "status": "estimated",
-      "basis": "2026-09-30按原始OSM入口节点7096023516投影至柱廊后墙，估算东侧人员门宽3.6米、门高2.8米、后退3.6米。门前地坪抬至1.05米，七级0.3米踏步、12米宽台阶及0.15米埋置基础均为照片关系和模型地形约束估算；照片不证明精确级数、门宽或轴网。既有等分玻璃改为门洞两侧及上方三个矩形分格区；旧南墙默认入口移除，不把它认定为运输口。完整接路和南侧运输开口仍待校准。",
+      "basis": "OSM节点7096023516支持D区人员入口位置；门宽3.6米/高2.8米、闭合双扇、0.07米框与0.18米门头为估算。门后退至新后墙，沿入口法线实际为5.9999357米；外缘锚点、1.05米地坪、七级0.3米踏步、12米梯宽和0.15米基础保持，已有服务路连接单独验收。完整相机配准、真实门宽/级数及C南墙运输口仍未确认。",
       "outerCenter": [
         -695.20838278471,
         -742.4153550071646
@@ -464,6 +500,7 @@
       "porticoWidth": 26.010538275636137
     }
   ],
+  "productionReadyScope": "No new unregistered entrance is ready for production; existing D entry is already implemented.",
   "estimatedPersonnelEntryImplemented": true,
   "limitations": [
     "Boundary lengths are not measured entrance widths.",

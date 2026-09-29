@@ -1,6 +1,6 @@
 # 结构平台：人员入口与构件入口定位接续
 
-> 最新状态（2026-09-30）：[后退人员门与台阶](CIVIL_PLATFORM_PERSONNEL_ENTRY.md)、[服务路连接](CIVIL_PLATFORM_ENTRY_CONNECTION.md)、[框与柱基](CIVIL_PLATFORM_ENTRY_TRIM.md)均已按估算实现，旧南墙默认门已移除。新找到的[完整门廊合影复核](CIVIL_PLATFORM_WIDE_ENTRY_REVIEW.md)显示当前单排柱和整板顶须重新校准，优先完成门廊整体位置与构成核对；C运输口尚未定位。以下按时间保留历史诊断，不代表当前入口尚未实现或已精确匹配照片。
+> 最新状态（2026-09-30）：[门廊整体方案](CIVIL_PLATFORM_PORTICO_INTEGRATION.md)已接入dev正式模型，包含约6米进深、前后柱列、曲线混合屋面、围合玻璃、人员门和接路。旧南墙默认门已移除；[C运输口定位及后续工作包](CIVIL_PLATFORM_DELIVERY_ENTRY.md)单独登记。定位脚本已按当前外缘、实际门宽和后退量更新。以下保留历史诊断，不代表当前仍为单排柱/整板顶，也不代表照片已精确配准。
 
 ## 2026-09-30：找到OSM入口节点，优先核对D区
 

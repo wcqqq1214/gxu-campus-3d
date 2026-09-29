@@ -1,0 +1,44 @@
+{
+  "baseCommit": "7124c28757614d45042e07103d37709dc49508a1",
+  "tests": [
+    {
+      "case": "current",
+      "accepted": true,
+      "expectedAccepted": true,
+      "assertion": null
+    },
+    {
+      "case": "rotated-portico-ring",
+      "accepted": true,
+      "expectedAccepted": true,
+      "assertion": null
+    },
+    {
+      "case": "door-off-wall",
+      "accepted": false,
+      "expectedAccepted": false,
+      "assertion": ""
+    },
+    {
+      "case": "mismatched-produced-door-width",
+      "accepted": false,
+      "expectedAccepted": false,
+      "assertion": "Production entrance changed after re-resolving current overrides"
+    },
+    {
+      "case": "column-moved-into-door-approach",
+      "accepted": false,
+      "expectedAccepted": false,
+      "assertion": "Column/base obstructs the modeled full-width door approach"
+    }
+  ],
+  "modelChanged": false,
+  "modelFilesUnchanged": 69,
+  "productionFingerprints": {
+    "data/building-overrides.json": "06d4d0b55a2caf01fc9f97336a83a41335a858ff8c605d9e584b235ea35d87f0",
+    "public/data/buildings.json": "ea5570b5b6525d3b50e77300cfee5084b6237ec736635ab619a167f5cf3a7b13",
+    "public/data/models.json": "a6bbc03d11f0c30985fcc4686b0ee27729cbbbe7c409c9ba7b10d795e3a9f20b",
+    "blender/gxu-campus.blend": "c65ee1d45529073b0cf4a65b1aa31e63b389ca9f438c478dd28e1cb1aa1ceb0e"
+  },
+  "newWholeBuildingsAccepted": 0
+}
