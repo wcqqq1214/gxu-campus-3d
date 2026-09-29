@@ -5659,6 +5659,52 @@
             [
               [
                 [
+                  -656.4254690470157,
+                  -766.5382365836045
+                ],
+                [
+                  -717.7775037716817,
+                  -766.4499404728923
+                ],
+                [
+                  -717.8064028063193,
+                  -788.05654399997
+                ],
+                [
+                  -656.4495536085785,
+                  -788.1344680000896
+                ],
+                [
+                  -656.4254690470157,
+                  -766.5382365836045
+                ]
+              ]
+            ]
+          ],
+          "height": 13.2,
+          "levels": 1,
+          "roof": {
+            "type": "flat",
+            "rise": 0,
+            "finish": "blue-metal",
+            "inset": 1.2
+          },
+          "wallFinish": "white"
+        },
+        {
+          "id": "north-low-wing",
+          "polygons": [
+            [
+              [
+                [
+                  -717.7775037716817,
+                  -766.4499404728923
+                ],
+                [
+                  -656.4254690470157,
+                  -766.5382365836045
+                ],
+                [
                   -656.418777727391,
                   -760.5382399999202
                 ],
@@ -5671,41 +5717,32 @@
                   -760.4499458086736
                 ],
                 [
-                  -717.8064028063193,
-                  -788.05654399997
-                ],
-                [
-                  -656.4495536085785,
-                  -788.1344680000896
-                ],
-                [
-                  -656.418777727391,
-                  -760.5382399999202
+                  -717.7775037716817,
+                  -766.4499404728923
                 ]
               ]
             ]
           ],
-          "height": 13.2,
-          "levels": 1,
+          "height": 7.2,
+          "levels": 2,
           "roof": {
             "type": "flat",
-            "rise": 0,
-            "finish": "blue-metal",
-            "inset": 1.2
-          }
+            "rise": 0
+          },
+          "wallFinish": "white"
         },
         {
-          "id": "middle-labs",
+          "id": "link-foyer",
           "polygons": [
             [
               [
                 [
-                  -695.093802217242,
-                  -760.4825800000607
+                  -698.6939074704767,
+                  -760.4773988305454
                 ],
                 [
-                  -695.2908592664412,
-                  -729.4103473955927
+                  -698.8909494339341,
+                  -729.4075449670695
                 ],
                 [
                   -720.2684733304854,
@@ -5720,8 +5757,8 @@
                   -760.4504602492385
                 ],
                 [
-                  -695.093802217242,
-                  -760.4825800000607
+                  -698.6939074704767,
+                  -760.4773988305454
                 ]
               ]
             ]
@@ -5731,7 +5768,110 @@
           "roof": {
             "type": "flat",
             "rise": 0
-          }
+          },
+          "wallFinish": "white"
+        },
+        {
+          "id": "link-portico",
+          "polygons": [
+            [
+              [
+                [
+                  -698.8909494339341,
+                  -729.4075449670695
+                ],
+                [
+                  -698.6939074704767,
+                  -760.4773988305454
+                ],
+                [
+                  -695.093802217242,
+                  -760.4825800000607
+                ],
+                [
+                  -695.2908592664412,
+                  -729.4103473955927
+                ],
+                [
+                  -698.8909494339341,
+                  -729.4075449670695
+                ]
+              ]
+            ]
+          ],
+          "height": 7.2,
+          "levels": 1,
+          "roof": {
+            "type": "flat",
+            "rise": 0
+          },
+          "openBelow": {
+            "clearHeight": 6.85,
+            "floorHeight": 0.24,
+            "columns": [
+              {
+                "center": [
+                  -696.2781556085655,
+                  -731.4166489513983
+                ],
+                "width": 0.65,
+                "depth": 0.65,
+                "angle": 0,
+                "shape": "cylinder"
+              },
+              {
+                "center": [
+                  -696.2438176181748,
+                  -736.8311115596942
+                ],
+                "width": 0.65,
+                "depth": 0.65,
+                "angle": 0,
+                "shape": "cylinder"
+              },
+              {
+                "center": [
+                  -696.209479627784,
+                  -742.2455741679902
+                ],
+                "width": 0.65,
+                "depth": 0.65,
+                "angle": 0,
+                "shape": "cylinder"
+              },
+              {
+                "center": [
+                  -696.1751416373934,
+                  -747.660036776286
+                ],
+                "width": 0.65,
+                "depth": 0.65,
+                "angle": 0,
+                "shape": "cylinder"
+              },
+              {
+                "center": [
+                  -696.1408036470026,
+                  -753.0744993845819
+                ],
+                "width": 0.65,
+                "depth": 0.65,
+                "angle": 0,
+                "shape": "cylinder"
+              },
+              {
+                "center": [
+                  -696.1064656566119,
+                  -758.4889619928779
+                ],
+                "width": 0.65,
+                "depth": 0.65,
+                "angle": 0,
+                "shape": "cylinder"
+              }
+            ]
+          },
+          "wallFinish": "white"
         },
         {
           "id": "west-foyer",
@@ -5790,7 +5930,8 @@
           "roof": {
             "type": "flat",
             "rise": 0
-          }
+          },
+          "wallFinish": "white"
         },
         {
           "id": "north-office",
@@ -5829,7 +5970,8 @@
           "roof": {
             "type": "flat",
             "rise": 0
-          }
+          },
+          "wallFinish": "white"
         }
       ],
       "facadeRules": [
@@ -5839,7 +5981,6 @@
           "edge": 0,
           "balconies": false,
           "wallFinish": "white",
-          "part": "south-hall",
           "windows": false
         },
         {
@@ -5857,7 +5998,6 @@
           "edge": 2,
           "balconies": false,
           "wallFinish": "white",
-          "part": "south-hall",
           "windows": false
         },
         {
@@ -5951,24 +6091,6 @@
           "polygon": 0,
           "ring": 0,
           "edge": 14,
-          "balconies": false,
-          "wallFinish": "white",
-          "part": "middle-labs",
-          "windowGrid": {
-            "columns": 18,
-            "firstLevel": 0,
-            "edgeInset": 0.65,
-            "widthRatio": 0.73,
-            "heightRatio": 0.74,
-            "pilasterWidth": 0.2,
-            "pilasterDepth": 0.14,
-            "paneRows": 2
-          }
-        },
-        {
-          "polygon": 0,
-          "ring": 0,
-          "edge": 14,
           "part": "north-office",
           "balconies": false,
           "wallFinish": "white",
@@ -6003,274 +6125,25 @@
           "edge": 15,
           "balconies": false,
           "wallFinish": "white",
-          "part": "south-hall",
-          "windows": false,
-          "panels": [
-            {
-              "id": "hall-north-1",
-              "type": "glazing",
-              "from": 0.025,
-              "to": 0.05,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-2",
-              "type": "glazing",
-              "from": 0.06818181818181818,
-              "to": 0.09318181818181817,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-3",
-              "type": "glazing",
-              "from": 0.11136363636363636,
-              "to": 0.13636363636363635,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-4",
-              "type": "glazing",
-              "from": 0.1545454545454545,
-              "to": 0.1795454545454545,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-5",
-              "type": "glazing",
-              "from": 0.19772727272727272,
-              "to": 0.22272727272727272,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-6",
-              "type": "glazing",
-              "from": 0.2409090909090909,
-              "to": 0.26590909090909093,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-7",
-              "type": "glazing",
-              "from": 0.28409090909090906,
-              "to": 0.3090909090909091,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-8",
-              "type": "glazing",
-              "from": 0.32727272727272727,
-              "to": 0.3522727272727273,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-9",
-              "type": "glazing",
-              "from": 0.3704545454545455,
-              "to": 0.3954545454545455,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-10",
-              "type": "glazing",
-              "from": 0.41363636363636364,
-              "to": 0.43863636363636366,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-11",
-              "type": "glazing",
-              "from": 0.45681818181818185,
-              "to": 0.48181818181818187,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-12",
-              "type": "glazing",
-              "from": 0.5,
-              "to": 0.525,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-13",
-              "type": "glazing",
-              "from": 0.5431818181818181,
-              "to": 0.5681818181818181,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-14",
-              "type": "glazing",
-              "from": 0.5863636363636364,
-              "to": 0.6113636363636364,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-15",
-              "type": "glazing",
-              "from": 0.6295454545454545,
-              "to": 0.6545454545454545,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-16",
-              "type": "glazing",
-              "from": 0.6727272727272727,
-              "to": 0.6977272727272728,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-17",
-              "type": "glazing",
-              "from": 0.7159090909090909,
-              "to": 0.740909090909091,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-18",
-              "type": "glazing",
-              "from": 0.759090909090909,
-              "to": 0.7840909090909091,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-19",
-              "type": "glazing",
-              "from": 0.8022727272727272,
-              "to": 0.8272727272727273,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-20",
-              "type": "glazing",
-              "from": 0.8454545454545455,
-              "to": 0.8704545454545455,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-21",
-              "type": "glazing",
-              "from": 0.8886363636363637,
-              "to": 0.9136363636363637,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            },
-            {
-              "id": "hall-north-22",
-              "type": "glazing",
-              "from": 0.9318181818181818,
-              "to": 0.9568181818181818,
-              "bottom": 7.0,
-              "top": 12.5,
-              "columns": 1,
-              "rows": 2,
-              "frameWidth": 0.12,
-              "depth": 0.1
-            }
-          ]
+          "part": "north-low-wing",
+          "windowGrid": {
+            "columns": 18,
+            "firstLevel": 0,
+            "edgeInset": 0.65,
+            "widthRatio": 0.73,
+            "heightRatio": 0.74,
+            "pilasterWidth": 0.2,
+            "pilasterDepth": 0.14,
+            "paneRows": 2
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 14,
+          "part": "link-portico",
+          "balconies": false,
+          "windows": false
         }
       ],
       "evidence": {
@@ -6304,7 +6177,7 @@
             "gxuCivilPlatformDesign2014",
             "gxuCivilDemolitionAerial2022"
           ],
-          "note": "2026-09-29复核：低实验翼与连接门厅的功能归属、分界需要重做。设计效果图与建成航拍中的密集窗低翼沿大厅长边展开，当前middle-labs名称不能证明其空间对应。现有四分部保留原OSM轮廓，仅为待纠正占位；南大厅13.2米按单跨高空间表达，北楼九层有2014年设计依据，29.7米为估算，低实验区三层10.8米和西侧门厅两层7.2米的归属尚未核实。大厅蓝色平面覆盖层内缩1.2米、分部边界及全部米制尺寸为估算；屋顶坡度、低翼体量与柱廊须联合重新配准。"
+          "note": "2026-09-29按设计效果图与建成航拍的相对空间关系重分区：南大厅北侧6米估算条带作为两层7.2米低实验翼，密集窗沿原北长边15布置；高大厅保持13.2米、北窗墙后退6米。原middle-labs改为连接门厅link-foyer，10.8米占位高度保留，其东侧3.6米条带改为7.2米高的开敞柱廊。西弧形分部7.2米、北楼九层29.7米保持。六分部合并严格保持原OSM外轮廓；进深、高度、楼层、柱廊六柱及柱径0.65米均为照片约束估算，不能作为竣工测绘。共享白色墙面用于分部内外墙与柱廊构件。"
         },
         "facadeRules": {
           "status": "estimated",
@@ -6313,7 +6186,7 @@
             "gx720CivilNorthPanorama",
             "gxuCivilPlatformDesign2014"
           ],
-          "note": "航拍可见浅白墙和南大厅北立面两排窄高窗；原外环第15边采用22列估算窗组，7至12.5米范围及分格尺寸为简化估算。北综合楼北立面（原边13）按航拍密集白框采用22列九层窗网，端部留1米、窗宽占跨0.78、窗高占层0.75、竖框宽0.22米/凸出0.18米均为照片约束估算，未逐窗测绘。东端墙（原边14的北楼分段）上八层按可见大块白色实墙停用通用窗，底层继续保留示意窗。北楼底层窗网为估算延续，不代表入口已定位；其他侧面、屋顶突出物和低翼立面仍待核对。 GX720广西大学全景可见北楼东端白墙中竖向窄玻璃带，按北楼东边分段自北向南0.56—0.64、底3.8米/顶26.4米、八格估算表达；形制和朝向有影像约束，尺寸、分格数、下端及实际用途未测绘。靠南转角暗带所属墙面未确认，暂不添加。 2026-09-29低翼配准复核：18列三行窄窗和19根白框目前仍放在原边14的南北向分段，但设计效果图及航拍中的低翼沿大厅北长边展开，撤回“已定位到东立面”的结论。现有网格为待纠正占位，其列数、三层10.8米和构件尺度均非实测；应先重做低翼与门厅分区，再迁移窗列，不能把当前墙面当作已确认实景。"
+          "note": "航拍可见浅白墙和南大厅北立面两排窄高窗；原外环第15边采用22列估算窗组，7至12.5米范围及分格尺寸为简化估算。北综合楼北立面（原边13）按航拍密集白框采用22列九层窗网，端部留1米、窗宽占跨0.78、窗高占层0.75、竖框宽0.22米/凸出0.18米均为照片约束估算，未逐窗测绘。东端墙（原边14的北楼分段）上八层按可见大块白色实墙停用通用窗，底层继续保留示意窗。北楼底层窗网为估算延续，不代表入口已定位；其他侧面、屋顶突出物和低翼立面仍待核对。 GX720广西大学全景可见北楼东端白墙中竖向窄玻璃带，按北楼东边分段自北向南0.56—0.64、底3.8米/顶26.4米、八格估算表达；形制和朝向有影像约束，尺寸、分格数、下端及实际用途未测绘。靠南转角暗带所属墙面未确认，暂不添加。 2026-09-29返工：取消原边14低实验区18列窗，将18列窄窗与连续白框迁至新north-low-wing的原边15，随7.2米两层分部采用两行。原边14前沿为开敞柱廊；高大厅22组窗迁至后退6米的分部共享北墙，底标高改为8.1米避开低翼屋顶与女儿墙。北楼窗网与玻璃带保持。窗数、层数、标高、进深和尺寸均为估算；门厅内部玻璃、真实人员门和南运输门仍未校准。"
         },
         "roofVolumes": {
           "status": "estimated",
@@ -6321,12 +6194,21 @@
             "gxuCivilDemolitionAerial2022"
           ],
           "note": "航拍北综合楼屋顶可见两条平行长条、西侧连接及东南局部附加体。采用原北边13为锚点的四个矩形体量：长条内退3/9米、宽0.4米、抬高1.1米；东南附加体内退10.3米、进深3.8米、抬高2.6米。范围、尺寸、高度和连接关系均为照片约束估算，不确定实际设备或房间用途。保留原平顶及女儿墙，不将屋顶附加体计为新增楼层，不补画未确认的设备、楼梯或门。"
+        },
+        "exposedFacadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCivilDemolitionAerial2022",
+            "gxuCivilPlatformDesign2014",
+            "gx720CivilNorthPanorama"
+          ],
+          "note": "高大厅北墙在原外轮廓内后退6米形成低翼屋面，22组两行窗位于共享高差墙东段；底8.1米、顶12.5米，与低翼7.2米屋面及0.8米通用女儿墙留出间隔。位置基于整体照片关系重估，绝对尺寸、开间及标高未测量。"
         }
       },
       "review": {
         "levels": {
           "status": "partial",
-          "note": "北综合楼九层有历史设计依据；低翼和门厅层数估算，南大厅按单跨高空间表达。"
+          "note": "北楼九层有2014年设计依据；低翼改为两层7.2米估算，连接体及西弧形体层数仍未知；大厅保持单跨高空间。"
         },
         "height": {
           "status": "partial",
@@ -6334,7 +6216,7 @@
         },
         "roof": {
           "status": "partial",
-          "note": "大厅内缩蓝顶和深色边带已表达；北楼新增两条平行长条、西端连接和东南小体量的估算屋顶轮廓。全部附加体尺寸及高度估算，实际用途、排水坡度、设备与其余分部屋顶细节仍待核对。 2026-09-29低翼/门厅分界进入返工核对；照片中的开敞前场不能直接当作现有轮廓内庭院挖空。"
+          "note": "高大厅内缩蓝顶随北侧6米低翼条带重新分区，蓝顶高度13.2米与1.2米边带保持；低翼与柱廊屋顶7.2米。北楼屋顶四附加体保持。连接门厅的实际曲面/坡面、屋面接缝、排水和设备仍待校准。"
         },
         "entrance": {
           "status": "pending",
@@ -6342,7 +6224,7 @@
         },
         "facade": {
           "status": "partial",
-          "note": "大厅北窗组、北楼北窗网及东端窄玻璃带已表达，数量与尺寸为估算。2026-09-29撤回低翼东立面已定位判断：当前18列窗与资料中沿大厅长边展开的低翼方向不符，须先重做低翼/门厅分区，再迁移窗列；人员门廊及其他侧面仍待核对。"
+          "note": "低翼窗列已从错误的南北向东墙迁到大厅前侧东西向长边；新柱廊替代连接体前窗墙，高大厅窗迁至后退高差墙。相对方向已纠正，但分部进深、窗数、层数及构件尺度仍为估算，不能视为整栋准确测绘；真实入口和其余立面继续核对。"
         }
       },
       "roofVolumes": [
@@ -6389,6 +6271,285 @@
           "inset": 10.3,
           "depth": 3.8,
           "rise": 2.6
+        }
+      ],
+      "exposedFacadeRules": [
+        {
+          "part": "south-hall",
+          "adjacentPart": "north-low-wing",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 0,
+          "rule": {
+            "windows": false,
+            "balconies": false,
+            "panels": [
+              {
+                "id": "hall-north-1",
+                "type": "glazing",
+                "from": 0.5988915792564905,
+                "to": 0.6146510502599435,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-2",
+                "type": "glazing",
+                "from": 0.5716706747959786,
+                "to": 0.5874301457994334,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-3",
+                "type": "glazing",
+                "from": 0.5444497703354684,
+                "to": 0.5602092413389214,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-4",
+                "type": "glazing",
+                "from": 0.5172288658749564,
+                "to": 0.5329883368784094,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-5",
+                "type": "glazing",
+                "from": 0.49000796141444447,
+                "to": 0.5057674324178992,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-6",
+                "type": "glazing",
+                "from": 0.46278705695393246,
+                "to": 0.4785465279573872,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-7",
+                "type": "glazing",
+                "from": 0.4355661524934223,
+                "to": 0.4513256234968753,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-8",
+                "type": "glazing",
+                "from": 0.40834524803291034,
+                "to": 0.4241047190363652,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-9",
+                "type": "glazing",
+                "from": 0.3811243435723984,
+                "to": 0.39688381457585314,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-10",
+                "type": "glazing",
+                "from": 0.3539034391118882,
+                "to": 0.3696629101153412,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-11",
+                "type": "glazing",
+                "from": 0.3266825346513762,
+                "to": 0.34244200565483107,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-12",
+                "type": "glazing",
+                "from": 0.29946163019086425,
+                "to": 0.31522110119431906,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-13",
+                "type": "glazing",
+                "from": 0.27224072573035407,
+                "to": 0.28800019673380706,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-14",
+                "type": "glazing",
+                "from": 0.24501982126984212,
+                "to": 0.26077929227329694,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-15",
+                "type": "glazing",
+                "from": 0.21779891680933014,
+                "to": 0.23355838781278493,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-16",
+                "type": "glazing",
+                "from": 0.19057801234882,
+                "to": 0.20633748335227292,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-17",
+                "type": "glazing",
+                "from": 0.163357107888308,
+                "to": 0.1791165788917628,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-18",
+                "type": "glazing",
+                "from": 0.136136203427796,
+                "to": 0.15189567443125082,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-19",
+                "type": "glazing",
+                "from": 0.10891529896728588,
+                "to": 0.12467476997073883,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-20",
+                "type": "glazing",
+                "from": 0.08169439450677389,
+                "to": 0.0974538655102287,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-21",
+                "type": "glazing",
+                "from": 0.05447349004626191,
+                "to": 0.0702329610497167,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              },
+              {
+                "id": "hall-north-22",
+                "type": "glazing",
+                "from": 0.027252585585751773,
+                "to": 0.04301205658920472,
+                "bottom": 8.1,
+                "top": 12.5,
+                "columns": 1,
+                "rows": 2,
+                "frameWidth": 0.12,
+                "depth": 0.1
+              }
+            ]
+          }
         }
       ]
     }
