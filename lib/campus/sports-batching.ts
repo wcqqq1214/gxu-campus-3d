@@ -2,16 +2,24 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { disposeObject } from './resources.ts';
 
-const surfaces = new Set([
+const trackSurfaces = new Set([
   'track',
   'trackAlt',
   'trackApron',
   'fieldGreen',
   'fieldStripe',
+  'goalNet',
+  'seatYellow',
 ]);
-const nodes = new Set(['sports-east-track', 'sports-west-track']);
+const courtSurfaces = new Set(['courtGreen', 'courtKey', 'goalNet']);
+const nodes = new Map([
+  ['sports-east-track', trackSurfaces],
+  ['sports-west-track', trackSurfaces],
+  ['basketball-bank-897194442', courtSurfaces],
+  ['basketball-bank-east', courtSurfaces],
+]);
 
-function signature(mesh: THREE.Mesh): string | null {
+function signature(mesh: THREE.Mesh, surfaces: Set<string>): string | null {
   const material = mesh.material;
   const geometry = mesh.geometry;
   if (
@@ -50,7 +58,7 @@ function signature(mesh: THREE.Mesh): string | null {
   });
 }
 
-/** Merge only colour variants within each track node; keep layer/LOD parents intact. */
+/** Merge compatible colour variants within each named sports node, preserving its layer. */
 export function batchSportsSurfaces(root: THREE.Object3D) {
   const stats = { batches: 0, removedDraws: 0, colourBytes: 0 };
   const parents: THREE.Object3D[] = [];
@@ -61,7 +69,7 @@ export function batchSportsSurfaces(root: THREE.Object3D) {
     const buckets = new Map<string, THREE.Mesh[]>();
     for (const child of parent.children) {
       if (!(child instanceof THREE.Mesh)) continue;
-      const key = signature(child);
+      const key = signature(child, nodes.get(parent.name)!);
       if (key === null) continue;
       const bucket = buckets.get(key) ?? [];
       bucket.push(child);

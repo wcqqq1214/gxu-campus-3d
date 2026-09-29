@@ -113,3 +113,26 @@ test('不跨跑道父节点合并、不处理标线，释放旧网格时保护�
   other.group.name = 'unrelated-building';
   assert.equal(batchSportsSurfaces(other.root).batches, 0);
 });
+
+test('篮球分组仅合并场面和篮网的同参数颜色，保留标线、玻璃与不同粗糙度的外沿', () => {
+  const { root, group } = fixture();
+  group.name = 'basketball-bank-east';
+  group.children[0].material.name = 'courtGreen';
+  group.children[1].material.name = 'courtKey';
+  const net = group.children[0].clone();
+  net.material = net.material.clone();
+  net.material.name = 'goalNet';
+  group.add(net);
+  const retained = ['sportWhite', 'courtGlass', 'courtApron', 'track'].map(
+    (name) => {
+      const mesh = group.children[0].clone();
+      mesh.material = mesh.material.clone();
+      mesh.material.name = name;
+      group.add(mesh);
+      return mesh;
+    },
+  );
+  assert.equal(batchSportsSurfaces(root).removedDraws, 2);
+  for (const mesh of retained) assert(group.children.includes(mesh));
+  assert.equal(batchSportsSurfaces(root).batches, 0);
+});
