@@ -10,6 +10,23 @@ assert(phase && /^[a-z0-9-]+$/.test(phase));
 const reportPath = `docs/model-checks/refinement/${phase}-visual.json`;
 await assert.rejects(fs.access(reportPath), { code: 'ENOENT' });
 const sports = JSON.parse(await fs.readFile('public/data/sports.json', 'utf8'));
+const includeCourts = process.argv.includes('--courts');
+if (includeCourts) {
+  const data = JSON.parse(
+    await fs.readFile('public/data/basketball.json', 'utf8'),
+  );
+  for (const bank of ['basketball-bank-897194442', 'basketball-bank-east']) {
+    const courts = data.courts.filter((c) => c.bank === bank);
+    assert(courts.length);
+    sports.push({
+      id: bank,
+      center: [0, 1].map(
+        (i) => courts.reduce((s, c) => s + c.center[i], 0) / courts.length,
+      ),
+      elevation: courts[0].elevation,
+    });
+  }
+}
 const browser = await chromium.launch({
   headless: true,
   executablePath: process.env.CHROMIUM_PATH,
@@ -19,7 +36,7 @@ const report = {
   errors: [],
   states: [],
   method:
-    'Saved before production frontend on port 4312; current frontend on port 4300; same unchanged assets, camera and viewport. Desktop mobile-size simulation.',
+    'Saved before production frontend (BEFORE_FRONTEND_ROOT route fulfillment or BEFORE_URL); current production frontend; same unchanged assets, camera and viewport. Desktop mobile-size simulation.',
 };
 try {
   for (const variant of ['before', 'after']) {
@@ -27,6 +44,30 @@ try {
       viewport: { width: 1280, height: 720 },
       deviceScaleFactor: 1,
     });
+    if (variant === 'before' && process.env.BEFORE_FRONTEND_ROOT) {
+      const saved = path.resolve(process.env.BEFORE_FRONTEND_ROOT);
+      await context.route('http://127.0.0.1:4300/**', async (route) => {
+        let pathname = new URL(route.request().url()).pathname.replace(
+          /^\/gxu-campus-3d(?=\/|$)/,
+          '',
+        );
+        if (pathname.endsWith('/')) pathname += 'index.html';
+        const file = path.resolve(saved, '.' + pathname);
+        assert(file.startsWith(saved + path.sep));
+        const types = {
+          '.html': 'text/html',
+          '.js': 'text/javascript',
+          '.css': 'text/css',
+          '.json': 'application/json',
+          '.geojson': 'application/json',
+          '.wasm': 'application/wasm',
+        };
+        await route.fulfill({
+          body: await fs.readFile(file),
+          contentType: types[path.extname(file)] || 'application/octet-stream',
+        });
+      });
+    }
     const page = await context.newPage();
     page.on('pageerror', (e) => report.errors.push(String(e)));
     page.on('console', (m) => {
@@ -37,7 +78,9 @@ try {
     });
     const base =
       variant === 'before'
-        ? process.env.BEFORE_URL || 'http://127.0.0.1:4312/gxu-campus-3d/'
+        ? process.env.BEFORE_FRONTEND_ROOT
+          ? 'http://127.0.0.1:4300/gxu-campus-3d/'
+          : process.env.BEFORE_URL || 'http://127.0.0.1:4312/gxu-campus-3d/'
         : process.env.REFINEMENT_URL || 'http://127.0.0.1:4300/gxu-campus-3d/';
     async function settle() {
       await page.waitForFunction(
@@ -57,6 +100,14 @@ try {
       ['east-track', 'day', false],
       ['west-track', 'night', false],
       ['west-track', 'day', true],
+      ...(includeCourts
+        ? [
+            ['basketball-bank-897194442', 'day', false],
+            ['basketball-bank-east', 'day', false],
+            ['basketball-bank-east', 'night', false],
+            ['basketball-bank-east', 'day', true],
+          ]
+        : []),
     ]) {
       const s = sports.find((s) => s.id === id),
         [x, y] = s.center;
