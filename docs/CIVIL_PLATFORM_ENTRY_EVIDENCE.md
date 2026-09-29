@@ -1,5 +1,7 @@
 # 结构平台：人员入口与构件入口定位接续
 
+> 最新接续：重新核看全景柱廊后，已将等距六柱改为[北侧宽跨的六柱估算布置](CIVIL_PLATFORM_ENTRY_BAY.md)，中央探测通路已清空。以下冲突是修改前的诊断，保存在[原始冲突报告](model-checks/refinement/s2-platform-entry-bay-prior-candidates.json)；最新定位图以绿色显示中央通路。实际门洞、台阶及道路连接尚未实现，入口位置也未完成精确照片配准。
+
 ## 2026-09-30：找到OSM入口节点，优先核对D区
 
 原始快照 `data/snapshots/osm-2026-09-09.json.gz` 中的[节点7096023516](https://www.openstreetmap.org/node/7096023516)带有 `entrance=yes`，且属于平台原始 `way/957404988` 的节点序列。本次读取[OSM节点接口](https://api.openstreetmap.org/api/0.6/node/7096023516)，核对版本2、2021-06-23更新时间、经纬度与标签，均与仓库快照相同。这是既有地图入口记录，不是新测绘，也不独立证明2026年现场状况。
@@ -20,7 +22,7 @@
 
 试装只在内存副本中采用2.2米探测门宽和既有3.6米后退，**2.2米不作为门宽建议或实测值**。没有把该配置写入生产覆盖表，也没有移动柱子以绕过检查。当前柱数、柱距和柱径原本就是估算；地图点的定位精度也未知，现阶段不能仅凭冲突判断哪一项应移动。此诊断检查的是现有规则的中央通路，不代替后续完整门宽、柱间净宽、台阶、贴地及道路连接验收。
 
-[更新后的定位图](model-checks/refinement/s2-platform-entry-candidates.svg)用红点表示OSM入口、红线表示通路投影、红色小圆表示冲突柱；南侧黑点仍为旧示意门。[机器坐标与解析器结果](model-checks/refinement/s2-platform-entry-candidates.json)可由 `scripts/inspect_civil_platform_entries.py` 复现；[独立证据记录](model-checks/refinement/s2-platform-entry-osm-evidence.json)保存当前接口响应指纹及快照一致性。
+[定位图](model-checks/refinement/s2-platform-entry-candidates.svg)随当前模型更新：本次发现冲突时采用红色，后续柱列修订后改为绿色；南侧黑点仍为旧示意门。[机器坐标与解析器结果](model-checks/refinement/s2-platform-entry-candidates.json)可由 `scripts/inspect_civil_platform_entries.py` 复现；[独立证据记录](model-checks/refinement/s2-platform-entry-osm-evidence.json)保存接口响应指纹及快照一致性，修改前拒绝结果见上述原始冲突报告。
 
 本次另核看2024年临时水电施工图第4、39、40页及第39页平台局部，没有取得可直接采用的门洞锚点；2024年夏令营末幅合影仍裁掉转角，2025年后勤简报对应平台的图片为室内桥梁展厅，均未用于定位。后续应围绕D区核对邻柱和门洞，不再反复扩大A/B/C搜索范围。生产模型保持 `0ed569b`，檐口局部联合验收已通过，整栋及全部入口接路未完成。
 

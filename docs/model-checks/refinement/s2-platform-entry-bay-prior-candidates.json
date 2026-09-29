@@ -1,6 +1,6 @@
 {
   "buildingId": "way/957404988",
-  "sourceSha256": "cfa611f10e68385dd8d5c00f6f65e3be3776e2bfc35316c71cdd42f2a02fe93f",
+  "sourceSha256": "e4b76fd28e24aaab9f2b5ba20098eb5ce7d8418409c5a802d6238a1ad6a72a42",
   "coordinateSystem": "campus local east/north metres",
   "status": "mapped-entrance-and-portico-constraint-review",
   "productionReady": false,
@@ -386,37 +386,37 @@
       {
         "columnIndex": 1,
         "center": [
-          -696.2495406165732,
-          -735.9287011249783
+          -696.2438176181748,
+          -736.8311115596942
         ],
-        "distanceToRouteM": 6.1660716872711685,
+        "distanceToRouteM": 5.263643105390605,
         "blocksCentralRoute": false
       },
       {
         "columnIndex": 2,
         "center": [
-          -696.1923106325887,
-          -744.952805472138
+          -696.209479627784,
+          -742.2455741679902
         ],
-        "distanceToRouteM": 2.2041050492462406,
-        "blocksCentralRoute": false
+        "distanceToRouteM": 0.0,
+        "blocksCentralRoute": true
       },
       {
         "columnIndex": 3,
         "center": [
-          -696.1636956405964,
-          -749.464857645718
+          -696.1751416373934,
+          -747.660036776286
         ],
-        "distanceToRouteM": 6.71624795864907,
+        "distanceToRouteM": 4.911390794887938,
         "blocksCentralRoute": false
       },
       {
         "columnIndex": 4,
         "center": [
-          -696.1350806486042,
-          -753.9769098192979
+          -696.1408036470026,
+          -753.0744993845819
         ],
-        "distanceToRouteM": 11.2283908680519,
+        "distanceToRouteM": 10.325962286171334,
         "blocksCentralRoute": false
       },
       {
@@ -431,8 +431,7 @@
     ],
     "probeWidthM": 2.2,
     "probePurpose": "Exercise existing parser only; not a proposed or measured doorway width.",
-    "candidateParserRejection": null,
-    "centralApproachClear": true,
+    "candidateParserRejection": "Portico column blocks the central entrance route",
     "locationAccuracy": "Unspecified OSM mapping accuracy; no surveyed or photo-registered door anchor."
   },
   "existingIllustrativeEntrances": [
@@ -455,7 +454,7 @@
     "D is prioritized by an OSM entrance node; A/B remain unregistered alternatives or other doors.",
     "C is the south delivery-entry search wall, not the personnel portal.",
     "D is a part-local recessed wall; its normal enters the open portico.",
-    "Mapped central approach is clear; doorway and stairs are still uncalibrated.",
+    "OSM node supports D; existing estimated columns conflict with its straight approach.",
     "No road alignment, stairs, column count or door position is inferred."
   ]
 }

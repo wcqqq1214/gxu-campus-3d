@@ -1,0 +1,130 @@
+{
+  "performanceReport": "s2-platform-entry-bay-performance-browser.json",
+  "checkedAt": "2026-09-29T17:14:21.361403+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [
+    "Hall roof slope, south delivery entrance and road connection",
+    "North office remaining elevations, actual rooftop use/details and personnel entrance",
+    "North low wing and foyer partition depths, levels, roof shape and dimensions; true glazing dimensions",
+    "Separate historical old hall footprint and demolition timing"
+  ],
+  "baseCommit": "541b04dfc45f52291586e0d79ba3c9cedab038ff",
+  "branch": "dev",
+  "scope": "Adjust four middle column centers to estimated unequal bays: six columns, one double-width bay at the north-office end. Mapped central approach is clear. Other geometry and production entrances preserved. Exact column grid, doorway, stairs and road connection remain unverified.",
+  "blenderVersion": "5.2.2",
+  "photoRegistrationAccepted": false,
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 247,
+  "nodeTests": 62,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4199001,
+        "medianDrawCalls": 563
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.454839897311391,
+        "medianDrawCalls": 2.925045703839113
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1164475,
+        "medianDrawCalls": 294
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 10.697327331752128,
+        "medianDrawCalls": 11.787072243346008
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 27,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5399896,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "26edce482706f705a4558a04dc3b8f85011dd8feb5017647b44e85851f9619e4",
+    "data/building-sources.json": "dd25067d6c0af395fd22f18fa605cd374799eff783d1bc625f2e5b9838004712",
+    "blender/gxu-campus.blend": "fa3d81028cce38f63a2913c3803cd22fac856b417f024521d2d31b3fc958d49f",
+    "blender/generic_buildings.py": "ad58dcb01732569acd5b63d932cfeb3cbabf841bb56b746e62d86374259b99b3",
+    "scripts/building_overrides.py": "7abef752a78abe36a98e268b321a2c2561ca7d34bbe91518de86be15f4f66214",
+    "scripts/roof_volumes_data.py": "d97e7359e1be7150d33e07285b36aae7b7d9984309a934a0932c6ec4de946cb8",
+    "scripts/explicit_roof_data.py": "ef5bb57eaf7fe8bea25c41ce39cdd4f32183d3c0974830ef92b40aa79d844d92",
+    "scripts/roof_rim_data.py": "5528f95f901dc099c3c9e878d2006c4ab11ddb269e6eacdf32e61079290a911b",
+    "scripts/exposed_facades_data.py": "d7218fed11d69817221e67f74627549d28f6b54421a4d1246f3f56f318d4360d",
+    "scripts/facade_panels_data.py": "087ea41d3cab30e7b51408245a85bb77cb03d67eed34242685f4e04badc14820",
+    "blender/validate_generic.py": "a13873c9f4f1d4e9bf25db53bd80b6d0c41577b360f4b183d78680f7cba6041c",
+    "blender/validate_civil_platform.py": "e170bac57ed8c9ab1b702a1855ecc83c500f8e3285b10f371ddc2c75ec254233",
+    "public/data/buildings.json": "cfa611f10e68385dd8d5c00f6f65e3be3776e2bfc35316c71cdd42f2a02fe93f",
+    "public/data/sources.json": "fdc8f5484b919a271503a5f34e445467df6488f5ea8776a9f150962c3a537c1f",
+    "public/data/models.json": "e75844d236f61d862c27d8554b24b454d9d79aa0e9e57455f8bbe008e9e32f5f"
+  }
+}
