@@ -75,8 +75,9 @@ def samples(b):
                 if volume['part'] != part['id']:continue
                 dx,dy=x-volume['center'][0],y-volume['center'][1]
                 cs,sn=math.cos(volume['angle']),math.sin(volume['angle'])
-                covered = covered or (abs(dx*cs+dy*sn)<=volume['width']/2+.01 and
-                                      abs(-dx*sn+dy*cs)<=volume['depth']/2+.01)
+                overhang=volume.get('cap',{}).get('overhang',0)
+                covered = covered or (abs(dx*cs+dy*sn)<=volume['width']/2+overhang+.01 and
+                                      abs(-dx*sn+dy*cs)<=volume['depth']/2+overhang+.01)
             crown = form.get('roofCrown')
             if crown and crown['part'] == part['id']:
                 dx,dy=x-crown['corner'][0],y-crown['corner'][1]
@@ -93,7 +94,7 @@ def samples(b):
         apex=z+dome['baseHeight']+dome['drumHeight']+dome['rise']
         points.append({'kind':'roof-dome-apex','x':x,'y':y,'top':apex+1,'expected':apex})
     for volume in form.get('roofVolumes', []):
-        x,y=volume['center'];apex=z+volume['baseHeight']+volume['rise']
+        x,y=volume['center'];apex=z+volume['baseHeight']+volume['rise']+volume.get('cap',{}).get('height',0)
         points.append({'kind':'roof-volume-top','x':x,'y':y,'top':apex+1,'expected':apex})
     if 'roofCrown' in form:
         c=form['roofCrown']
