@@ -1,0 +1,183 @@
+{
+  "firstAttemptReport": "s2-platform-rim-first-summary.json",
+  "performanceReport": "s2-platform-rim-quiet-browser.json",
+  "previousFailedReport": "s2-platform-rim-summary.json",
+  "checkedAt": "2026-09-29T16:37:32.616002+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [
+    "Hall roof slope, south delivery entrance and road connection",
+    "North office remaining elevations, actual rooftop use/details and personnel entrance",
+    "North low wing and foyer partition depths, levels, roof shape and dimensions; true glazing dimensions",
+    "Separate historical old hall footprint and demolition timing"
+  ],
+  "baseCommit": "c70b147641e3769b138204a161757180a114bc94",
+  "branch": "dev",
+  "scope": "Inset white rim follows the existing foyer profile on exposed sides, width 0.35 m and rise 0.45 m; portico exterior rim width 0.35 m and rise 0.18 m replaces the generic parapet. Body partitions, roof surfaces, columns, glazing and entries preserved. Rim dimensions, true curvature, drainage and entry registration remain estimates or unverified. Partial implementation only.",
+  "blenderVersion": "5.2.2",
+  "photoRegistrationAccepted": false,
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 247,
+  "nodeTests": 62,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4199001,
+        "medianDrawCalls": 563
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.454839897311391,
+        "medianDrawCalls": 2.925045703839113
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1167465,
+        "medianDrawCalls": 299
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 10.98156272428692,
+        "medianDrawCalls": 13.688212927756659
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5399880,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "65d444cdcc5d1678a5dae1901d10cf9d14c2d9501049ccc16c6fbecfd76c6f81",
+    "data/building-sources.json": "dd25067d6c0af395fd22f18fa605cd374799eff783d1bc625f2e5b9838004712",
+    "blender/gxu-campus.blend": "f759dd3bdbb1cc8a6c7d0676e7a52fb5f87cba676a906c8be1efb49a2b013ec3",
+    "blender/generic_buildings.py": "ad58dcb01732569acd5b63d932cfeb3cbabf841bb56b746e62d86374259b99b3",
+    "scripts/building_overrides.py": "7abef752a78abe36a98e268b321a2c2561ca7d34bbe91518de86be15f4f66214",
+    "scripts/roof_volumes_data.py": "d97e7359e1be7150d33e07285b36aae7b7d9984309a934a0932c6ec4de946cb8",
+    "scripts/explicit_roof_data.py": "ef5bb57eaf7fe8bea25c41ce39cdd4f32183d3c0974830ef92b40aa79d844d92",
+    "scripts/roof_rim_data.py": "5528f95f901dc099c3c9e878d2006c4ab11ddb269e6eacdf32e61079290a911b",
+    "scripts/exposed_facades_data.py": "d7218fed11d69817221e67f74627549d28f6b54421a4d1246f3f56f318d4360d",
+    "scripts/facade_panels_data.py": "087ea41d3cab30e7b51408245a85bb77cb03d67eed34242685f4e04badc14820",
+    "blender/validate_generic.py": "a13873c9f4f1d4e9bf25db53bd80b6d0c41577b360f4b183d78680f7cba6041c",
+    "blender/validate_civil_platform.py": "c6181e47d608a86cb8c9f029b6ea82ca75c5aefef2cbbbd188e5c34d2e48d2b9",
+    "public/data/buildings.json": "e4b76fd28e24aaab9f2b5ba20098eb5ce7d8418409c5a802d6238a1ad6a72a42",
+    "public/data/sources.json": "fdc8f5484b919a271503a5f34e445467df6488f5ea8776a9f150962c3a537c1f",
+    "public/data/models.json": "91acc2dba70bb8abdc7d96e575a74f0cfa12088b05945b7448e65da89a11993b"
+  },
+  "reviewCommit": "ef02951cd1b5e3897fe0a549165c7e8bf2a0ab88",
+  "validationReuse": {
+    "method": "Prior geometry, data, source-preservation, tree/road and test results reused for unchanged production inputs; this round reran browser performance and directly reviewed six regression screenshots. No model rebuild or Python/Node test rerun.",
+    "priorInputFingerprintsVerified": true,
+    "priorTargetVisualCaptureHashesVerified": 11,
+    "modelsMatchingManifestProductionAndHTTP": 69,
+    "reportHashes": {
+      "s2-platform-rim-geometry.json": "ab0652ad113dc87c61971c7b44619e849189c29bce6d59b6efea38090789468d",
+      "s2-platform-rim-data.json": "1fbae92d9144c1f8ea1c7b565975e376039ac8b720db600a2b5c0014e165cbb5",
+      "s2-platform-rim-generic-geometry.json": "854230adce34f311d935275846df916a84e0f418997c91594b9a803090baf345",
+      "s2-platform-rim-trees-geometry.json": "dd49248e900479cfbe5eb57567e37803a1b5ed3983acc5ec5bd72b3bf70714e6",
+      "s2-platform-rim-source-preservation.json": "7f64a8317ad86630e4d7eb479885038353e5cb555ad005fc6e495c1522284f81",
+      "s2-platform-rim-assets.json": "8d854f6006ba1144f58245ef1507c46975aa3d2402e6d0332a55bc9ef73c36ca",
+      "s2-platform-rim-visual-review.json": "b723b9a494b7c6fdde305cf619647131322f130c74231ba46227ed27febc271c",
+      "s2-platform-rim-road-building.json": "485bd34a5be68b53cc1e9f4eccca813520556e811c9211c929c12c681e819c46",
+      "s2-platform-rim-negative-geometry.json": "ca1a5d743ae59323afe8df6ddf904e38e51f02edbf8c558e20d438c7bb73d4b2"
+    }
+  },
+  "regressionCaptures": [
+    {
+      "file": "docs/screenshots/refinement/s2-platform-rim-quiet/library-approach.png",
+      "sha256": "222fd8d2d622cf4002bf60121d30d0eb2ad2a092fe28829dc09789c936380d2a",
+      "directlyViewed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-platform-rim-quiet/library-mobile.png",
+      "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4",
+      "directlyViewed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-platform-rim-quiet/library-north.png",
+      "sha256": "9a754a57be3111f8023fff8578fa8612f1eb4755581519634fcbc17009e40f3a",
+      "directlyViewed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-platform-rim-quiet/library-overhead.png",
+      "sha256": "217a95e50e81ef70af27b0d18141e1f7ecb7eb15a3f6bee69f0d92f197a73fe3",
+      "directlyViewed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-platform-rim-quiet/library-side.png",
+      "sha256": "ee2c19119721ccf476d8b04a16a469ebcb9de1c356e8d0c78dcc0567f01e2cd9",
+      "directlyViewed": true
+    },
+    {
+      "file": "docs/screenshots/refinement/s2-platform-rim-quiet/ordinary-lod.png",
+      "sha256": "7d1a80fb84278e63e2c11fa65e085e2339027713c0cfd4b5c80fb63671f12e58",
+      "directlyViewed": true
+    }
+  ],
+  "regressionObservations": "Six directly reviewed north/approach/side/overhead/mobile library and ordinary-roof views retain visible geometry; no new visible gaps observed. This is regression review, not platform entrance calibration."
+}
