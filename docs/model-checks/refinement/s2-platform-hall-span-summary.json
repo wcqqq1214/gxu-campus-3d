@@ -1,0 +1,108 @@
+{
+  "checkedAt": "2026-09-29T21:47:31.123642+00:00",
+  "passed": true,
+  "productionIntegrated": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "baseCommit": "88c7663ccdec2718c7465ccb9eefb8a55ac719bc",
+  "branch": "dev",
+  "scope": "Hall north glazing coverage repair: 32 estimated two-row strips over the full 61.3521m wall. Other six-part massing, roofs, facades, entrance, connection and terrain unchanged; source/base/near and runtime checks. Not surveyed or whole-building acceptance.",
+  "photoRegistrationAccepted": false,
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 278,
+  "nodeTests": 65,
+  "checks": [
+    "geometry",
+    "entry-geometry",
+    "portico",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review",
+    "performance-visual-review"
+  ],
+  "platformContextChecksPerAsset": 595,
+  "entryChecksPerAsset": 88,
+  "porticoChecksAcrossThreeAssets": 420,
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.324081076240318,
+        "medianDrawCalls": 3.4734917733089565
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 14.609699176287737,
+        "medianDrawCalls": 14.828897338403046
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "performanceReport": "s2-platform-hall-span-performance-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 27,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of complete isolation.",
+  "initialModelBytes": 5830400,
+  "maximumOrdinaryNearBytes": 1684868,
+  "pending": [
+    "C hall transport opening; south/east/west hall openings remain unknown",
+    "Separate old hall location/time evidence",
+    "North office south/west elevations, west foyer and whole-building review"
+  ],
+  "fingerprints": {
+    "data/building-overrides.json": "f094f47e45c341664223dde276b06d1f57b32bf98cd112abfae15ad460b42948",
+    "blender/gxu-campus.blend": "d7e8248e3c1a44a31c8946a5bcea61a92265a2ccfeb7f4fd4d6ec54d4680728c",
+    "blender/validate_civil_entry_proposal.py": "9dc1ab8246d659ce00a3e1a8595488e58ba1ba8e08b6508f72807d3d450c231f",
+    "blender/validate_civil_platform.py": "a8ddb697dd99801fd636dc65082643321a3449455ec72e303adb1be0667a852e",
+    "blender/validate_civil_platform_entry.py": "00523f8606cbd9ff6d140311bd43e0265cd7506255e8ef093f6380c20d1fdfe2",
+    "public/data/buildings.json": "0eedd38c8bad81f6b538fecf3e577000e1e6fc96f0a700b6af2ac6a9d56211df",
+    "public/data/models.json": "3ecb4cb61150c693f7027bb1b55eba0fd8ac9d9e9420db69f3ded91d57a6b195",
+    "public/data/sites.json": "51bdb13b94182aa599418232b30434e0dc26f51b08debc9918a9bcf6c0ed8be1"
+  }
+}
