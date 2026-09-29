@@ -20,6 +20,9 @@ REPARTITION = '--repartition' in sys.argv
 PORTICO_GLASS = '--portico-glass' in sys.argv
 FOYER_PROFILE = '--foyer-profile' in sys.argv
 ROOF_RIM = '--roof-rim' in sys.argv
+ENTRY_BAY = '--entry-bay' in sys.argv
+if ENTRY_BAY and not PORTICO_GLASS:
+    raise ValueError('--entry-bay requires --portico-glass')
 if ROOF_RIM and not FOYER_PROFILE:
     raise ValueError('--roof-rim requires --foyer-profile')
 if FOYER_PROFILE and not REPARTITION:
@@ -251,14 +254,16 @@ def check(objects, tolerance):
         a=Vector((-695.2908592664412,-729.4103473955927,0))
         b=Vector((-695.093802217242,-760.4825800000607,0))
         length=(b-a).length;u=(b-a).normalized();n=Vector((-u.y,u.x,0))
-        for i in range(6):
-            p=a+u*(2+i*(length-4)/5)
+        distances = ([2+i*(length-4)/6 for i in (0,1,3,4,5,6)] if ENTRY_BAY
+                     else [2+i*(length-4)/5 for i in range(6)])
+        for i, distance in enumerate(distances):
+            p=a+u*distance
             origin=p+n*2;origin.z=Z+3.2
             hit=ray(origin,-n,6)
             assert hit and hit[3]=='white' and abs(hit[0]-2.675)<tolerance*2,('portico-column',i,hit)
             samples.append(dict(kind='portico-column',column=i,distance=hit[0]))
         for i in range(5):
-            p=a+u*(2+(i+.5)*(length-4)/5)
+            p=a+u*((distances[i]+distances[i+1])/2)
             origin=p+n*2;origin.z=Z+3.2
             hit=ray(origin,-n,6)
             if PORTICO_GLASS:
@@ -269,6 +274,17 @@ def check(objects, tolerance):
             floor=ray(foot,(0,0,-1),4)
             assert floor and floor[3]=='stone' and abs(floor[1].z-Z-.24)<tolerance,('portico-floor',i,floor)
             samples.append(dict(kind='portico-open-bay',bay=i,rearWallDistance=hit[0],floorHeight=floor[1].z-Z))
+        if ENTRY_BAY:
+            # Fixed mapped-entry projection, independent of the production
+            # columns. This only checks the approach to the backing wall;
+            # a doorway, stairs and road connection are not inferred.
+            front=Vector((-695.20838278471,-742.4153550071646,0))
+            for offset in (-.6,0,.6):
+                for height in (1.,3.2,6.5):
+                    origin=front+u*offset+n*2;origin.z=Z+height
+                    hit=ray(origin,-n,6)
+                    assert hit and 5.44-tolerance < hit[0] < 5.6+tolerance,('mapped-entry-approach',offset,height,hit)
+                    samples.append(dict(kind='mapped-entry-approach',offset=offset,height=height,rearWallDistance=hit[0]))
     if PORTICO_GLASS:
         # Fixed adopted backing-wall endpoints; rays start behind the columns
         # so every glass cell is tested, without treating any cell as a door.
@@ -376,6 +392,7 @@ report['repartitionChecked']=REPARTITION
 report['porticoGlazingChecked']=PORTICO_GLASS
 report['foyerProfileChecked']=FOYER_PROFILE
 report['roofRimChecked']=ROOF_RIM
+report['entryBayChecked']=ENTRY_BAY
 if REPARTITION:
     report['scope']='Estimated six-part correction: 6 m deep north low wing at 7.2 m, recessed 13.2 m hall, 10.8 m connector and six-column 7.2 m open portico. Office and west part retained. Relative layout checked against imagery; dimensions and entries remain unverified.'
 if NORTH_FACADE:
@@ -390,6 +407,8 @@ if FOYER_PROFILE:
     report['scope']+=' Includes the four-segment west-rising foyer roof, with 2.4 m estimated rise and closed elevated boundaries.'
 if ROOF_RIM:
     report['scope']+=' Includes a 0.35 m inset rim: 0.45 m high around exposed foyer edges and 0.18 m high along the portico exterior. Exact sections and drainage remain unverified.'
+if ENTRY_BAY:
+    report['scope']+=' Includes six estimated columns with one double-width bay supporting the mapped east-entry approach; actual column grid, doorway, stairs and road connection remain unverified.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)

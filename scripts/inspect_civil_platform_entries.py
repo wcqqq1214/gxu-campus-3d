@@ -118,6 +118,7 @@ def main():
         rejection = None
     except ValueError as error:
         rejection = str(error)
+    blocked = any(s['blocksCentralRoute'] for s in supports)
     mapped_entry = {
         'nodeId': node['id'], 'sourceUrl': 'https://www.openstreetmap.org/node/7096023516',
         'snapshot': str(snapshot.relative_to(ROOT)),
@@ -133,6 +134,7 @@ def main():
         'columnClearance': supports, 'probeWidthM': 2.2,
         'probePurpose': 'Exercise existing parser only; not a proposed or measured doorway width.',
         'candidateParserRejection': rejection,
+        'centralApproachClear': not blocked,
         'locationAccuracy': 'Unspecified OSM mapping accuracy; no surveyed or photo-registered door anchor.'}
     report = {'buildingId': building['id'], 'sourceSha256': hashlib.sha256(raw).hexdigest(),
               'coordinateSystem': 'campus local east/north metres',
@@ -145,7 +147,8 @@ def main():
                               'D is prioritized by an OSM entrance node; A/B remain unregistered alternatives or other doors.',
                               'C is the south delivery-entry search wall, not the personnel portal.',
                               'D is a part-local recessed wall; its normal enters the open portico.',
-                              'OSM node supports D; existing estimated columns conflict with its straight approach.',
+                              ('OSM node supports D; existing estimated columns conflict with its straight approach.'
+                               if blocked else 'Mapped central approach is clear; doorway and stairs are still uncalibrated.'),
                               'No road alignment, stairs, column count or door position is inferred.']}
     OUT.with_suffix('.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     def point(p):
@@ -170,14 +173,15 @@ def main():
             f'<path d="{path(outer.coords)}" fill="none" stroke="#167a67" stroke-width="2" stroke-dasharray="6 5"/>']
     x, y = point(midpoint.coords[0])
     svg.append(f'<text x="{x-18:.2f}" y="{y:.2f}" font-size="15" fill="#167a67">D</text>')
-    svg.append(f'<path d="{path(route.coords)}" fill="none" stroke="#a22c3c" stroke-width="3"/>')
+    route_color = '#a22c3c' if blocked else '#167a67'
+    svg.append(f'<path d="{path(route.coords)}" fill="none" stroke="{route_color}" stroke-width="3"/>')
     for support in supports:
         x, y = point(support['center'])
         color = '#a22c3c' if support['blocksCentralRoute'] else '#617581'
         svg.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="3" fill="{color}"/>')
     x, y = point(mapped.coords[0])
-    svg += [f'<circle cx="{x:.2f}" cy="{y:.2f}" r="5" fill="#a22c3c"/>',
-            f'<text x="{x+12:.2f}" y="{y+5:.2f}" font-size="13" fill="#a22c3c">OSM entry 7096023516</text>']
+    svg += [f'<circle cx="{x:.2f}" cy="{y:.2f}" r="5" fill="{route_color}"/>',
+            f'<text x="{x+12:.2f}" y="{y+5:.2f}" font-size="13" fill="{route_color}">OSM entry 7096023516</text>']
     for entry in building['form']['entrances']:
         x, y = point(entry['center'])
         svg.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="6" fill="#26323b"/>')
@@ -188,7 +192,7 @@ def main():
             '<text x="35" y="735" font-size="16" fill="#8b538b">C: South hall wall, edge 1 (delivery candidate)</text>',
             '<text x="35" y="765" font-size="16" fill="#167a67">D: Recessed link-foyer east wall (personnel candidate)</text>',
             '<text x="35" y="795" font-size="15" fill="#167a67">Dashed: portico outer roof edge; no wall or door inferred.</text>',
-            '<text x="35" y="815" font-size="15" fill="#a22c3c">Red: mapped entry and route conflict with an estimated column.</text>',
+            '<text x="35" y="815" font-size="15">Entry route: red if blocked, green if clear; neither confirms a door.</text>',
             '<text x="35" y="840" font-size="15">Black dot: existing illustrative entrance, still uncalibrated.</text>',
             '<text x="35" y="865" font-size="15">Numbers: original exterior edges; D uses a part-local wall.</text>',
             '<text x="35" y="890" font-size="15">All lengths are model search boundaries, not measured door widths.</text>',
