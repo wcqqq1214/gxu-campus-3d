@@ -101,6 +101,25 @@ class ExposedFacadeTests(unittest.TestCase):
         self.assertEqual(result['form']['facades'][-1]['region'],'under-portico')
         self.assertEqual(result['form']['facades'][-1]['rule']['panels'][0]['top'],5.8)
 
+    def test_glazing_behind_mixed_roof_keeps_height_and_column_constraints(self):
+        b,r=self.portico_fixture()
+        opening=r['parts'][1]['openBelow']
+        opening['columns']=[dict(center=[29.5,y],width=.6,depth=.6,angle=0) for y in (7,12)]
+        opening['slattedRoof']=dict(edgeWidth=1,slatWidth=.3,slatCount=3,solidBays=[1,2])
+        result=self.resolve(b,r)
+        self.assertEqual(len(result['form']['parts'][1]['openBelow']['roofGeometry']['polygons'][0])-1,2)
+        self.assertAlmostEqual(result['form']['facades'][-1]['maximumHeight'],6.1)
+        automatic=[f for f in result['form']['facades'] if f['part']=='high' and f['polygon'] is None and not f['rule']]
+        self.assertEqual(len(automatic),1)
+        self.assertEqual(automatic[0]['minimumHeight'],6.6)
+        self.assertEqual(result,self.resolve(result,r))
+        bad=copy.deepcopy(r);bad['parts'][1]['openBelow']['columns'][0]['center']=[15.32,7]
+        with self.assertRaisesRegex(ValueError,'support column'):self.resolve(b,bad)
+        bad=copy.deepcopy(r);bad['exposedFacadeRules'][0]['rule']['panels'][0]['top']=6.3
+        with self.assertRaisesRegex(ValueError,'underside'):self.resolve(b,bad)
+        del opening['slattedRoof']['solidBays']
+        with self.assertRaisesRegex(ValueError,'open flat slab'):self.resolve(b,r)
+
     def test_portico_glazing_rejects_floor_slab_and_column_collisions(self):
         b,r=self.portico_fixture()
         for key,value in [('bottom',.2),('top',6.3)]:

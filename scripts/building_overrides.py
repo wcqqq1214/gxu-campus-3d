@@ -805,7 +805,20 @@ def resolve_building(building, record=None, source_ids=None):
         form['facades']=resolve_facades(b,form,record.get('facadeRules',[]))
     if 'exposedFacadeRules' in record:
         from exposed_facades_data import resolve_exposed_facades
-        form.setdefault('facades', []).extend(resolve_exposed_facades(b, form, record['exposedFacadeRules']))
+        exposed=resolve_exposed_facades(b, form, record['exposedFacadeRules'])
+        for facade in exposed:
+            if facade.get('region') != 'under-portico': continue
+            # A mixed roof exposes its backing wall down to the porch floor.
+            # Explicit glazing owns that lower region; do not draw automatic
+            # window rows over it. Keep automatic windows above the roof.
+            line=LineString([facade['start'],facade['end']]).buffer(1e-7)
+            porch=next(p for p in form['parts'] if p['id']==facade['adjacentPart'])
+            for automatic in form.get('facades',[]):
+                if (automatic['part']==facade['part'] and automatic['polygon'] is None
+                        and not automatic['rule'] and 'adjacentPart' not in automatic
+                        and line.covers(LineString([automatic['start'],automatic['end']]))):
+                    automatic['minimumHeight']=max(automatic.get('minimumHeight',0),porch['height'])
+        form.setdefault('facades', []).extend(exposed)
     for entry in form['entrances']:
         if 'flushEntrance' not in entry:continue
         from flush_return_data import validate_return_facades
