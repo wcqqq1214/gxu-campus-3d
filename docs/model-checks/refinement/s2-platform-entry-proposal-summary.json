@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "baseCommit": "f10c74a41406fa7fe33ce63ad79b902ac04b500c",
+  "scope": "Isolated D-area composition candidate and glazing integration fix; no production building update",
+  "photoRegistrationAccepted": false,
+  "productionReady": false,
+  "wholeBuildingAccepted": false,
+  "assumptions": [
+    "D remains the OSM-supported location hypothesis.",
+    "Front pair at +/-5.2m around the entry; other four longitudinal positions retained; front setback 0.7m.",
+    "Two rear columns at +/-2.8m along entry and 2.65m setback are estimates, not a surveyed count.",
+    "3.6m porch depth, central five solid bays and side lattice spacing are unverified estimates.",
+    "Curved named fascia and stone-framed glazing have not been reconstructed."
+  ],
+  "checks": {
+    "pythonTests": 264,
+    "blenderRecords": 50,
+    "detailModes": 2,
+    "oldRoofAndMissingRearColumnNegativeChecks": true
+  },
+  "production": {
+    "all448ResolvedRecordsPreserved": true,
+    "modelsVerifiedInPublicAndOut": 69,
+    "productionDataAndSourceBlendUnchanged": true,
+    "modelManifestSHA256": "4772183e55d1a68ef286890737cf57fd19e69e362318e37a3be618044933c721"
+  },
+  "captures": [
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proposal/candidate-entry.png",
+      "sha256": "7945e15344fb2ae866e796897f3f9d37443e10202592cfd8ddc1964403e22189",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proposal/candidate-oblique.png",
+      "sha256": "76d8c43d60bacf508de77267542628fc0195159d39ccf8c7c78182fe37e0cc16",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proposal/candidate-roof.png",
+      "sha256": "2876ee9c84a7fac8ff2673600aa7d457764477924b1f75bf46b74a7c48370c2f",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proposal/original-entry.png",
+      "sha256": "027678ca224c0bb2f36c5e799274b3b6d13f6d116ea1008de17e010e15ab6548",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proposal/original-oblique.png",
+      "sha256": "aa0e45bad6f1245c0ddb6917a28bfc6ed9fd091bb40a461ee91010bce8b85ec3",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proposal/original-roof.png",
+      "sha256": "012d29b05473475097141579503a11571d0a83fdba1e58274373aeb5e0e4fbf4",
+      "directlyViewed": true
+    }
+  ],
+  "visualFindings": [
+    "Front and rear entry supports are distinct in the candidate; lateral openings are visible from above.",
+    "Automatic window overlays found in the initial candidate were removed; explicit glazing owns the lower backing-wall region.",
+    "The full glass background, broad roof beam, unverified depth and straight fascia still differ from the reference photo composition."
+  ],
+  "notRun": [
+    "Campus model export",
+    "Pages rebuild",
+    "Runtime performance benchmark"
+  ],
+  "inputs": {
+    "scripts/building_overrides.py": "81cf1ef5ae7a9c322dc559ced81755d53bb1a575b8d130601b7c7c0e94fb77dd",
+    "scripts/exposed_facades_data.py": "ac10e8a2896206aa0c9df3e90e0269a6b67535a594957f9dab70978396728fcf",
+    "scripts/test_exposed_facades_data.py": "76d4a5305aef7d7706f4e1f61f40ad847988cca7808b10e690e0439973d8fb17",
+    "scripts/preview_civil_platform_entry.py": "518b79be95bab87c77785476015abe3b1d7c87eae02a6d34db89518c28a3157a",
+    "blender/render_civil_entry_proposal.py": "c5993d45314695cfb6394ca120f71ac56b34f8d342d3f56985528790248a7e80",
+    "blender/validate_civil_entry_proposal.py": "7b12b0873aed958448cdfd0b6ee357cbe677d36407edfa35695184176621fd34",
+    "work/refinement-s2-platform-entry-proposal/proposal.json": "b5bda96ced16fa2570593e43b59af15724e724421381f97976ce42a91ac24775"
+  },
+  "referenceImages": [
+    {
+      "source": "https://tmjz.gxu.edu.cn/info/1226/7880.htm",
+      "imageURL": "https://tmjz.gxu.edu.cn/__local/F/1C/0E/AAA123A810AC3CEADB74A0FF894_360F4D47_3390B.jpg",
+      "localReference": "work/refinement-s2-platform-entry-proposal/student2025.jpg",
+      "dimensions": [
+        648,
+        432
+      ],
+      "sha256": "e8fe3e1f0a55ee8acfba7f969aadb80983fdf51611867b04f84460a1ca171aff",
+      "directFullImageReview": true,
+      "orientationEstablished": false,
+      "includedInProductionTextures": false
+    },
+    {
+      "source": "https://dkgqgczx.gxu.edu.cn/info/1003/1091.htm",
+      "imageURL": "https://dkgqgczx.gxu.edu.cn/__local/E/E1/C2/61A99ACC6002810BCE64BA76545_4B597990_113A3.png",
+      "localReference": "work/refinement-s2-platform-entry-proposal/kindergarten2022-1.png",
+      "dimensions": [
+        693,
+        509
+      ],
+      "sha256": "454e3cb6adc8b836cae7e2eed33a017bfffc127283c9eebb231b0101c25522a6",
+      "directFullImageReview": true,
+      "orientationEstablished": false,
+      "includedInProductionTextures": false
+    },
+    {
+      "source": "https://dkgqgczx.gxu.edu.cn/info/1003/1091.htm",
+      "imageURL": "https://dkgqgczx.gxu.edu.cn/__local/C/2F/64/743B7C3BBB46F24189A6BCB25FF_8A8EA2DD_10EFD.png",
+      "localReference": "work/refinement-s2-platform-entry-proposal/kindergarten2022-2.png",
+      "dimensions": [
+        693,
+        520
+      ],
+      "sha256": "4f88e88a0f609eed73f756e8e9c4be7b8f4de386478d16f9ab7d898b59502c90",
+      "directFullImageReview": true,
+      "orientationEstablished": false,
+      "includedInProductionTextures": false
+    }
+  ]
+}

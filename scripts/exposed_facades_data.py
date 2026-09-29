@@ -44,7 +44,8 @@ def resolve_exposed_facades(building, form, rules):
         high, low = (parts[config[k]] for k in ('part', 'adjacentPart'))
         if under_portico:
             if ('openBelow' in high or 'openBelow' not in low or
-                    'slattedRoof' in low['openBelow'] or
+                    ('slattedRoof' in low['openBelow'] and
+                     not low['openBelow']['slattedRoof'].get('solidBays')) or
                     low['roof']['type'] != 'flat' or high['roof']['type'] not in ('flat','profiled')):
                 raise ValueError('Under-portico glazing needs a solid wall beside an open flat slab')
         elif (high['height'] <= low['height'] or any('openBelow' in p or p['roof']['type'] != 'flat' for p in (high, low))):

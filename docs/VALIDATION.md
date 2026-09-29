@@ -1,5 +1,7 @@
 # 验收记录
 
+2026-09-30整体门廊候选：[对照与复现](CIVIL_PLATFORM_ENTRY_PROPOSAL.md)通过264项Python测试、基础/近景几何50条记录及原模型反例。修复混合屋面下重复自动窗；全部448栋现有解析结果和69个GLB保持。六张图是隔离候选，未做照片配准、生产导出、接路或FPS验收。
+
 2026-09-30门廊生成支持：[混合实顶/格栅小样](CIVIL_PLATFORM_MIXED_ROOF.md)通过263项Python测试、两种旋转的62条Blender几何记录；448栋完整解析与生产记录一致、69个GLB保持。未修改平台模型，未重跑Pages或性能，小样不计整栋验收。
 
 2026-09-30完整门廊照片复核：[形制差异与接续顺序](CIVIL_PLATFORM_WIDE_ENTRY_REVIEW.md)。运行 `python3 scripts/inspect_civil_platform_entry_composition.py` 可重算柱列深度；当前一列柱和无格栅配置与人工照片观察不符，报告明确未配准、未达到落模条件。此批只修改来源/校准元数据，Pages构建及[数据一致性检查](model-checks/refinement/s2-platform-wide-entry-data.json)通过；未重跑Blender或性能，不增加整栋验收。此前几何测试只验证参数生成一致。
