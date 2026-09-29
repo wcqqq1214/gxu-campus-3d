@@ -104,3 +104,18 @@ for error,should_keep in [(.00005,True),(.001,False)]:
  if should_keep:assert 0<report['ignoredRoundoffLoweringMeters']<=.0001
  else:assert report['maximumLoweringMeters']>.0001
 print('Grounded-road float32 noise preserves original terrain; real clearance intrusion still lowers it',flush=True)
+
+# Preserve an intersecting neighbor while grounding the surrounding service road.
+terrain=quad([(-5,-5,0),(15,-5,0),(15,10,0),(-5,10,0)])
+roads=quad([(-3,-2,.4),(0,-2,.4),(0,8,.4),(-3,8,.4)])
+roads.extend(quad([(7,4,.4),(12,4,.4),(12,8,.4),(7,8,.4)]))
+record={**r,'groundedService':{'offset':.08,'preserveNeighborOverlap':True},'groundClearance':.06,'meshStep':.5,'neighborOverlaps':[{'outer':[(7,4),(10,4),(10,6),(7,6),(7,4)],'holes':[]}]}
+ground,_,meshes,_=build_pavings({'pavings':[record]},{'path':0,'road':0},terrain,roads,{'way/1':original})
+p=tree(meshes['paving-test'])
+assert ground is terrain
+# BVH rays originate at z=200; float32 cancellation is below 0.03 mm.
+for x,y in [(8,5),(9,5),(7,4)]:assert abs(height(p,x,y)-.4)<.00003
+assert abs(height(p,5,1)-.08)<1e-5
+hs=[height(p,8,1+i*.05) for i in range(81)]
+assert max(abs(a-b) for a,b in zip(hs,hs[1:]))<.01
+print('Neighbor overlap retains its height, blends continuously, and does not retessellate safe terrain',flush=True)

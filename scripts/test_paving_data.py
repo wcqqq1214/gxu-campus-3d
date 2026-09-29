@@ -35,4 +35,21 @@ class PavingDataTests(unittest.TestCase):
             with self.subTest(bad=bad),self.assertRaises(ValueError):derive_paving({**c,'groundedService':bad},s,n,{'osm'})
         s['tags']['bridge']='yes'
         with self.assertRaises(ValueError):derive_paving(c,s,n,{'osm'})
+    def test_neighbor_overlap_retains_footprint_and_is_opt_in(self):
+        c,s,n=self.fixture();s['tags']['highway']='service'
+        c['groundedService']={'offset':.08,'preserveNeighborOverlap':True};c['groundClearance']=.06
+        n=box(-2,-1,1,7);r=derive_paving(c,s,n,{'osm'})
+        from shapely.geometry import Polygon
+        self.assertAlmostEqual(sum(Polygon(p['outer'],p['holes']).area for p in r['neighborOverlaps']),6)
+        self.assertEqual(r['vertices'],s['vertices'])
+        c['groundedService']={'offset':.08}
+        self.assertNotIn('neighborOverlaps',derive_paving(c,s,n,{'osm'}))
+    def test_invalid_clearance_or_missing_overlap_rejected(self):
+        c,s,n=self.fixture();s['tags']['highway']='service';c['groundedService']={'offset':.08,'preserveNeighborOverlap':True}
+        with self.assertRaises(ValueError):derive_paving(c,s,n,{'osm'})
+        n=box(-2,-1,1,7)
+        for clearance in [True,float('nan'),.01,.3]:
+            with self.subTest(clearance=clearance),self.assertRaises(ValueError):derive_paving({**c,'groundClearance':clearance},s,n,{'osm'})
+        for flag in [False,1,'yes']:
+            with self.subTest(flag=flag),self.assertRaises(ValueError):derive_paving({**c,'groundedService':{'offset':.08,'preserveNeighborOverlap':flag}},s,n,{'osm'})
 if __name__=='__main__':unittest.main()

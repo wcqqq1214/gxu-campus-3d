@@ -13,13 +13,14 @@ def context_revision(surfaces,infrastructure,surroundings,roads,sites):
 
 def derive_paving(config,surface,neighbors,source_ids):
     fields={'id','surfaceId','surfaceRevision','joinEdges','joinFeather','meshStep','contactDepth','contactSideMargin','joinOverlap','burial','sourceRefs','evidence'}
-    if not isinstance(config,dict) or not fields<=set(config) or set(config)-fields-{'groundedService'}:raise ValueError('Unknown/missing paving field')
+    if not isinstance(config,dict) or not fields<=set(config) or set(config)-fields-{'groundedService','groundClearance'}:raise ValueError('Unknown/missing paving field')
     if not isinstance(config['id'],str) or not config['id'].strip():raise ValueError('Invalid paving ID')
     if surface['id']!=config['surfaceId'] or revision(surface['vertices'])!=config['surfaceRevision']:raise ValueError('Missing/stale paving surface')
     grounded=config.get('groundedService')
     if 'groundedService' in config:
-        if not isinstance(grounded,dict) or set(grounded)!={'offset'} or type(grounded['offset']) not in (int,float) or not math.isfinite(grounded['offset']) or not .08<=grounded['offset']<=.2:
+        if not isinstance(grounded,dict) or 'offset' not in grounded or set(grounded)-{'offset','preserveNeighborOverlap'} or type(grounded['offset']) not in (int,float) or not math.isfinite(grounded['offset']) or not .08<=grounded['offset']<=.2:
             raise ValueError('Grounded service paving needs a bounded terrain offset')
+        if 'preserveNeighborOverlap' in grounded and grounded['preserveNeighborOverlap'] is not True:raise ValueError('Neighbor overlap preservation must be true')
         if surface['tags'].get('highway')!='service':raise ValueError('Grounded service paving requires a mapped service road')
     allowed=('service',) if grounded is not None else ('pedestrian','footway','path')
     if surface['kind']!='roads' or surface['tags'].get('highway') not in allowed or not surface.get('insideCampus'):raise ValueError('Not ordinary campus pavement')
@@ -30,6 +31,9 @@ def derive_paving(config,surface,neighbors,source_ids):
     for name,(lo,hi) in ranges.items():
         v=config[name]
         if type(v) not in (int,float) or not math.isfinite(v) or not lo<=v<=hi:raise ValueError('Invalid paving '+name)
+    if 'groundClearance' in config:
+        v=config['groundClearance']
+        if grounded is None or type(v) not in (int,float) or not math.isfinite(v) or not .06<=v<=.12:raise ValueError('Invalid grounded paving clearance')
     ring=surface['vertices'];shape=Polygon(ring)
     if not shape.is_valid or shape.area<10 or shape.area>3000:raise ValueError('Invalid paving footprint')
     edges=config['joinEdges']
@@ -44,7 +48,13 @@ def derive_paving(config,surface,neighbors,source_ids):
     # Stop side faces at real pavement connections, rather than walling them off.
     free=shape.boundary.difference(neighbors.buffer(.02))
     lines=[free] if free.geom_type=='LineString' else [g for g in getattr(free,'geoms',[]) if g.geom_type=='LineString']
-    return {**copy.deepcopy(config),'vertices':copy.deepcopy(ring),'triangles':copy.deepcopy(surface['triangles']),'joins':joins,'freeEdges':[[list(p) for p in line.coords] for line in lines],'bounds':list(shape.bounds),'areaMeters2':shape.area,'layer':'roads','precision':'Mapped footprint and photo-supported hard paving; local join and buried side dimensions estimated.'}
+    result={**copy.deepcopy(config),'vertices':copy.deepcopy(ring),'triangles':copy.deepcopy(surface['triangles']),'joins':joins,'freeEdges':[[list(p) for p in line.coords] for line in lines],'bounds':list(shape.bounds),'areaMeters2':shape.area,'layer':'roads','precision':'Mapped footprint and photo-supported hard paving; local join and buried side dimensions estimated.'}
+    if grounded and grounded.get('preserveNeighborOverlap'):
+        overlap=shape.intersection(neighbors)
+        parts=[overlap] if overlap.geom_type=='Polygon' else [p for p in getattr(overlap,'geoms',[]) if p.geom_type=='Polygon']
+        result['neighborOverlaps']=[{'outer':list(p.exterior.coords),'holes':[list(h.coords) for h in p.interiors]} for p in parts if p.area>1e-8]
+        if not result['neighborOverlaps']:raise ValueError('No mapped neighbor overlap to preserve')
+    return result
 
 def prepare_pavings(root=ROOT):
     read=lambda p:json.loads(p.read_text());data=read(root/'data/paving-overrides.json')

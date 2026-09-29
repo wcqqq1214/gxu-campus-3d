@@ -44,7 +44,7 @@ def check(label):
     portal_front=max(flush['pierDepth']-.03,.18) if flush else 0
     tolerance=.004 if label=='source' else .025
     ring=site['localPolygon'];xmin=min(p[0] for p in ring);xmax=max(p[0] for p in ring);ymin=min(p[1] for p in ring);ymax=max(p[1] for p in ring)
-    count=0;clearances=[];outside_errors=[]
+    count=0;clearances=[];outside_errors=[];road_ground_errors=[]
     for ix in range(math.floor((xmin-4)*2),math.ceil((xmax+4)*2)):
         for iy in range(math.floor((ymin-4)*2),math.ceil((ymax+4)*2)):
             x,y=ix/2+.13,iy/2+.17;wx,wy=world(x,y)
@@ -62,6 +62,13 @@ def check(label):
                 count+=1
             elif ring_distance((x,y),ring)>.2:
                 old,new=old_ground(wx,wy),ground(wx,wy);assert old is not None and new is not None
+                if grounded and inside((wx,wy),grounded['vertices']):
+                    # This separate, explicitly mapped repair also lowers its
+                    # own ground to preserve the configured paving clearance.
+                    expected=min(old,roads(wx,wy)-grounded.get('groundClearance',.12))
+                    road_ground_errors.append(abs(new-expected))
+                    assert abs(new-expected)<tolerance,('ground beneath repaired road',x,y,new,expected)
+                    continue
                 outside_errors.append(abs(old-new));assert abs(old-new)<tolerance,('terrain changed outside connection',x,y,old,new)
     flush='flushEntrance' in site['entry']
     rises=[];w=site['halfWidth']*2 if 'halfWidth' in site else site['entry']['stairFlight' if front else 'attachedPortico']['width']
@@ -77,10 +84,24 @@ def check(label):
         if 'terracedStairs' in site['entry']:
             stairs=site['entry']['terracedStairs']
             expected=(stairs['intermediateHeight']-stairs['baseHeight'])/stairs['lowerRisers']
+        elif 'porticoId' in site['entry']:
+            expected=(site['entry']['platformHeight']-site['stairBaseHeight'])/site['entry']['steps']
         else:expected=(site['entry']['landingHeight']-site['stairBaseHeight'])/site['entry']['stairFlight']['riserCount'] if front else .12
         rises.append(tread-paved)
         assert (abs(tread-paved-expected)<.03 if front else .085<tread-paved<.15),('stair join height',x,tread-paved)
     joins=[];max_jump=0;gap_bounds=[];max_jump_at=None
+    grades=[]
+    if 'porticoId' in site['entry']:
+        # Include the narrow end missed by the half-metre area sampling grid.
+        # Measure the actual surface across the full stair width; these are
+        # model grades, not evidence of accessibility compliance.
+        for a,c in zip(site['columns'],site['columns'][1:]):
+            x,end=(a[0]+c[0])/2,(a[1]+c[1])/2
+            start=site['startY'];length=end-start
+            heights=[path(*world(x,start+length*(.01+.98*i/10))) for i in range(11)]
+            assert all(h is not None for h in heights),('recessed connection surface hole',x)
+            grades.append(abs(heights[-1]-heights[0])/(length*.98))
+            assert all(abs(h-(heights[0]+(heights[-1]-heights[0])*i/10))<tolerance for i,h in enumerate(heights)),('connection surface fold',x)
     for a,c in zip(site['columns'],site['columns'][1:]):
         x,y=(a[0]+c[0])/2,(a[1]+c[1])/2
         wx,wy=world(x,y+.05) if front else world(x-.05,y)
@@ -95,7 +116,10 @@ def check(label):
         joins.append(abs(expected-contact));assert abs(expected-contact)<tolerance,('road contact differs from reference plane',x,y)
         previous=None
         for i in range(101):
-            xx,yy=(x,y-.3+i*.02) if front else (x+.3-i*.02,y)
+            # A very short connector may be less than 30 cm long; its stair
+            # interface is checked above, so start this scan on the paving.
+            scan_start=max(y-.3,site['startY']+.01) if front else 0
+            xx,yy=(x,scan_start+i*.02) if front else (x+.3-i*.02,y)
             h=roads(*world(xx,yy))
             if h is None:
                 # A point exactly on separate float32/material boundaries may
@@ -117,6 +141,9 @@ def check(label):
         'approachHeadroomCheckedMeters':2.1,
         'closedPortalEnvelopeDepth':portal_front,'approachObstructionStart':portal_front+.025 if flush else 0,
         'maximumOutsideTerrainError':max(outside_errors),
+        'adjacentRepairedRoadGroundSamples':len(road_ground_errors),
+        'maximumAdjacentRoadGroundError':max(road_ground_errors,default=0),
+        'recessedConnectionGradeRange':[min(grades),max(grades)] if grades else None,
         ('thresholdOffsetRange' if flush else 'stairRiseRange'):[min(rises),max(rises)],
         'maximumContactRoadPlaneError':max(joins),'maximumRoadJoinStepPer2cm':max_jump,
         'measuredMaterialGapUpperBounds':gap_bounds,'passed':True}
