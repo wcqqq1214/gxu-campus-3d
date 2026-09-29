@@ -824,3 +824,5 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 ## 结构平台独立门廊围合候选（2026-09-30）
 
 `blender/validate_civil_entry_proposal.py -- --surround --proposal=<候选JSON> --report=<独立报告>` 检查两种生成细节档的74条记录，包括屋面孔洞、柱顶环、门宽通路、石色围合及其后无重复玻璃。通过Blender执行并加 `--python-exit-code 1`。候选JSON的 `original` 保留生产基线用于缺失构件反例；前后渲染另用上轮候选作为比较基线。详见[复现命令与限制](CIVIL_PLATFORM_ENTRY_SURROUND.md)。该专项不代替生产GLB、照片配准、地形接路及性能验收。
+
+2026-09-30接续：最新联合候选另加 `--tall-surround`，共114条记录；固定墙坐标检查十扇上部窗玻璃和白框，两档均运行缺窗反例。初稿曾通过74条旧几何检查但上部窗消失，最终不能省略新增检查。复现旧74条石色围合版本时，候选生成器加 `--low-roof`。详见[比例与窗带联合验证](CIVIL_PLATFORM_ENTRY_PROPORTIONS.md)。

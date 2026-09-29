@@ -1,5 +1,7 @@
 # 结构平台门廊：中央石色围合候选
 
+> 后续已补入[比例与上部窗带联合候选](CIVIL_PLATFORM_ENTRY_PROPORTIONS.md)。本文保留历史尺寸与图片；复现本批需加 `--low-roof`。
+
 2026-09-30，接续[前后柱列与混合屋面候选](CIVIL_PLATFORM_ENTRY_PROPOSAL.md)，在同一D区估算方案中补入中央玻璃周围的石色横梁、壁柱与门头。**仍是独立候选，未替换生产模型，未通过照片配准或整栋验收。**
 
 ![中央石色围合候选](screenshots/refinement/s2-platform-entry-surround/candidate-entry.png)
@@ -33,7 +35,7 @@
 ```sh
 mkdir -p work/refinement-s2-platform-entry-surround
 work/refinement-venv/bin/python scripts/preview_civil_platform_entry.py \
-  --output work/refinement-s2-platform-entry-surround/proposal.json
+  --low-roof --output work/refinement-s2-platform-entry-surround/proposal.json
 blender --background --python-exit-code 1 \
   --python blender/validate_civil_entry_proposal.py -- --surround \
   --proposal work/refinement-s2-platform-entry-surround/proposal.json \
@@ -48,7 +50,7 @@ import json,sys
 from pathlib import Path
 sys.path.insert(0,'scripts')
 from preview_civil_platform_entry import proposal
-r=proposal(); r['original']=proposal(False)['candidate']
+r=proposal(tall_surround=False); r['original']=proposal(False)['candidate']
 Path('work/refinement-s2-platform-entry-surround/comparison.json').write_text(json.dumps(r))
 PY
 blender --background --python-exit-code 1 \

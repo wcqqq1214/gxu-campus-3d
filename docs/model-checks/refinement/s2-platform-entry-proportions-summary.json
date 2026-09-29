@@ -1,0 +1,110 @@
+{
+  "passed": true,
+  "baseCommit": "9ef70625fa9c5d4cc13e51561b8e69b194bfb879",
+  "scope": "Independent proportional alternative with bounded upper windows; not a calibrated photo fit",
+  "photoRegistrationAccepted": false,
+  "productionReady": false,
+  "wholeBuildingAccepted": false,
+  "checks": {
+    "pythonTests": 267,
+    "blenderRecords": 114,
+    "detailModes": 2,
+    "missingUpperWindowNegativeChecks": true,
+    "previousTwoCandidatesReproduced": true
+  },
+  "production": {
+    "all448ResolvedRecordsPreserved": true,
+    "modelsVerifiedInPublicAndOut": 69,
+    "productionDataAndSourceBlendUnchanged": true,
+    "modelManifestSHA256": "4772183e55d1a68ef286890737cf57fd19e69e362318e37a3be618044933c721"
+  },
+  "captures": [
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proportions/candidate-entry.png",
+      "sha256": "9df464d7d6aeb6a813fb04c6f530a89771050a33464bb01c37ce5028211a7851",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proportions/candidate-oblique.png",
+      "sha256": "bd1495612a918748a0283dc21871c49afc583842d89fb650e636facda7892367",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proportions/candidate-roof.png",
+      "sha256": "097aa21a4fed1e556cbc13d8d301ed312dd96ebdd13e76a91e7cf3bbd098231c",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proportions/original-entry.png",
+      "sha256": "f2fb416617a4cff203d15375a884f5a32ccbdee4c86582850e9b7b48734ab84a",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proportions/original-oblique.png",
+      "sha256": "8e059fef8af5fa4c81d670cb832027e0179edbf4057a02cfa6822e0e0d44fe23",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-proportions/original-roof.png",
+      "sha256": "05ffdb23abc23dffae803d0a81df18973da13534b1415ff743faeeb0d2377d4a",
+      "directlyViewed": true
+    }
+  ],
+  "assumptions": [
+    "D remains the OSM-supported location hypothesis.",
+    "Front pair at +/-5.2m around the entry; other four longitudinal positions retained; front setback 0.7m.",
+    "Two rear columns at +/-2.8m along entry and 2.65m setback are estimates, not a surveyed count.",
+    "3.6m porch depth, central five solid bays and side lattice spacing are unverified estimates.",
+    "Stone-framed central glass bay is estimated: inner piers +/-2.8m, outer piers +/-5.225m; upper beam 7.45–8m.",
+    "Side glazing continuation remains estimated; curved named fascia has not been reconstructed.",
+    "8.6m roof and 8.25m clear height form a proportional alternative, not a measured height.",
+    "Ten 1.1m by 1.4m clerestory windows are an estimated replacement row, not a surveyed count."
+  ],
+  "initialFailure": {
+    "reason": "Raising the roof removed the automatic upper window row.",
+    "captures": "work/refinement-s2-platform-entry-proportions/initial-no-clerestory",
+    "geometryOnlyReport": "work/refinement-s2-platform-entry-proportions/geometry.json",
+    "correctedBy": "Separate above-portico bounded glazing; both detail modes and omitted-row negative checks."
+  },
+  "visualFindings": [
+    "Central upper glass is taller and no longer the preceding flattened rectangle.",
+    "The explicit upper window row coexists with the raised roof, columns and glazing.",
+    "Roof curve, depth, full support layout and camera registration remain unresolved."
+  ],
+  "notRun": [
+    "Campus GLB export",
+    "Pages rebuild",
+    "Runtime performance benchmark"
+  ],
+  "inputs": {
+    "scripts/building_overrides.py": "1c9e22ecd1d9a0f103055a1313e12ec4f482e1843a4098248386faa59b922f7f",
+    "scripts/exposed_facades_data.py": "8955af85716e6d0e0991ecaf7d9ab7bfda9c609722c9354a9ae9adaae069afa3",
+    "scripts/preview_civil_platform_entry.py": "3fd0880493d75bed06a1f0f4435ddcf4b62b5a3804389273810c772be4625c95",
+    "scripts/inspect_civil_entry_proportions.py": "00c4065b4c867a3ba2d09a25fc7c8a7b6e698df84a65e68688b2b0ddd32a67c5",
+    "blender/validate_civil_entry_proposal.py": "9a3c71c968354cff618b99c18dde31bf9230cbe40dd12a1884dfd859a177ba7f",
+    "work/refinement-s2-platform-entry-proportions/proposal.json": "8f191b83d827e2144641d54f501cbc1499b5743345dba098f74e489883e70a06",
+    "work/refinement-s2-platform-entry-proportions/comparison.json": "661ea83662a0d0e38ddd7a09790c7eda6956ef6ee5b12a9440e31197080884ec"
+  },
+  "references": [
+    {
+      "path": "work/refinement-s2-platform-delivery/school2023-group.png",
+      "sha256": "0bcc3c995166d400a4dc4cc615556ab85b9adad7a34ba5d256fa827e9f0005b4",
+      "directlyViewed": true
+    },
+    {
+      "path": "work/refinement-s2-civil-location/pano-tiles/b-6-7.jpg",
+      "sha256": "3086429877ab24eab15b4e2984b477b3249fd008a994eed876e869a1954e6f34",
+      "directlyViewed": true
+    },
+    {
+      "path": "work/refinement-s2-civil-labs/new-platform-detail.png",
+      "sha256": "ec641cc368fa12462f9497557f612e903b3d1ea99968930af34707b30b26430e",
+      "directlyViewed": true
+    },
+    {
+      "path": "work/refinement-s2-platform-topology/design.jpg",
+      "sha256": "d1a25f4ca836a8e80967eb39170d817e4724b5981b60f2838221f22e75afb0de",
+      "directlyViewed": true
+    }
+  ]
+}
