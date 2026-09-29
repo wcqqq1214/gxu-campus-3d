@@ -704,6 +704,30 @@ class BuildingOverrideTests(unittest.TestCase):
             with self.subTest(patch=patch),self.assertRaisesRegex(ValueError,'shared ground datum'):
                 self.resolve(b,floorHeights=floors,**bad)
 
+    def test_recessed_steps_can_be_narrower_than_the_portico(self):
+        b,v=self.portico_fixture()
+        v['entrances'][0].update(stepWidth=8,stepFoundationDepth=.15)
+        e=self.resolve(b,**v)['form']['entrances'][0]
+        self.assertEqual(e['stepWidth'],8)
+        self.assertEqual(e['porticoWidth'],14)
+        self.assertEqual(e['stepFoundationDepth'],.15)
+        # Moving the door toward the end reduces the usable symmetric span.
+        v['entrances'][0].update(t=.25,width=2,stepWidth=8)
+        with self.assertRaisesRegex(ValueError,'fit the portico frontage'):
+            self.resolve(b,**v)
+
+    def test_recessed_step_dimensions_reject_invalid_or_unbounded_values(self):
+        b,v=self.portico_fixture()
+        for key,values in [('stepWidth',[True,float('nan'),float('inf'),6,15]),
+                           ('stepFoundationDepth',[True,float('nan'),0,-.1,.31])]:
+            for value in values:
+                bad=copy.deepcopy(v);bad['entrances'][0][key]=value
+                with self.subTest(key=key,value=value),self.assertRaises(ValueError):self.resolve(b,**bad)
+        for key in ['stepWidth','stepFoundationDepth']:
+            bad=copy.deepcopy(v);del bad['entrances'][0]['recess'];bad['entrances'][0][key]=.15
+            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'require a recessed entrance'):
+                self.resolve(b,**bad)
+
     def test_round_portico_columns_validate_shape_and_diameter(self):
         b,v=self.portico_fixture()
         for c in v['parts'][1]['openBelow']['columns']:c['shape']='cylinder'
