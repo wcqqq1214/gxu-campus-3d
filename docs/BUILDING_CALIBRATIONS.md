@@ -66,6 +66,7 @@
 - `parts` 是已有轮廓的完整分区，每部分明确 `id`、`polygons`、`height`、`levels`；可选 `roof` 必须同时给出类型与起坡高度，分部依据写入 `parts` 的证据。拒绝越界、重叠、缺口、填内院及最高部分与主体高度不一致；不使用一套新轮廓替代原始建筑记录。
 - 分部坡屋面可选 `parts.roof.mesh`：`vertices` 为校园XY及相对主体顶面的增高，`triangles` 为扁平整数索引；限4–128顶点、最多256个三角面。显式网络须完整覆盖所属轮廓、内部共边连续、无重叠或退化面、檐口增高为零且最高点等于 `rise`。解析后生成普通 `roof.geometry`，两个LOD共用；平顶不接受该字段。首次应用及估算边界见[土木北翼](CIVIL_REAR_MASSING.md)。
 - 分部 `roof.type: "profiled"` 必须提供完整显式网格与正抬升，最低点接主体顶，抬升边缘自动补外向侧墙；仅用于封闭主体，材质为既有浅色屋面。投影仍需完整覆盖原分部，不能填孔洞或重叠。`hipped/gabled` 的零抬升檐口约束保持。见[门厅上升屋面](CIVIL_PLATFORM_FOYER_ROOF.md)。
+- 分部 `roof.rim` 用 `edges: [[polygonIndex, edgeIndex], …]` 选择分部外环边，`width` 为内收宽度（0.15–0.8米），`height` 为当地屋面以上高度（0.1–0.8米）。仅支持连续平屋面和 `profiled` 屋面，替换该分部全部通用女儿墙，未选边保持开放。边带合并后按支撑三角面求高程，裁在原占地内；见[门厅檐口与柱廊薄边框](CIVIL_PLATFORM_ROOF_RIMS.md)。
 - `exposedFacadeRules.region: "under-portico"` 允许在封闭分部与开放平顶柱廊的内部完整共边上表达柱后玻璃；仅接受显式玻璃面板和 `windows: false, balconies: false`，检查地坪/板底净距、框体边界及柱子碰撞。普通外立面面板仍限制在3.2米以上，不以玻璃面板声明门位。见[结构平台柱后玻璃](CIVIL_PLATFORM_PORTICO_GLAZING.md)。
 - `parts.wallFinish` 可选 `"white"`，复用白色墙面材质，覆盖该分部实体、开放顶板侧面及柱；未指定时保持原建筑墙色。拒绝其他值，不引入自定义贴图或材质。当前用于[结构平台六分部修正](CIVIL_PLATFORM_REPARTITION.md)。
 - `parts.openBelow` 可表达一层平顶门廊，显式指定地板、板底和方柱；验证高度次序、柱位与重叠。相邻主体墙在低屋面以上补充可见窗列，柱间不生成普通外窗。

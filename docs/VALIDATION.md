@@ -1,5 +1,7 @@
 # 验收记录
 
+2026-09-30屋面外缘接续：[门厅檐口与柱廊薄边框](CIVIL_PLATFORM_ROOF_RIMS.md)通过247项Python、62项Node、类型检查、lint及源/基础/近景各502项专项检查。参数追加 `--roof-rim`；旧模型在新增浅色檐口位置失败。宽度、标高与外向侧面按独立固定坐标检查，真实断面和尺寸仍为估算。两轮性能精细/流畅均为60/30 FPS且数值预算通过，但分别存在持续和短时外部Python活动；同条件性能及联合验收待复验，[汇总](model-checks/refinement/s2-platform-rim-summary.json)。
+
 2026-09-29屋面接续：[连接门厅上升屋面](CIVIL_PLATFORM_FOYER_ROOF.md)通过244项Python、最终62项Node、类型检查及lint，源/基础/近景各456项专项检查通过。当前平台参数追加 `--foyer-profile`，旧平顶在新坡高预期失败；投影面积检查排查重复顶盖。坡高与曲率仍为估算。11张对照及6张回归画面核看；同条件精细/流畅三轮60/60/60、30/30/30 FPS，原预算通过，[汇总](model-checks/refinement/s2-platform-profile-summary.json)。
 
 2026-09-29柱廊接续：[柱后玻璃](CIVIL_PLATFORM_PORTICO_GLAZING.md)通过241项Python、62项Node、类型检查、lint及源/基础/近景各441项专项检查，旧白墙模型在新增玻璃点失败。当前平台检查参数在 `--repartition` 后追加 `--portico-glass`；入口和屋面仍待校准。 精细/流畅三轮分别60/60/60与30/30/30 FPS，原预算通过，[汇总](model-checks/refinement/s2-platform-glass-summary.json)。

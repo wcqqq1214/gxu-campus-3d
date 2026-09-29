@@ -1,0 +1,427 @@
+{
+  "checkedAt": "2026-09-29T16:12:56.067067+00:00",
+  "passed": false,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": false,
+  "pending": [
+    "Hall roof slope, south delivery entrance and road connection",
+    "North office remaining elevations, actual rooftop use/details and personnel entrance",
+    "North low wing and foyer partition depths, levels, roof shape and dimensions; true glazing dimensions",
+    "Separate historical old hall footprint and demolition timing"
+  ],
+  "baseCommit": "c70b147641e3769b138204a161757180a114bc94",
+  "branch": "dev",
+  "scope": "Inset white rim follows the existing foyer profile on exposed sides, width 0.35 m and rise 0.45 m; portico exterior rim width 0.35 m and rise 0.18 m replaces the generic parapet. Body partitions, roof surfaces, columns, glazing and entries preserved. Rim dimensions, true curvature, drainage and entry registration remain estimates or unverified. Partial implementation only.",
+  "blenderVersion": "5.2.2",
+  "photoRegistrationAccepted": false,
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 247,
+  "nodeTests": 62,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4202891,
+        "medianDrawCalls": 554
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.551607992198847,
+        "medianDrawCalls": 1.279707495429605
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1164793,
+        "medianDrawCalls": 295
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 10.727557049085256,
+        "medianDrawCalls": 12.16730038022813
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [
+    {
+      "at": "2026-09-29T16:09:03.381416+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 3.0,
+      "elapsed": "09:08",
+      "cumulativeCPUTime": "0:17.98",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:03.381416+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 96.4,
+      "elapsed": "09:08",
+      "cumulativeCPUTime": "9:00.64",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:13.481995+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 3.7,
+      "elapsed": "09:18",
+      "cumulativeCPUTime": "0:18.49",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:13.481995+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 96.6,
+      "elapsed": "09:18",
+      "cumulativeCPUTime": "9:10.35",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:23.541454+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 2.6,
+      "elapsed": "09:28",
+      "cumulativeCPUTime": "0:18.91",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:23.541454+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 98.8,
+      "elapsed": "09:28",
+      "cumulativeCPUTime": "9:20.32",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:33.645209+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 3.7,
+      "elapsed": "09:38",
+      "cumulativeCPUTime": "0:19.37",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:33.645209+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 97.1,
+      "elapsed": "09:38",
+      "cumulativeCPUTime": "9:30.12",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:44.972750+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 6.0,
+      "elapsed": "09:49",
+      "cumulativeCPUTime": "9:38.77",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:55.041921+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 3.3,
+      "elapsed": "10:00",
+      "cumulativeCPUTime": "0:20.51",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:09:55.041921+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 99.0,
+      "elapsed": "10:00",
+      "cumulativeCPUTime": "9:48.50",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:05.168573+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 3.1,
+      "elapsed": "10:10",
+      "cumulativeCPUTime": "0:20.93",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:05.168573+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 68.7,
+      "elapsed": "10:10",
+      "cumulativeCPUTime": "9:58.28",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:15.239474+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 5.8,
+      "elapsed": "10:20",
+      "cumulativeCPUTime": "0:21.42",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:15.239474+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 100.0,
+      "elapsed": "10:20",
+      "cumulativeCPUTime": "10:08.14",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:25.296919+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 3.0,
+      "elapsed": "10:30",
+      "cumulativeCPUTime": "0:21.89",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:25.296919+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 98.2,
+      "elapsed": "10:30",
+      "cumulativeCPUTime": "10:18.09",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:45.397448+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 3.3,
+      "elapsed": "10:50",
+      "cumulativeCPUTime": "0:22.70",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:45.397448+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 99.2,
+      "elapsed": "10:50",
+      "cumulativeCPUTime": "10:37.78",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:55.485076+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 6.8,
+      "elapsed": "11:00",
+      "cumulativeCPUTime": "0:23.07",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:10:55.485076+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 96.6,
+      "elapsed": "11:00",
+      "cumulativeCPUTime": "10:47.30",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:05.536332+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 4.3,
+      "elapsed": "11:10",
+      "cumulativeCPUTime": "0:23.52",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:05.536332+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 99.6,
+      "elapsed": "11:10",
+      "cumulativeCPUTime": "10:55.77",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:15.579157+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 99.7,
+      "elapsed": "11:20",
+      "cumulativeCPUTime": "11:05.14",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:25.619744+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 3.7,
+      "elapsed": "11:30",
+      "cumulativeCPUTime": "0:24.21",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:25.619744+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 99.2,
+      "elapsed": "11:30",
+      "cumulativeCPUTime": "11:15.13",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:35.657674+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 2.0,
+      "elapsed": "11:40",
+      "cumulativeCPUTime": "0:24.49",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:35.657674+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 100.0,
+      "elapsed": "11:40",
+      "cumulativeCPUTime": "11:25.13",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:45.691747+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 99.7,
+      "elapsed": "11:50",
+      "cumulativeCPUTime": "11:35.11",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:55.735645+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 4.1,
+      "elapsed": "12:00",
+      "cumulativeCPUTime": "0:25.07",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:11:55.735645+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 100.0,
+      "elapsed": "12:00",
+      "cumulativeCPUTime": "11:45.09",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:12:05.775432+00:00",
+      "pid": 64695,
+      "parentPid": 70296,
+      "cpuPercent": 3.7,
+      "elapsed": "12:10",
+      "cumulativeCPUTime": "0:25.38",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    },
+    {
+      "at": "2026-09-29T16:12:05.775432+00:00",
+      "pid": 64704,
+      "parentPid": 64695,
+      "cpuPercent": 99.6,
+      "elapsed": "12:10",
+      "cumulativeCPUTime": "11:55.06",
+      "executable": "/Users/wcqqq1214/Project/Landslide-Warning/environments/tide/.venv/bin/python"
+    }
+  ],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5399880,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "65d444cdcc5d1678a5dae1901d10cf9d14c2d9501049ccc16c6fbecfd76c6f81",
+    "data/building-sources.json": "dd25067d6c0af395fd22f18fa605cd374799eff783d1bc625f2e5b9838004712",
+    "blender/gxu-campus.blend": "f759dd3bdbb1cc8a6c7d0676e7a52fb5f87cba676a906c8be1efb49a2b013ec3",
+    "blender/generic_buildings.py": "ad58dcb01732569acd5b63d932cfeb3cbabf841bb56b746e62d86374259b99b3",
+    "scripts/building_overrides.py": "7abef752a78abe36a98e268b321a2c2561ca7d34bbe91518de86be15f4f66214",
+    "scripts/roof_volumes_data.py": "d97e7359e1be7150d33e07285b36aae7b7d9984309a934a0932c6ec4de946cb8",
+    "scripts/explicit_roof_data.py": "ef5bb57eaf7fe8bea25c41ce39cdd4f32183d3c0974830ef92b40aa79d844d92",
+    "scripts/roof_rim_data.py": "5528f95f901dc099c3c9e878d2006c4ab11ddb269e6eacdf32e61079290a911b",
+    "scripts/exposed_facades_data.py": "d7218fed11d69817221e67f74627549d28f6b54421a4d1246f3f56f318d4360d",
+    "scripts/facade_panels_data.py": "087ea41d3cab30e7b51408245a85bb77cb03d67eed34242685f4e04badc14820",
+    "blender/validate_generic.py": "a13873c9f4f1d4e9bf25db53bd80b6d0c41577b360f4b183d78680f7cba6041c",
+    "blender/validate_civil_platform.py": "c6181e47d608a86cb8c9f029b6ea82ca75c5aefef2cbbbd188e5c34d2e48d2b9",
+    "public/data/buildings.json": "e4b76fd28e24aaab9f2b5ba20098eb5ce7d8418409c5a802d6238a1ad6a72a42",
+    "public/data/sources.json": "fdc8f5484b919a271503a5f34e445467df6488f5ea8776a9f150962c3a537c1f",
+    "public/data/models.json": "91acc2dba70bb8abdc7d96e575a74f0cfa12088b05945b7448e65da89a11993b"
+  }
+}
