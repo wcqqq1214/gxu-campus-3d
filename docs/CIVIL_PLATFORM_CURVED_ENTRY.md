@@ -4,6 +4,8 @@
 
 ![曲线前缘与加深门廊](screenshots/refinement/s2-platform-curved-entry/candidate-oblique.png)
 
+后续已完成[有界相机与柱距候选](CIVIL_PLATFORM_CAMERA_ALIGNMENT.md)；本文保留本批参数，复现时须加 `--wide-columns`。
+
 ## 本次联合变更
 
 | 部位 | 上一候选 | 本候选 |
@@ -39,14 +41,14 @@
 ```sh
 mkdir -p work/refinement-s2-platform-curved-entry
 work/refinement-venv/bin/python scripts/preview_civil_platform_entry.py \
-  --output work/refinement-s2-platform-curved-entry/proposal.json
+  --wide-columns --output work/refinement-s2-platform-curved-entry/proposal.json
 blender --background --python-exit-code 1 \
   --python blender/validate_civil_entry_proposal.py -- --surround --tall-surround --curved-roof \
   --proposal work/refinement-s2-platform-curved-entry/proposal.json \
   --report work/refinement-s2-platform-curved-entry/geometry-rerun.json
 ```
 
-`--straight-roof` 复现上一版3.6米进深的直线前缘；`--low-roof` 与 `--without-surround` 分别复现更早两版。前后渲染用 `r=proposal(); r['original']=proposal(curved_roof=False)['candidate']` 写比较JSON，再交给 `render_civil_entry_proposal.py -- --eye-level --proposal=<比较JSON> --output=<独立目录>`。
+`--straight-roof` 复现上一版3.6米进深的直线前缘；`--low-roof` 与 `--without-surround` 分别复现更早两版。前后渲染用 `r=proposal(refined_columns=False); r['original']=proposal(curved_roof=False)['candidate']` 写比较JSON，再交给 `render_civil_entry_proposal.py -- --eye-level --proposal=<比较JSON> --output=<独立目录>`。
 
 ## 下一步
 

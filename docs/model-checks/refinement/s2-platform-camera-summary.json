@@ -1,0 +1,175 @@
+{
+  "passed": true,
+  "baseCommit": "ffc02341768a26ba02f1289491b48809e704de46",
+  "scope": "Bounded single-image camera/column hypothesis and isolated candidate; not production or whole-building acceptance",
+  "photoRegistrationAccepted": false,
+  "productionReady": false,
+  "wholeBuildingAccepted": false,
+  "checks": {
+    "pythonTests": 272,
+    "blenderRecords": 184,
+    "detailModes": 2,
+    "previous166RecordMeshRegression": true,
+    "genericFacadeRotationRegressionDegrees": [
+      0,
+      90,
+      31.14
+    ],
+    "cameraProjectionRecords": 8,
+    "cameraProjectionMaxErrorPixels": 0.002132694339904893
+  },
+  "production": {
+    "all448ResolvedRecordsPreserved": true,
+    "modelsVerifiedInPublicAndOut": 69,
+    "productionDataAndSourceBlendUnchanged": true,
+    "modelManifestSHA256": "4772183e55d1a68ef286890737cf57fd19e69e362318e37a3be618044933c721",
+    "previousCandidateReproduced": true,
+    "allSixPartFootprintsPreserved": true,
+    "entryParametersPreserved": true
+  },
+  "fit": {
+    "fixedGeometry": {
+      "geometry": {
+        "frontHalfSpan": 5.2,
+        "rearHalfSpan": 2.8,
+        "rearSetback": 4.7,
+        "frontClearance": 0.6
+      },
+      "landmarkRmsPixels": 24.924461689312807,
+      "roofRmsPixels": 17.736959298004134,
+      "activeBounds": [
+        5,
+        6
+      ]
+    },
+    "jointFit": {
+      "geometry": {
+        "frontHalfSpan": 3.953310302858576,
+        "rearHalfSpan": 2.3293249626023265,
+        "rearSetback": 3.78324604364286,
+        "frontClearance": 0.9798618792206
+      },
+      "landmarkRmsPixels": 5.552433583165373,
+      "roofRmsPixels": 2.532801522940313,
+      "activeBounds": []
+    },
+    "roundedCandidate": {
+      "geometry": {
+        "frontHalfSpan": 4.0,
+        "rearHalfSpan": 2.35,
+        "rearSetback": 3.8,
+        "frontClearance": 1.0
+      },
+      "landmarkRmsPixels": 5.653307086721912,
+      "roofRmsPixels": 2.3207167996538565,
+      "activeBounds": []
+    }
+  },
+  "camera": {
+    "focalPixels": 478.26737843631736,
+    "outwardDistance": 6.474164600823062,
+    "rightOffset": 0.6769003632169222,
+    "height": 1.65,
+    "yaw": 0.050182754559597864,
+    "pitch": 0.1419369600976869,
+    "roll": -0.02174295507834023,
+    "principalPoint": [
+      427.5,
+      385.66575350859944
+    ],
+    "imageSize": [
+      855,
+      570
+    ]
+  },
+  "mullionsNotUsedInPoseFitRmsPixels": 6.4257702232219565,
+  "source": {
+    "article": "https://tmjz.gxu.edu.cn/info/1452/6575.htm",
+    "image": "https://tmjz.gxu.edu.cn/__local/B/11/E5/A12DDA85D1E7598DA582B485BE1_12A98A97_61751.png",
+    "localReference": "work/refinement-s2-platform-delivery/school2023-group.png",
+    "imageSHA256": "0bcc3c995166d400a4dc4cc615556ab85b9adad7a34ba5d256fa827e9f0005b4"
+  },
+  "captures": [
+    {
+      "path": "docs/screenshots/refinement/s2-platform-camera/candidate-entry.png",
+      "sha256": "8ca5045d8386664ee0ec00e817ed68691dc26d14d88aa501a92e8588c8d3e6a0",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-camera/candidate-oblique.png",
+      "sha256": "ad70db7fff7e03dc621df0c8b1ca61b93b4214db8424d8e3ede38f87fe3646f5",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-camera/candidate-photo.png",
+      "sha256": "07a998d184cc16106010adf38011dbd34df6c9ce02a8cd3a447712dd890de4e2",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-camera/candidate-roof.png",
+      "sha256": "07803b334484aa3bbbf28086a36b3f89d1afdc1ed960b0f10568b338e9e6a739",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-camera/original-entry.png",
+      "sha256": "a3b47a6efebe59ebc051526aa82f1a3ef1d4b856db757710ede2b63e8120572d",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-camera/original-oblique.png",
+      "sha256": "37db5ce6cc7cfa6061a5aa045a32ae3ee659021e6f07296c14c7286365d2334d",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-camera/original-photo.png",
+      "sha256": "1faa42bbe6dfb72321cdebd9dca6bd8880b306f2136b3f86be448abec1f77705",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-camera/original-roof.png",
+      "sha256": "38a84324ffce31d830d5c3a8e028a9c442f4ffa3d16ca0aa9a6a94f074358f10",
+      "directlyViewed": true
+    }
+  ],
+  "earlierCornerAttempt": {
+    "report": "work/refinement-s2-platform-camera/rectangular-picks-fit.json",
+    "reportSHA256": "fe46d6d37163bd396fd4c0ab03912de655650e9bcbd16da66ef8c48562125511",
+    "renders": "work/refinement-s2-platform-camera/rectangular-picks-renders",
+    "superseded": true
+  },
+  "limitations": [
+    "Manual correspondences and an uncalibrated pinhole model; principal y absorbs unknown cropping.",
+    "Fixed camera height and assumed metre dimensions prevent treating this as a metric survey.",
+    "Sensitivity trials are bounded alternatives, not statistical confidence intervals.",
+    "No independent aerial registration, lens correction, complete column count or production acceptance.",
+    "Fascia finish, capitals and side lattice remain unfinished.",
+    "Eight total columns remain an assumption."
+  ],
+  "next": [
+    "Finish stone fascia, capitals and side lattice consistency.",
+    "Integrate the estimated candidate with production, terrain/path, GLB and performance checks.",
+    "Continue hall transport opening, remaining roofs/north block and separate old-hall evidence."
+  ],
+  "notRun": [
+    "Campus GLB export",
+    "Pages rebuild",
+    "Runtime performance benchmark"
+  ],
+  "inputs": {
+    "scripts/fit_civil_entry_camera.py": "ebc13fe98a95730edd5358e174812e2c639bd0175ebf63433f20db2834493184",
+    "scripts/test_civil_entry_camera.py": "e2063f7d559c4fe9dde6708568e246026f9fe12fd526eec693d11628a763089e",
+    "scripts/preview_civil_platform_entry.py": "93d1908933c966eee602af7afd4cb92dbab23b01b0d4c63bcebff875a3683d5e",
+    "scripts/facade_panels_data.py": "cec33511afde1b8fbeda6dfa2e29795f1aec728f691146fdf5d3eb99857c0af0",
+    "scripts/test_exposed_facades_data.py": "19575a9f81cda163a7a684025279e23e6df8ab1ba25e574024bb361d1ecebde5",
+    "blender/facade_panels.py": "fca6cf1c1c3119432be1bfd096dc8e0c6a961034e2d2ae77a55292cfb96e493a",
+    "blender/render_civil_entry_proposal.py": "fba4a0d7fba013280a87233d3700c278f65eaa8b501edf5fd760749b69b8d697",
+    "blender/validate_civil_entry_proposal.py": "49a073041c7cdcdd9ae43aaf8273566b89f3c1379a10ac33f02f0ccdeeeb4029",
+    "work/refinement-s2-platform-camera/proposal.json": "05ee3796dc4bd10bb298347f07145e59be488fb290d5400131582ae98f64c153",
+    "work/refinement-s2-platform-camera/comparison.json": "bc60ff5c61908ca659dbf01318a0d0b08907f1459f178e58abad303eedbefc7d",
+    "work/refinement-s2-platform-camera/before.json": "c3e6a3c6b0856bd3d61f0ff8aeaab39ba03b7ab0836c671e82c13914e32d2f26",
+    "work/refinement-s2-platform-camera/fit.json": "63f6fe4458a441cc9f2d64fd6a9cd47bb35415fc39f137ee074799d50f1ed1aa",
+    "work/refinement-s2-platform-camera/geometry.json": "ab67e300a0f71a04e115b66c001f69f537d6471f57a0bc15df82db26fff22c30",
+    "work/refinement-s2-platform-camera/previous-geometry.json": "c9b190d1510292365a4448d67126030d2559c341577f1cc36b91d0e4d57e2e43",
+    "work/refinement-s2-platform-camera/python-tests.log": "53ec0aae92f30fc45e5cb65a9609604a594913e8bf8aea0f908fde894316d873"
+  }
+}

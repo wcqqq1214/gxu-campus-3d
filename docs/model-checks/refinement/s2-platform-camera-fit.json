@@ -1,0 +1,638 @@
+{
+  "status": "bounded-single-image-hypothesis",
+  "sourceURL": "https://tmjz.gxu.edu.cn/info/1452/6575.htm",
+  "imageURL": "https://tmjz.gxu.edu.cn/__local/B/11/E5/A12DDA85D1E7598DA582B485BE1_12A98A97_61751.png",
+  "imageSize": [
+    855,
+    570
+  ],
+  "landmarks": [
+    {
+      "name": "glass-tl",
+      "pixel": [
+        284.0,
+        239.0
+      ]
+    },
+    {
+      "name": "glass-tr",
+      "pixel": [
+        459.0,
+        240.0
+      ]
+    },
+    {
+      "name": "glass-br",
+      "pixel": [
+        461.0,
+        357.0
+      ]
+    },
+    {
+      "name": "glass-bl",
+      "pixel": [
+        280.0,
+        357.0
+      ]
+    },
+    {
+      "name": "front-left",
+      "pixel": [
+        150.0,
+        96.0
+      ]
+    },
+    {
+      "name": "front-right",
+      "pixel": [
+        580.0,
+        97.0
+      ]
+    },
+    {
+      "name": "rear-left",
+      "pixel": [
+        269.0,
+        166.0
+      ]
+    },
+    {
+      "name": "rear-right",
+      "pixel": [
+        473.0,
+        166.0
+      ]
+    }
+  ],
+  "roofSamples": [
+    {
+      "x": 80.0,
+      "y": 47.0
+    },
+    {
+      "x": 427.0,
+      "y": 64.0
+    },
+    {
+      "x": 760.0,
+      "y": 44.0
+    }
+  ],
+  "cameraHeightAssumedM": 1.65,
+  "principalXFixed": 427.5,
+  "parameterBounds": {
+    "lower": [
+      250.0,
+      3.0,
+      -5.0,
+      1.3,
+      -0.4,
+      -0.1,
+      -0.1,
+      3.0,
+      2.2,
+      2.0,
+      0.4,
+      100.0
+    ],
+    "upper": [
+      1800.0,
+      50.0,
+      5.0,
+      2.5,
+      0.4,
+      0.55,
+      0.1,
+      6.0,
+      3.5,
+      5.3,
+      1.5,
+      700.0
+    ]
+  },
+  "fixedGeometry": {
+    "parameters": [
+      491.872017624415,
+      9.010588828546398,
+      4.587394881347809,
+      1.65,
+      -0.163403353116713,
+      -0.1,
+      0.1,
+      5.2,
+      2.8,
+      4.7,
+      0.6,
+      478.10730232144994
+    ],
+    "geometry": {
+      "frontHalfSpan": 5.2,
+      "rearHalfSpan": 2.8,
+      "rearSetback": 4.7,
+      "frontClearance": 0.6
+    },
+    "camera": {
+      "focalPixels": 491.872017624415,
+      "outwardDistance": 9.010588828546398,
+      "rightOffset": 4.587394881347809,
+      "height": 1.65,
+      "yaw": -0.163403353116713,
+      "pitch": -0.1,
+      "roll": 0.1,
+      "principalPoint": [
+        427.5,
+        478.10730232144994
+      ],
+      "imageSize": [
+        855,
+        570
+      ]
+    },
+    "landmarkRmsPixels": 24.924461689312807,
+    "roofRmsPixels": 17.736959298004134,
+    "predictions": [
+      [
+        305.8629785795433,
+        226.04247119235868
+      ],
+      [
+        462.03480896150455,
+        231.3108729735368
+      ],
+      [
+        450.63246153021447,
+        342.83437306203774
+      ],
+      [
+        298.26558046833355,
+        332.0135423223168
+      ],
+      [
+        102.30394972721479,
+        94.60076126310116
+      ],
+      [
+        587.7622953705437,
+        88.18405821147581
+      ],
+      [
+        278.82322028481303,
+        179.32697071581566
+      ],
+      [
+        474.7611356159271,
+        182.76532325224065
+      ]
+    ],
+    "roofPredictions": [
+      75.07299557596923,
+      76.34284625680407,
+      45.833096039403294
+    ],
+    "activeBounds": [
+      5,
+      6
+    ],
+    "starts": [
+      {
+        "distance": 5,
+        "residualNorm": 77.7032137384629,
+        "iterations": 180
+      },
+      {
+        "distance": 9,
+        "residualNorm": 77.45383873438082,
+        "iterations": 180
+      },
+      {
+        "distance": 16,
+        "residualNorm": 76.9001267842475,
+        "iterations": 180
+      },
+      {
+        "distance": 30,
+        "residualNorm": 78.17343347077592,
+        "iterations": 180
+      }
+    ]
+  },
+  "jointFit": {
+    "parameters": [
+      484.2506004868876,
+      6.730275410342093,
+      0.5370147292250564,
+      1.65,
+      0.058074648773109416,
+      0.10838881347945115,
+      -0.027480252599401525,
+      3.953310302858576,
+      2.3293249626023265,
+      3.78324604364286,
+      0.9798618792206,
+      401.1636445445438
+    ],
+    "geometry": {
+      "frontHalfSpan": 3.953310302858576,
+      "rearHalfSpan": 2.3293249626023265,
+      "rearSetback": 3.78324604364286,
+      "frontClearance": 0.9798618792206
+    },
+    "camera": {
+      "focalPixels": 484.2506004868876,
+      "outwardDistance": 6.730275410342093,
+      "rightOffset": 0.5370147292250564,
+      "height": 1.65,
+      "yaw": 0.058074648773109416,
+      "pitch": 0.10838881347945115,
+      "roll": -0.027480252599401525,
+      "principalPoint": [
+        427.5,
+        401.1636445445438
+      ],
+      "imageSize": [
+        855,
+        570
+      ]
+    },
+    "landmarkRmsPixels": 5.552433583165373,
+    "roofRmsPixels": 2.532801522940313,
+    "predictions": [
+      [
+        285.03631436659686,
+        239.40927870823373
+      ],
+      [
+        465.3489163417841,
+        239.07532272994143
+      ],
+      [
+        469.6539871268306,
+        354.31821434697497
+      ],
+      [
+        284.4815400580936,
+        357.22181710006885
+      ],
+      [
+        143.9489708528899,
+        94.01278149131736
+      ],
+      [
+        573.21695842387,
+        100.43782114461459
+      ],
+      [
+        267.887535742775,
+        165.4304002438757
+      ],
+      [
+        471.8227397649206,
+        166.82087393432963
+      ]
+    ],
+    "roofPredictions": [
+      46.280033408155404,
+      62.10363636499658,
+      47.88982052725966
+    ],
+    "activeBounds": [],
+    "starts": [
+      {
+        "distance": 5,
+        "residualNorm": 16.305870115621804,
+        "iterations": 85
+      },
+      {
+        "distance": 9,
+        "residualNorm": 16.305870115621836,
+        "iterations": 75
+      },
+      {
+        "distance": 16,
+        "residualNorm": 16.30587011562182,
+        "iterations": 76
+      },
+      {
+        "distance": 30,
+        "residualNorm": 16.305870115621783,
+        "iterations": 180
+      }
+    ]
+  },
+  "roundedCandidate": {
+    "parameters": [
+      478.26737843631736,
+      6.474164600823062,
+      0.6769003632169222,
+      1.65,
+      0.050182754559597864,
+      0.1419369600976869,
+      -0.02174295507834023,
+      4.0,
+      2.35,
+      3.8,
+      1.0,
+      385.66575350859944
+    ],
+    "geometry": {
+      "frontHalfSpan": 4.0,
+      "rearHalfSpan": 2.35,
+      "rearSetback": 3.8,
+      "frontClearance": 1.0
+    },
+    "camera": {
+      "focalPixels": 478.26737843631736,
+      "outwardDistance": 6.474164600823062,
+      "rightOffset": 0.6769003632169222,
+      "height": 1.65,
+      "yaw": 0.050182754559597864,
+      "pitch": 0.1419369600976869,
+      "roll": -0.02174295507834023,
+      "principalPoint": [
+        427.5,
+        385.66575350859944
+      ],
+      "imageSize": [
+        855,
+        570
+      ]
+    },
+    "landmarkRmsPixels": 5.653307086721912,
+    "roofRmsPixels": 2.3207167996538565,
+    "predictions": [
+      [
+        285.9781377874245,
+        239.00907327407037
+      ],
+      [
+        465.5185913685066,
+        239.1166802297472
+      ],
+      [
+        469.486275843861,
+        353.70749934729344
+      ],
+      [
+        283.46786404286087,
+        355.8218363640971
+      ],
+      [
+        142.77104237563742,
+        94.70553004865366
+      ],
+      [
+        573.9989094631771,
+        101.24385333674184
+      ],
+      [
+        268.0139406784217,
+        165.99603251462023
+      ],
+      [
+        472.22989120511915,
+        167.64310827143527
+      ]
+    ],
+    "roofPredictions": [
+      46.283537109787346,
+      62.038349746373335,
+      47.43449976007882
+    ],
+    "activeBounds": [],
+    "starts": [
+      {
+        "distance": 5,
+        "residualNorm": 16.487456672477677,
+        "iterations": 50
+      },
+      {
+        "distance": 9,
+        "residualNorm": 16.48745667247767,
+        "iterations": 48
+      },
+      {
+        "distance": 16,
+        "residualNorm": 16.4874566724777,
+        "iterations": 40
+      },
+      {
+        "distance": 30,
+        "residualNorm": 16.48745667247768,
+        "iterations": 40
+      }
+    ]
+  },
+  "sensitivity": [
+    {
+      "kind": "assumed-height",
+      "height": 1.4,
+      "geometry": {
+        "frontHalfSpan": 3.997649301696798,
+        "rearHalfSpan": 2.3412962763825886,
+        "rearSetback": 3.7999640826724024,
+        "frontClearance": 0.989214486968116
+      },
+      "landmarkRmsPixels": 5.3291233866253265
+    },
+    {
+      "kind": "assumed-height",
+      "height": 1.9,
+      "geometry": {
+        "frontHalfSpan": 3.9077288855861934,
+        "rearHalfSpan": 2.3171260368961613,
+        "rearSetback": 3.764866632661268,
+        "frontClearance": 0.9700994699057536
+      },
+      "landmarkRmsPixels": 5.792447029130787
+    },
+    {
+      "kind": "two-pixel-perturbation",
+      "sample": 0,
+      "geometry": {
+        "frontHalfSpan": 3.9401249199018515,
+        "rearHalfSpan": 2.310904977705862,
+        "rearSetback": 3.809216170975059,
+        "frontClearance": 1.0396704790959843
+      },
+      "landmarkRmsPixels": 5.8100372348509515
+    },
+    {
+      "kind": "two-pixel-perturbation",
+      "sample": 1,
+      "geometry": {
+        "frontHalfSpan": 3.974720378446547,
+        "rearHalfSpan": 2.3519712466308955,
+        "rearSetback": 3.725524234991532,
+        "frontClearance": 0.9986284586984544
+      },
+      "landmarkRmsPixels": 5.973842407071372
+    },
+    {
+      "kind": "two-pixel-perturbation",
+      "sample": 2,
+      "geometry": {
+        "frontHalfSpan": 3.9467198943567148,
+        "rearHalfSpan": 2.3199212415252184,
+        "rearSetback": 3.7986895137264503,
+        "frontClearance": 0.9439296852065708
+      },
+      "landmarkRmsPixels": 5.834929268798574
+    }
+  ],
+  "earlierRectangularCornerPicks": {
+    "observed": [
+      [
+        284.0,
+        241.0
+      ],
+      [
+        460.0,
+        241.0
+      ],
+      [
+        460.0,
+        357.0
+      ],
+      [
+        284.0,
+        357.0
+      ],
+      [
+        150.0,
+        96.0
+      ],
+      [
+        580.0,
+        97.0
+      ],
+      [
+        269.0,
+        166.0
+      ],
+      [
+        473.0,
+        166.0
+      ]
+    ],
+    "geometry": {
+      "frontHalfSpan": 3.954460702114624,
+      "rearHalfSpan": 2.3354081339328934,
+      "rearSetback": 3.810175551498438,
+      "frontClearance": 0.9795703748557898
+    },
+    "camera": {
+      "focalPixels": 487.08762864720256,
+      "outwardDistance": 7.47889253308621,
+      "rightOffset": 0.2534990823073855,
+      "height": 1.65,
+      "yaw": 0.07034228907384305,
+      "pitch": -0.004416947401895896,
+      "roll": -0.03764644632959169,
+      "principalPoint": [
+        427.5,
+        453.02106593980193
+      ],
+      "imageSize": [
+        855,
+        570
+      ]
+    },
+    "landmarkRmsPixels": 5.182027094806465
+  },
+  "mullionsNotUsedInPoseFit": {
+    "observed": [
+      [
+        313,
+        284
+      ],
+      [
+        342,
+        284
+      ],
+      [
+        371,
+        284
+      ],
+      [
+        400,
+        284
+      ],
+      [
+        429,
+        284
+      ],
+      [
+        313,
+        313
+      ],
+      [
+        342,
+        313
+      ],
+      [
+        371,
+        313
+      ],
+      [
+        400,
+        313
+      ],
+      [
+        429,
+        313
+      ]
+    ],
+    "predicted": [
+      [
+        317.62031404541744,
+        282.34411687865855
+      ],
+      [
+        347.3385137148556,
+        282.2296060638993
+      ],
+      [
+        376.87569954314085,
+        282.11579273561847
+      ],
+      [
+        406.2335203443834,
+        282.0026705405696
+      ],
+      [
+        435.41360496841077,
+        281.89023320243314
+      ],
+      [
+        317.30189388734397,
+        310.1661584757714
+      ],
+      [
+        347.27525997194914,
+        309.9649502817132
+      ],
+      [
+        377.06450125136064,
+        309.7649780989668
+      ],
+      [
+        406.6713091338965,
+        309.56623057327823
+      ],
+      [
+        436.0973543742848,
+        309.36869648903894
+      ]
+    ],
+    "rmsPixels": 6.4257702232219565
+  },
+  "limitations": [
+    "Manual correspondences and an uncalibrated pinhole model; principal y absorbs unknown cropping.",
+    "Fixed camera height and assumed metre dimensions prevent treating this as a metric survey.",
+    "Sensitivity trials are bounded alternatives, not statistical confidence intervals.",
+    "No independent aerial registration, lens correction, complete column count or production acceptance."
+  ],
+  "photoRegistrationAccepted": false,
+  "productionReady": false,
+  "wholeBuildingAccepted": false
+}
