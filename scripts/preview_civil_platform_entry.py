@@ -5,7 +5,7 @@ from shapely.geometry import LineString, Point
 from building_overrides import ROOT,load_catalogue,resolve_building,source_catalogue
 
 
-def proposal(stone_surround=True, tall_surround=True, curved_roof=True, refined_columns=True):
+def proposal(stone_surround=True, tall_surround=True, curved_roof=True, refined_columns=True, finished_portico=True):
     path=ROOT/'public/data/buildings.json'
     original=next(b for b in json.loads(path.read_text()) if b['id']=='way/957404988')
     record=copy.deepcopy(load_catalogue()[original['id']])
@@ -15,6 +15,7 @@ def proposal(stone_surround=True, tall_surround=True, curved_roof=True, refined_
     def point(along,setback):return [front[k]+t[k]*along-n[k]*setback for k in (0,1)]
     curved_roof=stone_surround and tall_surround and curved_roof
     refined_columns=curved_roof and refined_columns
+    finished_portico=refined_columns and finished_portico
     front_half=4.0 if refined_columns else 5.2
     rear_half=2.35 if refined_columns else 2.8
     front_clearance=1.0 if refined_columns else .6
@@ -51,12 +52,16 @@ def proposal(stone_surround=True, tall_surround=True, curved_roof=True, refined_
     template=porch['openBelow']['columns'][0]
     for along in (-rear_half,rear_half):
         c=copy.deepcopy(template);c['center']=point(along,rear_setback);porch['openBelow']['columns'].append(c)
+    if finished_portico:
+        for c in porch['openBelow']['columns']:c['capital']=dict(height=.32,projection=.08,taperHeight=.07)
     # Start on the short depth edge, so lattice beams run across the porch.
     ring=porch['polygons'][0][0][:-1];ring=ring[1:]+ring[:1]
     porch['polygons']=[[ring+[ring[0]]]]
     porch['roof'].pop('rim',None)
     porch['openBelow']['slattedRoof']=dict(edgeWidth=1.55 if refined_columns else 1.15,
         slatWidth=.2,slatCount=11,solidBays=[5,6,7,8,9])
+    if finished_portico:
+        porch['openBelow']['slattedRoof'].update(edgeWidth=1.65,edgeFinish='stone',bayDivisions=3,dividerWidth=.12)
     if curved_roof:
         edge=LineString(ring[1:3]);center=edge.project(Point(front))/edge.length
         porch['openBelow']['slattedRoof']['frontCurve']={
@@ -116,7 +121,9 @@ def proposal(stone_surround=True, tall_surround=True, curved_roof=True, refined_
                              f'{depth:g}m porch depth, central five solid bays and side lattice spacing are unverified estimates.',
                              (f'Stone-framed central glass bay is estimated: inner piers +/-2.8m, outer piers +/-5.225m; upper beam {glass_top:g}–{beam_top:g}m.' if stone_surround else 'Stone-framed glazing has not been reconstructed.'),
                              ('Front roof edge uses an estimated 18m-wide parabolic recess, 0.8m inset at its center, entirely inside the original footprint; not a recovered circular radius.' if curved_roof else 'Side glazing continuation remains estimated; curved named fascia has not been reconstructed.'),
-                             ('8.6m roof and 8.25m clear height form a proportional alternative, not a measured height.' if tall_surround else 'Original 7.2m estimated roof height retained.')],
+                             ('8.6m roof and 8.25m clear height form a proportional alternative, not a measured height.' if tall_surround else 'Original 7.2m estimated roof height retained.')]+(
+                             ['Stone fascia with white soffit; eight 0.32m capitals with 0.08m projection and 0.07m tapered transition are estimates.',
+                              'Seven side bays each split into three slots with 0.12m dividers; 1.65m roof edge supports full capital tops. Counts and dimensions are not surveyed.'] if finished_portico else []),
                 productionReady=False,photoRegistrationAccepted=False,wholeBuildingAccepted=False,
                 buildingSha256=hashlib.sha256(path.read_bytes()).hexdigest())
 
@@ -128,6 +135,7 @@ if __name__=='__main__':
     parser.add_argument('--low-roof',action='store_true',help='Reproduce the preceding 7.2m roof and short central glazing')
     parser.add_argument('--straight-roof',action='store_true',help='Reproduce the preceding shallow straight-edged portico')
     parser.add_argument('--wide-columns',action='store_true',help='Reproduce the preceding curved candidate before camera/column refinement')
-    args=parser.parse_args();r=proposal(not args.without_surround,not args.low_roof,not args.straight_roof,not args.wide_columns)
+    parser.add_argument('--plain-portico',action='store_true',help='Reproduce the preceding candidate without fascia finish, capitals or subdivided lattice')
+    args=parser.parse_args();r=proposal(not args.without_surround,not args.low_roof,not args.straight_roof,not args.wide_columns,not args.plain_portico)
     args.output.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
     print(r['status'])

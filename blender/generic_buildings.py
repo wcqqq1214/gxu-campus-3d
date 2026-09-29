@@ -57,7 +57,8 @@ def shared_form(b, z, C):
             opening=part['openBelow'];soffit=opening['clearHeight'];floor=opening['floorHeight']
             roof_geometry=opening.get('roofGeometry',{'polygons':part['polygons'],'triangles':triangles})
             roof_wall=C['white'] if 'slattedRoof' in opening else part_wall
-            part_body.extrude(roof_geometry['polygons'],roof_geometry['triangles'],z+soffit,h-soffit,roof_wall,C['white'] if 'slattedRoof' in opening else C['paleRoof'])
+            edge_finish=opening.get('slattedRoof',{}).get('edgeFinish')
+            part_body.extrude(roof_geometry['polygons'],roof_geometry['triangles'],z+soffit,h-soffit,roof_wall,C['white'] if 'slattedRoof' in opening else C['paleRoof'],exterior_wall=C[edge_finish] if edge_finish else None)
             # Explicit underside and floor; the original footprint remains the canopy outline.
             for poly,indices in zip(roof_geometry['polygons'],roof_geometry['triangles']):
                 vertices=[p for ring in poly for p in ring[:-1]]
@@ -68,7 +69,12 @@ def shared_form(b, z, C):
                 column_material=C[column['finish']] if 'finish' in column else part_wall
                 if column.get('shape')=='cylinder':
                     base=column.get('base');bottom=floor+(base['height'] if base else 0)
-                    part_body.cylinder(*column['center'],z+(bottom+soffit)/2,column['width']/2,soffit-bottom,column_material,n=16)
+                    capital=column.get('capital');shaft_top=soffit-(capital['height'] if capital else 0)
+                    part_body.cylinder(*column['center'],z+(bottom+shaft_top)/2,column['width']/2,shaft_top-bottom,column_material,n=16)
+                    if capital:
+                        taper=capital['taperHeight'];radius=column['width']/2+capital['projection']
+                        part_body.cylinder(*column['center'],z+shaft_top+taper/2,column['width']/2,taper,column_material,n=16,topr=radius)
+                        part_body.cylinder(*column['center'],z+(shaft_top+taper+soffit)/2,radius,capital['height']-taper,column_material,n=16)
                     if base:
                         base_height=base['height'];cap=base['capHeight'];radius=column['width']/2+base['projection']
                         part_body.cylinder(*column['center'],z+floor+(base_height-cap)/2,radius,base_height-cap,column_material,n=16)

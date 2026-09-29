@@ -10,7 +10,7 @@ from shapely.ops import unary_union
 
 def resolve_slatted_roof(polygons, config, columns):
     required = {'edgeWidth', 'slatWidth', 'slatCount'}
-    if not isinstance(config, dict) or not required <= set(config) or set(config)-required-{'solidBays','frontCurve'}:
+    if not isinstance(config, dict) or not required <= set(config) or set(config)-required-{'solidBays','frontCurve','edgeFinish','bayDivisions','dividerWidth'}:
         raise ValueError('Slatted roof requires edgeWidth, slatWidth and slatCount')
     for key in ('edgeWidth', 'slatWidth'):
         v = config[key]
@@ -42,6 +42,14 @@ def resolve_slatted_roof(polygons, config, columns):
     gap=(v_length-2*edge-count*slat)/(count+1)
     if u_length-2*edge < .5 or gap < .25:
         raise ValueError('Slatted roof must retain at least 0.25m open gaps')
+    if 'edgeFinish' in config and config['edgeFinish'] not in ('white','stone'):
+        raise ValueError('Slatted roof edge finish must use shared white or stone')
+    divisions=config.get('bayDivisions',1);divider=config.get('dividerWidth',0)
+    if 'bayDivisions' in config or 'dividerWidth' in config:
+        if (not {'bayDivisions','dividerWidth'} <= set(config) or type(divisions) is not int or not 2<=divisions<=4 or
+                type(divider) not in (int,float) or not math.isfinite(divider) or not .08<=divider<=.25 or
+                (gap-(divisions-1)*divider)/divisions < .25):
+            raise ValueError('Bay divisions require 2–4 parts, 0.08–0.25m dividers and 0.25m clear gaps')
     curve=config.get('frontCurve')
     if 'frontCurve' in config:
         if not isinstance(curve,dict) or set(curve)!={'from','to','inset','segments'}:
@@ -53,7 +61,7 @@ def resolve_slatted_roof(polygons, config, columns):
             raise ValueError('Front curve needs a bounded interval, positive inset and even 4–64 segments')
         if (u_length-2*edge)*(1-curve['inset']/u_length) < .5:
             raise ValueError('Front curve leaves insufficient opening depth')
-    unit_space=bool(solid) or curve is not None
+    unit_space=bool(solid) or curve is not None or divisions>1
     def point(u,v):
         if curve:
             center=(curve['from']+curve['to'])/2;half=(curve['to']-curve['from'])/2
@@ -70,6 +78,12 @@ def resolve_slatted_roof(polygons, config, columns):
     for i in range(count):
         start=(edge+(i+1)*gap+i*slat)/v_length
         beams.append(strip(eu,1-eu,start,start+slat/v_length))
+    for i in range(count+1):
+        if i in solid:continue
+        clear_gap=(gap-(divisions-1)*divider)/divisions
+        for j in range(1,divisions):
+            start=(edge+i*(gap+slat)+j*clear_gap+(j-1)*divider)/v_length
+            beams.append(strip(eu,1-eu,start,start+divider/v_length))
     for i in solid:
         # Overlap adjacent beams rather than relying on floating-point shared
         # edges. The union removes internal faces before triangulation.
@@ -87,9 +101,15 @@ def resolve_slatted_roof(polygons, config, columns):
                 samples.extend(point(a[0]+t*(b[0]-a[0]),a[1]+t*(b[1]-a[1])) for t in sorted(ts))
             return samples
         roof=Polygon(mapped_ring(roof.exterior),[mapped_ring(ring) for ring in roof.interiors])
-    if not roof.is_valid or roof.difference(shape).area > 1e-7 or roof.geom_type != 'Polygon' or len(roof.interiors) != count+1-len(solid):
+    if not roof.is_valid or roof.difference(shape).area > 1e-7 or roof.geom_type != 'Polygon' or len(roof.interiors) != (count+1-len(solid))*divisions:
         raise ValueError('Slatted roof geometry must preserve every opening')
     for column in columns:
         if not roof.buffer(1e-7).covers(Point(column['center'])):
             raise ValueError('Slatted roof column center must meet a supporting beam')
+        if 'capital' in column:
+            radius=column['width']/2+column['capital']['projection']
+            top=Polygon([(column['center'][0]+radius*math.cos(i*math.tau/16),
+                          column['center'][1]+radius*math.sin(i*math.tau/16)) for i in range(16)])
+            if top.difference(roof).area>1e-7:
+                raise ValueError('Column capital must fit entirely beneath a supporting beam')
     return roof
