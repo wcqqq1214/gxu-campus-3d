@@ -50,12 +50,13 @@ def shared_form(b, z, C):
     parts = form['parts'] or [{'polygons': b['polygons'], 'triangles': b['roofTriangles'], 'height': h, 'roof':roof}]
     for part in parts:
         part_body = Mesh()
+        part_wall = C[part['wallFinish']] if 'wallFinish' in part else wall
         roof = part['roof']; h = part['height']
         triangles = part['triangles'] if roof['type'] == 'flat' else [[] for _ in part['polygons']]
         if 'openBelow' in part:
             opening=part['openBelow'];soffit=opening['clearHeight'];floor=opening['floorHeight']
             roof_geometry=opening.get('roofGeometry',{'polygons':part['polygons'],'triangles':triangles})
-            roof_wall=C['white'] if 'slattedRoof' in opening else wall
+            roof_wall=C['white'] if 'slattedRoof' in opening else part_wall
             part_body.extrude(roof_geometry['polygons'],roof_geometry['triangles'],z+soffit,h-soffit,roof_wall,C['white'] if 'slattedRoof' in opening else C['paleRoof'])
             # Explicit underside and floor; the original footprint remains the canopy outline.
             for poly,indices in zip(roof_geometry['polygons'],roof_geometry['triangles']):
@@ -65,13 +66,13 @@ def shared_form(b, z, C):
             part_body.extrude(part['polygons'],triangles,z-.15,floor+.15,C['stone'],C['stone'])
             for column in opening['columns']:
                 if column.get('shape')=='cylinder':
-                    part_body.cylinder(*column['center'],z+(floor+soffit)/2,column['width']/2,soffit-floor,wall,n=16)
+                    part_body.cylinder(*column['center'],z+(floor+soffit)/2,column['width']/2,soffit-floor,part_wall,n=16)
                 else:
-                    part_body.box(*column['center'],z+(floor+soffit)/2,column['width'],column['depth'],soffit-floor,wall,column['angle'])
+                    part_body.box(*column['center'],z+(floor+soffit)/2,column['width'],column['depth'],soffit-floor,part_wall,column['angle'])
         else:
             roof_material = C['blueRoof'] if roof.get('finish') == 'blue-metal' else C['paleRoof']
             top_indices = [[] for _ in part['polygons']] if 'inset' in roof else triangles
-            part_body.extrude(part['polygons'], top_indices, z-.5, h+.5, wall, roof_material)
+            part_body.extrude(part['polygons'], top_indices, z-.5, h+.5, part_wall, roof_material)
             if 'inset' in roof:
                 for key, material in [('borderGeometry',C['dark']),('centerGeometry',roof_material)]:
                     geometry = roof[key]

@@ -140,7 +140,7 @@ def resolve_parts(b, raw, roof):
         raise ValueError('parts must be a nonempty explicit partition')
     for part in raw:
         required = {'id', 'polygons', 'height', 'levels'}
-        if not required <= set(part) or set(part) - required - {'openBelow','roof'} or not isinstance(part['id'],str) or not part['id'] or part['id'] in ids:
+        if not required <= set(part) or set(part) - required - {'openBelow','roof','wallFinish'} or not isinstance(part['id'],str) or not part['id'] or part['id'] in ids:
             raise ValueError('Each part needs a unique ID, polygons, height and levels')
         ids.add(part['id'])
         polys = [Polygon(p[0], p[1:]) for p in part['polygons']]
@@ -199,6 +199,10 @@ def resolve_parts(b, raw, roof):
                 part_roof['geometry'] = roof_geometry(coords, part_roof['type'], part_roof['rise'])
         resolved = {'id':part['id'], 'polygons':coords, 'triangles':triangles,
                     'height':height, 'levels':levels, 'roof':part_roof}
+        if 'wallFinish' in part:
+            if part['wallFinish'] != 'white':
+                raise ValueError('Part wall finish must use the shared white material')
+            resolved['wallFinish'] = part['wallFinish']
         if 'openBelow' in part:
             opening = part['openBelow']
             if not isinstance(opening, dict) or not {'clearHeight','floorHeight','columns'} <= set(opening) or set(opening)-{'clearHeight','floorHeight','columns','slattedRoof'}:
@@ -367,6 +371,13 @@ def resolve_facades(b, form, rules):
             for ei in range(len(ring)-1):
                 a,c,normal,_ = anchor(b, {'polygon':pi,'ring':ri,'edge':ei})
                 line = LineString([a,c])
+                # Recover partial clipping only when the complete mapped edge
+                # is actually missing coverage. An already complete partition
+                # may contain sub-micrometre return slivers; expanding every
+                # nearly coincident boundary would overlap its neighbour.
+                clipped_length = sum(line.intersection(unary_union([
+                    Polygon(p[0], p[1:]) for p in part['polygons']])).length for part in parts)
+                incomplete_edge = abs(clipped_length-line.length) > 1e-5
                 for part in parts:
                     shape = unary_union([Polygon(p[0],p[1:]) for p in part['polygons']])
                     segment = line.intersection(shape)
@@ -384,10 +395,10 @@ def resolve_facades(b, form, rules):
                                 lo,hi=sorted((line.project(Point(v)),line.project(Point(w))))
                                 if hi-lo>.01:
                                     boundary_segments.append(LineString([line.interpolate(lo),line.interpolate(hi)]))
-                    # Explicit-storey and slatted-portico partitions use
-                    # coincident boundaries when GEOS drops part of an edge.
-                    # Keep other existing equal-storey exports unchanged.
-                    if not any(s.length > .01 for s in segments) or (('floorHeights' in part or has_slatted_portico) and boundary_segments and abs(sum(s.length for s in segments)-sum(s.length for s in boundary_segments))>1e-5):
+                    # Any partition can lose a partial oblique edge to GEOS
+                    # roundoff, including equal-storey solid wings. Recover
+                    # only the coincident intervals collected above.
+                    if not any(s.length > .01 for s in segments) or (('floorHeights' in part or has_slatted_portico or incomplete_edge) and boundary_segments and abs(sum(s.length for s in segments)-sum(s.length for s in boundary_segments))>1e-5):
                         segments=boundary_segments
                     for s in segments:
                         if s.length < .01: continue
