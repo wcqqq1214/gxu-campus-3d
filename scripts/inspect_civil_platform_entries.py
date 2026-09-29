@@ -1,4 +1,4 @@
-"""Map unconfirmed entrance candidates without changing production data.
+"""Map unresolved entrances alongside the current estimated personnel entry.
 
 Original edge indices and part-local edge indices are kept separate.
 Candidate edges and their lengths are diagnostic; they are not door anchors.
@@ -57,7 +57,13 @@ def main():
     foyer_ring = list(parts['link-foyer'].exterior.coords)
     portico_ring = list(parts['link-portico'].exterior.coords)
     wall = LineString(foyer_ring[:2])
-    outer = LineString(portico_ring[2:4])
+    # Part normalization can rotate the ring's start vertex after repartition.
+    # Find the edge on original exterior edge 14 instead of retaining an old index.
+    original_portico_edge = LineString([ring[14], ring[15]])
+    outer_index, outer = max(
+        ((i, LineString([a, b])) for i, (a, b) in
+         enumerate(zip(portico_ring, portico_ring[1:]))),
+        key=lambda item: item[1].intersection(original_portico_edge.buffer(1e-7)).length)
     assert wall.difference(parts['link-portico'].boundary.buffer(1e-7)).length < 1e-6
     assert outer.difference(footprint.boundary.buffer(1e-7)).length < 1e-6
     assert outer.difference(LineString([ring[14], ring[15]]).buffer(1e-7)).length < 1e-6
@@ -73,9 +79,9 @@ def main():
         'partLocalWallEdge': {'polygon': 0, 'ring': 0, 'edge': 0,
                              'start': a, 'end': b, 'outwardNormal': normal},
         'boundaryLengthM': wall.length,
-        'porticoOuterEdge': {'part': 'link-portico', 'polygon': 0, 'ring': 0, 'edge': 2,
-                            'originalEdge': 14, 'start': portico_ring[2],
-                            'end': portico_ring[3], 'lengthM': outer.length},
+        'porticoOuterEdge': {'part': 'link-portico', 'polygon': 0, 'ring': 0, 'edge': outer_index,
+                            'originalEdge': 14, 'start': list(outer.coords[0]),
+                            'end': list(outer.coords[-1]), 'lengthM': outer.length},
         'wallToOuterEdgeAtMidpointM': midpoint.distance(outer),
         'photoRegistered': False, 'doorAnchor': None,
         'note': 'Search wall behind the open portico; roof edge is not a door anchor.'})
@@ -97,6 +103,14 @@ def main():
     route = LineString([front, rear])
     assert outer.distance(front) < 1e-6
     portico = next(p for p in building['form']['parts'] if p['id'] == 'link-portico')
+    entry = next(e for e in building['form']['entrances'] if e['id'] == 'east-personnel')
+    assert Point(entry['center']).distance(wall) < 1e-6
+    assert Point(entry['outerCenter']).distance(front) < 1e-6
+    approach = LineString([entry['outerCenter'], entry['center']])
+    corridor = approach.buffer(entry['width'] / 2, cap_style=2)
+    candidates[-1]['doorAnchor'] = entry['center']
+    candidates[-1]['status'] = 'implemented-estimate-not-photo-registered'
+    candidates[-1]['note'] = 'Current personnel entry is estimated on the recessed wall; exact photo registration remains unresolved.'
     supports = []
     for index, column in enumerate(portico['openBelow']['columns']):
         spread=column['base']['projection']+.03 if 'base' in column else 0
@@ -105,21 +119,21 @@ def main():
                                    column['angle'], use_radians=True), *column['center'])
         supports.append({'columnIndex': index, 'center': column['center'],
                          'distanceToRouteM': route.distance(support),
-                         'blocksCentralRoute': route.buffer(.6).intersects(support)})
+                         'blocksCentralRoute': route.buffer(.6).intersects(support),
+                         'blocksModeledDoorWidth': corridor.intersects(support)})
     record = copy.deepcopy(json.loads((ROOT / 'data/building-overrides.json').read_text())
                            ['buildings'][building['id']])
-    record['entrances'] = [{'id': 'osm-entry-probe', 'polygon': 0, 'ring': 0, 'edge': 14,
-                            't': original_edge.project(front, normalized=True),
-                            'width': 2.2, 'primary': True, 'recess': 3.6}]
-    record['evidence']['entrances'] = {
-        'status': 'estimated', 'sourceRefs': ['osm'],
-        'note': 'Diagnostic only: mapped point with existing 3.6 m recess and arbitrary 2.2 m probe width.'}
     try:
-        resolve_building(building, record, {s['id'] for s in source_catalogue()})
+        resolved = resolve_building(building, record, {s['id'] for s in source_catalogue()})
         rejection = None
     except ValueError as error:
         rejection = str(error)
     blocked = any(s['blocksCentralRoute'] for s in supports)
+    width_blocked = any(s['blocksModeledDoorWidth'] for s in supports)
+    assert rejection is None, f'Current production entrance rejected: {rejection}'
+    resolved_entry = next(e for e in resolved['form']['entrances'] if e['id'] == entry['id'])
+    assert resolved_entry == entry, 'Production entrance changed after re-resolving current overrides'
+    assert not width_blocked, 'Column/base obstructs the modeled full-width door approach'
     mapped_entry = {
         'nodeId': node['id'], 'sourceUrl': 'https://www.openstreetmap.org/node/7096023516',
         'snapshot': str(snapshot.relative_to(ROOT)),
@@ -132,9 +146,11 @@ def main():
         'projectedOuterPosition': list(front.coords[0]),
         'projectedRearWallPosition': list(rear.coords[0]),
         'modelRecessM': route.length, 'preferredSearchArea': 'D',
-        'columnClearance': supports, 'probeWidthM': 2.2,
-        'probePurpose': 'Exercise existing parser only; not a proposed or measured doorway width.',
-        'candidateParserRejection': rejection,
+        'columnClearance': supports,
+        'modeledDoorWidthM': entry['width'],
+        'modeledDoorRecessM': entry['recess'],
+        'currentProductionParserRejection': rejection,
+        'modeledDoorWidthApproachClear': not width_blocked,
         'centralApproachClear': not blocked,
         'locationAccuracy': 'Unspecified OSM mapping accuracy; no surveyed or photo-registered door anchor.'}
     report = {'buildingId': building['id'], 'sourceSha256': hashlib.sha256(raw).hexdigest(),
@@ -143,7 +159,8 @@ def main():
               'sourceReview': 'docs/CIVIL_PLATFORM_ENTRY_EVIDENCE.md',
               'candidates': candidates, 'originalExteriorEdges': edges,
               'mappedEntranceEvidence': mapped_entry,
-              'existingIllustrativeEntrances': building['form']['entrances'],
+              'currentEstimatedEntrances': building['form']['entrances'],
+              'productionReadyScope': 'No new unregistered entrance is ready for production; existing D entry is already implemented.',
               'estimatedPersonnelEntryImplemented': any(e['id']=='east-personnel' for e in building['form']['entrances']),
               'limitations': ['Boundary lengths are not measured entrance widths.',
                               'D is prioritized by an OSM entrance node; A/B remain unregistered alternatives or other doors.',
@@ -161,7 +178,7 @@ def main():
            '<rect width="820" height="910" fill="#fafaf7"/>',
            '<g font-family="Arial,sans-serif" fill="#26323b">',
            '<text x="35" y="38" font-size="23">Platform: entrance search areas</text>',
-           '<text x="35" y="67" font-size="15">OSM entry supports D; production door placement remains unresolved.</text>']
+           '<text x="35" y="67" font-size="15">D: implemented estimate. C: delivery opening still unlocated.</text>']
     for part in parts.values():
         svg.append(f'<path d="{path(part.exterior.coords)} Z" fill="#e2e6e8" stroke="#617581"/>')
     for c, color in zip(candidates, ['#b66827', '#4774a3', '#8b538b']):
@@ -192,9 +209,9 @@ def main():
             '<text x="35" y="675" font-size="16" fill="#b66827">A: West foyer perimeter, edges 3-9 (personnel candidate)</text>',
             '<text x="35" y="705" font-size="16" fill="#4774a3">B: North office wall, edge 13 (personnel candidate)</text>',
             '<text x="35" y="735" font-size="16" fill="#8b538b">C: South hall wall, edge 1 (delivery candidate)</text>',
-            '<text x="35" y="765" font-size="16" fill="#167a67">D: Recessed link-foyer east wall (personnel candidate)</text>',
+            '<text x="35" y="765" font-size="16" fill="#167a67">D: Recessed link-foyer east wall (estimated personnel entry)</text>',
             '<text x="35" y="795" font-size="15" fill="#167a67">Dashed: portico outer roof edge; no wall or door inferred.</text>',
-            '<text x="35" y="815" font-size="15">Entry route: red if blocked, green if clear; neither confirms a door.</text>',
+            '<text x="35" y="815" font-size="15">Green: model approach clear; this does not establish photo registration.</text>',
             '<text x="35" y="840" font-size="15">Black dot: current modeled entrance; placement remains estimated.</text>',
             '<text x="35" y="865" font-size="15">Numbers: original exterior edges; D uses a part-local wall.</text>',
             '<text x="35" y="890" font-size="15">All lengths are model search boundaries, not measured door widths.</text>',
