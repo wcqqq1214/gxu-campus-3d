@@ -68,5 +68,19 @@ class RoofVolumeTests(unittest.TestCase):
             with self.subTest(patch=patch),self.assertRaises(ValueError):
                 resolve_roof_volumes(b,{**form,'parts':[{**part,**patch}]},[c])
 
+    def test_cap_clearance_and_collisions_include_overhang(self):
+        b,c=self.fixture();c={**c,'cap':{'overhang':.3,'height':.5}}
+        self.assertEqual(self.resolve(b,[c]),self.resolve(self.resolve(b,[c]),[c]))
+        for cap in ({'overhang':True,'height':.5},{'overhang':.3,'height':float('nan')},
+                    {'overhang':1.1,'height':.5},{'overhang':.3,'height':0},{'height':.5}):
+            with self.subTest(cap=cap),self.assertRaises(ValueError):self.resolve(b,[{**c,'cap':cap}])
+        with self.assertRaisesRegex(ValueError,'cap needs'):
+            self.resolve(b,[{**c,'inset':.6}])
+        # Body footprints do not intersect, but the taller neighbor hits the cap.
+        neighbor={**c,'id':'neighbor','inset':4.6,'rise':2};neighbor.pop('cap')
+        with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[c,neighbor])
+        with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[neighbor,c])
+        self.resolve(b,[c,{**neighbor,'rise':1}])
+
 
 if __name__=='__main__':unittest.main()

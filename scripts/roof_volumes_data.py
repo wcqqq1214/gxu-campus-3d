@@ -17,7 +17,7 @@ def resolve_roof_volumes(building, form, config):
     fields = {'id', 'part', 'polygon', 'edge', 'from', 'to', 'inset', 'depth', 'rise'}
     ids = set(); footprints = []; result = []
     for c in config:
-        if not isinstance(c, dict) or set(c) != fields:
+        if not isinstance(c, dict) or not fields <= set(c) or set(c)-fields-{'cap'}:
             raise ValueError('Roof volume needs identity, support, edge and dimensions')
         if not isinstance(c['id'], str) or not c['id'].strip() or c['id'] in ids:
             raise ValueError('Roof volume IDs must be nonempty and unique')
@@ -49,17 +49,31 @@ def resolve_roof_volumes(building, form, config):
             return [a[k]+u[k]*t*length-normal[k]*d for k in (0, 1)]
         shape = Polygon([point(c['from'], c['inset']), point(c['to'], c['inset']),
                          point(c['to'], c['inset']+c['depth']), point(c['from'], c['inset']+c['depth'])])
+        cap_shape = None
+        if 'cap' in c:
+            cap = c['cap']
+            if (not isinstance(cap, dict) or set(cap) != {'overhang', 'height'}
+                    or any(type(v) not in (int, float) or not math.isfinite(v) for v in cap.values())
+                    or not .05 <= cap['overhang'] <= 1 or not .1 <= cap['height'] <= 1):
+                raise ValueError('Roof volume cap needs bounded overhang and height')
+            cap_shape = shape.buffer(cap['overhang'], join_style=2)
         support = unary_union([Polygon(p[0], p[1:]) for p in part['polygons']])
         edge = LineString([point(c['from'], 0), point(c['to'], 0)])
         if not support.boundary.buffer(1e-7).covers(edge):
             raise ValueError('Roof volume anchor must lie on its support boundary')
         if not support.buffer(-.5).buffer(1e-7).covers(shape):
             raise ValueError('Roof volume needs 0.5 m clearance from roof edges and courtyards')
-        for old, height, rise in footprints:
-            vertical_overlap = min(height+rise, part['height']+c['rise'])-max(height, part['height'])
-            if vertical_overlap > 1e-7 and old.intersection(shape).area > 1e-7:
-                raise ValueError('Roof volumes overlap')
-        footprints.append((shape, part['height'], c['rise']))
+        if cap_shape is not None and not support.buffer(-.5).buffer(1e-7).covers(cap_shape):
+            raise ValueError('Roof volume cap needs 0.5 m clearance from roof edges and courtyards')
+        solids = [(shape, part['height'], c['rise'])]
+        if cap_shape is not None:
+            solids.append((cap_shape, part['height']+c['rise'], c['cap']['height']))
+        for current, bottom, rise in solids:
+            for old, height, old_rise in footprints:
+                vertical_overlap = min(height+old_rise, bottom+rise)-max(height, bottom)
+                if vertical_overlap > 1e-7 and old.intersection(current).area > 1e-7:
+                    raise ValueError('Roof volumes overlap')
+        footprints.extend(solids)
         result.append({**copy.deepcopy(c), 'center':point((c['from']+c['to'])/2, c['inset']+c['depth']/2),
                        'width':width, 'angle':math.atan2(u[1],u[0]), 'baseHeight':part['height'],
                        'footprint':[list(p) for p in shape.exterior.coords]})

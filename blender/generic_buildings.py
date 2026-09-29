@@ -136,6 +136,11 @@ def shared_form(b, z, C):
     for volume in form.get('roofVolumes', []):
         top.box(*volume['center'], z+volume['baseHeight']+volume['rise']/2,
                 volume['width'], volume['depth'], volume['rise'], C['white'], volume['angle'])
+        if 'cap' in volume:
+            cap = volume['cap']
+            top.box(*volume['center'], z+volume['baseHeight']+volume['rise']+cap['height']/2,
+                    volume['width']+2*cap['overhang'], volume['depth']+2*cap['overhang'],
+                    cap['height'], C['paleRoof'], volume['angle'])
     if 'roofEave' in form:
         add_roof_eave(top, form['roofEave'], z, C['white'])
     if 'roofCrown' in form:
