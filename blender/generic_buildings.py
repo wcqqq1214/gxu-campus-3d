@@ -98,7 +98,7 @@ def shared_form(b, z, C):
             for i in range(0, len(geometry['triangles']), 3):
                 top.face([(geometry['vertices'][k][0], geometry['vertices'][k][1], z+h+geometry['vertices'][k][2])
                           for k in geometry['triangles'][i:i+3]], roof_material)
-        elif 'slattedRoof' not in part.get('openBelow',{}):
+        elif 'slattedRoof' not in part.get('openBelow',{}) and 'rim' not in roof:
             # Parapets follow each actual terrace elevation in both LODs.
             edges = part.get('parapetEdges', [(a,c) for poly in part['polygons']
                                              for ring in poly for a,c in zip(ring,ring[1:])])
@@ -115,6 +115,9 @@ def shared_form(b, z, C):
                 if length < 2: continue
                 top.box((a[0]+c[0])/2, (a[1]+c[1])/2, z+h+.4, length, .25, .8,
                         C['white'], math.atan2(c[1]-a[1], c[0]-a[0]))
+        if 'rimGeometry' in roof:
+            for face in roof['rimGeometry']['tops'] + roof['rimGeometry']['walls']:
+                top.face([(x,y,z+h+up) for x,y,up in face], C['white'])
     if 'roofDome' in form:
         from roof_dome import add_roof_dome
         add_roof_dome(top, form['roofDome'], z, C['white'])
