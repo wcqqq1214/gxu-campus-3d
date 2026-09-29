@@ -5,7 +5,7 @@ from shapely.geometry import LineString, Point
 from building_overrides import ROOT,load_catalogue,resolve_building,source_catalogue
 
 
-def proposal(stone_surround=True):
+def proposal(stone_surround=True, tall_surround=True):
     path=ROOT/'public/data/buildings.json'
     original=next(b for b in json.loads(path.read_text()) if b['id']=='way/957404988')
     record=copy.deepcopy(load_catalogue()[original['id']])
@@ -26,6 +26,12 @@ def proposal(stone_surround=True):
     porch['polygons']=[[ring+[ring[0]]]]
     porch['roof'].pop('rim',None)
     porch['openBelow']['slattedRoof']=dict(edgeWidth=1.15,slatWidth=.2,slatCount=11,solidBays=[5,6,7,8,9])
+    tall_surround = stone_surround and tall_surround
+    if tall_surround:
+        porch['height']=8.6
+        porch['openBelow']['clearHeight']=8.25
+    glass_top=7.45 if tall_surround else 6.1
+    beam_top=8.0 if tall_surround else 6.65
     if stone_surround:
         # Bound stone and glass rectangles on the existing shared wall. Adjacent
         # intervals share exact endpoints; no full glass plane is hidden behind stone.
@@ -43,18 +49,27 @@ def proposal(stone_surround=True):
                 **({'finish':'stone'} if kind=='solid' else {'frameFinish':'dark'})))
         def span(name,kind,lo,hi,bottom,top,columns=1,rows=1):
             panel(name,kind,[fraction(lo),fraction(hi)],bottom,top,columns,rows)
-        span('central-upper-glass','glazing',-2.425,2.425,4.25,6.1,4,3)
-        span('upper-stone-beam','solid',-5.55,5.55,6.1,6.65)
+        span('central-upper-glass','glazing',-2.425,2.425,4.25,glass_top,4,3)
+        span('upper-stone-beam','solid',-5.55,5.55,glass_top,beam_top)
         for sign,label in [(-1,'north'),(1,'south')]:
-            span(label+'-inner-pier','solid',sign*2.425,sign*3.175,1.16,6.1)
-            span(label+'-outer-pier','solid',sign*4.9,sign*5.55,1.16,6.1)
-            span(label+'-side-glass','glazing',sign*3.175,sign*4.9,1.16,6.1,2,3)
+            span(label+'-inner-pier','solid',sign*2.425,sign*3.175,1.16,glass_top)
+            span(label+'-outer-pier','solid',sign*4.9,sign*5.55,1.16,glass_top)
+            span(label+'-side-glass','glazing',sign*3.175,sign*4.9,1.16,glass_top,2,3)
             span(label+'-door-cheek','solid',sign*1.9,sign*2.425,1.16,3.85)
             span(label+'-header-extension','solid',sign*1.9,sign*2.425,3.85,4.25)
             outer=fraction(sign*5.55)
-            panel(label+'-wing-glass','glazing',[outer,.03 if outer<.5 else .97],1.16,6.65,5,3)
+            panel(label+'-wing-glass','glazing',[outer,.03 if outer<.5 else .97],1.16,beam_top,5,3)
         facade['rule']['panels']=panels
         record['entrances'][0]['recessDoor']['lintelHeight']=.4
+        if tall_surround:
+            # Raising the canopy invalidates the old automatic window row.
+            # Preserve an estimated clerestory above it as a separate region.
+            upper=copy.deepcopy(facade);upper['region']='above-portico'
+            upper['rule']['panels']=[dict(id=f'clerestory-{i}',type='glazing',
+                **{'from':(i+.5)/10-.55/wall.length,'to':(i+.5)/10+.55/wall.length},
+                bottom=9.1,top=10.5,columns=1,rows=1,frameWidth=.07,depth=.1)
+                for i in range(10)]
+            record['exposedFacadeRules'].append(upper)
     candidate=resolve_building(original,record,{s['id'] for s in source_catalogue()})
     return dict(status='unregistered-composition-candidate',buildingId=original['id'],
                 scope='Actual mapped D outline, existing estimated dimensions; not a photo fit or production replacement',
@@ -63,8 +78,9 @@ def proposal(stone_surround=True):
                              'Front pair at +/-5.2m around the entry; other four longitudinal positions retained; front setback 0.7m.',
                              'Two rear columns at +/-2.8m along entry and 2.65m setback are estimates, not a surveyed count.',
                              '3.6m porch depth, central five solid bays and side lattice spacing are unverified estimates.',
-                             ('Stone-framed central glass bay is estimated: inner piers +/-2.8m, outer piers +/-5.225m; upper beam 6.1–6.65m.' if stone_surround else 'Stone-framed glazing has not been reconstructed.'),
-                             'Side glazing continuation remains estimated; curved named fascia has not been reconstructed.'],
+                             (f'Stone-framed central glass bay is estimated: inner piers +/-2.8m, outer piers +/-5.225m; upper beam {glass_top:g}–{beam_top:g}m.' if stone_surround else 'Stone-framed glazing has not been reconstructed.'),
+                             'Side glazing continuation remains estimated; curved named fascia has not been reconstructed.',
+                             ('8.6m roof and 8.25m clear height form a proportional alternative, not a measured height.' if tall_surround else 'Original 7.2m estimated roof height retained.')],
                 productionReady=False,photoRegistrationAccepted=False,wholeBuildingAccepted=False,
                 buildingSha256=hashlib.sha256(path.read_bytes()).hexdigest())
 
@@ -73,6 +89,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--without-surround',action='store_true',help='Reproduce the preceding full-glass candidate')
-    args=parser.parse_args();r=proposal(not args.without_surround)
+    parser.add_argument('--low-roof',action='store_true',help='Reproduce the preceding 7.2m roof and short central glazing')
+    args=parser.parse_args();r=proposal(not args.without_surround,not args.low_roof)
     args.output.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
     print(r['status'])
