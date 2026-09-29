@@ -162,7 +162,7 @@ def shared_form(b, z, C):
         theta = -bearing
         width = e['width']
         if e.get('porticoId'):
-            floor=e['platformHeight'];front=e['outerCenter'];pw=e['porticoWidth']
+            floor=e['platformHeight'];front=e['outerCenter'];pw=e.get('stepWidth',e['porticoWidth'])
             if 'recessGlazing' in e:
                 from recess_glazing import add_recess_glazing
                 add_recess_glazing(entrance,e,z,C)
@@ -172,9 +172,10 @@ def shared_form(b, z, C):
             # Counts can be sourced separately from estimated dimensions.
             steps=e.get('steps',3)
             step_base=e.get('stepBaseHeight',0)
+            foundation=e.get('stepFoundationDepth',0)
             for i in range(steps):
                 height=(floor-step_base)*(steps-i)/steps
-                entrance.box(front[0]+nx*(i+.5)*.3,front[1]+ny*(i+.5)*.3,z+step_base+height/2,pw,.32,height,C['stone'],theta)
+                entrance.box(front[0]+nx*(i+.5)*.3,front[1]+ny*(i+.5)*.3,z+step_base+(height-foundation)/2,pw,.32,height+foundation,C['stone'],theta)
             continue
         # Reuse facade glass and stone to avoid two extra draw calls per chunk.
         landing=e.get('landingHeight',0)
