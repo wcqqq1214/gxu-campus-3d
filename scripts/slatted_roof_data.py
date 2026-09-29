@@ -1,7 +1,7 @@
 """A photo-supported open portico roof, clipped to its existing quadrilateral.
 
-This is a flat beam lattice, not an occupied storey or a solid roof slab.
-The first polygon edge determines the slat direction.
+The first polygon edge determines the slat direction. Optional solidBays
+close selected spaces between beams, for a solid canopy with open side bays.
 """
 import math
 from shapely.geometry import Polygon, Point
@@ -9,7 +9,8 @@ from shapely.ops import unary_union
 
 
 def resolve_slatted_roof(polygons, config, columns):
-    if not isinstance(config, dict) or set(config) != {'edgeWidth', 'slatWidth', 'slatCount'}:
+    required = {'edgeWidth', 'slatWidth', 'slatCount'}
+    if not isinstance(config, dict) or not required <= set(config) or set(config)-required-{'solidBays'}:
         raise ValueError('Slatted roof requires edgeWidth, slatWidth and slatCount')
     for key in ('edgeWidth', 'slatWidth'):
         v = config[key]
@@ -18,6 +19,10 @@ def resolve_slatted_roof(polygons, config, columns):
     count = config['slatCount']
     if type(count) is not int or not 1 <= count <= 24:
         raise ValueError('Slatted roof needs 1–24 interior slats')
+    solid = config.get('solidBays', [])
+    if (not isinstance(solid, list) or any(type(i) is not int or not 0 <= i <= count for i in solid)
+            or len(set(solid)) != len(solid) or len(solid) == count+1):
+        raise ValueError('solidBays must be unique gap indices and retain at least one opening')
     if len(polygons) != 1 or len(polygons[0]) != 1 or len(polygons[0][0]) != 5:
         raise ValueError('Slatted roof requires one quadrilateral without holes')
     pts = polygons[0][0][:-1]
@@ -40,14 +45,26 @@ def resolve_slatted_roof(polygons, config, columns):
     def point(u,v):
         return [(1-u)*(1-v)*pts[0][k]+u*(1-v)*pts[1][k]+u*v*pts[2][k]+(1-u)*v*pts[3][k] for k in range(2)]
     def strip(u0,u1,v0,v1):
-        return Polygon([point(u0,v0),point(u1,v0),point(u1,v1),point(u0,v1)])
+        uv=[(u0,v0),(u1,v0),(u1,v1),(u0,v1)]
+        # Union mixed bays in the unit square: independently transformed beam
+        # edges can otherwise produce microscopic gaps on oblique buildings.
+        return Polygon(uv if solid else [point(u,v) for u,v in uv])
     eu=edge/u_length;ev=edge/v_length
     beams=[strip(0,eu,0,1),strip(1-eu,1,0,1),strip(eu,1-eu,0,ev),strip(eu,1-eu,1-ev,1)]
     for i in range(count):
         start=(edge+(i+1)*gap+i*slat)/v_length
         beams.append(strip(eu,1-eu,start,start+slat/v_length))
+    for i in solid:
+        # Overlap adjacent beams rather than relying on floating-point shared
+        # edges. The union removes internal faces before triangulation.
+        start=0 if i==0 else (edge+i*gap+(i-1)*slat)/v_length
+        end=1 if i==count else (edge+(i+1)*gap+(i+1)*slat)/v_length
+        beams.append(strip(0,1,start,end))
     roof=unary_union(beams)
-    if roof.difference(shape).area > 1e-7 or roof.geom_type != 'Polygon' or len(roof.interiors) != count+1:
+    if solid and roof.geom_type == 'Polygon':
+        roof=Polygon([point(*p) for p in roof.exterior.coords],
+                     [[point(*p) for p in ring.coords] for ring in roof.interiors])
+    if roof.difference(shape).area > 1e-7 or roof.geom_type != 'Polygon' or len(roof.interiors) != count+1-len(solid):
         raise ValueError('Slatted roof geometry must preserve every opening')
     for column in columns:
         if not roof.buffer(1e-7).covers(Point(column['center'])):
