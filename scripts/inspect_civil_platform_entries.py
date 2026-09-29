@@ -3,12 +3,17 @@
 Original edge indices and part-local edge indices are kept separate.
 Candidate edges and their lengths are diagnostic; they are not door anchors.
 """
+import copy
+import gzip
 import hashlib
 import json
 import math
 from pathlib import Path
 
-from shapely.geometry import LineString, Point, Polygon
+from shapely.affinity import rotate, translate
+from shapely.geometry import LineString, Point, Polygon, box
+
+from building_overrides import resolve_building, source_catalogue
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'public/data/buildings.json'
@@ -74,16 +79,73 @@ def main():
         'wallToOuterEdgeAtMidpointM': midpoint.distance(outer),
         'photoRegistered': False, 'doorAnchor': None,
         'note': 'Search wall behind the open portico; roof edge is not a door anchor.'})
+    snapshot = ROOT / 'data/snapshots/osm-2026-09-09.json.gz'
+    with gzip.open(snapshot) as source:
+        elements = json.load(source)['elements']
+    node = next(e for e in elements if e['type'] == 'node' and e['id'] == 7096023516)
+    way = next(e for e in elements if e['type'] == 'way' and e['id'] == 957404988)
+    assert node['tags']['entrance'] == 'yes' and node['id'] in way['nodes']
+    lon, lat = json.loads((ROOT / 'data/region.json').read_text())['center']
+    mapped = Point((node['lon'] - lon) * 111320 * math.cos(math.radians(lat)),
+                   (node['lat'] - lat) * 111320)
+    original_edge = LineString([ring[14], ring[15]])
+    # Normalization removed this nearly collinear tagged node. Retain its raw
+    # coordinates and report the tiny projection offset, rather than hiding it.
+    assert original_edge.distance(mapped) < .01
+    front = original_edge.interpolate(original_edge.project(mapped))
+    rear = wall.interpolate(wall.project(front))
+    route = LineString([front, rear])
+    assert outer.distance(front) < 1e-6
+    portico = next(p for p in building['form']['parts'] if p['id'] == 'link-portico')
+    supports = []
+    for index, column in enumerate(portico['openBelow']['columns']):
+        support = translate(rotate(box(-column['width']/2, -column['depth']/2,
+                                       column['width']/2, column['depth']/2),
+                                   column['angle'], use_radians=True), *column['center'])
+        supports.append({'columnIndex': index, 'center': column['center'],
+                         'distanceToRouteM': route.distance(support),
+                         'blocksCentralRoute': route.buffer(.6).intersects(support)})
+    record = copy.deepcopy(json.loads((ROOT / 'data/building-overrides.json').read_text())
+                           ['buildings'][building['id']])
+    record['entrances'] = [{'id': 'osm-entry-probe', 'polygon': 0, 'ring': 0, 'edge': 14,
+                            't': original_edge.project(front, normalized=True),
+                            'width': 2.2, 'primary': True, 'recess': 3.6}]
+    record['evidence']['entrances'] = {
+        'status': 'estimated', 'sourceRefs': ['osm'],
+        'note': 'Diagnostic only: mapped point with existing 3.6 m recess and arbitrary 2.2 m probe width.'}
+    try:
+        resolve_building(building, record, {s['id'] for s in source_catalogue()})
+        rejection = None
+    except ValueError as error:
+        rejection = str(error)
+    mapped_entry = {
+        'nodeId': node['id'], 'sourceUrl': 'https://www.openstreetmap.org/node/7096023516',
+        'snapshot': str(snapshot.relative_to(ROOT)),
+        'snapshotSha256': hashlib.sha256(snapshot.read_bytes()).hexdigest(),
+        'nodeVersion': node['version'], 'nodeTimestamp': node['timestamp'],
+        'tags': node['tags'], 'longitude': node['lon'], 'latitude': node['lat'],
+        'rawLocalPosition': list(mapped.coords[0]), 'originalEdge': 14,
+        'edgeFraction': original_edge.project(front, normalized=True),
+        'distanceToNormalizedEdgeM': original_edge.distance(mapped),
+        'projectedOuterPosition': list(front.coords[0]),
+        'projectedRearWallPosition': list(rear.coords[0]),
+        'modelRecessM': route.length, 'preferredSearchArea': 'D',
+        'columnClearance': supports, 'probeWidthM': 2.2,
+        'probePurpose': 'Exercise existing parser only; not a proposed or measured doorway width.',
+        'candidateParserRejection': rejection,
+        'locationAccuracy': 'Unspecified OSM mapping accuracy; no surveyed or photo-registered door anchor.'}
     report = {'buildingId': building['id'], 'sourceSha256': hashlib.sha256(raw).hexdigest(),
               'coordinateSystem': 'campus local east/north metres',
-              'status': 'candidate-search-edges-only', 'productionReady': False,
+              'status': 'mapped-entrance-and-portico-constraint-review', 'productionReady': False,
               'sourceReview': 'docs/CIVIL_PLATFORM_ENTRY_EVIDENCE.md',
               'candidates': candidates, 'originalExteriorEdges': edges,
+              'mappedEntranceEvidence': mapped_entry,
               'existingIllustrativeEntrances': building['form']['entrances'],
               'limitations': ['Boundary lengths are not measured entrance widths.',
-                              'A/B/D are competing personnel-entry search areas, not confirmed doors.',
+                              'D is prioritized by an OSM entrance node; A/B remain unregistered alternatives or other doors.',
                               'C is the south delivery-entry search wall, not the personnel portal.',
                               'D is a part-local recessed wall; its normal enters the open portico.',
+                              'OSM node supports D; existing estimated columns conflict with its straight approach.',
                               'No road alignment, stairs, column count or door position is inferred.']}
     OUT.with_suffix('.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     def point(p):
@@ -94,7 +156,7 @@ def main():
            '<rect width="820" height="910" fill="#fafaf7"/>',
            '<g font-family="Arial,sans-serif" fill="#26323b">',
            '<text x="35" y="38" font-size="23">Platform: entrance search areas</text>',
-           '<text x="35" y="67" font-size="15">Unregistered candidates; no production door anchors.</text>']
+           '<text x="35" y="67" font-size="15">OSM entry supports D; production door placement remains unresolved.</text>']
     for part in parts.values():
         svg.append(f'<path d="{path(part.exterior.coords)} Z" fill="#e2e6e8" stroke="#617581"/>')
     for c, color in zip(candidates, ['#b66827', '#4774a3', '#8b538b']):
@@ -108,6 +170,14 @@ def main():
             f'<path d="{path(outer.coords)}" fill="none" stroke="#167a67" stroke-width="2" stroke-dasharray="6 5"/>']
     x, y = point(midpoint.coords[0])
     svg.append(f'<text x="{x-18:.2f}" y="{y:.2f}" font-size="15" fill="#167a67">D</text>')
+    svg.append(f'<path d="{path(route.coords)}" fill="none" stroke="#a22c3c" stroke-width="3"/>')
+    for support in supports:
+        x, y = point(support['center'])
+        color = '#a22c3c' if support['blocksCentralRoute'] else '#617581'
+        svg.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="3" fill="{color}"/>')
+    x, y = point(mapped.coords[0])
+    svg += [f'<circle cx="{x:.2f}" cy="{y:.2f}" r="5" fill="#a22c3c"/>',
+            f'<text x="{x+12:.2f}" y="{y+5:.2f}" font-size="13" fill="#a22c3c">OSM entry 7096023516</text>']
     for entry in building['form']['entrances']:
         x, y = point(entry['center'])
         svg.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="6" fill="#26323b"/>')
@@ -118,7 +188,8 @@ def main():
             '<text x="35" y="735" font-size="16" fill="#8b538b">C: South hall wall, edge 1 (delivery candidate)</text>',
             '<text x="35" y="765" font-size="16" fill="#167a67">D: Recessed link-foyer east wall (personnel candidate)</text>',
             '<text x="35" y="795" font-size="15" fill="#167a67">Dashed: portico outer roof edge; no wall or door inferred.</text>',
-            '<text x="35" y="835" font-size="15">Dot: existing illustrative entrance, still uncalibrated.</text>',
+            '<text x="35" y="815" font-size="15" fill="#a22c3c">Red: mapped entry and route conflict with an estimated column.</text>',
+            '<text x="35" y="840" font-size="15">Black dot: existing illustrative entrance, still uncalibrated.</text>',
             '<text x="35" y="865" font-size="15">Numbers: original exterior edges; D uses a part-local wall.</text>',
             '<text x="35" y="890" font-size="15">All lengths are model search boundaries, not measured door widths.</text>',
             '</g></svg>']
