@@ -17,6 +17,9 @@ ROOF_VOLUMES = '--roof-volumes' in sys.argv
 EAST_SLIT = '--east-slit' in sys.argv
 LAB_FACADE = '--lab-facade' in sys.argv
 REPARTITION = '--repartition' in sys.argv
+PORTICO_GLASS = '--portico-glass' in sys.argv
+if PORTICO_GLASS and not REPARTITION:
+    raise ValueError('--portico-glass requires --repartition')
 if REPARTITION and LAB_FACADE:
     raise ValueError('Use --repartition for the corrected north low wing; --lab-facade is historical')
 
@@ -237,11 +240,34 @@ def check(objects, tolerance):
             p=a+u*(2+(i+.5)*(length-4)/5)
             origin=p+n*2;origin.z=Z+3.2
             hit=ray(origin,-n,6)
-            assert hit and hit[3]=='white' and abs(hit[0]-5.6)<tolerance*2,('portico-open-bay',i,hit)
+            if PORTICO_GLASS:
+                assert hit and hit[3] in ('glass','white') and 5.44-tolerance < hit[0] < 5.6+tolerance,('portico-open-bay',i,hit)
+            else:
+                assert hit and hit[3]=='white' and abs(hit[0]-5.6)<tolerance*2,('portico-open-bay',i,hit)
             foot=p-n;foot.z=Z+3.2
             floor=ray(foot,(0,0,-1),4)
             assert floor and floor[3]=='stone' and abs(floor[1].z-Z-.24)<tolerance,('portico-floor',i,floor)
             samples.append(dict(kind='portico-open-bay',bay=i,rearWallDistance=hit[0],floorHeight=floor[1].z-Z))
+    if PORTICO_GLASS:
+        # Fixed adopted backing-wall endpoints; rays start behind the columns
+        # so every glass cell is tested, without treating any cell as a door.
+        a=Vector((-698.6939074704767,-760.4773988305454,0))
+        b=Vector((-698.8909494339341,-729.4075449670695,0))
+        length=(b-a).length;u=(b-a).normalized();n=Vector((u.y,-u.x,0))
+        for col in range(12):
+            p=a+u*(.03*length+.12+(col+.37)*(.94*length-.24)/12)
+            for row in range(3):
+                height=.6+.12+(row+.37)*(5.7-.24)/3
+                origin=p+n*2;origin.z=Z+height
+                hit=ray(origin,-n,3)
+                assert hit and hit[3]=='glass' and hit[2].dot(n)>.98,('portico-glass-cell',col,row,hit)
+                assert abs(hit[0]-1.96)<tolerance*2,('portico-glass-wall-depth',hit)
+                samples.append(dict(kind='portico-glass-cell',column=col,row=row,distance=hit[0]))
+        for fraction,height in [(.01,3.),(.99,3.),(.5,.4),(.5,6.5)]:
+            origin=a.lerp(b,fraction)+n*2;origin.z=Z+height
+            hit=ray(origin,-n,3)
+            assert hit and hit[3]=='white' and abs(hit[0]-2)<tolerance*2,('portico-glass-boundary',fraction,height,hit)
+            samples.append(dict(kind='portico-glass-boundary',fraction=fraction,height=height))
     if ROOF_VOLUMES:
         a=Vector((-734.5484823735649,-713.5278039998846,0))
         b=Vector((-695.3913024054572,-713.5723320000095,0))
@@ -275,6 +301,7 @@ report['roofVolumesChecked']=ROOF_VOLUMES
 report['eastSlitChecked']=EAST_SLIT
 report['labFacadeChecked']=LAB_FACADE
 report['repartitionChecked']=REPARTITION
+report['porticoGlazingChecked']=PORTICO_GLASS
 if REPARTITION:
     report['scope']='Estimated six-part correction: 6 m deep north low wing at 7.2 m, recessed 13.2 m hall, 10.8 m connector and six-column 7.2 m open portico. Office and west part retained. Relative layout checked against imagery; dimensions and entries remain unverified.'
 if NORTH_FACADE:

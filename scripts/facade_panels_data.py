@@ -6,7 +6,7 @@ def overlaps(a, b):
     return a[0] < b[1] and a[1] > b[0] and a[2] < b[3] and a[3] > b[2]
 
 
-def validate_panels(panels, length, height, levels, band=None, ledges=None):
+def validate_panels(panels, length, height, levels, band=None, ledges=None, *, minimum_bottom=3.2):
     if not isinstance(panels, list) or not 1 <= len(panels) <= 32:
         raise ValueError('Facade panels require 1–32 explicit rectangles')
     fields = {'id', 'type', 'from', 'to', 'bottom', 'top', 'columns', 'rows', 'frameWidth', 'depth'}
@@ -28,9 +28,9 @@ def validate_panels(panels, length, height, levels, band=None, ledges=None):
                 raise ValueError('Facade panel cell counts must be integers from 1 to 16')
         if p['type'] in ('solid', 'round-window-wall') and (p['columns']!=1 or p['rows']!=1):
             raise ValueError('Solid panels cannot define glazing or lattice cells')
-        # This first contract intentionally covers upper solid walls. Ground
-        # doors, porticos and open corridors need their existing dedicated rules.
-        if not 0 < p['from'] < p['to'] < 1 or not 3.2 <= p['bottom'] < p['top'] <= height-.1:
+        # Exterior rules default to upper walls. A validated shared wall behind
+        # an open portico may pass its floor clearance as the lower bound.
+        if not 0 < p['from'] < p['to'] < 1 or not minimum_bottom <= p['bottom'] < p['top'] <= height-.1:
             raise ValueError('Facade panel must fit inside an upper solid facade')
         if not .04 <= p['frameWidth'] <= .2 or not .06 <= p['depth'] <= .25:
             raise ValueError('Facade panel frame/depth outside supported bounds')
