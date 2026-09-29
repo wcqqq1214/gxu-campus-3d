@@ -79,5 +79,34 @@ class SlattedRoofTests(unittest.TestCase):
         self.assertEqual(len(fs),3)
         self.assertEqual(sum(f['part']=='high-body' for f in fs),2)
 
+    def test_curved_front_preserves_holes_back_edge_and_rotation(self):
+        cfg={**self.config,'solidBays':[2,3,4,5],
+             'frontCurve':{'from':.2,'to':.8,'inset':.8,'segments':24}}
+        roof=resolve_slatted_roof(self.polygons,cfg,[])
+        self.assertEqual(len(roof.interiors),4)
+        self.assertFalse(roof.covers(Point(9,8)))
+        self.assertTrue(roof.covers(Point(8.15,8)))
+        self.assertTrue(roof.covers(Point(8.6,1)))
+        self.assertFalse(roof.covers(Point(8,1)))  # Tail opening stays open.
+        self.assertTrue(roof.covers(Point(0,8)))
+        self.assertLess(roof.difference(Polygon(self.polygons[0][0])).area,1e-8)
+        outline=translate(rotate(Polygon(self.polygons[0][0]),31,origin=(0,0)),50,-24)
+        moved=resolve_slatted_roof([[list(map(list,outline.exterior.coords))]],cfg,[])
+        expected=translate(rotate(roof,31,origin=(0,0)),50,-24)
+        self.assertLess(moved.symmetric_difference(expected).area,1e-8)
+        with self.assertRaisesRegex(ValueError,'supporting beam'):
+            resolve_slatted_roof(self.polygons,cfg,[{'center':[8.6,8]}])
+
+    def test_curved_front_rejects_invalid_dimensions_and_depth_loss(self):
+        curve={'from':.2,'to':.8,'inset':.8,'segments':24}
+        for update in [dict(inset=True),dict(inset=float('nan')),dict(inset=0),dict(inset=8.9),
+                       {'from':-.1},{'from':.9},dict(segments=3),dict(segments=5),dict(segments=66),dict(extra=1)]:
+            cfg={**self.config,'frontCurve':{**curve,**update}}
+            with self.subTest(update=update),self.assertRaises(ValueError):
+                resolve_slatted_roof(self.polygons,cfg,[])
+        for bad in (None,{},True):
+            with self.assertRaises(ValueError):
+                resolve_slatted_roof(self.polygons,{**self.config,'frontCurve':bad},[])
+
 
 if __name__=='__main__':unittest.main()
