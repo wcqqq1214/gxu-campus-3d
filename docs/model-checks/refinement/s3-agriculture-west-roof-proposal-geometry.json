@@ -1,0 +1,177 @@
+{
+  "passed": true,
+  "scope": "Generated candidate geometry only, not real-world correctness, terrain, shipping GLB or production acceptance.",
+  "productionReady": false,
+  "checks": [
+    {
+      "detail": false,
+      "region": "front-terrace",
+      "expected": 9.9,
+      "candidate": 9.899999618530273,
+      "original": 16.5,
+      "oldFailsNewHeight": true
+    },
+    {
+      "detail": false,
+      "region": "west-rear",
+      "expected": 13.2,
+      "candidate": 13.200000762939453,
+      "original": 16.5,
+      "oldFailsNewHeight": true
+    },
+    {
+      "detail": false,
+      "region": "west-north",
+      "expected": 13.2,
+      "candidate": 13.200000762939453,
+      "original": 16.5,
+      "oldFailsNewHeight": true
+    },
+    {
+      "detail": false,
+      "region": "main",
+      "expected": 16.5,
+      "candidate": 16.5,
+      "original": 16.5,
+      "oldFailsNewHeight": false
+    },
+    {
+      "detail": false,
+      "region": "east",
+      "expected": 16.5,
+      "candidate": 16.5,
+      "original": 16.5,
+      "oldFailsNewHeight": false
+    },
+    {
+      "detail": false,
+      "region": "central-rear",
+      "expected": 16.5,
+      "candidate": 16.5,
+      "original": 16.5,
+      "oldFailsNewHeight": false
+    },
+    {
+      "detail": false,
+      "upperSurfaceRayOrigin": [
+        255.76,
+        -350.94,
+        11
+      ],
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "length": 13,
+      "candidateClear": true,
+      "originalBlocked": true
+    },
+    {
+      "detail": false,
+      "upperSurfaceRayOrigin": [
+        252.67,
+        -337.24,
+        15
+      ],
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "length": 9,
+      "candidateClear": true,
+      "originalBlocked": true
+    },
+    {
+      "detail": true,
+      "region": "front-terrace",
+      "expected": 9.9,
+      "candidate": 9.899999618530273,
+      "original": 16.5,
+      "oldFailsNewHeight": true
+    },
+    {
+      "detail": true,
+      "region": "west-rear",
+      "expected": 13.2,
+      "candidate": 13.200000762939453,
+      "original": 16.5,
+      "oldFailsNewHeight": true
+    },
+    {
+      "detail": true,
+      "region": "west-north",
+      "expected": 13.2,
+      "candidate": 13.200000762939453,
+      "original": 16.5,
+      "oldFailsNewHeight": true
+    },
+    {
+      "detail": true,
+      "region": "main",
+      "expected": 16.5,
+      "candidate": 16.5,
+      "original": 16.5,
+      "oldFailsNewHeight": false
+    },
+    {
+      "detail": true,
+      "region": "east",
+      "expected": 16.5,
+      "candidate": 16.5,
+      "original": 16.5,
+      "oldFailsNewHeight": false
+    },
+    {
+      "detail": true,
+      "region": "central-rear",
+      "expected": 16.5,
+      "candidate": 16.5,
+      "original": 16.5,
+      "oldFailsNewHeight": false
+    },
+    {
+      "detail": true,
+      "upperSurfaceRayOrigin": [
+        255.76,
+        -350.94,
+        11
+      ],
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "length": 13,
+      "candidateClear": true,
+      "originalBlocked": true
+    },
+    {
+      "detail": true,
+      "upperSurfaceRayOrigin": [
+        252.67,
+        -337.24,
+        15
+      ],
+      "direction": [
+        0,
+        0,
+        1
+      ],
+      "length": 9,
+      "candidateClear": true,
+      "originalBlocked": true
+    }
+  ],
+  "images": [
+    "docs/screenshots/refinement/s3-agriculture-west-roof-proposal/original-southwest.png",
+    "docs/screenshots/refinement/s3-agriculture-west-roof-proposal/original-south.png",
+    "docs/screenshots/refinement/s3-agriculture-west-roof-proposal/original-roof.png",
+    "docs/screenshots/refinement/s3-agriculture-west-roof-proposal/candidate-southwest.png",
+    "docs/screenshots/refinement/s3-agriculture-west-roof-proposal/candidate-south.png",
+    "docs/screenshots/refinement/s3-agriculture-west-roof-proposal/candidate-roof.png"
+  ],
+  "proposalSha256": "9e2fbcf2478776a9e14367e227cde8aeaa52142a265bd18d6c1aac8b8ce84d6b",
+  "productionUnchanged": true
+}

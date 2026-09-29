@@ -799,6 +799,8 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 
 ## 农学院正面挑檐（2026-09-20）
 
+2026-09-30西翼屋面候选：`blender/check_agriculture_roof_proposal.py` 使用冻结的候选JSON，在两种生成细节档各检查六处屋面高度和两条有限上方射线，并运行原五层模型反例。通过Blender执行，加 `--python-exit-code 1`，并指定 `--proposal`、`--report`、`--images`。只生成独立检查图，不保存生产模型；通过不代表现场层数、照片配准、全体积净空或GLB/地形验收。候选生成、六图对照与接续门槛见[说明](AGRICULTURE_WEST_ROOF_PROPOSAL.md)。
+
 `blender/validate_agriculture_ledges.py -- --report-prefix=<新批次>` 对源文件、基础与近景的实际三角网各执行220条射线，包含十道挑檐的顶面、板底、外缘、深度外空区以及保留窗面与层间净空；使用固定验收位置。`--check-root=<旧资产目录>` 可验证缺失构件的反例，仍读取当前校准楼的锚点。与 `validate_agriculture.py` 配合检查原四柱门廊、三个开放柱间、退后门面及台阶。通过Blender的 `--python` 执行并设置 `--python-exit-code 1`，不同专项采用不同报告前缀。尺寸估算与完成边界见[本批记录](AGRICULTURE_FACADE_LEDGES.md)。
 
 ## 农学院东侧顶层窗列（2026-09-20）
