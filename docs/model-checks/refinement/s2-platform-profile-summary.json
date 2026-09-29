@@ -1,0 +1,129 @@
+{
+  "checkedAt": "2026-09-29T15:52:25.815527+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "testOrderingNote": "Initial Node attempt ran during model export and failed five derived elevation/camera assertions; all 62 passed on the final completed asset set.",
+  "pending": [
+    "Hall roof slope, south delivery entrance and road connection",
+    "North office remaining elevations, actual rooftop use/details and personnel entrance",
+    "North low wing and foyer partition depths, levels, roof shape and dimensions; true glazing dimensions",
+    "Separate historical old hall footprint and demolition timing"
+  ],
+  "baseCommit": "f2cd424101de38801b985317da2514b95958f24b",
+  "branch": "dev",
+  "scope": "Four-segment west-rising profiled foyer roof, 10.8 m lowest eave and 2.4 m rise, with closed raised boundary walls. Six body partitions, columns, glazing and other roofs preserved. Dimensions and true roof curvature are estimated; entries and cap/drainage details remain unverified. Partial implementation only.",
+  "blenderVersion": "5.2.2",
+  "photoRegistrationAccepted": false,
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 244,
+  "nodeTests": 62,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4198969,
+        "medianDrawCalls": 553
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.454043861569379,
+        "medianDrawCalls": 1.0968921389396646
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1164737,
+        "medianDrawCalls": 299
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 10.722233576850492,
+        "medianDrawCalls": 13.688212927756659
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 27,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5399328,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "8f38e022170639952ac8c6fcd41c3c15b61b6188ad59a2476ae3c76f36fecb70",
+    "data/building-sources.json": "dd25067d6c0af395fd22f18fa605cd374799eff783d1bc625f2e5b9838004712",
+    "blender/gxu-campus.blend": "cdc1087cdddbe1bf52eafa06c6e1e6c3ddf54081f2816b06c4d28b45988401c2",
+    "blender/generic_buildings.py": "5ba115d51852dbc95ccdac184b392b63e8e3571ffad9e539864fd5d8d6e4fbc6",
+    "scripts/building_overrides.py": "2636486074ecb52d13944c665d5adfbd9aabf9a0bb412f8ff0a10fcc66efbe4c",
+    "scripts/roof_volumes_data.py": "d97e7359e1be7150d33e07285b36aae7b7d9984309a934a0932c6ec4de946cb8",
+    "scripts/explicit_roof_data.py": "ef5bb57eaf7fe8bea25c41ce39cdd4f32183d3c0974830ef92b40aa79d844d92",
+    "scripts/exposed_facades_data.py": "d7218fed11d69817221e67f74627549d28f6b54421a4d1246f3f56f318d4360d",
+    "scripts/facade_panels_data.py": "087ea41d3cab30e7b51408245a85bb77cb03d67eed34242685f4e04badc14820",
+    "blender/validate_generic.py": "a13873c9f4f1d4e9bf25db53bd80b6d0c41577b360f4b183d78680f7cba6041c",
+    "blender/validate_civil_platform.py": "cd28571441a313043c13bd511131dc0fbe82d24c40b0084c999472b8ded068e4",
+    "public/data/buildings.json": "d688b7c991355507e9d5d53afe5cee7706033aafd08070fc971ca7187c6faa59",
+    "public/data/sources.json": "fdc8f5484b919a271503a5f34e445467df6488f5ea8776a9f150962c3a537c1f",
+    "public/data/models.json": "dc691ad9cdab339ba8ccd20edca32fd65b42668fa7eafb6be5d2166834a3eecc"
+  }
+}
