@@ -99,8 +99,9 @@ def main():
     portico = next(p for p in building['form']['parts'] if p['id'] == 'link-portico')
     supports = []
     for index, column in enumerate(portico['openBelow']['columns']):
-        support = translate(rotate(box(-column['width']/2, -column['depth']/2,
-                                       column['width']/2, column['depth']/2),
+        spread=column['base']['projection']+.03 if 'base' in column else 0
+        support = translate(rotate(box(-column['width']/2-spread, -column['depth']/2-spread,
+                                       column['width']/2+spread, column['depth']/2+spread),
                                    column['angle'], use_radians=True), *column['center'])
         supports.append({'columnIndex': index, 'center': column['center'],
                          'distanceToRouteM': route.distance(support),

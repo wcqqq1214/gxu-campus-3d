@@ -218,7 +218,7 @@ def resolve_parts(b, raw, roof):
             if not isinstance(columns,list) or not 2 <= len(columns) <= 12:
                 raise ValueError('Portico requires 2–12 explicit columns')
             for column in columns:
-                if not isinstance(column,dict) or not {'center','width','depth','angle'} <= set(column) or set(column)-{'center','width','depth','angle','shape'}:
+                if not isinstance(column,dict) or not {'center','width','depth','angle'} <= set(column) or set(column)-{'center','width','depth','angle','shape','base','finish'}:
                     raise ValueError('Unknown portico column fields')
                 if not isinstance(column['center'],list) or len(column['center']) != 2:
                     raise ValueError('Invalid portico column center')
@@ -228,7 +228,19 @@ def resolve_parts(b, raw, roof):
                 w = positive(column['width'],'column width'); d = positive(column['depth'],'column depth')
                 if column.get('shape','box') not in ('box','cylinder') or (column.get('shape')=='cylinder' and abs(w-d)>1e-6):
                     raise ValueError('Round portico columns need equal width and depth')
-                support = translate(rotate(box(-w/2,-d/2,w/2,d/2),column['angle'],use_radians=True),*column['center'])
+                if 'finish' in column and column['finish'] not in ('white','stone'):
+                    raise ValueError('Column finish must use shared white or stone')
+                spread=0
+                if 'base' in column:
+                    base=column['base']
+                    if column.get('shape')!='cylinder' or not isinstance(base,dict) or set(base)!={'height','projection','capHeight'}:
+                        raise ValueError('Round column base requires height, projection and cap height')
+                    for key,lo,hi in [('height',.2,.8),('projection',.03,.15),('capHeight',.04,.12)]:
+                        v=base[key]
+                        if type(v) not in (int,float) or not math.isfinite(v) or not lo<=v<=hi:raise ValueError('Invalid column base '+key)
+                    if base['height']<=base['capHeight'] or base['height']>=clear-floor:raise ValueError('Column base must fit its shaft')
+                    spread=base['projection']+.03
+                support = translate(rotate(box(-w/2-spread,-d/2-spread,w/2+spread,d/2+spread),column['angle'],use_radians=True),*column['center'])
                 if support.difference(shape).area > 1e-5 or any(support.intersection(s).area > 1e-5 for s in supports):
                     raise ValueError('Portico columns leave their footprint or overlap')
                 supports.append(support)
@@ -646,12 +658,20 @@ def resolve_building(building, record=None, source_ids=None):
         entrances = []; ids = set()
         for e in record['entrances']:
             required = {'id','polygon','ring','edge','t','width','primary'}
-            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance','recessGlazing'} or not e['id'] or e['id'] in ids:
+            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance','recessGlazing','recessDoor'} or not e['id'] or e['id'] in ids:
                 raise ValueError('Invalid or duplicate entrance')
             if 'recessGlazing' in e and ('recess' not in e or set(e)-required-{'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','recessGlazing'}):
                 raise ValueError('Recess glazing requires only a recessed portico entrance')
             if any(k in e for k in ('stepWidth','stepFoundationDepth')) and 'recess' not in e:
                 raise ValueError('Explicit step width and foundation require a recessed entrance')
+            if 'recessDoor' in e:
+                p=e['recessDoor']
+                if 'recess' not in e or any(k in e for k in ('recessGlazing','doorFrame','flushEntrance','attachedPortico','mappedCanopy')) or not isinstance(p,dict) or set(p)!={'frameWidth','leafCount','lintelHeight'}:
+                    raise ValueError('Recess door needs an independent recessed entrance and explicit frame/leaves/lintel')
+                if type(p['leafCount']) is not int or not 2<=p['leafCount']<=4:raise ValueError('Recess door requires 2–4 leaves')
+                for key,lo,hi in [('frameWidth',.04,.12),('lintelHeight',.12,.4)]:
+                    v=p[key]
+                    if type(v) not in (int,float) or not math.isfinite(v) or not lo<=v<=hi:raise ValueError('Invalid recess door '+key)
             if 'mappedCanopy' in e:
                 from mapped_canopy_data import validate_mapped_canopy
                 validate_mapped_canopy(e['mappedCanopy'])
@@ -759,11 +779,14 @@ def resolve_building(building, record=None, source_ids=None):
                     if type(base) not in (int,float) or not math.isfinite(base) or not 0 <= base < porch['openBelow']['floorHeight']:
                         raise ValueError('Step base must be finite, nonnegative and below the platform')
                 for column in porch['openBelow']['columns']:
-                    support=translate(rotate(box(-column['width']/2,-column['depth']/2,column['width']/2,column['depth']/2),column['angle'],use_radians=True),*column['center'])
+                    spread=column['base']['projection']+.03 if 'base' in column else 0
+                    support=translate(rotate(box(-column['width']/2-spread,-column['depth']/2-spread,column['width']/2+spread,column['depth']/2+spread),column['angle'],use_radians=True),*column['center'])
                     if support.intersects(route.buffer(.6)):
                         raise ValueError('Portico column blocks the central entrance route')
                 resolved.update(center=back,outerCenter=front,porticoId=porch['id'],
                     platformHeight=porch['openBelow']['floorHeight'],porticoWidth=portico_width)
+                if 'recessDoor' in e and ((width-e['recessDoor']['frameWidth'])/e['recessDoor']['leafCount']-e['recessDoor']['frameWidth']<.6 or porch['openBelow']['floorHeight']+2.8+e['recessDoor']['lintelHeight']>porch['openBelow']['clearHeight']):
+                    raise ValueError('Recess door leaves or lintel do not fit the portico')
                 if 'recessGlazing' in e:
                     from recess_glazing_data import validate_recess_glazing
                     validate_recess_glazing(e['recessGlazing'],resolved,porch['openBelow'],body.boundary,porch_shape,tangent)

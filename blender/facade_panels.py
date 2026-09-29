@@ -14,6 +14,7 @@ def add_panels(mesh, facade, z, C):
             add_round_window_wall(mesh, facade, p, z, C)
             continue
         w = (p['to']-p['from'])*length; h = p['top']-p['bottom']; fw = p['frameWidth']
+        frame_material=C[p.get('frameFinish','white')]
         x, y = point((p['from']+p['to'])/2, .025)
         if p['type']=='solid':
             mesh.box(x,y,z+(p['bottom']+p['top'])/2,w,p['depth'],h,C['white'],theta)
@@ -33,10 +34,10 @@ def add_panels(mesh, facade, z, C):
                 return (px, py, z+p['bottom']+up)
             front = [at(s, up, .05+p['depth']) for s, up in corners]
             back = [at(s, up, .05) for s, up in corners]
-            mesh.face(front, C['white']); mesh.face(back[::-1], C['white'])
+            mesh.face(front, frame_material); mesh.face(back[::-1], frame_material)
             for i in range(4):
                 j = (i+1)%4
-                mesh.face([front[j], front[i], back[i], back[j]], C['white'])
+                mesh.face([front[j], front[i], back[i], back[j]], frame_material)
 
         # Frames are entirely contained by the configured outer rectangle.
         bar((fw/2, 0), (fw/2, h), fw)

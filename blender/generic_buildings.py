@@ -65,10 +65,16 @@ def shared_form(b, z, C):
                     part_body.face([(vertices[k][0],vertices[k][1],z+soffit) for k in reversed(indices[i:i+3])],roof_wall)
             part_body.extrude(part['polygons'],triangles,z-.15,floor+.15,C['stone'],C['stone'])
             for column in opening['columns']:
+                column_material=C[column['finish']] if 'finish' in column else part_wall
                 if column.get('shape')=='cylinder':
-                    part_body.cylinder(*column['center'],z+(floor+soffit)/2,column['width']/2,soffit-floor,part_wall,n=16)
+                    base=column.get('base');bottom=floor+(base['height'] if base else 0)
+                    part_body.cylinder(*column['center'],z+(bottom+soffit)/2,column['width']/2,soffit-bottom,column_material,n=16)
+                    if base:
+                        base_height=base['height'];cap=base['capHeight'];radius=column['width']/2+base['projection']
+                        part_body.cylinder(*column['center'],z+floor+(base_height-cap)/2,radius,base_height-cap,column_material,n=16)
+                        part_body.cylinder(*column['center'],z+floor+base_height-cap/2,radius+.03,cap,column_material,n=16)
                 else:
-                    part_body.box(*column['center'],z+(floor+soffit)/2,column['width'],column['depth'],soffit-floor,part_wall,column['angle'])
+                    part_body.box(*column['center'],z+(floor+soffit)/2,column['width'],column['depth'],soffit-floor,column_material,column['angle'])
         else:
             roof_material = C['blueRoof'] if roof.get('finish') == 'blue-metal' else C['paleRoof']
             top_indices = [[] for _ in part['polygons']] if 'inset' in roof else triangles
@@ -168,7 +174,17 @@ def shared_form(b, z, C):
                 add_recess_glazing(entrance,e,z,C)
             else:
                 entrance.box(x+nx*.04,y+ny*.04,z+floor+1.4,width,.10,2.8,C['glass'],theta)
-                entrance.box(x+nx*.06,y+ny*.06,z+floor+2.83,width+.2,.14,.12,C['white'],theta)
+                door=e.get('recessDoor')
+                if door:
+                    fw=door['frameWidth'];tx,ty=ny,-nx
+                    for i in range(door['leafCount']+1):
+                        offset=-width/2+fw/2+(width-fw)*i/door['leafCount']
+                        entrance.box(x+tx*offset+nx*.14,y+ty*offset+ny*.14,z+floor+1.4,fw,.10,2.8,C['dark'],theta)
+                    for up in (fw/2,2.8-fw/2):
+                        entrance.box(x+nx*.14,y+ny*.14,z+floor+up,width,.10,fw,C['dark'],theta)
+                    lh=door['lintelHeight']
+                    entrance.box(x+nx*.06,y+ny*.06,z+floor+2.8+lh/2,width+.2,.14,lh,C['stone'],theta)
+                else:entrance.box(x+nx*.06,y+ny*.06,z+floor+2.83,width+.2,.14,.12,C['white'],theta)
             # Counts can be sourced separately from estimated dimensions.
             steps=e.get('steps',3)
             step_base=e.get('stepBaseHeight',0)
