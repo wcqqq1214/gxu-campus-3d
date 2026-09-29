@@ -10,19 +10,34 @@ parser.add_argument('--proposal',type=Path,required=True);parser.add_argument('-
 parser.add_argument('--surround',action='store_true',help='Check estimated stone surround and bounded glazing')
 parser.add_argument('--tall-surround',action='store_true',help='Check 8.6m proportional roof alternative')
 parser.add_argument('--curved-roof',action='store_true',help='Check curved front and approximately 6m recess')
+parser.add_argument('--refined-columns',action='store_true',help='Check camera-guided column layout and six-pane glazing')
 a=parser.parse_args(sys.argv[sys.argv.index('--')+1:]);data=json.loads(a.proposal.read_text())
 C={k:i for i,k in enumerate(['white','stone','pink','paleRoof','dark','glass','shadeGlass','blueRoof','red'])}
 b=data['candidate'];entry=next(e for e in b['form']['entrances'] if e.get('porticoId')=='link-portico')
 angle=math.radians(entry['bearing']);n=Vector((math.sin(angle),math.cos(angle),0));t=Vector((n.y,-n.x,0));front=Vector((*entry['outerCenter'],0))
 porch=next(p for p in b['form']['parts'] if p['id']=='link-portico');corners=porch['polygons'][0][0][:-1]
-length=min(math.dist(corners[1],corners[2]),math.dist(corners[3],corners[0]));gap=(length-2*1.15-11*.2)/12
+edge_width=1.55 if a.refined_columns else 1.15
+length=min(math.dist(corners[1],corners[2]),math.dist(corners[3],corners[0]));gap=(length-2*edge_width-11*.2)/12
 roof_height=8.6 if a.tall_surround else 7.2
 assert not a.tall_surround or a.surround, 'Tall alternative requires surround checks'
 assert not a.curved_roof or a.tall_surround, 'Curved alternative requires tall surround checks'
+assert not a.refined_columns or a.curved_roof, 'Refined columns require the curved candidate'
 checks=[];negative=[]
 for detail in (False,True):
     m=ordinary_building(b,0,C,detail);tree=BVHTree.FromPolygons(m.v,m.f)
     previous=ordinary_building(data['original'],0,C,detail);old=BVHTree.FromPolygons(previous.v,previous.f)
+    if a.refined_columns:
+        for along in (-4,4):
+            depth=1+.8*(1-(along/9)**2)
+            center=front+t*along-n*depth+Vector((0,0,3.2))
+            hit=tree.ray_cast(center-t,t,2)
+            assert hit[0] is not None and .65<hit[3]<.7,(detail,along,hit)
+            checks.append(dict(detail=detail,frontColumnAlong=along,passed=True))
+        # Interior divider locations are fixed independently of panel config.
+        for along,height in [(2.425-.07-i*.785,5.8) for i in range(1,6)]+[(2.0,5.4675),(2.0,6.2325)]:
+            start=front+t*along-n*5.4+Vector((0,0,height));hit=tree.ray_cast(start,-n,1)
+            assert hit[0] is not None and m.m[hit[2]]==C['dark'],(detail,along,height,hit)
+            checks.append(dict(detail=detail,glazingDividerAlong=along,height=height,passed=True))
     if a.curved_roof:
         for along in (-12,-9,-8,-6,-4,-2,0,2,4,6,8,9,12):
             setback=.8*max(0,1-(along/9)**2)
@@ -70,7 +85,7 @@ for detail in (False,True):
         assert hit[0] is not None and previous.m[hit[2]]!=C['stone']
         negative.append(dict(detail=detail,baselineLacksStoneSurround=True))
     for i in range(12):
-        v=(1.15+i*(gap+.2)+gap/2)/length
+        v=(edge_width+i*(gap+.2)+gap/2)/length
         p=Vector(tuple(sum(w*c[k] for w,c in zip([.5*(1-v),.5*(1-v),.5*v,.5*v],corners)) for k in (0,1))+(roof_height+.8,))
         hit=tree.ray_cast(p,Vector((0,0,-1)),3)[0]
         solid=i in (5,6,7,8,9)
@@ -78,8 +93,10 @@ for detail in (False,True):
         checks.append(dict(detail=detail,bay=i,solid=solid,passed=True))
         if not solid:assert old.ray_cast(p,Vector((0,0,-1)),3)[0] is not None
     negative.append(dict(detail=detail,baselineBlocksAllSevenIntendedOpenings=True))
-    for along in (-2.8,2.8):
-        center=front+t*along-n*(4.7 if a.curved_roof else 2.65)+Vector((0,0,3.2))
+    rear_half=2.35 if a.refined_columns else 2.8
+    for along in (-rear_half,rear_half):
+        rear_depth=3.8 if a.refined_columns else (4.7 if a.curved_roof else 2.65)
+        center=front+t*along-n*rear_depth+Vector((0,0,3.2))
         hit=tree.ray_cast(center-t,t,2)
         assert hit[0] is not None and .65<hit[3]<.7,(detail,along,hit)
         assert old.ray_cast(center-t,t,2)[0] is None

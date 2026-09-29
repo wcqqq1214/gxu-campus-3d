@@ -49,7 +49,8 @@ def add_panels(mesh, facade, z, C):
             for col in range(1, p['columns']):
                 s = fw+col*cw; bar((s, fw), (s, h-fw), fw*.65)
             for row in range(1, p['rows']):
-                up = fw+row*ch; bar((fw, up), (w-fw, up), fw*.65)
+                up = fw+(p['rowFractions'][row-1]*(h-2*fw) if 'rowFractions' in p else row*ch)
+                bar((fw, up), (w-fw, up), fw*.65)
             continue
         # Adjacent octagons share straight edges. Deduplicate these bars;
         # the small corner diamonds remain open like the reference screen.
