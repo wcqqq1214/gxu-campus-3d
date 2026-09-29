@@ -1,0 +1,126 @@
+{
+  "passed": true,
+  "scope": "Mapped service-road footprint repaired to original terrain plus its explicit estimated offset; original campus-road contacts retained through bounded blends. Interior, fixed profiles and exported seams checked.",
+  "pavingId": "civil-platform-service",
+  "areaMeters2": 635.5577866151093,
+  "groundOffsetM": 0.08,
+  "source": {
+    "passed": true,
+    "interiorSamples": 2121,
+    "maximumGroundedHeightError": 0.0011843872070312483,
+    "minimumGroundClearance": 0.07941436767578125,
+    "formerFailureProfiles": [
+      {
+        "x": -4,
+        "maximumStepPer2cm": 4.57763671875e-05
+      },
+      {
+        "x": 0,
+        "maximumStepPer2cm": 5.340576171875e-05
+      },
+      {
+        "x": 4,
+        "maximumStepPer2cm": 0.00067901611328125
+      }
+    ],
+    "joins": [
+      {
+        "edge": 4,
+        "t": 0.2,
+        "maximumStepPer2cm": 0.01004791259765625,
+        "measuredGapUpperBounds": []
+      },
+      {
+        "edge": 4,
+        "t": 0.5,
+        "maximumStepPer2cm": 0.009918212890625,
+        "measuredGapUpperBounds": []
+      },
+      {
+        "edge": 4,
+        "t": 0.8,
+        "maximumStepPer2cm": 0.0098724365234375,
+        "measuredGapUpperBounds": []
+      }
+    ],
+    "neighborOverlapProfiles": [
+      {
+        "x": -693.1,
+        "y": -712.92,
+        "samples": 181,
+        "maximumStepPer2cm": 0.0030059814453125
+      },
+      {
+        "x": -691.965,
+        "y": -711.7,
+        "samples": 101,
+        "maximumStepPer2cm": 0.00304412841796875
+      }
+    ],
+    "tolerance": 0.008,
+    "exportSeamSamples": 0,
+    "maximumExportSeamError": 0
+  },
+  "base": {
+    "passed": true,
+    "interiorSamples": 2121,
+    "maximumGroundedHeightError": 0.0017642211914062483,
+    "minimumGroundClearance": 0.07338714599609375,
+    "formerFailureProfiles": [
+      {
+        "x": -4,
+        "maximumStepPer2cm": 0.000885009765625
+      },
+      {
+        "x": 0,
+        "maximumStepPer2cm": 0.00115203857421875
+      },
+      {
+        "x": 4,
+        "maximumStepPer2cm": 0.0011138916015625
+      }
+    ],
+    "joins": [
+      {
+        "edge": 4,
+        "t": 0.2,
+        "maximumStepPer2cm": 0.0101318359375,
+        "measuredGapUpperBounds": []
+      },
+      {
+        "edge": 4,
+        "t": 0.5,
+        "maximumStepPer2cm": 0.00988006591796875,
+        "measuredGapUpperBounds": []
+      },
+      {
+        "edge": 4,
+        "t": 0.8,
+        "maximumStepPer2cm": 0.0098724365234375,
+        "measuredGapUpperBounds": []
+      }
+    ],
+    "neighborOverlapProfiles": [
+      {
+        "x": -693.1,
+        "y": -712.92,
+        "samples": 181,
+        "maximumStepPer2cm": 0.00299835205078125
+      },
+      {
+        "x": -691.965,
+        "y": -711.7,
+        "samples": 101,
+        "maximumStepPer2cm": 0.00299835205078125
+      }
+    ],
+    "tolerance": 0.045,
+    "exportSeamSamples": 270,
+    "maximumExportSeamError": 0.041290283203125
+  },
+  "fingerprints": {
+    "blender/gxu-campus.blend": "2dafa1fd1ac8ec571206a3c50010aafff164693e18d27d6915b09954c51ce057",
+    "public/models/base.glb": "7855462d61fac04d83e6160fc0ad58ee43e49867dcd7ef071e48f8bdd9ed6c64",
+    "public/data/pavings.json": "b9fd7b8aac292aa406f16e5a089c4d6f59254b1f9713447baac6f5c0902753d0"
+  }
+}

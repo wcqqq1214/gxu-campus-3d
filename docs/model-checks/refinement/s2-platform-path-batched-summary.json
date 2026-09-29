@@ -1,0 +1,123 @@
+{
+  "checkedAt": "2026-09-29T18:49:47.184270+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "baseCommit": "a574a2b00af4e3bd72710b6ecd7dd601eb27bfac",
+  "branch": "dev",
+  "removedContactDrawCalls": 2,
+  "priorFailedPerformance": "s2-platform-path-summary.json",
+  "scope": "Estimated full 12 m stair-width apron (19.171 m2) meets the mapped service road. Original 635.558 m2 road footprint grounded at 0.08 m above terrain, retaining the southern join and northern neighbor overlap with local blends. Dimensions, material and accessibility remain unverified.",
+  "pending": [
+    "Frame/leaf/base detail and exact photo registration",
+    "South delivery entry, remaining hall roof and north office elevations",
+    "Historical old hall identity/footprint/time"
+  ],
+  "blenderVersion": "5.2.2",
+  "photoRegistrationAccepted": false,
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 254,
+  "nodeTests": 65,
+  "checks": [
+    "contact-batching-decoded",
+    "connection-geometry",
+    "road-grade-geometry",
+    "platform-geometry",
+    "entry-geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review",
+    "performance-visual-review"
+  ],
+  "platformContextChecksPerAsset": 507,
+  "entryRecordsPerAsset": 53,
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.0182043423749665,
+        "medianDrawCalls": 3.4734917733089565
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 14.224507935300789,
+        "medianDrawCalls": 14.828897338403046
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "performanceReport": "s2-platform-path-batched-performance-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of absence of all background activity.",
+  "initialModelBytes": 5811724,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/site-overrides.json": "417d86d4deaf2773bab2ec62bcd34d8743901e6eeccc2a3af67b232e49415c31",
+    "data/paving-overrides.json": "c11db10306a34fc42821f1ee33abf13a566e612e46d632eb016c335bd16cadad",
+    "blender/gxu-campus.blend": "2dafa1fd1ac8ec571206a3c50010aafff164693e18d27d6915b09954c51ce057",
+    "blender/paving_geometry.py": "1488cfe0f740a07d8aae25fcf99e29f9e29ff43f9e868ee30e46f8061e30ed0a",
+    "blender/side_connection.py": "7561e106edea91faf2de63d1649b6a481b5d929a92bb9fefea1d8f5a279edfcb",
+    "blender/validate_civil_forecourt_road.py": "3027c2e946d7853be8e841cebafdc7b66631afabb6099957860d0899fe80e2a3",
+    "blender/validate_side_connection.py": "a2a5088f4d5f3619ce40cd6739339668d650d88dc903c40075e7518e1d0a4a60",
+    "scripts/paving_data.py": "2b4f5046539ce2a5aa41dd674c8fcd7c354b84325027ac4255399c1feefd81a0",
+    "scripts/front_connection_data.py": "5abd770e163db3c9504490e6e9a26a6bed18dff7c2ce4ab28020c4e3fe8322e4",
+    "scripts/test_paving_data.py": "0976f554c0e8728bae356945d8320fc7860af037d9f391ecb6a76402c6f44cea",
+    "scripts/test_recessed_connection_data.py": "70182d2de3a5ae43793e0a16d5a8bba94b83015eb61d2fc96a63e819f5d960cf",
+    "blender/test_paving_geometry.py": "f426ecd12b9127fbb90abf3cbd76f697f5f275b5f1a1228b11cfd948ec9c6d78",
+    "public/data/sites.json": "e55a14a37bc3c6da44fa66ac7e1c5758a28ff97bdaada966f2f4a09af9506a97",
+    "public/data/pavings.json": "b9fd7b8aac292aa406f16e5a089c4d6f59254b1f9713447baac6f5c0902753d0",
+    "public/data/buildings.json": "ef0e46d79e494ab06561807cd4a150c461f0c159151c520a7c767a3205408e0c",
+    "public/data/models.json": "f01237ae1d8965bf8308e0967d675ab225e6ad1a17457a369d118de286279bfa",
+    "lib/campus/road-batching.ts": "c37b103197fcbaee59ba6f69b8f8fec4cc2fbbff718e827c39fd2ef032737dde",
+    "lib/campus/scene.ts": "4c912fb7dd0276135b51754fffc77ef5b2f1fc658fc47eb3b22c37557e7cccf6",
+    "scripts/test-road-batching.mjs": "035cfa777a566c54538f89421b45dc99110e7cfa52d7fd2a1851fd6c142668e6",
+    "scripts/check-road-batching.mjs": "9f2c4f3cc70ef41ae721c8ee2d6b8b60e25f06231c178753e80bd18f8ba9b0c6"
+  }
+}

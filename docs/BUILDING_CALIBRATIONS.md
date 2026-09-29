@@ -145,3 +145,7 @@ blender --background --python-exit-code 1 --python blender/validate_generic.py -
 `roofEave` 用一个实体平屋面分段的外边锚定中央宽檐口：`part/polygon/edge` 指向分段自身外环，区别于立面规则引用的原建筑外环。`backDepth/projection/sideOverhang/rise/capThickness` 控制支撑宽度、外挑、两端放宽、斜面上升和顶边厚度；屋面标高、边长及朝向均由分段派生。只替换这条边的默认女儿墙，远近景共享闭合外形。拒绝空门廊、坡屋面、穿过内院的支撑、无效锚点和相交的等高/更高邻段，也暂不与楼梯塔或穹顶混用。当前仅农学院采用，轮廓与尺寸均为照片约束估算，见[中央檐口](AGRICULTURE_CENTRAL_EAVE.md)。
 
 2026-09-20 后续：`facadeRules.skipWindowLevels` 可按有序、不重复的零基层号跳过通用窗列，显式面板继续生成。不能与关闭全部窗、专项窗格/窗带、外廊或附着连廊混用，并按所属实体分段检查层号。水平挑檐现允许搭配显式面板，要求二者在墙面范围内不相交。农学院东侧顶层采用15扇、其中5扇较矮的窗列；底部四层保留通用示意。见[顶层窗列专项](AGRICULTURE_TOP_WINDOWS.md)。
+
+## 后退人员入口的场地衔接（2026-09-30）
+
+`front-connection` 可连接包含 `porticoId`、`recess`、`steps`、`stepWidth`、`platformHeight` 的已解析入口；连接面从实际最外踏面起算并沿用梯宽，拒绝 `pathWidth` 覆盖。具体场地与服务路交叠处理见[结构平台接路专项](CIVIL_PLATFORM_ENTRY_CONNECTION.md)。后退进深和级数必须先由建筑配置解析，场地不能另造一个入口。
