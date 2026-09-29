@@ -646,10 +646,12 @@ def resolve_building(building, record=None, source_ids=None):
         entrances = []; ids = set()
         for e in record['entrances']:
             required = {'id','polygon','ring','edge','t','width','primary'}
-            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance','recessGlazing'} or not e['id'] or e['id'] in ids:
+            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance','recessGlazing'} or not e['id'] or e['id'] in ids:
                 raise ValueError('Invalid or duplicate entrance')
-            if 'recessGlazing' in e and ('recess' not in e or set(e)-required-{'recess','steps','stepBaseHeight','recessGlazing'}):
+            if 'recessGlazing' in e and ('recess' not in e or set(e)-required-{'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','recessGlazing'}):
                 raise ValueError('Recess glazing requires only a recessed portico entrance')
+            if any(k in e for k in ('stepWidth','stepFoundationDepth')) and 'recess' not in e:
+                raise ValueError('Explicit step width and foundation require a recessed entrance')
             if 'mappedCanopy' in e:
                 from mapped_canopy_data import validate_mapped_canopy
                 validate_mapped_canopy(e['mappedCanopy'])
@@ -744,6 +746,14 @@ def resolve_building(building, record=None, source_ids=None):
                 width_at_front=2*min(front_line.project(Point(front))-lo,hi-front_line.project(Point(front)))
                 if width_at_front<width:raise ValueError('Recessed doorway exceeds its portico frontage')
                 portico_width=length if abs(width_at_front-length)<1e-6 else width_at_front
+                if 'stepWidth' in e:
+                    step_width=e['stepWidth']
+                    if type(step_width) not in (int,float) or not math.isfinite(step_width) or not width <= step_width <= portico_width:
+                        raise ValueError('Step width must cover the doorway and fit the portico frontage')
+                if 'stepFoundationDepth' in e:
+                    foundation=e['stepFoundationDepth']
+                    if type(foundation) not in (int,float) or not math.isfinite(foundation) or not 0 < foundation <= .3:
+                        raise ValueError('Step foundation depth must be finite and within 0–0.3 m')
                 if 'stepBaseHeight' in e:
                     base = e['stepBaseHeight']
                     if type(base) not in (int,float) or not math.isfinite(base) or not 0 <= base < porch['openBelow']['floorHeight']:

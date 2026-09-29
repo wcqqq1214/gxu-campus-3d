@@ -1,5 +1,7 @@
 # 验收记录
 
+2026-09-30人员入口接续：[D区门面、平台与台阶](CIVIL_PLATFORM_PERSONNEL_ENTRY.md)通过249项Python、62项Node、类型检查、lint、完整模型与Pages构建。平台专项追加 `--personnel-entry`（要求已有 `--entry-bay`），源/基础/近景各507项通过；`blender/validate_civil_platform_entry.py -- --report-prefix=<新批次>` 各53条记录检查门面、整门宽通路、横梁、平台、七级踏面、基础底面、实际地形及旧门移除。通过Blender运行并设置 `--python-exit-code 1`；`--check-root=<旧资产目录>` 验证旧模型失败。基础地形同时用于近景踏面检查，未将无地形近景文件独立当作贴地证明。道路与树冠回归通过，11张目标及6张回归图直接核看；台阶前完整步行接路仍未完成。 同条件精细60/60/60、流畅30/30/30 FPS，三角形增幅4.56%/10.71%、绘制调用增幅2.93%/11.79%，原预算及三次LOD往返通过；26次CPU快照在计时窗口未捕捉到达到2%阈值的Python/Blender活动。[本批汇总](model-checks/refinement/s2-platform-door-summary.json)通过入口局部联合验收。
+
 2026-09-30柱列接续：[入口侧宽跨](CIVIL_PLATFORM_ENTRY_BAY.md)通过247项Python、62项Node、类型检查、lint、模型及Pages构建。平台检查参数在 `--roof-rim` 后追加 `--entry-bay`，源/基础/近景各511项通过；旧等距柱列在新柱位检查失败，固定OSM投影及左右0.6米、三个高度的九条射线直达后墙。该检查只证明模型中央通路净空，不代表真实门洞、台阶或接路完成。11张目标图、6张回归图直接核看，普通建筑、道路与树冠回归通过。精细60/60/60、流畅30/30/30 FPS，原性能预算及三次LOD往返通过；27次CPU快照在计时窗口未捕捉到达到2%阈值的Python/Blender活动。[汇总](model-checks/refinement/s2-platform-entry-bay-summary.json)通过柱列局部联合验收，整栋计数不变。
 
 2026-09-30屋面外缘接续：[门厅檐口与柱廊薄边框](CIVIL_PLATFORM_ROOF_RIMS.md)通过247项Python、62项Node、类型检查、lint及源/基础/近景各502项专项检查。参数追加 `--roof-rim`；旧模型在新增浅色檐口位置失败。宽度、标高与外向侧面按独立固定坐标检查，真实断面和尺寸仍为估算。前两轮性能数值通过但存在外部Python活动，[失败汇总](model-checks/refinement/s2-platform-rim-summary.json)保留；确认环境改变后，同一资产集再次补测为60/60/60及30/30/30 FPS，26次快照在计时窗口未捕捉到达到原阈值的Python/Blender活动，原预算及三次LOD往返通过。[独立复验汇总](model-checks/refinement/s2-platform-rim-quiet-summary.json)补齐本局部联合验收，记录69个本地/生产/HTTP资产一致和六张新回归图直接核看；原几何与测试结果按指纹一致复用，未重跑或增加整栋完成数。

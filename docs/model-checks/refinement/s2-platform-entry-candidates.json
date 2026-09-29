@@ -1,6 +1,6 @@
 {
   "buildingId": "way/957404988",
-  "sourceSha256": "cfa611f10e68385dd8d5c00f6f65e3be3776e2bfc35316c71cdd42f2a02fe93f",
+  "sourceSha256": "ef0e46d79e494ab06561807cd4a150c461f0c159151c520a7c767a3205408e0c",
   "coordinateSystem": "campus local east/north metres",
   "status": "mapped-entrance-and-portico-constraint-review",
   "productionReady": false,
@@ -437,25 +437,40 @@
   },
   "existingIllustrativeEntrances": [
     {
-      "id": "fallback-0",
+      "id": "east-personnel",
       "polygon": 0,
-      "center": [
-        -687.1279782074489,
-        -788.0955060000298
-      ],
-      "bearing": 180.07276634943898,
-      "width": 2.2,
+      "ring": 0,
+      "edge": 14,
+      "t": 0.6148554790655477,
+      "width": 3.6,
       "primary": true,
-      "basis": "最长外边中点的示意入口，位置与朝向待逐栋核对",
-      "status": "estimated"
+      "recess": 3.6,
+      "steps": 7,
+      "stepWidth": 12,
+      "stepFoundationDepth": 0.15,
+      "center": [
+        -698.8083103913996,
+        -742.4381853946857
+      ],
+      "bearing": 89.63664066170013,
+      "status": "estimated",
+      "basis": "2026-09-30按原始OSM入口节点7096023516投影至柱廊后墙，估算东侧人员门宽3.6米、门高2.8米、后退3.6米。门前地坪抬至1.05米，七级0.3米踏步、12米宽台阶及0.15米埋置基础均为照片关系和模型地形约束估算；照片不证明精确级数、门宽或轴网。既有等分玻璃改为门洞两侧及上方三个矩形分格区；旧南墙默认入口移除，不把它认定为运输口。完整接路和南侧运输开口仍待校准。",
+      "outerCenter": [
+        -695.20838278471,
+        -742.4153550071646
+      ],
+      "porticoId": "link-portico",
+      "platformHeight": 1.05,
+      "porticoWidth": 26.010538275636137
     }
   ],
+  "estimatedPersonnelEntryImplemented": true,
   "limitations": [
     "Boundary lengths are not measured entrance widths.",
     "D is prioritized by an OSM entrance node; A/B remain unregistered alternatives or other doors.",
     "C is the south delivery-entry search wall, not the personnel portal.",
     "D is a part-local recessed wall; its normal enters the open portico.",
-    "Mapped central approach is clear; doorway and stairs are still uncalibrated.",
-    "No road alignment, stairs, column count or door position is inferred."
+    "Mapped central approach is clear; adopted doorway/stair dimensions remain estimates.",
+    "This diagnostic does not establish measured stairs, columns, doorway dimensions or a road connection."
   ]
 }

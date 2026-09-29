@@ -143,13 +143,14 @@ def main():
               'candidates': candidates, 'originalExteriorEdges': edges,
               'mappedEntranceEvidence': mapped_entry,
               'existingIllustrativeEntrances': building['form']['entrances'],
+              'estimatedPersonnelEntryImplemented': any(e['id']=='east-personnel' for e in building['form']['entrances']),
               'limitations': ['Boundary lengths are not measured entrance widths.',
                               'D is prioritized by an OSM entrance node; A/B remain unregistered alternatives or other doors.',
                               'C is the south delivery-entry search wall, not the personnel portal.',
                               'D is a part-local recessed wall; its normal enters the open portico.',
                               ('OSM node supports D; existing estimated columns conflict with its straight approach.'
-                               if blocked else 'Mapped central approach is clear; doorway and stairs are still uncalibrated.'),
-                              'No road alignment, stairs, column count or door position is inferred.']}
+                               if blocked else 'Mapped central approach is clear; adopted doorway/stair dimensions remain estimates.'),
+                              'This diagnostic does not establish measured stairs, columns, doorway dimensions or a road connection.']}
     OUT.with_suffix('.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     def point(p):
         return 100 + (p[0] + 740) * 6, 120 + (-705 - p[1]) * 6
@@ -193,7 +194,7 @@ def main():
             '<text x="35" y="765" font-size="16" fill="#167a67">D: Recessed link-foyer east wall (personnel candidate)</text>',
             '<text x="35" y="795" font-size="15" fill="#167a67">Dashed: portico outer roof edge; no wall or door inferred.</text>',
             '<text x="35" y="815" font-size="15">Entry route: red if blocked, green if clear; neither confirms a door.</text>',
-            '<text x="35" y="840" font-size="15">Black dot: existing illustrative entrance, still uncalibrated.</text>',
+            '<text x="35" y="840" font-size="15">Black dot: current modeled entrance; placement remains estimated.</text>',
             '<text x="35" y="865" font-size="15">Numbers: original exterior edges; D uses a part-local wall.</text>',
             '<text x="35" y="890" font-size="15">All lengths are model search boundaries, not measured door widths.</text>',
             '</g></svg>']
