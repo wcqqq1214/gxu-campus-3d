@@ -46,6 +46,10 @@ work/refinement-venv/bin/python scripts/propose_agriculture_west_roof.py --outpu
 blender --background --python-exit-code 1 --python blender/check_agriculture_roof_proposal.py -- --proposal docs/model-checks/refinement/s3-agriculture-west-roof-proposal.json --report work/agriculture-roof-geometry.json --images work/agriculture-roof-images
 ```
 
+## 2026-09-30投影试配补查
+
+以七处手动选择的主楼边角/层线和估算层高做初步针孔相机试配，尚不能同时对齐主楼两端；人工边角对应与相机假设均待重查。没有将试配结果用于修订进深或层数，不能把误差归因于OSM轮廓本身。试配脚本和参考叠图留在本机 `work/refinement-s3-agriculture-alignment/`，不作为通过的配准报告。本轮转入同帧背景中可与具名项目册交叉核对的[动物学院核心屋顶](ANIMAL_COLLEGE_ROOFTOP.md)，农学院候选保持。
+
 ## 接续工作
 
 1. 对应可见露台边缘与原外轮廓，取得西翼侧后视图或对应图纸，确认低翼层数、露台支撑层数和退台深度；不重复扩大无目标的全景搜索。

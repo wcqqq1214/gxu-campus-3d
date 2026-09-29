@@ -1,5 +1,7 @@
 # 验收记录
 
+2026-09-30：[动物学院核心屋顶](ANIMAL_COLLEGE_ROOFTOP.md)增加窄小体量及外挑平顶。`validate_animal_rooftop.py` 对源/基础/近景各执行30处固定坐标、法线与有限空隙检查，支持 `--check-root` 旧资产反例；必须配合原入口、外廊、窗格及普通建筑回归。尺寸估算和最终资产/性能指纹见[专项汇总](model-checks/refinement/s3-animal-rooftop-summary.json)。
+
 2026-09-30：[运动场合批扩展](SPORTS_EXTENDED_BATCHING.md)通过116,934个实际三角形等价检查、66项Node测试及同条件活动性能验收。16张前后图和6张回归图核看，三次LOD往返无错误；源文件、69份GLB和公共数据保持。精细/流畅均三轮60/30 FPS，流畅档绘制调用较S0 +13.69%、三角形 +14.61%，详见[汇总](model-checks/refinement/s5-sports-extended-summary.json)。
 
 2026-09-30：[结构平台整栋验收](CIVIL_PLATFORM_WHOLE_REVIEW.md)按原计划第5.3节通过首轮校准。新跑接路检查、18张多方向画面和69模型HTTP指纹核对；其余几何与性能按相同资产/源码证据复用上一批。背面、运输口及实测尺寸保留未知，非实测认证，详见[机器汇总](model-checks/refinement/s2-platform-whole-summary.json)。

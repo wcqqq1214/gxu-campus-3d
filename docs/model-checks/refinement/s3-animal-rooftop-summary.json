@@ -1,0 +1,101 @@
+{
+  "checkedAt": "2026-09-29T22:49:22.856708+00:00",
+  "passed": true,
+  "productionIntegrated": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "baseCommit": "07bffb4fce5328400f5ad71fb22aeb630c16fbac",
+  "branch": "dev",
+  "scope": "Animal college narrow rooftop body and projecting flat cap; dimensions estimated. Source/base/near probes and retained entry/corridor/glazing verification. Agriculture roof candidate remains unintegrated.",
+  "photoRegistrationAccepted": false,
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 20,
+  "totalFirstPassWholeBuildingsAccepted": 2,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 279,
+  "nodeTests": 66,
+  "checks": [
+    "geometry",
+    "entry-portico",
+    "corridor-geometry",
+    "grid-geometry",
+    "generic-geometry",
+    "data",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review",
+    "performance-visual-review"
+  ],
+  "rooftopRaysPerAsset": 30,
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4274191,
+      "medianDrawCalls": 559,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.325275129853325,
+        "medianDrawCalls": 2.1937842778793515
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1202665,
+      "medianDrawCalls": 291,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 14.327745271853566,
+        "medianDrawCalls": 10.646387832699622
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 27,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of complete isolation.",
+  "initialModelBytes": 5830644,
+  "maximumOrdinaryNearBytes": 1684868,
+  "pending": [
+    "Animal core sides/rear facades, rear-wing height and extent, other entrances and forecourt",
+    "Rooftop small openings, exact dimensions and equipment use",
+    "Agriculture terrace/wing boundary and heights"
+  ],
+  "fingerprints": {
+    "data/building-overrides.json": "c2b3bb0cd1d6f334d827d588e1eaa073010c5c6f2430faf1aed32e2ed2d74ea6",
+    "data/building-sources.json": "8cd77f0a6b8805b45e6eb13500a0d5001f2704fe0b714a5d16219f8b9fa71b58",
+    "blender/gxu-campus.blend": "c22c0037c106c2559ab53101eac3961f2c33bd2d7236416fdd6bba6eca5a85c2",
+    "blender/generic_buildings.py": "feb05d526d21d4df610a480b90f5b4f05ab364870cde2070d84748d070f92e72",
+    "blender/validate_animal_rooftop.py": "a1fedbb072a4082c48df4a03164ceefa0eef105f4905e22ad2c211c0f97390a1",
+    "scripts/roof_volumes_data.py": "8235a718421ae8cf7d4f4e966fe18b6cb5cf4cd76f707e5bcf71fb7cb8ec936a",
+    "public/data/buildings.json": "1e813a5b29c7cf0a7ec9977d6e9d474a50181cb6a563c15204ba549e6ff2c3aa",
+    "public/data/models.json": "0731b49163fe0467dbdd3297dbecd023af3053c5658db7fddad7ab38f353e013",
+    "public/data/vegetation.json": "82cc9988d641ad307ccffcf73f8fa9308f3c7e857cfe983da2f9c256b4625b26"
+  }
+}
