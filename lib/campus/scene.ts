@@ -27,6 +27,7 @@ import {
 } from './camera';
 import { DEFAULT_LAYERS } from './types';
 import { AdaptiveQuality, qualityProfile } from './quality';
+import { FramePacer } from './frame-pacing';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import type { CampusBoundary } from './boundary';
@@ -211,6 +212,7 @@ export function createScene(
         .connection?.saveData,
     );
   let lastFrame = 0;
+  const framePacer = new FramePacer();
   let sampleStart = performance.now();
   let fps = 0;
   let lastRendered = 0;
@@ -1295,7 +1297,7 @@ export function createScene(
   function animate(time: number) {
     if (disposed) return;
     loop = requestAnimationFrame(animate);
-    if (modeSmooth && time - lastFrame < 32) return;
+    if (!framePacer.shouldUpdate(time, modeSmooth)) return;
     const moving = controls.update();
     if (orbiting && !tween) {
       if (reduced.matches) setOrbit(false);
