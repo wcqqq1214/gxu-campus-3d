@@ -1,14 +1,16 @@
 """Build a separate, estimated D-area portico candidate; never update production data."""
-import argparse,copy,hashlib,json,math
+import argparse,copy,json,math
 from pathlib import Path
 from shapely.geometry import LineString, Point
-from building_overrides import ROOT,load_catalogue,resolve_building,source_catalogue
+from building_overrides import ROOT,resolve_building,source_catalogue
 
 
 def proposal(stone_surround=True, tall_surround=True, curved_roof=True, refined_columns=True, finished_portico=True):
-    path=ROOT/'public/data/buildings.json'
-    original=next(b for b in json.loads(path.read_text()) if b['id']=='way/957404988')
-    record=copy.deepcopy(load_catalogue()[original['id']])
+    # Freeze the production input preceding these alternatives: once integrated,
+    # reapplying the edits to live data would move the wall and add columns twice.
+    baseline=json.loads((ROOT/'data/refinement/civil-platform-entry-baseline.json').read_text())
+    original=baseline['original']
+    record=copy.deepcopy(baseline['override'])
     porch=next(p for p in record['parts'] if p['id']=='link-portico')
     entry=next(e for e in original['form']['entrances'] if e.get('porticoId')==porch['id'])
     a=math.radians(entry['bearing']);n=[math.sin(a),math.cos(a)];t=[n[1],-n[0]];front=entry['outerCenter']
@@ -125,7 +127,7 @@ def proposal(stone_surround=True, tall_surround=True, curved_roof=True, refined_
                              ['Stone fascia with white soffit; eight 0.32m capitals with 0.08m projection and 0.07m tapered transition are estimates.',
                               'Seven side bays each split into three slots with 0.12m dividers; 1.65m roof edge supports full capital tops. Counts and dimensions are not surveyed.'] if finished_portico else []),
                 productionReady=False,photoRegistrationAccepted=False,wholeBuildingAccepted=False,
-                buildingSha256=hashlib.sha256(path.read_bytes()).hexdigest())
+                buildingSha256=baseline['buildingSha256'])
 
 
 if __name__=='__main__':

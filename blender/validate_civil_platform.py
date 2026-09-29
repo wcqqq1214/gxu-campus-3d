@@ -23,6 +23,8 @@ ROOF_RIM = '--roof-rim' in sys.argv
 ENTRY_BAY = '--entry-bay' in sys.argv
 PERSONNEL_ENTRY = '--personnel-entry' in sys.argv
 ENTRY_TRIM = '--entry-trim' in sys.argv
+INTEGRATED_PORTICO = '--integrated-portico' in sys.argv
+if INTEGRATED_PORTICO and not ENTRY_TRIM:raise ValueError('--integrated-portico requires --entry-trim')
 if ENTRY_TRIM and not PERSONNEL_ENTRY:raise ValueError('--entry-trim requires --personnel-entry')
 if PERSONNEL_ENTRY and not ENTRY_BAY:
     raise ValueError('--personnel-entry requires --entry-bay')
@@ -42,6 +44,7 @@ def profile_height(x,y):
     knots=[(0.,0.),(5.354095349427889,.2611651689888372),
            (10.708190698855779,.7917047464637365),(16.062286048283667,1.5146394463523694),
            (21.416381397711557,2.4)]
+    if INTEGRATED_PORTICO:knots[0]=(2.399951735,0.)
     for (lo,h0),(hi,h1) in zip(knots,knots[1:]):
         if d<=hi+1e-7:return 10.8+h0+(h1-h0)*(d-lo)/(hi-lo)
     raise AssertionError(('profile sample beyond adopted roof',x,y))
@@ -93,6 +96,8 @@ def check(objects, tolerance):
             (-706,-744,10.8,'paleRoof','link-foyer'),(-696.7,-744,7.2,'paleRoof','link-portico')]
     if FOYER_PROFILE:
         roof_samples=[(x,y,profile_height(x,y),mat,'foyer-profile') if kind=='link-foyer' else (x,y,h,mat,kind) for x,y,h,mat,kind in roof_samples]
+    if INTEGRATED_PORTICO:
+        roof_samples=[(x,y,8.6,'white',kind) if kind=='link-portico' else (x,y,h,mat,kind) for x,y,h,mat,kind in roof_samples]
     for x,y,h,mat,kind in roof_samples:
         roof(x,y,h,mat,kind)
     # Both sides of three independent part junctions; no lost slivers or roofs.
@@ -103,8 +108,10 @@ def check(objects, tolerance):
         seams=[(-680,-766.9,13.2,'dark'),(-680,-766.1,7.2,'paleRoof'),
                (-706,-729.7,10.8,'paleRoof'),(-706,-729.1,29.7,'paleRoof'),
                (-699.2,-744,10.8,'paleRoof'),(-698.5,-744,7.2,'paleRoof')]
+    if INTEGRATED_PORTICO:
+        seams=[(-701.6,y,10.8,mat) if x==-699.2 else (-700.9,y,8.6,'white') if x==-698.5 else (x,y,h,mat) for x,y,h,mat in seams]
     for x,y,h,mat in seams:
-        if FOYER_PROFILE and (x,y) in [(-706,-729.7),(-699.2,-744)]:
+        if FOYER_PROFILE and (x,y) in [(-706,-729.7),(-701.6 if INTEGRATED_PORTICO else -699.2,-744)]:
             roof(x,y,profile_height(x,y),mat,'foyer-profile')
         else:
             roof(x,y,h,mat,'part-junction')
@@ -253,7 +260,7 @@ def check(objects, tolerance):
                 assert hit and hit[3]=='white' and hit[2].dot(n)>.98,(('lab-north-' if REPARTITION else 'lab-east-')+'pier',col,height,hit)
                 assert abs((hit[1]-p).dot(n)-.14)<tolerance,(('lab-north-' if REPARTITION else 'lab-east-')+'pier-depth',col,height,hit)
                 samples.append(dict(kind=('lab-north-' if REPARTITION else 'lab-east-')+'continuous-pier',column=col,height=height))
-    if REPARTITION:
+    if REPARTITION and not INTEGRATED_PORTICO:
         # Fixed front-edge anchors and six estimated columns. Test both solid
         # supports and the open bays; a replacement window wall must fail.
         a=Vector((-695.2908592664412,-729.4103473955927,0))
@@ -290,7 +297,7 @@ def check(objects, tolerance):
                     hit=ray(origin,-n,6)
                     assert hit and (5.40 if ENTRY_TRIM else 5.44)-tolerance < hit[0] < 5.6+tolerance,('mapped-entry-approach',offset,height,hit)
                     samples.append(dict(kind='mapped-entry-approach',offset=offset,height=height,rearWallDistance=hit[0]))
-    if PORTICO_GLASS:
+    if PORTICO_GLASS and not INTEGRATED_PORTICO:
         # Fixed adopted backing-wall endpoints; rays start behind the columns
         # so every glass cell is tested, without treating any cell as a door.
         a=Vector((-698.6939074704767,-760.4773988305454,0))
@@ -335,10 +342,10 @@ def check(objects, tolerance):
                     signed=(b-a).cross(c-a).z/2
                     assert signed>0,('profile-top-normal',signed)
                     projected_area+=signed
-        assert abs(projected_area-631.617979)<tolerance*150,('profile duplicated roof or gap',projected_area)
+        assert abs(projected_area-(557.052757 if INTEGRATED_PORTICO else 631.617979))<tolerance*150,('profile duplicated roof or gap',projected_area)
         samples.append(dict(kind='single-covered-profile-top',projectedAreaMeters2=projected_area))
         for y in (-737.,-744.,-752.):
-            for x in (-700.,-706.,-711.,-716.):
+            for x in (-702. if INTEGRATED_PORTICO else -700.,-706.,-711.,-716.):
                 roof(x,y,profile_height(x,y),'paleRoof','foyer-profile')
         for a,b in [((-720.2684733304854,-735.6025599999941),(-717.4120227129979,-760.4504602492385)),
                     ((-717.4120227129979,-760.4504602492385),(-698.6939074704767,-760.4773988305454))]:
@@ -358,6 +365,10 @@ def check(objects, tolerance):
             ((-720.2684733304854,-735.6025599999941),(-717.4120227129979,-760.4504602492385),True),
             ((-717.4120227129979,-760.4504602492385),(-698.6939074704767,-760.4773988305454),True),
             ((-695.093802217242,-760.4825800000607),(-695.2908592664412,-729.4103473955927),False)]
+        if INTEGRATED_PORTICO:
+            moved={(-698.6939074704767,-760.4773988305454):(-701.0939074704767,-760.4739448185203),
+                   (-698.8909494339341,-729.4075449670695):(-701.2909494339341,-729.4056767281803)}
+            cap_edges=[(moved.get(a,a),moved.get(b,b),profiled) for a,b,profiled in cap_edges if profiled]
         for a,b,profiled in cap_edges:
             a,b=Vector((*a,0)),Vector((*b,0));u=(b-a).normalized();n=Vector((u.y,-u.x,0))
             for t in (.25,.5,.75):
@@ -431,6 +442,9 @@ if PERSONNEL_ENTRY:
     report['scope']+=' Updated context for the estimated personnel entry: raised portico floor and three glazing panels. Door, stairs, foundation, ground and old-entry removal are checked separately by validate_civil_platform_entry.py.'
 if ENTRY_TRIM:
     report['scope']+=' Updated entry trim: dark glazing frames, estimated closed two-leaf door and stone columns with widened bases. Exact dimensions and photo registration remain unverified; the existing road connection is checked separately.'
+if INTEGRATED_PORTICO:
+    report['scope']='Integrated estimated six-part platform context: moved foyer wall and profile start, 8.6m mixed canopy, hall, low wing, office and roof volumes. Superseded six-column/old-glazing probes are replaced by source/base/near checks in validate_civil_entry_proposal.py --check-assets; door, stairs and ground checked separately. No survey, photo registration or whole-building acceptance.'
+    report['integratedPorticoContextChecked']=True
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
