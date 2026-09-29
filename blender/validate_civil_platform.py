@@ -24,6 +24,8 @@ ENTRY_BAY = '--entry-bay' in sys.argv
 PERSONNEL_ENTRY = '--personnel-entry' in sys.argv
 ENTRY_TRIM = '--entry-trim' in sys.argv
 INTEGRATED_PORTICO = '--integrated-portico' in sys.argv
+FULL_HALL_NORTH = '--full-hall-north' in sys.argv
+if FULL_HALL_NORTH and not REPARTITION:raise ValueError('--full-hall-north requires --repartition')
 if INTEGRATED_PORTICO and not ENTRY_TRIM:raise ValueError('--integrated-portico requires --entry-trim')
 if ENTRY_TRIM and not PERSONNEL_ENTRY:raise ValueError('--entry-trim requires --personnel-entry')
 if PERSONNEL_ENTRY and not ENTRY_BAY:
@@ -129,8 +131,13 @@ def check(objects, tolerance):
     outward=Vector((-(b-a).y,(b-a).x,0)).normalized()
     if REPARTITION:
         a-=outward*6; b-=outward*6
-    for i in (0,10,21):
-        p=a.lerp(b,.025+i*.95/22+.0125)
+    if FULL_HALL_NORTH:
+        a=Vector((-656.4254690470157,-766.5382365836045,0))
+        b=Vector((-717.7775037716817,-766.4499404728923,0))
+    # Start at the previously omitted west end so the old asset is a targeted negative.
+    for i in (range(31,-1,-1) if FULL_HALL_NORTH else (0,10,21)):
+        p=(a.lerp(b,(1.2+(i+.5)*((b-a).length-2.4)/32)/(b-a).length)
+           if FULL_HALL_NORTH else a.lerp(b,.025+i*.95/22+.0125))
         for h in ((9.2,11.4) if REPARTITION else (8.375,11.125)):
             origin=p+outward*2;origin.z=Z+h
             hit=ray(origin,-outward,3)
@@ -140,6 +147,14 @@ def check(objects, tolerance):
         hit=ray(origin,-outward,3)
         assert hit and hit[3]=='white',('no-lower-generic-window',i,hit)
         samples.append(dict(kind='hall-lower-solid-wall',strip=i))
+    if FULL_HALL_NORTH:
+        for distance in [0.6,(b-a).length-.6]+[1.2+i*((b-a).length-2.4)/32 for i in range(1,32)]:
+            p=a.lerp(b,distance/(b-a).length)
+            for h in (9.2,11.4):
+                origin=p+outward*2;origin.z=Z+h
+                hit=ray(origin,-outward,3)
+                assert hit and hit[3]=='white',('hall-north-pier-or-margin',distance,h,hit)
+                samples.append(dict(kind='hall-north-pier-or-margin',distance=distance,height=h))
     # A clearspan is not filled with intermediate generic floor plates.
     for h in (3.3,6.6,9.9):
         assert ray((-682,-774,Z+h-.1),(0,0,1),.2) is None,('hall-floor',h)
@@ -445,6 +460,9 @@ if ENTRY_TRIM:
 if INTEGRATED_PORTICO:
     report['scope']='Integrated estimated six-part platform context: moved foyer wall and profile start, 8.6m mixed canopy, hall, low wing, office and roof volumes. Superseded six-column/old-glazing probes are replaced by source/base/near checks in validate_civil_entry_proposal.py --check-assets; door, stairs and ground checked separately. No survey, photo registration or whole-building acceptance.'
     report['integratedPorticoContextChecked']=True
+if FULL_HALL_NORTH:
+    report['fullHallNorthChecked']=True
+    report['scope']+=' Hall north glazing spans the full wall with 32 estimated two-row strips; all centers, separating piers and end margins checked.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
