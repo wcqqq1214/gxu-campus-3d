@@ -93,6 +93,14 @@ class ExposedFacadeTests(unittest.TestCase):
         self.assertEqual(result,self.resolve(result,r))
         self.assertEqual(result['form']['parts'][1]['openBelow']['floorHeight'],.24)
 
+    def test_portico_backing_wall_can_support_profiled_roof(self):
+        b,r=self.portico_fixture()
+        r['parts'][0]['roof']=dict(type='profiled',rise=2,mesh={
+            'vertices':[[0,0,2],[15,0,0],[15,20,0],[0,20,2]],'triangles':[0,1,2,0,2,3]})
+        result=self.resolve(b,r)
+        self.assertEqual(result['form']['facades'][-1]['region'],'under-portico')
+        self.assertEqual(result['form']['facades'][-1]['rule']['panels'][0]['top'],5.8)
+
     def test_portico_glazing_rejects_floor_slab_and_column_collisions(self):
         b,r=self.portico_fixture()
         for key,value in [('bottom',.2),('top',6.3)]:

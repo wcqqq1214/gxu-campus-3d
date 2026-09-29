@@ -157,8 +157,10 @@ def resolve_parts(b, raw, roof):
         part_roof = copy.deepcopy(roof)
         if 'roof' in part:
             own = part['roof']
-            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh','finish','inset'} or own['type'] not in ('flat','hipped','gabled'):
+            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh','finish','inset'} or own['type'] not in ('flat','hipped','gabled','profiled'):
                 raise ValueError('Part roof needs an explicit type and rise')
+            if own['type']=='profiled' and ('mesh' not in own or 'openBelow' in part):
+                raise ValueError('Profiled roof requires an explicit mesh on a solid part')
             if 'finish' in own and (own['finish'] != 'blue-metal' or own['type'] != 'flat' or 'openBelow' in part):
                 raise ValueError('Blue metal finish requires a solid flat part roof')
             if type(own['rise']) not in (float,int) or not math.isfinite(own['rise']):
@@ -194,7 +196,8 @@ def resolve_parts(b, raw, roof):
         if part_roof['type'] != 'flat':
             if 'mesh' in part_roof:
                 from explicit_roof_data import resolve_roof_mesh
-                part_roof['geometry'] = resolve_roof_mesh(coords, part_roof.pop('mesh'), part_roof['rise'])
+                part_roof['geometry'] = resolve_roof_mesh(coords, part_roof.pop('mesh'), part_roof['rise'],
+                    raised_eaves=part_roof['type']=='profiled')
             else:
                 part_roof['geometry'] = roof_geometry(coords, part_roof['type'], part_roof['rise'])
         resolved = {'id':part['id'], 'polygons':coords, 'triangles':triangles,

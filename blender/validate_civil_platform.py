@@ -18,10 +18,23 @@ EAST_SLIT = '--east-slit' in sys.argv
 LAB_FACADE = '--lab-facade' in sys.argv
 REPARTITION = '--repartition' in sys.argv
 PORTICO_GLASS = '--portico-glass' in sys.argv
+FOYER_PROFILE = '--foyer-profile' in sys.argv
+if FOYER_PROFILE and not REPARTITION:
+    raise ValueError('--foyer-profile requires --repartition')
 if PORTICO_GLASS and not REPARTITION:
     raise ValueError('--portico-glass requires --repartition')
 if REPARTITION and LAB_FACADE:
     raise ValueError('Use --repartition for the corrected north low wing; --lab-facade is historical')
+
+def profile_height(x,y):
+    d=(x+698.6939074704767)*(-.9999798907471006)+(y+760.4773988305454)*(-.0063417743114130036)
+    knots=[(0.,0.),(5.354095349427889,.2611651689888372),
+           (10.708190698855779,.7917047464637365),(16.062286048283667,1.5146394463523694),
+           (21.416381397711557,2.4)]
+    for (lo,h0),(hi,h1) in zip(knots,knots[1:]):
+        if d<=hi+1e-7:return 10.8+h0+(h1-h0)*(d-lo)/(hi-lo)
+    raise AssertionError(('profile sample beyond adopted roof',x,y))
+
 
 def root_name(obj):
     while obj.parent:
@@ -54,7 +67,7 @@ def check(objects, tolerance):
         hit = ray((x,y,Z+40),(0,0,-1),40)
         assert hit and hit[3] == material, (kind,x,y,'material',hit)
         assert abs(hit[1].z-Z-height) < tolerance, (kind,x,y,height,hit)
-        assert hit[2].z > .99, (kind,'roof normal',hit)
+        assert hit[2].z > (.98 if FOYER_PROFILE and kind=='foyer-profile' else .99), (kind,'roof normal',hit)
         samples.append(dict(kind=kind,position=[x,y],expectedHeight=height,actualHeight=hit[1].z-Z,material=material))
     roof_samples = [
         (-680,-775,13.2,'blueRoof','hall'),(-710,-780,13.2,'blueRoof','hall'),
@@ -67,6 +80,8 @@ def check(objects, tolerance):
             (-680,-775,13.2,'blueRoof','hall'),(-710,-780,13.2,'blueRoof','hall'),
             (-680,-763,7.2,'paleRoof','north-low-wing'),(-660,-763,7.2,'paleRoof','north-low-wing'),
             (-706,-744,10.8,'paleRoof','link-foyer'),(-696.7,-744,7.2,'paleRoof','link-portico')]
+    if FOYER_PROFILE:
+        roof_samples=[(x,y,profile_height(x,y),mat,'foyer-profile') if kind=='link-foyer' else (x,y,h,mat,kind) for x,y,h,mat,kind in roof_samples]
     for x,y,h,mat,kind in roof_samples:
         roof(x,y,h,mat,kind)
     # Both sides of three independent part junctions; no lost slivers or roofs.
@@ -78,7 +93,10 @@ def check(objects, tolerance):
                (-706,-729.7,10.8,'paleRoof'),(-706,-729.1,29.7,'paleRoof'),
                (-699.2,-744,10.8,'paleRoof'),(-698.5,-744,7.2,'paleRoof')]
     for x,y,h,mat in seams:
-        roof(x,y,h,mat,'part-junction')
+        if FOYER_PROFILE and (x,y) in [(-706,-729.7),(-699.2,-744)]:
+            roof(x,y,profile_height(x,y),mat,'foyer-profile')
+        else:
+            roof(x,y,h,mat,'part-junction')
     # Outward-facing hall east and south walls and office north wall.
     for origin,direction,distance in [((-654,-776,Z+5),(-1,0,0),4),
                                        ((-680,-790,Z+6),(0,1,0),4),
@@ -268,6 +286,34 @@ def check(objects, tolerance):
             hit=ray(origin,-n,3)
             assert hit and hit[3]=='white' and abs(hit[0]-2)<tolerance*2,('portico-glass-boundary',fraction,height,hit)
             samples.append(dict(kind='portico-glass-boundary',fraction=fraction,height=height))
+    if FOYER_PROFILE:
+        # Samples span the four adopted slope intervals, plus fixed exposed
+        # closure walls. Expectations are independent of prepared roof meshes.
+        projected_area=0.
+        for obj in objects:
+            if obj.type!='MESH':continue
+            obj.data.calc_loop_triangles()
+            for tri in obj.data.loop_triangles:
+                if obj.data.materials[tri.material_index].name.split('.')[0]!='paleRoof':continue
+                a,b,c=[obj.matrix_world@obj.data.vertices[k].co for k in tri.vertices]
+                if all(10.8-tolerance<=p.z-Z<=13.2+tolerance and -721<p.x<-698 and -761<p.y<-728 for p in (a,b,c)):
+                    signed=(b-a).cross(c-a).z/2
+                    assert signed>0,('profile-top-normal',signed)
+                    projected_area+=signed
+        assert abs(projected_area-631.617979)<tolerance*150,('profile duplicated roof or gap',projected_area)
+        samples.append(dict(kind='single-covered-profile-top',projectedAreaMeters2=projected_area))
+        for y in (-737.,-744.,-752.):
+            for x in (-700.,-706.,-711.,-716.):
+                roof(x,y,profile_height(x,y),'paleRoof','foyer-profile')
+        for a,b in [((-720.2684733304854,-735.6025599999941),(-717.4120227129979,-760.4504602492385)),
+                    ((-717.4120227129979,-760.4504602492385),(-698.6939074704767,-760.4773988305454))]:
+            a,b=Vector((*a,0)),Vector((*b,0));p=a.lerp(b,.2)
+            u=(b-a).normalized();n=Vector((u.y,-u.x,0))
+            origin=p+n*1;origin.z=Z+11.5
+            hit=ray(origin,-n,2)
+            assert hit and hit[3]=='white' and hit[2].dot(n)>.98,('profile-rim-closure',p,hit)
+            assert abs(hit[0]-1)<tolerance*2,('profile-rim-depth',hit)
+            samples.append(dict(kind='profile-rim-closure',position=list(p),height=11.5))
     if ROOF_VOLUMES:
         a=Vector((-734.5484823735649,-713.5278039998846,0))
         b=Vector((-695.3913024054572,-713.5723320000095,0))
@@ -302,6 +348,7 @@ report['eastSlitChecked']=EAST_SLIT
 report['labFacadeChecked']=LAB_FACADE
 report['repartitionChecked']=REPARTITION
 report['porticoGlazingChecked']=PORTICO_GLASS
+report['foyerProfileChecked']=FOYER_PROFILE
 if REPARTITION:
     report['scope']='Estimated six-part correction: 6 m deep north low wing at 7.2 m, recessed 13.2 m hall, 10.8 m connector and six-column 7.2 m open portico. Office and west part retained. Relative layout checked against imagery; dimensions and entries remain unverified.'
 if NORTH_FACADE:
