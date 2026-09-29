@@ -157,7 +157,7 @@ def resolve_parts(b, raw, roof):
         part_roof = copy.deepcopy(roof)
         if 'roof' in part:
             own = part['roof']
-            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh','finish','inset'} or own['type'] not in ('flat','hipped','gabled','profiled'):
+            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh','finish','inset','rim'} or own['type'] not in ('flat','hipped','gabled','profiled'):
                 raise ValueError('Part roof needs an explicit type and rise')
             if own['type']=='profiled' and ('mesh' not in own or 'openBelow' in part):
                 raise ValueError('Profiled roof requires an explicit mesh on a solid part')
@@ -238,6 +238,9 @@ def resolve_parts(b, raw, roof):
                 lattice = resolve_slatted_roof(part['polygons'], opening['slattedRoof'], columns)
                 polygons, indices = pack_geometry([lattice])
                 resolved['openBelow']['roofGeometry'] = {'polygons':polygons,'triangles':indices}
+        if 'rim' in part_roof:
+            from roof_rim_data import resolve_roof_rim
+            part_roof['rimGeometry'] = resolve_roof_rim(resolved, part_roof['rim'])
         parts.append(resolved)
     if footprint.symmetric_difference(unary_union(covered)).area > 1e-5:
         raise ValueError('Building parts do not cover the complete mapped footprint')

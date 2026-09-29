@@ -19,6 +19,9 @@ LAB_FACADE = '--lab-facade' in sys.argv
 REPARTITION = '--repartition' in sys.argv
 PORTICO_GLASS = '--portico-glass' in sys.argv
 FOYER_PROFILE = '--foyer-profile' in sys.argv
+ROOF_RIM = '--roof-rim' in sys.argv
+if ROOF_RIM and not FOYER_PROFILE:
+    raise ValueError('--roof-rim requires --foyer-profile')
 if FOYER_PROFILE and not REPARTITION:
     raise ValueError('--foyer-profile requires --repartition')
 if PORTICO_GLASS and not REPARTITION:
@@ -67,7 +70,7 @@ def check(objects, tolerance):
         hit = ray((x,y,Z+40),(0,0,-1),40)
         assert hit and hit[3] == material, (kind,x,y,'material',hit)
         assert abs(hit[1].z-Z-height) < tolerance, (kind,x,y,height,hit)
-        assert hit[2].z > (.98 if FOYER_PROFILE and kind=='foyer-profile' else .99), (kind,'roof normal',hit)
+        assert hit[2].z > (.98 if FOYER_PROFILE and kind in ('foyer-profile','profile-rim') else .99), (kind,'roof normal',hit)
         samples.append(dict(kind=kind,position=[x,y],expectedHeight=height,actualHeight=hit[1].z-Z,material=material))
     roof_samples = [
         (-680,-775,13.2,'blueRoof','hall'),(-710,-780,13.2,'blueRoof','hall'),
@@ -314,6 +317,29 @@ def check(objects, tolerance):
             assert hit and hit[3]=='white' and hit[2].dot(n)>.98,('profile-rim-closure',p,hit)
             assert abs(hit[0]-1)<tolerance*2,('profile-rim-depth',hit)
             samples.append(dict(kind='profile-rim-closure',position=list(p),height=11.5))
+    if ROOF_RIM:
+        # Independent perimeter anchors and offsets check cap height, width,
+        # exposed normals, and removal of the portico's old 0.8 m parapet.
+        cap_edges = [
+            ((-698.6939074704767,-760.4773988305454),(-698.8909494339341,-729.4075449670695),True),
+            ((-720.2684733304854,-729.3909039997784),(-720.2684733304854,-735.6025599999941),True),
+            ((-720.2684733304854,-735.6025599999941),(-717.4120227129979,-760.4504602492385),True),
+            ((-717.4120227129979,-760.4504602492385),(-698.6939074704767,-760.4773988305454),True),
+            ((-695.093802217242,-760.4825800000607),(-695.2908592664412,-729.4103473955927),False)]
+        for a,b,profiled in cap_edges:
+            a,b=Vector((*a,0)),Vector((*b,0));u=(b-a).normalized();n=Vector((u.y,-u.x,0))
+            for t in (.25,.5,.75):
+                p=a.lerp(b,t)
+                for setback,cap in [(.17,True),(.55,False)]:
+                    q=p-n*setback;h=profile_height(q.x,q.y) if profiled else 7.2
+                    if cap:h+=.45 if profiled else .18
+                    roof(q.x,q.y,h,'white' if cap else 'paleRoof','profile-rim' if profiled else 'portico-rim')
+                q=p+n*.5;h=profile_height(p.x,p.y)+.2 if profiled else 7.29
+                hit=ray((q.x,q.y,Z+h),-n,1)
+                assert hit and hit[3]=='white' and hit[2].dot(n)>.98,('rim-outer-face',p,hit)
+                assert abs(hit[0]-.5)<tolerance*2,('rim-outer-position',p,hit)
+                samples.append(dict(kind='rim-outer-face',position=list(p),height=h))
+        roof(-709.,-729.58,profile_height(-709.,-729.58),'paleRoof','foyer-profile')
     if ROOF_VOLUMES:
         a=Vector((-734.5484823735649,-713.5278039998846,0))
         b=Vector((-695.3913024054572,-713.5723320000095,0))
@@ -349,6 +375,7 @@ report['labFacadeChecked']=LAB_FACADE
 report['repartitionChecked']=REPARTITION
 report['porticoGlazingChecked']=PORTICO_GLASS
 report['foyerProfileChecked']=FOYER_PROFILE
+report['roofRimChecked']=ROOF_RIM
 if REPARTITION:
     report['scope']='Estimated six-part correction: 6 m deep north low wing at 7.2 m, recessed 13.2 m hall, 10.8 m connector and six-column 7.2 m open portico. Office and west part retained. Relative layout checked against imagery; dimensions and entries remain unverified.'
 if NORTH_FACADE:
@@ -359,6 +386,10 @@ if EAST_SLIT:
     report['scope']+=' Includes the photo-constrained narrow east glazing strip with eight estimated divisions and surrounding solid wall. Ground openings, corner return and use remain unverified.'
 if LAB_FACADE:
     report['scope']+=' Includes the low-lab east 18-column three-row window grid and continuous white piers. Counts, dimensions and ground-row continuation are estimates; entry positions remain pending.'
+if FOYER_PROFILE:
+    report['scope']+=' Includes the four-segment west-rising foyer roof, with 2.4 m estimated rise and closed elevated boundaries.'
+if ROOF_RIM:
+    report['scope']+=' Includes a 0.35 m inset rim: 0.45 m high around exposed foyer edges and 0.18 m high along the portico exterior. Exact sections and drainage remain unverified.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
