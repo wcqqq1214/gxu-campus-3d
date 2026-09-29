@@ -4,6 +4,8 @@
 
 ![当前候选的拟合视角](screenshots/refinement/s2-platform-camera/candidate-photo.png)
 
+后续已完成[前缘饰面、柱帽与侧格栅候选](CIVIL_PLATFORM_PORTICO_FINISH.md)；本文保留上一批参数，复现时使用 `--plain-portico`。
+
 ## 输入与假设
 
 参考已核看的[2023年校方游学报道](https://tmjz.gxu.edu.cn/info/1452/6575.htm)中的855×570完整门廊合影。文章发表于2023年9月7日，活动为8月31日，未另行取得拍摄日期。使用针孔投影，不校正镜头畸变；固定相机高度1.65米、水平主点427.5像素，允许垂直主点偏移以表示未知裁切。玻璃宽4.85米、高3.2米、顶底标高7.45/4.25米和门廊净高8.25米仍是既有估算，不能由本次拟合反证为实测。
@@ -65,7 +67,7 @@ mkdir -p work/refinement-s2-platform-camera
 work/refinement-venv/bin/python scripts/fit_civil_entry_camera.py \
   --output work/refinement-s2-platform-camera/fit.json
 work/refinement-venv/bin/python scripts/preview_civil_platform_entry.py \
-  --output work/refinement-s2-platform-camera/proposal.json
+  --plain-portico --output work/refinement-s2-platform-camera/proposal.json
 blender --background --python-exit-code 1 \
   --python blender/validate_civil_entry_proposal.py -- \
   --surround --tall-surround --curved-roof --refined-columns \
@@ -73,6 +75,6 @@ blender --background --python-exit-code 1 \
   --report work/refinement-s2-platform-camera/geometry-rerun.json
 ```
 
-渲染比较JSON由 `r=proposal(); r['original']=proposal(refined_columns=False)['candidate']` 生成，交给 `render_civil_entry_proposal.py -- --proposal=<比较JSON> --output=<独立目录> --camera-report=work/refinement-s2-platform-camera/fit.json`。`--wide-columns`复现上一曲线候选；其他历史参数保留各自旧形体。
+渲染比较JSON由 `r=proposal(finished_portico=False); r['original']=proposal(refined_columns=False)['candidate']` 生成，交给 `render_civil_entry_proposal.py -- --proposal=<比较JSON> --output=<独立目录> --camera-report=work/refinement-s2-platform-camera/fit.json`。`--wide-columns`复现上一曲线候选；其他历史参数保留各自旧形体。
 
 下一步先完成门廊前缘石色饰面、柱帽及侧格栅一致性，再将标注为估算的整体候选接入正式构建，核对实际地形、接路、基础/近景GLB和性能预算。随后继续C区大厅运输口、剩余屋面及北楼立面，旧实验大厅保持独立取证。累计22个对象、1栋首轮整栋通过、21个部分校准；完整S0–S5目标保持。开发、提交与推送均在dev，未经许可不更新main/master。

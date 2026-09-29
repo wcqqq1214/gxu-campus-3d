@@ -1,0 +1,123 @@
+{
+  "passed": true,
+  "baseCommit": "346cf9ad08afb099083b4dc598070d94b195de93",
+  "scope": "Independent portico finish candidate; ready for production integration trial, not accepted production geometry",
+  "photoRegistrationAccepted": false,
+  "productionReady": false,
+  "wholeBuildingAccepted": false,
+  "checks": {
+    "pythonTests": 277,
+    "blenderRecords": 280,
+    "detailModes": 2,
+    "previous184RecordMeshRegression": true,
+    "cameraProjectionMaxErrorPixels": 0.002132694339904893,
+    "generatedOrdinaryMeshHashRecordsPreserved": 860
+  },
+  "production": {
+    "all448ResolvedRecordsPreserved": true,
+    "modelsVerifiedInPublicAndOut": 69,
+    "productionDataAndSourceBlendUnchanged": true,
+    "modelManifestSHA256": "4772183e55d1a68ef286890737cf57fd19e69e362318e37a3be618044933c721",
+    "previousCandidateReproduced": true,
+    "allSixPartFootprintsPreserved": true,
+    "entryAndFacadeParametersPreserved": true,
+    "all430OrdinaryBuildingsBothMeshModesPreserved": true,
+    "meshHashRecords": 860
+  },
+  "parameters": {
+    "capitalHeight": 0.32,
+    "capitalProjection": 0.08,
+    "capitalTaperHeight": 0.07,
+    "roofEdgeWidth": 1.65,
+    "bayDivisions": 3,
+    "dividerWidth": 0.12,
+    "openSlots": 21,
+    "totalColumns": 8
+  },
+  "assumptions": [
+    "D remains the OSM-supported location hypothesis.",
+    "Front columns follow the estimated curve with 1m clearance; pair at +/-4m.",
+    "Two rear columns at +/-2.35m along entry and 3.8m setback are estimates, not a surveyed count.",
+    "5.99994m porch depth, central five solid bays and side lattice spacing are unverified estimates.",
+    "Stone-framed central glass bay is estimated: inner piers +/-2.8m, outer piers +/-5.225m; upper beam 7.45–8m.",
+    "Front roof edge uses an estimated 18m-wide parabolic recess, 0.8m inset at its center, entirely inside the original footprint; not a recovered circular radius.",
+    "8.6m roof and 8.25m clear height form a proportional alternative, not a measured height.",
+    "Stone fascia with white soffit; eight 0.32m capitals with 0.08m projection and 0.07m tapered transition are estimates.",
+    "Seven side bays each split into three slots with 0.12m dividers; 1.65m roof edge supports full capital tops. Counts and dimensions are not surveyed."
+  ],
+  "source": {
+    "article": "https://tmjz.gxu.edu.cn/info/1452/6575.htm",
+    "localReference": "work/refinement-s2-platform-delivery/school2023-group.png",
+    "sha256": "0bcc3c995166d400a4dc4cc615556ab85b9adad7a34ba5d256fa827e9f0005b4"
+  },
+  "captures": [
+    {
+      "path": "docs/screenshots/refinement/s2-platform-finish/candidate-entry.png",
+      "sha256": "33ef26f905c7e63d89a0d822077a2e57d2bf16d8caec687778063514b2357801",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-finish/candidate-oblique.png",
+      "sha256": "a2abb7ed763d6371d854780ec74d7f6187dcceee346116c938df2f922306a0c1",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-finish/candidate-photo.png",
+      "sha256": "e90e427bb9892a973b3b64a39b1623fff19e09f7bc5f27344126e59bca65b4aa",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-finish/candidate-roof.png",
+      "sha256": "fa38ae6c4ad3a1fc1c5c0b178fe021accab273c5ee7c086c1b2e8c88a125dd99",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-finish/original-entry.png",
+      "sha256": "a9992986d602b2d7017cd299ab29295545f2b5d3e6ac3954da3d84667d2b2287",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-finish/original-oblique.png",
+      "sha256": "c6734b9adae6470c06bc98b7c1f518b2232765945c4259613226c7cf1d3f72a6",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-finish/original-photo.png",
+      "sha256": "9a9286c2f6d1712f21c884e53e03210b0d3807f0b5aaba910708a4d3b8213a77",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-finish/original-roof.png",
+      "sha256": "194f7686b84e4c17e8d002f1f52ed532ecfc7fe9b1fcfab56fda758da6cd5390",
+      "directlyViewed": true
+    }
+  ],
+  "notRun": [
+    "Campus GLB export",
+    "Pages rebuild",
+    "Runtime performance benchmark"
+  ],
+  "next": "Integrate complete estimated portico candidate, then verify terrain/path, source/base/near GLB, Pages and S0 performance budget.",
+  "inputs": {
+    "blender/generic_buildings.py": "d0e55cd9b24a03aabf115ea2897a633818d18520794db094722b441dc614b276",
+    "blender/geometry.py": "a61f6864a11699724a22157dc4768c190274bdf845a71e522202fba9bb992286",
+    "blender/validate_civil_entry_proposal.py": "487282a0d1e4b4dd35d9d44f0c147460aadd9d7606cdf20140873018ecb5b1cf",
+    "scripts/building_overrides.py": "a34b10cde5b4724b198df59d16413a6d802c2973ea2b3d4eb50ca1d922c71d09",
+    "scripts/exposed_facades_data.py": "a5e602b9511e98d33a803ad2886acd3751b241c4628597657d55ed8782ac5dc1",
+    "scripts/preview_civil_platform_entry.py": "b86560c82d86078e63c3717eaba13f160790e3843b561343603ebd37b5ca604c",
+    "scripts/slatted_roof_data.py": "d1a9828274e56af7cd5260abfa7813c499dffa1e62df7bf20fc6a0c00fd45b65",
+    "scripts/test_exposed_facades_data.py": "9beeaf76192ace22442d897426cec110b5a8646ac1e950bc70b3f8c7718e78d9",
+    "scripts/test_platform_entry_trim.py": "57d2e86bab738f2c43ea5867313825e1065d8beea68ddf3feb29ab31a6ab7c11",
+    "scripts/test_slatted_roof_data.py": "d25c10cd9f692c407f7e93b97481d5f6cfeb2b4cf8258a572f14e27be7654533",
+    "work/refinement-s2-platform-finish/proposal.json": "6747d4294fe5e557566ac54e07fec32e9233551371e499b5e64acea2311b3ff8",
+    "work/refinement-s2-platform-finish/before.json": "05ee3796dc4bd10bb298347f07145e59be488fb290d5400131582ae98f64c153",
+    "work/refinement-s2-platform-finish/comparison.json": "42335b5d663d794952deddf95e2ea5ca5ee06564c03a4fc77334744fb2746871",
+    "work/refinement-s2-platform-finish/geometry.json": "7664fa078e2024968bc92d728c6eb9913acb02668622bd40e798c1cf68325819",
+    "work/refinement-s2-platform-finish/previous-geometry.json": "ab67e300a0f71a04e115b66c001f69f537d6471f57a0bc15df82db26fff22c30",
+    "work/refinement-s2-platform-finish/current-mesh-hashes.json": "5219c556698012144c3f758d3256a98d52bcb3683f7451b4c7d35a0ef09e340d",
+    "work/refinement-s2-platform-finish/previous-mesh-hashes.json": "5219c556698012144c3f758d3256a98d52bcb3683f7451b4c7d35a0ef09e340d",
+    "work/refinement-s2-platform-finish/mesh_regression.py": "f98067ada349e2f25c4e7079525720d7ad58f49cf93369bc1ec220ad138ff294",
+    "work/refinement-s2-platform-finish/check_preservation.py": "b85a8981fbbc36044248adfc79923604aae088834e21b5c7f2679cfd62f7acdb",
+    "work/refinement-s2-platform-finish/python-tests.log": "5cafe0fe8333affec8468215e828c94a33da1d3fe241d94ec422a2a63bfe3b24"
+  }
+}

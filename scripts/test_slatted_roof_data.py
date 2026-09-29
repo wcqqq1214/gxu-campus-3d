@@ -108,5 +108,30 @@ class SlattedRoofTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 resolve_slatted_roof(self.polygons,{**self.config,'frontCurve':bad},[])
 
+    def test_subdivision_retains_solid_bays_and_rotates_without_cracks(self):
+        cfg={**self.config,'solidBays':[2,3,4,5],'bayDivisions':3,'dividerWidth':.12,'edgeFinish':'stone'}
+        roof=resolve_slatted_roof(self.polygons,cfg,[])
+        gap=(16-1.6-7*.3)/8
+        self.assertEqual(len(roof.interiors),12)
+        self.assertAlmostEqual(roof.area,9*16-4*(9-1.6)*(gap-2*.12))
+        self.assertTrue(roof.covers(Point(4.5,8)))
+        for hole in roof.interiors:self.assertGreater(Polygon(hole).area,0)
+        outline=translate(rotate(Polygon(self.polygons[0][0]),31,origin=(0,0)),50,-24)
+        rotated=resolve_slatted_roof([[list(map(list,outline.exterior.coords))]],cfg,[])
+        self.assertLess(rotated.symmetric_difference(translate(rotate(roof,31,origin=(0,0)),50,-24)).area,1e-8)
+
+    def test_subdivision_and_finish_reject_invalid_values(self):
+        for patch in [dict(bayDivisions=3),dict(dividerWidth=.12),dict(bayDivisions=True,dividerWidth=.12),
+                      dict(bayDivisions=5,dividerWidth=.12),dict(bayDivisions=3,dividerWidth=float('nan')),
+                      dict(bayDivisions=3,dividerWidth=True),dict(bayDivisions=4,dividerWidth=.25),dict(edgeFinish='gold')]:
+            with self.subTest(patch=patch),self.assertRaises(ValueError):
+                resolve_slatted_roof(self.polygons,{**self.config,**patch},[])
+
+    def test_capital_whole_top_must_fit_roof_not_just_its_center(self):
+        col=dict(center=[.5,8],width=.6,capital=dict(projection=.08))
+        resolve_slatted_roof(self.polygons,self.config,[{**col,'center':[.4,8]}])
+        with self.assertRaisesRegex(ValueError,'capital'):
+            resolve_slatted_roof(self.polygons,self.config,[col])
+
 
 if __name__=='__main__':unittest.main()

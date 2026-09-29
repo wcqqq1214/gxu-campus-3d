@@ -38,3 +38,14 @@ class PlatformEntryTrimTests(unittest.TestCase):
   for finish in ['white','dark']:validate_panels([{**p,'frameFinish':finish}],10,6,2)
   for patch in [{'frameFinish':'red'},{'frameFinish':None},{'frameFinish':'dark','type':'lattice'}]:
    with self.subTest(patch=patch),self.assertRaises(ValueError):validate_panels([{**p,**patch}],10,6,2)
+ def test_capital_bounds_and_footprint(self):
+  f,b,v=self.fixture();c=v['parts'][1]['openBelow']['columns'][0]
+  c['capital']=dict(height=.32,projection=.08,taperHeight=.07)
+  f.resolve(b,**v)
+  for patch in [dict(height=True),dict(height=float('nan')),dict(projection=.3),dict(taperHeight=.32),dict(extra=1)]:
+   bad=copy.deepcopy(v);bad['parts'][1]['openBelow']['columns'][0]['capital'].update(patch)
+   with self.subTest(patch=patch),self.assertRaises(ValueError):f.resolve(b,**bad)
+  c['shape']='box'
+  with self.assertRaisesRegex(ValueError,'Round column'):f.resolve(b,**v)
+  c['shape']='cylinder';del c['base'];c['capital']['projection']=.15;c['center'][0]=8.4
+  with self.assertRaisesRegex(ValueError,'footprint'):f.resolve(b,**v)
