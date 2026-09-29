@@ -45,7 +45,7 @@ def resolve_exposed_facades(building, form, rules):
         if under_portico:
             if ('openBelow' in high or 'openBelow' not in low or
                     'slattedRoof' in low['openBelow'] or
-                    any(p['roof']['type'] != 'flat' for p in (high, low))):
+                    low['roof']['type'] != 'flat' or high['roof']['type'] not in ('flat','profiled')):
                 raise ValueError('Under-portico glazing needs a solid wall beside an open flat slab')
         elif (high['height'] <= low['height'] or any('openBelow' in p or p['roof']['type'] != 'flat' for p in (high, low))):
             raise ValueError('Exposed facade needs a higher solid part beside a lower flat-roofed solid part')
