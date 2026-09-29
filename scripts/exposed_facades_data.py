@@ -68,8 +68,8 @@ def resolve_exposed_facades(building, form, rules):
         if under_portico and (set(rule) != {'windows', 'balconies', 'panels'} or
                               rule.get('windows') is not False or
                               not isinstance(rule['panels'], list) or
-                              any(not isinstance(p, dict) or p.get('type') != 'glazing' for p in rule['panels'])):
-            raise ValueError('Under-portico walls support only explicit glazing, without automatic windows or doors')
+                              any(not isinstance(p, dict) or p.get('type') not in ('glazing', 'solid') for p in rule['panels'])):
+            raise ValueError('Under-portico walls support only explicit glazing and solid panels, without automatic windows or doors')
         minimum = low['openBelow']['floorHeight']+.1 if under_portico else low['height']+.8
         anchored = {**copy.deepcopy(rule), **{k: config[k] for k in ('polygon', 'ring', 'edge')}}
         local_form = {'parts': [], 'height': high['height'], 'levels': high['levels'], 'roof': high['roof']}
