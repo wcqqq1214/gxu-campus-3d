@@ -1,0 +1,203 @@
+{
+  "date": "2026-09-29",
+  "baseCommit": "6a68c1f7038914ed21be1a905c04edb97dd35d39",
+  "scope": "Client frame pacing only; no geometry, rendering-quality or FPS metric changes.",
+  "reports": {
+    "before": "docs/model-checks/refinement/s5-frame-pacing-before-browser.json",
+    "after": "docs/model-checks/refinement/s5-frame-pacing-after-browser.json",
+    "s0": "docs/model-checks/refinement/s2-arts-s0-current-os-browser.json"
+  },
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "environmentMatches": true,
+  "metrics": {
+    "before": {
+      "精细": {
+        "fpsRounds": [
+          60,
+          60,
+          60
+        ],
+        "medianFPS": 60,
+        "medianTriangles": 4198301,
+        "medianDrawCalls": 554
+      },
+      "流畅": {
+        "fpsRounds": [
+          29,
+          28,
+          29
+        ],
+        "medianFPS": 29,
+        "medianTriangles": 1168063,
+        "medianDrawCalls": 287
+      }
+    },
+    "after": {
+      "精细": {
+        "fpsRounds": [
+          60,
+          60,
+          60
+        ],
+        "medianFPS": 60,
+        "medianTriangles": 4199396,
+        "medianDrawCalls": 563
+      },
+      "流畅": {
+        "fpsRounds": [
+          30,
+          30,
+          30
+        ],
+        "medianFPS": 30,
+        "medianTriangles": 1166765,
+        "medianDrawCalls": 299
+      }
+    },
+    "s0": {
+      "精细": {
+        "fpsRounds": [
+          60,
+          60,
+          60
+        ],
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "流畅": {
+        "fpsRounds": [
+          30,
+          30,
+          30
+        ],
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      }
+    }
+  },
+  "relativeToS0": {
+    "精细": {
+      "medianFPS": 0.0,
+      "medianTriangles": 4.4647,
+      "medianDrawCalls": 2.925
+    },
+    "流畅": {
+      "medianFPS": 0.0,
+      "medianTriangles": 10.915,
+      "medianDrawCalls": 13.6882
+    }
+  },
+  "assets": {
+    "unchanged": true,
+    "verifiedEntries": 69,
+    "manifestSHA256": "a0774e2ba11098cc475804c293394fb697bc36f16cf0658d2a1174e39a5ef693",
+    "initialBytes": 5396508,
+    "maximumOrdinaryNearBytes": 1684868
+  },
+  "cpuContexts": {
+    "s5-frame-pacing-before": {
+      "snapshots": 27,
+      "snapshotsWithinTimingWindows": 18,
+      "pythonOrBlenderAtLeast2PercentWithinWindows": [],
+      "limit": "10-second snapshots, normal desktop apps active; not proof of total CPU isolation."
+    },
+    "s5-frame-pacing-after": {
+      "snapshots": 27,
+      "snapshotsWithinTimingWindows": 19,
+      "pythonOrBlenderAtLeast2PercentWithinWindows": [],
+      "limit": "10-second snapshots, normal desktop apps active; not proof of total CPU isolation."
+    }
+  },
+  "lodCycles": {
+    "s5-frame-pacing-before": 3,
+    "s5-frame-pacing-after": 3
+  },
+  "visualReview": {
+    "reviewedIndividually": true,
+    "files": [
+      "docs/screenshots/refinement/s5-frame-pacing-before/library-approach.png",
+      "docs/screenshots/refinement/s5-frame-pacing-before/library-mobile.png",
+      "docs/screenshots/refinement/s5-frame-pacing-before/library-north.png",
+      "docs/screenshots/refinement/s5-frame-pacing-before/library-overhead.png",
+      "docs/screenshots/refinement/s5-frame-pacing-before/library-side.png",
+      "docs/screenshots/refinement/s5-frame-pacing-before/ordinary-lod.png",
+      "docs/screenshots/refinement/s5-frame-pacing-after/library-approach.png",
+      "docs/screenshots/refinement/s5-frame-pacing-after/library-mobile.png",
+      "docs/screenshots/refinement/s5-frame-pacing-after/library-north.png",
+      "docs/screenshots/refinement/s5-frame-pacing-after/library-overhead.png",
+      "docs/screenshots/refinement/s5-frame-pacing-after/library-side.png",
+      "docs/screenshots/refinement/s5-frame-pacing-after/ordinary-lod.png"
+    ],
+    "result": "No observed regression in framing, building visibility, entry stairs, trees, ordinary LOD or mobile layout. Mobile is viewport simulation."
+  },
+  "checks": {
+    "nodeTestsPassed": 62,
+    "typecheck": "passed",
+    "lint": "passed",
+    "pagesBuild": "passed",
+    "oldLimiterNegativeReplay": "All 3 tests fail; refresh-rate regression fails at 75 Hz.",
+    "modelRebuild": "Not needed; no asset/source changes."
+  },
+  "sourceSHA256": {
+    "lib/campus/scene.ts": "a346b9687e490fdb2686d5bda71b168051dfdd38c3d59fab39dd128dc10ce0d6",
+    "lib/campus/frame-pacing.ts": "4a7e4d6ae39212cd1e56db4f8a2c3c5236325c4cfa4d25d2d6ae48a9b03e74bc",
+    "scripts/test-frame-pacing.mjs": "4ebb98280e732b7cc70fa8f67199284668351050f55391da51a935754fc45810"
+  },
+  "beforeBuild": {
+    "baseCommit": "6a68c1f7038914ed21be1a905c04edb97dd35d39",
+    "bundle": {
+      "_next/static/35464e26-8acc-46bc-85e9-8ab22f4764de/_ssgManifest.js": "653f3e53e89b4f8548ff86c19e92bb3c6b84b6be7485a320b1e00893ed877479",
+      "_next/static/35464e26-8acc-46bc-85e9-8ab22f4764de/_buildManifest.js": "47f02b34be6dc481257b6efce4c19e19111f37ef5c437f8ffed44f0da97fa9bb",
+      "_next/static/chunks/page-DTzQXk6h.js": "ec2bd15634c4c4b6d80474821c6aeabace6a9424d14de2fb958c0a3a3d402719",
+      "_next/static/chunks/layout-segment-context-BqPHoexB.js": "90d01ef9f6943d24ee37a5e2676e4543823e99a86bef56eed9d29a4f989aead2",
+      "_next/static/chunks/vinext-C8AoDxvJ.js": "c017a64edc56a051fa8f8e0ae86abbacc02e49f36ad65b559294a037eef4d318",
+      "_next/static/chunks/scene-C24vlApz.js": "7303e649d5b45f9e3654d726fa0642cbe4da34d2c00ad676803075e969368942",
+      "_next/static/chunks/index-DPjJQRo8.js": "4232d6ad4944d451b6ce652e4d2ffa0f61b39dc4cf2da0b8c9843dafe323295b",
+      "_next/static/chunks/rolldown-runtime-hePW80VL.js": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+      "_next/static/chunks/framework-DTZGTDtF.js": "2a1edf81f32a49b1eacafc3546b371bca024c82a9191836e274d90890212e9df",
+      "_next/static/media/draco_wasm_wrapper.DxJM36Ib.js": "e8049906ef3f8f75d3456c22a3f31bfdfe5b5b5bd09ccdec613b9e9a49d554d8",
+      "_next/static/media/draco_decoder.fzg4nYZr.js": "30e4d486fa020737af10e3c56197693e5b904bdc05b8bfa5d7b06751dec6da04",
+      "_next/static/media/draco_wasm_wrapper.fZCQGLGb.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6",
+      "draco/draco_decoder.js": "8625489da79a805f4f2a7d511c3e52d8b4085608a9d2a4d5f4f9de5db0aea04f",
+      "draco/draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
+    },
+    "modelManifestSha256": "a0774e2ba11098cc475804c293394fb697bc36f16cf0658d2a1174e39a5ef693",
+    "productionModelManifestSha256": "a0774e2ba11098cc475804c293394fb697bc36f16cf0658d2a1174e39a5ef693"
+  },
+  "afterBundleSHA256": {
+    "_next/static/795feb74-087f-492d-bda3-466f5766f4c0/_buildManifest.js": "47f02b34be6dc481257b6efce4c19e19111f37ef5c437f8ffed44f0da97fa9bb",
+    "_next/static/795feb74-087f-492d-bda3-466f5766f4c0/_ssgManifest.js": "653f3e53e89b4f8548ff86c19e92bb3c6b84b6be7485a320b1e00893ed877479",
+    "_next/static/chunks/framework-DTZGTDtF.js": "2a1edf81f32a49b1eacafc3546b371bca024c82a9191836e274d90890212e9df",
+    "_next/static/chunks/index-YiYDSpxq.js": "3f0a0ec4a8d535e7d58095b8afb2c1c9e241e85b89f6044f7bce3c8eeaa92c00",
+    "_next/static/chunks/layout-segment-context-BSjBPJZv.js": "b058e715516a9903e8386f3c5d16a102675895ef0c736e0ca582a91478a485f1",
+    "_next/static/chunks/page-BrPSwEeC.js": "735aa5a8eac1ec7cdefa9cedcfe95450d455e68b3e7cb066a19212a41b010c92",
+    "_next/static/chunks/rolldown-runtime-hePW80VL.js": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+    "_next/static/chunks/scene-BsTKIN99.js": "49b214ba64c8c0bc17d7986b33f9b2ff331b41a567272d63f2c4f7b397b8c6f0",
+    "_next/static/chunks/vinext-D6MpRjIX.js": "72b6614a8372e922cac5f1586e8ed41cb11c99963739fdf3f5141045bb2ee05a",
+    "_next/static/media/draco_decoder.fzg4nYZr.js": "30e4d486fa020737af10e3c56197693e5b904bdc05b8bfa5d7b06751dec6da04",
+    "_next/static/media/draco_wasm_wrapper.DxJM36Ib.js": "e8049906ef3f8f75d3456c22a3f31bfdfe5b5b5bd09ccdec613b9e9a49d554d8",
+    "_next/static/media/draco_wasm_wrapper.fZCQGLGb.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6",
+    "draco/draco_decoder.js": "8625489da79a805f4f2a7d511c3e52d8b4085608a9d2a4d5f4f9de5db0aea04f",
+    "draco/draco_wasm_wrapper.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
+  },
+  "buildingProgress": {
+    "calibratedObjects": 22,
+    "wholeFirstPassAccepted": 1,
+    "partial": 21,
+    "s5Complete": false,
+    "next": "实验大厅和结构平台继续核对低翼屋面、门厅及人员/运输入口。"
+  }
+}
