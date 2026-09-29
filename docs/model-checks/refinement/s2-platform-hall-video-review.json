@@ -1,0 +1,709 @@
+{
+  "reviewedAt": "2026-09-30",
+  "baselineCommit": "2ac39b9ca7f4c3e3db5d2e5a0b4291ad3af77a2b",
+  "scope": "Evidence and execution-plan revision; no production geometry change",
+  "buildingId": "way/957404988",
+  "coordinateSystem": "Campus local x east, y north, metres; dimensions derive from the existing estimated model",
+  "video": {
+    "articleUrl": "https://tmjz.gxu.edu.cn/info/1452/5053.htm",
+    "mediaUrl": "https://tmjz.gxu.edu.cn/__local/2/B7/5D/B046C8E3829FF8A1793D4F6CFA2_7813618E_317EC7DB.mp4?e=.mp4",
+    "durationSeconds": 393.683333,
+    "inspection": "Discrete browser-decoded frames, not full playback or a continuity proof",
+    "reviewedPlayerTimes": [
+      "2:19",
+      "5:00",
+      "5:14",
+      "5:21",
+      "5:46",
+      "5:58",
+      "6:00",
+      "6:02",
+      "6:05",
+      "6:12",
+      "6:18",
+      "6:23"
+    ],
+    "timePrecisionSeconds": 1,
+    "transitionFrames": [
+      "5:14",
+      "6:00",
+      "6:02"
+    ],
+    "discardedStaleSeekBatch": {
+      "approximateDisplayedTimes": [
+        "3:20",
+        "4:18",
+        "5:18",
+        "6:12"
+      ],
+      "reason": "Same earlier exhibit image persisted after time label changed; discarded. Valid 6:12 reviewed separately after decoding."
+    },
+    "downloaded": false,
+    "mediaSha256": null,
+    "identityObservation": "At 6:23 the blue test-system plaque names the large structural test/research platform and 12000 kN system.",
+    "newDoorGeographicOrientationConfirmed": false,
+    "metricMeasurementsAccepted": false
+  },
+  "followup": "Seek uniquely identifiable exterior/plan for H-S candidate; independently review office south/west and west-foyer roof. Do not repeat the same group photo as new evidence.",
+  "facades": [
+    {
+      "id": "H-E",
+      "part": "south-hall",
+      "originalEdge": 0,
+      "adjacentPart": null,
+      "start": [
+        -656.4254690470157,
+        -766.5382365836045
+      ],
+      "end": [
+        -656.4495536085785,
+        -788.1344680000896
+      ],
+      "modelLengthMeters": 21.5962448462801,
+      "evidence": "Current white wall is an unverified placeholder",
+      "doorAnchor": null,
+      "newOpeningReadyForProduction": false
+    },
+    {
+      "id": "H-S",
+      "part": "south-hall",
+      "originalEdge": 1,
+      "adjacentPart": null,
+      "start": [
+        -656.4495536085785,
+        -788.1344680000896
+      ],
+      "end": [
+        -717.8064028063193,
+        -788.05654399997
+      ],
+      "modelLengthMeters": 61.35689867996992,
+      "evidence": "Current white wall is an unverified placeholder",
+      "doorAnchor": null,
+      "newOpeningReadyForProduction": false
+    },
+    {
+      "id": "H-W",
+      "part": "south-hall",
+      "originalEdge": 2,
+      "adjacentPart": null,
+      "start": [
+        -717.8064028063193,
+        -788.05654399997
+      ],
+      "end": [
+        -717.7775037716817,
+        -766.4499404728923
+      ],
+      "modelLengthMeters": 21.606622853433848,
+      "evidence": "Current white wall is an unverified placeholder",
+      "doorAnchor": null,
+      "newOpeningReadyForProduction": false
+    },
+    {
+      "id": "H-N",
+      "part": "south-hall",
+      "originalEdge": null,
+      "adjacentPart": "north-low-wing",
+      "start": [
+        -656.4254690470157,
+        -766.5382365836045
+      ],
+      "end": [
+        -717.7775037716817,
+        -766.4499404728923
+      ],
+      "modelLengthMeters": 61.352098261264025,
+      "evidence": "Upper window band supported by prior aerial; ground level adjoins low wing",
+      "doorAnchor": null,
+      "newOpeningReadyForProduction": false
+    }
+  ],
+  "parts": [
+    {
+      "id": "south-hall",
+      "estimatedHeight": 13.2,
+      "polygons": [
+        [
+          [
+            [
+              -656.4254690470157,
+              -766.5382365836045
+            ],
+            [
+              -717.7775037716817,
+              -766.4499404728923
+            ],
+            [
+              -717.8064028063193,
+              -788.05654399997
+            ],
+            [
+              -656.4495536085785,
+              -788.1344680000896
+            ],
+            [
+              -656.4254690470157,
+              -766.5382365836045
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "north-low-wing",
+      "estimatedHeight": 7.2,
+      "polygons": [
+        [
+          [
+            [
+              -717.7775037716817,
+              -766.4499404728923
+            ],
+            [
+              -656.4254690470157,
+              -766.5382365836045
+            ],
+            [
+              -656.418777727391,
+              -760.5382399999202
+            ],
+            [
+              -695.093802217242,
+              -760.4825800000607
+            ],
+            [
+              -717.7694787226078,
+              -760.4499458086736
+            ],
+            [
+              -717.7775037716817,
+              -766.4499404728923
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "link-foyer",
+      "estimatedHeight": 10.8,
+      "polygons": [
+        [
+          [
+            [
+              -701.0939074704767,
+              -760.4739448185203
+            ],
+            [
+              -701.2909494339341,
+              -729.4056767281803
+            ],
+            [
+              -720.2684733304854,
+              -729.3909039997784
+            ],
+            [
+              -720.2684733304854,
+              -735.6025599999941
+            ],
+            [
+              -717.4120227129979,
+              -760.4504602492385
+            ],
+            [
+              -701.0939074704767,
+              -760.4739448185203
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "link-portico",
+      "estimatedHeight": 8.6,
+      "polygons": [
+        [
+          [
+            [
+              -701.0939074704767,
+              -760.4739448185203
+            ],
+            [
+              -695.093802217242,
+              -760.4825800000607
+            ],
+            [
+              -695.2908592664412,
+              -729.4103473955927
+            ],
+            [
+              -701.2909494339341,
+              -729.4056767281803
+            ],
+            [
+              -701.0939074704767,
+              -760.4739448185203
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "west-foyer",
+      "estimatedHeight": 7.2,
+      "polygons": [
+        [
+          [
+            [
+              -717.7653682970973,
+              -757.3767519997551
+            ],
+            [
+              -717.7694787226078,
+              -760.4499458086736
+            ],
+            [
+              -717.4120227129979,
+              -760.4504602492385
+            ],
+            [
+              -720.2684733304854,
+              -735.6025599999941
+            ],
+            [
+              -726.936581001803,
+              -732.7193719999174
+            ],
+            [
+              -729.6243413237747,
+              -738.563671999795
+            ],
+            [
+              -730.6502040426632,
+              -744.0740119997248
+            ],
+            [
+              -730.8553765858578,
+              -750.4637800000445
+            ],
+            [
+              -729.901324257379,
+              -757.5548639998591
+            ],
+            [
+              -727.8290815664487,
+              -764.0893479998925
+            ],
+            [
+              -717.7653682970973,
+              -757.3767519997551
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "id": "north-office",
+      "estimatedHeight": 29.7,
+      "polygons": [
+        [
+          [
+            [
+              -720.2684733304854,
+              -729.3909039997784
+            ],
+            [
+              -695.2908592664412,
+              -729.4103473955927
+            ],
+            [
+              -695.3913024054572,
+              -713.5723320000095
+            ],
+            [
+              -734.5484823735649,
+              -713.5278039998846
+            ],
+            [
+              -734.5689996267181,
+              -729.3797720000439
+            ],
+            [
+              -720.2684733304854,
+              -729.3909039997784
+            ]
+          ]
+        ]
+      ]
+    }
+  ],
+  "unchangedProduction": {
+    "trackedProductionChanges": [],
+    "buildingsSha256": "1e813a5b29c7cf0a7ec9977d6e9d474a50181cb6a563c15204ba549e6ff2c3aa",
+    "glbCount": 69,
+    "assets": [
+      {
+        "file": "public/models/auditorium.glb",
+        "bytes": 37444,
+        "sha256": "5cf24d114f9872833e624e50301727e04ebcaa261d3ae0439991d1ea5008ca79"
+      },
+      {
+        "file": "public/models/base.glb",
+        "bytes": 5864948,
+        "sha256": "412c1f03c9f330aaed8bf10dd415fe63070e86afad470fb73e05bd67efa31236"
+      },
+      {
+        "file": "public/models/bocui-bridge.glb",
+        "bytes": 127380,
+        "sha256": "1bb76f28a111c18537cca37197cdfb76549eab3981c855493d546a8034f26404"
+      },
+      {
+        "file": "public/models/chongzuo-bridge.glb",
+        "bytes": 943412,
+        "sha256": "8dd1195fca9ce8eb2b5cc43e24e9323a25300d318959c2e2fd354517f69cadbc"
+      },
+      {
+        "file": "public/models/chunk-n1-n1.glb",
+        "bytes": 857212,
+        "sha256": "810dfcc343d732b1430b585a3548b1cc6f9bc83923636a2015e4cae1f361555d"
+      },
+      {
+        "file": "public/models/chunk-n1-n2.glb",
+        "bytes": 358448,
+        "sha256": "fcb2e4ab9e461b96b0aee7d77a4bf5868ce6cde47730926763db8e39855ce520"
+      },
+      {
+        "file": "public/models/chunk-n1-n3.glb",
+        "bytes": 1305920,
+        "sha256": "9c99deb6b436926b98a64db8b903278d2f1e1401135f5e93597e2e09c8f73184"
+      },
+      {
+        "file": "public/models/chunk-n1-n4.glb",
+        "bytes": 55236,
+        "sha256": "345f89eb7817051d1d23d1e1835ebabe7a3e77c2d08e28d0ae44d7186bc346ff"
+      },
+      {
+        "file": "public/models/chunk-n1-p0.glb",
+        "bytes": 1342744,
+        "sha256": "5e1410358bd995cfa47a88929da3bec7225c744ca5e035878a179debe23d3b5e"
+      },
+      {
+        "file": "public/models/chunk-n1-p1.glb",
+        "bytes": 157460,
+        "sha256": "d24e4967a9e0cd9e75dff4f48f19b8360784548d49d1a93aecf276a09bfde32c"
+      },
+      {
+        "file": "public/models/chunk-n1-p2.glb",
+        "bytes": 510984,
+        "sha256": "89cb595a8022834df35826eeb9853c84bef489ddb924e3c50d25ee90154f54c6"
+      },
+      {
+        "file": "public/models/chunk-n2-n1.glb",
+        "bytes": 1684868,
+        "sha256": "4730af2d3c8aa843e90c14d6b39af26474983698d0a9e7ef5d1a47bd521b2163"
+      },
+      {
+        "file": "public/models/chunk-n2-n2.glb",
+        "bytes": 1138380,
+        "sha256": "7f477846b1530ea0b8cc825685f2ffd14f8d39aaa1b28874ea374ea99d69c6c2"
+      },
+      {
+        "file": "public/models/chunk-n2-n3.glb",
+        "bytes": 1425004,
+        "sha256": "f33c9d62cf2a7d92bf5d91d997da8fe4091a2fc8951fc64076a33fc1e108217c"
+      },
+      {
+        "file": "public/models/chunk-n2-n4.glb",
+        "bytes": 349424,
+        "sha256": "903a4b89d87b3329c6baf5ddb412c424fd1388085d7759502ae547fb26dd1baf"
+      },
+      {
+        "file": "public/models/chunk-n2-p0.glb",
+        "bytes": 95724,
+        "sha256": "477fcc2fd1edebc5580e70f7f6527bf55444ec02dd758ef0759e1b41dfc4ed70"
+      },
+      {
+        "file": "public/models/chunk-n2-p2.glb",
+        "bytes": 631872,
+        "sha256": "9e22e563ae0c0ceb028dd385357db623227f0e18cd3815c05446aff3438c4af2"
+      },
+      {
+        "file": "public/models/chunk-n2-p3.glb",
+        "bytes": 93852,
+        "sha256": "ea32a5c6d40134d101f591f2d9b09a42810a37044bd2bfc375236affcb5f460c"
+      },
+      {
+        "file": "public/models/chunk-n3-n1.glb",
+        "bytes": 613944,
+        "sha256": "eb8428120ead4063be1e5c3e8aedf3bf3b9e8507dfc56f40f5c6c141dbe50826"
+      },
+      {
+        "file": "public/models/chunk-n3-n2.glb",
+        "bytes": 218900,
+        "sha256": "451c4b3d0e1471a3ce02a9049034aaaf52c40e5b9d4c713985da325bcbf92503"
+      },
+      {
+        "file": "public/models/chunk-n3-p0.glb",
+        "bytes": 138032,
+        "sha256": "5fa7f815f06f339d3f58d97f0dfefc64ee3f07c0ab2f930578b558bad500dde1"
+      },
+      {
+        "file": "public/models/chunk-n3-p2.glb",
+        "bytes": 212468,
+        "sha256": "b9b7712c9bdfdd6960bdd41ea898d8a5cb31271959009887c4c073e6b3db9664"
+      },
+      {
+        "file": "public/models/chunk-p0-n1.glb",
+        "bytes": 1017336,
+        "sha256": "9335e4a40435ca9d5cfcafe2c32006ef2a0e8654ded850f41d7de24b8af77bb3"
+      },
+      {
+        "file": "public/models/chunk-p0-n2.glb",
+        "bytes": 823872,
+        "sha256": "8e330ffe8dc9ee074a0dcd89d13ea3e34702d90a268bb55aca735d888aa0a6db"
+      },
+      {
+        "file": "public/models/chunk-p0-n3.glb",
+        "bytes": 1160172,
+        "sha256": "a4d6bce1846d3b1cc0c6872d151400674135f56088396f03aa4f458cc095661c"
+      },
+      {
+        "file": "public/models/chunk-p0-p0.glb",
+        "bytes": 1227032,
+        "sha256": "a2563f048a31f7d7dcdfd737c9755d669e084ac4a0987104905edc4dc10a5103"
+      },
+      {
+        "file": "public/models/chunk-p0-p1.glb",
+        "bytes": 648300,
+        "sha256": "2e5d9c04fcc0e9320939cbc1546ce6f0cac72605242b167f08cf26a0262d2a5c"
+      },
+      {
+        "file": "public/models/chunk-p0-p2.glb",
+        "bytes": 199920,
+        "sha256": "b61c9f52489e92bef1c93ad999bcbfae2dba95a6d1983c8f989fdc753561d182"
+      },
+      {
+        "file": "public/models/chunk-p1-n1.glb",
+        "bytes": 981832,
+        "sha256": "9ff6da2abbbcac004e6b82db33c12f0b97b70b3ec61dbe5a0bd6b04a02f90e61"
+      },
+      {
+        "file": "public/models/chunk-p1-n2.glb",
+        "bytes": 1010632,
+        "sha256": "e7fce85ff50ed96b6f60bf3752c8d94e7d9d28b7c8d761a2d4f9a900509646d6"
+      },
+      {
+        "file": "public/models/chunk-p1-p0.glb",
+        "bytes": 1635596,
+        "sha256": "5e42603974a046f1e8982886cb483c11f71911639bd9de4ca376364ce2a484e9"
+      },
+      {
+        "file": "public/models/chunk-p1-p1.glb",
+        "bytes": 585800,
+        "sha256": "45198a097e24be85e68dacfc26086be2167d1ffb095a3b136dfc3989a7a46d24"
+      },
+      {
+        "file": "public/models/chunk-p2-n1.glb",
+        "bytes": 91096,
+        "sha256": "18ecb5f1239259c107999c949143afac8980f842690f98ddec08c97a5ee2373f"
+      },
+      {
+        "file": "public/models/chunk-p2-p0.glb",
+        "bytes": 372724,
+        "sha256": "b70c94fe478d36f26f6e9da71923aff48f04834f97705336d6dfdc01a79ae5ca"
+      },
+      {
+        "file": "public/models/computer.glb",
+        "bytes": 42072,
+        "sha256": "41603c7ca050b724a612c826ead4a92c5519e1c2b55b9f5a05fef3aecb49c33f"
+      },
+      {
+        "file": "public/models/east-gate.glb",
+        "bytes": 437640,
+        "sha256": "87a88b839eda123e6dbc0d5977583be0602b1e7c4fa2e457cfa1a342fd29730d"
+      },
+      {
+        "file": "public/models/huicui.glb",
+        "bytes": 826044,
+        "sha256": "624945c59d21912ed3e5e3cc90ae351da1cdef35fe881afbbe02a679d1701c42"
+      },
+      {
+        "file": "public/models/huixian-bridge.glb",
+        "bytes": 125404,
+        "sha256": "780e84c975ff34065e585d9f3095d134ae719f673a45197b4f20a0fb0f668ac9"
+      },
+      {
+        "file": "public/models/huixue.glb",
+        "bytes": 29020,
+        "sha256": "1bcfb0bc7c9a42c7cb85095e280cc9a84b8c64befb2ed618a12880b7d1b83814"
+      },
+      {
+        "file": "public/models/infra-lake-bridge-1492215405.glb",
+        "bytes": 14488,
+        "sha256": "972688c364d96d36dae974d765e69ba0b025f600515c2ae231ea8903951ffbbe"
+      },
+      {
+        "file": "public/models/infra-lake-bridge-760193721.glb",
+        "bytes": 18804,
+        "sha256": "decf8062363005e439f3d09ea64fcdeafdc1043cb1958bfdc3eaef447f38e0d0"
+      },
+      {
+        "file": "public/models/infra-lake-bridge-822812181.glb",
+        "bytes": 27676,
+        "sha256": "69f8334bd29c857acc855a9f25172048cefbdf18444fed5a598f5fdaaaa73892"
+      },
+      {
+        "file": "public/models/infra-lake-bridge-833506388.glb",
+        "bytes": 9912,
+        "sha256": "a536b723d66f2cdf0aac6b8c1879323b335be06caac061faf8121a7c7c5ddf86"
+      },
+      {
+        "file": "public/models/infra-lake-bridge-834160220.glb",
+        "bytes": 10040,
+        "sha256": "b009fab0ef80d6456eac5a3a6676b4ebe51276b1affe1caa42a80d4abdfce569"
+      },
+      {
+        "file": "public/models/infra-lake-bridge-835748952.glb",
+        "bytes": 9108,
+        "sha256": "8f29c6792d4f6a69276a3a13efd944209696c8ffcca105aa27042cb0d36b835b"
+      },
+      {
+        "file": "public/models/infra-lake-bridge-845251806.glb",
+        "bytes": 19232,
+        "sha256": "3a3aa963367fa0c84781dc422d67a64ba54167bb1d639194faaab627e702d485"
+      },
+      {
+        "file": "public/models/infra-road-00.glb",
+        "bytes": 12864,
+        "sha256": "179884d1344bbb52fc88e76eb1341a60e724c4af19ccef1c0333142a87acff38"
+      },
+      {
+        "file": "public/models/infra-road-01.glb",
+        "bytes": 128116,
+        "sha256": "e4627183c5d5737bec07e2a3c4c74514431c3ab700c333b2920884ae52b68760"
+      },
+      {
+        "file": "public/models/infra-road-02.glb",
+        "bytes": 342468,
+        "sha256": "eabad15b632e65d3815e6aff4e3f2a49e9666636b2c20178421b9e4b745fb244"
+      },
+      {
+        "file": "public/models/infra-road-03.glb",
+        "bytes": 400940,
+        "sha256": "fb2c53affc1c374d9bc75f9500ed6b2b94f65c1cece5b20b53199fc05cdda8bd"
+      },
+      {
+        "file": "public/models/infra-road-04.glb",
+        "bytes": 278408,
+        "sha256": "e268dc7ad6f75599bcfcca9e1d8977246c970d627963ec1171f47421d680b4f8"
+      },
+      {
+        "file": "public/models/infra-road-05.glb",
+        "bytes": 104508,
+        "sha256": "60156b589b222edc1531ca0ad1baf2ddf5ae804603ba8cbbcab02cd3f2a7d1d5"
+      },
+      {
+        "file": "public/models/infra-road-06.glb",
+        "bytes": 74408,
+        "sha256": "26f3aded88b6c6757b422f2815ab3044f6558f9989799f37807d58c36190c214"
+      },
+      {
+        "file": "public/models/infra-road-07.glb",
+        "bytes": 179628,
+        "sha256": "da1afbd7f5f8188b78c39221cd7d063267697849f0405f9f9dd07bad1d44bc2f"
+      },
+      {
+        "file": "public/models/infra-road-08.glb",
+        "bytes": 13300,
+        "sha256": "06a143de0c316012213262ec25006ca78586728abbf9730e01e73e0caf82641d"
+      },
+      {
+        "file": "public/models/international-residence.glb",
+        "bytes": 595516,
+        "sha256": "c33b29cb2cca47adb0b81a1d4a6ee720fe469fa0334eb44588c0e5962728e4d8"
+      },
+      {
+        "file": "public/models/laboratory.glb",
+        "bytes": 71500,
+        "sha256": "6f08291669829175a04a4d135fc124fad2b12153946c53f88166c21f8fb0a8ab"
+      },
+      {
+        "file": "public/models/library.glb",
+        "bytes": 1500084,
+        "sha256": "1b8cfcd63a40555b72b2c7340d33b08a3528fb169f468b9eea5d34fcd400ae85"
+      },
+      {
+        "file": "public/models/new-east-gate.glb",
+        "bytes": 32788,
+        "sha256": "ae5ac82120334e03e01d5ba28fb54b7a062fb5807f9f2982ac6d67fcfbd9a954"
+      },
+      {
+        "file": "public/models/south-gate.glb",
+        "bytes": 640604,
+        "sha256": "e09895c8e14447e61b68326e25b3aaed30b1173b111b4dd12ddd93847f8affd0"
+      },
+      {
+        "file": "public/models/stadium.glb",
+        "bytes": 39340,
+        "sha256": "f8eb12fd36279989a8fe7487232ed66c2ffc813a70dddeb9e34f17c836a79a1d"
+      },
+      {
+        "file": "public/models/student-center.glb",
+        "bytes": 120764,
+        "sha256": "f5a9ab864d56ec6d7b5062d8b555537141c0cd9dce8c53d1ca7648cd30eb4bac"
+      },
+      {
+        "file": "public/models/teaching-six.glb",
+        "bytes": 238160,
+        "sha256": "612c46bfaac893a209c1b60f4e78eb44b46369b174b4b98ec431f24774276f63"
+      },
+      {
+        "file": "public/models/teaching-ten.glb",
+        "bytes": 415456,
+        "sha256": "ebf560eeb12a30c7d61f86de35bdeff3933c93022d7395a8012adf2a07ba1083"
+      },
+      {
+        "file": "public/models/teaching-two.glb",
+        "bytes": 38808,
+        "sha256": "4434f0254f79883b6256049d75a232fa2ced70f5ab50fdeec17fbae47ce05616"
+      },
+      {
+        "file": "public/models/time-gate.glb",
+        "bytes": 746308,
+        "sha256": "43bbbd611cd3e1bae95d1d3c73ba8d49494bfd106254497b1557a295f0531d1f"
+      },
+      {
+        "file": "public/models/trees-near.glb",
+        "bytes": 41304,
+        "sha256": "fe13967da352d7b82f57ff47aacd5ce4398fe7bb74f206c2dfb4a76fa99ebeff"
+      },
+      {
+        "file": "public/models/trees.glb",
+        "bytes": 21916,
+        "sha256": "dda1d627c9f5196492d3e4c275ec51d0536494f24fa8980dc952dded9b7bb6ed"
+      },
+      {
+        "file": "public/models/west-gate.glb",
+        "bytes": 36188,
+        "sha256": "f8530e2c14323ac8082d9419ccb8c1335631e829177ba6c351cd55a195414fea"
+      }
+    ]
+  },
+  "newTestsOrBuildsRun": false,
+  "newPerformanceMeasurement": false,
+  "counts": {
+    "calibratedObjects": 22,
+    "wholeFirstPass": 2,
+    "partial": 20,
+    "s3WholeNeighbors": 0
+  },
+  "documentationVerification": {
+    "baselineAndPhaseRequirementsUnchanged": true,
+    "historicalBlocksPreservedVerbatim": 3,
+    "markdownFilesChecked": 7,
+    "localFileLinksChecked": 430,
+    "jsonAndSvgParsed": true,
+    "diagramVisuallyReviewed": true,
+    "mainRefUnchanged": "b8d7936d38fafd4b5af9f0b1cb4267d187b48cc7"
+  }
+}
