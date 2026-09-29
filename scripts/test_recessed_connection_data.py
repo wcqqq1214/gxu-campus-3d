@@ -23,9 +23,12 @@ class RecessedConnectionTests(unittest.TestCase):
         self.assertGreater(area.boundary.intersection(Polygon(s['vertices']).boundary.buffer(1e-6)).length,12)
     def test_missing_explicit_stairs_and_arbitrary_width_are_rejected(self):
         c,bs,s,refs=self.fixture()
-        for key in ['steps','stepWidth','recess','platformHeight']:
+        for key in ['steps','recess','platformHeight']:
             bad=copy.deepcopy(bs);b=next(b for b in bad if b['id']==c['buildingId']);del b['form']['entrances'][0][key]
             with self.subTest(key=key),self.assertRaisesRegex(ValueError,'explicit stairs'):derive_front_connection(c,bad,s,refs)
+        bad=copy.deepcopy(bs);entry=next(b for b in bad if b['id']==c['buildingId'])['form']['entrances'][0]
+        entry.pop('stepWidth');entry.pop('porticoWidth')
+        with self.assertRaisesRegex(ValueError,'explicit stairs'):derive_front_connection(c,bad,s,refs)
         with self.assertRaisesRegex(ValueError,'width must match'):derive_front_connection({**c,'pathWidth':4},bs,s,refs)
         with self.assertRaisesRegex(ValueError,'Road is missing'):derive_front_connection({**c,'roadSearchDistance':[.3,4]},bs,s,refs)
     def test_rotated_recess_and_stair_toe_remain_aligned(self):
@@ -47,3 +50,16 @@ class RecessedConnectionTests(unittest.TestCase):
         cs,sn=math.cos(site['angle']),math.sin(site['angle'])
         toe=[site['origin'][0]-site['startY']*sn,site['origin'][1]+site['startY']*cs]
         for k in range(2):self.assertAlmostEqual(toe[k],e['outerCenter'][k]+2.11*n[k],places=7)
+
+    def test_default_recessed_width_and_two_step_base_are_preserved(self):
+        b=dict(id='way/test',center=[0,6],polygons=[[[[-7,0],[7,0],[7,12],[-7,12],[-7,0]]]],
+               form={'entrances':[dict(id='main',center=[0,4],outerCenter=[0,0],bearing=180,
+               porticoId='front',recess=4,steps=2,porticoWidth=14,platformHeight=.55,stepBaseHeight=.25)]})
+        surface=dict(id='way/road',kind='roads',tags={'highway':'service'},vertices=[[-20,-26],[20,-26],[20,-23],[-20,-23]],triangles=[0,1,2,0,2,3])
+        c=dict(id='test',type='front-connection',buildingId=b['id'],footprintRevision=footprint_revision(b),entranceId='main',surfaceId=surface['id'],surfaceRevision=revision(surface),roadSearchDistance=[15,30],meshStep=1,groundClearance=.12,joinOverlap=.2,roadContactDepth=1,roadContactSideMargin=.5,sourceRefs=['osm'],evidence={'presence':'fixture'})
+        original=copy.deepcopy(b);site,area,_=derive_front_connection(c,[b],surface,{'osm'})
+        self.assertEqual(b,original);self.assertEqual(site['halfWidth'],7)
+        self.assertAlmostEqual(site['startY'],4.61);self.assertEqual(site['stairBaseHeight'],.25)
+        self.assertAlmostEqual(area.area,313.46)
+        with self.assertRaisesRegex(ValueError,'width must match'):
+            derive_front_connection({**c,'pathWidth':4},[b],surface,{'osm'})

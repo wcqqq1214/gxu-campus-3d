@@ -1,6 +1,6 @@
 {
-  "inputTrees": 3121,
-  "retainedTrees": 3063,
+  "inputTrees": 3120,
+  "retainedTrees": 3062,
   "removed": [
     {
       "tree": [
@@ -873,7 +873,7 @@
       "containmentWitness": null
     }
   ],
-  "testedPairs": 1549,
+  "testedPairs": 1541,
   "clearanceMeters": 0.03,
   "treeLODs": [
     "near",
@@ -883,8 +883,8 @@
     "base",
     "near"
   ],
-  "testedClosedBuildingComponents": 177416,
-  "testedOpenBuildingComponents": 43663,
+  "testedClosedBuildingComponents": 177498,
+  "testedOpenBuildingComponents": 43719,
   "method": "Final grounded trees versus buildings in both LODs: 3D AABB, BVH surface overlap, then bidirectional containment in closed orientable components.",
   "limitations": "Open/non-manifold components are not capped; containment is only established for detected closed shells. Does not replace sourced no-tree masks or final road/sports/water/entrance exclusions."
 }

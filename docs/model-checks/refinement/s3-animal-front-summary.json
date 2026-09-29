@@ -1,0 +1,96 @@
+{
+  "checkedAt": "2026-09-29T23:09:42.452696+00:00",
+  "passed": false,
+  "productionIntegrated": true,
+  "performanceBudgetNumbersPassed": false,
+  "sameConditionPerformanceAccepted": true,
+  "baseCommit": "1090d548073501e9e7ba697594e13341e24c83e7",
+  "branch": "dev",
+  "scope": "Animal south central forecourt joined to existing steps and mapped service road. Estimated dimensions and grade; side plazas and statue remain unconfirmed.",
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 20,
+  "totalFirstPassWholeBuildingsAccepted": 2,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 280,
+  "nodeTests": 66,
+  "checks": [
+    "geometry",
+    "roof-geometry",
+    "entry-portico",
+    "corridor-geometry",
+    "grid-geometry",
+    "generic-geometry",
+    "data",
+    "trees-geometry",
+    "site-trees-geometry",
+    "source-preservation",
+    "assets"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4281827,
+      "medianDrawCalls": 564,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.5152291587892375,
+        "medianDrawCalls": 3.1078610603290757
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1211873,
+      "medianDrawCalls": 299,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 15.203076206455668,
+        "medianDrawCalls": 13.688212927756659
+      },
+      "passed": false
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of complete isolation.",
+  "initialModelBytes": 5970148,
+  "maximumOrdinaryNearBytes": 1684868,
+  "pending": [
+    "Animal side/rear facades, rear-wing height and extent, other entrances and full forecourt",
+    "Civil platform delivery opening and north office south/west facades; independent old-hall evidence"
+  ],
+  "fingerprints": {
+    "data/site-overrides.json": "6fe49e6663ec8b7987660aaa4d3ec849a2c4cd7d8d484810733c1a098df20469",
+    "blender/gxu-campus.blend": "84b10765692e4d94bd1c6e999925e7c2eb692b60598c97d946218dded24b4aef",
+    "scripts/front_connection_data.py": "649bcc2d1c66a759c3432a5331692c2345ab82a99f695b8dc6d3c97b46d1fc9e",
+    "scripts/test_recessed_connection_data.py": "29e273bd351463f44b672684f98ff1f6ea3424a7fa797bca444bc3fb2d99aff5",
+    "public/data/buildings.json": "1e813a5b29c7cf0a7ec9977d6e9d474a50181cb6a563c15204ba549e6ff2c3aa",
+    "public/data/sites.json": "040484dcdd1382af6912620b1f1b6d65d9c739a567bf310d749a61cf25aada9c",
+    "public/data/models.json": "599ee12508090c924abec1113f6eeda2829af32c3f243a4d16d68f51b0c80d97",
+    "public/data/vegetation.json": "66fabad226b58d1f366c29d87eb1e99120536ca3f14cbc30e72b5d233da73729"
+  }
+}

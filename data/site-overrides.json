@@ -420,6 +420,34 @@
         "extent": "沿已采用12米梯宽，从七级台阶最外实体面接入way/759332838边界，间距约0.17–3.03米；不拓宽道路或推断完整前广场。",
         "grading": "近端保持台阶零基准，远端接修复后的地形上方0.08米服务路，局部下削铺地下方地形。铺面不是实测纵坡，也不是无障碍路线认证。"
       }
+    },
+    {
+      "id": "animal-south-front-connection",
+      "type": "front-connection",
+      "buildingId": "relation/11564704",
+      "footprintRevision": "ab60e4c791319782664d5134f361ebe26f18461367a016cb8bdfadf65666618c",
+      "entranceId": "south-core",
+      "surfaceId": "way/759185167",
+      "surfaceRevision": "bc58f46288e8a4c12e82bd850f06e421431c6e2d43de6e0c2b47fc5cdb958bc5",
+      "roadSearchDistance": [
+        20,
+        30
+      ],
+      "meshStep": 2,
+      "groundClearance": 0.12,
+      "joinOverlap": 0.2,
+      "roadContactDepth": 1,
+      "roadContactSideMargin": 0.5,
+      "sourceRefs": [
+        "osm",
+        "gxuAnimalEnglishFacade",
+        "gxuAnimalAlumni2026"
+      ],
+      "evidence": {
+        "presence": "校方英文介绍的具名照片显示两级台阶前连续硬质铺地，2026年门口合影支持原台阶；不从画面推断完整前庭边界。",
+        "extent": "连接已采用的约13.894米全宽台阶与南侧way/759185167服务路的原边界，约24米纵深来自模型地图关系；宽度及铺装材质为估算，不补画未定位的雕像、树池、停车位或两侧完整广场。",
+        "grading": "近端接原台阶下部0.25米基准，远端接实际路面三角网；仅削低连接铺地下方地形并封闭侧面。标高与坡度不是现场测绘或无障碍认证。"
+      }
     }
   ]
 }

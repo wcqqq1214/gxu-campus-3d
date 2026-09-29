@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "method": "Direct inspection of all nine final PNGs; desktop before/after, vegetation, night, revised mobile overhead. Geometry checks supplement visibility.",
+  "reviewedImages": [
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-final/before/entry-close-trees-off-day.png",
+      "sha256": "dfaef55d606559d433a30824895170e89a185551f27f71c29854a5d0154199c2",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-final/before/forecourt-overhead-trees-off-day.png",
+      "sha256": "dc12c2db9d1f0008b95d398a5205909b379c8300c74e3f20d8afd83c8ce7b7c0",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-final/before/road-contact-trees-off-day.png",
+      "sha256": "20fe7a472d55dd553b874dfad0fc2d9290dcc9303da91dc1b143597ad2e7f219",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-final/after/entry-close-trees-off-day.png",
+      "sha256": "4577c084fbe5984f8d362a384c02d31fbb0b2dd1d38013bc4325cc73e1aa591e",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-final/after/forecourt-overhead-trees-off-day.png",
+      "sha256": "d16dcdb9f88715295cfed1ba3c173f8d180763296aba119c2e0f4eaff1d16f75",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-final/after/road-contact-trees-off-day.png",
+      "sha256": "c4a99a34df7b19fc016b4e43303f976f60379c99e0e41e496a0a7b55c46feba5",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-final/after/forecourt-overhead-trees-on-day.png",
+      "sha256": "040d84fa5ba3805f463866d2d69697a4b464abd704a959761ca4424ffc2601d4",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-final/after/entry-close-trees-off-night.png",
+      "sha256": "fc1069296ac3515736e2666a0536a978f8026db62ba2235a745af0a1eb3594ae",
+      "representation": "near"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-final/after/entry-close-trees-off-day-mobile.png",
+      "sha256": "4241b9606b401e49b07f1a5d737fbb5f891c299f0c6a120af8e563da77848a67",
+      "representation": "base"
+    }
+  ],
+  "findings": [
+    "Central paving visible between retained steps and service road; day/night show no visible gap or terrain piercing.",
+    "Road-contact oblique has foreground roof occlusion; overhead and actual surface probes verify full connection.",
+    "Initial mobile camera was occluded by an adjacent building. Final overhead mobile camera shows the entire connection.",
+    "Trees remain at sides; one original trunk inside paving removed. No full side forecourt or statue modeled."
+  ],
+  "limitations": [
+    "Screenshot views are stylized model review, not photo registration.",
+    "Mobile is a 390x844 desktop Chromium viewport, not a physical device.",
+    "Unsurveyed grade and exact paving boundaries remain estimates."
+  ],
+  "regressionImages": [
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-performance/library-approach.png",
+      "sha256": "222fd8d2d622cf4002bf60121d30d0eb2ad2a092fe28829dc09789c936380d2a"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-performance/library-mobile.png",
+      "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-performance/library-north.png",
+      "sha256": "b8b48052279823f4a882b4c195661f2d1dc8935f02797c81518c1e5e83467675"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-performance/library-overhead.png",
+      "sha256": "d95041304ad2d41e3b4639b661c308aa6abc8eb7ee5e8c48b91dcc91b24d7ef6"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-performance/library-side.png",
+      "sha256": "42c66b18c115957e386bd3bfd625e44409b38f46fcff85e59d2baded09351123"
+    },
+    {
+      "file": "docs/screenshots/refinement/s3-animal-front-lite-performance/ordinary-lod.png",
+      "sha256": "7d1a80fb84278e63e2c11fa65e085e2339027713c0cfd4b5c80fb63671f12e58"
+    }
+  ],
+  "regressionReview": "All six final library/ordinary LOD regression images directly inspected, including library north and mobile."
+}
