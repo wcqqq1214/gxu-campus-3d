@@ -1,5 +1,7 @@
 # 验收记录
 
+2026-09-30：[运动场合批扩展](SPORTS_EXTENDED_BATCHING.md)通过116,934个实际三角形等价检查、66项Node测试及同条件活动性能验收。16张前后图和6张回归图核看，三次LOD往返无错误；源文件、69份GLB和公共数据保持。精细/流畅均三轮60/30 FPS，流畅档绘制调用较S0 +13.69%、三角形 +14.61%，详见[汇总](model-checks/refinement/s5-sports-extended-summary.json)。
+
 2026-09-30：[结构平台整栋验收](CIVIL_PLATFORM_WHOLE_REVIEW.md)按原计划第5.3节通过首轮校准。新跑接路检查、18张多方向画面和69模型HTTP指纹核对；其余几何与性能按相同资产/源码证据复用上一批。背面、运输口及实测尺寸保留未知，非实测认证，详见[机器汇总](model-checks/refinement/s2-platform-whole-summary.json)。
 
 2026-09-30整体门廊候选：[对照与复现](CIVIL_PLATFORM_ENTRY_PROPOSAL.md)通过264项Python测试、基础/近景几何50条记录及原模型反例。修复混合屋面下重复自动窗；全部448栋现有解析结果和69个GLB保持。六张图是隔离候选，未做照片配准、生产导出、接路或FPS验收。

@@ -126,7 +126,12 @@ function triangles(parent) {
 
 const records = [];
 for (const node of doc.nodes.filter((n) =>
-  ['sports-east-track', 'sports-west-track'].includes(n.name),
+  [
+    'sports-east-track',
+    'sports-west-track',
+    'basketball-bank-897194442',
+    'basketball-bank-east',
+  ].includes(n.name),
 )) {
   const root = new THREE.Group(),
     parent = new THREE.Group();
@@ -164,7 +169,7 @@ for (const node of doc.nodes.filter((n) =>
     before,
     `${node.name}: oriented coloured triangles changed`,
   );
-  assert.equal(stats.removedDraws, 4);
+  assert.equal(stats.removedDraws, node.name.startsWith('sports-') ? 6 : 2);
   records.push({
     node: node.name,
     beforeMeshes,
@@ -174,7 +179,7 @@ for (const node of doc.nodes.filter((n) =>
     ...stats,
   });
 }
-assert.equal(records.length, 2);
+assert.equal(records.length, 4);
 const report = {
   passed: true,
   modelSha256: sha(raw),

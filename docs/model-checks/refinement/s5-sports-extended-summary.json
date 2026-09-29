@@ -1,0 +1,232 @@
+{
+  "checkedAt": "2026-09-29T22:09:19.269050+00:00",
+  "passed": true,
+  "baseCommit": "a9f3915bc29e33dd2718a599d746dc6149425b43",
+  "branch": "dev",
+  "scope": "Extend same-node colour batching to track nets/seats and basketball surfaces/nets, without changing models, physical layout or material response.",
+  "nodeTests": 66,
+  "typecheckPassed": true,
+  "lintPassed": true,
+  "pagesBuildPassed": true,
+  "unchangedGLBs": 69,
+  "sourceAndDataUnchanged": true,
+  "extraDrawGroupsRemoved": 8,
+  "newVertexColorBytes": 478512,
+  "decodedTriangles": 116934,
+  "fixedViewComparisons": [
+    {
+      "changedBounds": [
+        262,
+        189,
+        263,
+        190
+      ],
+      "id": "west-track",
+      "light": "day",
+      "mobile": false,
+      "beforeCalls": 374,
+      "afterCalls": 366,
+      "beforeTriangles": 1812225,
+      "afterTriangles": 1812225,
+      "changedPixels": 1,
+      "totalPixels": 921600
+    },
+    {
+      "changedBounds": [
+        262,
+        189,
+        263,
+        190
+      ],
+      "id": "east-track",
+      "light": "day",
+      "mobile": false,
+      "beforeCalls": 234,
+      "afterCalls": 226,
+      "beforeTriangles": 1307309,
+      "afterTriangles": 1307309,
+      "changedPixels": 1,
+      "totalPixels": 921600
+    },
+    {
+      "changedBounds": [
+        262,
+        189,
+        263,
+        190
+      ],
+      "id": "west-track",
+      "light": "night",
+      "mobile": false,
+      "beforeCalls": 409,
+      "afterCalls": 401,
+      "beforeTriangles": 1836201,
+      "afterTriangles": 1836201,
+      "changedPixels": 1,
+      "totalPixels": 921600
+    },
+    {
+      "changedBounds": null,
+      "id": "west-track",
+      "light": "day",
+      "mobile": true,
+      "beforeCalls": 138,
+      "afterCalls": 134,
+      "beforeTriangles": 424001,
+      "afterTriangles": 424001,
+      "changedPixels": 0,
+      "totalPixels": 329160
+    },
+    {
+      "changedBounds": null,
+      "id": "basketball-bank-897194442",
+      "light": "day",
+      "mobile": false,
+      "beforeCalls": 332,
+      "afterCalls": 324,
+      "beforeTriangles": 1622364,
+      "afterTriangles": 1622364,
+      "changedPixels": 0,
+      "totalPixels": 921600
+    },
+    {
+      "changedBounds": null,
+      "id": "basketball-bank-east",
+      "light": "day",
+      "mobile": false,
+      "beforeCalls": 264,
+      "afterCalls": 256,
+      "beforeTriangles": 1559466,
+      "afterTriangles": 1559466,
+      "changedPixels": 0,
+      "totalPixels": 921600
+    },
+    {
+      "changedBounds": [
+        262,
+        189,
+        263,
+        190
+      ],
+      "id": "basketball-bank-east",
+      "light": "night",
+      "mobile": false,
+      "beforeCalls": 242,
+      "afterCalls": 234,
+      "beforeTriangles": 1497736,
+      "afterTriangles": 1497736,
+      "changedPixels": 1,
+      "totalPixels": 921600
+    },
+    {
+      "changedBounds": null,
+      "id": "basketball-bank-east",
+      "light": "day",
+      "mobile": true,
+      "beforeCalls": 73,
+      "afterCalls": 69,
+      "beforeTriangles": 343122,
+      "afterTriangles": 343122,
+      "changedPixels": 0,
+      "totalPixels": 329160
+    }
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "FPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4268643,
+      "medianDrawCalls": 559,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.1872624330832515,
+        "medianDrawCalls": 2.1937842778793515
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "FPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1205631,
+      "medianDrawCalls": 299,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 14.609699176287737,
+        "medianDrawCalls": 13.688212927756659
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "performanceReport": "s5-sports-extended-performance-browser.json",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots with 2% CPU threshold; not proof of total isolation.",
+  "initialModelBytes": 5830400,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "lib/campus/sports-batching.ts": "1941d9febc398dfbfe121fc121e75ae576040094ae38e10912ec315006346890",
+    "scripts/check-sports-batching.mjs": "42e2558dc93262ee11e0cc4795862d939294f8c95cb4e4232c6d58ebdec48114",
+    "scripts/check-sports-batching-browser.mjs": "53075c80238345c2a0c541bb96c6a126fd1d6c8f6a5b24d0723626a6b647d5c0",
+    "scripts/test-sports-batching.mjs": "ef896d1094a68fa5e2e6ee26716bd226919b1b7934c89dda0142f84ab1df0ae4",
+    "blender/gxu-campus.blend": "d7e8248e3c1a44a31c8946a5bcea61a92265a2ccfeb7f4fd4d6ec54d4680728c",
+    "public/data/models.json": "3ecb4cb61150c693f7027bb1b55eba0fd8ac9d9e9420db69f3ded91d57a6b195",
+    "public/models/base.glb": "72c1e060474fe8c47f1027951e016871c27286202675ac593fab7e34e263ece6"
+  },
+  "productionJavascript": {
+    "out/_next/static/chunks/framework-DTZGTDtF.js": "2a1edf81f32a49b1eacafc3546b371bca024c82a9191836e274d90890212e9df",
+    "out/_next/static/chunks/index-BdtSUUoN.js": "dd9e5bb617cd46f6fdac1f83d1113ee8c2a73bcb3d730d71c861b4d16e26511d",
+    "out/_next/static/chunks/layout-segment-context-BUdDD_iN.js": "5a0a5f27ad6b3451c548b541af7e9160d8003da53147af14b9d3c087ed096e5e",
+    "out/_next/static/chunks/page-Cj4dpYDQ.js": "6515219929bcee2359287c9919b9105169f14edc8b613af6e223e5417a70fb71",
+    "out/_next/static/chunks/rolldown-runtime-hePW80VL.js": "580ad8c58061a4dde99bde0a56905e382f0568516ee2f5b84dbfb52085709021",
+    "out/_next/static/chunks/scene-UlmFBBnE.js": "2582024215e58a4018cf1f72bc996184721db2469e2405562f46c1c46ebd3c1a",
+    "out/_next/static/chunks/vinext-BFbfgB6v.js": "4d15a76bce6f8ae95d52795fe693dd31fa6308fd10cc9fad0f55b3ea97717fa3",
+    "out/_next/static/e54c733c-2f31-4711-99bc-98f89e2da765/_buildManifest.js": "47f02b34be6dc481257b6efce4c19e19111f37ef5c437f8ffed44f0da97fa9bb",
+    "out/_next/static/e54c733c-2f31-4711-99bc-98f89e2da765/_ssgManifest.js": "653f3e53e89b4f8548ff86c19e92bb3c6b84b6be7485a320b1e00893ed877479",
+    "out/_next/static/media/draco_decoder.fzg4nYZr.js": "30e4d486fa020737af10e3c56197693e5b904bdc05b8bfa5d7b06751dec6da04",
+    "out/_next/static/media/draco_wasm_wrapper.DxJM36Ib.js": "e8049906ef3f8f75d3456c22a3f31bfdfe5b5b5bd09ccdec613b9e9a49d554d8",
+    "out/_next/static/media/draco_wasm_wrapper.fZCQGLGb.js": "8bb2952d2ba7d67e1414f8df819410cb0434a666be53f671fff75f68843d76f6"
+  },
+  "calibratedObjects": 22,
+  "firstPassWholeBuildings": 2,
+  "partialObjects": 20,
+  "wholePlanCompleted": false,
+  "visualReview": {
+    "directlyReviewedFixedComparisonImages": 16,
+    "performanceImages": [
+      {
+        "file": "docs/screenshots/refinement/s5-sports-extended-performance/library-approach.png",
+        "sha256": "222fd8d2d622cf4002bf60121d30d0eb2ad2a092fe28829dc09789c936380d2a"
+      },
+      {
+        "file": "docs/screenshots/refinement/s5-sports-extended-performance/library-mobile.png",
+        "sha256": "d5f2d3149643abf22ab3d5b452eb977940fa8752b1fa602e8d9f66acf4ed4fb4"
+      },
+      {
+        "file": "docs/screenshots/refinement/s5-sports-extended-performance/library-north.png",
+        "sha256": "9a754a57be3111f8023fff8578fa8612f1eb4755581519634fcbc17009e40f3a"
+      },
+      {
+        "file": "docs/screenshots/refinement/s5-sports-extended-performance/library-overhead.png",
+        "sha256": "217a95e50e81ef70af27b0d18141e1f7ecb7eb15a3f6bee69f0d92f197a73fe3"
+      },
+      {
+        "file": "docs/screenshots/refinement/s5-sports-extended-performance/library-side.png",
+        "sha256": "42c66b18c115957e386bd3bfd625e44409b38f46fcff85e59d2baded09351123"
+      },
+      {
+        "file": "docs/screenshots/refinement/s5-sports-extended-performance/ordinary-lod.png",
+        "sha256": "7d1a80fb84278e63e2c11fa65e085e2339027713c0cfd4b5c80fb63671f12e58"
+      }
+    ],
+    "observations": "Sports colours, line markings, nets, shadows and scene pixels preserved at the eight paired views. Library entry/plaza, overhead courtyard and ordinary LOD building retained in six regression views. Mobile captures are desktop viewport simulations."
+  }
+}
