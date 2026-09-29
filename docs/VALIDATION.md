@@ -1,5 +1,7 @@
 # 验收记录
 
+2026-09-30门廊生成支持：[混合实顶/格栅小样](CIVIL_PLATFORM_MIXED_ROOF.md)通过263项Python测试、两种旋转的62条Blender几何记录；448栋完整解析与生产记录一致、69个GLB保持。未修改平台模型，未重跑Pages或性能，小样不计整栋验收。
+
 2026-09-30完整门廊照片复核：[形制差异与接续顺序](CIVIL_PLATFORM_WIDE_ENTRY_REVIEW.md)。运行 `python3 scripts/inspect_civil_platform_entry_composition.py` 可重算柱列深度；当前一列柱和无格栅配置与人工照片观察不符，报告明确未配准、未达到落模条件。此批只修改来源/校准元数据，Pages构建及[数据一致性检查](model-checks/refinement/s2-platform-wide-entry-data.json)通过；未重跑Blender或性能，不增加整栋验收。此前几何测试只验证参数生成一致。
 
 2026-09-30接路接续：[人员台阶与服务路衔接](CIVIL_PLATFORM_ENTRY_CONNECTION.md)通过254项Python、65项Node、类型检查、lint、模型/Pages构建及新增Blender铺装几何小样。连接面检查使用 `validate_side_connection.py -- --site-id=civil-platform-personnel-connection --baseline=work/refinement-s2-platform-path-before --report-prefix=<新批次>`；道路检查使用 `validate_civil_forecourt_road.py -- --paving-id=civil-platform-service --baseline=work/refinement-s2-platform-path-before --report-prefix=<新批次>`。均以Blender后台运行并加 `--python-exit-code 1`；旧资产用 `--check-root` 验证反例。检查包含全梯宽坡面、台阶接口、修复区域内外地形、南侧旧接口、北端邻路重叠以及导出边界。首次失败记录保留。平台、普通建筑、道路和树冠回归通过，17张最终/回归图已核看；性能和输入指纹见[联合汇总](model-checks/refinement/s2-platform-path-batched-summary.json)。不代表无障碍或整栋验收。

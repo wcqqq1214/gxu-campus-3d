@@ -151,3 +151,5 @@ blender --background --python-exit-code 1 --python blender/validate_generic.py -
 `front-connection` 可连接包含 `porticoId`、`recess`、`steps`、`stepWidth`、`platformHeight` 的已解析入口；连接面从实际最外踏面起算并沿用梯宽，拒绝 `pathWidth` 覆盖。具体场地与服务路交叠处理见[结构平台接路专项](CIVIL_PLATFORM_ENTRY_CONNECTION.md)。后退进深和级数必须先由建筑配置解析，场地不能另造一个入口。
 
 2026-09-30：[结构平台入口细节](CIVIL_PLATFORM_ENTRY_TRIM.md)增加三个可选字段组：玻璃面板 `frameFinish` 仅接受 `white` / `dark`；圆柱可用 `finish`（`white` / `stone`）及 `base`（`height`、`projection`、`capHeight`），基座顶圈另向外0.03米并纳入碰撞范围；独立后退门可用 `recessDoor`（`frameWidth`、`leafCount`、`lintelHeight`），表达原2.8米门高内的闭合门扇分隔。基座只能用于圆柱；门扇数2–4，参数有限且受范围/净空检查，不兼容其他入口构造。省略字段沿用原生成规则，所有新增目标尺寸保持估算标记。
+
+2026-09-30：`openBelow.slattedRoof` 支持可选 `solidBays` 空档编号数组（0至`slatCount`），可形成中部实顶、两侧格栅。至少保留一处开口；不指定时旧几何保持。参数、小样与验证见[混合屋面](CIVIL_PLATFORM_MIXED_ROOF.md)，此批未配置到任何生产楼栋。
