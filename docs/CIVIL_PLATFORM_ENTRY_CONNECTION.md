@@ -30,3 +30,5 @@
 ![人员台阶与道路衔接](screenshots/refinement/s2-platform-path-batched-final/after/stairs-oblique-trees-off-day.png)
 
 本批仍为22个校准对象、1栋首轮整栋通过、21个部分校准。下一步继续门框、门扇与柱基的可见细节，随后核对C区运输开口、大厅屋面及北楼剩余立面；旧实验大厅作为独立历史对象处理。完整S0–S5计划及只在 `dev` 开发、提交和推送的规则保持。
+
+2026-09-30接续：[门框、门扇与柱基专项](CIVIL_PLATFORM_ENTRY_TRIM.md)细化人员入口外观，原连接面和服务路几何保持，并重新检查实际接缝。上述性能数据仍为本接路批次历史结果，新批次结果单列。

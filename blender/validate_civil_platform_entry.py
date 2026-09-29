@@ -6,6 +6,7 @@ from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1]
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s2-platform-door-entry')
+TRIM='--entry-trim' in sys.argv
 Z=-4.76;ID='way/957404988';CHUNK='chunk-n2-n3'
 FRONT=Vector((-695.20838278471,-742.4153550071646,Z))
 U=Vector((.0063417743114130036,-.9999798907471006,0));N=Vector((-U.y,U.x,0))
@@ -29,14 +30,14 @@ def point(u,v,h):return FRONT+U*u+N*v+Vector((0,0,h))
 def check(objects,ground,tol):
     group=meshes(objects);records=[]
     # Cover the full adopted 3.6 m door width, including the side nearest a column.
-    for u in [-1.7,-.8,0,.8,1.7]:
+    for u in [-1.7,-.8,.2 if TRIM else 0,.8,1.7]:
         for h in [1.3,2.5,3.7]:
             hit=ray(group,point(u,.5,h),-N,4.3)
             assert hit and hit[3]=='glass' and abs(hit[0]-4.01)<tol*2,('door or approach blocked',u,h,hit)
             records.append(dict(kind='door-and-full-width-approach',offset=u,height=h,distance=hit[0]))
     for u in [-1.7,0,1.7]:
         hit=ray(group,point(u,-2.6,3.88),-N,1.2)
-        assert hit and hit[3]=='white' and abs(hit[0]-.87)<tol*2,('door-header',u,hit)
+        assert hit and hit[3]==('stone' if TRIM else 'white') and abs(hit[0]-.87)<tol*2,('door-header',u,hit)
         records.append(dict(kind='door-header',offset=u,distance=hit[0]))
     for u in [-1.7,0,1.7]:
         for v in [-.4,-1.8,-3.3]:
@@ -65,8 +66,21 @@ def check(objects,ground,tol):
         hit=ray(group,old+out*2+Vector((0,0,h)),-out,2.2)
         assert hit and hit[3]=='white' and abs(hit[0]-2)<tol*2,('old fallback entry remains',h,hit)
         records.append(dict(kind='old-fallback-removed',height=h,distance=hit[0]))
-    return dict(passed=True,rayCount=len(records),groundChecked=bool(ground),samples=records,toleranceMeters=tol)
+    if TRIM:
+        for u,h in [(-1.765,2.45),(0,2.45),(1.765,2.45),(-.8,1.085),(.8,3.815)]:
+            hit=ray(group,point(u,.5,h),-N,4.3)
+            assert hit and hit[3]=='dark' and abs(hit[0]-3.91)<tol*2,('closed leaf frame',u,h,hit)
+            records.append(dict(kind='dark-door-frame',offset=u,height=h,distance=hit[0]))
+        columns=[(-696.2781556085655,-731.4166489513983),(-696.2495406165732,-735.9287011249783),(-696.1923106325887,-744.952805472138),(-696.1636956405964,-749.464857645718),(-696.1350806486042,-753.9769098192979),(-696.1064656566119,-758.4889619928779)]
+        for index,(x,y) in enumerate(columns):
+            for h,radius in [(1.25,.405),(1.56,.435),(1.75,.325)]:
+                p=Vector((x,y,Z+h))+N*2;hit=ray(group,p,-N,3)
+                assert hit and hit[3]=='stone' and abs(hit[0]-(2-radius))<max(.012,tol*2),('stone column profile',index,h,hit)
+                records.append(dict(kind='column-base-profile',column=index,height=h,distance=hit[0]))
+    return dict(passed=True,rayCount=len(records),groundChecked=bool(ground),entryTrimChecked=TRIM,samples=records,toleranceMeters=tol)
 report=dict(passed=False,scope='Estimated D personnel entry at mapped OSM projection: 3.6 m door, 1.05 m platform, seven 0.3 m treads at 12 m width, 0.15 m foundation. Source/base ground and full adopted doorway approach checked. Not an interior, surveyed reconstruction, accessible route or completed road connection.')
+if TRIM:
+    report['scope']='Estimated D personnel entry with dark two-leaf closed door, stone header, six stone columns and widened bases. Fixed doorway, platform, seven stairs and foundation retained. Source/base ground and full adopted doorway approach checked; existing road connection checked separately. Leaf count, dimensions and exact photo registration are estimates. No interior, accessible-route or whole-building acceptance.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     ground=meshes([o for o in bpy.context.scene.objects if o.get('layer') in ('terrain','roads')])

@@ -810,3 +810,7 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 2026-09-21：土木学院北翼四面转折墙改色，专项与整栋收尾边界见[记录](CIVIL_WING_WRAP.md)。源文件顶点、拓扑、UV和变换保持，四个原墙面改材质；源/基础/近景固定坐标检查与旧模型反例用于验证目标范围，未把未核实侧窗计作完成。
 
 2026-09-21：`blender/validate_civil_garden.py -- --report-prefix=<新批次>` 检查源文件与实际基础GLB中的前庭环路、草坪留空、固定支路点、两处接缝及浅埋搭接渐变，支持 `--check-root=<旧资产目录>` 反例；通过Blender执行并加 `--python-exit-code 1`。园路与主门铺地合批，原门前连接几何前缀、其他源对象和近景资产另作保持性比较；原主门及附楼台阶连接继续运行 `validate_side_connection.py` 回归。见[园路验收与性能边界](CIVIL_FORECOURT_GARDEN.md)。
+
+## 结构平台门框与柱基（2026-09-30）
+
+`validate_civil_platform.py` 在原全部平台标志上增加 `--entry-trim`（要求 `--personnel-entry`），检查石色柱身、深色窗框和保留白墙；既有屋顶检查同时拦截柱基变量影响檐口的回归。`validate_civil_platform_entry.py -- --entry-trim --report-prefix=<独立前缀>` 补入固定门框、石色横梁、六柱基座/顶圈/柱身射线，完整门宽玻璃取样避开实际中竖框。两者均通过Blender运行，加 `--python-exit-code 1`，并支持 `--check-root=<旧资产目录>` 做缺失细节反例。两级实际资产及台阶接路回归必须同时通过，不能仅依靠配置测试。详见[本批范围与结果](CIVIL_PLATFORM_ENTRY_TRIM.md)。
