@@ -1,6 +1,6 @@
 """Map unconfirmed entrance candidates without changing production data.
 
-Edge indices refer to the original OSM ring, not the generated part rings.
+Original edge indices and part-local edge indices are kept separate.
 Candidate edges and their lengths are diagnostic; they are not door anchors.
 """
 import hashlib
@@ -46,6 +46,34 @@ def main():
         candidates.append({'label': label, 'part': part, 'originalEdges': indices,
                            'boundaryLengthM': sum(edges[i]['lengthM'] for i in indices),
                            'photoRegistered': False, 'doorAnchor': None})
+    # The six-part model has an open portico. Its outer roof edge is not the
+    # recessed wall on which a personnel door would need to be registered.
+    assert len(parts) == 6, 'Recheck candidates after part repartition'
+    foyer_ring = list(parts['link-foyer'].exterior.coords)
+    portico_ring = list(parts['link-portico'].exterior.coords)
+    wall = LineString(foyer_ring[:2])
+    outer = LineString(portico_ring[2:4])
+    assert wall.difference(parts['link-portico'].boundary.buffer(1e-7)).length < 1e-6
+    assert outer.difference(footprint.boundary.buffer(1e-7)).length < 1e-6
+    assert outer.difference(LineString([ring[14], ring[15]]).buffer(1e-7)).length < 1e-6
+    a, b = foyer_ring[:2]
+    dx, dy = b[0] - a[0], b[1] - a[1]
+    normal = [dy / wall.length, -dx / wall.length]
+    midpoint = wall.interpolate(.5, normalized=True)
+    assert parts['link-foyer'].exterior.is_ccw
+    assert parts['link-portico'].contains(Point(midpoint.x + normal[0] * .01,
+                                               midpoint.y + normal[1] * .01))
+    candidates.append({
+        'label': 'D', 'part': 'link-foyer', 'originalEdges': [],
+        'partLocalWallEdge': {'polygon': 0, 'ring': 0, 'edge': 0,
+                             'start': a, 'end': b, 'outwardNormal': normal},
+        'boundaryLengthM': wall.length,
+        'porticoOuterEdge': {'part': 'link-portico', 'polygon': 0, 'ring': 0, 'edge': 2,
+                            'originalEdge': 14, 'start': portico_ring[2],
+                            'end': portico_ring[3], 'lengthM': outer.length},
+        'wallToOuterEdgeAtMidpointM': midpoint.distance(outer),
+        'photoRegistered': False, 'doorAnchor': None,
+        'note': 'Search wall behind the open portico; roof edge is not a door anchor.'})
     report = {'buildingId': building['id'], 'sourceSha256': hashlib.sha256(raw).hexdigest(),
               'coordinateSystem': 'campus local east/north metres',
               'status': 'candidate-search-edges-only', 'productionReady': False,
@@ -53,16 +81,17 @@ def main():
               'candidates': candidates, 'originalExteriorEdges': edges,
               'existingIllustrativeEntrances': building['form']['entrances'],
               'limitations': ['Boundary lengths are not measured entrance widths.',
-                              'A/B are competing personnel-entry search areas, not confirmed doors.',
+                              'A/B/D are competing personnel-entry search areas, not confirmed doors.',
                               'C is the south delivery-entry search wall, not the personnel portal.',
+                              'D is a part-local recessed wall; its normal enters the open portico.',
                               'No road alignment, stairs, column count or door position is inferred.']}
     OUT.with_suffix('.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     def point(p):
         return 100 + (p[0] + 740) * 6, 120 + (-705 - p[1]) * 6
     def path(points):
         return 'M ' + ' L '.join(f'{x:.2f},{y:.2f}' for x, y in map(point, points))
-    svg = ['<svg xmlns="http://www.w3.org/2000/svg" width="820" height="850" viewBox="0 0 820 850">',
-           '<rect width="820" height="850" fill="#fafaf7"/>',
+    svg = ['<svg xmlns="http://www.w3.org/2000/svg" width="820" height="910" viewBox="0 0 820 910">',
+           '<rect width="820" height="910" fill="#fafaf7"/>',
            '<g font-family="Arial,sans-serif" fill="#26323b">',
            '<text x="35" y="38" font-size="23">Platform: entrance search areas</text>',
            '<text x="35" y="67" font-size="15">Unregistered candidates; no production door anchors.</text>']
@@ -75,6 +104,10 @@ def main():
             nx, ny = edges[index]['outwardNormal']
             svg += [f'<path d="{path([a,b])}" fill="none" stroke="{color}" stroke-width="5"/>',
                     f'<text x="{x+nx*19:.2f}" y="{y-ny*19+5:.2f}" font-size="13" text-anchor="middle">{index}</text>']
+    svg += [f'<path d="{path(wall.coords)}" fill="none" stroke="#167a67" stroke-width="5"/>',
+            f'<path d="{path(outer.coords)}" fill="none" stroke="#167a67" stroke-width="2" stroke-dasharray="6 5"/>']
+    x, y = point(midpoint.coords[0])
+    svg.append(f'<text x="{x-18:.2f}" y="{y:.2f}" font-size="15" fill="#167a67">D</text>')
     for entry in building['form']['entrances']:
         x, y = point(entry['center'])
         svg.append(f'<circle cx="{x:.2f}" cy="{y:.2f}" r="6" fill="#26323b"/>')
@@ -83,8 +116,11 @@ def main():
             '<text x="35" y="675" font-size="16" fill="#b66827">A: West foyer perimeter, edges 3-9 (personnel candidate)</text>',
             '<text x="35" y="705" font-size="16" fill="#4774a3">B: North office wall, edge 13 (personnel candidate)</text>',
             '<text x="35" y="735" font-size="16" fill="#8b538b">C: South hall wall, edge 1 (delivery candidate)</text>',
-            '<text x="35" y="770" font-size="15">Dot: existing illustrative entrance, still uncalibrated.</text>',
-            '<text x="35" y="800" font-size="15">Numbers: original exterior edges; lengths are not door widths.</text>',
+            '<text x="35" y="765" font-size="16" fill="#167a67">D: Recessed link-foyer east wall (personnel candidate)</text>',
+            '<text x="35" y="795" font-size="15" fill="#167a67">Dashed: portico outer roof edge; no wall or door inferred.</text>',
+            '<text x="35" y="835" font-size="15">Dot: existing illustrative entrance, still uncalibrated.</text>',
+            '<text x="35" y="865" font-size="15">Numbers: original exterior edges; D uses a part-local wall.</text>',
+            '<text x="35" y="890" font-size="15">All lengths are model search boundaries, not measured door widths.</text>',
             '</g></svg>']
     OUT.with_suffix('.svg').write_text('\n'.join(svg) + '\n')
     print(json.dumps({'candidates': candidates, 'productionReady': False}))
