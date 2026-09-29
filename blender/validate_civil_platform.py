@@ -21,6 +21,9 @@ PORTICO_GLASS = '--portico-glass' in sys.argv
 FOYER_PROFILE = '--foyer-profile' in sys.argv
 ROOF_RIM = '--roof-rim' in sys.argv
 ENTRY_BAY = '--entry-bay' in sys.argv
+PERSONNEL_ENTRY = '--personnel-entry' in sys.argv
+if PERSONNEL_ENTRY and not ENTRY_BAY:
+    raise ValueError('--personnel-entry requires --entry-bay')
 if ENTRY_BAY and not PORTICO_GLASS:
     raise ValueError('--entry-bay requires --portico-glass')
 if ROOF_RIM and not FOYER_PROFILE:
@@ -272,7 +275,7 @@ def check(objects, tolerance):
                 assert hit and hit[3]=='white' and abs(hit[0]-5.6)<tolerance*2,('portico-open-bay',i,hit)
             foot=p-n;foot.z=Z+3.2
             floor=ray(foot,(0,0,-1),4)
-            assert floor and floor[3]=='stone' and abs(floor[1].z-Z-.24)<tolerance,('portico-floor',i,floor)
+            assert floor and floor[3]=='stone' and abs(floor[1].z-Z-(1.05 if PERSONNEL_ENTRY else .24))<tolerance,('portico-floor',i,floor)
             samples.append(dict(kind='portico-open-bay',bay=i,rearWallDistance=hit[0],floorHeight=floor[1].z-Z))
         if ENTRY_BAY:
             # Fixed mapped-entry projection, independent of the production
@@ -280,7 +283,7 @@ def check(objects, tolerance):
             # a doorway, stairs and road connection are not inferred.
             front=Vector((-695.20838278471,-742.4153550071646,0))
             for offset in (-.6,0,.6):
-                for height in (1.,3.2,6.5):
+                for height in ((1.5,3.2,6.5) if PERSONNEL_ENTRY else (1.,3.2,6.5)):
                     origin=front+u*offset+n*2;origin.z=Z+height
                     hit=ray(origin,-n,6)
                     assert hit and 5.44-tolerance < hit[0] < 5.6+tolerance,('mapped-entry-approach',offset,height,hit)
@@ -291,16 +294,21 @@ def check(objects, tolerance):
         a=Vector((-698.6939074704767,-760.4773988305454,0))
         b=Vector((-698.8909494339341,-729.4075449670695,0))
         length=(b-a).length;u=(b-a).normalized();n=Vector((u.y,-u.x,0))
-        for col in range(12):
-            p=a+u*(.03*length+.12+(col+.37)*(.94*length-.24)/12)
-            for row in range(3):
-                height=.6+.12+(row+.37)*(5.7-.24)/3
-                origin=p+n*2;origin.z=Z+height
-                hit=ray(origin,-n,3)
-                assert hit and hit[3]=='glass' and hit[2].dot(n)>.98,('portico-glass-cell',col,row,hit)
-                assert abs(hit[0]-1.96)<tolerance*2,('portico-glass-wall-depth',hit)
-                samples.append(dict(kind='portico-glass-cell',column=col,row=row,distance=hit[0]))
-        for fraction,height in [(.01,3.),(.99,3.),(.5,.4),(.5,6.5)]:
+        rectangles = ([(.03,.5178412721089922,1.16,6.3,6,3),
+                       (.6433623508707508,.97,1.16,6.3,4,3),
+                       (.5178412721089922,.6433623508707508,4.03,6.3,2,1)]
+                      if PERSONNEL_ENTRY else [(.03,.97,.6,6.3,12,3)])
+        for lo,hi,bottom,top,columns,rows in rectangles:
+            for col in range(columns):
+                p=a+u*(lo*length+.12+(col+.37)*((hi-lo)*length-.24)/columns)
+                for row in range(rows):
+                    height=bottom+.12+(row+.37)*(top-bottom-.24)/rows
+                    origin=p+n*2;origin.z=Z+height
+                    hit=ray(origin,-n,3)
+                    assert hit and hit[3]=='glass' and hit[2].dot(n)>.98,('portico-glass-cell',lo,col,row,hit)
+                    assert abs(hit[0]-1.96)<tolerance*2,('portico-glass-wall-depth',hit)
+                    samples.append(dict(kind='portico-glass-cell',panelStart=lo,column=col,row=row,distance=hit[0]))
+        for fraction,height in [(.01,3.),(.99,3.),(.5,1.1 if PERSONNEL_ENTRY else .4),(.5,6.5)]:
             origin=a.lerp(b,fraction)+n*2;origin.z=Z+height
             hit=ray(origin,-n,3)
             assert hit and hit[3]=='white' and abs(hit[0]-2)<tolerance*2,('portico-glass-boundary',fraction,height,hit)
@@ -393,6 +401,7 @@ report['porticoGlazingChecked']=PORTICO_GLASS
 report['foyerProfileChecked']=FOYER_PROFILE
 report['roofRimChecked']=ROOF_RIM
 report['entryBayChecked']=ENTRY_BAY
+report['personnelEntryContextChecked']=PERSONNEL_ENTRY
 if REPARTITION:
     report['scope']='Estimated six-part correction: 6 m deep north low wing at 7.2 m, recessed 13.2 m hall, 10.8 m connector and six-column 7.2 m open portico. Office and west part retained. Relative layout checked against imagery; dimensions and entries remain unverified.'
 if NORTH_FACADE:
@@ -409,6 +418,8 @@ if ROOF_RIM:
     report['scope']+=' Includes a 0.35 m inset rim: 0.45 m high around exposed foyer edges and 0.18 m high along the portico exterior. Exact sections and drainage remain unverified.'
 if ENTRY_BAY:
     report['scope']+=' Includes six estimated columns with one double-width bay supporting the mapped east-entry approach; actual column grid, doorway, stairs and road connection remain unverified.'
+if PERSONNEL_ENTRY:
+    report['scope']+=' Updated context for the estimated personnel entry: raised portico floor and three glazing panels. Door, stairs, foundation, ground and old-entry removal are checked separately by validate_civil_platform_entry.py.'
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'))
     report['source']=check([o for o in bpy.context.scene.objects if o.get('featureId')==ID],.006)
