@@ -93,6 +93,14 @@ class ExposedFacadeTests(unittest.TestCase):
         self.assertEqual(result,self.resolve(result,r))
         self.assertEqual(result['form']['parts'][1]['openBelow']['floorHeight'],.24)
 
+    def test_upper_glazing_clearance_includes_capital_projection(self):
+        b,r=self.portico_fixture();opening=r['parts'][1]['openBelow']
+        opening['columns'][0]['center']=[15.5,5]
+        opening['columns'][0]['capital']=dict(height=.32,projection=.08,taperHeight=.07)
+        self.resolve(b,r)  # Glazing ends below the capital.
+        r['exposedFacadeRules'][0]['rule']['panels'][0]['top']=6.0
+        with self.assertRaisesRegex(ValueError,'support column'):self.resolve(b,r)
+
     def test_portico_backing_wall_can_support_profiled_roof(self):
         b,r=self.portico_fixture()
         r['parts'][0]['roof']=dict(type='profiled',rise=2,mesh={
