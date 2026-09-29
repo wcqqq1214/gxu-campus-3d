@@ -1,0 +1,78 @@
+{
+  "date": "2026-09-30",
+  "status": "evidence-and-diagnostic-only",
+  "baselineCommit": "2578479ce7329d9034edfdddbe3d27bc091f81e9",
+  "images": [
+    {
+      "page": "https://tmjz.gxu.edu.cn/info/1452/7240.htm",
+      "url": "https://tmjz.gxu.edu.cn/__local/C/1E/C0/9F510F90504D7D7685E6F241823_E827D573_17414.jpeg",
+      "sha256": "d13bf2153366c52bc133a6f2d33423722da3c0cd916c9f20256daceb801fbe92",
+      "bytes": 95252,
+      "review": "direct-full-image",
+      "finding": "室内桥梁展厅，可见蓝色塔架和红色桥梁模型；不提供外部门位。",
+      "photoRegistered": false
+    },
+    {
+      "page": "https://tmjz.gxu.edu.cn/info/1452/7240.htm",
+      "url": "https://tmjz.gxu.edu.cn/__local/C/FE/22/1B39A3CF6379DC5D082393738D0_AA6EA280_13E6F.jpeg",
+      "sha256": "e9a2ad32ecd79ca12c9bd16b220492b833d4d7197c3aeb485ef530a9d69f5d4b",
+      "bytes": 81519,
+      "review": "direct-full-image",
+      "finding": "室内沙盘与拱形展陈；不提供外部门位。",
+      "photoRegistered": false
+    },
+    {
+      "page": "https://tmjz.gxu.edu.cn/info/1452/7240.htm",
+      "url": "https://tmjz.gxu.edu.cn/__local/4/D6/4D/56690F73DCAACE2EFD8C0B3E84B_0645F216_18BE7.jpeg",
+      "sha256": "dff79b47fd589bc754970583026ceb478acb8ba4b2f4095075075332441be48d",
+      "bytes": 101351,
+      "review": "direct-full-image",
+      "finding": "高空间实验大厅内的试验设备；不提供运输开口位置。",
+      "photoRegistered": false
+    },
+    {
+      "page": "https://tmjz.gxu.edu.cn/info/1452/7240.htm",
+      "url": "https://tmjz.gxu.edu.cn/__local/3/51/FF/A5ED4EE21E174F5F15DD1B260DD_C9CE846A_1ED19.jpeg",
+      "sha256": "b94b0a471485d19596edd674f3e5d7ff8a666d5a7d5b0a180d4f01b9ab0a0e56",
+      "bytes": 126233,
+      "review": "direct-full-image",
+      "finding": "入口玻璃中可见与第一幅相符的蓝色塔架、红色桥梁模型；可见柱、台阶、阶前排水沟，但缺少建筑转角，仍不能配准墙面。",
+      "photoRegistered": false
+    },
+    {
+      "page": "https://news.gxu.edu.cn/info/1002/40253.htm",
+      "url": "https://news.gxu.edu.cn/__local/C/99/06/0AB316825A0B538BA36A2278045_8ED3AD29_4D471.jpg",
+      "sha256": "dad96d862f5916d934ca694dbd26a1cec8fcf2f92ad98f95aa27d07661e653c3",
+      "bytes": 316529,
+      "review": "direct-full-image",
+      "finding": "仅核看报道第一幅：拱形展陈及蓝色塔架、红色桥梁模型，与2024年展厅相容；本图为室内，不提供外部门位。",
+      "photoRegistered": false
+    }
+  ],
+  "findings": {
+    "entranceToExhibitAssociation": "Supported inference from visible interior continuity and primary-source article context; not a measured spatial registration.",
+    "doorLocationConfirmed": false,
+    "productionReady": false,
+    "candidates": [
+      "A",
+      "B",
+      "D"
+    ],
+    "deliveryCandidate": "C",
+    "newCandidate": "D separates the recessed link-foyer wall from the portico outer roof edge."
+  },
+  "limitations": [
+    "Article publication dates are not independently verified capture dates.",
+    "The screen date in the 2024 photograph is not assigned as its capture date.",
+    "Column count, doorway dimensions, stair levels and road alignment remain unresolved.",
+    "No production geometry, materials, data, textures or performance acceptance changed."
+  ],
+  "diagnostic": "docs/model-checks/refinement/s2-platform-entry-candidates.json",
+  "verification": {
+    "diagnostic": "passed shared-boundary, outer-ring correspondence and outward-normal checks",
+    "changedPartEdgeOrder": "rejected before writing output",
+    "noProductionDoorAnchors": true,
+    "trackedProductionDataBlenderAndModels": "unchanged against baseline commit; checked with git diff",
+    "geometryBuildOrPerformanceRun": false
+  }
+}

@@ -1,6 +1,6 @@
 {
   "buildingId": "way/957404988",
-  "sourceSha256": "0e42701311e5f3517dcfb015e7d8533ceb910a8c50761d2a99c2f82bea459ac1",
+  "sourceSha256": "e4b76fd28e24aaab9f2b5ba20098eb5ce7d8418409c5a802d6238a1ad6a72a42",
   "coordinateSystem": "campus local east/north metres",
   "status": "candidate-search-edges-only",
   "productionReady": false,
@@ -41,6 +41,49 @@
       "boundaryLengthM": 61.35689867996992,
       "photoRegistered": false,
       "doorAnchor": null
+    },
+    {
+      "label": "D",
+      "part": "link-foyer",
+      "originalEdges": [],
+      "partLocalWallEdge": {
+        "polygon": 0,
+        "ring": 0,
+        "edge": 0,
+        "start": [
+          -698.6939074704767,
+          -760.4773988305454
+        ],
+        "end": [
+          -698.8909494339341,
+          -729.4075449670695
+        ],
+        "outwardNormal": [
+          0.9999798907471006,
+          0.0063417743114130036
+        ]
+      },
+      "boundaryLengthM": 31.070478667589175,
+      "porticoOuterEdge": {
+        "part": "link-portico",
+        "polygon": 0,
+        "ring": 0,
+        "edge": 2,
+        "originalEdge": 14,
+        "start": [
+          -695.093802217242,
+          -760.4825800000607
+        ],
+        "end": [
+          -695.2908592664412,
+          -729.4103473955927
+        ],
+        "lengthM": 31.072857456416916
+      },
+      "wallToOuterEdgeAtMidpointM": 3.600000000000002,
+      "photoRegistered": false,
+      "doorAnchor": null,
+      "note": "Search wall behind the open portico; roof edge is not a door anchor."
     }
   ],
   "originalExteriorEdges": [
@@ -318,8 +361,9 @@
   ],
   "limitations": [
     "Boundary lengths are not measured entrance widths.",
-    "A/B are competing personnel-entry search areas, not confirmed doors.",
+    "A/B/D are competing personnel-entry search areas, not confirmed doors.",
     "C is the south delivery-entry search wall, not the personnel portal.",
+    "D is a part-local recessed wall; its normal enters the open portico.",
     "No road alignment, stairs, column count or door position is inferred."
   ]
 }
