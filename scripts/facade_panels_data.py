@@ -13,7 +13,7 @@ def validate_panels(panels, length, height, levels, band=None, ledges=None, *, m
     ids = set(); rectangles = []
     for p in panels:
         expected = fields | ({'openings'} if isinstance(p, dict) and p.get('type') == 'round-window-wall' else set())
-        if not isinstance(p, dict) or not expected <= set(p) or set(p)-expected-{'frameFinish', 'finish'}:
+        if not isinstance(p, dict) or not expected <= set(p) or set(p)-expected-{'frameFinish', 'finish', 'rowFractions'}:
             raise ValueError('Facade panel needs explicit bounds, type and frame dimensions')
         if 'frameFinish' in p and (p['type']!='glazing' or p['frameFinish'] not in ('white','dark')):
             raise ValueError('Glazing frame finish must use shared white or dark material')
@@ -41,6 +41,14 @@ def validate_panels(panels, length, height, levels, band=None, ledges=None, *, m
         w = (p['to']-p['from'])*length; h = p['top']-p['bottom']; fw = p['frameWidth']
         if min((w-2*fw)/p['columns'], (h-2*fw)/p['rows']) < max(.2, 4*fw):
             raise ValueError('Facade panel leaves insufficient clear cells')
+        if 'rowFractions' in p:
+            fractions=p['rowFractions']
+            if (p['type']!='glazing' or not isinstance(fractions,list) or len(fractions)!=p['rows']-1 or
+                    any(type(f) not in (int,float) or not math.isfinite(f) or not 0<f<1 for f in fractions)):
+                raise ValueError('Glazing row fractions require one finite interior boundary per divider')
+            boundaries=[0]+fractions+[1]
+            if any((b-a)*(h-2*fw)<max(.2,4*fw) for a,b in zip(boundaries,boundaries[1:])):
+                raise ValueError('Glazing row fractions overlap or leave insufficient clear cells')
         if p['type'] == 'round-window-wall':
             validate_round_openings(p, w)
         rectangle = (p['from']*length, p['to']*length, p['bottom'], p['top'])

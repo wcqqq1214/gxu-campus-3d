@@ -149,6 +149,17 @@ class ExposedFacadeTests(unittest.TestCase):
         r['exposedFacadeRules'].append(copy.deepcopy(upper))
         with self.assertRaisesRegex(ValueError,'Duplicate'):self.resolve(b,r)
 
+    def test_nonuniform_glazing_rows_keep_clear_cells_and_reject_bad_dividers(self):
+        b,r=self.portico_fixture();p=r['exposedFacadeRules'][0]['rule']['panels'][0]
+        p['rowFractions']=[.375,.625]
+        result=self.resolve(b,r)
+        self.assertEqual(result,self.resolve(result,r))
+        for value in [None,[],[.5],[.625,.375],[.5,.5],[.01,.5],[True,.7],[.3,float('nan')]]:
+            p['rowFractions']=value
+            with self.subTest(value=value),self.assertRaises(ValueError):self.resolve(b,r)
+        p.update(type='solid',columns=1,rows=1,rowFractions=[])
+        with self.assertRaisesRegex(ValueError,'Glazing row fractions'):self.resolve(b,r)
+
     def test_glazing_behind_mixed_roof_keeps_height_and_column_constraints(self):
         b,r=self.portico_fixture()
         opening=r['parts'][1]['openBelow']
