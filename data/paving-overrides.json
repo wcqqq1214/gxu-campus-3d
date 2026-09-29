@@ -53,6 +53,35 @@
         "dimensions": "1米网格、0.12米地形偏移及3米接缝过渡是消除悬浮和裂缝的建模参数，不是现场测量。",
         "excludedDetails": "不推断实际道路纵坡、路缘高度、车行管理方式或整片园路铺装边界。"
       }
+    },
+    {
+      "id": "civil-platform-service",
+      "surfaceId": "way/759332838",
+      "surfaceRevision": "a68849907f3292a9f20b4f5b4fb863650d5c76935ef0960c83d7e04a1c9effcd",
+      "joinEdges": [
+        4
+      ],
+      "joinFeather": 3,
+      "meshStep": 1,
+      "contactDepth": 1,
+      "contactSideMargin": 0.5,
+      "joinOverlap": 0.2,
+      "burial": 0.06,
+      "groundedService": {
+        "offset": 0.08,
+        "preserveNeighborOverlap": true
+      },
+      "sourceRefs": [
+        "osm",
+        "gx720CivilNorthPanorama"
+      ],
+      "evidence": {
+        "location": "原way/759332838平台东侧服务路，保持现有OSM平面轮廓与校道接口。",
+        "surface": "模型实际路面约比地形高0.40米，近台阶处仅约0.17米水平间隙；先以地形上方0.08米贴地表达，避免直接接旧悬空路面形成陡坡。",
+        "dimensions": "网格、8厘米偏移与3米接口过渡是数值建模参数，不是现场道路纵坡或路缘测量。",
+        "excludedDetails": "不重建整片广场，不推断实际车辆管理或无障碍合规。"
+      },
+      "groundClearance": 0.06
     }
   ]
 }

@@ -393,6 +393,33 @@
         "ground": "铺面沿实际地形三角面上方0.12米，与已修复服务路使用同一数值偏移；该值不代表真实路缘高。原地形、道路及树位保持。"
       },
       "batchWith": "civil-main-front-connection"
+    },
+    {
+      "id": "civil-platform-personnel-connection",
+      "type": "front-connection",
+      "buildingId": "way/957404988",
+      "footprintRevision": "51ade29b126e3eb8ddea57d77d010ce4b0fa7f6bb9efb2d526ac7904e38b5165",
+      "entranceId": "east-personnel",
+      "surfaceId": "way/759332838",
+      "surfaceRevision": "10e21ad4eaddec46ee8cb74ff5f3b41e0981e0b933e84306587ff5d9ad6a4a85",
+      "roadSearchDistance": [
+        0.1,
+        4
+      ],
+      "meshStep": 0.5,
+      "groundClearance": 0.12,
+      "joinOverlap": 0.2,
+      "roadContactDepth": 1,
+      "roadContactSideMargin": 0.5,
+      "sourceRefs": [
+        "osm",
+        "gx720CivilNorthPanorama"
+      ],
+      "evidence": {
+        "presence": "既有地图入口、台阶与前方服务路的短距离接续；照片支持硬质门前地面，精确铺装边界仍未知。",
+        "extent": "沿已采用12米梯宽，从七级台阶最外实体面接入way/759332838边界，间距约0.17–3.03米；不拓宽道路或推断完整前广场。",
+        "grading": "近端保持台阶零基准，远端接修复后的地形上方0.08米服务路，局部下削铺地下方地形。铺面不是实测纵坡，也不是无障碍路线认证。"
+      }
     }
   ]
 }
