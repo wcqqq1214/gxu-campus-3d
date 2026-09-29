@@ -22,7 +22,8 @@ def derive_front_connection(config,buildings,surface,source_ids):
         frame={'origin':p['center'],'angle':math.atan2(p['tangent'][1],p['tangent'][0])}
     else:
         entry=next((e for e in b.get('form',{}).get('entrances',[]) if e['id']==config['entranceId']),None)
-        recessed=bool(entry and all(k in entry for k in ('porticoId','recess','steps','stepWidth','platformHeight')))
+        recessed=bool(entry and all(k in entry for k in ('porticoId','recess','steps','platformHeight'))
+                      and ('stepWidth' in entry or 'porticoWidth' in entry))
         if not entry or not (recessed or any(k in entry for k in ('stairFlight','flushEntrance'))):raise ValueError('Front connection requires explicit stairs or a flush entrance')
         frame={'origin':entry['center'],'angle':-math.radians(entry['bearing'])}
     if 'flushEntrance' in entry:
@@ -36,7 +37,9 @@ def derive_front_connection(config,buildings,surface,source_ids):
         if 'porticoId' in entry:
             # Shared recessed steps have 0.3 m pitch and 0.32 m solids;
             # their outer face extends 0.01 m beyond the nominal last tread.
-            p={'width':entry['stepWidth'],'front':entry['recess']+entry['steps']*.3+.01,
+            # Match the building generator: absent a narrower explicit width,
+            # recessed steps span the resolved portico's full outer edge.
+            p={'width':entry.get('stepWidth',entry.get('porticoWidth')),'front':entry['recess']+entry['steps']*.3+.01,
                'baseHeight':entry.get('stepBaseHeight',0)}
         else:p=entry['stairFlight']
     if surface is None or surface['id']!=config['surfaceId'] or hashlib.sha256(json.dumps(surface,sort_keys=True,separators=(',',':')).encode()).hexdigest()!=config['surfaceRevision']:
