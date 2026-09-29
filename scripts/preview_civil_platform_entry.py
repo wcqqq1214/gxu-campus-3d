@@ -1,10 +1,11 @@
 """Build a separate, estimated D-area portico candidate; never update production data."""
 import argparse,copy,hashlib,json,math
 from pathlib import Path
+from shapely.geometry import LineString, Point
 from building_overrides import ROOT,load_catalogue,resolve_building,source_catalogue
 
 
-def proposal():
+def proposal(stone_surround=True):
     path=ROOT/'public/data/buildings.json'
     original=next(b for b in json.loads(path.read_text()) if b['id']=='way/957404988')
     record=copy.deepcopy(load_catalogue()[original['id']])
@@ -25,6 +26,35 @@ def proposal():
     porch['polygons']=[[ring+[ring[0]]]]
     porch['roof'].pop('rim',None)
     porch['openBelow']['slattedRoof']=dict(edgeWidth=1.15,slatWidth=.2,slatCount=11,solidBays=[5,6,7,8,9])
+    if stone_surround:
+        # Bound stone and glass rectangles on the existing shared wall. Adjacent
+        # intervals share exact endpoints; no full glass plane is hidden behind stone.
+        facade=next(f for f in record['exposedFacadeRules'] if f.get('region')=='under-portico')
+        foyer=next(p for p in record['parts'] if p['id']==facade['part'])
+        ring=foyer['polygons'][0][0];edge=facade['edge']
+        wall=LineString([ring[edge],ring[edge+1]])
+        def fraction(along):return wall.project(Point(point(along,3.6)))/wall.length
+        panels=[]
+        def panel(name,kind,bounds,bottom,top,columns=1,rows=1):
+            lo,hi=sorted(bounds)
+            panels.append(dict(id=name,type=kind,**{'from':lo,'to':hi},bottom=bottom,top=top,
+                columns=columns,rows=rows,frameWidth=.04 if kind=='solid' else .07,
+                depth=.21 if kind=='solid' else .1,
+                **({'finish':'stone'} if kind=='solid' else {'frameFinish':'dark'})))
+        def span(name,kind,lo,hi,bottom,top,columns=1,rows=1):
+            panel(name,kind,[fraction(lo),fraction(hi)],bottom,top,columns,rows)
+        span('central-upper-glass','glazing',-2.425,2.425,4.25,6.1,4,3)
+        span('upper-stone-beam','solid',-5.55,5.55,6.1,6.65)
+        for sign,label in [(-1,'north'),(1,'south')]:
+            span(label+'-inner-pier','solid',sign*2.425,sign*3.175,1.16,6.1)
+            span(label+'-outer-pier','solid',sign*4.9,sign*5.55,1.16,6.1)
+            span(label+'-side-glass','glazing',sign*3.175,sign*4.9,1.16,6.1,2,3)
+            span(label+'-door-cheek','solid',sign*1.9,sign*2.425,1.16,3.85)
+            span(label+'-header-extension','solid',sign*1.9,sign*2.425,3.85,4.25)
+            outer=fraction(sign*5.55)
+            panel(label+'-wing-glass','glazing',[outer,.03 if outer<.5 else .97],1.16,6.65,5,3)
+        facade['rule']['panels']=panels
+        record['entrances'][0]['recessDoor']['lintelHeight']=.4
     candidate=resolve_building(original,record,{s['id'] for s in source_catalogue()})
     return dict(status='unregistered-composition-candidate',buildingId=original['id'],
                 scope='Actual mapped D outline, existing estimated dimensions; not a photo fit or production replacement',
@@ -33,7 +63,8 @@ def proposal():
                              'Front pair at +/-5.2m around the entry; other four longitudinal positions retained; front setback 0.7m.',
                              'Two rear columns at +/-2.8m along entry and 2.65m setback are estimates, not a surveyed count.',
                              '3.6m porch depth, central five solid bays and side lattice spacing are unverified estimates.',
-                             'Curved named fascia and stone-framed glazing have not been reconstructed.'],
+                             ('Stone-framed central glass bay is estimated: inner piers +/-2.8m, outer piers +/-5.225m; upper beam 6.1–6.65m.' if stone_surround else 'Stone-framed glazing has not been reconstructed.'),
+                             'Side glazing continuation remains estimated; curved named fascia has not been reconstructed.'],
                 productionReady=False,photoRegistrationAccepted=False,wholeBuildingAccepted=False,
                 buildingSha256=hashlib.sha256(path.read_bytes()).hexdigest())
 
@@ -41,6 +72,7 @@ def proposal():
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output',type=Path,required=True)
-    args=parser.parse_args();r=proposal()
+    parser.add_argument('--without-surround',action='store_true',help='Reproduce the preceding full-glass candidate')
+    args=parser.parse_args();r=proposal(not args.without_surround)
     args.output.write_text(json.dumps(r,ensure_ascii=False,indent=2)+'\n')
     print(r['status'])

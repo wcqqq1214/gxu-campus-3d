@@ -1,0 +1,80 @@
+{
+  "passed": true,
+  "baseCommit": "e4e8e9583871c0e11d8653e314410c2c67911f70",
+  "scope": "Independent D-area stone surround candidate; production unchanged",
+  "photoRegistrationAccepted": false,
+  "productionReady": false,
+  "wholeBuildingAccepted": false,
+  "checks": {
+    "pythonTests": 266,
+    "blenderRecords": 74,
+    "detailModes": 2,
+    "legacyPanelsRotationRegression": true,
+    "baselineReproducedWithoutSurround": true
+  },
+  "production": {
+    "all448ResolvedRecordsPreserved": true,
+    "modelsVerifiedInPublicAndOut": 69,
+    "productionDataAndSourceBlendUnchanged": true,
+    "modelManifestSHA256": "4772183e55d1a68ef286890737cf57fd19e69e362318e37a3be618044933c721"
+  },
+  "captures": [
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-surround/candidate-entry.png",
+      "sha256": "e84c65279556913de2247a5b0955476fc13807027bfa66bdaa05493f3e38d9c9",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-surround/candidate-oblique.png",
+      "sha256": "b5df6f09e11b82dcb8358d2760a99dbefe854bd061228920621d235aa0695c63",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-surround/candidate-roof.png",
+      "sha256": "41a6178703771194f28c66853a994ccbff6ec143491412c08e3df562b6bcf4f3",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-surround/original-entry.png",
+      "sha256": "277a57534b8f72daa29b710591d698fc03f01e2c07780ba5b8cc6715ae2aedc1",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-surround/original-oblique.png",
+      "sha256": "35014260667a1d9ee8b32f64b4597844f8c9d2df03fd9cd9ba7d07f8daf62595",
+      "directlyViewed": true
+    },
+    {
+      "path": "docs/screenshots/refinement/s2-platform-entry-surround/original-roof.png",
+      "sha256": "18d334ef9b4f96663c21dba0121f3f6f140837c3575b56d35994049b8f6040b2",
+      "directlyViewed": true
+    }
+  ],
+  "assumptions": [
+    "D remains the OSM-supported location hypothesis.",
+    "Front pair at +/-5.2m around the entry; other four longitudinal positions retained; front setback 0.7m.",
+    "Two rear columns at +/-2.8m along entry and 2.65m setback are estimates, not a surveyed count.",
+    "3.6m porch depth, central five solid bays and side lattice spacing are unverified estimates.",
+    "Stone-framed central glass bay is estimated: inner piers +/-2.8m, outer piers +/-5.225m; upper beam 6.1–6.65m.",
+    "Side glazing continuation remains estimated; curved named fascia has not been reconstructed."
+  ],
+  "visualFindings": [
+    "Central upper glass now has stone surround and a continuous door header.",
+    "Side panes remain separately framed; columns, stairs and roof openings are preserved.",
+    "Unregistered straight fascia, shallow estimated porch depth and unsurveyed column count remain unresolved."
+  ],
+  "notRun": [
+    "Campus GLB export",
+    "Pages rebuild",
+    "Runtime performance benchmark"
+  ],
+  "inputs": {
+    "scripts/facade_panels_data.py": "9ec9e0cc46f62c9c9c001268f797de36fbabf20be5bab2bc3d09b1f881d5a877",
+    "scripts/exposed_facades_data.py": "f394fc79d0dbeb3aeb82985ff0176a6e47f75241f59e09a0744f3fd293cc6b80",
+    "blender/facade_panels.py": "1ae0f727b6288c812a27da6bc16b251883939d98d3d3958d51c0fa75b00a2cef",
+    "scripts/preview_civil_platform_entry.py": "f8e43eebff1ca2b610bc3fd81801e18ece31781114daf5f4ad94d50fde4fd53e",
+    "blender/validate_civil_entry_proposal.py": "2d28b148e6f2b47423dd8343095b82cbee78ef5cb35892a37040c13252fce1eb",
+    "work/refinement-s2-platform-entry-surround/proposal.json": "154076c40c1d192c6dfa6e242618254dfe3bbd65c0a15d793351f29bbbda7737",
+    "work/refinement-s2-platform-entry-surround/comparison.json": "cec5e24f77493b0a1f7e17720eff478ef758b332ba427b3dbfb022e7488e5d5c"
+  }
+}

@@ -13,10 +13,12 @@ def validate_panels(panels, length, height, levels, band=None, ledges=None, *, m
     ids = set(); rectangles = []
     for p in panels:
         expected = fields | ({'openings'} if isinstance(p, dict) and p.get('type') == 'round-window-wall' else set())
-        if not isinstance(p, dict) or not expected <= set(p) or set(p)-expected-{'frameFinish'}:
+        if not isinstance(p, dict) or not expected <= set(p) or set(p)-expected-{'frameFinish', 'finish'}:
             raise ValueError('Facade panel needs explicit bounds, type and frame dimensions')
         if 'frameFinish' in p and (p['type']!='glazing' or p['frameFinish'] not in ('white','dark')):
             raise ValueError('Glazing frame finish must use shared white or dark material')
+        if 'finish' in p and (p['type'] != 'solid' or p['finish'] not in ('white', 'stone')):
+            raise ValueError('Solid panel finish must use shared white or stone material')
         if not isinstance(p['id'], str) or not p['id'].strip() or p['id'] in ids:
             raise ValueError('Facade panel IDs must be nonempty and unique within the facade')
         ids.add(p['id'])

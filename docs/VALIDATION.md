@@ -820,3 +820,7 @@ Apple M5 / 16 GB / macOS 26.5.1、Codex 内置 Chromium、1280×720 本地生产
 ## 结构平台门框与柱基（2026-09-30）
 
 `validate_civil_platform.py` 在原全部平台标志上增加 `--entry-trim`（要求 `--personnel-entry`），检查石色柱身、深色窗框和保留白墙；既有屋顶检查同时拦截柱基变量影响檐口的回归。`validate_civil_platform_entry.py -- --entry-trim --report-prefix=<独立前缀>` 补入固定门框、石色横梁、六柱基座/顶圈/柱身射线，完整门宽玻璃取样避开实际中竖框。两者均通过Blender运行，加 `--python-exit-code 1`，并支持 `--check-root=<旧资产目录>` 做缺失细节反例。两级实际资产及台阶接路回归必须同时通过，不能仅依靠配置测试。详见[本批范围与结果](CIVIL_PLATFORM_ENTRY_TRIM.md)。
+
+## 结构平台独立门廊围合候选（2026-09-30）
+
+`blender/validate_civil_entry_proposal.py -- --surround --proposal=<候选JSON> --report=<独立报告>` 检查两种生成细节档的74条记录，包括屋面孔洞、柱顶环、门宽通路、石色围合及其后无重复玻璃。通过Blender执行并加 `--python-exit-code 1`。候选JSON的 `original` 保留生产基线用于缺失构件反例；前后渲染另用上轮候选作为比较基线。详见[复现命令与限制](CIVIL_PLATFORM_ENTRY_SURROUND.md)。该专项不代替生产GLB、照片配准、地形接路及性能验收。
