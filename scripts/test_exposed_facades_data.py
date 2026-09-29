@@ -101,6 +101,35 @@ class ExposedFacadeTests(unittest.TestCase):
         self.assertEqual(result['form']['facades'][-1]['region'],'under-portico')
         self.assertEqual(result['form']['facades'][-1]['rule']['panels'][0]['top'],5.8)
 
+    def test_stone_surround_keeps_panel_clearances_and_rejects_overlap(self):
+        b,r=self.portico_fixture()
+        panels=r['exposedFacadeRules'][0]['rule']['panels']
+        panels[0]['to']=.45
+        stone=dict(panels[0],id='pier',type='solid',finish='stone',columns=1,rows=1,
+                   **{'from':.45,'to':.55})
+        panels.append(stone)
+        result=self.resolve(b,r)
+        self.assertEqual(result['form']['facades'][-1]['rule']['panels'][1]['finish'],'stone')
+        self.assertEqual(result,self.resolve(result,r))
+        stone['from']=.44
+        with self.assertRaisesRegex(ValueError,'panels overlap'):self.resolve(b,r)
+        stone['from']=.45;stone['top']=6.3
+        with self.assertRaisesRegex(ValueError,'underside'):self.resolve(b,r)
+        stone['top']=5.8
+        r['parts'][1]['openBelow']['columns'][0]['center']=[15.32,10]
+        with self.assertRaisesRegex(ValueError,'support column'):self.resolve(b,r)
+
+    def test_solid_finish_is_explicit_and_type_restricted(self):
+        b,r=self.portico_fixture();panel=r['exposedFacadeRules'][0]['rule']['panels'][0]
+        panel.update(type='solid',columns=1,rows=1)
+        self.assertNotIn('finish',self.resolve(b,r)['form']['facades'][-1]['rule']['panels'][0])
+        for finish in ('white','stone'):
+            panel['finish']=finish;self.resolve(b,r)
+        for update in [dict(finish='dark'),dict(finish=None),dict(finish='stone',type='glazing')]:
+            bad=copy.deepcopy(r);bad['exposedFacadeRules'][0]['rule']['panels'][0].update(update)
+            with self.subTest(update=update),self.assertRaisesRegex(ValueError,'Solid panel finish'):
+                self.resolve(b,bad)
+
     def test_glazing_behind_mixed_roof_keeps_height_and_column_constraints(self):
         b,r=self.portico_fixture()
         opening=r['parts'][1]['openBelow']

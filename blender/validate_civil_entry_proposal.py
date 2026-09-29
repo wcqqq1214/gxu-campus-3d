@@ -7,6 +7,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from generic_buildings import ordinary_building
 parser=argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--proposal',type=Path,required=True);parser.add_argument('--report',type=Path,required=True)
+parser.add_argument('--surround',action='store_true',help='Check estimated stone surround and bounded glazing')
 a=parser.parse_args(sys.argv[sys.argv.index('--')+1:]);data=json.loads(a.proposal.read_text())
 C={k:i for i,k in enumerate(['white','stone','pink','paleRoof','dark','glass','shadeGlass','blueRoof','red'])}
 b=data['candidate'];entry=next(e for e in b['form']['entrances'] if e.get('porticoId')=='link-portico')
@@ -17,6 +18,21 @@ checks=[];negative=[]
 for detail in (False,True):
     m=ordinary_building(b,0,C,detail);tree=BVHTree.FromPolygons(m.v,m.f)
     previous=ordinary_building(data['original'],0,C,detail);old=BVHTree.FromPolygons(previous.v,previous.f)
+    if a.surround:
+        # Start behind the column rows, using fixed design points independent
+        # of panel rectangles. Stone must replace, not cover, a glass plane.
+        glass=BVHTree.FromPolygons(m.v,[face for face,mat in zip(m.f,m.m) if mat==C['glass']])
+        for along,height,material in [(0,6.35,'stone'),(-2.8,5.4,'stone'),(2.8,5.4,'stone'),
+                (-5.225,3.2,'stone'),(5.225,3.2,'stone'),(-2.15,4.05,'stone'),(2.15,4.05,'stone'),
+                (-2.15,2.4,'stone'),(2.15,2.4,'stone'),(.4,5.5,'glass'),(-3.5,4.2,'glass'),(3.5,4.2,'glass')]:
+            start=front+t*along-n*3+Vector((0,0,height))
+            hit=tree.ray_cast(start,-n,1)
+            assert hit[0] is not None and m.m[hit[2]]==C[material],(detail,along,height,material,hit)
+            if material=='stone':assert glass.ray_cast(start,-n,1)[0] is None,(detail,along,height,'hidden glass')
+            checks.append(dict(detail=detail,surroundAlong=along,height=height,material=material,passed=True))
+        start=front-n*3+Vector((0,0,6.35));hit=old.ray_cast(start,-n,1)
+        assert hit[0] is not None and previous.m[hit[2]]!=C['stone']
+        negative.append(dict(detail=detail,baselineLacksStoneSurround=True))
     for i in range(12):
         v=(1.15+i*(gap+.2)+gap/2)/length
         p=Vector(tuple(sum(w*c[k] for w,c in zip([.5*(1-v),.5*(1-v),.5*v,.5*v],corners)) for k in (0,1))+(8,))
