@@ -1,5 +1,7 @@
 # 验收记录
 
+2026-09-29柱廊接续：[柱后玻璃](CIVIL_PLATFORM_PORTICO_GLAZING.md)通过241项Python、62项Node、类型检查、lint及源/基础/近景各441项专项检查，旧白墙模型在新增玻璃点失败。当前平台检查参数在 `--repartition` 后追加 `--portico-glass`；入口和屋面仍待校准。 精细/流畅三轮分别60/60/60与30/30/30 FPS，原预算通过，[汇总](model-checks/refinement/s2-platform-glass-summary.json)。
+
 2026-09-29体量返工：[低翼与柱廊六分部估算模型](CIVIL_PLATFORM_REPARTITION.md)已替换错误东墙窗列，当前专项参数为 `--inset-roof --north-facade --roof-volumes --east-slit --repartition`，源/基础/近景各401项通过。238项Python、62项Node、类型检查、lint、模型与Pages构建以及普通楼栋/道路/植被回归通过；11张固定画面核看。历史 `--lab-facade` 仅适用于旧版；精确墙线、入口及屋面仍待校准。 精细/流畅三轮分别为60/60/60和30/30/30 FPS，原预算通过，[汇总及指纹](model-checks/refinement/s2-platform-repartition-summary.json)。
 
 2026-09-29真实性复核：[结构平台低翼方向配准更正](CIVIL_PLATFORM_ALIGNMENT_REVIEW.md)撤回“密集窗翼已对应东立面”的判断。此前413项源/基础/近景检查仅证明几何生成一致，该部位需重新配准后返工。性能通过不代表真实性验收通过。

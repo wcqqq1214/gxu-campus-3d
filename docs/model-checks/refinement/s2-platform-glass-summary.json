@@ -1,0 +1,127 @@
+{
+  "checkedAt": "2026-09-29T15:27:09.146607+00:00",
+  "passed": true,
+  "geometryAndVisualsPassed": true,
+  "performanceBudgetNumbersPassed": true,
+  "sameConditionPerformanceAccepted": true,
+  "pending": [
+    "Hall roof slope, south delivery entrance and road connection",
+    "North office remaining elevations, actual rooftop use/details and personnel entrance",
+    "North low wing and foyer partition depths, levels, roof shape and dimensions; true glazing dimensions",
+    "Separate historical old hall footprint and demolition timing"
+  ],
+  "baseCommit": "983099877bc9082e2670855d70a740e40b41151c",
+  "branch": "dev",
+  "scope": "Estimated 12-column three-row glazing on the backing wall inside the connecting portico. Six parts, columns, roofs and existing facades remain unchanged; exact partition, roof forms and entries remain unverified. Partial implementation only.",
+  "blenderVersion": "5.2.2",
+  "photoRegistrationAccepted": false,
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 241,
+  "nodeTests": 62,
+  "geometryChecks": [
+    "geometry",
+    "data",
+    "generic-geometry",
+    "trees-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "beforeFPS": [
+        60,
+        60,
+        60
+      ],
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "baseline": {
+        "medianFPS": 60,
+        "medianTriangles": 4019920,
+        "medianDrawCalls": 547
+      },
+      "current": {
+        "medianFPS": 60,
+        "medianTriangles": 4207717,
+        "medianDrawCalls": 563
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 4.671660132539945,
+        "medianDrawCalls": 2.925045703839113
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "beforeFPS": [
+        30,
+        30,
+        30
+      ],
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "baseline": {
+        "medianFPS": 30,
+        "medianTriangles": 1051945,
+        "medianDrawCalls": 263
+      },
+      "current": {
+        "medianFPS": 30,
+        "medianTriangles": 1167445,
+        "medianDrawCalls": 299
+      },
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 10.979661484203064,
+        "medianDrawCalls": 13.688212927756659
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second samples with 2% CPU inclusion threshold, not proof of absence of all background activity.",
+  "initialModelBytes": 5399376,
+  "maximumOrdinaryNearBytes": 1684868,
+  "fingerprints": {
+    "data/building-overrides.json": "989233cef2a585c62b64b09736f0c5b8410ba148765afb172c47a97c11bc04df",
+    "data/building-sources.json": "dd25067d6c0af395fd22f18fa605cd374799eff783d1bc625f2e5b9838004712",
+    "blender/gxu-campus.blend": "0d4f57006022b8b7ad23f13741f188e1e24619ef6b17d2ba82508aaf3be17c5a",
+    "blender/generic_buildings.py": "5be9a8a4b7a154e22361bea8c8150adbad1b58d561d5972cd977ca01629fa86e",
+    "scripts/building_overrides.py": "a43ebbd997fa6d57f02136fdfe7b840f77906418df9ea932acf04ec117bc95e9",
+    "scripts/roof_volumes_data.py": "d97e7359e1be7150d33e07285b36aae7b7d9984309a934a0932c6ec4de946cb8",
+    "scripts/exposed_facades_data.py": "28447c969d67ec241f4f6b7666670444fef39c14756443255f23c8f8f94b02c2",
+    "scripts/facade_panels_data.py": "087ea41d3cab30e7b51408245a85bb77cb03d67eed34242685f4e04badc14820",
+    "blender/validate_generic.py": "a13873c9f4f1d4e9bf25db53bd80b6d0c41577b360f4b183d78680f7cba6041c",
+    "blender/validate_civil_platform.py": "243bfe927599c9260e5e574409b08e130d9a573944c4458b3e343a797d5bfc53",
+    "public/data/buildings.json": "60e2cc0e2a9f19ecba25a0cb050e1cc71e4e1feb4e849410c8ef030f525b5013",
+    "public/data/sources.json": "fdc8f5484b919a271503a5f34e445467df6488f5ea8776a9f150962c3a537c1f",
+    "public/data/models.json": "ffd6b5f449025c4ead1b22a3a7fcb36adbdbb89bb70bd3563c8b173141c4a4e7"
+  }
+}
