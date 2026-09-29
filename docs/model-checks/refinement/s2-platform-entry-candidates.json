@@ -2,7 +2,7 @@
   "buildingId": "way/957404988",
   "sourceSha256": "e4b76fd28e24aaab9f2b5ba20098eb5ce7d8418409c5a802d6238a1ad6a72a42",
   "coordinateSystem": "campus local east/north metres",
-  "status": "candidate-search-edges-only",
+  "status": "mapped-entrance-and-portico-constraint-review",
   "productionReady": false,
   "sourceReview": "docs/CIVIL_PLATFORM_ENTRY_EVIDENCE.md",
   "candidates": [
@@ -344,6 +344,96 @@
       ]
     }
   ],
+  "mappedEntranceEvidence": {
+    "nodeId": 7096023516,
+    "sourceUrl": "https://www.openstreetmap.org/node/7096023516",
+    "snapshot": "data/snapshots/osm-2026-09-09.json.gz",
+    "snapshotSha256": "3f448ad4b6f2c706b22e993bb750e5e4634440993e7469f96acf6cde1f64690e",
+    "nodeVersion": 2,
+    "nodeTimestamp": "2021-06-23T11:30:01Z",
+    "tags": {
+      "entrance": "yes"
+    },
+    "longitude": 108.2814232,
+    "latitude": 22.8404808,
+    "rawLocalPosition": [
+      -695.2066471154159,
+      -742.4153439997203
+    ],
+    "originalEdge": 14,
+    "edgeFraction": 0.6148554790655477,
+    "distanceToNormalizedEdgeM": 0.0017357041978790417,
+    "projectedOuterPosition": [
+      -695.20838278471,
+      -742.4153550071646
+    ],
+    "projectedRearWallPosition": [
+      -698.8083103913996,
+      -742.4381853946858
+    ],
+    "modelRecessM": 3.6000000000000005,
+    "preferredSearchArea": "D",
+    "columnClearance": [
+      {
+        "columnIndex": 0,
+        "center": [
+          -696.2781556085655,
+          -731.4166489513983
+        ],
+        "distanceToRouteM": 10.678214596674,
+        "blocksCentralRoute": false
+      },
+      {
+        "columnIndex": 1,
+        "center": [
+          -696.2438176181748,
+          -736.8311115596942
+        ],
+        "distanceToRouteM": 5.263643105390605,
+        "blocksCentralRoute": false
+      },
+      {
+        "columnIndex": 2,
+        "center": [
+          -696.209479627784,
+          -742.2455741679902
+        ],
+        "distanceToRouteM": 0.0,
+        "blocksCentralRoute": true
+      },
+      {
+        "columnIndex": 3,
+        "center": [
+          -696.1751416373934,
+          -747.660036776286
+        ],
+        "distanceToRouteM": 4.911390794887938,
+        "blocksCentralRoute": false
+      },
+      {
+        "columnIndex": 4,
+        "center": [
+          -696.1408036470026,
+          -753.0744993845819
+        ],
+        "distanceToRouteM": 10.325962286171334,
+        "blocksCentralRoute": false
+      },
+      {
+        "columnIndex": 5,
+        "center": [
+          -696.1064656566119,
+          -758.4889619928779
+        ],
+        "distanceToRouteM": 15.740533777454727,
+        "blocksCentralRoute": false
+      }
+    ],
+    "probeWidthM": 2.2,
+    "probePurpose": "Exercise existing parser only; not a proposed or measured doorway width.",
+    "candidateParserRejection": "Portico column blocks the central entrance route",
+    "locationAccuracy": "Unspecified OSM mapping accuracy; no surveyed or photo-registered door anchor."
+  },
   "existingIllustrativeEntrances": [
     {
       "id": "fallback-0",
@@ -361,9 +451,10 @@
   ],
   "limitations": [
     "Boundary lengths are not measured entrance widths.",
-    "A/B/D are competing personnel-entry search areas, not confirmed doors.",
+    "D is prioritized by an OSM entrance node; A/B remain unregistered alternatives or other doors.",
     "C is the south delivery-entry search wall, not the personnel portal.",
     "D is a part-local recessed wall; its normal enters the open portico.",
+    "OSM node supports D; existing estimated columns conflict with its straight approach.",
     "No road alignment, stairs, column count or door position is inferred."
   ]
 }

@@ -1,0 +1,43 @@
+{
+  "date": "2026-09-30",
+  "status": "mapped-entrance-found-production-candidate-rejected",
+  "liveSource": {
+    "url": "https://api.openstreetmap.org/api/0.6/node/7096023516",
+    "sha256": "6931f5c21b32c2d133a56ad5e672ddf0133ae867c8fa3c028a5b377af6cb9dac",
+    "bytes": 510,
+    "nodeId": 7096023516,
+    "version": 2,
+    "timestamp": "2021-06-23T11:30:01Z",
+    "coordinatesAndTagsMatchRepositorySnapshot": true
+  },
+  "diagnostic": "docs/model-checks/refinement/s2-platform-entry-candidates.json",
+  "images": [
+    {
+      "key": "maintenance2025",
+      "page": "https://ghjjc.gxu.edu.cn/info/1045/3749.htm",
+      "url": "https://ghjjc.gxu.edu.cn/__local/2/27/74/CAC261A3DD071E29406DD6AA072_CDAFA2F1_10DE1.jpeg",
+      "sha256": "1561a0ff3fdac9bea61bd9a184eac9e4bdf88bbb36c88bab7b67be76c0d3f649",
+      "bytes": 69089,
+      "review": "direct-full-image",
+      "finding": "Interior bridge exhibit only; no exterior corner or door registration."
+    },
+    {
+      "key": "camp2024",
+      "page": "https://tmjz.gxu.edu.cn/info/1452/7289.htm",
+      "url": "https://tmjz.gxu.edu.cn/__local/C/79/17/47AE791F97A9C0A20BD5EEF40C1_47C7BEDE_2D605.png",
+      "sha256": "0aa43031866a689bfe0f99206025f8f968aa3c32b38b07fc8ef891097c6b7af1",
+      "bytes": 185861,
+      "review": "direct-full-image",
+      "finding": "Cropped round-column glass entrance and stairs; no building corner, door dimensions or column layout registration."
+    }
+  ],
+  "productionChanged": false,
+  "photoRegistered": false,
+  "findings": [
+    "Existing OSM entrance node belongs to the source building way and projects to the east portico frontage, prioritizing D.",
+    "Current estimated third column from north conflicts with the direct approach to the projected rear-wall point.",
+    "Existing parser rejects the candidate; probe width is not a measured or adopted door width.",
+    "OSM mapping accuracy and exact door/column correspondence remain unresolved; no column is moved merely to make the probe pass."
+  ],
+  "nextAction": "Register doorway against adjacent columns within D; preserve this OSM reference and record any proposed offset explicitly. Then validate the full doorway width, stairs, terrain and road connection before rebuilding."
+}
