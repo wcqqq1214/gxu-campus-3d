@@ -130,6 +130,25 @@ class ExposedFacadeTests(unittest.TestCase):
             with self.subTest(update=update),self.assertRaisesRegex(ValueError,'Solid panel finish'):
                 self.resolve(b,bad)
 
+    def test_separate_clerestory_and_lower_glass_share_one_portico_wall(self):
+        b,r=self.portico_fixture()
+        r['parts'][0]['roof']=dict(type='profiled',rise=2,mesh={
+            'vertices':[[0,0,2],[15,0,0],[15,20,0],[0,20,2]],'triangles':[0,1,2,0,2,3]})
+        upper=copy.deepcopy(r['exposedFacadeRules'][0]);upper['region']='above-portico'
+        upper['rule']['panels'][0].update(bottom=7,top=8.5,rows=1)
+        r['exposedFacadeRules'].append(upper)
+        result=self.resolve(b,r)
+        self.assertEqual(result,self.resolve(result,r))
+        self.assertEqual([f['region'] for f in result['form']['facades'] if 'region' in f],
+                         ['under-portico','above-portico'])
+        automatic=[f for f in result['form']['facades'] if f['part']=='high' and f['polygon'] is None and not f['rule']]
+        self.assertEqual(automatic[0]['minimumHeight'],16.5)
+        for change in [dict(bottom=6.5),dict(top=16.45)]:
+            bad=copy.deepcopy(r);bad['exposedFacadeRules'][1]['rule']['panels'][0].update(change)
+            with self.subTest(change=change),self.assertRaises(ValueError):self.resolve(b,bad)
+        r['exposedFacadeRules'].append(copy.deepcopy(upper))
+        with self.assertRaisesRegex(ValueError,'Duplicate'):self.resolve(b,r)
+
     def test_glazing_behind_mixed_roof_keeps_height_and_column_constraints(self):
         b,r=self.portico_fixture()
         opening=r['parts'][1]['openBelow']
