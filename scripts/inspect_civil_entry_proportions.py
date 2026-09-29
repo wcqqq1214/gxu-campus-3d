@@ -17,7 +17,7 @@ def inspect():
     interval = [(width-6)/(height+6), (width+6)/(height-6)]
     variants = {}
     for name,tall in [('preceding',False),('proportional',True)]:
-        b = proposal(tall_surround=tall)['candidate']
+        b = proposal(tall_surround=tall,curved_roof=False)['candidate']
         facade = next(f for f in b['form']['facades'] if f.get('region')=='under-portico')
         panel = next(p for p in facade['rule']['panels'] if p['id']=='central-upper-glass')
         w = (panel['to']-panel['from'])*math.dist(facade['start'],facade['end'])
