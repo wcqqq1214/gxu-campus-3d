@@ -4,7 +4,7 @@ from functools import lru_cache
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from geometry import Mesh
-from site_geometry import mesh_triangles,split_convex,contact_road
+from site_geometry import mesh_triangles,split_convex,contact_road,inside
 from shore_geometry import conform_edges,smooth,bounds,overlaps,triangles_into
 
 def clear_paving_ground(terrain,paving,record):
@@ -99,6 +99,30 @@ def build_pavings(data,C,terrain,roads,originals):
             return hit.z+(normal.x*(hit.x-x)+normal.y*(hit.y-y))/normal.z
         def top(x,y):
             result=old_height(x,y);weights=[]
+            for overlap in record.get('neighborOverlaps',[]):
+                rings=[overlap['outer'],*overlap['holes']]
+                covered=inside((x,y),rings[0]) and not any(inside((x,y),h) for h in rings[1:])
+                candidates=[]
+                for ring in rings:
+                    for a,b in zip(ring,ring[1:]):
+                        dx,dy=b[0]-a[0],b[1]-a[1];den=dx*dx+dy*dy
+                        if not den:continue
+                        t=max(0,min(1,((x-a[0])*dx+(y-a[1])*dy)/den))
+                        qx,qy=a[0]+t*dx,a[1]+t*dy
+                        candidates.append((math.hypot(x-qx,y-qy),qx,qy))
+                distance,qx,qy=min(candidates)
+                if covered:distance,qx,qy=0,x,y
+                weight=smooth(1-distance/record['joinFeather'])
+                if weight:
+                    # Query just inside the retained neighboring road to avoid
+                    # float32 misses exactly on its mapped boundary.
+                    hit=neighboring.ray_cast(Vector((qx,qy,200)),Vector((0,0,-1)),400)[0]
+                    if hit is None:
+                        for dx,dy in ((.0001,0),(-.0001,0),(0,.0001),(0,-.0001)):
+                            hit=neighboring.ray_cast(Vector((qx+dx,qy+dy,200)),Vector((0,0,-1)),400)[0]
+                            if hit is not None:break
+                    if hit is None:raise ValueError('Missing mapped neighbor overlap height')
+                    weights.append((weight,hit.z-old_height(qx,qy)))
             for join in record['joins']:
                 a,b=join['a'],join['b'];dx,dy=b[0]-a[0],b[1]-a[1];t=max(0,min(1,((x-a[0])*dx+(y-a[1])*dy)/(dx*dx+dy*dy)))
                 qx,qy=a[0]+t*dx,a[1]+t*dy;distance=math.hypot(x-qx,y-qy)
@@ -124,6 +148,13 @@ def build_pavings(data,C,terrain,roads,originals):
                                 for cut in [split_convex(p,outline)[0]] if len(cut)>=3]
                     for join in record['joins']:
                         pieces=[part for piece in pieces for part in split_at_feather(piece,join,record['joinFeather'])]
+                    for overlap in record.get('neighborOverlaps',[]):
+                        for ring in [overlap['outer'],*overlap['holes']]:
+                            for a,b in zip(ring,ring[1:]):
+                                length=math.dist(a,b)
+                                if not length:continue
+                                join={'a':a,'inward':[-(b[1]-a[1])/length,(b[0]-a[0])/length]}
+                                pieces=[part for piece in pieces for part in split_at_feather(piece,join,0)]
                     for piece in pieces:
                         for i in range(1,len(piece)-1):
                             a,b,c=piece[0],piece[i],piece[i+1]
