@@ -74,7 +74,7 @@ def prepare_pavings(root=ROOT):
         shapes.append(shape);records.append(record)
     result={'schemaVersion':1,'contextRevision':context_revision(ss,infra,sur,roads,sites),'pavings':records}
     (out/'pavings.json').write_text(json.dumps(result,ensure_ascii=False,separators=(',',':'))+'\n')
-    report={'pavingIds':list(ids),'areasMeters2':[r['areaMeters2'] for r in records],'originalSurfaceSlotsAndFootprintsPreserved':True,'treesUnchanged':True,'passed':True}
+    report={'pavingIds':[r['id'] for r in records],'areasMeters2':[r['areaMeters2'] for r in records],'originalSurfaceSlotsAndFootprintsPreserved':True,'treesUnchanged':True,'passed':True}
     (root/'docs/model-checks/refinement').mkdir(parents=True,exist_ok=True)
     (root/'docs/model-checks/refinement/paving-preparation.json').write_text(json.dumps(report,indent=2)+'\n');print(report)
 if __name__=='__main__':prepare_pavings()
