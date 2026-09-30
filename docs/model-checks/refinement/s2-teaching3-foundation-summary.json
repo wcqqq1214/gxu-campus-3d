@@ -1,0 +1,147 @@
+{
+  "checkedAt": "2026-09-30T08:44:24.335360+00:00",
+  "passed": true,
+  "baseCommit": "17d2c04357830961a802250fc212b1ab256c0275",
+  "branch": "dev",
+  "productionIntegrated": true,
+  "buildingId": "way/759132933",
+  "scope": "Local third-teaching terrain/road repair plus shared ordinary-road quantization; architectural facade/roof calibration remains partial.",
+  "checks": [
+    "s2-teaching3-foundation-validated",
+    "s2-teaching3-foundation-neighbors",
+    "s2-teaching3-existing-foundations",
+    "s2-teaching3-service-road",
+    "s2-teaching3-ordinary-road-export",
+    "s2-teaching3-foundation-assets",
+    "s2-teaching3-foundation-http",
+    "s2-teaching3-road-decoded-anchors"
+  ],
+  "sourcePreservation": "s2-teaching3-foundation-source-candidate.json",
+  "negativeControl": "s2-teaching3-ground-review.json",
+  "pythonTests": 300,
+  "nodeTests": 70,
+  "foundationGeometryFixtures": 14,
+  "vertexAttributeTests": 9,
+  "shoreGeometryCases": 7,
+  "nativeSharedQuantizationFixturePassed": true,
+  "groundExportFixturePassed": true,
+  "mixedMaterialExportFixturePassed": true,
+  "typecheckPassed": true,
+  "lintPassed": true,
+  "pagesBuildPassed": true,
+  "buildMode": "Incremental source candidate integration and actual ground export; full generator wiring updated, no claim that all campus meshes were regenerated.",
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4266692,
+      "medianDrawCalls": 565,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.138729128937892,
+        "medianDrawCalls": 3.290676416819016
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1203669,
+      "medianDrawCalls": 302,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 14.423187524062575,
+        "medianDrawCalls": 14.828897338403046
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "cpuSnapshots": 27,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "cpuSamplingLimit": "10-second snapshots with 2% CPU inclusion threshold, not proof of complete isolation.",
+  "visualReview": {
+    "acceptedSet": "s2-teaching3-contact",
+    "acceptedImages": 7,
+    "rejectedSets": [
+      "s2-teaching3-foundation",
+      "s2-teaching3-ground-detail",
+      "s2-teaching3-foot"
+    ],
+    "exclusionReason": "Wide views are contextual; subsequent cameras intersected dormitory or were occluded by journalism building. Final cameras sit in the narrow east/north gaps.",
+    "nightChecked": true,
+    "mobileRepresentation": "base"
+  },
+  "dataPreservation": {
+    "buildings": 448,
+    "allBuildingRecordsAndFootprintsUnchanged": true,
+    "changedPublicData": [
+      "foundations.json",
+      "models.json"
+    ],
+    "priorFoundationRecordsUnchanged": true
+  },
+  "assetPreservation": {
+    "changedBuildingIds": [],
+    "footprintsPreserved": true,
+    "treesPreserved": 3062,
+    "removedTreeCandidates": [],
+    "restoredTreeCandidates": [],
+    "shippingTrees": 3062,
+    "changedGLBFiles": [
+      "base.glb"
+    ],
+    "changedBaseNodes": [
+      "roads",
+      "terrain"
+    ],
+    "addedBaseNodes": [],
+    "preservedBaseNodes": 95,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5846556,
+    "initialModelByteChange": -148136,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "180a0147f75a4712924cc932282aeac92b94393aef16ad146f2d59a297fc6772",
+    "passed": true
+  },
+  "geometryLimitations": [
+    "Not surveyed elevations or grading.",
+    "Ordinary-road audit reports one real step-edge witness using 1cm 3D surface distance rather than claiming pointwise vertical error below 2.5cm. Existing omitted pavement-node samples are not certified by that ordinary-road check.",
+    "Flow draw-call growth vs S0 is close to the existing 15% limit; further details require checking this budget.",
+    "Teaching-three exterior identity details and civil transport-door/back-facade evidence remain pending."
+  ],
+  "counts": {
+    "calibratedObjects": 22,
+    "wholeFirstPassAccepted": 2,
+    "partialObjects": 20,
+    "s3RequiredNeighborsWholeAccepted": 0,
+    "newWholeAcceptances": 0
+  },
+  "nextPriority": [
+    "Civil experimental hall external-wall/transport-opening alignment",
+    "Existing nine-storey structural platform south/west facades and foyer roof"
+  ],
+  "fingerprints": {
+    "blender/gxu-campus.blend": "c427ceffb07d114d0362aad89d14cd0d12d4ed4bf7493f809722fa881604cf9e",
+    "public/models/base.glb": "5d7cff75af7a053804fdc5842e10351491c639ea7a461d6ce109cf3b5c765829",
+    "public/data/models.json": "180a0147f75a4712924cc932282aeac92b94393aef16ad146f2d59a297fc6772",
+    "public/data/foundations.json": "b1bf5a020005fb2b3bae5bca73bd349ec69cda9b9c53558bff3dba2bd67525b3",
+    "data/foundation-overrides.json": "5936afcea3d873e4bbbdeaad4fe79937e2e9b177db15299879e1b15d46a0b76d",
+    "blender/export_repaired_ground.py": "6bc9aea6346ed2d7afea0b9dfecb5d187836ca742785590c426e904010eb72d4",
+    "blender/road_export.py": "14fd66584c5a0cba2396683f3edcb4271120a8ba355f690fbdccd81c4b35e3ba",
+    "blender/vertex_dedup.py": "fdbe634a785e230240ac290451e7b02e5ef72693c7915a2be05a1da00605d84a",
+    "blender/shore_geometry.py": "26ba72f07b6e7109566df2e49fec99ee71de9d39a3a4a894cc8d13fdcae71de2",
+    "blender/terrain_export.py": "486b2d1430fe05d65820e10cad68f81b4363c2b13b85e0411b4a10e49709635d",
+    "blender/validate_ordinary_road_export.py": "34564af070894a841a8d92ffa3a22a140ce63a9e5a3252132673ae834454a13b",
+    "out/index.html": "f75ddf7318bc08b485bc928d368c7caa7b9550f1ee15c3d7b5f45612ac46d02f"
+  }
+}

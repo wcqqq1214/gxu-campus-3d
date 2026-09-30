@@ -1,0 +1,52 @@
+{
+  "buildingId": "way/759132933",
+  "adoptedDatum": 4.64,
+  "datumMeaning": "Current model elevation, not surveyed ground-floor elevation",
+  "sampling": {
+    "spacingMeters": 2,
+    "perimeterInsetMeters": 0.25,
+    "allowedIntrusionMeters": 0.3,
+    "openPorticosExcluded": true,
+    "scope": "Closed part interiors; road layers include ordinary service roads; near buildings reuse base terrain"
+  },
+  "fingerprints": {
+    "buildings": "e61b23512d4f81c9bfb9027dcf97d584124400a411faa72eaa0fe6e78a0ce455",
+    "source": "c427ceffb07d114d0362aad89d14cd0d12d4ed4bf7493f809722fa881604cf9e",
+    "base": "5d7cff75af7a053804fdc5842e10351491c639ea7a461d6ce109cf3b5c765829"
+  },
+  "representations": [
+    {
+      "representation": "source",
+      "samples": 499,
+      "parts": [
+        {
+          "part": "mapped-closed-body",
+          "samples": 499,
+          "terrainIntrusionSamples": 0,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.00488220214843782,
+          "worstGroundSamples": [],
+          "worstRoadSamples": []
+        }
+      ],
+      "passed": true
+    },
+    {
+      "representation": "base",
+      "samples": 499,
+      "parts": [
+        {
+          "part": "mapped-closed-body",
+          "samples": 499,
+          "terrainIntrusionSamples": 0,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.0019525146484378197,
+          "worstGroundSamples": [],
+          "worstRoadSamples": []
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "passed": true
+}

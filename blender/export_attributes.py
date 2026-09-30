@@ -3,6 +3,7 @@ from contextlib import contextmanager
 import sys
 
 _deduplicate_vertices = False
+_share_position_bounds = False
 
 
 def needs_texcoords(material):
@@ -41,14 +42,18 @@ class glTF2ExportUserExtension:
             if _deduplicate_vertices:
                 from vertex_dedup import deduplicate_primitive_vertices
                 deduplicate_primitive_vertices(primitive)
+        if _share_position_bounds:
+            from vertex_dedup import share_position_quantization_bounds
+            share_position_quantization_bounds(mesh.primitives)
 
 
 @contextmanager
-def omit_unused_uvs(*, deduplicate_vertices=False):
+def omit_unused_uvs(*, deduplicate_vertices=False, share_position_bounds=False):
     """Register the supported exporter hook only for this process and scope."""
     import bpy
-    global _deduplicate_vertices
+    global _deduplicate_vertices, _share_position_bounds
     previous_deduplication = _deduplicate_vertices
+    previous_shared_bounds = _share_position_bounds
     name = __name__
     assert sys.modules[name].glTF2ExportUserExtension is glTF2ExportUserExtension
     existing = bpy.context.preferences.addons.get(name)
@@ -57,9 +62,11 @@ def omit_unused_uvs(*, deduplicate_vertices=False):
         addon.module = name
     try:
         _deduplicate_vertices = deduplicate_vertices
+        _share_position_bounds = share_position_bounds
         yield
     finally:
         _deduplicate_vertices = previous_deduplication
+        _share_position_bounds = previous_shared_bounds
         if existing is None:
             bpy.context.preferences.addons.remove(addon)
 

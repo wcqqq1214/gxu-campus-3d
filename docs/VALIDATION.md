@@ -1,5 +1,8 @@
 # 验收记录
 
+2026-09-30当前验收：[三教接地修补](TEACHING_THREE_FOUNDATION.md)正式集成，源/基础各499点侵入归零，周边、三项既有修补、土木服务路与普通道路导出检查通过。300项Python、70项Node、相关真实Blender/Draco夹具及类型/lint/Pages检查通过；69个资产本地/预览包/HTTP一致，7张有效网页画面逐张审阅。首屏5,846,556字节，精细60/60/60与流畅30/30/30 FPS；流畅绘制调用较S0增加14.83%，接近15%上限。当前哈希、抽样范围、边缘例外与性能上下文见[联合汇总](model-checks/refinement/s2-teaching3-foundation-summary.json)，旧记录保持历史含义。
+
+
 2026-09-30最新验收：[动物学院接地](ANIMAL_COLLEGE_FOUNDATION.md)源/基础各782点侵入归零，各57,250点周边检查通过，入口、屋顶和既有土木修补回归通过。保留道路导出基线比较要求压缩节点完全不变，既有源/导出误差仍单列。资产、画面和同条件性能以[本批汇总](model-checks/refinement/s3-animal-foundation-summary.json)为准，整栋计数不增加。
 
 2026-09-30当前接续：[结构平台西侧服务路](CIVIL_PLATFORM_WEST_ROAD.md)新增实际源文件/GLB路面、路边封口、三处接缝和保留区检查，复跑封闭楼体侵入及D区接路。首轮性能因流畅三角形增幅15.23%而未通过，失败记录保留。后续从解码后的地形/道路索引剔除9,650个严格零面积面，完整有效三角形和所有属性字节保持；七组校园渲染像素一致，UI太阳图标的1像素差异单列。最终状态、资产指纹和性能以[本批汇总](model-checks/refinement/s2-platform-west-road-summary.json)为准，不恢复平台整栋完成计数。
