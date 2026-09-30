@@ -15,8 +15,8 @@ def mesh(name,layer,z):
     return obj
 
 # The actual export objects acquire .001, just as in a full campus build.
-mesh('terrain','terrain',-1);mesh('roads','roads',-1)
-objects=[mesh('terrain','terrain',0),mesh('roads','roads',.2)]
+mesh('terrain','terrain',-1);mesh('roads','roads',-1);mesh('paving-civil-platform-service-export','roads',-1)
+objects=[mesh('terrain','terrain',0),mesh('roads','roads',.2),mesh('paving-civil-platform-service-export','roads',.3)]
 assert all(o.name.endswith('.001') for o in objects)
 bpy.ops.object.select_all(action='DESELECT')
 for obj in objects:obj.select_set(True)
@@ -30,11 +30,11 @@ with tempfile.TemporaryDirectory() as directory:
         p=next(p for p in doc['meshes'][node['mesh']]['primitives'] if doc['materials'][p['material']]['name']==material)
         view=doc['bufferViews'][p['extensions']['KHR_draco_mesh_compression']['bufferView']]
         start=view.get('byteOffset',0);return binary[start:start+view['byteLength']]
-    old_white=payload(before,blob,'roads','white')
+    old_white={n:payload(before,blob,n,'white') for n in ['roads','paving-civil-platform-service-export']}
     replace_precise_terrain(path,objects)
     after,binary=unpack(path.read_bytes())
-    assert set(mesh_nodes_by_name(after))=={'roads','terrain'}
-    assert payload(after,binary,'roads','white')==old_white
+    assert set(mesh_nodes_by_name(after))=={'roads','terrain','paving-civil-platform-service-export'}
+    assert all(payload(after,binary,n,'white')==v for n,v in old_white.items())
     assert payload(after,binary,'roads','road')
     assert all(len(after['meshes'][n['mesh']]['primitives'])==2 for n in mesh_nodes_by_name(after).values())
 print('GROUND_EXPORT_SUFFIX_AND_MATERIAL_FILTER passed',flush=True)
