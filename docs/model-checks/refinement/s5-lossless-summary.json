@@ -1,0 +1,80 @@
+{
+  "checkedAt": "2026-09-30T05:21:15.821638+00:00",
+  "baselineCommit": "6f79647133beb9470617cd6879e31cfc0202b476",
+  "branch": "dev",
+  "scope": "Lossless initial GLB packing and bounded civil construction photo review; no architectural parameter changes.",
+  "passed": true,
+  "pythonTests": 297,
+  "nodeTests": 70,
+  "typecheckPassed": true,
+  "lintPassed": true,
+  "pagesBuildPassed": true,
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4254888,
+      "medianDrawCalls": 565,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 5.845091444605854,
+        "medianDrawCalls": 3.290676416819016
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1195577,
+      "medianDrawCalls": 289,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 13.65394578613901,
+        "medianDrawCalls": 9.885931558935358
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "cpuSnapshots": 27,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "cpuSamplingLimit": "10-second snapshots with 2% CPU inclusion threshold, not proof of complete isolation.",
+  "visualReview": {
+    "reviewedImages": 13,
+    "civilContextImages": 7,
+    "performanceContextImages": 6,
+    "pixelReport": "s5-lossless-pixels.json",
+    "treeViewIsOccludedEntranceContext": true,
+    "mobileIsDesktopViewportSimulation": true
+  },
+  "assetReport": "s5-lossless-assets.json",
+  "photoReport": "s2-civil-construction-photo-followup.json",
+  "initialBytes": 5993304,
+  "headroomBytes": 6696,
+  "savedBytes": 6604,
+  "counts": {
+    "calibratedObjects": 22,
+    "wholeFirstPassAccepted": 1,
+    "partialObjects": 21,
+    "s3RequiredNeighborsWholeAccepted": 0,
+    "newWholeAcceptances": 0
+  },
+  "fingerprints": {
+    "blender/gxu-campus.blend": "3004678f9aa2b04704691236f6c7765973e97c024c5b5807708d565b5af7de63",
+    "public/models/base.glb": "f39ffdff1912e1fcccebe2a75b57ad34b5792a592fe3861bf7ddd373d7fb06bf",
+    "public/models/trees.glb": "28939d19c702b3b196f3ace74525eef1856fc0159c53873e7a93fa1b786c9d59",
+    "public/data/models.json": "e9c21bcc8c21cf45bcc45cfce5aa809ecc2daccdb73dd460846072e91e4789a4",
+    "blender/preserve_glb_geometry.py": "edaa4e956809eaae4bdadcbe7c35fa4c67a95208f5f7337a613144f0758baa9b",
+    "blender/terrain_export.py": "e1bd949af9ce1c97f14391ab6301eefb97f11b15026ebac94733184a72d239ae",
+    "scripts/optimize_initial_models.py": "a6aba1ec9912579906e72a1efcaed5884f48a1e1bb8d7e9e40674a2631248fdf",
+    "out/index.html": "1459e883d375e7e62d2b953434a9b9a26734e5a86213c9d19f4b7ce5eef33bf2"
+  }
+}
