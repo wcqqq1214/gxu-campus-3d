@@ -71,6 +71,22 @@ class FoundationRepairTests(unittest.TestCase):
         self.assertAlmostEqual(height(ground,.5,0),3,places=4)
         self.assertAlmostEqual(height(ground,-1.5,0),0,places=4)
 
+    def test_shared_grading_boundary_retains_each_original_surface(self):
+        # Adjacent retained and graded patches can meet at one XY boundary
+        # with different elevations (a previously graded apron/terrain seam).
+        # A vertical ray on that edge must not lift the retained lower patch.
+        core=square(1,-1,2,1);outer=square(0,-3,3,3)
+        self.record.update(bounds=[0,-3,3,3],coreMasks=[core],
+            corePolygons=[[core+[core[0]]]],gradingPolygons=[[outer+[outer[0]]]],
+            transitionMasks=[square(0,-3,3,-1),square(0,1,3,3),
+                             square(0,-1,1,1),square(2,-1,3,1)])
+        old=mesh(square(-4,-4,0,4),1)
+        old.face([(x,y,3) for x,y in square(0,-4,4,4)],0)
+        ground,_=self.repair(old)
+        for x,y in [(-.01,0),(-.1,1),(-1,-1)]:
+            self.assertAlmostEqual(height(ground,x,y),height(old,x,y),places=4)
+        self.assertAlmostEqual(height(ground,1.5,0),0,places=4)
+
 
 if __name__=='__main__':
     result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(FoundationRepairTests))
