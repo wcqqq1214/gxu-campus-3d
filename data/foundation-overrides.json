@@ -18,6 +18,19 @@
         "evidence": "原映射西侧服务路，地形上方8厘米为数值贴地偏移；三处接缝保持邻接路面，名义3米方角过渡带内接续。轮廓和建筑裁剪不变，纵坡及侧边封口为模型修复参数，并非实测。",
         "exportWith": "civil-platform-service"
       }
+    },
+    {
+      "id": "animal-college-foundation",
+      "buildingId": "relation/11564704",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 6,
+      "groundOffset": 0,
+      "evidence": "模型修复：实际源/基础地形在动物学院闭合侧翼内各101处采样高出采用基准，源最大约0.94米。局部削低地形，保护南入口铺地、道路及邻楼；保留原DEM和楼体标高。范围与坡度为模型估算，不代表实测。",
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      }
     }
   ]
 }

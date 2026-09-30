@@ -54,3 +54,32 @@ def omit_unused_uvs():
     finally:
         if existing is None:
             bpy.context.preferences.addons.remove(addon)
+
+
+@contextmanager
+def omit_zero_area_terrain_faces(obj):
+    """Drop exactly collapsed triangle faces only in the temporary export mesh."""
+    import bpy
+    import bmesh
+    original=obj.data
+    collapsed=[]
+    if obj.get('layer')=='terrain' and not original.shape_keys and not obj.modifiers:
+        for face in original.polygons:
+            if len(face.vertices)!=3:
+                continue
+            a,b,c=[tuple(original.vertices[i].co) for i in face.vertices]
+            u=[b[i]-a[i] for i in range(3)];v=[c[i]-a[i] for i in range(3)]
+            cross=(u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0])
+            if cross==(0,0,0):
+                collapsed.append(face.index)
+    if not collapsed:
+        yield 0
+        return
+    temporary=original.copy();bm=bmesh.new()
+    try:
+        bm.from_mesh(temporary);bm.faces.ensure_lookup_table()
+        bmesh.ops.delete(bm,geom=[bm.faces[i] for i in collapsed],context='FACES_ONLY')
+        bm.to_mesh(temporary);temporary.update();obj.data=temporary
+        yield len(collapsed)
+    finally:
+        obj.data=original;bm.free();bpy.data.meshes.remove(temporary)
