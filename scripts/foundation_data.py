@@ -43,6 +43,10 @@ def prepare_foundations(root=ROOT):
     if len({i['id'] for i in config['foundations']}) != len(config['foundations']):
         raise ValueError('Duplicate foundation repair ID')
     for item in config['foundations']:
+        if 'roadExportConformMargin' in item:
+            margin=item['roadExportConformMargin']
+            if type(margin) not in (int,float) or not math.isfinite(margin) or not 0<margin<=50:
+                raise ValueError('Invalid foundation road export conform margin')
         simplification=item.get('meshSimplification',{})
         if not isinstance(simplification,dict) or set(simplification)-{'normalTolerance','weldDistance'}:
             raise ValueError('Invalid foundation mesh simplification')

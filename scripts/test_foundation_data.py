@@ -70,6 +70,16 @@ class FoundationPreparationTests(unittest.TestCase):
         prepare_foundations(self.root)
         self.assertEqual(load_foundations(self.root)['foundations'][0]['meshSimplification'],settings)
 
+    def test_road_conform_margin_is_bounded_and_fresh(self):
+        self.config['foundations'][0]['roadExportConformMargin']=15
+        (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+        prepare_foundations(self.root)
+        self.assertEqual(load_foundations(self.root)['foundations'][0]['roadExportConformMargin'],15)
+        for value in [0,-1,51,True,float('nan')]:
+            self.config['foundations'][0]['roadExportConformMargin']=value
+            (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+            with self.assertRaisesRegex(ValueError,'conform margin'):prepare_foundations(self.root)
+
     def test_unpartitioned_building_can_limit_repair_without_filling_courtyard(self):
         self.buildings[0]['form']['parts']=[]
         self.buildings[0]['polygons'][0].append([[1,1],[1,3],[3,3],[3,1],[1,1]])
