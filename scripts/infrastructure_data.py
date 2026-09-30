@@ -398,6 +398,8 @@ def prepare_infrastructure():
     prepare_pavings()
     from shore_data import prepare_shores
     prepare_shores()
+    from foundation_data import prepare_foundations
+    prepare_foundations()
     from vegetation_data import prepare_vegetation
     prepare_vegetation()
 
