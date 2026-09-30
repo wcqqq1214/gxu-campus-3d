@@ -1,0 +1,61 @@
+{
+  "baseCommit": "8c4b0ec720b847d66a91bc1617857af21a834ac4",
+  "productionIntegrated": false,
+  "productionModelStillHasIntrusion": true,
+  "wholeBuildingAccepted": false,
+  "scope": "Generator boundary fix and isolated source-model repair candidate; no exported GLB or browser/performance acceptance.",
+  "candidateConfiguration": {
+    "id": "animal-college-foundation",
+    "buildingId": "relation/11564704",
+    "coreMargin": 0.1,
+    "roadTrimMargin": 0.4,
+    "haloMeters": 6,
+    "groundOffset": 0,
+    "evidence": "独立模型修补候选：闭合侧翼内地形采样高出采用标高最高约0.94米。保留原始DEM、楼体标高和南入口接路。参数并非实测。"
+  },
+  "candidateMeasures": {
+    "datum": 3.8999999999999995,
+    "closedArea": 2369.2413014655112,
+    "gradingArea": 4530.305626016997,
+    "trimmedRoadArea": 0.0,
+    "bounds": [
+      221.67296582510642,
+      -293.58097599242143,
+      354.52152870365364,
+      -223.12984592005444
+    ]
+  },
+  "productionBefore": "s3-animal-foundation-before.json",
+  "firstCandidateBoundaryFailure": "s3-animal-foundation-candidate-boundary-failed.json",
+  "candidateAfter": "s3-animal-foundation-candidate.json",
+  "candidateNeighbors": "s3-animal-foundation-candidate-neighbors.json",
+  "regression": {
+    "foundationFixtures": 5,
+    "clearanceFixtures": 5,
+    "newBoundaryFixtureFailsBefore": true,
+    "newBoundaryFixturePassesAfter": true,
+    "boundaryToleranceMeters": 0.0001,
+    "acceptanceTolerancesUnchanged": true
+  },
+  "limitations": [
+    "Only source candidate has been checked after repair; shipping source/base still fail.",
+    "Neighbor perimeter sampling covers agriculture; other surroundings are covered only by the regional grid.",
+    "No actual GLB export, byte-budget, browser rendering or activity performance validation yet."
+  ],
+  "localArtifacts": {
+    "work/refinement-s3-animal-foundation/probe.py": "0df42ac538852fca9c25664165970e9cef192eae86a058f07b1f19237439f9e2",
+    "work/refinement-s3-animal-foundation/check_neighbors.py": "efeb0140cd176975b98ae4bf803f24361b2cab6e344f53efaf979de9f657e0a6",
+    "work/refinement-s3-animal-foundation/probe.blend": "b9456028956cee8b11f132a3f03f14a14f9c2f2485dda6a34e6745635e350af2",
+    "work/refinement-s3-animal-foundation/public/data/foundations.json": "55289c604bedf3c04e293c8faa95e4c8d9a5b5c6655bc531b723d00742da7281",
+    "work/refinement-s3-animal-foundation/boundary-probe.json": "5d9eb7d72ecc85e3da70e8b9c1074320a2bf6ae0d6972e2dc6ff24b81e8b76c1",
+    "work/refinement-s3-animal-foundation/boundary-fixture-before.log": "31f7fdcc3b1169334ef8834827ac2ad4f0da9c09cc0cf1673d4dc16c1cba2f50",
+    "work/refinement-s3-animal-foundation/boundary-fixture-after.log": "cb4db63ee41567337e00d31cd0dc19e94ec651fc81f43eac317cc24a7d4df8e8",
+    "work/refinement-s3-animal-foundation/audit-fixtures.log": "deaf79c319775af34ed4b86e4930d90d42e6731c4919cf7ba0392d786c7719f5"
+  },
+  "productionFingerprints": {
+    "blender/gxu-campus.blend": "ee001b0ba403cb28d5c7cd7f3e4a344f302475d1cc35a6fddd126f862cd1a66e",
+    "public/models/base.glb": "d2390e490f212730394a03e82d8ae9e9d54e21307f7aa447120bd8d88da3c1c2",
+    "public/data/models.json": "115214cc26da8dad8d7e7e6bef4e29127b10fcf6e3686ca885ffd86b8f690d00",
+    "data/foundation-overrides.json": "b6645c5359f930ed688d9c02f0cda139d131eedc811e8d209148fb5d85abb6dc"
+  }
+}

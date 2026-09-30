@@ -1,0 +1,268 @@
+{
+  "buildingId": "way/759185166",
+  "productionReady": false,
+  "method": "Seven-point fit compared with six facade points and one held-out roof corner",
+  "reference": {
+    "path": "work/refinement-s3-agriculture-roof/anniversary-255s.png",
+    "sha256": "ea3fd3311912ba07216b80b9866cacb6d5ce4e2043ebbbdcee0b143b3bfa9b01",
+    "url": "https://nxy.gxu.edu.cn/xyzc/a90znyqxcsp.htm",
+    "frameSeconds": 255,
+    "captureDate": null
+  },
+  "proposalSha256": "9e2fbcf2478776a9e14367e227cde8aeaa52142a265bd18d6c1aac8b8ce84d6b",
+  "assumptions": {
+    "pixelPrincipalPoint": [
+      960,
+      540
+    ],
+    "squarePixels": true,
+    "lensDistortion": "not modelled",
+    "modelOrigin": [
+      300,
+      -326,
+      0
+    ],
+    "parameterOrder": [
+      "focalPixels",
+      "cameraX",
+      "cameraY",
+      "cameraZ",
+      "yaw",
+      "pitch",
+      "roll"
+    ],
+    "lowerBounds": [
+      500.0,
+      -400.0,
+      -500.0,
+      10.0,
+      -0.1,
+      -0.6,
+      -0.08
+    ],
+    "upperBounds": [
+      6000.0,
+      -20.0,
+      -30.0,
+      200.0,
+      1.2,
+      0.1,
+      0.08
+    ],
+    "maximumIterationsPerStart": 200,
+    "initialDistances": [
+      80,
+      150,
+      250,
+      500
+    ],
+    "pointSelection": "Prior manually selected wall corners and level lines; roof correspondence unverified",
+    "heights": "Existing estimated 3.3 m storey spacing, not surveyed heights"
+  },
+  "observations": [
+    {
+      "index": 0,
+      "originalVertex": 12,
+      "modelHeight": 16.5,
+      "pixels": [
+        787,
+        519
+      ],
+      "role": "facade control"
+    },
+    {
+      "index": 1,
+      "originalVertex": 7,
+      "modelHeight": 16.5,
+      "pixels": [
+        1305,
+        438
+      ],
+      "role": "facade control"
+    },
+    {
+      "index": 2,
+      "originalVertex": 12,
+      "modelHeight": 13.2,
+      "pixels": [
+        788,
+        567
+      ],
+      "role": "facade control"
+    },
+    {
+      "index": 3,
+      "originalVertex": 7,
+      "modelHeight": 13.2,
+      "pixels": [
+        1302,
+        469
+      ],
+      "role": "facade control"
+    },
+    {
+      "index": 4,
+      "originalVertex": 12,
+      "modelHeight": 9.9,
+      "pixels": [
+        789,
+        617
+      ],
+      "role": "facade control"
+    },
+    {
+      "index": 5,
+      "originalVertex": 7,
+      "modelHeight": 9.9,
+      "pixels": [
+        1297,
+        503
+      ],
+      "role": "facade control"
+    },
+    {
+      "index": 6,
+      "originalVertex": 17,
+      "modelHeight": 16.5,
+      "pixels": [
+        706,
+        507
+      ],
+      "role": "held-out roof corner"
+    }
+  ],
+  "allPointsFit": {
+    "parameters": [
+      795.2721579220038,
+      -55.35222938833658,
+      -77.19893191072993,
+      24.024049019327578,
+      0.5704200662641581,
+      -0.1678046831650889,
+      -0.02646677873700993
+    ],
+    "predicted": [
+      [
+        785.5290942556388,
+        521.1163653157842
+      ],
+      [
+        1302.6682728916035,
+        447.8713361881401
+      ],
+      [
+        788.5161766366741,
+        568.2355161412022
+      ],
+      [
+        1301.6477031870186,
+        470.229259818953
+      ],
+      [
+        791.4441092429275,
+        614.4216203332429
+      ],
+      [
+        1300.6366259804458,
+        492.37922847650856
+      ],
+      [
+        703.787169305613,
+        505.71945313270896
+      ]
+    ],
+    "errorsPixels": [
+      2.577317570391521,
+      10.142989177127012,
+      1.339006518064558,
+      1.2787465530468445,
+      3.5527048424137644,
+      11.226122940528507,
+      2.5566423217474226
+    ],
+    "fittingPointCount": 7,
+    "fittingRmsePixels": 6.072595284705987,
+    "heldOutRoofErrorPixels": null
+  },
+  "facadeOnlyFit": {
+    "parameters": [
+      2166.1789800323254,
+      -131.67284201203296,
+      -131.76152295562764,
+      34.51254076125605,
+      0.8105210974316136,
+      -0.13338980593408184,
+      0.02729120184368633
+    ],
+    "predicted": [
+      [
+        788.8125656129772,
+        518.5819043205328
+      ],
+      [
+        1302.8981090210777,
+        437.67871448617655
+      ],
+      [
+        787.9926032670741,
+        567.7772088979984
+      ],
+      [
+        1301.3376391781119,
+        470.02592595791214
+      ],
+      [
+        787.1776186114826,
+        616.6738668459075
+      ],
+      [
+        1299.783373588466,
+        502.24452853978613
+      ],
+      [
+        639.9979398811868,
+        500.24643699839254
+      ]
+    ],
+    "errorsPixels": [
+      1.8601607722281994,
+      2.1263043217440822,
+      0.7772440947256652,
+      1.2211658075340273,
+      1.8513337784994643,
+      2.884077956673135,
+      66.34668456783743
+    ],
+    "fittingPointCount": 6,
+    "fittingRmsePixels": 1.9070948630076636,
+    "heldOutRoofErrorPixels": 66.34668456783743
+  },
+  "deterministicPixelSensitivity": [
+    {
+      "eastEndpointAxis": 0,
+      "shiftPixels": -3,
+      "fittingRmsePixels": 1.912076955116802,
+      "heldOutRoofErrorPixels": 66.90948414450702
+    },
+    {
+      "eastEndpointAxis": 0,
+      "shiftPixels": 3,
+      "fittingRmsePixels": 1.9020498813387803,
+      "heldOutRoofErrorPixels": 65.78014730674832
+    },
+    {
+      "eastEndpointAxis": 1,
+      "shiftPixels": -3,
+      "fittingRmsePixels": 1.893760481666693,
+      "heldOutRoofErrorPixels": 66.51157770462247
+    },
+    {
+      "eastEndpointAxis": 1,
+      "shiftPixels": 3,
+      "fittingRmsePixels": 1.9204142004649785,
+      "heldOutRoofErrorPixels": 66.18788246408127
+    }
+  ],
+  "decision": "Do not infer terrace depth or roof heights from this registration. The held-out roof corner disagrees despite a better facade fit.",
+  "limitation": "This does not identify whether the incorrect assumption is the image correspondence, roof geometry, mapped footprint, or camera model."
+}

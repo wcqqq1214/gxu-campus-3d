@@ -1,0 +1,182 @@
+{
+  "buildingId": "relation/11564704",
+  "adoptedDatum": 3.9,
+  "datumMeaning": "Current model elevation, not surveyed ground-floor elevation",
+  "sampling": {
+    "spacingMeters": 2,
+    "perimeterInsetMeters": 0.25,
+    "allowedIntrusionMeters": 0.3,
+    "openPorticosExcluded": true,
+    "scope": "Closed part interiors; road layers include ordinary service roads; near buildings reuse base terrain"
+  },
+  "fingerprints": {
+    "buildings": "1e813a5b29c7cf0a7ec9977d6e9d474a50181cb6a563c15204ba549e6ff2c3aa",
+    "source": "ee001b0ba403cb28d5c7cd7f3e4a344f302475d1cc35a6fddd126f862cd1a66e",
+    "base": "d2390e490f212730394a03e82d8ae9e9d54e21307f7aa447120bd8d88da3c1c2"
+  },
+  "representations": [
+    {
+      "representation": "source",
+      "samples": 782,
+      "parts": [
+        {
+          "part": "entrance-core",
+          "samples": 69,
+          "terrainIntrusionSamples": 0,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.2069946289062501,
+          "worstGroundSamples": [],
+          "worstRoadSamples": []
+        },
+        {
+          "part": "side-wings",
+          "samples": 713,
+          "terrainIntrusionSamples": 101,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.9406829833984376,
+          "worstGroundSamples": [
+            {
+              "part": "side-wings",
+              "xy": [
+                346.4549247,
+                -244.2933515
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.9406829833984376,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "side-wings",
+              "xy": [
+                347.0373245,
+                -243.5115009
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.9207550048828126,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "side-wings",
+              "xy": [
+                346,
+                -244
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.9000335693359376,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "side-wings",
+              "xy": [
+                344.5434005,
+                -244.6755502
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8757415771484376,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "side-wings",
+              "xy": [
+                342.6318763,
+                -245.0577489
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8200927734375001,
+              "roadAboveDatum": null,
+              "roadHit": null
+            }
+          ],
+          "worstRoadSamples": []
+        }
+      ],
+      "passed": false
+    },
+    {
+      "representation": "base",
+      "samples": 782,
+      "parts": [
+        {
+          "part": "entrance-core",
+          "samples": 69,
+          "terrainIntrusionSamples": 0,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.2098480224609376,
+          "worstGroundSamples": [],
+          "worstRoadSamples": []
+        },
+        {
+          "part": "side-wings",
+          "samples": 713,
+          "terrainIntrusionSamples": 101,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.9378601074218751,
+          "worstGroundSamples": [
+            {
+              "part": "side-wings",
+              "xy": [
+                346.4549247,
+                -244.2933515
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.9378601074218751,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "side-wings",
+              "xy": [
+                347.0373245,
+                -243.5115009
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.9179779052734376,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "side-wings",
+              "xy": [
+                346,
+                -244
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.8968292236328126,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "side-wings",
+              "xy": [
+                344.5434005,
+                -244.6755502
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8725219726562501,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "side-wings",
+              "xy": [
+                342.6318763,
+                -245.0577489
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8173309326171876,
+              "roadAboveDatum": null,
+              "roadHit": null
+            }
+          ],
+          "worstRoadSamples": []
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "passed": false
+}

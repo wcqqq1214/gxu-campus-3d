@@ -43,7 +43,7 @@
       "reviewedAt": "2026-09-16T02:13:31.668886+00:00",
       "frontLedgeReport": "docs/AGRICULTURE_FACADE_LEDGES.md",
       "frontLedgeReviewDate": "2026-09-20",
-      "nextAction": "西翼分级独立候选已生成：四层后段、三层前段及8米退台深度均待核实，未替换生产模型。下一步将露台边缘对应到原轮廓并区分露台楼层与支撑层数，再补退台墙面及入口；继续核对动物学院剩余体量及前庭。",
+      "nextAction": "正面六点拟合不能预测独立屋顶角，约66像素偏差；保持西翼候选，等待新的可定位屋顶边缘，不重复求解同一对应组。当前接续动物学院已确认的接地修补。",
       "frontLedgePerformanceStatus": "Retained geometry rechecked with central eave; current full-asset performance accepted on 21f2143",
       "topWindowReport": "docs/AGRICULTURE_TOP_WINDOWS.md",
       "currentPerformanceReport": "docs/model-checks/refinement/s3-agriculture-eave-recheck-summary.json",
@@ -51,7 +51,8 @@
       "centralEaveReport": "docs/AGRICULTURE_CENTRAL_EAVE.md",
       "queueResumedAt": "2026-09-30",
       "westRoofProposalReport": "docs/AGRICULTURE_WEST_ROOF_PROPOSAL.md",
-      "westRoofProposalStatus": "isolated-estimated-candidate-not-production-ready"
+      "westRoofProposalStatus": "isolated-estimated-candidate-not-production-ready",
+      "roofAlignmentReport": "docs/model-checks/refinement/s3-agriculture-roof-alignment-audit.json"
     },
     {
       "id": "way/759170251",
@@ -210,7 +211,9 @@
         "performanceReport": "docs/model-checks/refinement/s3-glazing-timed-browser.json"
       },
       "rooftopReport": "docs/ANIMAL_COLLEGE_ROOFTOP.md",
-      "nextAction": "继续核心侧后立面、后翼层数与范围，以及前庭铺地和植被组织；屋顶小体量已按估算校准，门窗与设备用途继续待核对。"
+      "nextAction": "集成侧翼接地候选；复验实际源/GLB、南入口、邻接与土木既有修补、画面及原性能预算。生产模型尚未修复，不增加整栋通过数。",
+      "foundationReport": "docs/ANIMAL_COLLEGE_FOUNDATION.md",
+      "foundationStatus": "shipping-source-and-base-intrusion-confirmed-isolated-source-repair-passed-export-pending"
     }
   ],
   "completedCount": 0
