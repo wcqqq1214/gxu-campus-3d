@@ -5,14 +5,19 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from site_geometry import inside,ring_distance
+from inspect_foundation_clearance import covers
 PREFIX=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--report-prefix=')),'s3-mathematics-path')
 BASELINE=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--baseline=')),ROOT/'work/refinement-s3-mathematics-path-before')
 TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)
 SITE_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--site-id=')),'mathematics-north-connection')
+FOUNDATION_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--foundation-id=')),None)
 site=next(s for s in json.loads((ROOT/'public/data/sites.json').read_text())['sites'] if s['id']==SITE_ID)
 grounded=next((p for p in json.loads((ROOT/'public/data/pavings.json').read_text())['pavings'] if p['surfaceId']==site.get('surfaceId') and 'groundedService' in p),None)
 front=site.get('type') in ('front-connection','terraced-stair-connection')
 b=next(b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if b['id']==site['buildingId'])
+foundation=next((r for r in json.loads((ROOT/'public/data/foundations.json').read_text())['foundations'] if r['id']==FOUNDATION_ID),None) if FOUNDATION_ID else None
+if FOUNDATION_ID and (foundation is None or foundation['buildingId']!=b['id']):
+    raise ValueError('Connection foundation must exist and belong to the same building')
 angle=site['angle'];cs,sn=math.cos(angle),math.sin(angle);ox,oy=site['origin']
 def world(x,y):return ox+x*cs-y*sn,oy+x*sn+y*cs
 def owner(o):
@@ -44,7 +49,7 @@ def check(label):
     portal_front=max(flush['pierDepth']-.03,.18) if flush else 0
     tolerance=.004 if label=='source' else .025
     ring=site['localPolygon'];xmin=min(p[0] for p in ring);xmax=max(p[0] for p in ring);ymin=min(p[1] for p in ring);ymax=max(p[1] for p in ring)
-    count=0;clearances=[];outside_errors=[];road_ground_errors=[]
+    count=0;clearances=[];outside_errors=[];road_ground_errors=[];foundation_changes=[]
     for ix in range(math.floor((xmin-4)*2),math.ceil((xmax+4)*2)):
         for iy in range(math.floor((ymin-4)*2),math.ceil((ymax+4)*2)):
             x,y=ix/2+.13,iy/2+.17;wx,wy=world(x,y)
@@ -68,6 +73,11 @@ def check(label):
                     expected=min(old,roads(wx,wy)-grounded.get('groundClearance',.12))
                     road_ground_errors.append(abs(new-expected))
                     assert abs(new-expected)<tolerance,('ground beneath repaired road',x,y,new,expected)
+                    continue
+                if foundation and covers((wx,wy),foundation['gradingPolygons']):
+                    target=foundation['datum']+foundation['groundOffset']
+                    assert min(old,target)-tolerance<=new<=old+tolerance,('foundation grade outside its lowering bounds',x,y,old,new,target)
+                    foundation_changes.append(old-new)
                     continue
                 outside_errors.append(abs(old-new));assert abs(old-new)<tolerance,('terrain changed outside connection',x,y,old,new)
     flush='flushEntrance' in site['entry']
@@ -141,6 +151,8 @@ def check(label):
         'approachHeadroomCheckedMeters':2.1,
         'closedPortalEnvelopeDepth':portal_front,'approachObstructionStart':portal_front+.025 if flush else 0,
         'maximumOutsideTerrainError':max(outside_errors),
+        'foundationId':FOUNDATION_ID,'foundationGradingSamples':len(foundation_changes),
+        'foundationLoweringRange':[min(foundation_changes),max(foundation_changes)] if foundation_changes else None,
         'adjacentRepairedRoadGroundSamples':len(road_ground_errors),
         'maximumAdjacentRoadGroundError':max(road_ground_errors,default=0),
         'recessedConnectionGradeRange':[min(grades),max(grades)] if grades else None,
@@ -148,7 +160,7 @@ def check(label):
         'maximumContactRoadPlaneError':max(joins),'maximumRoadJoinStepPer2cm':max_jump,
         'measuredMaterialGapUpperBounds':gap_bounds,'passed':True}
 
-report={'siteId':site['id'],'scope':'Actual source/base path width, stair or flush threshold, mapped road plane/contact, clear ground and unchanged ground outside the connector. Dimensions remain estimates.','passed':False}
+report={'siteId':site['id'],'scope':'Actual source/base path width, stair or flush threshold, mapped road plane/contact, clear ground and unchanged ground outside the connector except an explicitly selected same-building foundation mask, where monotonic lowering bounds are checked. Dimensions remain estimates.','passed':False}
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'));report['source']=check('source')
     bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(TARGET/'public/models/base.glb'));bpy.context.view_layer.update();report['base']=check('base')

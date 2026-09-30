@@ -53,5 +53,22 @@ class FoundationPreparationTests(unittest.TestCase):
         (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
         with self.assertRaisesRegex(ValueError,'stale'):load_foundations(self.root)
 
+    def test_simplification_limits_are_checked_before_preparation(self):
+        for value in [{'weldDistance':.001},{'normalTolerance':.001},
+                      {'weldDistance':float('nan')},{'normalTolerance':True},
+                      {'normalTolerance':0},{'other':.0001},[]]:
+            with self.subTest(value=value):
+                self.config['foundations'][0]['meshSimplification']=value
+                (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+                with self.assertRaisesRegex(ValueError,'simplification'):
+                    prepare_foundations(self.root)
+
+    def test_bounded_simplification_survives_freshness_contract(self):
+        settings={'normalTolerance':1e-4,'weldDistance':1e-4}
+        self.config['foundations'][0]['meshSimplification']=settings
+        (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+        prepare_foundations(self.root)
+        self.assertEqual(load_foundations(self.root)['foundations'][0]['meshSimplification'],settings)
+
 
 if __name__=='__main__':unittest.main()
