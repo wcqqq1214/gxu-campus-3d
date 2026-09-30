@@ -11,7 +11,17 @@ def add_flush_entrance(mesh, entry, z, C):
         mesh.box(x+ny*u+nx*depth,y-nx*u+ny*depth,z+bottom+h/2,w,d,h,C[material],theta)
     for i in range(p['bays']):
         u=-width/2+(i+.5)*bay
-        box(u,.055,floor,bay-pw,.05,top-floor,'glass')
+        if i==p['bays']//2 and p.get('opaqueDoor',False):
+            # Keep the glazed transom and sidelights, with no hidden glass
+            # behind the photo-attributed solid door leaves.
+            dh,dw=p['doorHeight'],p['doorWidth']
+            side=(bay-pw-dw)/2
+            for sign in (-1,1):
+                box(sign*(dw+side)/2,.055,floor,side,.05,dh,'glass')
+            box(0,.055,floor+dh,bay-pw,.05,top-floor-dh,'glass')
+            box(0,.055,floor,dw,.05,dh,'stone')
+        else:
+            box(u,.055,floor,bay-pw,.05,top-floor,'glass')
         box(u,.095,p['splitHeight']-fw/2,bay-pw,.09,fw,'white')
         if i!=p['bays']//2:
             box(u,.095,floor,fw,.09,top-floor,'white')

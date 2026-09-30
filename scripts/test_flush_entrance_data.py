@@ -9,6 +9,25 @@ from shore_data import effective_surfaces
 ROOT=Path(__file__).resolve().parents[1]
 
 class FlushEntranceTests(unittest.TestCase):
+    def test_math_lobby_can_share_edge_with_disjoint_bands_but_not_overlap_them(self):
+        b=next(b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if b['id']=='way/759129516')
+        record=load_catalogue()[b['id']];refs={s['id'] for s in source_catalogue()}
+        result=resolve_building(b,record,refs)
+        entry=next(e for e in result['form']['entrances'] if e['id']=='north-stair-lobby')
+        self.assertTrue(entry['flushEntrance']['opaqueDoor'])
+        for fraction in (.35,.06):
+            bad=copy.deepcopy(record);bad['entrances'][-1]['t']=fraction
+            with self.subTest(fraction=fraction),self.assertRaisesRegex(ValueError,'conflicts with another'):
+                resolve_building(b,bad,refs)
+
+    def test_opaque_door_is_opt_in_and_does_not_accept_truthy_values(self):
+        _,r,_=self.fixture();p=copy.deepcopy(r['entrances'][0]['flushEntrance'])
+        for value in (True,False):
+            validate_flush_entrance({**p,'opaqueDoor':value},16.2,13.2)
+        for value in (1,0,'true',None):
+            with self.subTest(value=value),self.assertRaisesRegex(ValueError,'explicit boolean'):
+                validate_flush_entrance({**p,'opaqueDoor':value},16.2,13.2)
+
     def test_glazed_portal_canopy_rejects_bad_dimensions_and_local_roof_collision(self):
         _,r,_=self.fixture();p=copy.deepcopy(r['entrances'][0]['flushEntrance'])
         p['canopy']={'width':17,'depth':2,'thickness':.6}
