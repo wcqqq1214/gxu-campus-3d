@@ -1,0 +1,745 @@
+{
+  "status": "candidate-rejected-for-production",
+  "buildingId": "way/759129516",
+  "productionReady": false,
+  "wholeBuildingAccepted": false,
+  "source": {
+    "url": "https://www.gx720.net/pano/viewer/?slug=pano-658",
+    "image": {
+      "path": "work/refinement-s2-mathematics-east/math-common-perspective.png",
+      "sha256": "d566924448ecd8f5f938454fb6577f5969225e4b49a84d065026de28f866e91b",
+      "directlyReviewed": true
+    },
+    "evidenceSHA256": "cacbe85f371f7740613167293a4e54c77b3dff6df4f9fd8e256120c3d7ccc5a4"
+  },
+  "baselineCommit": "d53cc0b913dee1c6e94c4a3b1290e92d431e1115",
+  "productionPreservation": {
+    "countsByRoot": {
+      "app": 3,
+      "blender": 192,
+      "components": 7,
+      "data": 29,
+      "lib": 17,
+      "public": 95,
+      "scripts": 155
+    },
+    "allExistingBaselineFilesMatchGitBlob": true,
+    "inventorySHA256": "9cdd9ddf16b481f67a4970e4ab20c566aefac4d19ecae376fa65125a22059071",
+    "newAuditScriptExcludedFromBaseline": true
+  },
+  "auditScriptSHA256": "ced5ed0224c0796f2bc38c1687300764ec102ecd921e4a8ee1491b23688c5d33",
+  "assumptions": {
+    "imageSize": [
+      1600,
+      800
+    ],
+    "principalPoint": [
+      800,
+      400
+    ],
+    "focalPixels": 2616.6820947873125,
+    "horizontalFovDegrees": 34,
+    "origin": [
+      -240.0,
+      -870.0,
+      0.0
+    ],
+    "lowerBounds": [
+      -400.0,
+      60.0,
+      40.0,
+      2.1,
+      -1.1,
+      -0.2,
+      -30.0,
+      10.0
+    ],
+    "upperBounds": [
+      400.0,
+      800.0,
+      400.0,
+      4.3,
+      -0.05,
+      0.2,
+      10.0,
+      22.0
+    ],
+    "parameterOrder": [
+      "cameraX",
+      "cameraY",
+      "cameraZ",
+      "yaw",
+      "pitch",
+      "roll",
+      "splitRelativeX",
+      "eastAbsoluteRoofDatum"
+    ],
+    "heights": "Current assumed west/central 16.5/13.2 m above 2.38 m model datum; not surveyed.",
+    "map": "Current OSM outer vertices rounded to millimetres; eaves identified manually.",
+    "lens": "Common cube reprojection assumed pinhole; stitch/lens errors not calibrated."
+  },
+  "fittingObservations": [
+    {
+      "name": "west-NW",
+      "pixel": [
+        920.0,
+        356.0
+      ]
+    },
+    {
+      "name": "west-SW",
+      "pixel": [
+        942.0,
+        333.0
+      ]
+    },
+    {
+      "name": "split-high-N",
+      "pixel": [
+        754.0,
+        320.0
+      ]
+    },
+    {
+      "name": "split-high-S",
+      "pixel": [
+        780.0,
+        300.0
+      ]
+    },
+    {
+      "name": "split-low-N",
+      "pixel": [
+        754.0,
+        349.0
+      ]
+    },
+    {
+      "name": "middle-NE",
+      "pixel": [
+        504.0,
+        299.0
+      ]
+    },
+    {
+      "name": "middle-SE",
+      "pixel": [
+        530.0,
+        275.0
+      ]
+    },
+    {
+      "name": "east-NE",
+      "pixel": [
+        440.0,
+        253.0
+      ]
+    },
+    {
+      "name": "east-NW",
+      "pixel": [
+        499.0,
+        269.0
+      ]
+    },
+    {
+      "name": "east-SE",
+      "pixel": [
+        469.0,
+        236.0
+      ]
+    },
+    {
+      "name": "east-SW",
+      "pixel": [
+        530.0,
+        254.0
+      ]
+    }
+  ],
+  "independentObservations": {
+    "buildingId": "way/759129515",
+    "names": [
+      "north-west-eave",
+      "north-east-eave"
+    ],
+    "xyz": [
+      [
+        -284.841,
+        -837.171,
+        9.92
+      ],
+      [
+        -197.12,
+        -837.271,
+        6.62
+      ]
+    ],
+    "pixels": [
+      [
+        845.0,
+        491.0
+      ],
+      [
+        328.0,
+        399.0
+      ]
+    ],
+    "note": "Not fitted; mapped corners and existing 9.9/6.6 m eaves plus 0.02 m datum are assumptions."
+  },
+  "observationRevision": {
+    "discardedSplitPixels": [
+      [
+        720,
+        321
+      ],
+      [
+        757,
+        295
+      ],
+      [
+        720,
+        342
+      ]
+    ],
+    "correctedSplitPixels": [
+      [
+        754.0,
+        320.0
+      ],
+      [
+        780.0,
+        300.0
+      ],
+      [
+        754.0,
+        349.0
+      ]
+    ],
+    "discardedCenterPixels": [
+      [
+        870,
+        479
+      ],
+      [
+        318,
+        402
+      ]
+    ],
+    "correctedCenterPixels": [
+      [
+        845.0,
+        491.0
+      ],
+      [
+        328.0,
+        399.0
+      ]
+    ],
+    "reason": "Image overlay exposed a split selected on the low roof and an eave selected on the wall. Re-picked actual visible corners with enlarged pixel grids; first fits are superseded, not retained as accepted evidence."
+  },
+  "cases": {
+    "current": {
+      "parameters": [
+        -242.15284587507895,
+        261.9750483151298,
+        165.832341792097,
+        2.4527394675900527,
+        -0.4372428483794467,
+        -0.09139936547574201,
+        -25.0,
+        15.58
+      ],
+      "splitX": -265.0,
+      "eastRelativeHeight": 13.2,
+      "rmsePixels": 24.272057834452415,
+      "errorsPixels": [
+        41.931178688820125,
+        20.432548085994053,
+        24.3483781511079,
+        37.92019026167521,
+        24.796931029988222,
+        29.189872495544154,
+        17.88167367936749,
+        12.152562678016638,
+        8.59435566697651,
+        14.852114330865748,
+        6.71862066644547
+      ],
+      "predicted": [
+        [
+          878.0980906426547,
+          354.4335586692817
+        ],
+        [
+          922.7908020834586,
+          326.0361119559831
+        ],
+        [
+          776.7648577337837,
+          328.63740533667
+        ],
+        [
+          817.6914134079258,
+          304.15910865384404
+        ],
+        [
+          778.7794559073392,
+          349.9307810925379
+        ],
+        [
+          482.2349689091179,
+          279.54923965704523
+        ],
+        [
+          524.5735933591386,
+          257.961562144862
+        ],
+        [
+          446.0608888567519,
+          263.533299858507
+        ],
+        [
+          492.3155559981254,
+          274.40195869257565
+        ],
+        [
+          478.4565626825435,
+          247.45245486034472
+        ],
+        [
+          524.5735933591386,
+          257.961562144862
+        ]
+      ],
+      "activeBounds": [],
+      "startDistance": 650,
+      "iterations": 58,
+      "starts": [
+        {
+          "startDistance": 250,
+          "rmsePixels": 24.272057834452436,
+          "iterations": 43
+        },
+        {
+          "startDistance": 450,
+          "rmsePixels": 52.718486869534296,
+          "iterations": 250
+        },
+        {
+          "startDistance": 650,
+          "rmsePixels": 24.272057834452415,
+          "iterations": 58
+        }
+      ],
+      "independentCenter": {
+        "predicted": [
+          [
+            758.2178781115142,
+            506.1109649354033
+          ],
+          [
+            301.3059578469624,
+            395.9282545198087
+          ]
+        ],
+        "errorsPixels": [
+          88.0878989461492,
+          26.87019737112523
+        ],
+        "rmsePixels": 65.12098527936374
+      }
+    },
+    "free": {
+      "parameters": [
+        -182.97704334377022,
+        336.9326548557938,
+        196.57045757761563,
+        2.6942949224102013,
+        -0.47136607138882347,
+        -0.027434256557907682,
+        -14.463794392749405,
+        20.46296152115044
+      ],
+      "splitX": -254.4637943927494,
+      "eastRelativeHeight": 18.08296152115044,
+      "rmsePixels": 5.817612212362674,
+      "errorsPixels": [
+        1.8036835449940571,
+        4.58279531151029,
+        5.893699786438924,
+        2.114292421366805,
+        4.385760288417868,
+        7.518063204419808,
+        4.018273655080268,
+        10.311902663026263,
+        4.147324461850142,
+        5.546547309132217,
+        7.913722194902049
+      ],
+      "predicted": [
+        [
+          918.961945306985,
+          357.4750311131606
+        ],
+        [
+          945.2339659051756,
+          329.7529278740129
+        ],
+        [
+          753.5631425360248,
+          325.8774869399123
+        ],
+        [
+          779.5799084501195,
+          302.0721379135492
+        ],
+        [
+          754.2373373001493,
+          344.62066622493546
+        ],
+        [
+          496.60222217019134,
+          297.6605383445419
+        ],
+        [
+          526.0040311769988,
+          275.4227958522906
+        ],
+        [
+          449.7086155574967,
+          256.47535904453923
+        ],
+        [
+          501.3718311738717,
+          265.59783641273515
+        ],
+        [
+          472.75476793013075,
+          240.0823895996467
+        ],
+        [
+          523.9142335734207,
+          248.94129997141505
+        ]
+      ],
+      "activeBounds": [],
+      "startDistance": 250,
+      "iterations": 33,
+      "starts": [
+        {
+          "startDistance": 250,
+          "rmsePixels": 5.817612212362674,
+          "iterations": 33
+        },
+        {
+          "startDistance": 450,
+          "rmsePixels": 35.84616494846505,
+          "iterations": 250
+        },
+        {
+          "startDistance": 650,
+          "rmsePixels": 5.817612212362674,
+          "iterations": 250
+        }
+      ],
+      "independentCenter": {
+        "predicted": [
+          [
+            850.5669820507353,
+            498.96630963717723
+          ],
+          [
+            348.7647110174847,
+            414.4191383681637
+          ]
+        ],
+        "errorsPixels": [
+          9.718712794840267,
+          25.863546772556692
+        ],
+        "rmsePixels": 19.536842503905532
+      }
+    },
+    "equalEndHeights": {
+      "parameters": [
+        -182.14271375903502,
+        335.1487147790973,
+        196.6157057921811,
+        2.6947885803416503,
+        -0.47378328216793997,
+        -0.012879650442099155,
+        -14.561760738660398,
+        18.88
+      ],
+      "splitX": -254.5617607386604,
+      "eastRelativeHeight": 16.5,
+      "rmsePixels": 6.537310786861182,
+      "errorsPixels": [
+        3.038403376809557,
+        3.9963592057197586,
+        4.630398625960372,
+        1.0000517329823002,
+        5.566951091682009,
+        10.817911965950223,
+        6.612711713828554,
+        11.369449907468054,
+        2.4237548537697906,
+        7.723685908806657,
+        5.9930673199048545
+      ],
+      "predicted": [
+        [
+          918.7985447097274,
+          358.7907705505261
+        ],
+        [
+          945.5714173275417,
+          331.20671664991943
+        ],
+        [
+          753.7155639885948,
+          324.6216542050127
+        ],
+        [
+          780.1774954622557,
+          300.9841741865745
+        ],
+        [
+          754.1225015399209,
+          343.434396903309
+        ],
+        [
+          495.56936972808734,
+          292.2212322269192
+        ],
+        [
+          525.4262125870639,
+          270.2241833251817
+        ],
+        [
+          449.76183078961117,
+          258.8284689956647
+        ],
+        [
+          501.4184806403873,
+          268.8401907911152
+        ],
+        [
+          473.10468172132715,
+          242.54269913602187
+        ],
+        [
+          524.2592106825787,
+          252.27947859243406
+        ]
+      ],
+      "activeBounds": [],
+      "startDistance": 650,
+      "iterations": 39,
+      "starts": [
+        {
+          "startDistance": 250,
+          "rmsePixels": 6.537310786861205,
+          "iterations": 29
+        },
+        {
+          "startDistance": 450,
+          "rmsePixels": 39.54470497848134,
+          "iterations": 250
+        },
+        {
+          "startDistance": 650,
+          "rmsePixels": 6.537310786861182,
+          "iterations": 39
+        }
+      ],
+      "independentCenter": {
+        "predicted": [
+          [
+            848.0813694763444,
+            500.2421654187812
+          ],
+          [
+            345.41294193943344,
+            407.5568104087239
+          ]
+        ],
+        "errorsPixels": [
+          9.742302575770395,
+          19.401792477936812
+        ],
+        "rmsePixels": 15.351579899716967
+      }
+    }
+  },
+  "eastCornerSensitivity": [
+    {
+      "axis": 0,
+      "eastCornerShiftPixels": -3,
+      "splitX": -254.57944329869613,
+      "eastRelativeHeight": 18.12933410604109,
+      "fitRmsePixels": 6.3355589514211,
+      "independentCenter": {
+        "predicted": [
+          [
+            851.0718284910731,
+            500.61464012255453
+          ],
+          [
+            346.9595726917907,
+            416.451956820408
+          ]
+        ],
+        "errorsPixels": [
+          11.371385399820145,
+          25.768899734305315
+        ],
+        "rmsePixels": 19.916633744535286
+      }
+    },
+    {
+      "axis": 0,
+      "eastCornerShiftPixels": 3,
+      "splitX": -254.34779458458792,
+      "eastRelativeHeight": 18.041953997314355,
+      "fitRmsePixels": 5.431871919512101,
+      "independentCenter": {
+        "predicted": [
+          [
+            850.0342043207311,
+            497.3581176580742
+          ],
+          [
+            350.5695264396904,
+            412.44788301040495
+          ]
+        ],
+        "errorsPixels": [
+          8.109801063946174,
+          26.27221119687913
+        ],
+        "rmsePixels": 19.442195792530786
+      }
+    },
+    {
+      "axis": 1,
+      "eastCornerShiftPixels": -3,
+      "splitX": -254.45931748681357,
+      "eastRelativeHeight": 18.635130095125216,
+      "fitRmsePixels": 5.775395612568058,
+      "independentCenter": {
+        "predicted": [
+          [
+            850.3049261564429,
+            499.36993045452664
+          ],
+          [
+            348.90144535134635,
+            414.78860526249287
+          ]
+        ],
+        "errorsPixels": [
+          9.909489257218276,
+          26.194474110203767
+        ],
+        "rmsePixels": 19.80338924589753
+      }
+    },
+    {
+      "axis": 1,
+      "eastCornerShiftPixels": 3,
+      "splitX": -254.46728172769159,
+      "eastRelativeHeight": 17.53003205037139,
+      "fitRmsePixels": 5.8600026186193555,
+      "independentCenter": {
+        "predicted": [
+          [
+            850.8477702972776,
+            498.52126022853946
+          ],
+          [
+            348.64309797443985,
+            414.00501171724966
+          ]
+        ],
+        "errorsPixels": [
+          9.527107266905942,
+          25.52034229035971
+        ],
+        "rmsePixels": 19.262056529512293
+      }
+    }
+  ],
+  "independentEaveHeightSensitivity": [
+    {
+      "centerEaveHeightShiftM": -3.3,
+      "predicted": [
+        [
+          848.1509073320923,
+          519.955751040526
+        ],
+        [
+          347.2898149436944,
+          425.93688318411637
+        ]
+      ],
+      "errorsPixels": [
+        29.126684248921244,
+        33.13144482567441
+      ],
+      "horizontalErrorsPixels": [
+        3.150907332092288,
+        19.28981494369441
+      ]
+    },
+    {
+      "centerEaveHeightShiftM": 0,
+      "predicted": [
+        [
+          848.0813694763444,
+          500.2421654187812
+        ],
+        [
+          345.41294193943344,
+          407.5568104087239
+        ]
+      ],
+      "errorsPixels": [
+        9.742302575770395,
+        19.401792477936812
+      ],
+      "horizontalErrorsPixels": [
+        3.0813694763444346,
+        17.412941939433438
+      ]
+    },
+    {
+      "centerEaveHeightShiftM": 3.3,
+      "predicted": [
+        [
+          848.011279229057,
+          480.3719799451288
+        ],
+        [
+          343.5224300808018,
+          389.0431733829343
+        ]
+      ],
+      "errorsPixels": [
+        11.04638460683376,
+        18.441372831101525
+      ],
+      "horizontalErrorsPixels": [
+        3.0112792290569814,
+        15.522430080801826
+      ]
+    }
+  ],
+  "syntheticRecovery": {
+    "rmsePixels": 1.3910767260596005e-11,
+    "maxParameterError": 1.517719283583574e-10,
+    "realImageValidation": false
+  },
+  "decision": "Do not adopt the fitted numeric split or height. A better target fit still leaves independent neighbouring eaves inconsistent under the declared assumptions; this does not isolate whether map geometry, heights, correspondence or camera/stitch assumptions are wrong. Keep the raised east end as a qualitative candidate; close this correspondence set and move to another building until stronger control points arrive."
+}
