@@ -2,6 +2,8 @@
 from contextlib import contextmanager
 import sys
 
+_deduplicate_vertices = False
+
 
 def needs_texcoords(material):
     # Unknown extensions may sample a UV set. Keep those streams conservatively.
@@ -32,17 +34,21 @@ class glTF2ExportUserExtension:
     def gather_mesh_hook(self, mesh, blender_data, blender_object,
                          vertex_groups, modifiers, materials, export_settings):
         for primitive in mesh.primitives:
-            if needs_texcoords(primitive.material):
-                continue
-            # Accessor caches may be shared; leave the original mapping untouched.
-            primitive.attributes = {name: value for name, value in primitive.attributes.items()
-                                    if not name.startswith('TEXCOORD_')}
+            if not needs_texcoords(primitive.material):
+                # Accessor caches may be shared; leave the original mapping untouched.
+                primitive.attributes = {name: value for name, value in primitive.attributes.items()
+                                        if not name.startswith('TEXCOORD_')}
+            if _deduplicate_vertices:
+                from vertex_dedup import deduplicate_primitive_vertices
+                deduplicate_primitive_vertices(primitive)
 
 
 @contextmanager
-def omit_unused_uvs():
+def omit_unused_uvs(*, deduplicate_vertices=False):
     """Register the supported exporter hook only for this process and scope."""
     import bpy
+    global _deduplicate_vertices
+    previous_deduplication = _deduplicate_vertices
     name = __name__
     assert sys.modules[name].glTF2ExportUserExtension is glTF2ExportUserExtension
     existing = bpy.context.preferences.addons.get(name)
@@ -50,8 +56,10 @@ def omit_unused_uvs():
         addon = bpy.context.preferences.addons.new()
         addon.module = name
     try:
+        _deduplicate_vertices = deduplicate_vertices
         yield
     finally:
+        _deduplicate_vertices = previous_deduplication
         if existing is None:
             bpy.context.preferences.addons.remove(addon)
 

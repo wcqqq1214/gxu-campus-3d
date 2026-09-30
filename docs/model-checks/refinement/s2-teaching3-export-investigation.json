@@ -1,0 +1,261 @@
+{
+  "baselineCommit": "326e3ee471cf3769e70a86c4472adba15b8e2f6c",
+  "productionModelsChanged": false,
+  "productionReady": false,
+  "wholeBuildingAccepted": false,
+  "implemented": [
+    "Exact complete-attribute deduplication before Draco, enabled for precise terrain export",
+    "Actual decoded node face multiset comparison"
+  ],
+  "reports": {
+    "s2-teaching3-triangle-quantization.json": "ab9278d09f2ca8ada1c47c675cb0b6babde731771a5a7153db745fa243a529ce",
+    "s2-teaching3-local-precision-neighbors.json": "ba14cc84033edc206d1dc127a14dd3c35b76fcd01fac103548ba8ff9a622ccbd",
+    "s2-teaching3-local-precision-preservation.json": "2cca4335fe5b5815279f86961946641b394d2ec8f6115b1a8b5ab654bb8960d2",
+    "s2-teaching3-local-precision-seams-rejected.json": "c382f52f3a0f25a3606a2accb8277518847f68788b2bb283dcd8d5ec55c56aa3",
+    "s2-teaching3-global20-neighbors-rejected.json": "0118af20aac7105ed8ffeee111a7ec2136f398b18b11a991078e5d8152cc6420",
+    "s2-teaching3-road-boundary-coverage.json": "1abb2b8f9ec605fb6301e500c6ecb3dada085f4e3fd1e8251d44eb21aedd93c0",
+    "s2-teaching3-terrain-dedup-equivalence.json": "c8acac5f825df6f87df8b0ca8708a7c343e0412b99e1692a1350884500595596",
+    "s2-teaching3-terrain-weld-rejected.json": "fbf6f87eff21b310f8a39583d24f71fb70ce4f372a9c197d10ac44fe58038d3b",
+    "s2-teaching3-road-dedup-equivalence.json": "9cc3cf9c34944f205879ccf262c9e7ee4cb7162e4baeb62188620767244c166a"
+  },
+  "trials": {
+    "roadCompression": [
+      {
+        "compressionLevel": 5,
+        "positionBits": 16,
+        "uvBits": 11,
+        "firstLoadBytes": 6037292,
+        "baseSHA256": "0064eba4c4808309c170eefc884931d2145cc51fdb38e9dc86b7bb6d2d51541c",
+        "basePath": "work/refinement-s2-teaching3-review/candidate-16-level5.glb"
+      },
+      {
+        "compressionLevel": 7,
+        "positionBits": 16,
+        "uvBits": 11,
+        "firstLoadBytes": 6071888,
+        "baseSHA256": "968f7199389658f5d8289f688de6f629298232637e2ea9d1f7bd4caf2333bdf9",
+        "basePath": "work/refinement-s2-teaching3-review/candidate-16-level7.glb"
+      },
+      {
+        "compressionLevel": 8,
+        "positionBits": 16,
+        "uvBits": 11,
+        "firstLoadBytes": 6072088,
+        "baseSHA256": "7d6aede15805c2bb51a7960d1519f5397864ce16d132f3963575ff2b25fae136",
+        "basePath": "work/refinement-s2-teaching3-review/candidate-16-level8.glb"
+      },
+      {
+        "compressionLevel": 9,
+        "positionBits": 16,
+        "uvBits": 11,
+        "firstLoadBytes": 6072096,
+        "baseSHA256": "953100115c7b46fb33304c3b6d36a4dd1ea814163e67225fcffb2373efc3620e",
+        "basePath": "work/refinement-s2-teaching3-review/candidate-16-level9.glb"
+      }
+    ],
+    "terrainCompression": [
+      {
+        "level": 5,
+        "bytes": 1347564,
+        "sha256": "7f2d3eab33d31cf8f4b664f01d012b6870f65d5ca34db90f7ac5ff9d6ca911bb"
+      },
+      {
+        "level": 7,
+        "bytes": 1438096,
+        "sha256": "e47a2b964c67ec8d3f73f3ef2c0e937ca0a18be3f0c3f5e10249c67315589830"
+      },
+      {
+        "level": 8,
+        "bytes": 1438248,
+        "sha256": "0aa43ed319f6dfcd468ee7d8fcbff925655d39c33c422caddb31fa952ae0c0a5"
+      },
+      {
+        "level": 9,
+        "bytes": 1438272,
+        "sha256": "ddf34adf8952503471d20b58eee007cd8d09df03b8d51e60ccb3058b5254815c"
+      },
+      {
+        "level": 10,
+        "bytes": 1438272,
+        "sha256": "564b0bd31fc46a99b6c37863171d9a1dd881363c2ead077d5308547bd3345fd0"
+      }
+    ],
+    "heightScale": [
+      {
+        "factor": 2,
+        "positionBits": 15,
+        "uvBits": 11,
+        "firstLoadBytes": 6003604,
+        "baseSHA256": "1f4ab2a3081b2f5df22a557293b6bba67fdf35d93b4dbc499a928fefa6c96a5c",
+        "basePath": "work/refinement-s2-teaching3-review/candidate-height-scale2.glb"
+      },
+      {
+        "factor": 4,
+        "positionBits": 15,
+        "uvBits": 11,
+        "firstLoadBytes": 6022548,
+        "baseSHA256": "8dc88a5789f757c420e4864e045d07e8abed36ae7eaa19b363c9e441dfe680dc",
+        "basePath": "work/refinement-s2-teaching3-review/candidate-height-scale4.glb"
+      },
+      {
+        "factor": 8,
+        "positionBits": 15,
+        "uvBits": 11,
+        "firstLoadBytes": 6040700,
+        "baseSHA256": "2e2f96e9eea440b895463ec351f687b4b8238bb7a96f63de99b3811338d14125",
+        "basePath": "work/refinement-s2-teaching3-review/candidate-height-scale8.glb"
+      }
+    ],
+    "localSelective": {
+      "record": {
+        "id": "teaching3-road-precision",
+        "groundedService": true,
+        "bounds": [
+          -150.50927358196205,
+          -731.7461685476769,
+          -11.491051116172954,
+          -659.9335969961024
+        ]
+      },
+      "stats": {
+        "roads": {
+          "faces": 89331,
+          "originalUVFaces": 89028,
+          "maximumCutFaceDistance": 0.0011429083533585072
+        },
+        "paving-teaching3-road-precision-export": {
+          "faces": 786,
+          "originalUVFaces": 525,
+          "maximumCutFaceDistance": 0.03999168053269386
+        }
+      },
+      "firstLoadBytes": 6011228,
+      "baseSHA256": "797281ef3aa0da05b913705f8c8b9957c91999ae63bffab3cb40b1a900733ff2"
+    },
+    "localWithDedup": {
+      "implementation": "blender/vertex_dedup.py",
+      "firstLoadBytes": 5701716,
+      "baseSHA256": "7174787900ae38bb6f584c68c493098309430ccf551ae4db94b8e01eff6d51ab"
+    },
+    "global18": {
+      "positionBits": 18,
+      "roadUVBits": 10,
+      "otherUVBits": 12,
+      "firstLoadBytes": 5910528,
+      "baseSHA256": "b6b90053be8249c8ac81e531d02e873ca8e264f2b73ad9f9770eb82fc9285b2d"
+    },
+    "global19": {
+      "positionBits": 19,
+      "roadUVBits": 10,
+      "otherUVBits": 12,
+      "firstLoadBytes": 6178280,
+      "baseSHA256": "8aa6c4422f735dc7a6b5d6a3e3860db919644aa7c1487b3088f547e06a817b52"
+    },
+    "global19Dedup": {
+      "positionBits": 19,
+      "roadUVBits": 10,
+      "otherUVBits": 12,
+      "firstLoadBytes": 6099732,
+      "baseSHA256": "41325f81889ea35db77299da6ef01147c70c900c43010e93ad3c79d0406142a1"
+    },
+    "selective19": {
+      "changedRoadMaterials": [
+        "asphalt",
+        "curb",
+        "roadYellow"
+      ],
+      "positionBits": 19,
+      "uvBits": 12,
+      "firstLoadBytes": 5924312,
+      "baseSHA256": "bedc153ffc2aaa08911ceaf3bbdc116cc097af65d1e9486be9e53321a14b16ab"
+    },
+    "selective20": {
+      "changedRoadMaterials": [
+        "asphalt",
+        "curb",
+        "roadYellow"
+      ],
+      "positionBits": 20,
+      "uvBits": 12,
+      "firstLoadBytes": 5969204,
+      "baseSHA256": "2ff205e1bb44aa438f8fd11f9d7d7054f14ba8c592d52a7cf1ad32f3c8f26ed5"
+    }
+  },
+  "tests": {
+    "python": 299,
+    "vertexDedupRegression": 7,
+    "existingBlenderFixtures": [
+      "test_export_attributes.py",
+      "test_ground_export.py"
+    ],
+    "nodeEquivalence": [
+      "terrain, all 117906 faces and all attributes identical",
+      "roads at 19 bits, all 89811 faces and all attributes identical"
+    ],
+    "newScriptLint": true,
+    "newBrowserOrPerformanceResults": false
+  },
+  "productionPreservation": {
+    "files": 125,
+    "models": 69,
+    "allMatchBaselineGitBlob": true
+  },
+  "localReproductionScripts": [
+    {
+      "path": "work/refinement-s2-teaching3-review/probe_triangles.py",
+      "sha256": "4d5e5cf889c05f6940b95e45d1ac278118044d8d6f761beb0fe131c115e109f5"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/trial_local_selective.py",
+      "sha256": "9d3751685da60e26533b2b28fa7087df2dfb0f3424824b59c839d20357cee1d0"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/check_neighbors_local_selective.py",
+      "sha256": "1e09f84ca5363c50633736efd5c601bbd401b72d144277934cdc848927ba5ec0"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/check_export_selective.py",
+      "sha256": "109c185d44cab7bbcb629420f539eb103c1a4219ddd8213bd5c38248aacc56a4"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/check_local_seams.py",
+      "sha256": "cb1e75a2485e39f08a2feb28949e4253bccff02d2db8270f80bba21def9d8270"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/trial_global_19_dedup.py",
+      "sha256": "7de6669780a93daa858dccf817274abadf562ad8243bca259136a24a8b53aa0e"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/trial_global_20_dedup.py",
+      "sha256": "802f964a5e68e863fd4e8e2e65f575e0caca26f351b8f816ba4e29b59204b29c"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/check_neighbors_global20_selective.py",
+      "sha256": "1a2e9bb783c802280f356445f666fc4ed05168730414442a9ae899821d3f9920"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/probe_coverage.py",
+      "sha256": "9cb955596d3cfbc7d56674eec857ef23fd10f88d728b6c26094fdca486338c10"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/trial_attribute_dedup.py",
+      "sha256": "66f80a583ae9d2269bc2e1befb99464e5475f11c21f8e446bfe4fd914e3bec85"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/trial_global_precision.py",
+      "sha256": "d76bd7dcbec5d8f3c6d66076a5aa8c03f04b27960908342cdc9d12ed44db18d7"
+    }
+  ],
+  "next": "Resolve road material boundary alignment using the new missing-ray witnesses and unchanged tolerances. Neither the local precision seam nor the 20-bit selective export is accepted. Then integrate configuration/source/models and complete road regression, browser and performance checks. Civil hall then structural building remains the next user priority.",
+  "implementedFiles": {
+    "blender/export_attributes.py": "beeefe06a7dc661a4d143ea8ba75b525356737a9ca03436b710748127b3d7ce0",
+    "blender/vertex_dedup.py": "a7d6993c9656e36a58ec6bde4be69d3fbde5b2f58de61c8f1c256f50f11ca71c",
+    "blender/terrain_export.py": "ea597064d81f9ee8c8cbea9396f15803e2b82faad71146efef1abe43caee83c2",
+    "blender/test_vertex_dedup.py": "469dcab67600536cc392c42342867cd84205d0ca3e754deeb7e5ddfa2d03c4bb",
+    "scripts/check-glb-node-equivalence.mjs": "7b24506438208daee97084140091c6fa13adfdb22e80c26620d0dd0e7a3b80b4"
+  },
+  "candidateSource": {
+    "path": "work/refinement-s2-teaching3-review/candidate.blend",
+    "sha256": "c427ceffb07d114d0362aad89d14cd0d12d4ed4bf7493f809722fa881604cf9e"
+  }
+}

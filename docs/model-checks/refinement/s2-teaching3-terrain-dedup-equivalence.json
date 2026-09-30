@@ -1,0 +1,31 @@
+{
+  "node": "terrain",
+  "passed": true,
+  "before": {
+    "file": "work/refinement-s2-teaching3-review/terrain-18.glb",
+    "fileSHA256": "0a44db8be35dc57a96d4a3ed6eb80a15c00afc7dcace5e57900fd43ed17cb702",
+    "bytes": 1312488,
+    "vertices": 313852,
+    "materials": [
+      "grass"
+    ],
+    "triangles": 117906,
+    "zeroAreaTriangles": 7547,
+    "allFacesSHA256": "5aceb25db7275902965aeb4dc3af96481b3c78fecacddc1b9c46e61ffd503c22",
+    "validFacesSHA256": "927a2b9b1111817f5af1d34d818b1b96794c5a2b360744c2ddd4a15fa09e03c3"
+  },
+  "after": {
+    "file": "work/refinement-s2-teaching3-review/terrain-attribute-dedup.glb",
+    "fileSHA256": "ee04d1728b6ce74c8e92dd470a805d8f3f5daaa8ae132c701a951dbce9a13247",
+    "bytes": 1002976,
+    "vertices": 246135,
+    "materials": [
+      "grass"
+    ],
+    "triangles": 117906,
+    "zeroAreaTriangles": 7547,
+    "allFacesSHA256": "5aceb25db7275902965aeb4dc3af96481b3c78fecacddc1b9c46e61ffd503c22",
+    "validFacesSHA256": "927a2b9b1111817f5af1d34d818b1b96794c5a2b360744c2ddd4a15fa09e03c3"
+  },
+  "scope": "Exact multiset of oriented Draco-decoded selected-node faces, including zero-area faces, material names and every Float32 vertex attribute; signed zero normalized. Texture payloads and material parameters are outside this check."
+}
