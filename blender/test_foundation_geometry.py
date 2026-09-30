@@ -7,7 +7,7 @@ from mathutils.bvhtree import BVHTree
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from geometry import Mesh
 from site_geometry import mesh_triangles
-from foundation_geometry import build_foundations
+from foundation_geometry import build_foundations,clipped_mesh,masks_for
 
 
 def square(x0,y0,x1,y1):
@@ -58,6 +58,13 @@ class FoundationRepairTests(unittest.TestCase):
         ground,_=self.repair(old)
         self.assertAlmostEqual(height(ground,0,0),-2)
 
+    def test_mask_miss_keeps_road_quad_and_material(self):
+        old=mesh(square(0,0,1,1),2)
+        old.m=[3]
+        result,report=clipped_mesh(old,masks_for([square(2,2,3,3)]),[-1,-1,4,4])
+        self.assertEqual((result.v,result.f,result.m),(old.v,old.f,old.m))
+        self.assertEqual(report['affectedTriangles'],0)
+
     def test_protected_hole_preserves_ground_and_road_support(self):
         # A road-sized interior hole keeps its original ground support.
         core=square(-2,-.5,-1,.5);hole=square(0,-1,1,1)
@@ -88,6 +95,14 @@ class FoundationRepairTests(unittest.TestCase):
         self.assertAlmostEqual(height(ground,1.5,0),0,places=4)
 
 
+class WeldedFoundationRepairTests(FoundationRepairTests):
+    def setUp(self):
+        super().setUp()
+        self.record['meshSimplification']={'normalTolerance':1e-4,'weldDistance':1e-4}
+
+
 if __name__=='__main__':
-    result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromTestCase(FoundationRepairTests))
+    suite=unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromTestCase(c)
+                             for c in [FoundationRepairTests,WeldedFoundationRepairTests])
+    result=unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful():raise AssertionError('Foundation repair tests failed')

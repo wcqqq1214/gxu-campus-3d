@@ -1,0 +1,72 @@
+{
+  "siteId": "animal-south-front-connection",
+  "scope": "Actual source/base path width, stair or flush threshold, mapped road plane/contact, clear ground and unchanged ground outside the connector except an explicitly selected same-building foundation mask, where monotonic lowering bounds are checked. Dimensions remain estimates.",
+  "passed": true,
+  "source": {
+    "pavingSamples": 1344,
+    "minimumGroundClearance": 0.119964599609375,
+    "outsideTerrainSamples": 1141,
+    "approachHeadroomCheckedMeters": 2.1,
+    "closedPortalEnvelopeDepth": 0,
+    "approachObstructionStart": 0,
+    "maximumOutsideTerrainError": 2.288818359375e-05,
+    "foundationId": "animal-college-foundation",
+    "foundationGradingSamples": 322,
+    "foundationLoweringRange": [
+      -1.52587890625e-05,
+      0.35382080078125
+    ],
+    "adjacentRepairedRoadGroundSamples": 0,
+    "maximumAdjacentRoadGroundError": 0,
+    "recessedConnectionGradeRange": [
+      0.08753400932811801,
+      0.12442046745390244
+    ],
+    "stairRiseRange": [
+      0.1468353271484375,
+      0.147857666015625
+    ],
+    "maximumContactRoadPlaneError": 0.0,
+    "maximumRoadJoinStepPer2cm": 0.00251007080078125,
+    "measuredMaterialGapUpperBounds": [
+      0.0001,
+      0.0001
+    ],
+    "passed": true
+  },
+  "base": {
+    "pavingSamples": 1344,
+    "minimumGroundClearance": 0.11362457275390625,
+    "outsideTerrainSamples": 1141,
+    "approachHeadroomCheckedMeters": 2.1,
+    "closedPortalEnvelopeDepth": 0,
+    "approachObstructionStart": 0,
+    "maximumOutsideTerrainError": 0.006195068359375,
+    "foundationId": "animal-college-foundation",
+    "foundationGradingSamples": 322,
+    "foundationLoweringRange": [
+      -0.005615234375,
+      0.358856201171875
+    ],
+    "adjacentRepairedRoadGroundSamples": 0,
+    "maximumAdjacentRoadGroundError": 0,
+    "recessedConnectionGradeRange": [
+      0.08753017432223288,
+      0.12442239990384464
+    ],
+    "stairRiseRange": [
+      0.14337921142578125,
+      0.1444091796875
+    ],
+    "maximumContactRoadPlaneError": 0.00014495849609375,
+    "maximumRoadJoinStepPer2cm": 0.00604248046875,
+    "measuredMaterialGapUpperBounds": [],
+    "passed": true
+  },
+  "fingerprints": {
+    "blender/gxu-campus.blend": "0fb731123dce777ba1785847ad3ca12b0d30c6ee958b5401ea59a15de40c7d6a",
+    "public/models/base.glb": "0101e42691f2a326e9ebb5a6e10512f9c850790a73896d3523ef5f2f4e37a177",
+    "public/data/models.json": "bdac573341fda69a03559c141b35d5a515020adc29f5037e9a4d9c3695fa183d",
+    "public/data/sites.json": "3e8039dfcc526ac7df54383d708298d68201e46f9bb65793a3165851c636046d"
+  }
+}

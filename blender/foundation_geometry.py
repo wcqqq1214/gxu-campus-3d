@@ -49,6 +49,9 @@ def clipped_mesh(mesh, masks, area, transform=None, ceiling=None):
                 maximum = max(maximum,max(p[2]-q[2] for p,q in zip(piece,graded)))
                 triangles_into(result,graded,mesh.m[face])
         affected += bool(pieces)
+    if not affected:
+        # Bounding-box overlap alone must not retriangulate a retained road.
+        return mesh, {'affectedTriangles':0,'maximumLoweringMeters':0}
     touched = bounds([mesh.v[k] for i in selected for k in mesh.f[i]])
     result = conform_edges(result,tuple(v+(-1 if i<2 else 1) for i,v in enumerate(touched)))
     return result, {'affectedTriangles':affected,'maximumLoweringMeters':maximum}
@@ -129,7 +132,10 @@ def build_foundations(data,terrain,roads):
                     continue
                 if min(polygon_distance((x,y),poly) for poly in record['gradingPolygons'])<1e-5:
                     terrain.v[i]=shared_point(x,y)
-        terrain = simplify_local_planes(terrain,record)
+        simplification=record.get('meshSimplification',{})
+        terrain = simplify_local_planes(terrain,record,
+            normal_tolerance=simplification.get('normalTolerance',1e-6),
+            weld_distance=simplification.get('weldDistance',0))
         roads,road_report = clipped_mesh(roads,masks_for(record['roadTrimMasks']),record['roadTrimBounds'])
         after = sum(len(f)-2 for f in terrain.f)+sum(len(f)-2 for f in roads.f)
         reports.append({'id':record['id'],'terrain':ground_report,'roads':road_report,

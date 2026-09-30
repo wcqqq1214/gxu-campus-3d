@@ -43,6 +43,13 @@ def prepare_foundations(root=ROOT):
     if len({i['id'] for i in config['foundations']}) != len(config['foundations']):
         raise ValueError('Duplicate foundation repair ID')
     for item in config['foundations']:
+        simplification=item.get('meshSimplification',{})
+        if not isinstance(simplification,dict) or set(simplification)-{'normalTolerance','weldDistance'}:
+            raise ValueError('Invalid foundation mesh simplification')
+        for key,default,minimum in [('normalTolerance',1e-6,1e-8),('weldDistance',0,0)]:
+            value=simplification.get(key,default)
+            if type(value) not in (int,float) or not math.isfinite(value) or not minimum<=value<=1e-4:
+                raise ValueError('Invalid foundation mesh simplification tolerance')
         for key in ('coreMargin','roadTrimMargin','haloMeters','groundOffset'):
             if type(item[key]) not in (int,float) or not math.isfinite(item[key]):
                 raise ValueError('Invalid foundation dimension')

@@ -1,0 +1,118 @@
+{
+  "checkedAt": "2026-09-30T03:07:43.640386+00:00",
+  "passed": true,
+  "productionIntegrated": true,
+  "scope": "Bounded animal-college ground repair, local simplification and export-only exact zero-area face removal.",
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "s3RequiredNeighborsWholeAccepted": 0,
+  "pythonTests": 289,
+  "nodeTests": 70,
+  "typecheckPassed": true,
+  "lintPassed": true,
+  "pagesBuildPassed": true,
+  "blenderFoundationFixtures": 12,
+  "blenderExportPruningFixtures": 3,
+  "blenderSuffixedExportFixturePassed": true,
+  "pavingTestsRerun": 7,
+  "checks": [
+    "after",
+    "neighbors",
+    "front-geometry",
+    "entry-portico",
+    "rooftop-geometry",
+    "civil",
+    "civil-road",
+    "civil-entry-geometry",
+    "source-preservation",
+    "assets",
+    "export-pruning",
+    "site-trees-geometry",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4255944,
+      "medianDrawCalls": 564,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 5.871360624092015,
+        "medianDrawCalls": 3.1078610603290757
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1202075,
+      "medianDrawCalls": 301,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 14.27165868938014,
+        "medianDrawCalls": 14.448669201520904
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of complete isolation.",
+  "initialModelBytes": 5998892,
+  "initialByteHeadroom": 1108,
+  "maximumOrdinaryNearBytes": 1684868,
+  "exportOnlyRemovedSourceZeroAreaTriangles": 374,
+  "geometryReuse": "Only source terrain/roads and base terrain/local civil-service-road nodes changed. Other 533 non-tree objects, 3062 tree instances, 95 base nodes and 68 GLBs are preserved. Full site/tree collision audit and animal/civil local regressions passed.",
+  "limitations": [
+    "Local sampled repair does not establish surveyed terrain, access slopes or whole-building acceptance.",
+    "Encoded ordinary roads are unchanged; existing source/export height deviation up to 0.0750122m and 50 missing ray samples remain recorded.",
+    "First two close camera sets are occluded; final foot camera is the repair proof.",
+    "Civil hall transport opening, north-office rear facades, west foyer roof and independent old-hall identity remain pending."
+  ],
+  "fingerprints": {
+    "lib/campus/scene.ts": "ded9d1047f17eb6698de3eb96d10a9f365a3229e95ba31ac8b37c1fca856142e",
+    "out/index.html": "12c0f46f91f6521dff572b983d77764a464fdb967ac7eccb595f2193e64affac",
+    "data/foundation-overrides.json": "5a848de4cfdf3f5084a061d4b0e789309e7655a3d800d32916f961dc8148f07b",
+    "scripts/foundation_data.py": "36395d457ea4d0c070a2822a930f9611b241f6d5f8c97b097070e321e5d965b2",
+    "scripts/paving_data.py": "9e302d3639b5094050be76a8272e8a91e6b9da554683adfb45a349a80e20aef2",
+    "blender/export_attributes.py": "91bbeedc18dee6136b53df88fed10d7e835a385df63360dcace0cca9a50dd349",
+    "blender/foundation_geometry.py": "6af35a23bb52385e390103887a1c9be7e36a11fd26d637829a69a11033dbe1c2",
+    "blender/terrain_export.py": "89b8172700024896ea5d503df3bf7bdb3ca1c4cfbaaf7c6154e651685c74fe27",
+    "blender/validate_foundation_neighbors.py": "90047a0a8d2a69697e01c48bc803125e04dd9f122480dea5dd513732513edb19",
+    "blender/validate_side_connection.py": "883cc9df5958c4492ac4cc55d194efecc9a86dbecab49bf77ee66b349c9feaba",
+    "blender/gxu-campus.blend": "0fb731123dce777ba1785847ad3ca12b0d30c6ee958b5401ea59a15de40c7d6a",
+    "public/data/foundations.json": "083827df6b0539b8ac3c135e7f43fb1a70bd4630bb65dd0c70e88ba9cdee104f",
+    "public/data/buildings.json": "1e813a5b29c7cf0a7ec9977d6e9d474a50181cb6a563c15204ba549e6ff2c3aa",
+    "public/data/terrain.json": "6ea0100e963f3e26c176273fea174ffe3e4ac60d2e131955119be53fd005aa52",
+    "public/data/models.json": "bdac573341fda69a03559c141b35d5a515020adc29f5037e9a4d9c3695fa183d",
+    "public/data/vegetation.json": "66fabad226b58d1f366c29d87eb1e99120536ca3f14cbc30e72b5d233da73729",
+    "public/models/base.glb": "0101e42691f2a326e9ebb5a6e10512f9c850790a73896d3523ef5f2f4e37a177"
+  },
+  "branch": "dev",
+  "baseCommit": "641d15ad968a4b205b5678b7cded6058901f359e"
+}
