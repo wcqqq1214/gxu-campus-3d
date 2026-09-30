@@ -31,6 +31,25 @@
         "normalTolerance": 0.0001,
         "weldDistance": 0.0001
       }
+    },
+    {
+      "id": "environment-west-foundation",
+      "buildingId": "way/759170251",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "模型修复：原环境楼候选的源/基础模型各23个采样地形高于现有楼底超过0.3米，最高约0.57米。只削低西端有冲突的区域，整栋617点复验；矩形截取边界、3米过渡和原楼底均为模型参数，不代表现场土方。保留楼体、原DEM、道路及邻楼；完整楼高、身份和入口继续待证。",
+      "repairBounds": [
+        260,
+        -440,
+        282,
+        -380
+      ]
     }
   ]
 }
