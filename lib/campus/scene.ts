@@ -7,6 +7,7 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { batchSportsSurfaces } from './sports-batching';
 import { batchPlatformRoadContacts } from './road-batching';
+import { pruneGroundTriangles } from './ground-triangles';
 import { isTap } from './math';
 import type { CameraSnapshot } from './share';
 import {
@@ -682,6 +683,7 @@ export function createScene(
       styleMeshes(gltf.scene);
       batchSportsSurfaces(gltf.scene);
       batchPlatformRoadContacts(gltf.scene);
+      if (key === 'base') pruneGroundTriangles(gltf.scene);
       return gltf;
     } finally {
       progresses.delete(key);

@@ -214,12 +214,15 @@ def sync_source_pavings(base):
     for key,mesh in base.items():
         if key.startswith('paving-'):mesh.object(key,collection,{'layer':'roads'})
 
-def split_grounded_road_exports(groups,records):
+def split_grounded_road_exports(groups,records,extensions=()):
     """Bound road quantization locally; retain buried overlap at export seams."""
     result=dict(groups)
     for record in records:
         if 'groundedService' not in record:continue
         x0,y0,x1,y1=record['bounds']
+        for extension in extensions:
+            if extension.get('exportWith')==record['id']:
+                a,b,c,d=extension['bounds'];x0,y0,x1,y1=min(x0,a),min(y0,b),max(x1,c),max(y1,d)
         def rectangle(extra):
             return [(x0-extra,y0-extra),(x1+extra,y0-extra),(x1+extra,y1+extra),(x0-extra,y1+extra)]
         # Include neighboring road contacts well beyond the 3 m end blends.

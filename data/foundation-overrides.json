@@ -1,12 +1,23 @@
 {
   "schemaVersion": 1,
-  "foundations": [{
-    "id": "civil-platform-foundation",
-    "buildingId": "way/957404988",
-    "coreMargin": 0.1,
-    "roadTrimMargin": 0.4,
-    "haloMeters": 6,
-    "groundOffset": 0,
-    "evidence": "模型修复：实际地形在闭合建筑内高出采用标高最高4.15米，西侧普通服务路穿入北楼及西门厅。仅局部削低地形并裁除冲突路面，保留原DEM、楼体标高、邻楼与D区入口。边界和坡度为模型估算，不代表实测土方或道路改建。"
-  }]
+  "foundations": [
+    {
+      "id": "civil-platform-foundation",
+      "buildingId": "way/957404988",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 6,
+      "groundOffset": 0,
+      "evidence": "模型修复：实际地形在闭合建筑内高出采用标高最高4.15米，西侧普通服务路穿入北楼及西门厅。仅局部削低地形并裁除冲突路面，保留原DEM、楼体标高、邻楼与D区入口。边界和坡度为模型估算，不代表实测土方或道路改建。",
+      "groundedServiceRoad": {
+        "surfaceId": "way/759096572",
+        "offset": 0.08,
+        "burial": 0.06,
+        "joinFeather": 3,
+        "joinMeshStep": 1.5,
+        "evidence": "原映射西侧服务路，地形上方8厘米为数值贴地偏移；三处接缝保持邻接路面，名义3米方角过渡带内接续。轮廓和建筑裁剪不变，纵坡及侧边封口为模型修复参数，并非实测。",
+        "exportWith": "civil-platform-service"
+      }
+    }
+  ]
 }
