@@ -28,12 +28,15 @@ def covers(point, polygons):
     return any(inside(point, p[0]) and not any(inside(point, h) for h in p[1:]) for p in polygons)
 
 
+def building_parts(building):
+    return building.get('form', {}).get('parts') or [
+        {'id':'mapped-closed-body', 'polygons':building['polygons'], 'height':building['height']}]
+
+
 def sample_parts(building, spacing):
     """Interior lattice plus an inward perimeter band, independent of the DEM."""
     samples = []
-    parts = building.get('form', {}).get('parts')
-    if not parts:
-        raise ValueError('This audit requires explicit building parts')
+    parts = building_parts(building)
     for part in parts:
         if part.get('openBelow'):
             continue
@@ -100,7 +103,7 @@ def measure(building, samples, tolerance, name):
     ground, _ = top_tree([o for o in objects if layer(o) == 'terrain'])
     roads, road_labels = top_tree([o for o in objects if layer(o) == 'roads'])
     datum = building['elevation']
-    heights = {p['id']: p['height'] for p in building['form']['parts']}
+    heights = {p['id']: p['height'] for p in building_parts(building)}
     rows = []
     for part, x, y, kind in samples:
         origin = Vector((x, y, datum + 150))
