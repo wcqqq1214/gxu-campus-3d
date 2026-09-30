@@ -421,6 +421,8 @@ for o in templates:o.hide_set(True);o.hide_render=True
 bpy.ops.object.select_all(action='DESELECT')
 for o in low_templates:o.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(MODELS/'trees.glb'),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True)
+from preserve_glb_geometry import compact_buffer_views
+compact_buffer_views(MODELS/'trees.glb')
 for o in low_templates:
     mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
 (DATA/'buildings.json').write_text(json.dumps(buildings,ensure_ascii=False,separators=(',',':')))

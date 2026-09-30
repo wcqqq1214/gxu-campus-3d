@@ -35,4 +35,4 @@ def replace_precise_terrain(path,objects):
                     export_draco_position_quantization=bits,export_draco_texcoord_quantization=TERRAIN_BITS if name=='terrain' else ROAD_UV_BITS if name=='roads' else LOCAL_ROAD_UV_BITS,
                     export_draco_normal_quantization=6,export_materials='EXPORT',export_cameras=False,export_lights=False)
             preserve_geometry(precise.read_bytes(),path,[name],materials=None if name=='terrain' else {'road'})
-    compact_buffer_views(path)
+    compact_buffer_views(path,optimize_jpegs=True)
