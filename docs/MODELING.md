@@ -18,9 +18,9 @@
 
 铺地节点归入 `roads` 图层，源文件与基础 GLB 成套更新。`update_roads.py` 和 `update_basketball.py` 已接入 `sync_source_pavings()`；2026-09-13 已在隔离副本中把铺地过渡宽度改为 4 米，核对两条实际增量命令及源文件/GLB 的参数响应。局部压低穿出铺面的底面，不修改原始 DEM JSON；详见 [铺地校准与专项验证](PAVING_CALIBRATION.md)。
 
-细分地形由 `blender/terrain_export.py` 以匹配的 18 位位置和 UV 精度导出，替换基础模型内地形节点的压缩数据；其他节点保持原精度。`compact_buffer_views()` 清除替换后不用的载荷，保留图片及全部有效引用。铺地地形的 UV 投影在局部范围内固定为 XY，避免极小三角面的不稳定法线改变投影；其他区域保持原投影。完整构建与两条增量模型路径共用该逻辑。专项命令为 `blender --background --python-exit-code 1 --python blender/validate_terrain_texture.py`。
+细分地形由 `blender/terrain_export.py` 以匹配的 18 位位置和 UV 精度导出，替换基础模型内地形节点的压缩数据；其他节点保持原精度。`compact_buffer_views()` 清除替换后不用的载荷，并共享元数据与字节完全相同的视图。基础模型的JPEG经jpegtran优化Huffman表，保留像素、量化精度与元数据；树木基础模板复用相同压缩载荷。见[无损打包](LOSSLESS_INITIAL_MODELS.md)。铺地地形的 UV 投影在局部范围内固定为 XY，避免极小三角面的不稳定法线改变投影；其他区域保持原投影。完整构建与两条增量模型路径共用该逻辑。专项命令为 `blender --background --python-exit-code 1 --python blender/validate_terrain_texture.py`。
 
-网页运行只需要 npm；重新制作模型需要 Blender，建议使用与 CI 一致的 Python 3.12，并通过约束文件固定几何处理依赖。
+网页运行只需要 npm；重新制作模型需要 Blender，以及提供 `jpegtran` 的 libjpeg-turbo（macOS可用 `brew install jpeg-turbo`，Debian/Ubuntu可用 `apt install libjpeg-turbo-progs`）。构建会在缺少编码器时报错；不重算几何的现有资产优化入口为 `python3 scripts/optimize_initial_models.py`。重新准备数据建议使用与 CI 一致的 Python 3.12，并通过约束文件固定几何处理依赖。
 
 ```sh
 python3 -m venv work/venv
@@ -61,7 +61,7 @@ blender --background --python-exit-code 1 --python blender/validate_landmarks.py
 | 20 个地标 GLB | 独立加载，可点选、巡游和单独修改；使用一致的米制位置 |
 | trees.glb | 3 个多材质模板，网页合并为顶点色几何后分块实例化 |
 
-模板材质包括石材、白色涂层、玻璃、深色金属、灰青屋瓦、铺装、草地、树皮和三种树冠色。10 张 128 × 128 自制 JPEG 纹理采用米制平面 UV；没有大尺寸摄影贴图。几何使用 Draco，解码器本地托管。东/西/北是场景加载分区，并不逐线等同于校方的行政分区。网页以视距触发普通分区近景，树木按空间块进行视锥剔除。首屏基础模型和树木模板约 5.68 MB。自动画质按运行表现调整阴影、植被密度与近景预算，手机默认采用保守配置，详见 [近期优化](FIXES.md)。
+模板材质包括石材、白色涂层、玻璃、深色金属、灰青屋瓦、铺装、草地、树皮和三种树冠色。10 张 128 × 128 自制 JPEG 纹理采用米制平面 UV；没有大尺寸摄影贴图。几何使用 Draco，解码器本地托管。东/西/北是场景加载分区，并不逐线等同于校方的行政分区。网页以视距触发普通分区近景，树木按空间块进行视锥剔除。首屏基础模型和树木模板共 5,993,304 字节（约5.99 MB，十进制）。自动画质按运行表现调整阴影、植被密度与近景预算，手机默认采用保守配置，详见 [近期优化](FIXES.md)。
 
 ### 普通建筑共享形体（2026-09-12）
 

@@ -78,7 +78,7 @@ python -m pip install -r scripts/requirements.txt -c scripts/constraints-geodata
 npm run test:data
 ```
 
-[可编辑源文件](blender/gxu-campus.blend) 内含具名对象、材质和打包纹理。修改模型需要 Blender；步骤见 [建模说明](docs/MODELING.md)。[原始数据快照](data/snapshots/) 用于离线恢复，[网页模型](public/models/) 使用 Draco 压缩并按需加载。首屏模型和树木模板共 5,012,720 bytes，低于 6 MB（十进制）预算；[省去未使用纹理坐标](docs/EXPORT_ATTRIBUTE_BUDGET.md)后保留原形体与材质，并继续用于[数学学院立面校准](docs/MATHEMATICS_FACADE_PANELS.md)、[数学研究中心校准](docs/MATH_CENTER_CALIBRATION.md)及[东翼外廊](docs/MATH_CENTER_EAST_GALLERIES.md)。脚本、JSON 和解码器另计。
+[可编辑源文件](blender/gxu-campus.blend) 内含具名对象、材质和打包纹理。修改模型需要 Blender；步骤见 [建模说明](docs/MODELING.md)。[原始数据快照](data/snapshots/) 用于离线恢复，[网页模型](public/models/) 使用 Draco 压缩并按需加载。首屏模型和树木模板共 5,993,304 bytes，低于 6 MB（十进制）预算；[无损打包](docs/LOSSLESS_INITIAL_MODELS.md)共享重复载荷并保留纹理像素；[省去未使用纹理坐标](docs/EXPORT_ATTRIBUTE_BUDGET.md)后保留原形体与材质，并继续用于[数学学院立面校准](docs/MATHEMATICS_FACADE_PANELS.md)、[数学研究中心校准](docs/MATH_CENTER_CALIBRATION.md)及[东翼外廊](docs/MATH_CENTER_EAST_GALLERIES.md)。脚本、JSON 和解码器另计。
 
 ## 项目文档
 

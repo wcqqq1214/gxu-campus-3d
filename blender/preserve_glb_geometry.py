@@ -3,7 +3,7 @@
 Only compressed geometry and accessor metadata are copied. Materials, layers and
 scene structure stay in the new export; no decode/re-encode loses precision.
 """
-import json,struct,copy,re
+import json,struct,copy,re,shutil,subprocess
 
 def mesh_nodes_by_name(doc):
     """Full exports coexist with source objects and acquire Blender suffixes.
@@ -23,8 +23,13 @@ def unpack(raw):
     size=struct.unpack_from('<I',raw,12)[0]
     return json.loads(raw[20:20+size]),raw[28+size:]
 
-def compact_buffer_views(path):
-    """Remove payloads no longer referenced after a compressed-node swap."""
+def compact_buffer_views(path, *, optimize_jpegs=False):
+    """Pack live views, sharing exact duplicates without decoding geometry.
+
+    Optional jpegtran Huffman optimization preserves DCT coefficients and all
+    metadata markers. Only views exclusively referenced by JPEG images qualify.
+    All processing finishes before the original file is overwritten.
+    """
     doc,binary=unpack(path.read_bytes())
     if len(doc['buffers'])!=1 or doc['buffers'][0].get('uri'):
         raise ValueError('Expected one internal GLB buffer')
@@ -38,14 +43,27 @@ def compact_buffer_views(path):
             for child in value:collect(child)
     collect(doc);used=sorted({index for _,_,index in references})
     if any(index<0 or index>=len(doc['bufferViews']) for index in used):raise ValueError('Invalid buffer view reference')
-    packed=bytearray();views=[];remap={}
+    jpeg_images={id(item) for item in doc.get('images',[]) if item.get('mimeType')=='image/jpeg'}
+    jpeg_views={index for index in used if all(id(parent) in jpeg_images for parent,_,ref in references if ref==index)} if optimize_jpegs else set()
+    encoder=shutil.which('jpegtran') if jpeg_views else None
+    if jpeg_views and not encoder:raise RuntimeError('JPEG optimization requires jpegtran (libjpeg-turbo) on PATH')
+    packed=bytearray();views=[];remap={};shared={}
     for index in used:
         view=copy.deepcopy(doc['bufferViews'][index])
         if view['buffer']!=0:raise ValueError('Unexpected external buffer view')
         start=view.get('byteOffset',0);end=start+view['byteLength']
-        if end>len(binary):raise ValueError('Buffer view exceeds binary payload')
+        if start<0 or end<start or end>len(binary):raise ValueError('Buffer view exceeds binary payload')
+        payload=binary[start:end]
+        if index in jpeg_views:
+            candidate=subprocess.run([encoder,'-copy','all','-optimize','-strict'],input=payload,stdout=subprocess.PIPE,stderr=subprocess.PIPE,check=True).stdout
+            if len(candidate)<len(payload):payload=candidate
+        view['byteLength']=len(payload)
+        metadata={key:value for key,value in view.items() if key!='byteOffset'}
+        signature=(json.dumps(metadata,sort_keys=True,separators=(',',':')),payload)
+        if signature in shared:
+            remap[index]=shared[signature];continue
         packed.extend(b'\0'*(-len(packed)%4));view['byteOffset']=len(packed)
-        packed.extend(binary[start:end]);remap[index]=len(views);views.append(view)
+        packed.extend(payload);remap[index]=len(views);shared[signature]=len(views);views.append(view)
     for parent,key,index in references:parent[key]=remap[index]
     doc['bufferViews']=views;packed.extend(b'\0'*(-len(packed)%4));doc['buffers'][0]['byteLength']=len(packed)
     header=json.dumps(doc,separators=(',',':')).encode();header+=b' '*(-len(header)%4)
