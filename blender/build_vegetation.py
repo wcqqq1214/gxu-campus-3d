@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from geometry import material
 from vegetation import tree_templates
+from preserve_glb_geometry import compact_buffer_views
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 collection=bpy.context.scene.collection
 C={}
@@ -17,6 +18,7 @@ for detail,name,key in [(False,'trees.glb','trees'),(True,'trees-near.glb','tree
     for o in templates:o.select_set(True)
     path=ROOT/'public/models'/name
     bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True)
+    if key=='trees':compact_buffer_views(path)
     manifest[key]={'url':'models/'+name,'bytes':path.stat().st_size,'sha256':hashlib.sha256(path.read_bytes()).hexdigest()}
 (ROOT/'public/data/models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 print('Vegetation LODs ready',manifest['trees']['bytes'],manifest['treesNear']['bytes'],flush=True)
