@@ -121,6 +121,12 @@ def build_foundations(data,terrain,roads):
         area=record['bounds']
         for i,(x,y,z) in enumerate(terrain.v):
             if area[0]-1e-5<=x<=area[2]+1e-5 and area[1]-1e-5<=y<=area[3]+1e-5:
+                # The clipped boundary already carries the original surface
+                # height. A vertical ray there can select the other side of
+                # an existing apron/terrain seam and lift a retained face.
+                # Preserve this edge, including float32 coordinate roundoff.
+                if min(ring_distance((x,y),ring) for poly in record['gradingPolygons'] for ring in poly)<1e-4:
+                    continue
                 if min(polygon_distance((x,y),poly) for poly in record['gradingPolygons'])<1e-5:
                     terrain.v[i]=shared_point(x,y)
         terrain = simplify_local_planes(terrain,record)
