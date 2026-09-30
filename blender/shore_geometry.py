@@ -44,14 +44,14 @@ def triangles_into(mesh,points,material,transform=lambda p:p):
             mesh.face([transform(a),transform(b),transform(c)],material)
 
 
-def conform_edges(mesh,area):
+def conform_edges(mesh,area,*,epsilon=1e-5,preserve_vertical_faces=False):
     """Split T junctions before Draco rounds long and subdivided edges apart.
 
     All incident faces must share the same XY edge segments. Interpolate each
     face's Z so intentional water-side steps and unchanged outside planes remain.
     A center fan preserves every collinear boundary vertex in the triangulation.
     """
-    cell=2.;epsilon=1e-5;points={};buckets={}
+    cell=2.;points={};buckets={}
     for x,y,z in mesh.v:
         if area[0]-epsilon<=x<=area[2]+epsilon and area[1]-epsilon<=y<=area[3]+epsilon:
             key=(round(x,6),round(y,6));points.setdefault(key,(x,y))
@@ -82,7 +82,14 @@ def conform_edges(mesh,area):
         if not changed:result.face(original,mat);continue
         # Each fan stays on the original triangle plane.
         center=tuple(sum(p[k] for p in original)/len(original) for k in range(3))
-        for a,b in zip(ring,ring[1:]+ring[:1]):triangles_into(result,[center,a,b],mat)
+        for a,b in zip(ring,ring[1:]+ring[:1]):
+            if preserve_vertical_faces:
+                # Road walls have zero XY area but real 3D area. Conform
+                # their top/bottom edges without deleting the closure faces.
+                u=[a[k]-center[k] for k in range(3)];v=[b[k]-center[k] for k in range(3)]
+                cross=(u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0])
+                if any(c!=0 for c in cross):result.face([center,a,b],mat)
+            else:triangles_into(result,[center,a,b],mat)
     return result
 
 

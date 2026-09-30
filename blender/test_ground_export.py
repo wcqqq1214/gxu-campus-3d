@@ -34,7 +34,8 @@ with tempfile.TemporaryDirectory() as directory:
     replace_precise_terrain(path,objects)
     after,binary=unpack(path.read_bytes())
     assert set(mesh_nodes_by_name(after))=={'roads','terrain','paving-civil-platform-service-export'}
-    assert all(payload(after,binary,n,'white')==v for n,v in old_white.items())
+    assert payload(after,binary,'paving-civil-platform-service-export','white')==old_white['paving-civil-platform-service-export']
+    assert payload(after,binary,'roads','white')!=old_white['roads']
     assert payload(after,binary,'roads','road')
     assert all(len(after['meshes'][n['mesh']]['primitives'])==2 for n in mesh_nodes_by_name(after).values())
 print('GROUND_EXPORT_SUFFIX_AND_MATERIAL_FILTER passed',flush=True)
