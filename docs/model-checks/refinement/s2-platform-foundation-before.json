@@ -1,0 +1,876 @@
+{
+  "buildingId": "way/957404988",
+  "adoptedDatum": -4.76,
+  "datumMeaning": "Current model elevation, not surveyed ground-floor elevation",
+  "sampling": {
+    "spacingMeters": 2,
+    "perimeterInsetMeters": 0.25,
+    "allowedIntrusionMeters": 0.3,
+    "openPorticosExcluded": true,
+    "scope": "Closed part interiors; road layers include ordinary service roads; near buildings reuse base terrain"
+  },
+  "fingerprints": {
+    "buildings": "1e813a5b29c7cf0a7ec9977d6e9d474a50181cb6a563c15204ba549e6ff2c3aa",
+    "source": "6dd19272888829f0d8c803895d4607aeb10b7d5d0a09c7379b7b7612b915ffce",
+    "base": "412c1f03c9f330aaed8bf10dd415fe63070e86afad470fb73e05bd67efa31236"
+  },
+  "representations": [
+    {
+      "representation": "source",
+      "samples": 1108,
+      "parts": [
+        {
+          "part": "link-foyer",
+          "samples": 197,
+          "terrainIntrusionSamples": 0,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 2.0751953124786837e-05,
+          "worstGroundSamples": [],
+          "worstRoadSamples": []
+        },
+        {
+          "part": "north-low-wing",
+          "samples": 161,
+          "terrainIntrusionSamples": 20,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.7287194824218748,
+          "worstGroundSamples": [
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -657.3860131,
+                -760.7868482
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.7287194824218748,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -656.669614,
+                -761.2879608
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.7027337646484373,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -659.3197644,
+                -760.7840652
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.6749627685546873,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -661.2535156,
+                -760.7812822
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.6211755371093748,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -658,
+                -762
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.6002252197265623,
+              "roadAboveDatum": null,
+              "roadHit": null
+            }
+          ],
+          "worstRoadSamples": []
+        },
+        {
+          "part": "north-office",
+          "samples": 217,
+          "terrainIntrusionSamples": 5,
+          "roadIntrusionSamples": 4,
+          "maximumTerrainAboveDatum": 0.5008294677734373,
+          "worstGroundSamples": [
+            {
+              "part": "north-office",
+              "xy": [
+                -733.6750221,
+                -729.1304678
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.5008294677734373,
+              "roadAboveDatum": 0.6216256713867185,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -731.8874563,
+                -729.1318593
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.4683129882812498,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -734.3177175,
+                -728.3893476
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.4215142822265623,
+              "roadAboveDatum": 0.6327436065673826,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -734,
+                -728
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.3678796386718748,
+              "roadAboveDatum": 0.6120336151123045,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -732,
+                -728
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.3313195800781248,
+              "roadAboveDatum": null,
+              "roadHit": null
+            }
+          ],
+          "worstRoadSamples": [
+            {
+              "part": "north-office",
+              "xy": [
+                -734.3177175,
+                -728.3893476
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.4215142822265623,
+              "roadAboveDatum": 0.6327436065673826,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -733.6750221,
+                -729.1304678
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.5008294677734373,
+              "roadAboveDatum": 0.6216256713867185,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -734,
+                -728
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.3678796386718748,
+              "roadAboveDatum": 0.6120336151123045,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -734.3151529,
+                -726.4078516
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.1780297851562498,
+              "roadAboveDatum": 0.5901849365234373,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            }
+          ]
+        },
+        {
+          "part": "south-hall",
+          "samples": 414,
+          "terrainIntrusionSamples": 155,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 3.7652337646484373,
+          "worstGroundSamples": [
+            {
+              "part": "south-hall",
+              "xy": [
+                -716.8164587,
+                -787.807801
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 3.7652337646484373,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "south-hall",
+              "xy": [
+                -716,
+                -788
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 3.66643310546875,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "south-hall",
+              "xy": [
+                -717.5550894,
+                -787.07476
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 3.5425164794921873,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "south-hall",
+              "xy": [
+                -714.8372055,
+                -787.8103147
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 3.2670343017578123,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "south-hall",
+              "xy": [
+                -714,
+                -788
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 3.1615960693359373,
+              "roadAboveDatum": null,
+              "roadHit": null
+            }
+          ],
+          "worstRoadSamples": []
+        },
+        {
+          "part": "west-foyer",
+          "samples": 119,
+          "terrainIntrusionSamples": 14,
+          "roadIntrusionSamples": 19,
+          "maximumTerrainAboveDatum": 0.8847100830078123,
+          "worstGroundSamples": [
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.5798588,
+                -749.6730823
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8847100830078123,
+              "roadAboveDatum": 0.7969608402252195,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.5285657,
+                -748.0756403
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8626153564453123,
+              "roadAboveDatum": 0.7201507186889646,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.4883525,
+                -751.3168302
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8452661132812498,
+              "roadAboveDatum": 0.8522720432281492,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.2498394,
+                -753.0896012
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.7424218749999998,
+              "roadAboveDatum": 0.9401216602325437,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.0113263,
+                -754.8623722
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.6396081542968748,
+              "roadAboveDatum": 1.0167975521087644,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            }
+          ],
+          "worstRoadSamples": [
+            {
+              "part": "west-foyer",
+              "xy": [
+                -727.8498077,
+                -763.1969655
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 5.493164062286837e-06,
+              "roadAboveDatum": 1.2532663440704344,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -728.3678684,
+                -761.5633445
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": -9.765625000213163e-06,
+              "roadAboveDatum": 1.2004032230377195,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -728,
+                -762
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 5.493164062286837e-06,
+              "roadAboveDatum": 1.1960549449920652,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -727.2489694,
+                -763.4018972
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 2.0751953124786837e-05,
+              "roadAboveDatum": 1.1861920452117918,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -728.8859291,
+                -759.9297235
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.1543328857421873,
+              "roadAboveDatum": 1.181037435531616,
+              "roadHit": {
+                "object": "roads",
+                "material": "road"
+              }
+            }
+          ]
+        }
+      ],
+      "passed": false
+    },
+    {
+      "representation": "base",
+      "samples": 1108,
+      "parts": [
+        {
+          "part": "link-foyer",
+          "samples": 197,
+          "terrainIntrusionSamples": 0,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.0012261962890622868,
+          "worstGroundSamples": [],
+          "worstRoadSamples": []
+        },
+        {
+          "part": "north-low-wing",
+          "samples": 161,
+          "terrainIntrusionSamples": 20,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.7305047607421873,
+          "worstGroundSamples": [
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -657.3860131,
+                -760.7868482
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.7305047607421873,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -656.669614,
+                -761.2879608
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.7034967041015623,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -659.3197644,
+                -760.7840652
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.6786096191406248,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -661.2535156,
+                -760.7812822
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.6250817871093748,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-low-wing",
+              "xy": [
+                -658,
+                -762
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.6031854248046873,
+              "roadAboveDatum": null,
+              "roadHit": null
+            }
+          ],
+          "worstRoadSamples": []
+        },
+        {
+          "part": "north-office",
+          "samples": 217,
+          "terrainIntrusionSamples": 5,
+          "roadIntrusionSamples": 4,
+          "maximumTerrainAboveDatum": 0.5016839599609373,
+          "worstGroundSamples": [
+            {
+              "part": "north-office",
+              "xy": [
+                -733.6750221,
+                -729.1304678
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.5016839599609373,
+              "roadAboveDatum": 0.6194589233398435,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -731.8874563,
+                -729.1318593
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.4695184326171873,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -734.3177175,
+                -728.3893476
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.4219415283203123,
+              "roadAboveDatum": 0.6493451690673826,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -734,
+                -728
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.3681848144531248,
+              "roadAboveDatum": 0.6199567413330076,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -732,
+                -728
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.3320214843749998,
+              "roadAboveDatum": null,
+              "roadHit": null
+            }
+          ],
+          "worstRoadSamples": [
+            {
+              "part": "north-office",
+              "xy": [
+                -734.3177175,
+                -728.3893476
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.4219415283203123,
+              "roadAboveDatum": 0.6493451690673826,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -734,
+                -728
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.3681848144531248,
+              "roadAboveDatum": 0.6199567413330076,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -733.6750221,
+                -729.1304678
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.5016839599609373,
+              "roadAboveDatum": 0.6194589233398435,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "north-office",
+              "xy": [
+                -734.3151529,
+                -726.4078516
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.1776025390624998,
+              "roadAboveDatum": 0.6028344726562498,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            }
+          ]
+        },
+        {
+          "part": "south-hall",
+          "samples": 414,
+          "terrainIntrusionSamples": 155,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 3.764913330078125,
+          "worstGroundSamples": [
+            {
+              "part": "south-hall",
+              "xy": [
+                -716.8164587,
+                -787.807801
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 3.764913330078125,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "south-hall",
+              "xy": [
+                -716,
+                -788
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 3.6660516357421873,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "south-hall",
+              "xy": [
+                -717.5550894,
+                -787.07476
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 3.5422418212890623,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "south-hall",
+              "xy": [
+                -714.8372055,
+                -787.8103147
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 3.2665765380859373,
+              "roadAboveDatum": null,
+              "roadHit": null
+            },
+            {
+              "part": "south-hall",
+              "xy": [
+                -714,
+                -788
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 3.1610772705078123,
+              "roadAboveDatum": null,
+              "roadHit": null
+            }
+          ],
+          "worstRoadSamples": []
+        },
+        {
+          "part": "west-foyer",
+          "samples": 119,
+          "terrainIntrusionSamples": 14,
+          "roadIntrusionSamples": 19,
+          "maximumTerrainAboveDatum": 0.8868615722656248,
+          "worstGroundSamples": [
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.5798588,
+                -749.6730823
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8868615722656248,
+              "roadAboveDatum": 0.7816901302337644,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.5285657,
+                -748.0756403
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8647363281249998,
+              "roadAboveDatum": 0.7026088333129881,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.4883525,
+                -751.3168302
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.8474023437499998,
+              "roadAboveDatum": 0.8386530971527097,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.2498394,
+                -753.0896012
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.7444818115234373,
+              "roadAboveDatum": 0.9258389568328855,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -730.0113263,
+                -754.8623722
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.6416070556640623,
+              "roadAboveDatum": 1.0064044094085691,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            }
+          ],
+          "worstRoadSamples": [
+            {
+              "part": "west-foyer",
+              "xy": [
+                -727.8498077,
+                -763.1969655
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.0012109374999997868,
+              "roadAboveDatum": 1.2530264949798582,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -728,
+                -762
+              ],
+              "kind": "interior-grid",
+              "terrainAboveDatum": 0.0012109374999997868,
+              "roadAboveDatum": 1.1990652179718015,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -727.2489694,
+                -763.4018972
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.0012109374999997868,
+              "roadAboveDatum": 1.1807231998443601,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -728.3678684,
+                -761.5633445
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.0012109374999997868,
+              "roadAboveDatum": 1.1793794727325437,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            },
+            {
+              "part": "west-foyer",
+              "xy": [
+                -728.8859291,
+                -759.9297235
+              ],
+              "kind": "perimeter-inset",
+              "terrainAboveDatum": 0.1560723876953123,
+              "roadAboveDatum": 1.1558728313446043,
+              "roadHit": {
+                "object": "roads.001",
+                "material": "road"
+              }
+            }
+          ]
+        }
+      ],
+      "passed": false
+    }
+  ],
+  "passed": false
+}

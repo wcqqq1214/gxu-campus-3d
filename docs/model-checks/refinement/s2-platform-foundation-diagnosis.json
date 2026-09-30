@@ -1,0 +1,154 @@
+{
+  "baselineCommit": "8c9cf8ec523b32abbc7bcd789a55fac57e3f08a2",
+  "buildingId": "way/957404988",
+  "gridSpacingMeters": [
+    19.689945727250684,
+    19.616756097561076
+  ],
+  "buildingGradeInnerBufferMeters": 4,
+  "buildingGradeFadeMeters": 18,
+  "probeAtOriginalSouthwestCorner": [
+    -717.8064028063193,
+    -788.05654399997
+  ],
+  "currentDatum": -4.76,
+  "interpolationCorners": [
+    {
+      "xy": [
+        -728.5279919082753,
+        -804.2870000000041
+      ],
+      "terrainElevation": 11.16,
+      "buildingGradingInfluences": [
+        {
+          "buildingId": "way/957404988",
+          "name": "大型结构试验研究平台综合楼",
+          "gradingOrder": 358,
+          "weight": 0.14154971370919323,
+          "currentModelDatum": -4.76
+        }
+      ]
+    },
+    {
+      "xy": [
+        -708.8380461810247,
+        -804.2870000000041
+      ],
+      "terrainElevation": 6.53,
+      "buildingGradingInfluences": [
+        {
+          "buildingId": "way/957404988",
+          "name": "大型结构试验研究平台综合楼",
+          "gradingOrder": 358,
+          "weight": 0.3211637227873554,
+          "currentModelDatum": -4.76
+        },
+        {
+          "buildingId": "way/957404989",
+          "name": "物理科学与工程技术学院",
+          "gradingOrder": 359,
+          "weight": 0.7023703173769795,
+          "currentModelDatum": 7.4
+        }
+      ]
+    },
+    {
+      "xy": [
+        -708.8380461810247,
+        -784.6702439024431
+      ],
+      "terrainElevation": -4.76,
+      "buildingGradingInfluences": [
+        {
+          "buildingId": "way/957404988",
+          "name": "大型结构试验研究平台综合楼",
+          "gradingOrder": 358,
+          "weight": 1.0,
+          "currentModelDatum": -4.76
+        }
+      ]
+    },
+    {
+      "xy": [
+        -728.5279919082753,
+        -784.6702439024431
+      ],
+      "terrainElevation": 0.21,
+      "buildingGradingInfluences": [
+        {
+          "buildingId": "way/957404988",
+          "name": "大型结构试验研究平台综合楼",
+          "gradingOrder": 358,
+          "weight": 0.6263272935594867,
+          "currentModelDatum": -4.76
+        }
+      ]
+    }
+  ],
+  "boundaryRayChecks": {
+    "source": 4.153936157226562,
+    "base": 4.153707275390625
+  },
+  "cause": "The 4 m building buffer does not flatten all ~20 m grid corners under the boundary. Sequential neighboring grading also influences one corner. Both triangle-rendered source/base and bilinear preliminary sampling show intrusion.",
+  "notEstablished": [
+    "Surveyed elevations",
+    "Current south/west facade details",
+    "Exterior transport-door position"
+  ],
+  "rejectedExperiment": {
+    "experiment": "In-memory last-write flatten of every grid vertex within one cell diagonal of target footprint; not applied",
+    "gridDiagonal": 27.794083588657447,
+    "verticesAssigned": 37,
+    "changedOtherBuildingDatums": [],
+    "allChangedDatums": [],
+    "changedNeighborPerimeterGround": [
+      {
+        "buildingId": "way/957404989",
+        "name": "物理科学与工程技术学院",
+        "maximumSignedPerimeterGroundDelta": -8.726473732365486,
+        "at": [
+          -688.1876943956438,
+          -809.401040800009
+        ]
+      }
+    ],
+    "decision": "Rejected: keeping center datums does not preserve neighboring ground contact."
+  },
+  "productionChanged": false,
+  "sourceCoverageReview": {
+    "existingAerial": "North/east view; south/west office faces and west-foyer roof remain occluded",
+    "existingPanoramaTile": "b-6-7; east entrance and link roof visible, no new west-foyer roof measurement"
+  },
+  "regressionGap": "validate_road_buildings.py checks infrastructureId/infra/bridge meshes; ordinary aggregated service-road geometry is outside that scope. The new audit samples all road layers within closed part interiors.",
+  "nextImplementation": [
+    "Build a local terrain patch constrained to this compound; keep its current datum and all building geometry.",
+    "Resolve ordinary western service-road overlap with the mapped closed volumes before accepting the patch; retain the existing D entrance connection.",
+    "Verify ground at all target parts and neighboring physics footprint, source/base consistency, road joins, slope transitions, trees, asset budgets and activity performance."
+  ],
+  "statusChange": {
+    "wholeFirstPassBefore": 2,
+    "wholeFirstPassAfter": 1,
+    "partialBefore": 20,
+    "partialAfter": 21,
+    "calibratedObjects": 22,
+    "reason": "Reopen platform whole-building acceptance for verified ground/road intrusion"
+  },
+  "verification": {
+    "fixtureTestsPassed": 5,
+    "actualSourceAndBaseAuditPassed": false,
+    "actualFailureExpectedAndConfirmed": true,
+    "samplesPerRepresentation": 1108,
+    "unchangedGLBs": 69,
+    "productionChanged": false,
+    "linksChecked": 415,
+    "diagramVisuallyReviewed": true,
+    "wholeBuildingAcceptanceReopened": true,
+    "mainUnchanged": true
+  },
+  "diagnosticInputs": {
+    "public/data/terrain.json": "6ea0100e963f3e26c176273fea174ffe3e4ac60d2e131955119be53fd005aa52",
+    "scripts/prepare_geodata.py": "29ae09146716d00730e07dd406a9fa7afc5dadf59489c3b4848765f31c681c01",
+    "blender/inspect_foundation_clearance.py": "f96f1267214020d3bc13fff605021eae60310dca682dedc209eb8d53f6ab0e48",
+    "blender/test_foundation_clearance.py": "397aa372dd8ce7273dce83d13479bcdc8bda1b7b4ca7df75d3eff1a430bd7004"
+  }
+}
