@@ -2,7 +2,7 @@
 
 按用户再次指定的优先顺序，动物学院入口接路及侧翼接地批次收尾后，下一批先做土木建筑工程学院实验大厅，再做“新结构大楼”的剩余核对项。已经落地的模型保留，避免重复造楼。
 
-已完成[视频末段定向核对和墙面索引](CIVIL_HALL_VIDEO_REVIEW.md)：末段设备铭牌可关联大型结构平台，但运输口仍缺外墙方位。此前的[楼体内部接地侵入](CIVIL_PLATFORM_FOUNDATION.md)已修复；随后完成[整条西侧服务路贴地、三处接缝及路边封口](CIVIL_PLATFORM_WEST_ROAD.md)。最新[四张校方施工外景核对](CIVIL_CONSTRUCTION_PHOTO_REVIEW.md)仍未补齐下表所需锚点，本轮保留未知并接续S3独立工作；缺证据项不反复重查同一资料。
+已完成[视频末段定向核对和墙面索引](CIVIL_HALL_VIDEO_REVIEW.md)：末段设备铭牌可关联大型结构平台，但运输口仍缺外墙方位。此前的[楼体内部接地侵入](CIVIL_PLATFORM_FOUNDATION.md)已修复；随后完成[整条西侧服务路贴地、三处接缝及路边封口](CIVIL_PLATFORM_WEST_ROAD.md)。[四张校方施工外景](CIVIL_CONSTRUCTION_PHOTO_REVIEW.md)及最新[两条校方室内资料](CIVIL_PLATFORM_RECHECK.md)仍未补齐下表锚点；最新批次同时修复联合复验发现的保留地形边界偏移。缺证据项保留并接续S3动物学院后翼、层数及背面的独立核对，不反复重查同一资料；取得土木新定位资料后优先恢复。
 
 ## 已有成果
 

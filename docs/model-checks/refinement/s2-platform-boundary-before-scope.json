@@ -1,0 +1,199 @@
+{
+  "passed": false,
+  "foundationId": "civil-platform-foundation",
+  "roadReference": "source",
+  "unchangedEncodedOrdinaryRoadNode": null,
+  "representations": [
+    {
+      "representation": "source",
+      "samples": 49196,
+      "outsideSamples": 30871,
+      "maximumOutsideGroundChange": 0.0066680908203125,
+      "worstOutsideSamples": [
+        [
+          0.0066680908203125,
+          [
+            -734.8593360763691,
+            -721.9133595574489
+          ],
+          -4.6648712158203125,
+          -4.658203125
+        ],
+        [
+          0.0050201416015625,
+          [
+            -734.8605925501272,
+            -722.8841318951249
+          ],
+          -4.659698486328125,
+          -4.6546783447265625
+        ],
+        [
+          0.001708984375,
+          [
+            -734.8631054976433,
+            -724.8256765704772
+          ],
+          -4.6494293212890625,
+          -4.6477203369140625
+        ],
+        [
+          6.103515625e-05,
+          [
+            -735.83,
+            -740.81
+          ],
+          -3.7327728271484375,
+          -3.7327117919921875
+        ],
+        [
+          4.57763671875e-05,
+          [
+            -666.83,
+            -794.31
+          ],
+          1.0649871826171875,
+          1.065032958984375
+        ]
+      ],
+      "retainedRoadSamples": 4048,
+      "maximumRetainedRoadErrorToSource": 0.0,
+      "maximumRoadChangeFromPreviousExport": 0.0,
+      "worstRoadSamples": [
+        [
+          0.0,
+          [
+            -640.33,
+            -784.81
+          ],
+          -1.943603515625,
+          -1.943603515625,
+          -2.0236053466796875,
+          -2.0236053466796875
+        ],
+        [
+          0.0,
+          [
+            -640.33,
+            -785.31
+          ],
+          -1.6632232666015625,
+          -1.6632232666015625,
+          -1.74322509765625,
+          -1.74322509765625
+        ],
+        [
+          0.0,
+          [
+            -640.33,
+            -785.81
+          ],
+          -1.382843017578125,
+          -1.382843017578125,
+          -1.462860107421875,
+          -1.462860107421875
+        ],
+        [
+          0.0,
+          [
+            -640.33,
+            -786.31
+          ],
+          -1.10247802734375,
+          -1.10247802734375,
+          -1.182464599609375,
+          -1.182464599609375
+        ],
+        [
+          0.0,
+          [
+            -640.33,
+            -786.81
+          ],
+          -0.8220977783203125,
+          -0.8220977783203125,
+          -0.902099609375,
+          -0.902099609375
+        ]
+      ],
+      "maximumRoadSupportChange": 3.0517578125e-05,
+      "rebuiltServiceRoadSamples": 2615,
+      "maximumRebuiltServiceRoadChangeToSource": 0.0032196044921875,
+      "worstRebuiltServiceRoadSamples": [
+        [
+          0.0032196044921875,
+          [
+            -722.83,
+            -797.81
+          ],
+          6.38873291015625,
+          6.3855133056640625,
+          6.1063232421875,
+          6.1063232421875
+        ],
+        [
+          0.0002899169921875,
+          [
+            -722.33,
+            -797.81
+          ],
+          6.3123931884765625,
+          6.312103271484375,
+          5.980133056640625,
+          5.9801177978515625
+        ],
+        [
+          6.103515625e-05,
+          [
+            -721.83,
+            -796.81
+          ],
+          5.45953369140625,
+          5.45947265625,
+          5.29571533203125,
+          5.29571533203125
+        ],
+        [
+          4.57763671875e-05,
+          [
+            -715.33,
+            -712.31
+          ],
+          -4.728179931640625,
+          -4.7282257080078125,
+          -4.8082275390625,
+          -4.8082275390625
+        ],
+        [
+          4.57763671875e-05,
+          [
+            -716.33,
+            -712.31
+          ],
+          -4.728179931640625,
+          -4.7282257080078125,
+          -4.8082122802734375,
+          -4.8082122802734375
+        ]
+      ],
+      "missingRebuiltServiceRoadSamples": [],
+      "neighborId": "way/957404989",
+      "neighborIds": [
+        "way/957404989"
+      ],
+      "neighborPerimeterSamples": 1129,
+      "previousExportMissingRoadSamples": [],
+      "maximumNeighborGroundChange": 0.0,
+      "errors": [
+        [
+          "outside",
+          0.0066680908203125,
+          0.002
+        ]
+      ],
+      "passed": false
+    }
+  ],
+  "requiredCompanionCheck": "validate_service_road.py",
+  "scope": "0.5m grid, grading boundary at 1m, listed neighbor perimeters at 0.5m; representation-matched ground baselines. Source-plane road errors always reported; previous-export mode checks retained compressed-road height/support changes and preserves existing missing samples, without claiming their repair."
+}

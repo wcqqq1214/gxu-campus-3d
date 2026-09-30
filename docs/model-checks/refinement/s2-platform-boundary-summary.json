@@ -1,0 +1,484 @@
+{
+  "checkedAt": "2026-09-30T03:52:45.545770+00:00",
+  "passed": true,
+  "productionIntegrated": true,
+  "scope": "Conform original terrain planes before bounded foundation grading. Rebuilt service-road changes are separately reported and checked by the mandatory service-road companion audit.",
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "s3RequiredNeighborsWholeAccepted": 0,
+  "pythonTests": 289,
+  "nodeTests": 70,
+  "blenderFoundationFixtures": 14,
+  "blenderServiceRoadFixtures": 5,
+  "typecheckPassed": true,
+  "lintPassed": true,
+  "pagesBuildPassed": true,
+  "negativeControl": {
+    "oldImplementationFailedNewFixtureInBothSimplificationModes": true,
+    "oldProductionRejectedWithCorrectedRoadScope": true,
+    "report": "s2-platform-boundary-before-scope.json"
+  },
+  "checks": [
+    "after",
+    "neighbors",
+    "front-geometry",
+    "entry-portico",
+    "rooftop-geometry",
+    "civil",
+    "civil-road",
+    "civil-neighbors",
+    "civil-entry-geometry",
+    "source-preservation",
+    "assets",
+    "export-pruning",
+    "site-trees-geometry",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4254672,
+      "medianDrawCalls": 556,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 5.839718203347322,
+        "medianDrawCalls": 1.645338208409508
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1199265,
+      "medianDrawCalls": 301,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 14.00453445759997,
+        "medianDrawCalls": 14.448669201520904
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of complete isolation.",
+  "initialModelBytes": 5997024,
+  "initialByteHeadroom": 2976,
+  "maximumOrdinaryNearBytes": 1684868,
+  "civilNeighborChecks": [
+    {
+      "representation": "source",
+      "samples": 49196,
+      "outsideSamples": 30871,
+      "maximumOutsideGroundChange": 6.103515625e-05,
+      "worstOutsideSamples": [
+        [
+          6.103515625e-05,
+          [
+            -735.83,
+            -740.81
+          ],
+          -3.7327728271484375,
+          -3.7327117919921875
+        ],
+        [
+          4.57763671875e-05,
+          [
+            -666.83,
+            -794.31
+          ],
+          1.0649871826171875,
+          1.065032958984375
+        ],
+        [
+          4.57763671875e-05,
+          [
+            -682.33,
+            -750.31
+          ],
+          -4.5505218505859375,
+          -4.550567626953125
+        ],
+        [
+          4.57763671875e-05,
+          [
+            -690.83,
+            -796.81
+          ],
+          2.5041351318359375,
+          2.504180908203125
+        ],
+        [
+          4.57763671875e-05,
+          [
+            -691.35343924972,
+            -794.0901444480972
+          ],
+          0.852874755859375,
+          0.8529205322265625
+        ]
+      ],
+      "retainedRoadSamples": 4048,
+      "maximumRetainedRoadErrorToSource": 0.0,
+      "maximumRoadChangeFromPreviousExport": 0.0,
+      "worstRoadSamples": [
+        [
+          0.0,
+          [
+            -640.33,
+            -784.81
+          ],
+          -1.943603515625,
+          -1.943603515625,
+          -2.0236053466796875,
+          -2.0236053466796875
+        ],
+        [
+          0.0,
+          [
+            -640.33,
+            -785.31
+          ],
+          -1.6632232666015625,
+          -1.6632232666015625,
+          -1.74322509765625,
+          -1.74322509765625
+        ],
+        [
+          0.0,
+          [
+            -640.33,
+            -785.81
+          ],
+          -1.382843017578125,
+          -1.382843017578125,
+          -1.462860107421875,
+          -1.462860107421875
+        ],
+        [
+          0.0,
+          [
+            -640.33,
+            -786.31
+          ],
+          -1.10247802734375,
+          -1.10247802734375,
+          -1.182464599609375,
+          -1.182464599609375
+        ],
+        [
+          0.0,
+          [
+            -640.33,
+            -786.81
+          ],
+          -0.8220977783203125,
+          -0.8220977783203125,
+          -0.902099609375,
+          -0.902099609375
+        ]
+      ],
+      "maximumRoadSupportChange": 3.0517578125e-05,
+      "rebuiltServiceRoadSamples": 2615,
+      "maximumRebuiltServiceRoadChangeToSource": 0.0032196044921875,
+      "worstRebuiltServiceRoadSamples": [
+        [
+          0.0032196044921875,
+          [
+            -722.83,
+            -797.81
+          ],
+          6.38873291015625,
+          6.3855133056640625,
+          6.1063232421875,
+          6.1063232421875
+        ],
+        [
+          0.0007476806640625,
+          [
+            -694.83,
+            -712.81
+          ],
+          -4.42437744140625,
+          -4.4236297607421875,
+          -4.7785797119140625,
+          -4.778564453125
+        ],
+        [
+          0.0002899169921875,
+          [
+            -722.33,
+            -797.81
+          ],
+          6.3123931884765625,
+          6.312103271484375,
+          5.980133056640625,
+          5.9801177978515625
+        ],
+        [
+          6.103515625e-05,
+          [
+            -721.83,
+            -796.81
+          ],
+          5.45953369140625,
+          5.45947265625,
+          5.29571533203125,
+          5.29571533203125
+        ],
+        [
+          4.57763671875e-05,
+          [
+            -709.33,
+            -711.31
+          ],
+          -4.73175048828125,
+          -4.7317962646484375,
+          -4.8117828369140625,
+          -4.8117828369140625
+        ]
+      ],
+      "missingRebuiltServiceRoadSamples": [],
+      "neighborId": "way/957404989",
+      "neighborIds": [
+        "way/957404989"
+      ],
+      "neighborPerimeterSamples": 1129,
+      "previousExportMissingRoadSamples": [],
+      "maximumNeighborGroundChange": 0.0,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "representation": "base",
+      "samples": 49196,
+      "outsideSamples": 30871,
+      "maximumOutsideGroundChange": 0.0087738037109375,
+      "worstOutsideSamples": [
+        [
+          0.0087738037109375,
+          [
+            -678.83,
+            -751.31
+          ],
+          -4.434326171875,
+          -4.4255523681640625
+        ],
+        [
+          0.00787353515625,
+          [
+            -679.33,
+            -752.31
+          ],
+          -4.450286865234375,
+          -4.442413330078125
+        ],
+        [
+          0.0073394775390625,
+          [
+            -679.83,
+            -752.81
+          ],
+          -4.46563720703125,
+          -4.4582977294921875
+        ],
+        [
+          0.00726318359375,
+          [
+            -679.33,
+            -751.81
+          ],
+          -4.4509735107421875,
+          -4.4437103271484375
+        ],
+        [
+          0.00689697265625,
+          [
+            -744.33,
+            -710.31
+          ],
+          -4.808319091796875,
+          -4.801422119140625
+        ]
+      ],
+      "retainedRoadSamples": 4048,
+      "maximumRetainedRoadErrorToSource": 0.0049591064453125,
+      "maximumRoadChangeFromPreviousExport": 0.0064239501953125,
+      "worstRoadSamples": [
+        [
+          0.0049591064453125,
+          [
+            -643.83,
+            -787.81
+          ],
+          -1.0146484375,
+          -1.0096893310546875,
+          -1.0881805419921875,
+          -1.0897369384765625
+        ],
+        [
+          0.00469970703125,
+          [
+            -643.33,
+            -787.31
+          ],
+          -1.1878509521484375,
+          -1.1831512451171875,
+          -1.267181396484375,
+          -1.2631988525390625
+        ],
+        [
+          0.0044708251953125,
+          [
+            -640.83,
+            -787.81
+          ],
+          -0.37274169921875,
+          -0.3682708740234375,
+          -0.4461822509765625,
+          -0.4482879638671875
+        ],
+        [
+          0.0043487548828125,
+          [
+            -641.83,
+            -798.31
+          ],
+          4.02642822265625,
+          4.0220794677734375,
+          4.676300048828125,
+          4.67724609375
+        ],
+        [
+          0.0042266845703125,
+          [
+            -643.33,
+            -798.31
+          ],
+          4.0097503662109375,
+          4.005523681640625,
+          4.78057861328125,
+          4.780853271484375
+        ]
+      ],
+      "maximumRoadSupportChange": 0.0064239501953125,
+      "rebuiltServiceRoadSamples": 2615,
+      "maximumRebuiltServiceRoadChangeToSource": 0.0044403076171875,
+      "worstRebuiltServiceRoadSamples": [
+        [
+          0.0044403076171875,
+          [
+            -722.83,
+            -797.81
+          ],
+          6.38995361328125,
+          6.3855133056640625,
+          6.1049957275390625,
+          6.1063232421875
+        ],
+        [
+          0.00433349609375,
+          [
+            -725.83,
+            -796.31
+          ],
+          6.1105804443359375,
+          6.1062469482421875,
+          6.0273895263671875,
+          6.0262603759765625
+        ],
+        [
+          0.0042572021484375,
+          [
+            -725.83,
+            -796.81
+          ],
+          6.3896331787109375,
+          6.3853759765625,
+          6.306396484375,
+          6.30535888671875
+        ],
+        [
+          0.0042266845703125,
+          [
+            -723.83,
+            -804.31
+          ],
+          10.233261108398438,
+          10.23748779296875,
+          10.061553955078125,
+          10.0611572265625
+        ],
+        [
+          0.004180908203125,
+          [
+            -725.83,
+            -797.31
+          ],
+          6.6686553955078125,
+          6.6644744873046875,
+          6.5853729248046875,
+          6.5844573974609375
+        ]
+      ],
+      "missingRebuiltServiceRoadSamples": [],
+      "neighborId": "way/957404989",
+      "neighborIds": [
+        "way/957404989"
+      ],
+      "neighborPerimeterSamples": 1129,
+      "previousExportMissingRoadSamples": [],
+      "maximumNeighborGroundChange": 0.0,
+      "errors": [],
+      "passed": true
+    }
+  ],
+  "serviceRoadCompanionPassed": true,
+  "geometryReuse": "Only source terrain/roads and base terrain/local civil-service-road nodes changed. Other 533 non-tree objects, 3062 trees, 95 base nodes, 448 building records and 68 other GLBs are preserved.",
+  "limitations": [
+    "Local ground repair does not establish surveyed terrain or real access slopes.",
+    "The 3.2mm rebuilt service-road transition change remains recorded; retained source roads and joins are unchanged.",
+    "Ordinary compressed roads retain prior source/export differences and missing samples reported separately.",
+    "Hall transport opening, north-office rear facades, west foyer roof and independent old-hall identity remain pending."
+  ],
+  "fingerprints": {
+    "blender/foundation_geometry.py": "7bbd303c1c8cb11f9d0f1067d912d6eab1b05ec99225a440b89b6289d44ecd87",
+    "blender/test_foundation_geometry.py": "93e657c05437e0548aaf15ba00fa3840a7944829527fb68aaf8aa7386808c3ec",
+    "blender/fixtures/civil-foundation-boundary.json": "1d4a3a551acf3bd7aadc4831199c389e875cd5eba6528de35f47c87d76da5a17",
+    "blender/validate_foundation_neighbors.py": "69830baf295b8ce85fd3b77f4e986d941c1f70ccbab09aa9deacfbcccc7a2a97",
+    "blender/gxu-campus.blend": "f69374b715d664802986e9222f97e9ec9a28ca1e2a2c1640328a4b6e85a5de13",
+    "public/models/base.glb": "ff977e234ec1f9d9df793728e5a40753e96a6b73f98cb0dec2d7e3aeb26b1fe5",
+    "public/data/models.json": "5fba265dc576ad2ffe4ce2de2f93308c5a61837c8363ce19cc5adf4eb2dbb04a",
+    "public/data/foundations.json": "083827df6b0539b8ac3c135e7f43fb1a70bd4630bb65dd0c70e88ba9cdee104f",
+    "public/data/buildings.json": "1e813a5b29c7cf0a7ec9977d6e9d474a50181cb6a563c15204ba549e6ff2c3aa",
+    "lib/campus/scene.ts": "ded9d1047f17eb6698de3eb96d10a9f365a3229e95ba31ac8b37c1fca856142e",
+    "out/index.html": "a88804396c9cf2323474119670524d82e60005b4e8893fa7ab35e6902d3a1408"
+  },
+  "branch": "dev",
+  "baseCommit": "176c77fc9a5ff1d546aee294cbbccd8422c93434"
+}
