@@ -1,14 +1,16 @@
 # Blender 模型与重建
 
-2026-09-30：[结构平台首轮整栋状态](CIVIL_PLATFORM_WHOLE_REVIEW.md)覆盖六分部、屋顶、主要立面和D区入口接路。本轮未改生产模型；通用背面窗格、西门厅平顶及未定位运输口保留明确限制。大厅与北楼不拆分计数。
+2026-09-30当前接续：[结构平台西侧服务路](CIVIL_PLATFORM_WEST_ROAD.md)按实际地形三角面贴地并封闭路边，保留三处邻路接缝。平台在此前接地审计后重开整栋验收，未知背立面、运输口和西门厅屋面继续核对；大厅与北楼不拆分计数。
 
-源文件 `blender/gxu-campus.blend` 由 Blender 5.2.1 LTS 构建，使用米制坐标；建筑、树木与道路水体为具名对象，建筑带 `featureId` / `landmark` / `sourceUrl` 属性。材质与自制 JPEG 纹理均打包在 .blend 内，不需要额外下载摄影贴图。
+源文件 `blender/gxu-campus.blend` 当前由 Blender 5.2.2 LTS 构建，使用米制坐标；建筑、树木与道路水体为具名对象，建筑带 `featureId` / `landmark` / `sourceUrl` 属性。材质与自制 JPEG 纹理均打包在 .blend 内，不需要额外下载摄影贴图。
 
 树木朝向由树位稳定计算，网页与 Blender 共用同一角度约定，局部删树不影响其余树的朝向。已有开放区域由 `data/vegetation-zones.json` 配置，完整与增量准备复用分区解析器。仅更新源文件朝向使用 `blender/update_tree_layout.py`；完整建模也采用同一公式，详见[植被分区与稳定朝向](VEGETATION_ZONES.md)。背景候选按世界网格独立种子生成；完整建模通过 `blender/tree_layout.py` 采样最终地形三角面，将高程写入树位第五列并应用到源实例。数据准备后须完成模型构建再发布树位；只校正既有源实例高程时，可对上述增量命令添加 `-- --ground`，再更新网页生产包。
 
 行道树使用 `data/vegetation-avenues.json` → `scripts/vegetation_avenues.py`，在最终植被筛选前局部替换背景树。道路ID和线位哈希固定里程方向，候选按道路切线生成双侧偏移，再保留路口开口；重复准备保留已有树位的标高。首个[博萃路试点](AVENUE_PILOT.md)保留14株树，全部3,061株继续经过占地、树冠保留区、显式禁植区及模型检查。个别树位、间距和高度为估算，模板仍由既有GLB实例化，未增加新的树模型资源。
 
 ## 可重复构建
+
+平台基础修补由 `data/foundation-overrides.json` 派生 `public/data/foundations.json`。道路贴地在基础修补后执行，不修改原始DEM或楼底标高。网页加载基础GLB后，仅从静态地形与道路的索引中删除严格零面积三角形；有效顶点、法线、UV、包围盒和原资产不变，线框、位移、形变及局部绘制范围均不适用该优化。
 
 普通铺地样例使用 `data/paving-overrides.json` → `scripts/paving_data.py` → `public/data/pavings.json` → `blender/paving_geometry.py`。完整准备顺序为最终道路、入口场地、普通铺地、岸段、植被；完整几何构建先处理入口场地与铺地，再处理岸段，最后重算树根高程。修改道路或场地后，需同时刷新铺地和岸段上下文；构建会拒绝过期的派生结果。
 

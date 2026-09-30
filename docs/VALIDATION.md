@@ -1,5 +1,7 @@
 # 验收记录
 
+2026-09-30当前接续：[结构平台西侧服务路](CIVIL_PLATFORM_WEST_ROAD.md)新增实际源文件/GLB路面、路边封口、三处接缝和保留区检查，复跑封闭楼体侵入及D区接路。首轮性能因流畅三角形增幅15.23%而未通过，失败记录保留。后续从解码后的地形/道路索引剔除9,650个严格零面积面，完整有效三角形和所有属性字节保持；七组校园渲染像素一致，UI太阳图标的1像素差异单列。最终状态、资产指纹和性能以[本批汇总](model-checks/refinement/s2-platform-west-road-summary.json)为准，不恢复平台整栋完成计数。
+
 2026-09-30：[动物学院核心屋顶](ANIMAL_COLLEGE_ROOFTOP.md)增加窄小体量及外挑平顶。`validate_animal_rooftop.py` 对源/基础/近景各执行30处固定坐标、法线与有限空隙检查，支持 `--check-root` 旧资产反例；必须配合原入口、外廊、窗格及普通建筑回归。尺寸估算和最终资产/性能指纹见[专项汇总](model-checks/refinement/s3-animal-rooftop-summary.json)。
 
 2026-09-30：[运动场合批扩展](SPORTS_EXTENDED_BATCHING.md)通过116,934个实际三角形等价检查、66项Node测试及同条件活动性能验收。16张前后图和6张回归图核看，三次LOD往返无错误；源文件、69份GLB和公共数据保持。精细/流畅均三轮60/30 FPS，流畅档绘制调用较S0 +13.69%、三角形 +14.61%，详见[汇总](model-checks/refinement/s5-sports-extended-summary.json)。

@@ -87,6 +87,12 @@ def prepare_foundations(root=ROOT):
         for masks, shape in ((record['coreMasks'],core),(record['transitionMasks'],ring),(record['roadTrimMasks'],trim)):
             if unary_union([Polygon(t) for t in masks]).symmetric_difference(shape).area > 1e-6:
                 raise ValueError('Incomplete foundation triangulation')
+        if 'groundedServiceRoad' in item:
+            export_with=item['groundedServiceRoad'].get('exportWith')
+            if export_with is not None and not any(p['id']==export_with and 'groundedService' in p for p in context['pavings']['pavings']):
+                raise ValueError('Missing grounded road export group')
+            from service_road_data import derive_service_road
+            record['groundedServiceRoad']=derive_service_road(item['groundedServiceRoad'],effective,context['campus-roads']['layers']+context['surroundings']['layers'],trim,convex_masks)
         records.append(record)
     digest = revision(context)
     result = {'schemaVersion':1, 'contextRevision':digest, 'foundations':records}

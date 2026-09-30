@@ -1,0 +1,105 @@
+{
+  "checkedAt": "2026-09-30T01:50:27.611465+00:00",
+  "passed": false,
+  "productionIntegrated": true,
+  "scope": "Ground the complete mapped west service road on actual terrain, retain three neighboring contacts, and close free road edges.",
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonTests": 287,
+  "nodeTests": 66,
+  "typecheckPassed": true,
+  "lintPassed": true,
+  "blenderNewRoadFixtures": 5,
+  "blenderFoundationFixtures": 4,
+  "blenderPavingFixturesPassed": true,
+  "blenderSuffixedExportFixturePassed": true,
+  "checks": [
+    "geometry",
+    "foundation",
+    "connection-geometry",
+    "source-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4270158,
+      "medianDrawCalls": 564,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.224949750243791,
+        "medianDrawCalls": 3.1078610603290757
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1212169,
+      "medianDrawCalls": 302,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 15.23121455969656,
+        "medianDrawCalls": 14.828897338403046
+      },
+      "passed": false
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of complete isolation.",
+  "initialModelBytes": 5994296,
+  "initialByteHeadroom": 5704,
+  "maximumOrdinaryNearBytes": 1684868,
+  "geometryReuse": "Exact object and compressed-node fingerprints preserve every building, terrain, site and tree from the prior accepted batch. Only source roads and the two base road nodes changed; all 68 other GLBs match. Road grounding, building intrusion and D connection were rerun on final assets.",
+  "limitations": [
+    "Existing terrain and retained junction elevations are model estimates; steep grades are not certified as-built slopes.",
+    "Low south/southwest views remain occluded by unchanged exterior high ground; the road mesh audit is a separate result.",
+    "Hall transport opening, north-office south/west facades, west foyer roof, and independent old-hall identity remain unconfirmed."
+  ],
+  "fingerprints": {
+    "data/foundation-overrides.json": "b6645c5359f930ed688d9c02f0cda139d131eedc811e8d209148fb5d85abb6dc",
+    "scripts/foundation_data.py": "085a25b2e5dfa2ea8654ac97ce1baa5b79a5d012f928b5b3b108af603ac6cfae",
+    "scripts/service_road_data.py": "94855e292be547f618111c865c6f747aa4b4af7c3660cd29652cbb6f3a35bbc8",
+    "blender/service_road_geometry.py": "2372cc6f41c718f84c54683a5ce52df84001beb5442404d8923f8434043ad4ee",
+    "blender/foundation_geometry.py": "842a235d63c0da64c47b3337cba57a5d6065a8a81b0c0a2db4c6def982f82b21",
+    "blender/paving_geometry.py": "62037dca925d8a46c1c0800000c85448f4b2f36b8899e96b49039e38ecaef92a",
+    "blender/build_campus.py": "966c8438f38205ba1ebe19c02bfe884a5702a8c227da530b4268999fbfac9a7a",
+    "blender/terrain_export.py": "5a46c08f79b3788238b85519120dfe6341cb24ed3178a2bda5d0efec5da51a2c",
+    "blender/gxu-campus.blend": "ee001b0ba403cb28d5c7cd7f3e4a344f302475d1cc35a6fddd126f862cd1a66e",
+    "public/data/foundations.json": "e08da664e8a7ee48c81838fd2a33818839cd07da05d3169a322cd743384f6eb6",
+    "public/data/buildings.json": "1e813a5b29c7cf0a7ec9977d6e9d474a50181cb6a563c15204ba549e6ff2c3aa",
+    "public/data/terrain.json": "6ea0100e963f3e26c176273fea174ffe3e4ac60d2e131955119be53fd005aa52",
+    "public/data/models.json": "115214cc26da8dad8d7e7e6bef4e29127b10fcf6e3686ca885ffd86b8f690d00",
+    "public/data/vegetation.json": "66fabad226b58d1f366c29d87eb1e99120536ca3f14cbc30e72b5d233da73729",
+    "public/models/base.glb": "d2390e490f212730394a03e82d8ae9e9d54e21307f7aa447120bd8d88da3c1c2"
+  },
+  "branch": "dev",
+  "baseCommit": "3fdf6153dd719284dcfc9db92d601418fa394bcc"
+}

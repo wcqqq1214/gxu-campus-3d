@@ -6,6 +6,8 @@ from export_attributes import omit_unused_uvs
 
 TERRAIN_BITS=18
 ROAD_BITS=17
+ROAD_UV_BITS=10
+LOCAL_ROAD_UV_BITS=11
 
 
 def replace_precise_terrain(path,objects):
@@ -18,14 +20,19 @@ def replace_precise_terrain(path,objects):
     # Clipping a footprint can shift that grid even for retained road planes.
     # A finer grid for the ordinary service-road material keeps the exported
     # height within contact tolerance without raising every road material cost.
-    for obj,bits,name in [(terrain[0],TERRAIN_BITS,'terrain'),(roads[0],ROAD_BITS,'roads')]:
+    exports=[(terrain[0],TERRAIN_BITS,'terrain'),(roads[0],ROAD_BITS,'roads')]
+    # The joined civil service roads use a small position domain. Match the
+    # granular-texture UV precision without lowering position precision.
+    exports.extend((o,15,'paving-civil-platform-service-export') for o in objects
+                   if re.sub(r'\.\d{3,}$','',o.name)=='paving-civil-platform-service-export')
+    for obj,bits,name in exports:
         bpy.ops.object.select_all(action='DESELECT');obj.select_set(True)
         with tempfile.TemporaryDirectory(prefix='gxu-ground-export-') as directory:
             precise=Path(directory)/'ground.glb'
             with omit_unused_uvs():
                 bpy.ops.export_scene.gltf(filepath=str(precise),export_format='GLB',use_selection=True,export_extras=True,
                     export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,
-                    export_draco_position_quantization=bits,export_draco_texcoord_quantization=TERRAIN_BITS if obj==terrain[0] else 11,
+                    export_draco_position_quantization=bits,export_draco_texcoord_quantization=TERRAIN_BITS if name=='terrain' else ROAD_UV_BITS if name=='roads' else LOCAL_ROAD_UV_BITS,
                     export_draco_normal_quantization=6,export_materials='EXPORT',export_cameras=False,export_lights=False)
-            preserve_geometry(precise.read_bytes(),path,[name],materials={'road'} if obj==roads[0] else None)
+            preserve_geometry(precise.read_bytes(),path,[name],materials=None if name=='terrain' else {'road'})
     compact_buffer_views(path)

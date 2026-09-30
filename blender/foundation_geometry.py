@@ -54,7 +54,7 @@ def clipped_mesh(mesh, masks, area, transform=None, ceiling=None):
     return result, {'affectedTriangles':affected,'maximumLoweringMeters':maximum}
 
 
-def simplify_local_planes(mesh, record):
+def simplify_local_planes(mesh, record, *, normal_tolerance=1e-6, weld_distance=0):
     """Remove coplanar clipping diagonals, retaining every boundary vertex."""
     import bmesh
     from mathutils import Vector
@@ -76,11 +76,13 @@ def simplify_local_planes(mesh, record):
                 retained.append(i)
         else:
             retained.append(i)
+    if weld_distance:
+        bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=weld_distance)
     bm.normal_update()
     edges = [e for e in bm.edges if len(e.link_faces)==2
              and e.link_faces[0].material_index==e.link_faces[1].material_index
              and e.link_faces[0].normal.dot(e.link_faces[1].normal)>0
-             and e.link_faces[0].normal.cross(e.link_faces[1].normal).length < 1e-6]
+             and e.link_faces[0].normal.cross(e.link_faces[1].normal).length < normal_tolerance]
     bmesh.ops.dissolve_edges(bm,edges=edges,use_verts=False,use_face_split=False)
     # Preserve every boundary vertex so adjacent retained triangles still meet.
     bmesh.ops.triangulate(bm,faces=list(bm.faces))

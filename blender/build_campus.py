@@ -236,6 +236,13 @@ base.update(shore_meshes)
 from foundation_geometry import build_foundations
 base['terrain'],base['roads'],foundation_report=build_foundations(foundations,base['terrain'],base['roads'])
 (ROOT/'docs/model-checks/refinement/foundation-build.json').write_text(json.dumps(foundation_report,ensure_ascii=False,indent=2)+'\n')
+from service_road_geometry import build_service_road
+service_road_report=[]
+for foundation in foundations['foundations']:
+    if foundation.get('groundedServiceRoad'):
+        base['roads'],report=build_service_road(foundation['groundedServiceRoad'],C,base['terrain'],base['roads'])
+        service_road_report.append(report)
+(ROOT/'docs/model-checks/refinement/service-road-build.json').write_text(json.dumps(service_road_report,ensure_ascii=False,indent=2)+'\n')
 base['terrain'].ground_uv_bounds=[[v+(-1 if i<2 else 1) for i,v in enumerate(p['bounds'])] for p in pavings['pavings']]+[s['gradingBounds'] for s in sites['sites'] if s.get('type') in ('side-connection','front-connection','terraced-stair-connection','entry-apron','gallery-apron','canopy-connection')]
 base['terrain'].ground_uv_bounds.extend(r['bounds'] for r in foundations['foundations'])
 (ROOT/'docs/model-checks/refinement/shore-build.json').write_text(json.dumps(shore_report,ensure_ascii=False,indent=2)+'\n')
@@ -370,7 +377,7 @@ scene.view_settings.view_transform='AgX';scene.unit_settings.system='METRIC';sce
 def export(name,groups):
     if name=='base.glb':
         from paving_geometry import split_grounded_road_exports
-        groups=split_grounded_road_exports(groups,pavings['pavings'])
+        groups=split_grounded_road_exports(groups,pavings['pavings'],[r['groundedServiceRoad'] for r in foundations['foundations'] if r.get('groundedServiceRoad')])
     bpy.ops.object.select_all(action='DESELECT');objs=[]
     for key,mesh in groups.items():
         if not mesh.v:continue
@@ -378,7 +385,7 @@ def export(name,groups):
         props={'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else '', 'sportsId':key[7:] if key.startswith('sports-') else ''}
         if key.startswith('vegetation-low-'):props.update(layer='vegetation',plantingId=key.removeprefix('vegetation-low-'))
         if key=='terrain':props.update(positionQuantizationBits=18,texcoordQuantizationBits=18)
-        if key=='roads':props.update(roadMaterialPositionQuantizationBits=17,roadMaterialTexcoordQuantizationBits=11)
+        if key=='roads':props.update(roadMaterialPositionQuantizationBits=17,roadMaterialTexcoordQuantizationBits=10)
         if key.startswith('site-'):props['siteId']=key[5:]
         o=mesh.object(key,EXPORT,props);o.select_set(True);objs.append(o)
     path=MODELS/name
