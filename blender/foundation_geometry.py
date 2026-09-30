@@ -1,8 +1,5 @@
 """Bounded foundation clearance on actual terrain and ordinary road triangles."""
 from geometry import Mesh
-from mathutils import Vector
-from mathutils.bvhtree import BVHTree
-from functools import lru_cache
 from site_geometry import mesh_triangles, split_convex, polygon_distance, ring_distance
 from shore_geometry import bounds, overlaps, triangles_into, conform_edges
 
@@ -16,14 +13,18 @@ def masks_for(triangles):
     return result
 
 
-def clipped_mesh(mesh, masks, area, transform=None, ceiling=None):
-    """Keep original planes outside the mask; optionally drop masked road tops."""
+def clipped_mesh(mesh, masks, area, retain_masked=False, ceiling=None):
+    """Clip and conform original planes; retain masked terrain or drop road tops.
+
+    Grading must happen after conformity, so inserted points are interpolated
+    from the original surface rather than a piecewise approximation of a grade.
+    """
     selected = {i for i,f in enumerate(mesh.f)
                 if overlaps(bounds([mesh.v[k] for k in f]),area)
                 and (ceiling is None or max(mesh.v[k][2] for k in f)>ceiling+.0001)}
     if not selected:
         return mesh, {'affectedTriangles':0,'maximumLoweringMeters':0}
-    result = Mesh(); affected = 0; maximum = 0
+    result = Mesh(); affected = 0
     for i,f in enumerate(mesh.f):
         if i not in selected:
             result.face([mesh.v[k] for k in f],mesh.m[i])
@@ -44,17 +45,15 @@ def clipped_mesh(mesh, masks, area, transform=None, ceiling=None):
         for piece in remaining:
             triangles_into(result,piece,mesh.m[face])
         for piece in pieces:
-            if transform:
-                graded = [transform(p) for p in piece]
-                maximum = max(maximum,max(p[2]-q[2] for p,q in zip(piece,graded)))
-                triangles_into(result,graded,mesh.m[face])
+            if retain_masked:
+                triangles_into(result,piece,mesh.m[face])
         affected += bool(pieces)
     if not affected:
         # Bounding-box overlap alone must not retriangulate a retained road.
         return mesh, {'affectedTriangles':0,'maximumLoweringMeters':0}
     touched = bounds([mesh.v[k] for i in selected for k in mesh.f[i]])
     result = conform_edges(result,tuple(v+(-1 if i<2 else 1) for i,v in enumerate(touched)))
-    return result, {'affectedTriangles':affected,'maximumLoweringMeters':maximum}
+    return result, {'affectedTriangles':affected,'maximumLoweringMeters':0}
 
 
 def simplify_local_planes(mesh, record, *, normal_tolerance=1e-6, weld_distance=0):
@@ -109,29 +108,22 @@ def build_foundations(data,terrain,roads):
             dedge = min(ring_distance(p[:2],ring) for poly in record['gradingPolygons'] for ring in poly)
             weight = 1 if dcore < 1e-6 else dedge/(dcore+dedge)
             return p[0],p[1],p[2]-max(0,p[2]-target)*weight
-        original = BVHTree.FromPolygons(terrain.v,[ids for ids,_ in mesh_triangles(terrain)],all_triangles=True)
         before = sum(len(f)-2 for f in terrain.f)+sum(len(f)-2 for f in roads.f)
         terrain,ground_report = clipped_mesh(terrain,masks_for(record['coreMasks']+record['transitionMasks']),
-                                            record['bounds'],grade,ceiling=target)
-        # Edge conformity adds points on graded triangle planes. Those planes
-        # approximate a nonlinear field, so re-evaluate shared edge points from
-        # original ground to prevent differing Z on opposite sides of a seam.
-        @lru_cache(maxsize=None)
-        def shared_point(x,y):
-            hit=original.ray_cast(Vector((x,y,150)),Vector((0,0,-1)),300)[0]
-            if hit is None:raise ValueError('Missing original foundation ground')
-            return grade((x,y,hit.z))
-        area=record['bounds']
-        for i,(x,y,z) in enumerate(terrain.v):
+                                            record['bounds'],retain_masked=True,ceiling=target)
+        # Conform while faces still carry their original planes. Each new
+        # edge point then retains its own surface height, even where two
+        # surfaces share XY coordinates at different elevations.
+        area=record['bounds'];maximum=0
+        for i,p in enumerate(terrain.v):
+            x,y,z=p
             if area[0]-1e-5<=x<=area[2]+1e-5 and area[1]-1e-5<=y<=area[3]+1e-5:
-                # The clipped boundary already carries the original surface
-                # height. A vertical ray there can select the other side of
-                # an existing apron/terrain seam and lift a retained face.
-                # Preserve this edge, including float32 coordinate roundoff.
+                # Preserve the edge through float32 coordinate roundoff.
                 if min(ring_distance((x,y),ring) for poly in record['gradingPolygons'] for ring in poly)<1e-4:
                     continue
                 if min(polygon_distance((x,y),poly) for poly in record['gradingPolygons'])<1e-5:
-                    terrain.v[i]=shared_point(x,y)
+                    q=grade(p);terrain.v[i]=q;maximum=max(maximum,z-q[2])
+        ground_report['maximumLoweringMeters']=maximum
         simplification=record.get('meshSimplification',{})
         terrain = simplify_local_planes(terrain,record,
             normal_tolerance=simplification.get('normalTolerance',1e-6),

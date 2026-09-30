@@ -1,6 +1,7 @@
 """Actual mesh regression tests for bounded grading and service-road trimming."""
 import sys
 import unittest
+import json
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
@@ -93,6 +94,19 @@ class FoundationRepairTests(unittest.TestCase):
         for x,y in [(-.01,0),(-.1,1),(-1,-1)]:
             self.assertAlmostEqual(height(ground,x,y),height(old,x,y),places=4)
         self.assertAlmostEqual(height(ground,1.5,0),0,places=4)
+
+    def test_conformed_boundary_preserves_original_sloping_quad(self):
+        fixture=json.loads((Path(__file__).parent/'fixtures/civil-foundation-boundary.json').read_text())
+        simplification=self.record.get('meshSimplification')
+        self.record=fixture['record']
+        if simplification:self.record['meshSimplification']=simplification
+        old=Mesh();old.v=fixture['vertices'];old.f=fixture['faces'];old.m=fixture['materials']
+        ground,_=self.repair(old)
+        x,y=fixture['probe']
+        # Exact boundary and the retained side: conforming already lowered
+        # triangles used to move this original plane down by about 6.7 mm.
+        for dx in [0,-.001,-.01]:
+            self.assertAlmostEqual(height(ground,x+dx,y),height(old,x+dx,y),places=4)
 
 
 class WeldedFoundationRepairTests(FoundationRepairTests):

@@ -84,7 +84,7 @@ def main():
         old=source_baseline if label=='source' else read(args.baseline/'public/models/base.glb')
         current=read(path);tol=.002 if label=='source' else .025
         errors=[];outside_points=[];outside=[];support=[];retained=[];road_points=[];old_export_deltas=[];neighbors=[]
-        existing_road_misses=[]
+        existing_road_misses=[];rebuilt_road_points=[];missing_rebuilt_road=[]
         for p,(g,r) in current.items():
             bg,old_export_road=old[p]
             source_ground,br=source_baseline[p]
@@ -94,18 +94,26 @@ def main():
                 outside.append(abs(g-bg));outside_points.append((abs(g-bg),p,g,bg))
             trimmed=any(covers(p,[[m+[m[0]]]]) for m in record['roadTrimMasks'])
             trim_edge=min(ring_distance(p,m+[m[0]]) for m in record['roadTrimMasks'])
+            # A mapped service-road transition is rebuilt from the graded
+            # terrain. Report its changes separately; validate_service_road
+            # checks its clearance, joins and closures. The unchanged-road
+            # tolerance continues to apply outside this explicit repair mask.
+            rebuilt=covers(p,record.get('groundedServiceRoad',{}).get('polygons',[]))
+            if rebuilt and not trimmed and trim_edge>.05 and br is not None:
+                if r is None:missing_rebuilt_road.append(p)
+                else:rebuilt_road_points.append((abs(r-br),p,r,br,g,source_ground))
             # Boundary rounding can change road hit/no-hit; evaluate interior.
             reference_road=old_export_road if label=='base' and args.road_reference=='previous-export' else br
             reference_ground=bg if label=='base' and args.road_reference=='previous-export' else source_ground
-            if label=='base' and not trimmed and trim_edge>.05 and br is not None and old_export_road is None:
+            if label=='base' and not trimmed and not rebuilt and trim_edge>.05 and br is not None and old_export_road is None:
                 existing_road_misses.append(p)
                 if args.road_reference=='previous-export' and r is not None:
                     errors.append(['changed previously missing road sample',p])
-            if not trimmed and trim_edge>.05 and reference_road is not None and r is None:
+            if not trimmed and not rebuilt and trim_edge>.05 and reference_road is not None and r is None:
                 adjacent=[(p[0]+dx,p[1]+dy) for dx,dy in ((-.5,0),(.5,0),(0,-.5),(0,.5))]
                 if all(source_baseline.get(q,(None,None))[1] is not None for q in adjacent):
                     errors.append(['missing retained road interior',p])
-            if not trimmed and trim_edge>.05 and br is not None and r is not None:
+            if not trimmed and not rebuilt and trim_edge>.05 and br is not None and r is not None:
                 retained.append(abs(r-br));road_points.append((abs(r-br),p,r,br,g,source_ground))
                 if reference_road is not None:
                     support.append(abs((r-g)-(reference_road-reference_ground)))
@@ -117,6 +125,10 @@ def main():
         report={'representation':label,'samples':len(points),'outsideSamples':len(outside),
                 'maximumOutsideGroundChange':max(outside),'worstOutsideSamples':sorted(outside_points,reverse=True)[:5],'retainedRoadSamples':len(retained),
                 'maximumRetainedRoadErrorToSource':max(retained),'maximumRoadChangeFromPreviousExport':max(old_export_deltas,default=0),'worstRoadSamples':sorted(road_points,reverse=True)[:5],'maximumRoadSupportChange':max(support),
+                'rebuiltServiceRoadSamples':len(rebuilt_road_points),
+                'maximumRebuiltServiceRoadChangeToSource':max((r[0] for r in rebuilt_road_points),default=0),
+                'worstRebuiltServiceRoadSamples':sorted(rebuilt_road_points,reverse=True)[:5],
+                'missingRebuiltServiceRoadSamples':missing_rebuilt_road,
                 'neighborId':neighbor_ids[0] if len(neighbor_ids)==1 else None,
                 'neighborIds':neighbor_ids,'neighborPerimeterSamples':len(neighbors),
                 'previousExportMissingRoadSamples':existing_road_misses,
@@ -124,7 +136,8 @@ def main():
         reports.append(report)
     result={'passed':all(r['passed'] for r in reports),'foundationId':record['id'],'roadReference':args.road_reference,
             'unchangedEncodedOrdinaryRoadNode':unchanged_road_export,'representations':reports,
-            'scope':'0.5m grid, grading boundary at 1m, listed neighbor perimeters at 0.5m; representation-matched ground baselines. Source-plane road errors always reported; previous-export mode checks retained compressed-road height/support changes and preserves existing missing samples, without claiming their repair.'}
+            'requiredCompanionCheck':'validate_service_road.py' if record.get('groundedServiceRoad') else None,
+            'scope':'0.5m grid, grading boundary at 1m, listed neighbor perimeters at 0.5m; representation-matched ground baselines. Source-plane road errors always reported; mapped rebuilt service roads are listed separately and require the companion service-road clearance/join/closure check. Previous-export mode checks retained compressed-road height/support changes and preserves existing missing samples, without claiming their repair.'}
     args.report.parent.mkdir(parents=True,exist_ok=True);args.report.write_text(json.dumps(result,indent=2)+'\n')
     print('FOUNDATION_NEIGHBORS',json.dumps(result),flush=True)
     assert result['passed'],result
