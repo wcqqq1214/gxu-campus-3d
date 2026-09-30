@@ -58,8 +58,19 @@ def prepare_foundations(root=ROOT):
         b = next(b for b in context['buildings'] if b['id'] == item['buildingId'])
         if not 0 < item['coreMargin'] < item['roadTrimMargin'] < item['haloMeters'] <= 8:
             raise ValueError('Invalid local foundation margins')
-        closed = unary_union([Polygon(p[0], p[1:]) for part in b['form']['parts']
+        parts=b.get('form',{}).get('parts') or [{'polygons':b['polygons']}]
+        closed = unary_union([Polygon(p[0], p[1:]) for part in parts
                               if not part.get('openBelow') for p in part['polygons']])
+        building_closed_area=closed.area
+        if 'repairBounds' in item:
+            repair_bounds=item['repairBounds']
+            if (not isinstance(repair_bounds,list) or len(repair_bounds)!=4
+                    or any(type(v) not in (int,float) or not math.isfinite(v) for v in repair_bounds)
+                    or repair_bounds[0]>=repair_bounds[2] or repair_bounds[1]>=repair_bounds[3]):
+                raise ValueError('Invalid foundation repair bounds')
+            closed=closed.intersection(box(*repair_bounds))
+            if closed.is_empty or closed.area<=1e-7:
+                raise ValueError('Foundation repair bounds do not intersect a closed floor')
         core = closed.buffer(item['coreMargin'], join_style=2)
         trim = closed.buffer(item['roadTrimMargin'], join_style=2)
         halo = closed.buffer(item['haloMeters'], join_style=2)
@@ -90,6 +101,8 @@ def prepare_foundations(root=ROOT):
                   'roadTrimMasks': convex_masks(trim), 'roadTrimBounds': list(trim.bounds),
                   'closedArea': closed.area, 'gradingArea': area.area,
                   'trimmedRoadArea': roads.intersection(trim).area}
+        if 'repairBounds' in item:
+            record['buildingClosedArea']=building_closed_area
         # Every mask must cover exactly its intended region, including holes.
         for masks, shape in ((record['coreMasks'],core),(record['transitionMasks'],ring),(record['roadTrimMasks'],trim)):
             if unary_union([Polygon(t) for t in masks]).symmetric_difference(shape).area > 1e-6:
