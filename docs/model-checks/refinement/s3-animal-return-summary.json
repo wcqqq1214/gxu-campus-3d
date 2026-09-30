@@ -1,0 +1,117 @@
+{
+  "checkedAt": "2026-09-30T04:16:01.298724+00:00",
+  "passed": true,
+  "productionIntegrated": true,
+  "scope": "Remove four default upper-floor windows on the photo-mapped east terminal west return; retain obscured ground window and all existing body geometry.",
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "s3RequiredNeighborsWholeAccepted": 0,
+  "pythonTests": 289,
+  "nodeTests": 70,
+  "typecheckPassed": true,
+  "lintPassed": true,
+  "pagesBuildPassed": true,
+  "negativeControl": "s3-animal-return-before-geometry.json",
+  "checks": [
+    "geometry",
+    "entry-portico",
+    "corridor-geometry",
+    "grid-geometry",
+    "rooftop-geometry",
+    "source-preservation",
+    "assets"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4254680,
+      "medianDrawCalls": 565,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 5.83991721228283,
+        "medianDrawCalls": 3.290676416819016
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1198939,
+      "medianDrawCalls": 291,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 13.973544244233294,
+        "medianDrawCalls": 10.646387832699622
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "visualReview": {
+    "reviewedImages": 7,
+    "accepted": true,
+    "closeComparison": "Four upper windows removed; ground glass and neighboring front windows retained.",
+    "mobile": "Base LOD also retains blank upper wall and ground glass.",
+    "night": "No spurious lit windows on blank wall.",
+    "wideView": "Context only, not rear-wing evidence."
+  },
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of complete isolation.",
+  "dataPreservation": {
+    "otherBuildings": 447,
+    "allFootprints": true,
+    "allGeojsonGeometries": true,
+    "foundationGeometry": true,
+    "onlyFormChange": "Original exterior edge 8 skipWindowLevels [1,2,3,4]; balconies false"
+  },
+  "initialModelBytes": 5996992,
+  "initialByteHeadroom": 3008,
+  "maximumOrdinaryNearBytes": 1684868,
+  "geometryReuse": "Only animal college source object and base/near chunk changed; 534 other non-tree objects, 3062 trees, 96 base nodes and 67 other GLBs preserved. Civil ground/roads retained without rerunning their full audits.",
+  "limitations": [
+    "Ground window is obscured in photos and remains estimated.",
+    "Existing double-sided inward-wound wall retained; no wall-winding repair claimed.",
+    "Rear wing extent, height and back facades remain unverified.",
+    "Civil hall transport opening, north-office rear facades, west foyer roof and independent old-hall identity remain pending."
+  ],
+  "fingerprints": {
+    "blender/validate_animal_return.py": "21f83ebec7b5b80cd3e47142bd9c7160953120ae9467f0a552bae50b65aa4c57",
+    "blender/gxu-campus.blend": "8559ba8ab4fae8221d1863d5139e6ae30e9af803e84aeb74d32ff36ae5a9f9ab",
+    "public/models/base.glb": "ab7437e513543d914c6028023d7b3d13bba38d8305c628a5b35b8797137dd9fc",
+    "public/models/chunk-p0-n1.glb": "5e9f7c9c5866784f14273e76eeb53fa658917c1b0df79cc6c9a28c1bace815d4",
+    "public/data/models.json": "73673cf264de19d2824d22d91a19c82d0500fe62221b1bb57bc2db202e9ff196",
+    "public/data/buildings.json": "b32a12adb531305f3bc880a5c999bf8b8c237e1c38e1db543e79c8b294170bee",
+    "public/data/foundations.json": "0dad49948e63a4ab19f734a7f8f0ad08f27dd76092b040f00a2186748712b5cf",
+    "data/building-overrides.json": "54a262503edbc3474901c937bec00ea3546424c5595266fa318b9ae955c9a0ad",
+    "data/building-sources.json": "272ca97b4bf6322f365500fd3431778d530189da72138d67a627c0438c6a4133",
+    "lib/campus/scene.ts": "ded9d1047f17eb6698de3eb96d10a9f365a3229e95ba31ac8b37c1fca856142e",
+    "out/index.html": "0087243c661c63794c31ac4e4a73c9d4de136e58bb18aca4f88200e6980477a8"
+  },
+  "branch": "dev",
+  "baseCommit": "579938e64136f3d204ff05c9ba625b7138820f21"
+}
