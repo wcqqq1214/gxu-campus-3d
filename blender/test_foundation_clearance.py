@@ -79,6 +79,15 @@ class FoundationAuditTests(unittest.TestCase):
         self.assertFalse(result['passed'])
         self.assertAlmostEqual(result['parts'][0]['worstRoadSamples'][0]['roadAboveDatum'], 1)
 
+    def test_unpartitioned_body_still_checks_whole_footprint_and_courtyard(self):
+        polygons=self.building['form']['parts'][0]['polygons']
+        polygons[0].append([[1,1],[1,3],[3,3],[3,1],[1,1]])
+        self.building={'elevation':0,'height':4,'polygons':polygons,'form':{'parts':[]}}
+        self.points=sample_parts(self.building,1)
+        self.assertFalse(any(1<x<3 and 1<y<3 for _,x,y,_ in self.points))
+        self.ground(high=4);self.road()
+        self.assertFalse(self.result()['passed'])
+
 
 if __name__ == '__main__':
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(FoundationAuditTests)

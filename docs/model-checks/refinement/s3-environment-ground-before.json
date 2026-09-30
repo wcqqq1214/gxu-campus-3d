@@ -1,0 +1,248 @@
+{
+  "scope": "Read-only mapped-body terrain and roads audit; temporary whole-body sampling parts are not calibration parts.",
+  "baseCommit": "27459cd854c84bdbf7fb6560cc555cee78fdf631",
+  "sampling": {
+    "spacingMeters": 2,
+    "perimeterInsetMeters": 0.25,
+    "allowedIntrusionMeters": 0.3,
+    "datum": "Exact original DEM interpolation used by generic builder; not a surveyed floor elevation."
+  },
+  "fingerprints": {
+    "source": "8559ba8ab4fae8221d1863d5139e6ae30e9af803e84aeb74d32ff36ae5a9f9ab",
+    "base": "ab7437e513543d914c6028023d7b3d13bba38d8305c628a5b35b8797137dd9fc",
+    "buildings": "b32a12adb531305f3bc880a5c999bf8b8c237e1c38e1db543e79c8b294170bee",
+    "terrainData": "6ea0100e963f3e26c176273fea174ffe3e4ac60d2e131955119be53fd005aa52"
+  },
+  "buildings": [
+    {
+      "id": "way/880036336",
+      "name": "动物繁殖研究所",
+      "adoptedDatum": 1.5574939229769305,
+      "representations": [
+        {
+          "representation": "source",
+          "samples": 192,
+          "parts": [
+            {
+              "part": "mapped-closed-body",
+              "samples": 192,
+              "terrainIntrusionSamples": 0,
+              "roadIntrusionSamples": 0,
+              "maximumTerrainAboveDatum": 0.14825558874181954,
+              "worstGroundSamples": [],
+              "worstRoadSamples": []
+            }
+          ],
+          "passed": true
+        },
+        {
+          "representation": "base",
+          "samples": 192,
+          "parts": [
+            {
+              "part": "mapped-closed-body",
+              "samples": 192,
+              "terrainIntrusionSamples": 0,
+              "roadIntrusionSamples": 0,
+              "maximumTerrainAboveDatum": 0.14924741003088204,
+              "worstGroundSamples": [],
+              "worstRoadSamples": []
+            }
+          ],
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "way/759140885",
+      "name": "校内建筑 759140885",
+      "adoptedDatum": 3.442822574547506,
+      "representations": [
+        {
+          "representation": "source",
+          "samples": 132,
+          "parts": [
+            {
+              "part": "mapped-closed-body",
+              "samples": 132,
+              "terrainIntrusionSamples": 0,
+              "roadIntrusionSamples": 0,
+              "maximumTerrainAboveDatum": 0.09569060904624394,
+              "worstGroundSamples": [],
+              "worstRoadSamples": []
+            }
+          ],
+          "passed": true
+        },
+        {
+          "representation": "base",
+          "samples": 132,
+          "parts": [
+            {
+              "part": "mapped-closed-body",
+              "samples": 132,
+              "terrainIntrusionSamples": 0,
+              "roadIntrusionSamples": 0,
+              "maximumTerrainAboveDatum": 0.09746062857749394,
+              "worstGroundSamples": [],
+              "worstRoadSamples": []
+            }
+          ],
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "way/759170251",
+      "name": "野生动物研究所",
+      "adoptedDatum": 1.9897530000242778,
+      "representations": [
+        {
+          "representation": "source",
+          "samples": 617,
+          "parts": [
+            {
+              "part": "mapped-closed-body",
+              "samples": 617,
+              "terrainIntrusionSamples": 23,
+              "roadIntrusionSamples": 0,
+              "maximumTerrainAboveDatum": 0.5715262968507222,
+              "worstGroundSamples": [
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    269.8793063,
+                    -419.2473224
+                  ],
+                  "kind": "perimeter-inset",
+                  "terrainAboveDatum": 0.5715262968507222,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                },
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    270,
+                    -420
+                  ],
+                  "kind": "interior-grid",
+                  "terrainAboveDatum": 0.5653464872804097,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                },
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    269.4843491,
+                    -417.4595232
+                  ],
+                  "kind": "perimeter-inset",
+                  "terrainAboveDatum": 0.5646903593507222,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                },
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    270,
+                    -418
+                  ],
+                  "kind": "interior-grid",
+                  "terrainAboveDatum": 0.5531089384522847,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                },
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    270.2742634,
+                    -421.0351216
+                  ],
+                  "kind": "perimeter-inset",
+                  "terrainAboveDatum": 0.5471427519288472,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                }
+              ],
+              "worstRoadSamples": []
+            }
+          ],
+          "passed": false
+        },
+        {
+          "representation": "base",
+          "samples": 617,
+          "parts": [
+            {
+              "part": "mapped-closed-body",
+              "samples": 617,
+              "terrainIntrusionSamples": 23,
+              "roadIntrusionSamples": 0,
+              "maximumTerrainAboveDatum": 0.5743644316163472,
+              "worstGroundSamples": [
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    269.8793063,
+                    -419.2473224
+                  ],
+                  "kind": "perimeter-inset",
+                  "terrainAboveDatum": 0.5743644316163472,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                },
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    270,
+                    -420
+                  ],
+                  "kind": "interior-grid",
+                  "terrainAboveDatum": 0.5683219511475972,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                },
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    269.4843491,
+                    -417.4595232
+                  ],
+                  "kind": "perimeter-inset",
+                  "terrainAboveDatum": 0.5671928007569722,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                },
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    270,
+                    -418
+                  ],
+                  "kind": "interior-grid",
+                  "terrainAboveDatum": 0.5557944853272847,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                },
+                {
+                  "part": "mapped-closed-body",
+                  "xy": [
+                    270.2742634,
+                    -421.0351216
+                  ],
+                  "kind": "perimeter-inset",
+                  "terrainAboveDatum": 0.5503470976319722,
+                  "roadAboveDatum": null,
+                  "roadHit": null
+                }
+              ],
+              "worstRoadSamples": []
+            }
+          ],
+          "passed": false
+        }
+      ]
+    }
+  ],
+  "passed": false
+}

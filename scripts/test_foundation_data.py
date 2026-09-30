@@ -70,5 +70,28 @@ class FoundationPreparationTests(unittest.TestCase):
         prepare_foundations(self.root)
         self.assertEqual(load_foundations(self.root)['foundations'][0]['meshSimplification'],settings)
 
+    def test_unpartitioned_building_can_limit_repair_without_filling_courtyard(self):
+        self.buildings[0]['form']['parts']=[]
+        self.buildings[0]['polygons'][0].append([[1,1],[1,3],[3,3],[3,1],[1,1]])
+        self.write('buildings',self.buildings)
+        self.config['foundations'][0]['repairBounds']=[-1,-1,2,5]
+        (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+        prepare_foundations(self.root)
+        r=load_foundations(self.root)['foundations'][0]
+        core=unary_union([Polygon(p[0],p[1:]) for p in r['corePolygons']])
+        self.assertTrue(core.contains(Point(.5,2)))
+        self.assertFalse(core.contains(Point(1.5,2)))
+        self.assertFalse(core.contains(Point(3.5,2)))
+        self.assertAlmostEqual(r['closedArea'],6)
+        self.assertAlmostEqual(r['buildingClosedArea'],12)
+
+    def test_invalid_or_empty_repair_bounds_rejected(self):
+        for bounds in [[0,0,0,1],[0,0,1],[0,0,True,1],[0,0,float('inf'),1],[20,20,21,21]]:
+            with self.subTest(bounds=bounds):
+                self.config['foundations'][0]['repairBounds']=bounds
+                (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+                with self.assertRaisesRegex(ValueError,'repair bounds'):
+                    prepare_foundations(self.root)
+
 
 if __name__=='__main__':unittest.main()

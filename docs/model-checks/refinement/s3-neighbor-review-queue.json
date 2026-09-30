@@ -88,7 +88,10 @@
         "Entrance facade orientation and along-wall position",
         "Full-height exterior showing ground, roof and any local upper volume",
         "Resolve historical 7F / OSM 8 / elevator 9/9 and 8/8 without inventing a basement"
-      ]
+      ],
+      "foundationReport": "docs/ENVIRONMENT_WEST_FOUNDATION.md",
+      "foundationStatus": "west-only-production-repair-with-full-building-sampling-passed",
+      "foundationSummaryReport": "docs/model-checks/refinement/s3-environment-ground-summary.json"
     },
     {
       "id": "way/759140885",
@@ -101,7 +104,7 @@
         297.61,
         -467.32
       ],
-      "status": "reviewed-insufficient-exterior-evidence",
+      "status": "round-corner-candidate-remains-unmapped",
       "toVerify": [
         "identity and footprint correspondence",
         "levels and roof",
@@ -109,7 +112,12 @@
         "visible facade and wings"
       ],
       "selectionBasis": "Distance to S0 work-area polygon plus visible context; not a factual plaza boundary.",
-      "note": "保留OSM层数和已有形体；本批未将不对应的研究所或新楼照片套用于此建筑。"
+      "note": "保留OSM层数和已有形体；本批未将不对应的研究所或新楼照片套用于此建筑。",
+      "reviewedAt": "2026-09-30",
+      "exteriorEvidenceReport": "docs/REPRODUCTION_BUILDING_EVIDENCE.md",
+      "exteriorEvidenceData": "docs/model-checks/refinement/s3-reproduction-exterior-evidence.json",
+      "groundAuditReport": "docs/model-checks/refinement/s3-environment-ground-before.json",
+      "nextAction": "等待带单位标识的侧墙/入口与建筑尽端、可识别路口同框资料；不把室内房号或混合地点活动照片作为总层数、入口方位或轮廓依据。"
     },
     {
       "id": "way/759158607",
@@ -153,7 +161,7 @@
         352.3,
         -454.24
       ],
-      "status": "reviewed-insufficient-exterior-evidence",
+      "status": "named-local-photo-found-geographic-anchor-pending",
       "toVerify": [
         "identity and footprint correspondence",
         "levels and roof",
@@ -170,7 +178,11 @@
         "entrance direction",
         "visible facades"
       ],
-      "reviewedAt": "2026-09-12T20:19:49.616722+00:00"
+      "reviewedAt": "2026-09-30",
+      "exteriorEvidenceReport": "docs/REPRODUCTION_BUILDING_EVIDENCE.md",
+      "exteriorEvidenceData": "docs/model-checks/refinement/s3-reproduction-exterior-evidence.json",
+      "groundAuditReport": "docs/model-checks/refinement/s3-environment-ground-before.json",
+      "nextAction": "等待带单位标识的侧墙/入口与建筑尽端、可识别路口同框资料；不把室内房号或混合地点活动照片作为总层数、入口方位或轮廓依据。"
     },
     {
       "id": "relation/11564704",

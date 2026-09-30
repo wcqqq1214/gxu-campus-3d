@@ -1,0 +1,169 @@
+{
+  "checkedAt": "2026-09-30T04:56:57.135818+00:00",
+  "passed": true,
+  "baseCommit": "27459cd854c84bdbf7fb6560cc555cee78fdf631",
+  "branch": "dev",
+  "productionIntegrated": true,
+  "buildingId": "way/759170251",
+  "scope": "Bounded west-end terrain correction; full 617-point building test retained, with original 0.3m diagnostic tolerance. Building identity, level count and facade remain unverified.",
+  "checks": [
+    "final",
+    "neighbors",
+    "source-preservation",
+    "terrain-preservation",
+    "assets"
+  ],
+  "negativeControl": "s3-environment-ground-negative.json",
+  "pythonTests": 291,
+  "nodeTests": 70,
+  "foundationPreparationTests": 8,
+  "realMeshAuditFixtures": 6,
+  "foundationGeometryFixtures": 14,
+  "typecheckPassed": true,
+  "lintPassed": true,
+  "pagesBuildPassed": true,
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4254888,
+      "medianDrawCalls": 565,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 5.845091444605854,
+        "medianDrawCalls": 3.290676416819016
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1195577,
+      "medianDrawCalls": 289,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 13.65394578613901,
+        "medianDrawCalls": 9.885931558935358
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "cpuSnapshots": 27,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "cpuSamplingLimit": "10-second snapshots with 2% CPU inclusion threshold, not proof of complete isolation.",
+  "visualReview": {
+    "reviewedImages": 14,
+    "acceptedSet": "s3-environment-ground-foot",
+    "excludedSet": "s3-environment-ground",
+    "exclusionReason": "First close camera was occluded by library; final northwest close camera shows west wall base. Wide views are context only.",
+    "nightChecked": true,
+    "mobileRepresentation": "base",
+    "performanceContextScreenshotsReviewed": 5
+  },
+  "dataPreservation": {
+    "buildings": 448,
+    "allBuildingRecordsAndFootprintsUnchanged": true,
+    "changedPublicData": [
+      "foundations.json",
+      "models.json"
+    ],
+    "priorFoundationRecordsUnchanged": true
+  },
+  "assetPreservation": {
+    "changedBuildingIds": [],
+    "footprintsPreserved": true,
+    "treesPreserved": 3062,
+    "removedTreeCandidates": [],
+    "restoredTreeCandidates": [],
+    "shippingTrees": 3062,
+    "changedGLBFiles": [
+      "base.glb"
+    ],
+    "changedBaseNodes": [
+      "terrain"
+    ],
+    "addedBaseNodes": [],
+    "preservedBaseNodes": 96,
+    "modelsVerified": 69,
+    "productionMatches": true,
+    "initialModelBytes": 5999908,
+    "initialModelByteChange": 2916,
+    "maximumOrdinaryNearBytes": 1684868,
+    "modelManifestSha256": "cf4d3ff726c54148b14ae250c5231797fd41f9a43f29962fdb7b460204905356",
+    "passed": true
+  },
+  "geometryLimitations": [
+    "Residual terrain above the adopted building floor remains at most about 0.276m in the full-building sample; not all floor terrain flattened.",
+    "No surveyed elevation or slope claim.",
+    "First-screen asset budget has only 92 bytes remaining.",
+    "Architectural evidence and civil follow-up scope remain pending."
+  ],
+  "counts": {
+    "calibratedObjects": 22,
+    "wholeFirstPassAccepted": 1,
+    "partialObjects": 21,
+    "s3RequiredNeighborsWholeAccepted": 0,
+    "newWholeAcceptances": 0
+  },
+  "fingerprints": {
+    "blender/gxu-campus.blend": "3004678f9aa2b04704691236f6c7765973e97c024c5b5807708d565b5af7de63",
+    "public/models/base.glb": "44af68bca5d948a98ac8ae127896f45d5d7044de6819524530b7017f0bb78312",
+    "public/data/models.json": "cf4d3ff726c54148b14ae250c5231797fd41f9a43f29962fdb7b460204905356",
+    "public/data/foundations.json": "c42003c012d94621d8a32832766c9a4d7ce00a5ac0bf260ea10071a04a160b10",
+    "data/foundation-overrides.json": "c6cc3abe06dcc756f1b796e4a901e0286f1eff03931eefd2bb89ead402160fd6",
+    "scripts/foundation_data.py": "eb7dfb1f39e1a168e0db2f4ef42715c4525a9bd578c53545f311585a4d65657f",
+    "blender/inspect_foundation_clearance.py": "b368141e48311ea9f2605939ad5571f0d40102cbd02140d33183f0c30a62a153",
+    "out/index.html": "daaa3fbfb84fe7172e94f7ee9e9fa35630be9d27eaf7a9961bbd404d4f733ea9"
+  },
+  "budgetTrials": [
+    {
+      "scope": "whole building, 6m halo",
+      "firstLoadBytes": 6004512,
+      "budgetPassed": false,
+      "wholeBuildingSamplesPerRepresentation": 617,
+      "sourcePassed": true,
+      "basePassed": true
+    },
+    {
+      "scope": "whole building, 3m halo",
+      "firstLoadBytes": 6004060,
+      "budgetPassed": false,
+      "wholeBuildingSamplesPerRepresentation": 617,
+      "sourcePassed": true,
+      "basePassed": true
+    },
+    {
+      "scope": "west subset x <= 294, 3m halo",
+      "firstLoadBytes": 6000592,
+      "budgetPassed": false,
+      "wholeBuildingSamplesPerRepresentation": 617,
+      "sourcePassed": true,
+      "basePassed": true
+    },
+    {
+      "scope": "west subset x <= 286, 3m halo",
+      "firstLoadBytes": 6000052,
+      "budgetPassed": false,
+      "wholeBuildingSamplesPerRepresentation": 617,
+      "sourcePassed": true,
+      "basePassed": true
+    },
+    {
+      "scope": "adopted west subset x <= 282, 3m halo",
+      "firstLoadBytes": 5999908,
+      "budgetPassed": true,
+      "wholeBuildingSamplesPerRepresentation": 617,
+      "sourcePassed": true,
+      "basePassed": true
+    }
+  ]
+}
