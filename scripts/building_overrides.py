@@ -837,7 +837,17 @@ def resolve_building(building, record=None, source_ids=None):
         for facade in form.get('facades',[]):
             if any(facade[k]!=entry[k] for k in ('polygon','ring','edge')):continue
             rule=facade['rule']
-            if any(k in rule for k in ('openCorridor','windowGrid','windowBands','attachedGallery')):
+            length=math.dist(facade['start'],facade['end'])
+            tangent=[(facade['end'][i]-facade['start'][i])/length for i in (0,1)]
+            center=sum((entry['center'][i]-facade['start'][i])*tangent[i] for i in (0,1))
+            half=max(entry['width'],entry['flushEntrance'].get('canopy',{}).get('width',0))/2
+            # A mapped edge can span several parts. Rules on a disjoint part
+            # cannot intersect this doorway or its projecting canopy.
+            if center+half<=0 or center-half>=length:continue
+            if any(k in rule for k in ('openCorridor','windowGrid','attachedGallery')):
+                raise ValueError('Flush entrance conflicts with another facade system')
+            band=rule.get('windowBands')
+            if band and center+half>band['from']*length-.06 and center-half<band['to']*length+.06:
                 raise ValueError('Flush entrance conflicts with another facade system')
             # Upper panels are permitted; they must not cover the glazed portal.
             head=entry['flushEntrance']['glazingHeight']+entry['flushEntrance'].get('canopy',{}).get('thickness',0)

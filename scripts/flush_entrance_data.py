@@ -5,8 +5,10 @@ import math
 def validate_flush_entrance(config, width, height):
     fields = {'floorHeight', 'glazingHeight', 'splitHeight', 'bays', 'pierWidth',
               'pierDepth', 'doorWidth', 'doorHeight', 'frameWidth'}
-    if not isinstance(config, dict) or not fields <= set(config) or set(config)-fields-{'canopy','returnGlazing'}:
+    if not isinstance(config, dict) or not fields <= set(config) or set(config)-fields-{'canopy','returnGlazing','opaqueDoor'}:
         raise ValueError('Flush entrance needs explicit glazing, door and frame dimensions')
+    if 'opaqueDoor' in config and type(config['opaqueDoor']) is not bool:
+        raise ValueError('Opaque door must be an explicit boolean')
     if type(config['bays']) is not int or config['bays'] not in (1, 3, 5):
         raise ValueError('Flush entrance needs an odd number of bays with a central door')
     for k in fields - {'bays'}:

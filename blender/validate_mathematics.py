@@ -102,6 +102,9 @@ def check(objects,tolerance,detail,ground):
             require('west-blank-wall',wall,p,-n,.8)
             assert ray(glass,p,-n) is None,('window on blank west wall',level,t)
     for e in b['form']['entrances']:
+        # The north stair lobby has its own solid-door/canopy checks in
+        # validate_math_lobby.py; the original two entries remain covered here.
+        if 'flushEntrance' in e:continue
         n=Vector((math.sin(math.radians(e['bearing'])),math.cos(math.radians(e['bearing'])),0));a=Vector((*e['center'],b['elevation']))
         if 'attachedPortico' in e:
             p=e['attachedPortico'];tangent=Vector((n.y,-n.x,0));floor=p['platformHeight']
