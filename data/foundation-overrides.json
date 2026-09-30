@@ -50,6 +50,20 @@
         282,
         -380
       ]
+    },
+    {
+      "id": "teaching-three-foundation",
+      "buildingId": "way/759132933",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "模型修复：三教闭合楼体内源/基础各检出10个地形、17个道路侵入采样。保留楼底、轮廓与原DEM，局部削低地形并裁除冲突路面；3米过渡和15米临时导出边缘分段范围为模型参数，不代表现场土方或道路改建。",
+      "roadExportConformMargin": 15
     }
   ]
 }

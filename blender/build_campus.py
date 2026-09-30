@@ -377,6 +377,8 @@ scene.view_settings.view_transform='AgX';scene.unit_settings.system='METRIC';sce
 def export(name,groups):
     if name=='base.glb':
         from paving_geometry import split_grounded_road_exports
+        from road_export import conform_foundation_road_exports
+        groups=conform_foundation_road_exports(groups,foundations['foundations'])
         groups=split_grounded_road_exports(groups,pavings['pavings'],[r['groundedServiceRoad'] for r in foundations['foundations'] if r.get('groundedServiceRoad')])
     bpy.ops.object.select_all(action='DESELECT');objs=[]
     for key,mesh in groups.items():
@@ -385,7 +387,7 @@ def export(name,groups):
         props={'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else '', 'sportsId':key[7:] if key.startswith('sports-') else ''}
         if key.startswith('vegetation-low-'):props.update(layer='vegetation',plantingId=key.removeprefix('vegetation-low-'))
         if key=='terrain':props.update(positionQuantizationBits=18,texcoordQuantizationBits=18)
-        if key=='roads':props.update(roadMaterialPositionQuantizationBits=17,roadMaterialTexcoordQuantizationBits=10)
+        if key=='roads':props.update(positionQuantizationBits=18,sharedPositionQuantizationBounds=True,roadMaterialPositionQuantizationBits=18,roadMaterialTexcoordQuantizationBits=10,otherMaterialTexcoordQuantizationBits=12)
         if key.startswith('site-'):props['siteId']=key[5:]
         o=mesh.object(key,EXPORT,props);o.select_set(True);objs.append(o)
     path=MODELS/name

@@ -1,5 +1,7 @@
 # Blender 模型与重建
 
+2026-09-30当前版本：[三教接地修补](TEACHING_THREE_FOUNDATION.md)正式集成。普通道路全部材质共享18位位置量化范围，普通UV12位、road材质UV10位；独立土木服务路编码保持。地形18位位置/UV，地形与道路在压缩前精确去重全部属性。`road_export.py`只在配置的局部临时网格内补齐边缘分段，保留垂直路缘面；`export_repaired_ground.py`用于从已修补源文件向基础GLB副本增量导出，需完成文中列出的源/基础、邻楼、服务路及性能验收后再更新清单。基础修补区外扩15米是导出处理范围，不是实体改建范围。结构平台已恢复首轮整栋通过，运输口和背立面仍待证。
+
 2026-09-30最新修补：[动物学院侧翼接地](ANIMAL_COLLEGE_FOUNDATION.md)已正式集成。基础修补支持有界局部简化参数，无命中道路保留原网格；地形精度导出临时剔除叉积严格为零的三角面并恢复源网格，保留原Draco精度与压缩级别。
 
 2026-09-30当前接续：[结构平台西侧服务路](CIVIL_PLATFORM_WEST_ROAD.md)按实际地形三角面贴地并封闭路边，保留三处邻路接缝。平台在此前接地审计后重开整栋验收，未知背立面、运输口和西门厅屋面继续核对；大厅与北楼不拆分计数。
@@ -18,7 +20,7 @@
 
 铺地节点归入 `roads` 图层，源文件与基础 GLB 成套更新。`update_roads.py` 和 `update_basketball.py` 已接入 `sync_source_pavings()`；2026-09-13 已在隔离副本中把铺地过渡宽度改为 4 米，核对两条实际增量命令及源文件/GLB 的参数响应。局部压低穿出铺面的底面，不修改原始 DEM JSON；详见 [铺地校准与专项验证](PAVING_CALIBRATION.md)。
 
-细分地形由 `blender/terrain_export.py` 以匹配的 18 位位置和 UV 精度导出，替换基础模型内地形节点的压缩数据；其他节点保持原精度。`compact_buffer_views()` 清除替换后不用的载荷，并共享元数据与字节完全相同的视图。基础模型的JPEG经jpegtran优化Huffman表，保留像素、量化精度与元数据；树木基础模板复用相同压缩载荷。见[无损打包](LOSSLESS_INITIAL_MODELS.md)。铺地地形的 UV 投影在局部范围内固定为 XY，避免极小三角面的不稳定法线改变投影；其他区域保持原投影。完整构建与两条增量模型路径共用该逻辑。专项命令为 `blender --background --python-exit-code 1 --python blender/validate_terrain_texture.py`。
+细分地形由 `blender/terrain_export.py` 以匹配的 18 位位置和 UV 精度导出，替换基础模型内地形节点的压缩数据；普通道路的当前精度见上方三教修补说明，其他节点保持原精度。`compact_buffer_views()` 清除替换后不用的载荷，并共享元数据与字节完全相同的视图。基础模型的JPEG经jpegtran优化Huffman表，保留像素、量化精度与元数据；树木基础模板复用相同压缩载荷。见[无损打包](LOSSLESS_INITIAL_MODELS.md)。铺地地形的 UV 投影在局部范围内固定为 XY，避免极小三角面的不稳定法线改变投影；其他区域保持原投影。完整构建与两条增量模型路径共用该逻辑。专项命令为 `blender --background --python-exit-code 1 --python blender/validate_terrain_texture.py`。
 
 网页运行只需要 npm；重新制作模型需要 Blender，以及提供 `jpegtran` 的 libjpeg-turbo（macOS可用 `brew install jpeg-turbo`，Debian/Ubuntu可用 `apt install libjpeg-turbo-progs`）。构建会在缺少编码器时报错；不重算几何的现有资产优化入口为 `python3 scripts/optimize_initial_models.py`。重新准备数据建议使用与 CI 一致的 Python 3.12，并通过约束文件固定几何处理依赖。
 

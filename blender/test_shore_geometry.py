@@ -46,3 +46,19 @@ conformed=conform_edges(quad,(-1,-3,11,11))
 for x in [1,3,7,9]:
     for y in [1.3,3.3,7.3,9.3]:assert abs(sample(quad,x,y)-sample(conformed,x,y))<2e-5
 print('6 shore geometry cases passed: land rise and wall closure, outside water/land preserved, winding independence, original slope preserved, quantized T junction closure, non-planar neighbor preservation',flush=True)
+
+# A vertical curb shares a subdivided top edge. XY-only triangulation would
+# silently remove its wall; preserve area and winding through the 3D fan.
+wall=Mesh();wall.face([(0,0,0),(10,0,0),(10,0,1),(0,0,1)],0)
+wall.face([(3.7,0,1),(4,-1,1),(3,-1,1)],1)
+fixed=conform_edges(wall,(-1,-2,11,2),preserve_vertical_faces=True)
+def area_vector(mesh,material):
+    value=Vector()
+    for tri,face in mesh_triangles(mesh):
+        if mesh.m[face]==material:
+            a,b,c=[Vector(mesh.v[i]) for i in tri];value+=(b-a).cross(c-a)/2
+    return value
+assert (area_vector(wall,0)-area_vector(fixed,0)).length<1e-6
+assert area_vector(fixed,0).length>9.99
+assert any(abs(x-3.7)<1e-6 and y==0 and z==1 for x,y,z in fixed.v)
+print('Vertical curb area and winding preservation passed',flush=True)

@@ -8,7 +8,7 @@ import numpy as np
 from io_scene_gltf2.io.exp.binary_data import BinaryData
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from vertex_dedup import deduplicate_primitive_vertices
+from vertex_dedup import deduplicate_primitive_vertices, share_position_quantization_bounds
 from export_attributes import omit_unused_uvs
 import export_attributes
 
@@ -18,7 +18,7 @@ def accessor(values, component=5126):
     array = np.array(values, dtype=dtype)
     return SimpleNamespace(count=len(values), component_type=component,
                            buffer_view=BinaryData(array.tobytes()), byte_offset=None,
-                           sparse=None, min=None, max=None)
+                           sparse=None, min=None, max=None, type={1: 'SCALAR', 2: 'VEC2', 3: 'VEC3'}[array.shape[1] if array.ndim > 1 else 1])
 
 
 def fixture(component=5123):
@@ -89,15 +89,39 @@ class VertexDedupTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             deduplicate_primitive_vertices(p)
 
+    def test_shared_domain_keeps_face_attributes_and_cached_bounds(self):
+        a, b = fixture(), fixture()
+        b.attributes['POSITION'] = accessor([[10, 0, 0], [12, 0, 0], [10, 1, 0]] * 2)
+        a.attributes['POSITION'].min, a.attributes['POSITION'].max = [0, 0, 0], [1, 1, 0]
+        original = a.attributes['POSITION']
+        before = [corners(p) for p in (a, b)]
+        share_position_quantization_bounds([a, b])
+        self.assertEqual([corners(p) for p in (a, b)], before)
+        self.assertEqual(original.count, 6)
+        self.assertEqual(a.attributes['POSITION'].min, [0, 0, 0])
+        self.assertEqual(a.attributes['POSITION'].max, [1, 1, 0])
+        self.assertIsNot(a.attributes['POSITION'], original)
+
+    def test_shared_domain_validation_is_atomic(self):
+        a, b = fixture(), fixture()
+        original = a.attributes
+        b.attributes['POSITION'].count = 5
+        with self.assertRaises(ValueError):
+            share_position_quantization_bounds([a, b])
+        self.assertIs(a.attributes, original)
+
     def test_scope_restores_on_nested_failure(self):
         self.assertFalse(export_attributes._deduplicate_vertices)
-        with omit_unused_uvs(deduplicate_vertices=True):
+        with omit_unused_uvs(deduplicate_vertices=True, share_position_bounds=True):
             self.assertTrue(export_attributes._deduplicate_vertices)
+            self.assertTrue(export_attributes._share_position_bounds)
             with self.assertRaises(RuntimeError):
                 with omit_unused_uvs():
                     self.assertFalse(export_attributes._deduplicate_vertices)
+                    self.assertFalse(export_attributes._share_position_bounds)
                     raise RuntimeError('cleanup probe')
             self.assertTrue(export_attributes._deduplicate_vertices)
+            self.assertTrue(export_attributes._share_position_bounds)
         self.assertFalse(export_attributes._deduplicate_vertices)
 
 
