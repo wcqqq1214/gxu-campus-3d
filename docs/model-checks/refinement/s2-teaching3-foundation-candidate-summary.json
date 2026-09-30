@@ -1,0 +1,302 @@
+{
+  "baselineCommit": "64748da775664ea260f94a7628f5072de7ce4fff",
+  "branch": "dev",
+  "buildingId": "way/759132933",
+  "productionReady": false,
+  "productionChanged": false,
+  "wholeBuildingAccepted": false,
+  "originalProblem": {
+    "sourceAndBaseSamplesEach": 499,
+    "terrainIntrusionsEach": 10,
+    "roadIntrusionsEach": 17,
+    "toleranceMeters": 0.3
+  },
+  "candidate": {
+    "sourcePath": "work/refinement-s2-teaching3-review/candidate.blend",
+    "sourceSHA256": "c427ceffb07d114d0362aad89d14cd0d12d4ed4bf7493f809722fa881604cf9e",
+    "basePath": "work/refinement-s2-teaching3-review/candidate-base.glb",
+    "baseSHA256": "ac357c2cd3904df5bf81c1a0e2b4ba93d67db9a6c9df85b5cc8c18d5fa67af58",
+    "build": [
+      {
+        "id": "teaching-three-foundation",
+        "terrain": {
+          "affectedTriangles": 30,
+          "maximumLoweringMeters": 0.31977053716978254
+        },
+        "roads": {
+          "affectedTriangles": 24,
+          "maximumLoweringMeters": 0
+        },
+        "triangleDelta": 424,
+        "datum": 4.644867730429883,
+        "gradingBounds": [
+          -130.50927358196205,
+          -711.7461685476769,
+          -31.491051116172954,
+          -679.9335969961024
+        ]
+      }
+    ],
+    "sourceAudit": {
+      "representation": "source-candidate",
+      "samples": 499,
+      "parts": [
+        {
+          "part": "mapped-closed-body",
+          "samples": 499,
+          "terrainIntrusionSamples": 0,
+          "roadIntrusionSamples": 0,
+          "maximumTerrainAboveDatum": 0.00488220214843782,
+          "worstGroundSamples": [],
+          "worstRoadSamples": []
+        }
+      ],
+      "passed": true
+    },
+    "uvPreservation": {
+      "terrain": {
+        "unchangedFaces": 97918,
+        "cutFaces": 429,
+        "maxSourcePlaneDistance": 0
+      },
+      "roads": {
+        "unchangedFaces": 97903,
+        "cutFaces": 101,
+        "maxSourcePlaneDistance": 8.915834769140929e-05
+      }
+    },
+    "currentExport": {
+      "baseAudit": {
+        "representation": "base-candidate",
+        "samples": 499,
+        "parts": [
+          {
+            "part": "mapped-closed-body",
+            "samples": 499,
+            "terrainIntrusionSamples": 0,
+            "roadIntrusionSamples": 0,
+            "maximumTerrainAboveDatum": 0.0019525146484378197,
+            "worstGroundSamples": [],
+            "worstRoadSamples": []
+          }
+        ],
+        "passed": true
+      },
+      "firstLoadBytes": 5984676,
+      "budgetPassed": true,
+      "preservedUVFaces": 89628,
+      "changedRoadMaterials": [
+        "asphalt",
+        "curb"
+      ],
+      "positionBits": 15,
+      "compressionLevel": 6,
+      "baseSha256": "ac357c2cd3904df5bf81c1a0e2b4ba93d67db9a6c9df85b5cc8c18d5fa67af58"
+    },
+    "treeCentersInGradingArea": 0,
+    "sourcePreservationReport": "s2-teaching3-foundation-source-candidate.json"
+  },
+  "reports": {
+    "s2-teaching3-foundation-source-candidate.json": "146b637d1a3557a8792e92fe4ac9bbddaa36a2908e7444f9322932cb4d505018",
+    "s2-teaching3-foundation-neighbors-candidate.json": "a0cc88d2526449902bcf414dde85c0c67d6bdb0af17dafaf0493deb9b25752c4",
+    "s2-teaching3-foundation-neighbors-baseline.json": "79fd6da839fc77a17f8e0e88a874efea87215e184e6f7318657a22f974c30ad4",
+    "s2-teaching3-foundation-export-delta.json": "33edde37c3eade9d59340a57f0c7bec8d0388dbdfec97abf02b54ee3c94e1ec0",
+    "s2-teaching3-ground-review.json": "7373f02d8519387a90e4fef4c6996fe47615c58e328c6d3e294b4887c659a3a7",
+    "s2-teaching3-foundation-proposal.json": "424a0d901cad765cb8395d610170bf5cebf62d8a3286ebf9595db60e9ccc1dbc"
+  },
+  "rejectedExports": {
+    "unsplitRoads": {
+      "build": [
+        {
+          "id": "teaching-three-foundation",
+          "terrain": {
+            "affectedTriangles": 30,
+            "maximumLoweringMeters": 0.31977053716978254
+          },
+          "roads": {
+            "affectedTriangles": 24,
+            "maximumLoweringMeters": 0
+          },
+          "triangleDelta": 424,
+          "datum": 4.644867730429883,
+          "gradingBounds": [
+            -130.50927358196205,
+            -711.7461685476769,
+            -31.491051116172954,
+            -679.9335969961024
+          ]
+        }
+      ],
+      "uvPreservation": {
+        "terrain": {
+          "unchangedFaces": 97918,
+          "cutFaces": 429,
+          "maxSourcePlaneDistance": 0
+        },
+        "roads": {
+          "unchangedFaces": 97903,
+          "cutFaces": 101,
+          "maxSourcePlaneDistance": 8.915834769140929e-05
+        }
+      },
+      "sourceAudit": {
+        "representation": "source-candidate",
+        "samples": 499,
+        "parts": [
+          {
+            "part": "mapped-closed-body",
+            "samples": 499,
+            "terrainIntrusionSamples": 0,
+            "roadIntrusionSamples": 0,
+            "maximumTerrainAboveDatum": 0.00488220214843782,
+            "worstGroundSamples": [],
+            "worstRoadSamples": []
+          }
+        ],
+        "passed": true
+      },
+      "baseAudit": {
+        "representation": "base-candidate",
+        "samples": 499,
+        "parts": [
+          {
+            "part": "mapped-closed-body",
+            "samples": 499,
+            "terrainIntrusionSamples": 0,
+            "roadIntrusionSamples": 0,
+            "maximumTerrainAboveDatum": 0.0019525146484378197,
+            "worstGroundSamples": [],
+            "worstRoadSamples": []
+          }
+        ],
+        "passed": true
+      },
+      "firstLoadBytes": 6054552,
+      "budgetPassed": false,
+      "baseSha256": "0453d5f1403557f2dc7a10b493624b5e45397276247dbf2bc62f5e6dec2bba89",
+      "sourceSha256": "e6d3824e363257573e2fad042d130b71810932a211d9b7f8ff2d77ed4703b933"
+    },
+    "splitAllMaterials": {
+      "initialBytes": 5977916,
+      "reason": "Regenerated unrelated road materials; retained-road checks failed."
+    },
+    "sixteenBitLevelSix": {
+      "baseAudit": {
+        "representation": "base-candidate",
+        "samples": 499,
+        "parts": [
+          {
+            "part": "mapped-closed-body",
+            "samples": 499,
+            "terrainIntrusionSamples": 0,
+            "roadIntrusionSamples": 0,
+            "maximumTerrainAboveDatum": 0.0019525146484378197,
+            "worstGroundSamples": [],
+            "worstRoadSamples": []
+          }
+        ],
+        "passed": true
+      },
+      "firstLoadBytes": 6021876,
+      "budgetPassed": false,
+      "preservedUVFaces": 89628,
+      "changedRoadMaterials": [
+        "asphalt",
+        "curb"
+      ],
+      "positionBits": 16,
+      "baseSha256": "26ec479c1b68807e30f40d6637d928d38c98cbf99411a087efd582ac41514048"
+    },
+    "sixteenBitLevelTen": {
+      "baseAudit": {
+        "representation": "base-candidate",
+        "samples": 499,
+        "parts": [
+          {
+            "part": "mapped-closed-body",
+            "samples": 499,
+            "terrainIntrusionSamples": 0,
+            "roadIntrusionSamples": 0,
+            "maximumTerrainAboveDatum": 0.0019525146484378197,
+            "worstGroundSamples": [],
+            "worstRoadSamples": []
+          }
+        ],
+        "passed": true
+      },
+      "firstLoadBytes": 6072384,
+      "budgetPassed": false,
+      "preservedUVFaces": 89628,
+      "changedRoadMaterials": [
+        "asphalt",
+        "curb"
+      ],
+      "positionBits": 16,
+      "compressionLevel": 10,
+      "baseSha256": "9837d2410284a18df5d0f0fe86b88a7eefc36eb993d292af63d6a0379a5d5fc8"
+    }
+  },
+  "reproductionScripts": [
+    {
+      "path": "work/refinement-s2-teaching3-review/prepare_candidate.py",
+      "sha256": "5a54a964c473f84feaf20042c17a976a48edc1623ef14a274033e96656fe0c32"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/build_candidate.py",
+      "sha256": "a9d00a1a84de2fb693058389ba19bba7258c2b0aecfe547b10e41a3efe4daa16"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/export_candidate.py",
+      "sha256": "1c0a8f8795dc6ebdfffdb834327537e7848efa5af90403123aa1885da5cc6d9e"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/check_neighbors.py",
+      "sha256": "f01ecde3d4021e331a54f58d175e6bb35936b1219f3085d00a72d232e67d5f3e"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/check_delta.py",
+      "sha256": "add2952333190e9577c7269bcb09bc38ff581cc8cac3e3d22d43872dfe62e5e3"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/check_baseline.py",
+      "sha256": "1caea950c9d188d743fc453e308cc5c47a849fe8b26c067ec512e2b928dce737"
+    },
+    {
+      "path": "work/refinement-s2-teaching3-review/compare_source.py",
+      "sha256": "88ef0b7c90e26dffa0c4ff4047a5e047eacb8e5ec47f3b38af077053f605275a"
+    }
+  ],
+  "evidenceReview": {
+    "revisitedPhoto": "work/refinement-s2-teaching3/page34-0-Im369.jpg",
+    "photoSHA256": "846551679818c51fad31adbeae7ce839d63bc5751a3429101736ed079962e2ff",
+    "newExteriorImageCount": 0,
+    "notAdopted": [
+      "https://ghjjc.gxu.edu.cn/info/1045/3556.htm: web timeout and direct request HTTP 403; no image obtained.",
+      "Search results on network upgrades, exams, maintenance and traffic do not locate an entrance or roof corner."
+    ],
+    "architecturePending": [
+      "wing heights",
+      "full roof",
+      "entrance position",
+      "corridor orientation"
+    ]
+  },
+  "productionPreservation": {
+    "checkedFiles": 499,
+    "countsByRoot": {
+      "app": 3,
+      "blender": 192,
+      "components": 7,
+      "data": 29,
+      "lib": 17,
+      "public": 95,
+      "scripts": 156
+    },
+    "allMatchBaselineGitBlob": true,
+    "inventorySHA256": "fe96a890d9e989c9bd1bfd57c8d772acf6a8b46d2da9ffe7d7caff1887d2ca1c",
+    "models": 69
+  },
+  "initialProductionBytes": 5994692,
+  "productionHeadroomBytes": 5308,
+  "next": "Resolve retained-road export changes and model budget jointly; do not raise tolerance or publish the candidate. Complete source/base/neighbour checks, browser comparisons, performance and production integration. Then follow the renewed user priority: civil experimental hall, followed by the new structural building; retain unverified Teaching Three exterior items."
+}
