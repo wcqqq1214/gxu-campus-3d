@@ -29,7 +29,7 @@ def replace_precise_terrain(path,objects):
         bpy.ops.object.select_all(action='DESELECT');obj.select_set(True)
         with tempfile.TemporaryDirectory(prefix='gxu-ground-export-') as directory:
             precise=Path(directory)/'ground.glb'
-            with omit_zero_area_terrain_faces(obj),omit_unused_uvs():
+            with omit_zero_area_terrain_faces(obj),omit_unused_uvs(deduplicate_vertices=name=='terrain'):
                 bpy.ops.export_scene.gltf(filepath=str(precise),export_format='GLB',use_selection=True,export_extras=True,
                     export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,
                     export_draco_position_quantization=bits,export_draco_texcoord_quantization=TERRAIN_BITS if name=='terrain' else ROAD_UV_BITS if name=='roads' else LOCAL_ROAD_UV_BITS,
