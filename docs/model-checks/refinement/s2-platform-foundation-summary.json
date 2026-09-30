@@ -1,0 +1,114 @@
+{
+  "checkedAt": "2026-09-30T00:54:35.427129+00:00",
+  "passed": true,
+  "productionIntegrated": true,
+  "scope": "Remove actual terrain/service-road intrusion into the five closed civil-platform parts without changing DEM, building datums, D entrance or adjacent building contact.",
+  "wholeBuildingAccepted": false,
+  "calibratedObjectRecords": 22,
+  "partialObjectRecords": 21,
+  "totalFirstPassWholeBuildingsAccepted": 1,
+  "newWholeBuildingsAccepted": 0,
+  "pythonValidation": {
+    "fullSuiteBeforeAdditionalCompressionCase": 284,
+    "compressionTargetedSuite": 5,
+    "newCompressionCases": 1,
+    "distinctPythonTestsCovered": 285
+  },
+  "blenderMeshFixtureCases": 9,
+  "blenderSuffixedExportFixturePassed": true,
+  "nodeTests": 66,
+  "typecheckPassed": true,
+  "lintPassed": true,
+  "checks": [
+    "after",
+    "neighbors",
+    "connection-geometry",
+    "entry-geometry",
+    "parts-geometry",
+    "generic-geometry",
+    "trees-geometry",
+    "site-trees-geometry",
+    "source-preservation",
+    "precision-preservation",
+    "assets",
+    "visual-review"
+  ],
+  "performance": [
+    {
+      "tier": "精细",
+      "currentFPS": [
+        60,
+        60,
+        60
+      ],
+      "medianTriangles": 4281139,
+      "medianDrawCalls": 564,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 6.498114390336118,
+        "medianDrawCalls": 3.1078610603290757
+      },
+      "passed": true
+    },
+    {
+      "tier": "流畅",
+      "currentFPS": [
+        30,
+        30,
+        30
+      ],
+      "medianTriangles": 1207021,
+      "medianDrawCalls": 300,
+      "changePercent": {
+        "medianFPS": 0.0,
+        "medianTriangles": 14.74183536211493,
+        "medianDrawCalls": 14.068441064638781
+      },
+      "passed": true
+    }
+  ],
+  "baselineReport": "s2-arts-s0-current-os-browser.json",
+  "environment": {
+    "platform": "darwin",
+    "release": "27.0.0",
+    "cpu": "Apple M5",
+    "headless": true,
+    "deviceScaleFactor": 1,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "browser": "148.0.7778.96",
+  "cpuSnapshots": 26,
+  "heavyPythonOrBlenderWithinTimedWindows": [],
+  "samplingLimit": "10-second snapshots, 2% CPU inclusion threshold; not proof of complete isolation.",
+  "initialModelBytes": 5986800,
+  "initialByteHeadroom": 13200,
+  "maximumOrdinaryNearBytes": 1684868,
+  "geometryReuse": "After full source/base/near regression, precision-only re-exports changed only the roads node. An immutable node-signature comparison confirms all previously tested building, terrain, site and tree payloads are retained. Ground/road and D connection checks were rerun on the final base.",
+  "limitations": [
+    "Low south/southwest views remain occluded by unchanged exterior high ground; interior mesh clearance is a separate verified result.",
+    "Existing retained western service-road grade/ground mismatch remains for a separate calibration; this patch does not worsen its source-plane support.",
+    "Hall transport opening, north-office south/west facades, west foyer roof, and independent old-hall identity remain unconfirmed."
+  ],
+  "fingerprints": {
+    "data/foundation-overrides.json": "6f74e82737eaeffb2166d08f91a69e5e76bfecaa0715d235474e36c800228f31",
+    "scripts/foundation_data.py": "3a2ae901d33350c72af78623d734476df7a4ff10f5698384949e9c41eb19023d",
+    "scripts/foundation_contract.py": "f92cbebc7e860c7b0376e3cacbfd894659f0834a1bc043d340aba2181370493f",
+    "scripts/infrastructure_data.py": "56a2c221942cdc962f1981ebd3f6a5079d642e3863bbce7af531c61cf83902e8",
+    "blender/foundation_geometry.py": "cef28ecd456e343f845914287f0076fdfe03a6e2d3506c84283cc6d7ffac9751",
+    "blender/build_campus.py": "b3d1601625a56e8d2f2e56f00e1dfa6e8889e25bab6e7d5cbb5c8b5fb0cc7831",
+    "blender/terrain_export.py": "1e38643ad6716c5af0ad97d3ee5d2d752663eb75871355759e0c7307f6aa577f",
+    "blender/preserve_glb_geometry.py": "68b86174966def34688a58fd256e3e462a7c56882e3c1e9455368df5f609cf66",
+    "blender/gxu-campus.blend": "7b042c8619f7d6e698d31d98447924914c6d2050b4141e2702c98a97578fdde7",
+    "public/data/foundations.json": "dcc5b7a5f4620f33fdbdff2a6af3f60969acbaa690943ce45c6650699751fe31",
+    "public/data/buildings.json": "1e813a5b29c7cf0a7ec9977d6e9d474a50181cb6a563c15204ba549e6ff2c3aa",
+    "public/data/terrain.json": "6ea0100e963f3e26c176273fea174ffe3e4ac60d2e131955119be53fd005aa52",
+    "public/data/models.json": "3312ca0c47859d2d1c3783b40839bcb7da4999f7e6a702bdf7c3e9526f3b90ac",
+    "public/data/vegetation.json": "66fabad226b58d1f366c29d87eb1e99120536ca3f14cbc30e72b5d233da73729",
+    "public/models/base.glb": "71e22d64b90ad29eb3b14f12d65a5a3b0f2e083c9dd45899d96b3498903ac29c"
+  },
+  "branch": "dev",
+  "baseCommit": "8830c73a18b1374d2d158a48970828fd23d6801d"
+}

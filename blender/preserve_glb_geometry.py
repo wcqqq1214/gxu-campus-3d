@@ -51,7 +51,7 @@ def compact_buffer_views(path):
     header=json.dumps(doc,separators=(',',':')).encode();header+=b' '*(-len(header)%4)
     path.write_bytes(struct.pack('<4sII',b'glTF',2,28+len(header)+len(packed))+struct.pack('<I4s',len(header),b'JSON')+header+struct.pack('<I4s',len(packed),b'BIN\0')+packed)
 
-def preserve_geometry(previous,path,names):
+def preserve_geometry(previous,path,names,materials=None):
     old,oldbin=unpack(previous);new,newbin=unpack(path.read_bytes());binary=bytearray(newbin)
     old_nodes=mesh_nodes_by_name(old);new_nodes=mesh_nodes_by_name(new)
     for name in names:
@@ -60,6 +60,7 @@ def preserve_geometry(previous,path,names):
         assert len(before)==len(after)
         for p,q in zip(before,after):
             assert old['materials'][p['material']]['name']==new['materials'][q['material']]['name']
+            if materials is not None and old['materials'][p['material']]['name'] not in materials:continue
             ext=copy.deepcopy(p['extensions']['KHR_draco_mesh_compression']);view=old['bufferViews'][ext['bufferView']];offset=view.get('byteOffset',0);blob=oldbin[offset:offset+view['byteLength']]
             current=new['bufferViews'][q['extensions']['KHR_draco_mesh_compression']['bufferView']];start=current.get('byteOffset',0)
             if blob==binary[start:start+current['byteLength']]:continue

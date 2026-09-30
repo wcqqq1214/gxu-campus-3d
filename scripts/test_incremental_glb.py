@@ -27,6 +27,17 @@ class IncrementalGLBTests(unittest.TestCase):
             self.assertEqual(doc['accessors'][1]['count'],6)
             self.assertEqual(doc['nodes'][0]['name'],'shore-jinghu')
 
+    def test_material_filter_preserves_unselected_compressed_payload(self):
+        old=self.encode('roads',b'precise-stone',6)
+        for selected,expected,count in [({'stone'},b'precise-stone',6),({'road'},b'current-stone',9)]:
+            with self.subTest(materials=selected),tempfile.TemporaryDirectory() as directory:
+                p=Path(directory)/'base.glb';p.write_bytes(self.encode('roads',b'current-stone',9))
+                preserve_geometry(old,p,['roads'],materials=selected);compact_buffer_views(p)
+                doc,buf=unpack(p.read_bytes());primitive=doc['meshes'][0]['primitives'][0]
+                view=doc['bufferViews'][primitive['extensions']['KHR_draco_mesh_compression']['bufferView']]
+                self.assertEqual(buf[view['byteOffset']:view['byteOffset']+view['byteLength']],expected)
+                self.assertEqual(doc['accessors'][primitive['attributes']['POSITION']]['count'],count)
+
     def test_ambiguous_suffixes_rejected_without_changing_real_names(self):
         self.assertEqual(list(mesh_nodes_by_name({'nodes':[{'name':'bank.v2','mesh':0},{'name':'bank.001'}]})),['bank.v2'])
         with self.assertRaisesRegex(ValueError,'Ambiguous'):
