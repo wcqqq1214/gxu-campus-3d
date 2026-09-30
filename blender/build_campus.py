@@ -31,6 +31,8 @@ campus_roads=json.loads((DATA/'campus-roads.json').read_text())
 sites=json.loads((DATA/'sites.json').read_text())
 pavings=json.loads((DATA/'pavings.json').read_text())
 sys.path.insert(0,str(ROOT/'scripts'))
+from foundation_contract import load_foundations
+foundations=load_foundations(ROOT)
 from mapped_canopy_data import check_prepared_mapped_canopies
 check_prepared_mapped_canopies(buildings)
 from stair_tower_data import check_prepared_stair_towers
@@ -231,7 +233,11 @@ base.update(paving_meshes)
 from shore_geometry import build_shores
 base['terrain'],base['green'],shore_meshes,shore_report=build_shores(shores,C,base['terrain'],base['green'])
 base.update(shore_meshes)
+from foundation_geometry import build_foundations
+base['terrain'],base['roads'],foundation_report=build_foundations(foundations,base['terrain'],base['roads'])
+(ROOT/'docs/model-checks/refinement/foundation-build.json').write_text(json.dumps(foundation_report,ensure_ascii=False,indent=2)+'\n')
 base['terrain'].ground_uv_bounds=[[v+(-1 if i<2 else 1) for i,v in enumerate(p['bounds'])] for p in pavings['pavings']]+[s['gradingBounds'] for s in sites['sites'] if s.get('type') in ('side-connection','front-connection','terraced-stair-connection','entry-apron','gallery-apron','canopy-connection')]
+base['terrain'].ground_uv_bounds.extend(r['bounds'] for r in foundations['foundations'])
 (ROOT/'docs/model-checks/refinement/shore-build.json').write_text(json.dumps(shore_report,ensure_ascii=False,indent=2)+'\n')
 print('Ground assembled',flush=True)
 infra_near={}
@@ -372,6 +378,7 @@ def export(name,groups):
         props={'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else '', 'sportsId':key[7:] if key.startswith('sports-') else ''}
         if key.startswith('vegetation-low-'):props.update(layer='vegetation',plantingId=key.removeprefix('vegetation-low-'))
         if key=='terrain':props.update(positionQuantizationBits=18,texcoordQuantizationBits=18)
+        if key=='roads':props.update(roadMaterialPositionQuantizationBits=17,roadMaterialTexcoordQuantizationBits=11)
         if key.startswith('site-'):props['siteId']=key[5:]
         o=mesh.object(key,EXPORT,props);o.select_set(True);objs.append(o)
     path=MODELS/name
