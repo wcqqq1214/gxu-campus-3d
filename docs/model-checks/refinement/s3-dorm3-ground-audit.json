@@ -1,0 +1,58 @@
+{
+  "scope": "Read-only mapped-body terrain and roads audit; temporary whole-body sampling parts are not calibration parts.",
+  "baseCommit": "9f2746928f08c158a7e806e9fa8f9ce43ff20b51",
+  "sampling": {
+    "spacingMeters": 2,
+    "perimeterInsetMeters": 0.25,
+    "allowedIntrusionMeters": 0.3,
+    "datum": "Exact original DEM interpolation used by generic builder; not a surveyed floor elevation."
+  },
+  "fingerprints": {
+    "source": "3004678f9aa2b04704691236f6c7765973e97c024c5b5807708d565b5af7de63",
+    "base": "f39ffdff1912e1fcccebe2a75b57ad34b5792a592fe3861bf7ddd373d7fb06bf",
+    "buildings": "b32a12adb531305f3bc880a5c999bf8b8c237e1c38e1db543e79c8b294170bee",
+    "terrainData": "6ea0100e963f3e26c176273fea174ffe3e4ac60d2e131955119be53fd005aa52"
+  },
+  "buildings": [
+    {
+      "id": "way/759158607",
+      "name": "西校园学生宿舍楼3栋",
+      "adoptedDatum": 5.2652695602610144,
+      "representations": [
+        {
+          "representation": "source",
+          "samples": 246,
+          "parts": [
+            {
+              "part": "mapped-closed-body",
+              "samples": 246,
+              "terrainIntrusionSamples": 0,
+              "roadIntrusionSamples": 0,
+              "maximumTerrainAboveDatum": 0.27663107450461055,
+              "worstGroundSamples": [],
+              "worstRoadSamples": []
+            }
+          ],
+          "passed": true
+        },
+        {
+          "representation": "base",
+          "samples": 246,
+          "parts": [
+            {
+              "part": "mapped-closed-body",
+              "samples": 246,
+              "terrainIntrusionSamples": 0,
+              "roadIntrusionSamples": 0,
+              "maximumTerrainAboveDatum": 0.27714987333273555,
+              "worstGroundSamples": [],
+              "worstRoadSamples": []
+            }
+          ],
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "passed": true
+}
