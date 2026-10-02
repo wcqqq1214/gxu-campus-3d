@@ -1,5 +1,6 @@
 'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 import {
   ArrowUpRight,
   Building2,
@@ -70,25 +71,32 @@ import { sourceIndex, sourceDates } from '@/lib/campus/sources';
 import { CampusMinimap } from '@/components/campus-minimap';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
-  ['buildings', '校园建筑', '教学楼、宿舍与校园地标', Building2],
+  ['labels', '地点名称', '在地图上显示地标名称', MapPin],
+  ['boundary', '校园边界', '白色细线标示大致范围', MapPin],
+  ['buildings', '校园建筑', '教学楼、宿舍与地标', Building2],
   ['vegetation', '林木植被', '乔木、棕榈与林荫景观', Trees],
-  ['roads', '道路与桥梁', '公共农院路、校道、桥梁与步行空间', Navigation],
+  ['roads', '道路与桥梁', '校道、桥梁与步行空间', Navigation],
   ['water', '湖塘水面', '镜湖、碧云湖及其他水体', Waves],
   ['sports', '运动场地', '球场、跑道与游泳池', GraduationCap],
-  ['boundary', '校园边界', '白色细线表示大致范围，农院路为公共道路', MapPin],
   ['context', '紧邻校界建筑', '仅保留贴近校界的周边建筑', Layers3],
-  ['labels', '地点名称', '可点击的校园地标标注', MapPin],
 ];
-const PRESETS: [Preset, string, typeof Sun][] = [
-  ['morning', '晨光', Sunrise],
-  ['day', '日间', Sun],
-  ['evening', '黄昏', Sunset],
-  ['night', '夜景', Moon],
+const PRESETS: [Preset, string, string, typeof Sun][] = [
+  ['morning', '晨光', '树影初长', Sunrise],
+  ['day', '日间', '校园清朗', Sun],
+  ['evening', '黄昏', '余晖入窗', Sunset],
+  ['night', '夜景', '灯火渐明', Moon],
 ];
+const QUALITY_NAMES: Record<Quality, string> = {
+  auto: '自动',
+  fine: '精细',
+  smooth: '流畅',
+};
 const refs = sourceIndex(sourceData.sources);
 export default function Home() {
   const dock = useRef<HTMLElement>(null);
   const detailBack = useRef<HTMLButtonElement>(null);
+  const tourEntry = useRef<HTMLButtonElement>(null);
+  const extraViews = useRef<HTMLDetailsElement>(null);
   const menuScroll = useRef(0);
   const returnPlace = useRef<string | null>(null);
   const pendingFocus = useRef<'detail' | 'menu' | 'views' | null>(null);
@@ -354,9 +362,12 @@ export default function Home() {
       if (body) body.scrollTop = 0;
       detailBack.current?.focus({ preventScroll: true });
     } else if (destination === 'views') {
-      dock.current
-        ?.querySelector<HTMLButtonElement>('.landmark-views button')
-        ?.focus();
+      if (extraViews.current) {
+        extraViews.current.open = true;
+        extraViews.current.querySelector<HTMLButtonElement>('button')?.focus();
+      } else {
+        detailBack.current?.focus({ preventScroll: true });
+      }
     } else {
       const row = Array.from(
         dock.current?.querySelectorAll<HTMLButtonElement>('[data-place-id]') ??
@@ -524,22 +535,29 @@ export default function Home() {
             <button
               ref={detailBack}
               className="dock-back"
-              title="返回精选地标"
+              title="返回地标列表"
+              aria-label="返回地标列表"
               onClick={returnToMenu}
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={16} />
+              <span>返回地标</span>
             </button>
           )}
           <button
             className="dock-toggle"
             aria-expanded={!collapsed}
             aria-controls="campus-panel-body"
+            aria-label={collapsed ? '展开面板' : '收起面板'}
             onClick={() => setCollapsed((v) => !v)}
           >
             <span>
-              {panelMode === 'detail' && current ? current.name : '校园探索'}
+              {panelMode === 'detail' && current
+                ? collapsed
+                  ? current.name
+                  : ''
+                : '校园导览'}
             </span>
-            <small>{collapsed ? '展开' : '收起'}</small>
+            <small>{collapsed ? '展开' : '收起面板'}</small>
             <ChevronDown size={16} />
           </button>
           {!collapsed && (
@@ -567,6 +585,7 @@ export default function Home() {
         >
           {panelMode === 'detail' && current && !collapsed && (
             <div className="mobile-place-summary">
+              <h2>{current.name}</h2>
               <p>{currentLandmark?.description ?? current.name}</p>
               <div className="summary-actions">
                 <button
@@ -604,91 +623,110 @@ export default function Home() {
               <div className="detail-heading">
                 <div>
                   <div className="eyebrow">
-                    {currentLandmark?.placeKind === 'sports'
-                      ? 'CAMPUS ATHLETICS'
-                      : currentLandmark
-                        ? 'CAMPUS LANDMARK'
-                        : 'CAMPUS BUILDING'}
+                    {CATEGORY_NAMES[current.category]}
+                    {currentLandmark?.id === 'new-east-gate' && ' · 外观推定'}
                   </div>
                   <h2>{current.name}</h2>
                 </div>
-                <button
-                  className="icon-button"
-                  title="关闭建筑详情"
-                  onClick={() => {
-                    returnToMenu();
-                    setSelected(null);
-                    setMore(false);
-                    controller.current?.clearSelection();
-                  }}
-                >
-                  <X size={18} />
-                </button>
               </div>
               <p>
                 {currentLandmark?.description ??
                   `${CATEGORY_NAMES[currentBuilding!.category]}建筑，位置依据公开地图。`}
               </p>
               {currentLandmark && (
-                <fieldset className="landmark-views" aria-label="地标观察视角">
-                  {(
-                    [
-                      ['oblique', '全貌'],
-                      [
-                        'front',
-                        ['library', 'teaching-six'].includes(currentLandmark.id)
-                          ? '南侧'
-                          : '正面',
-                      ],
-                      [
-                        'back',
-                        ['library', 'teaching-six'].includes(currentLandmark.id)
-                          ? '北侧'
-                          : '背面',
-                      ],
-                      ['top', '俯视'],
-                      [
-                        'entrance',
-                        ['library', 'teaching-six'].includes(currentLandmark.id)
-                          ? '南门近景'
-                          : currentLandmark?.placeKind === 'bridge'
-                            ? '桥下近景'
-                            : currentLandmark?.placeKind === 'sculpture'
-                              ? '雕塑近景'
-                              : '入口近景',
-                      ],
-                      ...(['library', 'teaching-six'].includes(
-                        currentLandmark.id,
-                      )
-                        ? [['rear-entrance', '北门近景']]
-                        : []),
-                    ] as [LandmarkView, string][]
-                  ).map(([value, label]) => (
-                    <button
-                      key={value}
-                      aria-pressed={!orbit && landmarkView === value}
-                      onClick={() => changeLandmarkView(value)}
-                    >
-                      {label}
-                    </button>
-                  ))}
-                  <button
-                    aria-pressed={orbit}
-                    disabled={reducedMotion}
-                    title={
-                      reducedMotion
-                        ? '系统已启用减少动态效果'
-                        : '环绕当前地标，拖动画面可暂停'
-                    }
-                    onClick={() => {
-                      setTour(false);
-                      controller.current?.setOrbit(!orbit);
-                    }}
+                <div key={current.id}>
+                  <fieldset
+                    className="landmark-views"
+                    aria-label="地标观察视角"
                   >
-                    {orbit ? <Pause size={14} /> : <RotateCcw size={14} />}{' '}
-                    {orbit ? '暂停环绕' : '环绕观察'}
-                  </button>
-                </fieldset>
+                    <button
+                      aria-pressed={!orbit && landmarkView === 'oblique'}
+                      onClick={() => changeLandmarkView('oblique')}
+                    >
+                      全貌
+                    </button>
+                    <button
+                      aria-pressed={!orbit && landmarkView === 'top'}
+                      onClick={() => changeLandmarkView('top')}
+                    >
+                      俯视
+                    </button>
+                    <button
+                      aria-pressed={orbit}
+                      disabled={reducedMotion}
+                      title={
+                        reducedMotion
+                          ? '系统已启用减少动态效果'
+                          : '环绕当前地标，拖动画面可暂停'
+                      }
+                      onClick={() => {
+                        setTour(false);
+                        controller.current?.setOrbit(!orbit);
+                      }}
+                    >
+                      {orbit ? <Pause size={14} /> : <RotateCcw size={14} />}
+                      {orbit ? '暂停环绕' : '环绕'}
+                    </button>
+                  </fieldset>
+                  <details
+                    ref={extraViews}
+                    className="menu-disclosure more-views"
+                  >
+                    <summary>
+                      更多视角 <ChevronDown size={15} />
+                    </summary>
+                    <fieldset
+                      className="landmark-views extra-views"
+                      aria-label="更多地标视角"
+                    >
+                      {(
+                        [
+                          [
+                            'front',
+                            ['library', 'teaching-six'].includes(
+                              currentLandmark.id,
+                            )
+                              ? '南侧'
+                              : '正面',
+                          ],
+                          [
+                            'back',
+                            ['library', 'teaching-six'].includes(
+                              currentLandmark.id,
+                            )
+                              ? '北侧'
+                              : '背面',
+                          ],
+                          [
+                            'entrance',
+                            ['library', 'teaching-six'].includes(
+                              currentLandmark.id,
+                            )
+                              ? '南门近景'
+                              : currentLandmark.placeKind === 'bridge'
+                                ? '桥下近景'
+                                : currentLandmark.placeKind === 'sculpture'
+                                  ? '雕塑近景'
+                                  : '入口近景',
+                          ],
+                          ...(['library', 'teaching-six'].includes(
+                            currentLandmark.id,
+                          )
+                            ? [['rear-entrance', '北门近景']]
+                            : []),
+                        ] as [LandmarkView, string][]
+                      ).map(([value, label]) => (
+                        <button
+                          key={value}
+                          aria-pressed={!orbit && landmarkView === value}
+                          onClick={() => changeLandmarkView(value)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </fieldset>
+                  </details>
+                </div>
               )}
               <div className="detail-actions">
                 <button onClick={() => setMore((v) => !v)} aria-expanded={more}>
@@ -758,14 +796,15 @@ export default function Home() {
             </section>
           ) : (
             <div className="explorer">
-              <div className="panel-heading">
-                <div className="eyebrow">发现 · GUANGXI UNIVERSITY</div>
-                <h2>林荫深处，是西大。</h2>
-                <p className="intro">沿着校道，发现熟悉的风景。</p>
-              </div>
               <Tabs
                 value={tab}
-                onValueChange={(v) => setTab(String(v))}
+                onValueChange={(v) => {
+                  setTab(String(v));
+                  if (dock.current) {
+                    const body = dock.current.querySelector('.dock-body');
+                    if (body) body.scrollTop = 0;
+                  }
+                }}
                 className="main-tabs"
               >
                 <TabsList className="panel-tabs">
@@ -846,11 +885,8 @@ export default function Home() {
                           </span>
                           <span className="place-copy">
                             <strong>{p.name}</strong>
-                            <small>
-                              {CATEGORY_NAMES[p.category]}
-                              {p.id === 'new-east-gate'
-                                ? ' · 外观推定'
-                                : ' · 重点复原'}
+                            <small title={p.description}>
+                              {p.description.split(/[，。]/)[0]}
                             </small>
                           </span>
                           <ArrowUpRight size={16} />
@@ -866,7 +902,7 @@ export default function Home() {
                   </div>
                 </TabsContent>
                 <TabsContent value="layers" className="settings-content">
-                  <p className="section-hint">选择你想看见的校园层次。</p>
+                  <p className="section-hint">留下想看的风景。</p>
                   {LAYER_ITEMS.map(([key, label, desc, Icon]) => (
                     <label
                       className="layer-row"
@@ -875,60 +911,89 @@ export default function Home() {
                     >
                       <Icon size={19} />
                       <span>
-                        <strong>{label}</strong>
-                        <small>{desc}</small>
+                        <strong id={`layer-title-${key}`}>{label}</strong>
+                        <small id={`layer-description-${key}`}>{desc}</small>
                       </span>
                       <Switch
                         id={`layer-${key}`}
                         checked={layers[key]}
                         onCheckedChange={(on) => toggleLayer(key, on)}
-                        aria-label={label}
+                        aria-labelledby={`layer-title-${key}`}
+                        aria-describedby={`layer-description-${key}`}
                       />
                     </label>
                   ))}
+                  <details className="menu-disclosure layer-note">
+                    <summary>
+                      关于校园边界 <ChevronDown size={15} />
+                    </summary>
+                    <p className="settings-note">
+                      白色细线表示校园大致范围；农院路为公共道路，不代表封闭校区。
+                    </p>
+                  </details>
                 </TabsContent>
                 <TabsContent value="environment" className="settings-content">
                   <p className="section-hint">同一座校园，不同的光景。</p>
                   <div className="preset-grid">
-                    {PRESETS.map(([p, label, Icon]) => (
+                    {PRESETS.map(([p, label, caption, Icon]) => (
                       <button
                         key={p}
                         className={preset === p ? 'active' : ''}
                         onClick={() => changePreset(p)}
                         aria-pressed={preset === p}
+                        aria-label={label}
                       >
-                        <Icon size={24} />
-                        {label}
-                        {preset === p && <Check size={12} />}
+                        <Image
+                          src={`${BASE}/images/presets/${p}.jpg`}
+                          alt=""
+                          width={640}
+                          height={360}
+                          loading="lazy"
+                          unoptimized
+                        />
+                        <span className="preset-caption">
+                          <Icon size={16} />
+                          <strong>{label}</strong>
+                          {preset === p && <Check size={14} />}
+                        </span>
+                        <small>{caption}</small>
                       </button>
                     ))}
                   </div>
-                  <div className="settings-title">画面偏好</div>
-                  <RadioGroup
-                    value={quality}
-                    onValueChange={(v) => changeQuality(v as Quality)}
-                    className="quality-options"
-                  >
-                    {[
-                      ['auto', '自动', '根据屏幕与运行表现调节'],
-                      ['fine', '精细', '完整植被、阴影与近景细节'],
-                      ['smooth', '流畅', '降低植被密度与渲染分辨率'],
-                    ].map(([q, name, desc]) => (
-                      <label key={q} htmlFor={`quality-${q}`}>
-                        <RadioGroupItem
-                          id={`quality-${q}`}
-                          value={q}
-                          aria-label={name}
-                        />
-                        <span>
-                          <strong>{name}</strong>
-                          <small>{desc}</small>
-                        </span>
-                      </label>
-                    ))}
-                  </RadioGroup>
+                  <details className="menu-disclosure quality-disclosure">
+                    <summary>
+                      <span>
+                        画质 <strong>{QUALITY_NAMES[quality]}</strong>
+                      </span>
+                      <ChevronDown size={15} />
+                    </summary>
+                    <RadioGroup
+                      value={quality}
+                      onValueChange={(v) => changeQuality(v as Quality)}
+                      className="quality-options"
+                      aria-label="画质"
+                    >
+                      {[
+                        ['auto', '自动', '根据屏幕与运行表现调节'],
+                        ['fine', '精细', '完整植被、阴影与近景细节'],
+                        ['smooth', '流畅', '降低植被密度与渲染分辨率'],
+                      ].map(([q, name, desc]) => (
+                        <label key={q} htmlFor={`quality-${q}`}>
+                          <RadioGroupItem
+                            id={`quality-${q}`}
+                            value={q}
+                            aria-labelledby={`quality-title-${q}`}
+                          />
+                          <span>
+                            <strong id={`quality-title-${q}`}>{name}</strong>
+                            <small>{desc}</small>
+                          </span>
+                        </label>
+                      ))}
+                    </RadioGroup>
+                  </details>
                   <p className="settings-note">
-                    光照为氛围模拟。复原比例保持一致，资料缺失处已注明推定。
+                    预览取自图书馆同一视角，光照为氛围模拟。
                   </p>
                 </TabsContent>
               </Tabs>
@@ -978,54 +1043,86 @@ export default function Home() {
             {landmarks.length}
           </button>
         )}
-        <div className="tour-bar">
-          <div className="tour-copy">
-            <strong>
-              {tour
-                ? '正在云游西大'
-                : tourStarted
-                  ? '巡游已暂停'
-                  : '把校园，慢慢看一遍'}
-            </strong>
-            <small>
-              {tourStarted
-                ? `${String(tourIndex + 1).padStart(2, '0')} / ${landmarks.length} · ${landmarks[tourIndex]?.name}`
-                : `${landmarks.length || '—'} 处精选地标 · 自动导览`}
-            </small>
-          </div>
-          <button
-            className="tour-start"
-            disabled={!ready}
-            onClick={() => {
-              setTourStarted(true);
-              setTour((v) => !v);
-            }}
+        {(tourStarted || panelMode === 'detail' || tab === 'explore') && (
+          <div
+            className={`tour-bar ${tourStarted ? 'tour-active' : 'tour-idle'}`}
           >
-            {tour ? <Pause size={15} /> : <Play size={15} />}
-            <span>{tour ? '暂停' : tourStarted ? '继续巡游' : '开始巡游'}</span>
             {tourStarted && (
-              <small className="mobile-tour-progress">
-                {tourIndex + 1}/{landmarks.length}
-              </small>
+              <div className="tour-heading">
+                <div className="tour-copy">
+                  <strong>{tour ? '正在云游西大' : '巡游已暂停'}</strong>
+                  <small>
+                    {String(tourIndex + 1).padStart(2, '0')} /{' '}
+                    {landmarks.length} · {landmarks[tourIndex]?.name}
+                  </small>
+                </div>
+                <button
+                  className="tour-end"
+                  title="结束巡游"
+                  aria-label="结束巡游"
+                  onClick={() => {
+                    setTour(false);
+                    setTourStarted(false);
+                    requestAnimationFrame(() => {
+                      const target =
+                        tourEntry.current ??
+                        dock.current?.querySelector<HTMLButtonElement>(
+                          '[role="tab"][aria-selected="true"]',
+                        );
+                      target?.focus({ preventScroll: true });
+                    });
+                  }}
+                >
+                  <X size={16} />
+                </button>
+              </div>
             )}
-          </button>
-          <button
-            className="tour-skip"
-            title="上一站"
-            disabled={!ready}
-            onClick={() => jump(-1)}
-          >
-            <ChevronLeft size={17} />
-          </button>
-          <button
-            className="tour-skip"
-            title="下一站"
-            disabled={!ready}
-            onClick={() => jump(1)}
-          >
-            <ChevronRight size={17} />
-          </button>
-        </div>
+            <button
+              ref={tourEntry}
+              className="tour-start"
+              disabled={!ready}
+              onClick={() => {
+                setTourStarted(true);
+                setTour((v) => !v);
+              }}
+            >
+              {tour ? <Pause size={15} /> : <Play size={15} />}
+              <span>
+                {tour ? '暂停巡游' : tourStarted ? '继续巡游' : '开始校园巡游'}
+              </span>
+              {!tourStarted && (
+                <small className="tour-count">
+                  {landmarks.length || '—'} 处风景
+                </small>
+              )}
+              {tourStarted && (
+                <small className="mobile-tour-progress">
+                  {tourIndex + 1}/{landmarks.length}
+                </small>
+              )}
+            </button>
+            {tourStarted && (
+              <>
+                <button
+                  className="tour-skip"
+                  title="上一站"
+                  disabled={!ready}
+                  onClick={() => jump(-1)}
+                >
+                  <ChevronLeft size={17} />
+                </button>
+                <button
+                  className="tour-skip"
+                  title="下一站"
+                  disabled={!ready}
+                  onClick={() => jump(1)}
+                >
+                  <ChevronRight size={17} />
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </aside>
       <div className="map-tools" aria-label="视角控制">
         <button
@@ -1224,7 +1321,7 @@ export default function Home() {
         <DialogContent className="tools-dialog">
           <DialogTitle>怎样游览校园</DialogTitle>
           <DialogDescription>
-            先搜索地标，或点击“开始巡游”自动探索。
+            先搜索地标，或点击“开始校园巡游”自动探索。
           </DialogDescription>
           <dl className="gesture-instructions">
             <dt>手机触控</dt>
