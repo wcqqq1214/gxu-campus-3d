@@ -524,12 +524,19 @@ export default function Home() {
           className="brand-mark"
           onClick={() => view('overview')}
           title="返回全景"
+          aria-label="返回校园全景"
         >
-          西
+          <Image
+            src={`${BASE}/favicon.svg`}
+            alt=""
+            width={44}
+            height={44}
+            unoptimized
+          />
         </button>
         <div>
           <h1>
-            西大 <span>云游校园</span>
+            广西大学 <span>云游校园</span>
           </h1>
           <p>GUANGXI UNIVERSITY · CAMPUS EXPLORER</p>
         </div>
