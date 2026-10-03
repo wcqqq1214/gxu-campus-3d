@@ -147,6 +147,18 @@ export default function Home() {
   const [orbit, setOrbit] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
   const notify = useCallback((message: string) => setToast(message), []);
+  const pauseMotion = useCallback(() => {
+    setTour(false);
+    controller.current?.setOrbit(false);
+  }, []);
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.hidden) pauseMotion();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () =>
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [pauseMotion]);
   useEffect(() => {
     if (!toast) return;
     const t = setTimeout(() => setToast(''), 3500);
@@ -383,6 +395,7 @@ export default function Home() {
   function returnToMenu() {
     returnPlace.current = selected;
     pendingFocus.current = 'menu';
+    setTab('explore');
     setPanelMode('menu');
     setPanelExpanded(true);
     setCollapsed(false);
@@ -414,6 +427,20 @@ export default function Home() {
     () => searchLandmarks(landmarks, query, category),
     [landmarks, query, category],
   );
+  const matchesInAllCategories = useMemo(
+    () =>
+      category === 'all'
+        ? places.length
+        : searchLandmarks(landmarks, query).length,
+    [landmarks, query, category, places.length],
+  );
+  function resetSearch() {
+    setCategory('all');
+    if (!matchesInAllCategories) setQuery('');
+    dock.current
+      ?.querySelector<HTMLInputElement>('input[type="search"]')
+      ?.focus();
+  }
   function toggleLayer(k: LayerKey, on: boolean) {
     settings.current.layers = { ...settings.current.layers, [k]: on };
     setLayers(settings.current.layers);
@@ -442,6 +469,7 @@ export default function Home() {
     }
   }
   async function shareView() {
+    pauseMotion();
     const snapshot = controller.current?.getSnapshot();
     if (!snapshot) return;
     const url = new URL(location.pathname, location.origin);
@@ -511,7 +539,10 @@ export default function Home() {
         </div>
         <button
           className="icon-button about-button"
-          onClick={() => setAbout(true)}
+          onClick={() => {
+            pauseMotion();
+            setAbout(true);
+          }}
           title="项目说明"
         >
           <Info size={19} />
@@ -528,19 +559,19 @@ export default function Home() {
       <aside
         ref={dock}
         className={`panel-dock ${collapsed ? 'collapsed' : ''} ${panelExpanded ? 'expanded' : ''} ${panelMode === 'detail' ? 'detail-mode' : ''}`}
-        aria-label="校园探索菜单"
+        aria-label="校园导览菜单"
       >
         <div className="dock-heading">
           {panelMode === 'detail' && current && (
             <button
               ref={detailBack}
               className="dock-back"
-              title="返回地标列表"
-              aria-label="返回地标列表"
+              title="返回地点列表"
+              aria-label="返回地点列表"
               onClick={returnToMenu}
             >
               <ChevronLeft size={16} />
-              <span>返回地标</span>
+              <span>返回列表</span>
             </button>
           )}
           <button
@@ -579,7 +610,7 @@ export default function Home() {
           className="dock-body"
           hidden={collapsed}
           onScroll={(event) => {
-            if (panelMode === 'menu')
+            if (panelMode === 'menu' && tab === 'explore')
               menuScroll.current = event.currentTarget.scrollTop;
           }}
         >
@@ -810,7 +841,7 @@ export default function Home() {
                 <TabsList className="panel-tabs">
                   <TabsTrigger value="explore">
                     <Compass size={17} />
-                    探索
+                    地点
                   </TabsTrigger>
                   <TabsTrigger value="layers">
                     <Layers3 size={17} />
@@ -818,7 +849,7 @@ export default function Home() {
                   </TabsTrigger>
                   <TabsTrigger value="environment">
                     <Sun size={17} />
-                    环境
+                    光影
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="explore" className="explore-content">
@@ -826,21 +857,34 @@ export default function Home() {
                     <Search size={16} />
                     <Input
                       type="search"
-                      onFocus={() => setPanelExpanded(true)}
+                      onFocus={() => {
+                        pauseMotion();
+                        setPanelExpanded(true);
+                      }}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      placeholder="搜索地标，如图书馆、六教"
-                      aria-label="搜索精选地标"
+                      placeholder="搜索地点，如图书馆、六教"
+                      aria-label="搜索校园地点"
                     />
                     {query && (
-                      <button title="清除搜索" onClick={() => setQuery('')}>
+                      <button
+                        title="清除搜索"
+                        onClick={() => {
+                          setQuery('');
+                          dock.current
+                            ?.querySelector<HTMLInputElement>(
+                              'input[type="search"]',
+                            )
+                            ?.focus();
+                        }}
+                      >
                         <X size={14} />
                       </button>
                     )}
                   </div>
                   <fieldset
                     className="category-filters"
-                    aria-label="精选地标分类"
+                    aria-label="校园地点分类"
                   >
                     {(
                       [
@@ -862,13 +906,22 @@ export default function Home() {
                       </button>
                     ))}
                   </fieldset>
-                  <div className="result-heading">
-                    <span>{query ? '精选地标搜索结果' : '精选地标'}</span>
+                  <output className="result-heading" aria-atomic="true">
+                    <span>{query ? '搜索结果' : '校园地点'}</span>
                     <span>{places.length} 处</span>
-                  </div>
+                  </output>
                   <div className="places">
-                    {!landmarks.length && !error ? (
-                      <output className="empty-state">正在加载精选地标…</output>
+                    {!landmarks.length ? (
+                      error ? (
+                        <div className="empty-state">
+                          <p>地点资料暂时无法加载，请检查网络后重试。</p>
+                          <button className="search-reset" onClick={retry}>
+                            重新加载地点
+                          </button>
+                        </div>
+                      ) : (
+                        <output className="empty-state">正在加载地点…</output>
+                      )
                     ) : places.length ? (
                       places.map((p) => (
                         <button
@@ -885,24 +938,28 @@ export default function Home() {
                           </span>
                           <span className="place-copy">
                             <strong>{p.name}</strong>
-                            <small title={p.description}>
-                              {p.description.split(/[，。]/)[0]}
-                            </small>
                           </span>
-                          <ArrowUpRight size={16} />
+                          <ChevronRight size={16} aria-hidden="true" />
                         </button>
                       ))
                     ) : (
                       <div className="empty-state">
-                        没有找到对应精选地标。
-                        <br />
-                        试试“图书馆”“六教”，或切换到全部分类。
+                        <p>
+                          {matchesInAllCategories
+                            ? '当前分类中没有相关地点。'
+                            : '没有找到相关地点。试试“图书馆”或“六教”。'}
+                        </p>
+                        <button className="search-reset" onClick={resetSearch}>
+                          {matchesInAllCategories
+                            ? `显示全部分类（${matchesInAllCategories}）`
+                            : '清空搜索与筛选'}
+                        </button>
                       </div>
                     )}
                   </div>
                 </TabsContent>
                 <TabsContent value="layers" className="settings-content">
-                  <p className="section-hint">留下想看的风景。</p>
+                  <p className="section-hint">选择地图中显示的内容</p>
                   {LAYER_ITEMS.map(([key, label, desc, Icon]) => (
                     <label
                       className="layer-row"
@@ -998,17 +1055,22 @@ export default function Home() {
                 </TabsContent>
               </Tabs>
               <div className="panel-foot">
-                <span className="live-dot" />
                 {overviewError ? (
                   <button onClick={() => setOverviewRetry((n) => n + 1)}>
-                    统计资料暂不可用 · 重试
+                    地图数据暂不可用 · 重试
                   </button>
                 ) : overview ? (
-                  `地图快照 ${overview.snapshotAt.slice(0, 10).replaceAll('-', '.')}`
+                  `地图数据 · ${overview.snapshotAt.slice(0, 10).replaceAll('-', '.')}`
                 ) : (
-                  '统计资料加载中…'
+                  '地图数据加载中…'
                 )}
-                <button onClick={() => setAbout(true)} title="查看数据来源">
+                <button
+                  onClick={() => {
+                    pauseMotion();
+                    setAbout(true);
+                  }}
+                  title="查看数据来源"
+                >
                   <Info size={14} />
                 </button>
               </div>
@@ -1039,7 +1101,7 @@ export default function Home() {
             onClick={() => setTour((value) => !value)}
           >
             {tour ? <Pause size={15} /> : <Play size={15} />}
-            {tour ? '暂停巡游' : '继续巡游'} · {tourIndex + 1}/
+            {tour ? '暂停游览' : '继续游览'} · {tourIndex + 1}/
             {landmarks.length}
           </button>
         )}
@@ -1050,7 +1112,7 @@ export default function Home() {
             {tourStarted && (
               <div className="tour-heading">
                 <div className="tour-copy">
-                  <strong>{tour ? '正在云游西大' : '巡游已暂停'}</strong>
+                  <strong>{tour ? '正在游览' : '游览已暂停'}</strong>
                   <small>
                     {String(tourIndex + 1).padStart(2, '0')} /{' '}
                     {landmarks.length} · {landmarks[tourIndex]?.name}
@@ -1058,8 +1120,8 @@ export default function Home() {
                 </div>
                 <button
                   className="tour-end"
-                  title="结束巡游"
-                  aria-label="结束巡游"
+                  title="结束游览"
+                  aria-label="结束游览"
                   onClick={() => {
                     setTour(false);
                     setTourStarted(false);
@@ -1088,11 +1150,11 @@ export default function Home() {
             >
               {tour ? <Pause size={15} /> : <Play size={15} />}
               <span>
-                {tour ? '暂停巡游' : tourStarted ? '继续巡游' : '开始校园巡游'}
+                {tour ? '暂停游览' : tourStarted ? '继续游览' : '开始游览'}
               </span>
               {!tourStarted && (
                 <small className="tour-count">
-                  {landmarks.length || '—'} 处风景
+                  {landmarks.length || '—'} 个地点
                 </small>
               )}
               {tourStarted && (
@@ -1184,7 +1246,10 @@ export default function Home() {
           </button>
           <button
             className="more-tools-button"
-            onClick={() => setToolsOpen(true)}
+            onClick={() => {
+              pauseMotion();
+              setToolsOpen(true);
+            }}
             aria-haspopup="dialog"
             title="更多工具"
           >
@@ -1194,7 +1259,13 @@ export default function Home() {
         </div>
       </div>
       <footer className="map-footer">
-        <button className="gesture-help" onClick={() => setHelpOpen(true)}>
+        <button
+          className="gesture-help"
+          onClick={() => {
+            pauseMotion();
+            setHelpOpen(true);
+          }}
+        >
           操作说明 · 拖动旋转 · 滚轮缩放
         </button>
         {layers.boundary && (
@@ -1308,6 +1379,7 @@ export default function Home() {
             <button
               onClick={() => {
                 setToolsOpen(false);
+                pauseMotion();
                 setHelpOpen(true);
               }}
             >
@@ -1321,7 +1393,7 @@ export default function Home() {
         <DialogContent className="tools-dialog">
           <DialogTitle>怎样游览校园</DialogTitle>
           <DialogDescription>
-            先搜索地标，或点击“开始校园巡游”自动探索。
+            选择一个地点，或点击“开始游览”依次浏览校园。
           </DialogDescription>
           <dl className="gesture-instructions">
             <dt>手机触控</dt>
@@ -1333,12 +1405,15 @@ export default function Home() {
               Tab 选择控件，Enter 确认。聚焦三维画面后，方向键平移，+ / −
               缩放，Home 返回全景。
             </dd>
-            <dt>查看地标</dt>
+            <dt>查看地点</dt>
             <dd>
               搜索“六教”等名称或别名，选择全貌、正背面及入口近景。手机点击“更多视角”展开详情。
             </dd>
-            <dt>暂停巡游</dt>
-            <dd>点击暂停，或直接拖动画面。收起面板后仍可暂停和继续。</dd>
+            <dt>暂停游览</dt>
+            <dd>
+              点击暂停或拖动画面；搜索、打开说明和切到其他网页时也会暂停。
+              收起面板后仍可暂停和继续，返回页面后需手动继续。
+            </dd>
           </dl>
         </DialogContent>
       </Dialog>
@@ -1434,7 +1509,7 @@ export default function Home() {
             <h3>如何操作</h3>
             <p>
               鼠标左键旋转，右键平移，滚轮缩放；触屏单指旋转、双指平移与缩放。聚焦画面后可用方向键平移、加减键缩放、Home
-              返回全景。手动操作会暂停巡游和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆和六教分别提供南北门，桥梁提供桥下近景。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。白色细线表示校园大致边界，可在图层中关闭，农院路公共走廊从校园范围中扣除。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
+              返回全景。手动操作会暂停游览和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆和六教分别提供南北门，桥梁提供桥下近景。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。白色细线表示校园大致边界，可在图层中关闭，农院路公共走廊从校园范围中扣除。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
             </p>
             <h3>开源与许可</h3>
             <p>
