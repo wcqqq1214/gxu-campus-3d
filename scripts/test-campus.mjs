@@ -149,15 +149,19 @@ test('现南门绑定真实门楼且不重复导出，汇学堂从东侧进入',
     ),
   ]) {
     const node = gltf.nodes.find((n) => n.extras?.landmark === gate.id);
-    const positions = gltf.meshes[node.mesh].primitives.map(
-      (p) => gltf.accessors[p.attributes.POSITION],
-    );
+    // The editable landmark also contains the photo-based approach paving.
+    // Check the gate architecture itself against its mapped building footprint.
+    const architecture = new Set(['gateStone', 'gateTrim', 'gateRecess', 'gateJoint', 'gateRed']);
+    const positions = gltf.meshes[node.mesh].primitives
+      .filter((p) => architecture.has(gltf.materials[p.material].name))
+      .map((p) => gltf.accessors[p.attributes.POSITION]);
+    assert.ok(positions.length > 0, '南门建筑主体材质不能缺失');
     const minX = Math.min(...positions.map((p) => p.min[0]));
     const maxX = Math.max(...positions.map((p) => p.max[0]));
     assert.ok(
       Math.abs(minX - gate.bounds[0]) < 0.2 &&
         Math.abs(maxX - gate.bounds[2]) < 0.2,
-      '基础与近景南门均须保持真实轮廓宽度',
+      '基础与近景南门建筑主体均须保持真实轮廓宽度',
     );
   }
   const hui = landmarks.find((l) => l.id === 'huixue');

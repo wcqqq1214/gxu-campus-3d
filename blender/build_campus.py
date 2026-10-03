@@ -143,6 +143,8 @@ for name in ['stone','grass','green','road','path','paleRoof','slate','sport','p
 # Modest near-view variation remains an explicitly estimated facade treatment.
 for name,color in [('stoneWarm','#c6b69f'),('stoneCool','#c5c0b1'),('livingWarm','#d0b39f'),('livingCool','#c3b0a4'),('shadeGlass','#3b6573')]:
     C[name]=material(name,rgb(color),.28 if name.endswith('Glass') else .84,.28 if name.endswith('Glass') else 0)
+from south_gate_site import ensure_materials, repair_roads
+ensure_materials(C)
 cols=terrain['cols'];rows=terrain['rows'];xmin,ymin,xmax,ymax=terrain['bounds'];hh=terrain['heights']
 def elevation(x,y):
     u=max(0,min(cols-1.001,(x-xmin)/(xmax-xmin)*(cols-1)));v=max(0,min(rows-1.001,(y-ymin)/(ymax-ymin)*(rows-1)));i=int(u);j=int(v);a=u-i;b=v-j
@@ -334,6 +336,10 @@ for l in landmarks:
         if not BASE_ONLY:high.object(l['name'],SOURCE,{'featureId':l.get('osmId',l['id']),'landmark':l['id'],'layer':'buildings','sourceUrl':l['sourceUrl']})
     base['landmark-'+l['id']]=landmark(l,bylandmark.get(l['id']),z,C,False)
     tree_obstacles.append((bylandmark[l['id']]['id'] if l['id'] in bylandmark else l.get('osmId',l['id']),'base',base['landmark-'+l['id']]))
+# Photo-based south-gate split carriageways, bounded independently of the gate.
+gate_site=next(l for l in landmarks if l['id']=='south-gate')
+gx0,gy0,gx1,gy1=gate_site['bounds']
+base['roads']=repair_roads(base['roads'],(gx0+gx1)/2,(gy0+gy1)/2,C)
 # Reusable tree templates; linked copies keep the Blender source small.
 from low_planting import hedge_mesh
 for planting in low_plantings:
