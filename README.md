@@ -1,8 +1,20 @@
-# 西大 · 云游校园
+<h1 align="center">西大 · 云游校园</h1>
 
-广西大学大学东路主校区的三维游览项目。使用 Three.js 和 Blender 制作，基于 OpenStreetMap 与公开资料建模，可在浏览器中搜索地标、调整视角、自动巡游和切换昼夜。
+<p align="center">
+  <img src="https://img.shields.io/badge/Three.js-000000?style=flat&amp;logo=threedotjs&amp;logoColor=white" alt="Three.js">
+  <img src="https://img.shields.io/badge/Blender-E87D0D?style=flat&amp;logo=blender&amp;logoColor=white" alt="Blender">
+  <img src="https://img.shields.io/badge/React-20232A?style=flat&amp;logo=react&amp;logoColor=61DAFB" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&amp;logo=typescript&amp;logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/OpenStreetMap-387C44?style=flat&amp;logo=openstreetmap&amp;logoColor=white" alt="OpenStreetMap">
+</p>
 
-[在线游览](https://wcqqq1214.github.io/gxu-campus-3d/) · [Blender 源文件](blender/gxu-campus.blend) · [数据来源](docs/DATA.md) · [建模说明](docs/MODELING.md)
+<p align="center">
+  广西大学大学东路主校区的三维游览项目。使用 Three.js 和 Blender 制作，基于 OpenStreetMap 与公开资料建模，可在浏览器中搜索地标、调整视角、自动巡游和切换昼夜。
+</p>
+
+<p align="center">
+  <a href="https://wcqqq1214.github.io/gxu-campus-3d/">在线游览</a> · <a href="blender/gxu-campus.blend">Blender 源文件</a> · <a href="docs/DATA.md">数据来源</a> · <a href="docs/MODELING.md">建模说明</a>
+</p>
 
 ![校园全景与地标菜单](docs/screenshots/readme/overview.jpg)
 
