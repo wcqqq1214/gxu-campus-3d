@@ -398,6 +398,7 @@ export default function Home() {
     }
   }, [selected, panelMode, collapsed, panelExpanded]);
   function returnToMenu() {
+    pauseMotion();
     returnPlace.current = selected;
     pendingFocus.current = 'menu';
     setTab('explore');
@@ -1423,7 +1424,7 @@ export default function Home() {
             </dd>
             <dt>暂停游览</dt>
             <dd>
-              点击暂停或拖动画面；搜索、打开说明和切到其他网页时也会暂停。
+              点击暂停或拖动画面；搜索、返回地点列表、打开说明和切到其他网页时也会暂停。
               收起面板后仍可暂停和继续，返回页面后需手动继续。
             </dd>
           </dl>
