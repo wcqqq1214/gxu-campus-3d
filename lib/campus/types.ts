@@ -112,7 +112,7 @@ export interface SceneController {
   focus: (id: string, origin?: SelectionOrigin) => void;
   landmarkView: (view: LandmarkView) => void;
   setOrbit: (on: boolean) => void;
-  setViewport: (frame: ViewportFrame) => void;
+  setViewport: (frame: ViewportFrame, reframe?: boolean) => void;
   setLayer: (key: LayerKey, on: boolean) => void;
   setPreset: (p: Preset) => void;
   setQuality: (q: Quality) => void;

@@ -130,6 +130,8 @@ export default function Home() {
     quality: 'auto' as Quality,
   });
   const presetEdited = useRef(false);
+  const [framingRequest, setFramingRequest] = useState(0);
+  const framedRequest = useRef(0);
   const [overviewRetry, setOverviewRetry] = useState(0);
   const [overviewError, setOverviewError] = useState(false);
   const [panelExpanded, setPanelExpanded] = useState(false);
@@ -214,6 +216,7 @@ export default function Home() {
             onSelect: (id, origin = 'manual') => {
               if (active) {
                 setSelected(id);
+                setFramingRequest((value) => value + 1);
                 setLandmarkView('oblique');
                 if (id) setTourIndex(ls.findIndex((place) => place.id === id));
                 if (origin !== 'tour') {
@@ -349,9 +352,11 @@ export default function Home() {
         root.style.setProperty('--dock-height', `${panel.height}px`);
         root.style.setProperty('--scene-left', `${left}px`);
         const key = JSON.stringify(frame);
-        if (key !== previous) {
+        const reframe = framedRequest.current !== framingRequest;
+        if (key !== previous || reframe) {
           previous = key;
-          controller.current?.setViewport(frame);
+          framedRequest.current = framingRequest;
+          controller.current?.setViewport(frame, reframe);
         }
       });
     };
@@ -364,7 +369,7 @@ export default function Home() {
       observer.disconnect();
       cancelAnimationFrame(pending);
     };
-  }, [ready, collapsed]);
+  }, [ready, collapsed, framingRequest]);
   useEffect(() => {
     if (!pendingFocus.current || collapsed) return;
     const destination = pendingFocus.current;
@@ -1516,7 +1521,7 @@ export default function Home() {
             <h3>如何操作</h3>
             <p>
               鼠标左键旋转，右键平移，滚轮缩放；触屏单指旋转、双指平移与缩放。聚焦画面后可用方向键平移、加减键缩放、Home
-              返回全景。手动操作会暂停游览和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆和六教分别提供南北门，桥梁提供桥下近景。面板可收起，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。白色细线表示校园大致边界，可在图层中关闭，农院路公共走廊从校园范围中扣除。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
+              返回全景。手动操作会暂停游览和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆和六教分别提供南北门，桥梁提供桥下近景。面板展开、收起时保持当前视角；主动定位地点或返回全景时，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。白色细线表示校园大致边界，可在图层中关闭，农院路公共走廊从校园范围中扣除。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
             </p>
             <h3>开源与许可</h3>
             <p>

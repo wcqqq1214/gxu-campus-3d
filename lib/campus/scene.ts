@@ -228,6 +228,10 @@ export function createScene(
     width: Math.max(200, host.clientWidth - 100),
     height: Math.max(200, host.clientHeight - 160),
   };
+  // UI occlusion can change without changing the current camera composition.
+  let cameraFrame = frame;
+  let framedWidth = host.clientWidth;
+  let framedHeight = host.clientHeight;
   let selectedView: LandmarkView = 'oblique';
   let autoFramed = true;
   let orbiting = false;
@@ -386,6 +390,7 @@ export function createScene(
     autoFramed = true;
     setOrbit(false);
     const c = l;
+    composeViewport();
     frameLandmark();
     const radius = Math.max(
       12,
@@ -432,7 +437,7 @@ export function createScene(
         selectedView,
         buildings.find((b) => b.landmark === selected)?.architecture,
       ),
-      frame,
+      cameraFrame,
       { width: host.clientWidth, height: host.clientHeight },
       camera.fov,
     );
@@ -453,6 +458,7 @@ export function createScene(
     restoredPose = null;
     setOrbit(false);
     selectedView = value;
+    composeViewport();
     autoFramed = true;
     frameLandmark();
   }
@@ -461,6 +467,7 @@ export function createScene(
     orbiting = on && Boolean(selected) && !reduced.matches;
     callbacks.onOrbit(orbiting);
     if (orbiting) {
+      composeViewport();
       selectedView = 'oblique';
       // A sphere fits through a complete rotation, including the wider sides.
       const place = landmarks.find((p) => p.id === selected)!;
@@ -475,15 +482,14 @@ export function createScene(
           new THREE.Vector3().setScalar(sphere.radius * 2),
         ),
         landmarkDirection(place, 'oblique'),
-        frame,
+        cameraFrame,
         { width: host.clientWidth, height: host.clientHeight },
       );
       moveTo(fit.target, fit.position);
     }
   }
-  function setViewport(value: ViewportFrame) {
-    frame = value;
-    frameReady = true;
+  function composeViewport() {
+    cameraFrame = frame;
     camera.setViewOffset(
       host.clientWidth,
       host.clientHeight,
@@ -492,6 +498,21 @@ export function createScene(
       host.clientWidth,
       host.clientHeight,
     );
+    cameraChanged = true;
+    dirty = true;
+  }
+  function setViewport(value: ViewportFrame, reframe = false) {
+    frame = value;
+    const resized =
+      framedWidth !== host.clientWidth || framedHeight !== host.clientHeight;
+    dirty = true;
+    // A panel toggle only changes label occlusion. Preserve position, target and
+    // projection, including during an orbit or an in-flight navigation tween.
+    if (frameReady && !resized && !reframe) return;
+    frameReady = true;
+    framedWidth = host.clientWidth;
+    framedHeight = host.clientHeight;
+    composeViewport();
     if (restoredPose?.position) applyRestoredPose();
     else if (orbiting) setOrbit(true);
     else if (selected && autoFramed) frameLandmark();
@@ -501,7 +522,7 @@ export function createScene(
   function visibleTangent() {
     return (
       (Math.tan((camera.fov * Math.PI) / 360) *
-        Math.min(frame.width, frame.height)) /
+        Math.min(cameraFrame.width, cameraFrame.height)) /
       host.clientHeight
     );
   }
@@ -550,8 +571,8 @@ export function createScene(
     const direction = new THREE.Vector3(0.55, 1.1, 1);
     const viewport = { width: host.clientWidth, height: host.clientHeight };
     const { target: t, position: p } = overviewPoints
-      ? fitPoints(overviewPoints, direction, frame, viewport)
-      : fitBox(box, direction, frame, viewport);
+      ? fitPoints(overviewPoints, direction, cameraFrame, viewport)
+      : fitBox(box, direction, cameraFrame, viewport);
     if (animate) moveTo(t, p);
     else {
       controls.target.copy(t);
@@ -933,7 +954,10 @@ export function createScene(
           sectors.get(key)!.push(row);
         }
         for (const sectorRows of sectors.values()) {
-          const rows = prioritizeTreeRows(sectorRows, manifest.treePriorityPositions || []);
+          const rows = prioritizeTreeRows(
+            sectorRows,
+            manifest.treePriorityPositions || [],
+          );
           const inst = new THREE.InstancedMesh(geometry, material, rows.length);
           const transform = new THREE.Object3D();
           rows.forEach((row, i) => {
@@ -1133,6 +1157,7 @@ export function createScene(
     restoredPose = null;
     setOrbit(false);
     if (v === 'overview') {
+      composeViewport();
       autoFramed = true;
       selected = null;
       callbacks.onSelect(null);
@@ -1141,6 +1166,7 @@ export function createScene(
       return;
     }
     autoFramed = false;
+    if (v === 'top' || v === 'tilt' || v === 'north') composeViewport();
     const t = controls.target.clone();
     const offset = camera.position.clone().sub(t);
     if (v === 'top')
@@ -1217,11 +1243,14 @@ export function createScene(
     const w = host.clientWidth,
       h = host.clientHeight;
     renderer.setSize(w, h);
+    // Preserve the current optical centre until the measured viewport arrives.
+    // ResizeObserver may also fire without an actual canvas size change.
+    const previousView = camera.view;
     camera.setViewOffset(
       w,
       h,
-      w / 2 - (frame.left + frame.width / 2),
-      h / 2 - (frame.top + frame.height / 2),
+      previousView ? (previousView.offsetX * w) / previousView.fullWidth : 0,
+      previousView ? (previousView.offsetY * h) / previousView.fullHeight : 0,
       w,
       h,
     );
