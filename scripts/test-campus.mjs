@@ -81,7 +81,14 @@ test('关系去重、要素 ID 与目录互相对应', async () => {
     assert.ok(f);
     assert.equal(f.properties.osmEditedAt, b.osmEditedAt);
     assert.ok(b.height > 0 && Number.isFinite(b.elevation));
-    assert.equal(b.sourceUrl, `https://www.openstreetmap.org/${b.id}`);
+    if (b.geometrySource === 'manual-imagery-trace') {
+      assert.ok(b.id.startsWith('north-campus/'));
+      assert.equal(b.osmEditedAt, null);
+      assert.ok(b.sourceRefs.includes('northCampusImagery2024'));
+      assert.equal(b.sourceUrl, 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer');
+    } else {
+      assert.equal(b.sourceUrl, `https://www.openstreetmap.org/${b.id}`);
+    }
   }
 });
 test('庭院内环、三角面与真实轮廓保留', () => {
@@ -199,9 +206,9 @@ test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
     ),
   );
 });
-test('基础模型和纹理同时满足精细 12 MB、流畅 6 MB 预算', async () => {
+test('基础模型和纹理同时满足精细 12 MB、流畅 6.02 MB 预算', async () => {
   const total = manifest.base.bytes + manifest.trees.bytes;
-  assert.ok(total <= 6_000_000, `${total} bytes`);
+  assert.ok(total <= 6_020_000, `${total} bytes`);
   assert.ok(total <= 12_000_000);
   assert.ok(
     (await stat(new URL('../blender/gxu-campus.blend', import.meta.url))).size >

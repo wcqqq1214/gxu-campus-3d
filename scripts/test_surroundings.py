@@ -25,6 +25,9 @@ class SurroundingsTest(unittest.TestCase):
         self.assertTrue(any(s['name']=='大学东路' for s in data['sources']))
     def test_boundary_matches_campus_with_public_corridor_removed(self):
         data=read('campus-boundary.json');geo=read('geography.geojson');expected=transform(project,shape(next(f for f in geo['features'] if f['id']=='campus-display-area')['geometry']))
+        supplements=[transform(project,shape(f['geometry'])) for f in geo['features'] if f['properties'].get('kind')=='campus-supplement']
+        expected=unary_union([expected]+supplements)
+        if supplements:expected=expected.difference(Polygon(read('north-campus.json')['publicRoad']))
         actual=[]
         for ring in data['rings']:
             self.assertEqual(ring[0],ring[-1]);self.assertTrue(all(len(p)==3 and all(math.isfinite(v) for v in p) for p in ring))

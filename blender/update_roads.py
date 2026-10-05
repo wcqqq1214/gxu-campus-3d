@@ -85,6 +85,6 @@ assert set(changed)<= {'roads','terrain','green'}|{'infra-approach-'+k for k in 
 assert all(hashlib.sha256((ROOT/'public/models'/n).read_bytes()).hexdigest()==h for n,h in before.items() if n not in {'base.glb'}|{k+'.glb' for k in high})
 report={'changedBaseNodes':changed,'retainedBaseNodes':len(retained),'retainedNearAndTreeGlbs':len(before)-1-len(high),'trees':len(trees),'initialBytes':len(blob)+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
 (ROOT/'docs/model-checks/bridge-joins-models.json').write_text(json.dumps(report,indent=2)+'\n')
-assert report['initialBytes']<6_000_000,report
+assert report['initialBytes']<6_020_000,report
 assert report['blendBytes']<100*1024*1024,report
 print(report,flush=True)

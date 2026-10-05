@@ -1,0 +1,691 @@
+{
+  "version": 2,
+  "target": "现广西大学北校园布局与主要建筑形体；已核实名称单独标注，其余翼楼按方位命名。",
+  "retrievedAt": "2026-10-05",
+  "sourceRefs": [
+    "northCampusImagery2024",
+    "northCampusPlan2022",
+    "northCampusTeaching2025",
+    "northCampusMaintenance2024",
+    "northCampusExterior2018",
+    "northCampusTeaching2026",
+    "northCampusLab2022",
+    "northCampusPump2026"
+  ],
+  "image": {
+    "width": 1800,
+    "height": 720,
+    "extent": [
+      108.2815,
+      22.85695,
+      108.291,
+      22.86075
+    ],
+    "capturedAt": "2024-11-30",
+    "resolutionMeters": 0.34,
+    "accuracyMeters": 8.47,
+    "service": "https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
+    "metadata": {
+      "OBJECTID": "4910117",
+      "Shape": "Polygon",
+      "DATE (YYYYMMDD)": "20241130",
+      "RESOLUTION (M)": "0.34",
+      "ACCURACY (M)": "8.47",
+      "DESCRIPTION": "LG01",
+      "SOURCE_INFO": "Vivid Advanced",
+      "SOURCE": "Vantor",
+      "SRC_DATE2": "11/30/2024",
+      "MinMapLevel": "12",
+      "MaxMapLevel": "18",
+      "DrawOrder": "80",
+      "BlockName": "DYNAMIC_ESRI_Nanning_25Q1",
+      "ReleaseName": "Raster Basemaps 2025.R06"
+    }
+  },
+  "precision": "影像人工描绘轮廓，结合公开历史外观照片及2024年校方现场照片校准形体；层高、立面构件和场地尺寸仍为估算。2024影像及历史照片不等于2026实测。",
+  "boundaryPixels": [
+    [
+      393,
+      392
+    ],
+    [
+      863,
+      365
+    ],
+    [
+      921,
+      365
+    ],
+    [
+      950,
+      366
+    ],
+    [
+      1620,
+      436
+    ],
+    [
+      1663,
+      469
+    ],
+    [
+      1694,
+      635
+    ],
+    [
+      1600,
+      631
+    ],
+    [
+      909,
+      553
+    ],
+    [
+      849,
+      528
+    ],
+    [
+      392,
+      502
+    ]
+  ],
+  "buildings": [
+    {
+      "id": "north-campus/library",
+      "name": "北校园图书馆（行健馆）",
+      "pixels": [
+        [
+          932,
+          387
+        ],
+        [
+          1004,
+          395
+        ],
+        [
+          990,
+          512
+        ],
+        [
+          915,
+          501
+        ]
+      ],
+      "levels": 6,
+      "height": 24.4,
+      "category": "academic",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "library",
+        "front": "west",
+        "bodyHeight": 20.8,
+        "evidence": "历史照片正面双端高起、宽台阶、四柱门厅；高程和尺寸按照片比例估算，背面未核实。"
+      }
+    },
+    {
+      "id": "north-campus/teaching-nw",
+      "name": "北校园行健5号楼（原第五教学楼）",
+      "pixels": [
+        [
+          1004,
+          395
+        ],
+        [
+          1199,
+          414
+        ],
+        [
+          1195,
+          453
+        ],
+        [
+          999,
+          435
+        ]
+      ],
+      "levels": 5,
+      "height": 17.5,
+      "category": "academic",
+      "heightBasis": "资料层数与估算层高",
+      "architecture": {
+        "kind": "teaching",
+        "front": "south",
+        "bodyHeight": 17.5,
+        "portalWidth": 0,
+        "roofPavilions": [],
+        "evidence": "白色框格、灰色基座、分段深色檐顶参考历史外景，屋面分段参照2024影像；门洞定位、尺寸和未见面估算。"
+      },
+      "levelsBasis": "校方2022年公告明确5层；2024年后勤简报仍记载5层"
+    },
+    {
+      "id": "north-campus/office",
+      "name": "北校园教学组团·西南翼",
+      "pixels": [
+        [
+          994,
+          477
+        ],
+        [
+          1191,
+          498
+        ],
+        [
+          1187,
+          535
+        ],
+        [
+          990,
+          512
+        ]
+      ],
+      "levels": 4,
+      "height": 14.0,
+      "category": "academic",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "teaching",
+        "front": "south",
+        "bodyHeight": 14.0,
+        "portalWidth": 0,
+        "roofPavilions": [],
+        "evidence": "白色框格、灰色基座、分段深色檐顶参考历史外景，屋面分段参照2024影像；门洞定位、尺寸和未见面估算。"
+      }
+    },
+    {
+      "id": "north-campus/link-west",
+      "name": "北校园教学组团·西连廊",
+      "pixels": [
+        [
+          1169,
+          450
+        ],
+        [
+          1195,
+          453
+        ],
+        [
+          1191,
+          498
+        ],
+        [
+          1164,
+          495
+        ]
+      ],
+      "levels": 3,
+      "height": 10.2,
+      "category": "academic",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "gallery",
+        "front": "south",
+        "bodyHeight": 10.2,
+        "evidence": "连廊位置取自影像；开放式楼层、栏杆及柱距为估算。"
+      }
+    },
+    {
+      "id": "north-campus/teaching-north-middle",
+      "name": "第十六教学楼（原行健第四教学楼）",
+      "pixels": [
+        [
+          1199,
+          414
+        ],
+        [
+          1400,
+          434
+        ],
+        [
+          1396,
+          473
+        ],
+        [
+          1195,
+          453
+        ]
+      ],
+      "levels": 5,
+      "height": 19.7,
+      "category": "academic",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "teaching",
+        "front": "south",
+        "bodyHeight": 17.5,
+        "portalWidth": 5.2,
+        "roofPavilions": [
+          [
+            0.04,
+            0.3
+          ],
+          [
+            0.37,
+            0.63
+          ],
+          [
+            0.7,
+            0.96
+          ]
+        ],
+        "evidence": "白色框格、灰色基座、分段深色檐顶参考历史外景，屋面分段参照2024影像；门洞定位、尺寸和未见面估算。"
+      }
+    },
+    {
+      "id": "north-campus/teaching-ne",
+      "name": "北校园教学组团·东北翼",
+      "pixels": [
+        [
+          1400,
+          434
+        ],
+        [
+          1558,
+          450
+        ],
+        [
+          1554,
+          490
+        ],
+        [
+          1396,
+          473
+        ]
+      ],
+      "levels": 5,
+      "height": 19.7,
+      "category": "academic",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "teaching",
+        "front": "south",
+        "bodyHeight": 17.5,
+        "portalWidth": 5.2,
+        "roofPavilions": [
+          [
+            0.04,
+            0.3
+          ],
+          [
+            0.37,
+            0.63
+          ],
+          [
+            0.7,
+            0.96
+          ]
+        ],
+        "evidence": "白色框格、灰色基座、分段深色檐顶参考历史外景，屋面分段参照2024影像；门洞定位、尺寸和未见面估算。"
+      }
+    },
+    {
+      "id": "north-campus/teaching-south-middle",
+      "name": "北校园教学组团·中南翼",
+      "pixels": [
+        [
+          1191,
+          498
+        ],
+        [
+          1388,
+          520
+        ],
+        [
+          1384,
+          558
+        ],
+        [
+          1187,
+          535
+        ]
+      ],
+      "levels": 6,
+      "height": 23.2,
+      "category": "academic",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "teaching",
+        "front": "south",
+        "bodyHeight": 21.0,
+        "portalWidth": 5.2,
+        "roofPavilions": [
+          [
+            0.04,
+            0.3
+          ],
+          [
+            0.37,
+            0.63
+          ],
+          [
+            0.7,
+            0.96
+          ]
+        ],
+        "evidence": "白色框格、灰色基座、分段深色檐顶参考历史外景，屋面分段参照2024影像；门洞定位、尺寸和未见面估算；历史原第二教学楼照片可见六层窗列及外露楼梯，当前楼号仍未核实。",
+        "openStair": {
+          "centerFraction": 0.12,
+          "width": 5.2
+        }
+      }
+    },
+    {
+      "id": "north-campus/teaching-se",
+      "name": "北校园教学组团·东南翼",
+      "pixels": [
+        [
+          1388,
+          520
+        ],
+        [
+          1551,
+          539
+        ],
+        [
+          1547,
+          577
+        ],
+        [
+          1384,
+          558
+        ]
+      ],
+      "levels": 5,
+      "height": 19.7,
+      "category": "academic",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "teaching",
+        "front": "south",
+        "bodyHeight": 17.5,
+        "portalWidth": 5.2,
+        "roofPavilions": [
+          [
+            0.04,
+            0.3
+          ],
+          [
+            0.37,
+            0.63
+          ],
+          [
+            0.7,
+            0.96
+          ]
+        ],
+        "evidence": "白色框格、灰色基座、分段深色檐顶参考历史外景，屋面分段参照2024影像；门洞定位、尺寸和未见面估算。"
+      }
+    },
+    {
+      "id": "north-campus/link-middle",
+      "name": "北校园教学组团·中连廊",
+      "pixels": [
+        [
+          1356,
+          469
+        ],
+        [
+          1377,
+          471
+        ],
+        [
+          1373,
+          518
+        ],
+        [
+          1352,
+          516
+        ]
+      ],
+      "levels": 3,
+      "height": 10.2,
+      "category": "academic",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "gallery",
+        "front": "south",
+        "bodyHeight": 10.2,
+        "evidence": "连廊位置取自影像；开放式楼层、栏杆及柱距为估算。"
+      }
+    },
+    {
+      "id": "north-campus/lab-east",
+      "name": "北校园教学组团·东端楼",
+      "pixels": [
+        [
+          1558,
+          450
+        ],
+        [
+          1607,
+          456
+        ],
+        [
+          1596,
+          584
+        ],
+        [
+          1547,
+          577
+        ]
+      ],
+      "levels": 5,
+      "height": 19.7,
+      "category": "academic",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "teaching",
+        "front": "south",
+        "bodyHeight": 17.5,
+        "portalWidth": 5.2,
+        "roofPavilions": [
+          [
+            0.04,
+            0.3
+          ],
+          [
+            0.37,
+            0.63
+          ],
+          [
+            0.7,
+            0.96
+          ]
+        ],
+        "evidence": "白色框格、灰色基座、分段深色檐顶参考历史外景，屋面分段参照2024影像；门洞定位、尺寸和未见面估算。"
+      }
+    },
+    {
+      "id": "north-campus/gym",
+      "name": "北校园体育馆",
+      "pixels": [
+        [
+          412,
+          405
+        ],
+        [
+          604,
+          417
+        ],
+        [
+          592,
+          496
+        ],
+        [
+          401,
+          482
+        ]
+      ],
+      "levels": 1,
+      "height": 17.2,
+      "category": "culture",
+      "heightBasis": "照片比例估算",
+      "architecture": {
+        "kind": "gym",
+        "front": "east",
+        "bodyHeight": 9.8,
+        "evidence": "2024校方室内照片可见钢桁架曲面屋顶和高窗；历史外景显示弧形东山墙。跨度、拱高按影像与照片估算。"
+      }
+    }
+  ],
+  "grounds": [
+    {
+      "id": "academic-walk",
+      "name": "教学区南侧步行道",
+      "kind": "roads",
+      "material": "path",
+      "pixels": [
+        [
+          910,
+          513
+        ],
+        [
+          1604,
+          593
+        ],
+        [
+          1610,
+          607
+        ],
+        [
+          908,
+          528
+        ]
+      ]
+    },
+    {
+      "id": "east-entrance",
+      "name": "北校园东侧入口场地",
+      "kind": "roads",
+      "material": "path",
+      "pixels": [
+        [
+          1622,
+          456
+        ],
+        [
+          1661,
+          477
+        ],
+        [
+          1685,
+          626
+        ],
+        [
+          1614,
+          614
+        ]
+      ]
+    },
+    {
+      "id": "central-walk",
+      "name": "体育区与图书馆之间通道",
+      "kind": "roads",
+      "material": "path",
+      "pixels": [
+        [
+          872,
+          378
+        ],
+        [
+          905,
+          381
+        ],
+        [
+          881,
+          559
+        ],
+        [
+          862,
+          552
+        ]
+      ]
+    },
+    {
+      "id": "gym-apron",
+      "name": "体育馆周边场地",
+      "kind": "roads",
+      "material": "path",
+      "pixels": [
+        [
+          399,
+          397
+        ],
+        [
+          610,
+          409
+        ],
+        [
+          599,
+          506
+        ],
+        [
+          388,
+          494
+        ]
+      ]
+    },
+    {
+      "id": "sports-ground",
+      "name": "北校园田径场基础布局",
+      "kind": "sports",
+      "material": "trackApron",
+      "pixels": [
+        [
+          628,
+          388
+        ],
+        [
+          850,
+          412
+        ],
+        [
+          842,
+          520
+        ],
+        [
+          605,
+          499
+        ]
+      ]
+    }
+  ],
+  "track": {
+    "centerPixels": [
+      733,
+      453
+    ],
+    "widthPixels": 216,
+    "heightPixels": 93,
+    "rotationDegrees": 6,
+    "laneCount": 4,
+    "note": "轮廓由影像估算；非标准400米场。四道及球场标线仅作基础示意。"
+  },
+  "publicRoadPixels": [
+    [
+      0,
+      510
+    ],
+    [
+      1800,
+      650
+    ],
+    [
+      1800,
+      704
+    ],
+    [
+      0,
+      569
+    ]
+  ],
+  "underpass": {
+    "osmId": "way/839763085",
+    "topology": "Existing road axis; passage below arterial; retain original upper roads and curbs."
+  },
+  "roadAlignment": {
+    "gymNorthMeters": 5,
+    "academicEastScale": 0.96,
+    "academicAnchorX": -191.922,
+    "basis": "Road-priority registration correction: retain original road corridors and fit the approximate imagery outlines. Not surveyed coordinates."
+  }
+}
