@@ -151,9 +151,13 @@ def elevation(x,y):
     return (hh[j*cols+i]*(1-a)+hh[j*cols+i+1]*a)*(1-b)+(hh[(j+1)*cols+i]*(1-a)+hh[(j+1)*cols+i+1]*a)*b
 
 def building_elevation(b):
+    if b.get('customModel')=='north-campus':return b['elevation']
     return elevation(*b.get('form',{}).get('stairTower',{}).get('hostCenter',b['center']))
 
 def generic(b,detail):
+    if b.get('customModel')=='north-campus':
+        from north_campus import building_model
+        return building_model(b,C,detail)
     if b.get('customModel')=='huicui':return huicui(b,elevation(*b['center']),C,detail)
     m=Mesh();h=b['height'];cx,cy=b['center'];z=building_elevation(b)
     if b['id']=='way/948683815':return west_stand(b,z,C,detail)
@@ -175,6 +179,13 @@ def generic(b,detail):
     return ordinary_building(b,z,C,detail)
 
 base={k:Mesh() for k in ['terrain','roads','water','green','sports','context']}
+north_replaced=set()
+if (DATA/'north-campus.json').exists():
+    from north_campus import site_models
+    north_data=json.loads((DATA/'north-campus.json').read_text())
+    north_replaced=set(north_data['replacedSurfaceIds'])
+    for key,mesh in site_models(north_data,C,elevation).items():
+        base[key]=mesh
 paving_originals={};paving_ids={p['surfaceId'] for p in pavings['pavings']}
 cut_cells=set(infrastructure['terrainCells'])|set(basketball['terrainCells'])
 for j in range(rows-1):
@@ -187,7 +198,7 @@ for j in range(rows-1):
 for patch in infrastructure['terrainPatch']+basketball['terrainPatch']:
     for i in range(0,len(patch['triangles']),3):base['terrain'].face([patch['vertices'][k] for k in patch['triangles'][i:i+3]],C['grass'])
 for si,original in enumerate(surfaces):
-    if original.get('suppressed'):continue
+    if original.get('suppressed') or original['id'] in north_replaced:continue
     s=original
     if s['id'] in infrastructure['replaceSurfaceIds']:continue
     if str(si) in infrastructure['surfaceOverrides']:s={**s,**infrastructure['surfaceOverrides'][str(si)]}
@@ -364,8 +375,14 @@ print('Tree building clearance',tree_clearance['inputTrees'],'->',len(trees),flu
 for i,(x,y,h,t,z) in enumerate([] if BASE_ONLY else trees):
     o=bpy.data.objects.new(f'树木示意-{i:04}',templates[t].data);PLANTS.objects.link(o);o.location=(x,y,z);o.scale=(h/9,h/9,h/9);o.rotation_euler.z=tree_rotation(x,y)
 for t in templates:t.hide_render=True;t.hide_set(True)
+if (DATA/'north-campus.json').exists() and north_data.get('underpass'):
+    from north_underpass import cut_meshes,upper_road_model,road_height_sampler
+    base['north-campus-roads'].extend(upper_road_model(north_data['underpass'],C,road_height_sampler(base['roads'],elevation)))
+    cut_meshes(base,north_data['underpass'])
 for k,m in base.items():
-    if not BASE_ONLY and not k.startswith(('landmark','sports-','basketball-')) and k not in near and k not in infra_near and k not in ('context','sports'):
+    if not BASE_ONLY and k.startswith('north-campus-'):
+        m.object(k+' · 可编辑',GROUND,{'layer':'sports' if k.endswith('sports') else 'roads','northCampus':True})
+    if not BASE_ONLY and not k.startswith(('landmark','sports-','basketball-','north-campus-')) and k not in near and k not in infra_near and k not in ('context','sports'):
         props={'layer':'water' if k.startswith('shore-') else 'roads' if k.startswith(('infra-','site-','paving-')) else k}
         if k.startswith('vegetation-low-'):props.update(layer='vegetation',plantingId=k.removeprefix('vegetation-low-'))
         if k.startswith('site-'):props['siteId']=k[5:]
@@ -391,6 +408,7 @@ def export(name,groups):
         if not mesh.v:continue
         layer='water' if key.startswith('shore-') else 'roads' if key.startswith(('infra-','site-','paving-')) or key.removeprefix('landmark-') in bridge_by_id else 'buildings' if key in near or key.startswith('landmark') else 'sports' if key.startswith(('sports-','basketball-')) else key
         props={'layer':layer,'zone':key if key in near else '', 'landmark':key[9:] if key.startswith('landmark-') else '', 'sportsId':key[7:] if key.startswith('sports-') else ''}
+        if key.startswith('north-campus-'):props['layer']='sports' if key.endswith('sports') else 'roads'
         if key.startswith('vegetation-low-'):props.update(layer='vegetation',plantingId=key.removeprefix('vegetation-low-'))
         if key=='terrain':props.update(positionQuantizationBits=18,texcoordQuantizationBits=18)
         if key=='roads':props.update(positionQuantizationBits=18,sharedPositionQuantizationBounds=True,roadMaterialPositionQuantizationBits=18,roadMaterialTexcoordQuantizationBits=10,otherMaterialTexcoordQuantizationBits=12)
@@ -403,6 +421,10 @@ def export(name,groups):
     if name=='base.glb':
         from terrain_export import replace_precise_terrain
         replace_precise_terrain(path,objs)
+        from north_campus_export import repack_north_base
+        north_keys={b['chunk'] for b in buildings if b.get('customModel')=='north-campus'}
+        north_keys.update(k for k in groups if k.startswith('north-campus-'))
+        if north_keys:repack_north_base(path,objs,north_keys)
     for o in objs:mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
     print('Export',name,round(path.stat().st_size/1e6,2),'MB',flush=True);return path.stat().st_size
 sizes={};sizes['base.glb']=export('base.glb',base)

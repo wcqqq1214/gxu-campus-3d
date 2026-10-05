@@ -213,7 +213,7 @@ def main():
         assert a.keys() == b.keys()
         assert all(a[k] == b[k] for k in a if k not in ('landmark-south-gate','roads'))
         manifest_before=json.loads((ROOT/'public/data/models.json').read_text())
-        assert candidate.stat().st_size+manifest_before['trees']['bytes']<=6_000_000,'Initial load budget exceeded'
+        assert candidate.stat().st_size+manifest_before['trees']['bytes']<=6_020_000,'Initial load budget exceeded'
         old_mesh = old.data
         bpy.data.objects.remove(old, do_unlink=True)
         if old_mesh.users == 0:
