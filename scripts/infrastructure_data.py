@@ -402,5 +402,7 @@ def prepare_infrastructure():
     prepare_foundations()
     from vegetation_data import prepare_vegetation
     prepare_vegetation()
+    from north_campus_data import prepare as prepare_north_campus
+    prepare_north_campus()
 
 if __name__=='__main__':prepare_infrastructure()

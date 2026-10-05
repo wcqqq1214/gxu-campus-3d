@@ -16,6 +16,10 @@ class BuildingFormTests(unittest.TestCase):
     def test_refinement_preserves_every_existing_footprint(self):
         baseline = json.loads((ROOT/'docs/model-checks/refinement/footprint-baseline.json').read_text())['footprints']
         buildings = json.loads((ROOT/'public/data/buildings.json').read_text())
+        supplements=[b for b in buildings if b.get('geometrySource')=='manual-imagery-trace']
+        config=json.loads((ROOT/'data/north-campus-layout.json').read_text())
+        self.assertEqual({b['id'] for b in supplements},{b['id'] for b in config['buildings']})
+        buildings=[b for b in buildings if b not in supplements]
         self.assertEqual(set(baseline), {b['id'] for b in buildings})
         for b in buildings:
             digest = hashlib.sha256(json.dumps(b['polygons'],separators=(',',':')).encode()).hexdigest()
