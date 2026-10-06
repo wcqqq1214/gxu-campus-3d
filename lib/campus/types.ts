@@ -52,6 +52,7 @@ export interface Building {
   zone: string;
 }
 export interface Landmark {
+  modelingBasis: 'photo' | 'type' | 'inferred';
   placeKind?: 'sports' | 'gate' | 'bridge' | 'sculpture';
   pickPolygon?: number[][];
   portalCenter?: [number, number];
@@ -108,6 +109,7 @@ export interface Metrics {
   detailGeometryMiB: number;
 }
 export interface SceneController {
+  setHovered: (id: string | null) => void;
   clearSelection: () => void;
   focus: (id: string, origin?: SelectionOrigin) => void;
   landmarkView: (view: LandmarkView) => void;
@@ -137,10 +139,10 @@ export const DEFAULT_LAYERS: Record<LayerKey, boolean> = {
   labels: true,
 };
 export const CATEGORY_NAMES: Record<Category, string> = {
-  academic: '教学科研',
-  living: '校园生活',
-  culture: '文化体育',
+  academic: '教学',
+  living: '生活',
+  culture: '文体',
   service: '校园服务',
-  infrastructure: '道路桥梁',
-  landmark: '校园地标',
+  infrastructure: '路桥',
+  landmark: '校门',
 };

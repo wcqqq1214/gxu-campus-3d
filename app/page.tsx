@@ -1,5 +1,13 @@
 'use client';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentProps,
+} from 'react';
+import { Tooltip } from '@base-ui/react/tooltip';
 import Image from 'next/image';
 import {
   ArrowUpRight,
@@ -8,10 +16,15 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Compass,
   Download,
   Expand,
-  GraduationCap,
+  Grid2X2,
+  House,
+  Orbit,
+  Scan,
+  Dumbbell,
+  RectangleEllipsis,
+  ScanEye,
   Info,
   Ellipsis,
   CircleHelp,
@@ -24,7 +37,6 @@ import {
   Pause,
   Play,
   Plus,
-  RotateCcw,
   Search,
   Share2,
   Sun,
@@ -70,15 +82,16 @@ import { fetchJson } from '@/lib/campus/streaming';
 import { sourceIndex, sourceDates } from '@/lib/campus/sources';
 import { CampusMinimap } from '@/components/campus-minimap';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
+const TOUR_STOP_MS = 8500;
 const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
-  ['labels', '地点名称', '在地图上显示地标名称', MapPin],
-  ['boundary', '校园边界', '白色细线标示大致范围', MapPin],
+  ['labels', '地点名称', '在地图上显示地点名称', RectangleEllipsis],
+  ['boundary', '校园边界', '白色细线标示大致范围', Scan],
   ['buildings', '校园建筑', '教学楼、宿舍与地标', Building2],
-  ['vegetation', '林木植被', '乔木、棕榈与林荫景观', Trees],
+  ['vegetation', '树木', '乔木、棕榈与林荫景观', Trees],
   ['roads', '道路与桥梁', '校道、桥梁与步行空间', Navigation],
   ['water', '湖塘水面', '镜湖、碧云湖及其他水体', Waves],
-  ['sports', '运动场地', '球场、跑道与游泳池', GraduationCap],
-  ['context', '紧邻校界建筑', '仅保留贴近校界的周边建筑', Layers3],
+  ['sports', '运动场地', '球场、跑道与游泳池', Dumbbell],
+  ['context', '周边建筑', '仅保留贴近校界的周边建筑', Layers3],
 ];
 const PRESETS: [Preset, string, string, typeof Sun][] = [
   ['morning', '晨光', '树影初长', Sunrise],
@@ -96,10 +109,10 @@ export default function Home() {
   const dock = useRef<HTMLElement>(null);
   const detailBack = useRef<HTMLButtonElement>(null);
   const tourEntry = useRef<HTMLButtonElement>(null);
-  const extraViews = useRef<HTMLDetailsElement>(null);
+  const tourProgress = useRef<HTMLSpanElement>(null);
   const menuScroll = useRef(0);
   const returnPlace = useRef<string | null>(null);
-  const pendingFocus = useRef<'detail' | 'menu' | 'views' | null>(null);
+  const pendingFocus = useRef<'detail' | 'menu' | null>(null);
   const host = useRef<HTMLDivElement>(null),
     controller = useRef<SceneController | null>(null);
   const [buildings, setBuildings] = useState<Building[]>([]),
@@ -139,7 +152,8 @@ export default function Home() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [debug, setDebug] = useState(false);
-  const [category, setCategory] = useState<Category | 'all'>('all');
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const [cameraState, setCameraState] = useState<CameraSnapshot | null>(null);
   const [shareLink, setShareLink] = useState('');
   const [panelMode, setPanelMode] = useState<'menu' | 'detail'>('menu');
@@ -233,6 +247,9 @@ export default function Home() {
                   }
                 }
               }
+            },
+            onHover: (id) => {
+              if (active) setHovered(id);
             },
             onInteract: () => {
               if (active) {
@@ -378,13 +395,6 @@ export default function Home() {
     if (destination === 'detail') {
       if (body) body.scrollTop = 0;
       detailBack.current?.focus({ preventScroll: true });
-    } else if (destination === 'views') {
-      if (extraViews.current) {
-        extraViews.current.open = true;
-        extraViews.current.querySelector<HTMLButtonElement>('button')?.focus();
-      } else {
-        detailBack.current?.focus({ preventScroll: true });
-      }
     } else {
       const row = Array.from(
         dock.current?.querySelectorAll<HTMLButtonElement>('[data-place-id]') ??
@@ -418,11 +428,29 @@ export default function Home() {
   useEffect(() => {
     if (!tour || !landmarks.length) return;
     controller.current?.focus(landmarks[tourIndex].id, 'tour');
+    // Both the station change and its indicator use this deadline. Updating the
+    // DOM directly keeps progress running while the panel is display:none,
+    // without re-rendering the entire map on every animation frame.
+    const deadline = performance.now() + TOUR_STOP_MS;
+    let frame = 0;
+    const updateProgress = () => {
+      const progress = Math.min(
+        1,
+        Math.max(0, 1 - (deadline - performance.now()) / TOUR_STOP_MS),
+      );
+      if (tourProgress.current)
+        tourProgress.current.style.transform = `scaleX(${progress})`;
+      if (progress < 1) frame = requestAnimationFrame(updateProgress);
+    };
+    updateProgress();
     const timer = setTimeout(
       () => setTourIndex((i) => nextTourIndex(i, landmarks.length)),
-      8500,
+      Math.max(0, deadline - performance.now()),
     );
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(timer);
+      cancelAnimationFrame(frame);
+    };
   }, [tour, tourIndex, landmarks]);
   const currentLandmark = landmarks.find((l) => l.id === selected);
   const currentBuilding = selected
@@ -430,22 +458,39 @@ export default function Home() {
     : undefined;
   const current = currentLandmark ?? currentBuilding;
   const places = useMemo(
-    () => searchLandmarks(landmarks, query, category),
-    [landmarks, query, category],
+    () => searchLandmarks(landmarks, query),
+    [landmarks, query],
   );
-  const matchesInAllCategories = useMemo(
-    () =>
-      category === 'all'
-        ? places.length
-        : searchLandmarks(landmarks, query).length,
-    [landmarks, query, category, places.length],
-  );
+  const groups = query.trim()
+    ? [{ key: 'search', name: '搜索结果', places }]
+    : (
+        [
+          'academic',
+          'culture',
+          'landmark',
+          'infrastructure',
+          'living',
+          'service',
+        ] as Category[]
+      )
+        .map((key) => ({
+          key,
+          name: CATEGORY_NAMES[key],
+          places: places.filter((p) => p.category === key),
+        }))
+        .filter((group) => group.places.length);
+  function hoverPlace(id: string | null) {
+    controller.current?.setHovered(id);
+  }
   function resetSearch() {
-    setCategory('all');
-    if (!matchesInAllCategories) setQuery('');
+    setQuery('');
     dock.current
       ?.querySelector<HTMLInputElement>('input[type="search"]')
       ?.focus();
+  }
+  function openShare() {
+    pauseMotion();
+    setShareOpen(true);
   }
   function toggleLayer(k: LayerKey, on: boolean) {
     settings.current.layers = { ...settings.current.layers, [k]: on };
@@ -542,9 +587,8 @@ export default function Home() {
         </button>
         <div>
           <h1>
-            广西大学 <span>云游校园</span>
+            广西大学 <span>校园地图</span>
           </h1>
-          <p>GUANGXI UNIVERSITY · CAMPUS EXPLORER</p>
         </div>
         <div className="header-location">
           <span className="live-dot" />
@@ -572,7 +616,7 @@ export default function Home() {
       <aside
         ref={dock}
         className={`panel-dock ${collapsed ? 'collapsed' : ''} ${panelExpanded ? 'expanded' : ''} ${panelMode === 'detail' ? 'detail-mode' : ''}`}
-        aria-label="校园导览菜单"
+        aria-label="校园浏览面板"
       >
         <div className="dock-heading">
           {panelMode === 'detail' && current && (
@@ -599,7 +643,7 @@ export default function Home() {
                 ? collapsed
                   ? current.name
                   : ''
-                : '校园导览'}
+                : '校园浏览'}
             </span>
             <small>{collapsed ? '展开' : '收起面板'}</small>
             <ChevronDown size={16} />
@@ -608,7 +652,10 @@ export default function Home() {
             <button
               className="dock-expand"
               aria-expanded={panelExpanded}
-              onClick={() => setPanelExpanded((value) => !value)}
+              onClick={() => {
+                if (panelExpanded) setMore(false);
+                setPanelExpanded((value) => !value);
+              }}
             >
               {panelExpanded
                 ? '简要'
@@ -627,50 +674,33 @@ export default function Home() {
               menuScroll.current = event.currentTarget.scrollTop;
           }}
         >
-          {panelMode === 'detail' && current && !collapsed && (
-            <div className="mobile-place-summary">
-              <h2>{current.name}</h2>
-              <p>{currentLandmark?.description ?? current.name}</p>
-              <div className="summary-actions">
-                <button
-                  aria-pressed={landmarkView === 'oblique'}
-                  onClick={() => changeLandmarkView('oblique')}
-                >
-                  全貌
-                </button>
-                <button
-                  aria-pressed={landmarkView === 'entrance'}
-                  onClick={() => changeLandmarkView('entrance')}
-                >
-                  {currentLandmark?.placeKind === 'bridge'
-                    ? '桥下近景'
-                    : currentLandmark?.placeKind === 'sculpture'
-                      ? '雕塑近景'
-                      : '入口近景'}
-                </button>
-                <button
-                  onClick={() => {
-                    pendingFocus.current = 'views';
-                    setPanelExpanded(true);
-                  }}
-                >
-                  更多视角
-                </button>
-              </div>
-            </div>
-          )}
           {panelMode === 'detail' && current ? (
             <section
               className={`place-detail ${more ? 'expanded' : ''}`}
-              aria-label="建筑详情"
+              aria-label="地点详情"
             >
               <div className="detail-heading">
                 <div>
                   <div className="eyebrow">
                     {CATEGORY_NAMES[current.category]}
-                    {currentLandmark?.id === 'new-east-gate' && ' · 外观推定'}
                   </div>
                   <h2>{current.name}</h2>
+                  <button
+                    className={`model-badge basis-${currentLandmark?.modelingBasis ?? 'type'}`}
+                    aria-expanded={more}
+                    onClick={() => {
+                      setMore((v) => !v);
+                      setPanelExpanded(true);
+                    }}
+                  >
+                    {
+                      {
+                        photo: '照片建模',
+                        type: '类型估算',
+                        inferred: '外观推定',
+                      }[currentLandmark?.modelingBasis ?? 'type']
+                    }
+                  </button>
                 </div>
               </div>
               <p>
@@ -681,7 +711,7 @@ export default function Home() {
                 <div key={current.id}>
                   <fieldset
                     className="landmark-views"
-                    aria-label="地标观察视角"
+                    aria-label="地点观察视角"
                   >
                     <button
                       aria-pressed={!orbit && landmarkView === 'oblique'}
@@ -701,88 +731,79 @@ export default function Home() {
                       title={
                         reducedMotion
                           ? '系统已启用减少动态效果'
-                          : '环绕当前地标，拖动画面可暂停'
+                          : '环绕当前地点，拖动画面可暂停'
                       }
                       onClick={() => {
                         setTour(false);
                         controller.current?.setOrbit(!orbit);
                       }}
                     >
-                      {orbit ? <Pause size={14} /> : <RotateCcw size={14} />}
+                      {orbit ? <Pause size={14} /> : <Orbit size={14} />}
                       {orbit ? '暂停环绕' : '环绕'}
                     </button>
-                  </fieldset>
-                  <details
-                    ref={extraViews}
-                    className="menu-disclosure more-views"
-                  >
-                    <summary>
-                      更多视角 <ChevronDown size={15} />
-                    </summary>
-                    <fieldset
-                      className="landmark-views extra-views"
-                      aria-label="更多地标视角"
-                    >
-                      {(
+
+                    {(
+                      [
                         [
-                          [
-                            'front',
-                            ['library', 'teaching-six'].includes(
-                              currentLandmark.id,
-                            )
-                              ? '南侧'
-                              : '正面',
-                          ],
-                          [
-                            'back',
-                            ['library', 'teaching-six'].includes(
-                              currentLandmark.id,
-                            )
-                              ? '北侧'
-                              : '背面',
-                          ],
-                          [
-                            'entrance',
-                            ['library', 'teaching-six'].includes(
-                              currentLandmark.id,
-                            )
-                              ? '南门近景'
-                              : currentLandmark.placeKind === 'bridge'
-                                ? '桥下近景'
-                                : currentLandmark.placeKind === 'sculpture'
-                                  ? '雕塑近景'
-                                  : '入口近景',
-                          ],
-                          ...(['library', 'teaching-six'].includes(
+                          'front',
+                          ['library', 'teaching-six'].includes(
                             currentLandmark.id,
                           )
-                            ? [['rear-entrance', '北门近景']]
-                            : []),
-                        ] as [LandmarkView, string][]
-                      ).map(([value, label]) => (
-                        <button
-                          key={value}
-                          aria-pressed={!orbit && landmarkView === value}
-                          onClick={() => changeLandmarkView(value)}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </fieldset>
-                  </details>
+                            ? '南侧'
+                            : '正面',
+                        ],
+                        [
+                          'back',
+                          ['library', 'teaching-six'].includes(
+                            currentLandmark.id,
+                          )
+                            ? '北侧'
+                            : '背面',
+                        ],
+                        [
+                          'entrance',
+                          ['library', 'teaching-six'].includes(
+                            currentLandmark.id,
+                          )
+                            ? '南门近景'
+                            : currentLandmark.placeKind === 'bridge'
+                              ? '桥下近景'
+                              : currentLandmark.placeKind === 'sculpture'
+                                ? '雕塑近景'
+                                : '入口近景',
+                        ],
+                        ...(['library', 'teaching-six'].includes(
+                          currentLandmark.id,
+                        )
+                          ? [['rear-entrance', '北门近景']]
+                          : []),
+                      ] as [LandmarkView, string][]
+                    ).map(([value, label]) => (
+                      <button
+                        key={value}
+                        aria-pressed={!orbit && landmarkView === value}
+                        onClick={() => changeLandmarkView(value)}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </fieldset>
                 </div>
               )}
               <div className="detail-actions">
                 <button onClick={() => setMore((v) => !v)} aria-expanded={more}>
-                  复原依据 <ChevronDown size={14} />
+                  建模依据 <ChevronDown size={14} />
                 </button>
-                <button onClick={() => void shareView()}>
+                <button onClick={openShare}>
                   <Share2 size={14} />
                   分享视角
                 </button>
               </div>
               {more && (
                 <div className="detail-evidence">
+                  <p className="basis-note">
+                    徽章表示建模参考类型，照片未覆盖的细节和尺寸仍可能包含推定。
+                  </p>
                   <p>
                     {currentLandmark?.detail ??
                       currentBuilding?.facadeBasis ??
@@ -832,7 +853,7 @@ export default function Home() {
                           {source.note && <small>{source.note}</small>}
                         </div>
                       ) : (
-                        <p key={id}>这项复原资料的链接暂缺。</p>
+                        <p key={id}>这项建模资料的链接暂缺。</p>
                       );
                     })}
                 </div>
@@ -853,7 +874,7 @@ export default function Home() {
               >
                 <TabsList className="panel-tabs">
                   <TabsTrigger value="explore">
-                    <Compass size={17} />
+                    <MapPin size={17} />
                     地点
                   </TabsTrigger>
                   <TabsTrigger value="layers">
@@ -895,32 +916,11 @@ export default function Home() {
                       </button>
                     )}
                   </div>
-                  <fieldset
-                    className="category-filters"
-                    aria-label="校园地点分类"
-                  >
-                    {(
-                      [
-                        ['all', '全部'],
-                        ['academic', '教学'],
-                        ['living', '生活'],
-                        ['culture', '文体'],
-                        ['landmark', '校门'],
-                        ['infrastructure', '路桥'],
-                      ] as [Category | 'all', string][]
-                    ).map(([value, label]) => (
-                      <button
-                        key={value}
-                        className={category === value ? 'active' : ''}
-                        aria-pressed={category === value}
-                        onClick={() => setCategory(value)}
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </fieldset>
                   <output className="result-heading" aria-atomic="true">
-                    <span>{query ? '搜索结果' : '校园地点'}</span>
+                    <span>
+                      {query.trim() ? '搜索结果' : '地点'}
+                      <small className="index-note">编号为游览站号</small>
+                    </span>
                     <span>{places.length} 处</span>
                   </output>
                   <div className="places">
@@ -936,36 +936,21 @@ export default function Home() {
                         <output className="empty-state">正在加载地点…</output>
                       )
                     ) : places.length ? (
-                      places.map((p) => (
-                        <button
-                          key={p.id}
-                          data-place-id={p.id}
-                          className={`place-row ${selected === p.id ? 'selected' : ''}`}
-                          onClick={() => choose(p.id)}
-                          disabled={!ready}
-                        >
-                          <span className="place-index">
-                            {String(
-                              landmarks.findIndex((l) => l.id === p.id) + 1,
-                            ).padStart(2, '0')}
-                          </span>
-                          <span className="place-copy">
-                            <strong>{p.name}</strong>
-                          </span>
-                          <ChevronRight size={16} aria-hidden="true" />
-                        </button>
-                      ))
+                      <PlaceGroups
+                        groups={groups}
+                        landmarks={landmarks}
+                        selected={selected}
+                        hovered={hovered}
+                        ready={ready}
+                        searching={Boolean(query.trim())}
+                        onHover={hoverPlace}
+                        onChoose={choose}
+                      />
                     ) : (
                       <div className="empty-state">
-                        <p>
-                          {matchesInAllCategories
-                            ? '当前分类中没有相关地点。'
-                            : '没有找到相关地点。试试“图书馆”或“六教”。'}
-                        </p>
+                        <p>没有找到相关地点。试试“图书馆”或“六教”。</p>
                         <button className="search-reset" onClick={resetSearch}>
-                          {matchesInAllCategories
-                            ? `显示全部分类（${matchesInAllCategories}）`
-                            : '清空搜索与筛选'}
+                          清空搜索
                         </button>
                       </div>
                     )}
@@ -1003,7 +988,7 @@ export default function Home() {
                   </details>
                 </TabsContent>
                 <TabsContent value="environment" className="settings-content">
-                  <p className="section-hint">同一座校园，不同的光景。</p>
+                  <p className="section-hint">同一座校园，不同的光景</p>
                   <div className="preset-grid">
                     {PRESETS.map(([p, label, caption, Icon]) => (
                       <button
@@ -1093,6 +1078,7 @@ export default function Home() {
                   onClick={() => {
                     pendingFocus.current = 'detail';
                     setPanelMode('detail');
+                    setMore(false);
                     setPanelExpanded(false);
                   }}
                 >
@@ -1118,159 +1104,185 @@ export default function Home() {
             {landmarks.length}
           </button>
         )}
-        {(tourStarted || panelMode === 'detail' || tab === 'explore') && (
-          <div
-            className={`tour-bar ${tourStarted ? 'tour-active' : 'tour-idle'}`}
-          >
-            {tourStarted && (
-              <div className="tour-heading">
-                <div className="tour-copy">
-                  <strong>{tour ? '正在游览' : '游览已暂停'}</strong>
-                  <small>
-                    {String(tourIndex + 1).padStart(2, '0')} /{' '}
-                    {landmarks.length} · {landmarks[tourIndex]?.name}
-                  </small>
-                </div>
-                <button
-                  className="tour-end"
-                  title="结束游览"
-                  aria-label="结束游览"
-                  onClick={() => {
-                    setTour(false);
-                    setTourStarted(false);
-                    requestAnimationFrame(() => {
-                      const target =
-                        tourEntry.current ??
-                        dock.current?.querySelector<HTMLButtonElement>(
-                          '[role="tab"][aria-selected="true"]',
-                        );
-                      target?.focus({ preventScroll: true });
-                    });
-                  }}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            )}
-            <button
-              ref={tourEntry}
-              className="tour-start"
-              disabled={!ready}
-              onClick={() => {
-                setTourStarted(true);
-                setTour((v) => !v);
-              }}
-            >
-              {tour ? <Pause size={15} /> : <Play size={15} />}
-              <span>
-                {tour ? '暂停游览' : tourStarted ? '继续游览' : '开始游览'}
-              </span>
-              {!tourStarted && (
-                <small className="tour-count">
-                  {landmarks.length || '—'} 个地点
-                </small>
-              )}
-              {tourStarted && (
-                <small className="mobile-tour-progress">
-                  {tourIndex + 1}/{landmarks.length}
-                </small>
-              )}
-            </button>
-            {tourStarted && (
-              <>
-                <button
-                  className="tour-skip"
-                  title="上一站"
-                  disabled={!ready}
-                  onClick={() => jump(-1)}
-                >
-                  <ChevronLeft size={17} />
-                </button>
-                <button
-                  className="tour-skip"
-                  title="下一站"
-                  disabled={!ready}
-                  onClick={() => jump(1)}
-                >
-                  <ChevronRight size={17} />
-                </button>
-              </>
-            )}
-          </div>
-        )}
-      </aside>
-      <div className="map-tools" aria-label="视角控制">
-        <button
-          className="north-button"
-          onClick={() => view('north')}
-          title="正北朝向"
+        <div
+          className={`tour-bar ${tourStarted ? 'tour-active' : 'tour-idle'}`}
         >
-          <Navigation
-            size={20}
-            style={{
-              transform: `rotate(${cameraBearing(cameraState) - 45}deg)`,
-            }}
-          />
-          <span>N</span>
-        </button>
-        <div className="tool-stack zoom-tools">
-          <button onClick={() => view('zoomIn')} title="放大">
-            <Plus size={19} />
-          </button>
-          <button onClick={() => view('zoomOut')} title="缩小">
-            <Minus size={19} />
-          </button>
-        </div>
-        <div className="tool-stack secondary-tools">
-          <button onClick={() => view('top')} title="俯视校园">
-            <Layers3 size={18} />
-          </button>
-          <button onClick={() => view('tilt')} title="倾斜鸟瞰">
-            <Compass size={18} />
-          </button>
-          <button onClick={() => view('overview')} title="全景复位">
-            <RotateCcw size={18} />
-          </button>
-          <button title="全屏" onClick={toggleFullscreen}>
-            <Expand size={18} />
-          </button>
+          {tour && (
+            <div className="tour-timer" key={tourIndex} aria-hidden="true">
+              <span ref={tourProgress} />
+            </div>
+          )}
+          {tourStarted && (
+            <div className="tour-heading">
+              <div className="tour-copy">
+                <strong>{tour ? '正在游览' : '游览已暂停'}</strong>
+                <small>
+                  {String(tourIndex + 1).padStart(2, '0')} / {landmarks.length}{' '}
+                  · {landmarks[tourIndex]?.name}
+                </small>
+              </div>
+              <button
+                className="tour-end"
+                title="结束游览"
+                aria-label="结束游览"
+                onClick={() => {
+                  setTour(false);
+                  setTourStarted(false);
+                  requestAnimationFrame(() => {
+                    const target =
+                      tourEntry.current ??
+                      dock.current?.querySelector<HTMLButtonElement>(
+                        '[role="tab"][aria-selected="true"]',
+                      );
+                    target?.focus({ preventScroll: true });
+                  });
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          )}
           <button
-            title="分享当前视角"
+            ref={tourEntry}
+            className="tour-start"
             disabled={!ready}
-            onClick={() => void shareView()}
-          >
-            <Share2 size={18} />
-          </button>
-          <button
-            title="导出校园画面"
-            disabled={!ready}
-            onClick={() => void exportView()}
-          >
-            <Download size={18} />
-          </button>
-        </div>
-        <div className="tool-stack mobile-tools">
-          <button
-            className="mobile-reset"
-            onClick={() => view('overview')}
-            title="全景复位"
-          >
-            <RotateCcw size={18} />
-          </button>
-          <button
-            className="more-tools-button"
             onClick={() => {
-              pauseMotion();
-              setToolsOpen(true);
+              setTourStarted(true);
+              setTour((v) => !v);
             }}
-            aria-haspopup="dialog"
-            title="更多工具"
           >
-            <Ellipsis size={20} />
-            <span>更多</span>
+            {tour ? <Pause size={15} /> : <Play size={15} />}
+            <span>
+              {tour ? '暂停游览' : tourStarted ? '继续游览' : '开始游览'}
+            </span>
+            {!tourStarted && (
+              <small className="tour-count">
+                {landmarks.length || '—'} 个地点
+              </small>
+            )}
+            {tourStarted && (
+              <small className="mobile-tour-progress">
+                {tourIndex + 1}/{landmarks.length}
+              </small>
+            )}
           </button>
+          {tourStarted && (
+            <>
+              <button
+                className="tour-skip"
+                title="上一站"
+                disabled={!ready}
+                onClick={() => jump(-1)}
+              >
+                <ChevronLeft size={17} />
+              </button>
+              <button
+                className="tour-skip"
+                title="下一站"
+                disabled={!ready}
+                onClick={() => jump(1)}
+              >
+                <ChevronRight size={17} />
+              </button>
+            </>
+          )}
         </div>
-      </div>
+      </aside>
+      <Tooltip.Provider delay={200}>
+        <div className="map-tools" aria-label="视角控制">
+          <MapToolButton
+            className="north-button"
+            onClick={() => view('north')}
+            aria-label="正北朝向"
+            tooltip="正北朝向"
+          >
+            <Navigation
+              size={20}
+              style={{
+                transform: `rotate(${cameraBearing(cameraState) - 45}deg)`,
+              }}
+            />
+            <span>N</span>
+          </MapToolButton>
+          <div className="tool-stack zoom-tools">
+            <MapToolButton
+              onClick={() => view('zoomIn')}
+              aria-label="放大"
+              tooltip="放大 · +（聚焦画面）"
+            >
+              <Plus size={19} />
+            </MapToolButton>
+            <MapToolButton
+              onClick={() => view('zoomOut')}
+              aria-label="缩小"
+              tooltip="缩小 · −（聚焦画面）"
+            >
+              <Minus size={19} />
+            </MapToolButton>
+          </div>
+          <div className="tool-stack secondary-tools">
+            <MapToolButton
+              onClick={() => view('top')}
+              aria-label="俯视校园"
+              tooltip="俯视校园"
+            >
+              <Grid2X2 size={18} />
+            </MapToolButton>
+            <MapToolButton
+              onClick={() => view('tilt')}
+              aria-label="倾斜鸟瞰"
+              tooltip="倾斜鸟瞰"
+            >
+              <ScanEye size={18} />
+            </MapToolButton>
+            <MapToolButton
+              onClick={() => view('overview')}
+              aria-label="全景复位"
+              tooltip="全景复位 · Home（聚焦画面）"
+            >
+              <House size={18} />
+            </MapToolButton>
+            <MapToolButton
+              aria-label="全屏"
+              tooltip="全屏"
+              onClick={toggleFullscreen}
+            >
+              <Expand size={18} />
+            </MapToolButton>
+            <MapToolButton
+              aria-label="分享"
+              tooltip="分享"
+              disabled={!ready}
+              onClick={openShare}
+            >
+              <Share2 size={18} />
+            </MapToolButton>
+          </div>
+          <div className="tool-stack mobile-tools">
+            <MapToolButton
+              className="mobile-reset"
+              onClick={() => view('overview')}
+              aria-label="全景复位"
+              tooltip="全景复位 · Home（聚焦画面）"
+            >
+              <House size={18} />
+            </MapToolButton>
+            <MapToolButton
+              className="more-tools-button"
+              onClick={() => {
+                pauseMotion();
+                setToolsOpen(true);
+              }}
+              aria-haspopup="dialog"
+              aria-label="更多工具"
+              tooltip="更多工具"
+            >
+              <Ellipsis size={20} />
+              <span>更多</span>
+            </MapToolButton>
+          </div>
+        </div>
+      </Tooltip.Provider>
       <footer className="map-footer">
         <button
           className="gesture-help"
@@ -1330,7 +1342,7 @@ export default function Home() {
                 view('overview');
               }}
             >
-              <RotateCcw size={20} />
+              <House size={20} />
               全景复位
             </button>
             <button
@@ -1348,7 +1360,7 @@ export default function Home() {
                 view('top');
               }}
             >
-              <Layers3 size={20} />
+              <Grid2X2 size={20} />
               俯视校园
             </button>
             <button
@@ -1357,7 +1369,7 @@ export default function Home() {
                 view('tilt');
               }}
             >
-              <Compass size={20} />
+              <ScanEye size={20} />
               倾斜鸟瞰
             </button>
             <button
@@ -1373,21 +1385,11 @@ export default function Home() {
               disabled={!ready}
               onClick={() => {
                 setToolsOpen(false);
-                void shareView();
+                openShare();
               }}
             >
               <Share2 size={20} />
-              分享当前视角
-            </button>
-            <button
-              disabled={!ready}
-              onClick={() => {
-                setToolsOpen(false);
-                void exportView();
-              }}
-            >
-              <Download size={20} />
-              导出校园画面
+              分享
             </button>
             <button
               onClick={() => {
@@ -1420,14 +1422,41 @@ export default function Home() {
             </dd>
             <dt>查看地点</dt>
             <dd>
-              搜索“六教”等名称或别名，选择全貌、正背面及入口近景。手机点击“更多视角”展开详情。
+              搜索“六教”等名称或别名，在详情视角栏选择全貌、俯视、环绕、正背面及近景；可横向滑动查看更多视角。
             </dd>
             <dt>暂停游览</dt>
-            <dd>
-              点击暂停或拖动画面；搜索、返回地点列表、打开说明和切到其他网页时也会暂停。
-              收起面板后仍可暂停和继续，返回页面后需手动继续。
-            </dd>
+            <dd>拖动画面即可暂停，也可使用“暂停游览”按钮。</dd>
           </dl>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={shareOpen} onOpenChange={setShareOpen}>
+        <DialogContent className="share-dialog">
+          <DialogTitle>分享校园</DialogTitle>
+          <DialogDescription>
+            保存当前视角链接，或下载带署名的校园画面。
+          </DialogDescription>
+          <div className="tools-grid">
+            <button
+              disabled={!ready}
+              onClick={() => {
+                setShareOpen(false);
+                void shareView();
+              }}
+            >
+              <Share2 size={20} />
+              复制视角链接
+            </button>
+            <button
+              disabled={!ready}
+              onClick={() => {
+                setShareOpen(false);
+                void exportView();
+              }}
+            >
+              <Download size={20} />
+              下载画面
+            </button>
+          </div>
         </DialogContent>
       </Dialog>
       <Dialog
@@ -1439,7 +1468,7 @@ export default function Home() {
         <DialogContent className="share-dialog">
           <DialogTitle>分享这个校园视角</DialogTitle>
           <DialogDescription>
-            链接保留当前地标、镜头和光照，换一块屏幕也能继续浏览。
+            链接保留当前地点、镜头和光照，换一块屏幕也能继续浏览。
           </DialogDescription>
           <Input
             aria-label="校园视角链接"
@@ -1452,7 +1481,7 @@ export default function Home() {
       </Dialog>
       <Dialog open={about} onOpenChange={setAbout}>
         <DialogContent className="about-dialog">
-          <DialogTitle>关于「西大 · 云游校园」</DialogTitle>
+          <DialogTitle>关于「广西大学 校园地图」</DialogTitle>
           <DialogDescription>
             广西大学主校区的三维建筑与地理环境复现。
           </DialogDescription>
@@ -1473,13 +1502,13 @@ export default function Home() {
                 <b>{overview?.campusBuildings ?? '—'}</b>校内建筑
               </span>
               <span>
-                <b>{landmarks.length || '—'}</b>精选地标
+                <b>{landmarks.length || '—'}</b>精选地点
               </span>
               <span>
                 <b>{overview?.trees ?? '—'}</b>示意树木
               </span>
             </div>
-            <h3>地图与复原依据</h3>
+            <h3>地图与建模依据</h3>
             <p>
               OSM 快照：{overview?.snapshotAt.slice(0, 10) ?? '暂不可用'}
               。获取日期不代表所有要素都在当年更新。近期资料以 2024—2026
@@ -1520,10 +1549,16 @@ export default function Home() {
                 ))}
             </div>
             <h3>如何操作</h3>
-            <p>
-              鼠标左键旋转，右键平移，滚轮缩放；触屏单指旋转、双指平移与缩放。聚焦画面后可用方向键平移、加减键缩放、Home
-              返回全景。手动操作会暂停游览和环绕。地标详情可切换全貌、正面、背面、俯视与入口近景，图书馆和六教分别提供南北门，桥梁提供桥下近景。面板展开、收起时保持当前视角；主动定位地点或返回全景时，镜头会避开展开的面板。搜索支持“六教”“新东园门”“农院路”等别名，可按教学、生活、文体、校门和路桥筛选；地图标注和点击定位仅开放精选地标。白色细线表示校园大致边界，可在图层中关闭，农院路公共走廊从校园范围中扣除。位置小图显示镜头方向，分享按钮可复制带光照与视角的链接。
-            </p>
+            <p>选择地点或开始游览，拖动画面探索校园。</p>
+            <button
+              className="help-link"
+              onClick={() => {
+                setAbout(false);
+                setHelpOpen(true);
+              }}
+            >
+              查看操作说明 <ArrowUpRight size={14} />
+            </button>
             <h3>开源与许可</h3>
             <p>
               Three.js + Blender。代码 MIT，自制模型与材质 CC BY 4.0，OSM 数据
@@ -1541,5 +1576,89 @@ export default function Home() {
         </DialogContent>
       </Dialog>
     </main>
+  );
+}
+
+function PlaceGroups({
+  groups,
+  landmarks,
+  selected,
+  hovered,
+  ready,
+  searching,
+  onHover,
+  onChoose,
+}: {
+  groups: { key: string; name: string; places: Landmark[] }[];
+  landmarks: Landmark[];
+  selected: string | null;
+  hovered: string | null;
+  ready: boolean;
+  searching: boolean;
+  onHover: (id: string | null) => void;
+  onChoose: (id: string) => void;
+}) {
+  return (
+    <>
+      {' '}
+      {groups.map((group) => (
+        <section
+          className="place-group"
+          key={group.key}
+          aria-label={group.name}
+        >
+          {!searching && (
+            <h3>
+              {group.name}
+              <span>{group.places.length}</span>
+            </h3>
+          )}
+          {group.places.map((p) => (
+            <button
+              key={p.id}
+              data-place-id={p.id}
+              className={`place-row ${selected === p.id ? 'selected' : ''} ${hovered === p.id ? 'linked-hover' : ''}`}
+              onPointerEnter={() => onHover(p.id)}
+              onPointerLeave={() => onHover(null)}
+              onFocus={() => onHover(p.id)}
+              onBlur={() => onHover(null)}
+              onClick={() => onChoose(p.id)}
+              disabled={!ready}
+            >
+              <span className="place-index">
+                {String(landmarks.findIndex((l) => l.id === p.id) + 1).padStart(
+                  2,
+                  '0',
+                )}
+              </span>
+              <span className="place-copy">
+                <strong>{p.name}</strong>
+              </span>
+              <ChevronRight size={16} aria-hidden="true" />
+            </button>
+          ))}
+        </section>
+      ))}{' '}
+    </>
+  );
+}
+
+function MapToolButton({
+  tooltip,
+  ...props
+}: ComponentProps<'button'> & { tooltip: string }) {
+  return (
+    <Tooltip.Root disabled={props.disabled}>
+      <Tooltip.Trigger render={<button {...props} />} />
+      <Tooltip.Portal>
+        <Tooltip.Positioner
+          className="map-tool-tooltip-positioner"
+          side="left"
+          sideOffset={10}
+        >
+          <Tooltip.Popup className="map-tool-tooltip">{tooltip}</Tooltip.Popup>
+        </Tooltip.Positioner>
+      </Tooltip.Portal>
+    </Tooltip.Root>
   );
 }

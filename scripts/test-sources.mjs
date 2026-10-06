@@ -48,3 +48,32 @@ test('发布时间、拍摄时间与查阅时间分开，不用来源ID或查阅
     /发布：2020-01-01 · 拍摄：2019/,
   );
 });
+
+test('建模依据分类覆盖全部地点，并与可再生成的源目录一致', async () => {
+  const catalogue = JSON.parse(
+    await readFile(new URL('../data/landmarks.json', import.meta.url)),
+  );
+  const sculptures = JSON.parse(
+    await readFile(new URL('../data/sculptures.json', import.meta.url)),
+  );
+  for (const place of landmarks) {
+    assert.ok(
+      ['photo', 'type', 'inferred'].includes(place.modelingBasis),
+      place.id,
+    );
+    const source = [...catalogue, ...sculptures].find(
+      (item) => item.id === place.id,
+    );
+    if (source) {
+      assert.equal(place.modelingBasis, source.modelingBasis, place.id);
+      assert.equal(place.description, source.description, place.id);
+    }
+  }
+  assert.equal(
+    landmarks.find((p) => p.id === 'teaching-two').modelingBasis,
+    'type',
+  );
+  for (const id of ['new-east-gate', 'bocui-bridge', 'huixian-bridge']) {
+    assert.equal(landmarks.find((p) => p.id === id).modelingBasis, 'inferred');
+  }
+});

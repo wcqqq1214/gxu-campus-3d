@@ -362,7 +362,8 @@ def prepare_infrastructure():
             'height':b['deckElevation']-b['floorElevation']+1.3,'elevation':b['floorElevation'],
             'approachPath':[p[:3] for p in b['underpass']],
             'distance':90,'zone':'roads','cameraOffset':[-1,.75,1],
-            'description':f"{b['name']}连接农院路两侧校园。农院路是公共道路，校内通道从桥下穿行，两者在这里分层交叉。",
+            'modelingBasis':'photo' if b['id']=='chongzuo-bridge' else 'inferred',
+            'description':{'chongzuo-bridge': '连接农院路两侧校园的下穿通道，两侧抬高步道与坡道相接，圆形护栏沿道路延伸。', 'bocui-bridge': '农院路沿线的校园联络通道，校内交通从公共道路下方穿行。', 'huixian-bridge': '农院路两侧校园之间的通行节点，桥上公共道路与桥下校内通道分层交叉。'}[b['id']],
             'detail':recent+' '+b['pedestrian']['basis']+' 净高、路幅、跨径分配、桥墩及未见于照片的构件为视觉估算。',
             'sourceRefs':['infrastructureOsm',b['reference'],'bridgeMaintenance2024']+(['chongzuoReport2013','chongzuoHistoric2013','chongzuoRoute2025'] if b['id']=='chongzuo-bridge' else ['bocuiNotice2023'] if b['id']=='bocui-bridge' else ['bridgeNamingGuide']),
             'additionalReferences':['bridgeMaintenance2024']+(['chongzuoReport2013','chongzuoHistoric2013','chongzuoRoute2025'] if b['id']=='chongzuo-bridge' else ['bocuiNotice2023'] if b['id']=='bocui-bridge' else ['bridgeNamingGuide'])})
