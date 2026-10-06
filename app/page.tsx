@@ -79,7 +79,7 @@ import {
 } from '@/lib/campus/share';
 import sourceData from '@/public/data/sources.json';
 import { fetchJson } from '@/lib/campus/streaming';
-import { sourceIndex, sourceDates } from '@/lib/campus/sources';
+import { sourceIndex } from '@/lib/campus/sources';
 import { CampusMinimap } from '@/components/campus-minimap';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const TOUR_STOP_MS = 8500;
@@ -133,7 +133,6 @@ export default function Home() {
     [tourIndex, setTourIndex] = useState(0),
     [collapsed, setCollapsed] = useState(false),
     [about, setAbout] = useState(false),
-    [more, setMore] = useState(false),
     [toast, setToast] = useState(''),
     [retrySeed, setRetrySeed] = useState(0),
     [metrics, setMetrics] = useState<Metrics | null>(null);
@@ -234,7 +233,6 @@ export default function Home() {
                 setLandmarkView('oblique');
                 if (id) setTourIndex(ls.findIndex((place) => place.id === id));
                 if (origin !== 'tour') {
-                  setMore(false);
                   setPanelMode(id ? 'detail' : 'menu');
                   setCollapsed(false);
                   setPanelExpanded(false);
@@ -653,7 +651,6 @@ export default function Home() {
               className="dock-expand"
               aria-expanded={panelExpanded}
               onClick={() => {
-                if (panelExpanded) setMore(false);
                 setPanelExpanded((value) => !value);
               }}
             >
@@ -675,37 +672,18 @@ export default function Home() {
           }}
         >
           {panelMode === 'detail' && current ? (
-            <section
-              className={`place-detail ${more ? 'expanded' : ''}`}
-              aria-label="地点详情"
-            >
+            <section className="place-detail" aria-label="地点详情">
               <div className="detail-heading">
                 <div>
                   <div className="eyebrow">
                     {CATEGORY_NAMES[current.category]}
                   </div>
                   <h2>{current.name}</h2>
-                  <button
-                    className={`model-badge basis-${currentLandmark?.modelingBasis ?? 'type'}`}
-                    aria-expanded={more}
-                    onClick={() => {
-                      setMore((v) => !v);
-                      setPanelExpanded(true);
-                    }}
-                  >
-                    {
-                      {
-                        photo: '照片建模',
-                        type: '类型估算',
-                        inferred: '外观推定',
-                      }[currentLandmark?.modelingBasis ?? 'type']
-                    }
-                  </button>
                 </div>
               </div>
               <p>
                 {currentLandmark?.description ??
-                  `${CATEGORY_NAMES[currentBuilding!.category]}建筑，位置依据公开地图。`}
+                  `${CATEGORY_NAMES[currentBuilding!.category]}建筑。`}
               </p>
               {currentLandmark && (
                 <div key={current.id}>
@@ -791,73 +769,11 @@ export default function Home() {
                 </div>
               )}
               <div className="detail-actions">
-                <button onClick={() => setMore((v) => !v)} aria-expanded={more}>
-                  建模依据 <ChevronDown size={14} />
-                </button>
                 <button onClick={openShare}>
                   <Share2 size={14} />
                   分享视角
                 </button>
               </div>
-              {more && (
-                <div className="detail-evidence">
-                  <p className="basis-note">
-                    徽章表示建模参考类型，照片未覆盖的细节和尺寸仍可能包含推定。
-                  </p>
-                  <p>
-                    {currentLandmark?.detail ??
-                      currentBuilding?.facadeBasis ??
-                      '保留公开地图轮廓，窗格、屋顶和入口按建筑类型推定。'}
-                  </p>
-                  {currentBuilding?.constructionStatus && (
-                    <p>{currentBuilding.constructionStatus}</p>
-                  )}
-                  <dl>
-                    <div>
-                      <dt>高度依据</dt>
-                      <dd>
-                        {currentLandmark?.placeKind === 'bridge'
-                          ? '净高与坡度为视觉估算，非工程测量'
-                          : currentLandmark?.placeKind === 'sports'
-                            ? '历史 DEM 局部平整，非测量高程'
-                            : currentLandmark?.id === 'new-east-gate'
-                              ? '缺少门体照片，暂按门卫设施尺度估算'
-                              : (currentBuilding?.heightBasis ??
-                                '参考照片估算')}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt>地图编辑时间</dt>
-                      <dd>
-                        {current.osmEditedAt?.slice(0, 10) ?? '详见位置来源'}
-                      </dd>
-                    </div>
-                  </dl>
-                  <a href={current.sourceUrl} target="_blank" rel="noreferrer">
-                    查看位置来源 <ArrowUpRight size={13} />
-                  </a>
-                  {currentLandmark &&
-                    [
-                      ...new Set([
-                        currentLandmark.reference,
-                        ...(currentLandmark.additionalReferences ?? []),
-                      ]),
-                    ].map((id) => {
-                      const source = refs[id];
-                      return source ? (
-                        <div key={id}>
-                          <a href={source.url} target="_blank" rel="noreferrer">
-                            {source.name} <ArrowUpRight size={13} />
-                          </a>
-                          <small>{sourceDates(source)}</small>
-                          {source.note && <small>{source.note}</small>}
-                        </div>
-                      ) : (
-                        <p key={id}>这项建模资料的链接暂缺。</p>
-                      );
-                    })}
-                </div>
-              )}
             </section>
           ) : (
             <div className="explorer">
@@ -1078,7 +994,6 @@ export default function Home() {
                   onClick={() => {
                     pendingFocus.current = 'detail';
                     setPanelMode('detail');
-                    setMore(false);
                     setPanelExpanded(false);
                   }}
                 >

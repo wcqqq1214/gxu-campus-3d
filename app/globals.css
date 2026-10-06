@@ -703,42 +703,6 @@ a svg {
 .detail-actions button:last-child {
   color: var(--primary);
 }
-.detail-evidence {
-  font-size: 13px;
-  color: #63765e;
-  line-height: 1.8;
-  padding-top: 16px;
-}
-.detail-evidence p {
-  margin: 0 0 14px;
-}
-.detail-evidence dl {
-  font-size: 12px;
-}
-.detail-evidence dl > div {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-.detail-evidence dt {
-  color: #8f9b84;
-}
-.detail-evidence dd {
-  margin: 0;
-}
-.detail-evidence a {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  margin: 10px 0;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-.detail-evidence > small {
-  color: #99a18f;
-  font-size: 11px;
-}
 .scene-status {
   position: absolute;
   left: 50%;
@@ -1383,23 +1347,6 @@ a svg {
 .panel-dock .detail-actions button {
   min-height: 44px;
   font-size: 14px;
-}
-.panel-dock .detail-evidence,
-.panel-dock .detail-evidence dl {
-  font-size: 14px;
-}
-.panel-dock .detail-evidence dt,
-.panel-dock .detail-evidence > small {
-  color: #52674c;
-  font-size: 12px;
-}
-.panel-dock .detail-evidence a {
-  font-size: 14px;
-  min-height: 30px;
-}
-.panel-dock .detail-evidence dl > div {
-  display: block;
-  margin: 12px 0;
 }
 .place-index,
 .result-heading,
@@ -2100,24 +2047,6 @@ output.empty-state {
 .panel-dock .panel-tabs [data-active] {
   border-bottom-color: var(--phoenix);
 }
-.model-badge {
-  display: inline-flex;
-  padding: 4px 8px;
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  background: var(--muted);
-  color: var(--muted-foreground);
-  font-size: 11px;
-  line-height: 1.4;
-}
-.model-badge.basis-photo {
-  color: var(--primary);
-  background: var(--surface-hover);
-}
-.model-badge.basis-inferred {
-  color: var(--phoenix);
-  background: var(--phoenix-soft);
-}
 .panel-dock .landmark-views {
   display: flex;
   flex-wrap: nowrap;
@@ -2228,8 +2157,7 @@ output.empty-state {
   .detail-mode:not(.expanded) .place-detail {
     display: block;
   }
-  .detail-mode:not(.expanded) .detail-actions,
-  .detail-mode:not(.expanded) .detail-evidence {
+  .detail-mode:not(.expanded) .detail-actions {
     display: none;
   }
   .detail-mode:not(.expanded) .place-detail > p {
