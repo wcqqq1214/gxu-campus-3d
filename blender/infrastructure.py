@@ -5,7 +5,6 @@ explicit estimates in infrastructure.json, not a claim of engineering accuracy.
 """
 import math
 from geometry import Mesh
-from south_gate import inscription
 
 def frames(path):
     result=[]
@@ -229,20 +228,6 @@ def bridge(b,C,detail):
         # Historical photo shows a median pier. Align it with the campus road.
         bearing=math.radians(b['frontBearing']);ux=math.sin(bearing);uy=math.cos(bearing)
         m.box(*b['center'],(z-slab+floor)/2,16,.65,z-slab-floor,C['bridgeConcrete'],math.atan2(uy,ux))
-        if detail:
-            # The historical name panel sits beside the campus-road opening,
-            # not at the far end of the much longer public-road bridge span.
-            reach=math.dist(b['portalCenter'],b['center'])
-            for sign in [-1,1]:
-                fx,fy=ux*sign,uy*sign
-                px=b['center'][0]+fx*(reach+.18)-fy*5.65
-                py=b['center'][1]+fy*(reach+.18)+fx*5.65
-                panel=Mesh();panel.box(0,0,floor+2.3,1.12,.22,3.8,C['bridgePlaque'])
-                for i,char in enumerate('崇左桥'):
-                    panel.extend(inscription(char,0,-.13,floor+3.45-i*1.05,.85,.9,C['white'],True))
-                panel.rotate_z(0,0,math.atan2(fy,fx)+math.pi/2)
-                panel.v=[(x+px,y+py,h) for x,y,h in panel.v]
-                m.add_part('崇左桥入口题名（历史照片辅助；双面位置估算）',panel)
     if detail:
         rails=Mesh();drains=Mesh();walk=b['pedestrian'];walkpath=walk['path']
         for i,(a,c) in enumerate(zip(path,path[1:])):
