@@ -32,6 +32,7 @@ import { AdaptiveQuality, qualityProfile } from './quality';
 import { FramePacer } from './frame-pacing';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
+import { createContextStyle } from './context-style';
 import type { CampusBoundary } from './boundary';
 import type {
   Building,
@@ -58,6 +59,7 @@ interface Manifest {
 interface Callbacks {
   onStatus: (message: string, error?: boolean, progress?: number) => void;
   onReady: () => void;
+  onHover: (id: string | null) => void;
   onSelect: (
     id: string | null,
     origin?: import('./types').SelectionOrigin,
@@ -74,6 +76,7 @@ export function createScene(
   callbacks: Callbacks,
 ): SceneController {
   const scene = new THREE.Scene();
+  const contextStyle = createContextStyle();
   scene.background = new THREE.Color('#d8e5e5');
   scene.fog = new THREE.Fog('#d8e5e5', 8500, 22000);
   const renderer = new THREE.WebGLRenderer({
@@ -201,6 +204,7 @@ export function createScene(
   let quality: Quality = 'auto';
   let preset: Preset = 'day';
   let selected: string | null = null;
+  let hovered: string | null = null;
   let initialReady = false;
   let readyMs = 0;
   let loadedBytes = 0;
@@ -263,6 +267,11 @@ export function createScene(
   const labelNodes = landmarks.map((l, i) => {
     const el = document.createElement('button');
     el.className = 'map-label';
+    el.dataset.placeId = l.id;
+    el.onpointerenter = () => setHovered(l.id);
+    el.onpointerleave = () => setHovered(null);
+    el.onfocus = () => setHovered(l.id);
+    el.onblur = () => setHovered(null);
     const number = document.createElement('span');
     number.textContent = String(i + 1).padStart(2, '0');
     el.appendChild(number);
@@ -283,6 +292,14 @@ export function createScene(
       ),
     };
   });
+  function setHovered(id: string | null) {
+    if (hovered === id) return;
+    hovered = id;
+    for (const { l, el } of labelNodes)
+      el.classList.toggle('linked-hover', l.id === id);
+    callbacks.onHover(id);
+    dirty = true;
+  }
   const proxies: THREE.Mesh[] = [];
   for (const b of navigationFootprints(buildings, landmarks)) {
     const groupShapes = b.polygons.map((poly) => {
@@ -384,6 +401,7 @@ export function createScene(
   ) {
     const l = landmarks.find((l) => l.id === id);
     if (!l) return;
+    setHovered(null);
     selected = id;
     restoredPose = null;
     selectedView = 'oblique';
@@ -597,6 +615,7 @@ export function createScene(
       const mats = Array.isArray(o.material) ? o.material : [o.material];
       for (const m of mats) {
         if (m instanceof THREE.MeshStandardMaterial) {
+          contextStyle.apply(m);
           if (
             ['sportWhite', 'roadWhite', 'roadYellow', 'tactile'].includes(
               m.name,
@@ -1023,6 +1042,7 @@ export function createScene(
       );
       if (disposed) return;
       boundaryRoot.add(createBoundary(data));
+      contextStyle.setBoundary(data);
       overviewPoints = campusOverviewPoints(data.rings, buildings, landmarks);
       if (!selected && autoFramed && !restoredPose?.position) overview();
       boundaryReady = true;
@@ -1061,6 +1081,7 @@ export function createScene(
         const mat = terrainMesh[0].material as THREE.MeshStandardMaterial;
         ground.material.dispose();
         ground.material = mat.clone();
+        contextStyle.apply(ground.material);
         const uv = ground.geometry.getAttribute('uv');
         for (let i = 0; i < uv.count; i++)
           uv.setXY(i, uv.getX(i) * 7500, uv.getY(i) * 7500);
@@ -1157,6 +1178,7 @@ export function createScene(
     restoredPose = null;
     setOrbit(false);
     if (v === 'overview') {
+      setHovered(null);
       composeViewport();
       autoFramed = true;
       selected = null;
@@ -1375,7 +1397,10 @@ export function createScene(
       const rect = host.getBoundingClientRect();
       const occupied: number[][] = [];
       for (const { l, el, point } of [...labelNodes].sort(
-        (a, b) => Number(b.l.id === selected) - Number(a.l.id === selected),
+        (a, b) =>
+          Number(b.l.id === hovered) * 2 +
+          Number(b.l.id === selected) -
+          (Number(a.l.id === hovered) * 2 + Number(a.l.id === selected)),
       )) {
         const p = point.clone().project(camera);
         const dist = camera.position.distanceTo(point);
@@ -1455,6 +1480,7 @@ export function createScene(
   canvas.addEventListener('webglcontextrestored', onRestored);
   return {
     focus,
+    setHovered,
     landmarkView,
     setOrbit,
     setViewport,
@@ -1466,6 +1492,7 @@ export function createScene(
       dirty = true;
     },
     setLayer: (key, on) => {
+      if (!on) setHovered(null);
       layers[key] = on;
       applyLayers();
       if (key === 'buildings' || key === 'roads') reconcileDetails();
@@ -1486,7 +1513,7 @@ export function createScene(
       const size = Math.max(15, Math.round(out.width / 110));
       ctx.font = `${size}px sans-serif`;
       const label =
-        '广西大学 · 云游校园  |  © OpenStreetMap contributors · ODbL' +
+        '广西大学 校园地图  |  © OpenStreetMap contributors · ODbL' +
         (layers.boundary && boundaryReady ? '  |  白色细线：校园大致边界' : '');
       ctx.fillStyle = '#15382ddd';
       ctx.fillRect(0, out.height - size * 3, out.width, size * 3);
@@ -1541,6 +1568,7 @@ export function createScene(
         p.geometry.dispose();
         (p.material as THREE.Material).dispose();
       }
+      contextStyle.dispose();
       renderer.dispose();
       canvas.remove();
       labels.remove();
