@@ -256,3 +256,5 @@ npm run models:build
 2026-09-21：土木学院北翼中央立面采用已定位全景原始切片，补两层外廊和底层玻璃。七跨及窗面尺寸为估算，底层开口未认定为通行门，未新增入口。见[北翼立面](CIVIL_NORTH_WING_FACADE.md)。
 
 2026-09-21：土木学院北翼两端正面采用白墙与三列/五列估算窗格；分格和窗面尺寸不是实测，底层用途尚未确认。新增有界 `wallFinish`，来源及精度见[北翼窗列](CIVIL_WING_END_WINDOWS.md)。
+
+2026-10-10：结构平台南面上部窗网与西墙修正已采用 `gx720CivilSouthwestPanorama` 来源，窗列、标高和尺寸为估算，尺寸级配准未通过。[参数及验证](CIVIL_PLATFORM_SOUTH_FACADE.md)、[新建中心外景边界](CIVIL_CENTER_2026_EXTERIORS.md)分别记录；新中心与现有平台不共用身份。
