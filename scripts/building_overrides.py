@@ -817,7 +817,7 @@ def resolve_building(building, record=None, source_ids=None):
         from exposed_facades_data import resolve_exposed_facades
         exposed=resolve_exposed_facades(b, form, record['exposedFacadeRules'])
         for facade in exposed:
-            if facade.get('region') not in ('under-portico','above-portico'): continue
+            if facade.get('region') not in ('under-portico','above-portico','above-roof'): continue
             # A mixed roof exposes its backing wall down to the porch floor.
             # Explicit glazing owns its region. Keep automatic windows above
             # the roof unless a second explicit rule also owns the upper wall.

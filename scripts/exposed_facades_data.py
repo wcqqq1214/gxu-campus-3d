@@ -40,10 +40,16 @@ def resolve_exposed_facades(building, form, rules):
             raise ValueError('Exposed facade references an unknown part')
         under_portico = config.get('region') == 'under-portico'
         above_portico = config.get('region') == 'above-portico'
-        if 'region' in config and not (under_portico or above_portico):
+        above_roof = config.get('region') == 'above-roof'
+        if 'region' in config and not (under_portico or above_portico or above_roof):
             raise ValueError('Unknown exposed facade region')
         high, low = (parts[config[k]] for k in ('part', 'adjacentPart'))
-        if under_portico or above_portico:
+        if above_roof:
+            if ('openBelow' in high or high['roof']['type'] != 'flat' or
+                    low['roof']['type'] not in ('flat', 'profiled') or
+                    high['height'] <= low['height'] + low['roof'].get('rise', 0)):
+                raise ValueError('Above-roof panels need a higher flat solid wall')
+        elif under_portico or above_portico:
             if ('openBelow' in high or 'openBelow' not in low or
                     ('slattedRoof' in low['openBelow'] and
                      not low['openBelow']['slattedRoof'].get('solidBays')) or
@@ -66,12 +72,19 @@ def resolve_exposed_facades(building, form, rules):
                 set(rule)-{'windows', 'balconies', 'windowBands', 'panels', 'openCorridor'} or
                 rule.get('balconies') is not False):
             raise ValueError('Exposed facade supports bounded windows, panels and recesses without balconies')
-        if (under_portico or above_portico) and (set(rule) != {'windows', 'balconies', 'panels'} or
+        if (under_portico or above_portico or above_roof) and (set(rule) != {'windows', 'balconies', 'panels'} or
                               rule.get('windows') is not False or
                               not isinstance(rule['panels'], list) or
                               any(not isinstance(p, dict) or p.get('type') not in ('glazing', 'solid') for p in rule['panels'])):
             raise ValueError('Under-portico walls support only explicit glazing and solid panels, without automatic windows or doors')
         minimum = low['openBelow']['floorHeight']+.1 if under_portico else low['height']+.8
+        if above_roof:
+            # Conservatively clear the entire profiled roof, not just one low
+            # vertex; flat solid roofs keep their existing generic parapet.
+            roof = low['roof']
+            rim = roof.get('rim', {}).get('height', 0)
+            parapet = 0 if 'openBelow' in low or roof['type'] == 'profiled' else .8
+            minimum = low['height'] + roof.get('rise', 0) + max(rim, parapet) + .1
         if above_portico:
             # An open slab has no generic 0.8m parapet. Keep the explicit
             # upper wall separate from glazing underneath the same roof.
@@ -133,5 +146,7 @@ def resolve_exposed_facades(building, form, rules):
             facade.update(region='under-portico', maximumHeight=maximum)
         if above_portico:
             facade.update(region='above-portico', maximumHeight=high['height']-.1)
+        if above_roof:
+            facade.update(region='above-roof', maximumHeight=high['height']-.1)
         result.append(facade)
     return result

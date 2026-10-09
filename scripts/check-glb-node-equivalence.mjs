@@ -8,8 +8,8 @@ import { createRequire } from 'node:module';
 
 const args = process.argv.slice(2);
 assert(
-  [6, 8, 10].includes(args.length),
-  'Use --before FILE --after FILE --report FILE [--node NAME] [--allow-degenerate-removal true]',
+  [6, 8, 10, 12].includes(args.length),
+  'Use --before FILE --after FILE --report FILE [--node NAME] [--allow-degenerate-removal true] [--exclude-bounds x0,y0,z0,x1,y1,z1]',
 );
 const options = Object.fromEntries(
   Array.from({ length: args.length / 2 }, (_, i) => i * 2).map((i) => [
@@ -23,6 +23,11 @@ assert(
     options['--allow-degenerate-removal'] === 'true',
 );
 const allowDegenerateRemoval = options['--allow-degenerate-removal'] === 'true';
+const excludedBounds = options['--exclude-bounds']?.split(',').map(Number);
+if (excludedBounds) {
+  assert(excludedBounds.length === 6 && excludedBounds.every(Number.isFinite));
+  assert([0, 1, 2].every((i) => excludedBounds[i] < excludedBounds[i + 3]));
+}
 const nodeName = options['--node'] ?? 'terrain';
 const sha = (value) => crypto.createHash('sha256').update(value).digest('hex');
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'gxu-node-decoder-'));
@@ -51,7 +56,7 @@ function read(file) {
   const rows = [],
     validRows = [],
     materials = [];
-  let vertices = 0;
+  let vertices = 0, excludedTriangles = 0;
   for (const p of doc.meshes[node.mesh].primitives) {
     assert(p.mode === undefined || p.mode === 4);
     const material = doc.materials[p.material].name;
@@ -102,10 +107,18 @@ function read(file) {
         [0, 1, 2]
           .map((j) => corners.slice(j).concat(corners.slice(0, j)).join(''))
           .sort()[0];
-      rows.push(row);
       const xyz = ids.map((id) =>
         Array.from(attributes.POSITION.array.subarray(id * 3, id * 3 + 3)),
       );
+      // Bounds use decoded glTF coordinates, including its Y-up convention.
+      // A boundary-crossing triangle remains in the strict comparison.
+      if (excludedBounds && xyz.every((point) => point.every(
+        (v, j) => v >= excludedBounds[j] && v <= excludedBounds[j + 3],
+      ))) {
+        excludedTriangles++;
+        continue;
+      }
+      rows.push(row);
       const u = xyz[1].map((v, j) => v - xyz[0][j]),
         v = xyz[2].map((w, j) => w - xyz[0][j]);
       const cross = [
@@ -125,6 +138,7 @@ function read(file) {
     fileSHA256: sha(raw),
     bytes: raw.length,
     vertices,
+    ...(excludedBounds ? { excludedTriangles } : {}),
     materials,
     triangles: rows.length,
     zeroAreaTriangles: rows.length - validRows.length,
@@ -146,10 +160,11 @@ const report = {
   node: nodeName,
   passed,
   allowDegenerateRemoval,
+  ...(excludedBounds ? { excludedBoundsGlTF: excludedBounds } : {}),
   before,
   after,
   scope:
-    `Exact multiset of oriented Draco-decoded selected-node ${allowDegenerateRemoval ? 'nonzero-area' : 'all'} faces, material names and every Float32 vertex attribute; signed zero normalized. ${allowDegenerateRemoval ? 'Only removal of exactly zero-area faces is permitted; their count cannot increase. ' : ''}Texture payloads and material parameters are outside this check.`,
+    `${excludedBounds ? 'Outside the declared exclusion prism only: ' : ''}Exact multiset of oriented Draco-decoded selected-node ${allowDegenerateRemoval ? 'nonzero-area' : 'all'} faces, material names and every Float32 vertex attribute; signed zero normalized. ${allowDegenerateRemoval ? 'Only removal of exactly zero-area faces is permitted; their count cannot increase. ' : ''}Texture payloads and material parameters are outside this check.`,
 };
 fs.mkdirSync(path.dirname(options['--report']), { recursive: true });
 fs.writeFileSync(options['--report'], JSON.stringify(report, null, 2) + '\n');
