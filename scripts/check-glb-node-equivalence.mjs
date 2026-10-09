@@ -8,8 +8,8 @@ import { createRequire } from 'node:module';
 
 const args = process.argv.slice(2);
 assert(
-  [6, 8].includes(args.length),
-  'Use --before FILE --after FILE --report FILE [--node NAME]',
+  [6, 8, 10].includes(args.length),
+  'Use --before FILE --after FILE --report FILE [--node NAME] [--allow-degenerate-removal true]',
 );
 const options = Object.fromEntries(
   Array.from({ length: args.length / 2 }, (_, i) => i * 2).map((i) => [
@@ -18,6 +18,11 @@ const options = Object.fromEntries(
   ]),
 );
 for (const key of ['--before', '--after', '--report']) assert(options[key]);
+assert(
+  options['--allow-degenerate-removal'] === undefined ||
+    options['--allow-degenerate-removal'] === 'true',
+);
+const allowDegenerateRemoval = options['--allow-degenerate-removal'] === 'true';
 const nodeName = options['--node'] ?? 'terrain';
 const sha = (value) => crypto.createHash('sha256').update(value).digest('hex');
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'gxu-node-decoder-'));
@@ -130,16 +135,21 @@ function read(file) {
 
 const before = read(options['--before']),
   after = read(options['--after']);
-const passed =
-  before.triangles === after.triangles &&
-  before.allFacesSHA256 === after.allFacesSHA256;
+const passed = allowDegenerateRemoval
+  ? before.triangles - before.zeroAreaTriangles ===
+      after.triangles - after.zeroAreaTriangles &&
+    before.validFacesSHA256 === after.validFacesSHA256 &&
+    after.zeroAreaTriangles <= before.zeroAreaTriangles
+  : before.triangles === after.triangles &&
+    before.allFacesSHA256 === after.allFacesSHA256;
 const report = {
   node: nodeName,
   passed,
+  allowDegenerateRemoval,
   before,
   after,
   scope:
-    'Exact multiset of oriented Draco-decoded selected-node faces, including zero-area faces, material names and every Float32 vertex attribute; signed zero normalized. Texture payloads and material parameters are outside this check.',
+    `Exact multiset of oriented Draco-decoded selected-node ${allowDegenerateRemoval ? 'nonzero-area' : 'all'} faces, material names and every Float32 vertex attribute; signed zero normalized. ${allowDegenerateRemoval ? 'Only removal of exactly zero-area faces is permitted; their count cannot increase. ' : ''}Texture payloads and material parameters are outside this check.`,
 };
 fs.mkdirSync(path.dirname(options['--report']), { recursive: true });
 fs.writeFileSync(options['--report'], JSON.stringify(report, null, 2) + '\n');

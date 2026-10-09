@@ -71,9 +71,50 @@ def omit_unused_uvs(*, deduplicate_vertices=False, share_position_bounds=False):
             bpy.context.preferences.addons.remove(addon)
 
 
+def quantized_terrain_collapses(mesh, excluded, bits):
+    """Find triangles collapsed by the same Float32, Y-up Draco position grid.
+
+    Keep the original domain: removing a sole extremum would change every
+    remaining decoded position. Non-triangular polygons are left untouched.
+    """
+    import numpy as np
+    if type(bits) is not int or not 1 <= bits <= 30:
+        raise ValueError('Expected 1–30 Draco position quantization bits')
+    active = [p for p in mesh.polygons if p.index not in excluded]
+    if not active:
+        return set()
+    xyz = np.array([tuple(v.co) for v in mesh.vertices], dtype=np.float32)
+    xyz = xyz[:, [0, 2, 1]]
+    xyz[:, 2] *= -1  # Match the glTF exporter's default Y-up conversion.
+    used = np.array(sorted({i for p in active for i in p.vertices}))
+    minimum, maximum = xyz[used].min(axis=0), xyz[used].max(axis=0)
+    extent = np.float32((maximum - minimum).max())
+    if not np.isfinite(xyz[used]).all() or extent <= 0:
+        return set()
+    max_value = (1 << bits) - 1
+    values = np.floor((xyz - minimum) * np.float32(max_value / float(extent)) + np.float32(.5))
+    decoded = (values * np.float32(float(extent) / max_value) + minimum).astype(np.float64)
+    triangles = [p for p in active if len(p.vertices) == 3]
+    if not triangles:
+        return set()
+    indices = np.array([tuple(p.vertices) for p in triangles])
+    a, b, c = (decoded[indices[:, i]] for i in range(3))
+    zero = np.all(np.cross(b - a, c - a) == 0, axis=1)
+    collapsed = {p.index for p, flag in zip(triangles, zero) if flag}
+    kept = sorted({i for p in active if p.index not in collapsed for i in p.vertices})
+    if not kept or not (np.array_equal(xyz[kept].min(axis=0), minimum)
+                        and np.array_equal(xyz[kept].max(axis=0), maximum)):
+        return set()
+    return collapsed
+
+
 @contextmanager
-def omit_zero_area_terrain_faces(obj):
-    """Drop exactly collapsed triangle faces only in the temporary export mesh."""
+def omit_zero_area_terrain_faces(obj, *, position_quantization_bits=None):
+    """Drop collapsed triangles only from a temporary terrain export mesh.
+
+    Optional quantized cleanup uses the caller's existing position precision;
+    it does not lower that precision or modify the editable source geometry.
+    """
     import bpy
     import bmesh
     original=obj.data
@@ -87,6 +128,12 @@ def omit_zero_area_terrain_faces(obj):
             cross=(u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0])
             if cross==(0,0,0):
                 collapsed.append(face.index)
+        if position_quantization_bits is not None:
+            from mathutils import Matrix
+            if obj.matrix_world != Matrix.Identity(4) or any(p.use_smooth for p in original.polygons):
+                raise ValueError('Quantized terrain cleanup requires untransformed, flat-shaded geometry')
+            collapsed = sorted(set(collapsed) | quantized_terrain_collapses(
+                original, set(collapsed), position_quantization_bits))
     if not collapsed:
         yield 0
         return

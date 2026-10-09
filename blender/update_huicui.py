@@ -47,7 +47,7 @@ obj=high.object('荟萃楼 · 新闻传播学院共用楼体',collection,{'featu
 compact_source(obj)
 bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'),compress=True)
 assert (ROOT/'blender/gxu-campus.blend').stat().st_size<100*1024*1024
-assert manifest['base']['bytes']+manifest['trees']['bytes']<6_020_000
+assert manifest['base']['bytes']+manifest['trees']['bytes']<6_000_000
 
 # Check exact compressed primitive bytes of all unrelated base nodes.
 a,ab=unpack(previous_base);c,cb=unpack((ROOT/'public/models/base.glb').read_bytes())
