@@ -206,9 +206,9 @@ test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
     ),
   );
 });
-test('基础模型和纹理同时满足精细 12 MB、流畅 6.02 MB 预算', async () => {
+test('基础模型和纹理同时满足精细 12 MB、流畅 6 MB 预算', async () => {
   const total = manifest.base.bytes + manifest.trees.bytes;
-  assert.ok(total <= 6_020_000, `${total} bytes`);
+  assert.ok(total <= 6_000_000, `${total} bytes`);
   assert.ok(total <= 12_000_000);
   assert.ok(
     (await stat(new URL('../blender/gxu-campus.blend', import.meta.url))).size >

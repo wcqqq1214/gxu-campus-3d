@@ -145,7 +145,7 @@ def main():
             from update_south_gate import export_roads
             obj=bpy.data.objects['terrain']
             bpy.ops.object.select_all(action='DESELECT');obj.select_set(True)
-            with omit_zero_area_terrain_faces(obj),omit_unused_uvs(deduplicate_vertices=True):
+            with omit_zero_area_terrain_faces(obj,position_quantization_bits=18),omit_unused_uvs(deduplicate_vertices=True):
                 bpy.ops.export_scene.gltf(filepath=str(temp/'terrain.glb'),export_format='GLB',use_selection=True,export_extras=True,
                     export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,
                     export_draco_position_quantization=18,export_draco_texcoord_quantization=18,
@@ -167,10 +167,10 @@ def main():
             if name not in allowed:assert sig_after[name]==sig,name
         initial_bytes=candidate.stat().st_size+(models/'trees.glb').stat().st_size
         print('North campus initial bytes:',initial_bytes,flush=True)
-        if initial_bytes>6_020_000:
+        if initial_bytes>6_000_000:
             import shutil
             shutil.copy2(candidate,ROOT/'work/north-campus/underpass/candidate.glb')
-        assert initial_bytes<=6_020_000,f'Initial model budget: {initial_bytes}'
+        assert initial_bytes<=6_000_000,f'Initial model budget: {initial_bytes}'
         for entry in [manifest['base']]+[z for z in manifest['zones'] if z['id'] in keys]:
             target=models/Path(entry['url']).name;raw=(temp/target.name).read_bytes()
             target.write_bytes(raw);entry.update(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
