@@ -71,6 +71,33 @@ class ExposedFacadeTests(unittest.TestCase):
         r['parts'].append(dict(id='other', polygons=[[[[15,10],[30,10],[30,20],[15,20],[15,10]]]], height=6.6, levels=2))
         with self.assertRaisesRegex(ValueError, 'complete internal'): self.resolve(b, r)
 
+    def test_above_profiled_roof_uses_peak_and_rim_not_eave(self):
+        b, r = self.fixture()
+        low = r['parts'][1]
+        low['roof'] = dict(type='profiled', rise=2, mesh=dict(
+            vertices=[[15,0,0],[30,0,2],[30,20,2],[15,20,0]], triangles=[0,1,2,0,2,3]),
+            rim=dict(edges=[[0,1]], width=.3, height=.4))
+        config = r['exposedFacadeRules'][0]
+        config.update(region='above-roof', rule=dict(windows=False, balconies=False,
+            panels=[dict(id='upper', type='glazing', **{'from':.05,'to':.95},
+                         bottom=9.3, top=15.5, columns=8, rows=2, frameWidth=.12, depth=.1)]))
+        result = self.resolve(b, r)
+        self.assertAlmostEqual(result['form']['facades'][-1]['minimumHeight'], 9.1)
+        self.assertEqual(result, self.resolve(result, r))
+        config['rule']['panels'][0]['bottom'] = 8.9
+        with self.assertRaisesRegex(ValueError, 'lower roof'): self.resolve(b, r)
+
+    def test_above_roof_explicit_panels_own_the_internal_wall(self):
+        b, r = self.portico_fixture()
+        config = r['exposedFacadeRules'][0]
+        config['region'] = 'above-roof'
+        config['rule']['panels'][0].update(bottom=11, top=15.5)
+        result = self.resolve(b, r)
+        automatic = next(f for f in result['form']['facades'] if f['polygon'] is None and not f['rule'])
+        self.assertEqual(automatic['minimumHeight'], 16.5)
+        self.assertEqual(result['form']['facades'][-1]['rule']['panels'][0]['bottom'], 11)
+        self.assertEqual(result, self.resolve(result, r))
+
     def portico_fixture(self):
         b, r = self.fixture()
         r['parts'][1]['openBelow'] = dict(clearHeight=6.2, floorHeight=.24,
