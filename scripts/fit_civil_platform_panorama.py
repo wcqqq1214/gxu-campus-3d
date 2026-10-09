@@ -84,8 +84,9 @@ def report(buildings_path):
     fit, starts = solve(world, PIXELS)
     parameters = fit['parameters']
     office = next(p for p in platform['form']['parts'] if p['id'] == 'north-office')
-    target = np.array([[*office['polygons'][0][0][i], platform['elevation'] + office['height']]
-                       for i in (3, 4, 2)])  # northwest, southwest, northeast
+    # Use stable outer-ring corners: internal collinear splits may change part indices.
+    target = np.array([[*platform['polygons'][0][0][i], platform['elevation'] + office['height']]
+                       for i in (13, 12, 14)])  # northwest, southwest, northeast
     prediction = project(parameters, target)
     sensitivity = []
     for omit in range(len(world)):
