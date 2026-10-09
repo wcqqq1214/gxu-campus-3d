@@ -65,7 +65,7 @@ bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'),compre
 print('Basketball updated in editable source and base GLB',flush=True)
 
 assert (ROOT/'blender/gxu-campus.blend').stat().st_size<100*1024*1024
-assert manifest['base']['bytes']+manifest['trees']['bytes']<6_020_000
+assert manifest['base']['bytes']+manifest['trees']['bytes']<6_000_000
 from preserve_glb_geometry import unpack,mesh_nodes_by_name
 a,ab=unpack(previous_base);c,cb=unpack((ROOT/'public/models/base.glb').read_bytes())
 def signature(doc,binary,node):

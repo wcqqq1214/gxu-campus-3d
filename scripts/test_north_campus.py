@@ -58,7 +58,7 @@ class NorthCampusTests(unittest.TestCase):
             payload=(ROOT/'public'/zone['url']).read_bytes()
             self.assertEqual(hashlib.sha256(payload).hexdigest(),zone['sha256'])
             self.assertTrue({b['id'] for b in self.buildings if b['chunk']==key}<=set(zone['featureIds']))
-        self.assertLessEqual(manifest['base']['bytes']+manifest['trees']['bytes'],6_020_000)
+        self.assertLessEqual(manifest['base']['bytes']+manifest['trees']['bytes'],6_000_000)
 
     def test_underpass_and_no_new_paving_over_existing_roads(self):
         passage=self.layout['underpass']
