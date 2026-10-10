@@ -1476,7 +1476,7 @@ export default function Home() {
             </button>
             <h3>开源与许可</h3>
             <p>
-              Three.js + Blender。代码 MIT，自制模型与材质 CC BY 4.0，OSM 数据
+              Three.js + Blender。原创代码、文档、模型、材质和渲染图 MIT，OSM 数据
               ODbL。公开照片用于造型参考，未作为贴图再分发。
             </p>
             <a

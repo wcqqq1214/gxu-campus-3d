@@ -94,6 +94,6 @@ npm run preview
 
 ## 许可
 
-代码采用 [MIT](LICENSE)，自制模型和材质采用 [CC BY 4.0](licenses/MODELS.md)。地理数据库及其衍生数据采用 ODbL，署名 **© OpenStreetMap contributors**。其他数据与字体的许可见 [第三方说明](licenses/THIRD_PARTY.md)。
+项目原创代码、文档、模型、材质和渲染图统一采用 [MIT](LICENSE)。OpenStreetMap 地理数据库及其衍生数据采用 ODbL，署名 **© OpenStreetMap contributors**；其他第三方资源保留各自许可，见 [第三方说明](licenses/THIRD_PARTY.md)。
 
 官方照片和视频只用于造型参考，未作为网页贴图或仓库图片分发。
