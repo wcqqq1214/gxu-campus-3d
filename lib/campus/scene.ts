@@ -8,6 +8,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { batchSportsSurfaces } from './sports-batching';
 import { batchStaticRoadSurfaces } from './road-batching';
 import { pruneGroundTriangles } from './ground-triangles';
+import { createConvexCulling } from './convex-culling';
 import { isTap } from './math';
 import type { CameraSnapshot } from './share';
 import {
@@ -78,6 +79,7 @@ export function createScene(
 ): SceneController {
   const benchmarkOrbit = benchmarkOrbitEnabled(location.search);
   const scene = new THREE.Scene();
+  let convexCulling: ReturnType<typeof createConvexCulling> | null = null;
   const contextStyle = createContextStyle();
   scene.background = new THREE.Color('#d8e5e5');
   scene.fog = new THREE.Fog('#d8e5e5', 8500, 22000);
@@ -1075,6 +1077,7 @@ export function createScene(
       if (disposed) return;
       const gltf = await loadGLB(manifest!.base);
       baseRoot = gltf.scene;
+      convexCulling = createConvexCulling(baseRoot);
       scene.add(baseRoot);
       const terrainMesh: THREE.Mesh[] = [];
       baseRoot.traverse((o) => {
@@ -1400,6 +1403,7 @@ export function createScene(
       }
       shadowFrustum();
       applyTreeLOD();
+      convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
       renderer.render(scene, camera);
       dirty = false;
       lastFrame = time;
@@ -1517,6 +1521,7 @@ export function createScene(
     setQuality,
     view,
     exportImage: async () => {
+      convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
       renderer.render(scene, camera);
       const out = document.createElement('canvas');
       out.width = canvas.width;
@@ -1577,6 +1582,7 @@ export function createScene(
       canvas.removeEventListener('keydown', onKey);
       canvas.removeEventListener('webglcontextlost', onLost);
       canvas.removeEventListener('webglcontextrestored', onRestored);
+      convexCulling = null;
       disposeObject(scene);
       for (const p of proxies) {
         p.geometry.dispose();

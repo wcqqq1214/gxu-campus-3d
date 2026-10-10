@@ -12,13 +12,13 @@ def revision(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
-def load_landings(root):
+def load_landings(root, configuration='data/road-landing-overrides.json'):
     read = lambda name: json.loads((root / name).read_text())
     buildings = read('public/data/buildings.json')
     surfaces = read('public/data/surfaces.json')
     overlays = [read('public/data/' + name + '.json') for name in
                 ('infrastructure', 'surroundings', 'campus-roads', 'sites')]
-    records = read('data/refinement/agriculture-road-landing-proposal.json')['landings']
+    records = read(configuration)['landings']
     result = []
     for config in records:
         b = next(b for b in buildings if b['id'] == config['buildingId'])

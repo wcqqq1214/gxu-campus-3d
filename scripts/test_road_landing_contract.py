@@ -27,7 +27,7 @@ class RoadLandingContractTests(unittest.TestCase):
         path=self.root/name;path.parent.mkdir(parents=True,exist_ok=True)
         path.write_text(json.dumps(data))
     def load(self):
-        self.write('data/refinement/agriculture-road-landing-proposal.json',{'landings':[self.config]})
+        self.write('data/road-landing-overrides.json',{'landings':[self.config]})
         return load_landings(self.root)
     def test_existing_stair_datum(self):
         record=self.load()[0]

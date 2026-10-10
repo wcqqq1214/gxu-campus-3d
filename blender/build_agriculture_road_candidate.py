@@ -1,6 +1,7 @@
 """Build the isolated agriculture road candidate; never update production assets.
 
-The candidate remains unaccepted while its S0 activity budget fails.
+Historical reproduction requires the pinned pre-repair production baseline.
+Current production builds use data/road-landing-overrides.json instead.
 """
 import argparse,bpy,json,hashlib,sys,shutil
 from pathlib import Path
@@ -31,7 +32,7 @@ from terrain_export import replace_precise_terrain
 from preserve_glb_geometry import compact_buffer_views
 bpy.ops.wm.open_mainfile(filepath=str(WORK/'before/blender/gxu-campus.blend'))
 roads=bpy.data.objects['roads'];terrain=bpy.data.objects['terrain']
-r,report=build_landings(load_landings(ROOT),source_mesh(roads),source_mesh(terrain),next(i for i,m in enumerate(roads.data.materials) if m.name=='road'))
+r,report=build_landings(load_landings(ROOT,'data/refinement/agriculture-road-landing-proposal.json'),source_mesh(roads),source_mesh(terrain),next(i for i,m in enumerate(roads.data.materials) if m.name=='road'))
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 def replace_road(obj, result):
@@ -90,7 +91,7 @@ bpy.ops.wm.save_as_mainfile(filepath=str(WORK/'candidate.blend'),compress=True,r
 (WORK/'build.json').write_text(json.dumps({'roadLandings':report,'uvPreservation':uv},indent=2)+'\n')
 target=WORK/'base.glb';shutil.copy2(WORK/'before/public/models/base.glb',target)
 export=road_object(roads,load_foundations(ROOT)['foundations'],json.loads((ROOT/'public/data/pavings.json').read_text())['pavings'])
-# Candidate-only UV precision. Keep the production exporter at its accepted setting.
+# Pin historical candidate precision independently of future exporter changes.
 original_bits=terrain_export.ROAD_UV_BITS
 try:
     terrain_export.ROAD_UV_BITS=12
