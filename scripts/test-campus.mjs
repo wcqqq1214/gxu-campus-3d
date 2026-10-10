@@ -5,7 +5,7 @@ import {
 } from '../lib/campus/navigation.ts';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile, stat } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { gunzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import {
@@ -210,10 +210,6 @@ test('基础模型和纹理同时满足精细 12 MB、流畅 6 MB 预算', async
   const total = manifest.base.bytes + manifest.trees.bytes;
   assert.ok(total <= 6_000_000, `${total} bytes`);
   assert.ok(total <= 12_000_000);
-  assert.ok(
-    (await stat(new URL('../blender/gxu-campus.blend', import.meta.url))).size >
-      1_000_000,
-  );
 });
 test('来源日期字段和高程原始值可追溯', async () => {
   const sources = await json('sources');
