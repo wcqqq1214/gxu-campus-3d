@@ -5,9 +5,10 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from site_geometry import inside,ring_distance
+from validation_inputs import baseline_root
 PREFIX=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--report-prefix=')),'s2-civil-front-connection-road-grade')
 TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)
-BASELINE=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--baseline=')),ROOT/'work/refinement-s2-civil-front-connection-before')
+BASELINE=baseline_root(sys.argv)
 PAVING_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--paving-id=')),'civil-forecourt-service')
 r=next(p for p in json.load(open(ROOT/'public/data/pavings.json'))['pavings'] if p['id']==PAVING_ID)
 def root(o):

@@ -1,560 +1,123 @@
 # Blender 模型与重建
 
-> 2026-10-10：本文涉及的过程截图已清理。文字观察和数值检查报告保留；历史报告中的截图路径不再保证可访问。
+本页说明当前的源文件、构建与校验流程。数据来源、估算边界及坐标约定见 [DATA.md](DATA.md)，界面和加载行为见 [DESIGN.md](DESIGN.md)。
 
-## 源文件保存方式
+## 文件与版本控制
 
-当前 Git 收录规则：`docs/` 默认作为本地开发资料目录，验收报告、过程文档、相机记录和截图均不跟踪。仅明确保留本文件、`DATA.md`、`DESIGN.md`、README 展示 JPEG，以及校验脚本读取的5份基准输入。新增正式文档需要在 `.gitignore` 中显式放行；已有其他文档及报告保留在本地。下文提到的历史资料保存方式以本段为准。
+| 内容 | 保存位置与用途 |
+| --- | --- |
+| 可编辑模型 | 本地 `blender/gxu-campus.blend`，不纳入 Git；增量建模和源模型校验需要它。目前尚未提供 Release 下载。 |
+| 建模规则与参数 | `blender/`、`scripts/`、`data/`，随代码版本管理。 |
+| 网页资产 | `public/models/`、`public/data/`，网页直接使用，须成套更新。 |
+| 参考资料、候选模型、临时输出 | `work/`，不纳入 Git。 |
+| 验收记录和过程截图 | `docs/` 默认忽略，仅保留三份正式说明、README 展示图及五份校验输入；例外在 `.gitignore` 中列明。 |
 
-过程截图不再纳入 Git。2026-10-10删除精修阶段截图与模型检查 PNG/JPEG 等栅格截图共1,934张，合计1,122,784,480字节；不另行留档。保留 README 展示图、精修目录外的专题效果图、相机参数及数值检查报告。文档中的对应图片链接改为文字说明，历史 JSON 报告内的截图路径仅作采集记录，不代表图片仍然存在。浏览器检查重新生成的过程截图由 `.gitignore` 排除；已有 Git 历史未重写。
+网页开发和普通测试无需 `.blend`。本地源文件保留具名对象、材质、打包纹理以及 `featureId`、`landmark`、`sourceUrl` 属性；楼栋 ID 是关联模型、目录和拾取的稳定标识，不随显示名称变更。
 
-2026-10-10起，`blender/gxu-campus.blend` 仅在本地保存，不再纳入 Git；所有 `.blend` 与自动备份均被忽略。目前尚未提供 Release 下载。网页运行、网页构建和普通测试使用仓库内的 GLB 与数据，无需此源文件；增量建模及源模型校验仍读取上述本地路径，执行前须准备配套源文件。下文的完整构建命令可生成源文件，但不代表已经验证能逐字节复现当前增量精修成果。此次取消跟踪不清理既有 Git 历史。
+开发、提交和推送使用 `dev`。主分支更新须另行取得授权。`dev` 已清除旧 Blender 源文件、过程截图和报告历史；主分支和本地恢复引用可能仍保存旧对象。不要把工作目录大小与完整 Git 对象库大小混为一谈。
 
-2026-10-10按用户授权清理旧Blender文件及Git历史：工作目录仅保留最新 `blender/gxu-campus.blend`，删除30份旧源文件/自动备份与7个软链接，释放约2.85 GB文件空间；dev可达历史的Blender对象从12个减至1个。本地历史备份及检查点引用同步移除旧Blender数据，其他文件保持；main及其历史未改，仍保留主分支原有模型。带明确租约的dev强制推送已完成；回收无引用对象后本地 `.git` 由约4.5 GiB降至1.3 GiB，完整Git对象校验通过。旧检查报告作为历史证据保留，已删除的候选源文件不可再按原路径读取。清理核验（本地开发记录）。
+## 网页开发和检查
 
-
-2026-10-10本批模型：办公南楼墙脚（本地开发记录）复用封闭体 `baseDepth`，仅主体底部12个顶点下移0.3米；两档同步，其他源对象与地形道路保持。Pages因固定环绕基准指标计时修正而重新构建，正式模型及清单配套同步；未重建全校园模型。
-
-2026-10-10本批模型：农学院东侧第四层（本地开发记录）由显式窗替换该排通用窗，两档共用窗位和分格；原顶层窗、中央窗、挑檐和门廊保持。只更新该楼源对象、基础和所属近景区块，并同步现有Pages包。
-
-2026-10-10低矮绿篱当前联合验收（本地开发记录）重新读取源文件及71个GLB，确认单闭合290三角形绿篱贴地及邻近净空；源文件、模型、派生数据和既有前端包均保持。本批只补齐验收，没有新增导出、全校园构建或部署。
-
-2026-10-10本批模型：农学院中央窗列（本地开发记录）复用 `exposedFacadeRules` 的 `above-portico` 区域与显式玻璃面板，接管门廊上方自动窗；两档共享窗位、边框与上亮窗分隔，门廊后沿矮墙保持。仅更新该楼源对象、基础和所属近景区块，同步既有Pages包。
-
-2026-10-10当前集成：办公北楼接地与整栋复核（本地开发记录）通过首轮。本批只修补基础地形，楼体及道路保持；受测源文件、基础GLB与派生数据同步到正式资产及既有Pages包，未新增全校或前端构建。`repair_foundation_candidate.py`仅在原BVH查询未通过0.1毫米距离门槛时，补原三角面的严格双精度XY包含判断，随后仍执行原材质边界检查；没有放宽容差。
-
-2026-10-10当前林学院模型：西南角接地修补（本地开发记录）及南门接路（本地开发记录）已进入正式源文件与基础GLB；外挑门廊直向接路按实际台阶外缘、全宽及起算标高生成。整栋复核（本地开发记录）通过首轮，内院保持；未定位屋顶体、背立面及其他入口仍为未知。
-
-2026-10-05：新增北校园基础布局（本地开发记录），依据公开校园图及 2024 年影像人工补绘 11 个建筑与连廊体块，补充小田径场、步道及校界显示。随后完成照片约束精修（本地开发记录）：图书馆门厅及台阶、体育馆拱顶、教学楼门洞与开放连廊。高度、未见面和运动场细节仍为估算；Blender 源文件及两档网页模型已同步。
-
-2026-09-30当前版本：三教接地修补（本地开发记录）正式集成。普通道路全部材质共享18位位置量化范围，普通UV12位、road材质UV10位；独立土木服务路编码保持。地形18位位置/UV，地形与道路在压缩前精确去重全部属性。`road_export.py`只在配置的局部临时网格内补齐边缘分段，保留垂直路缘面；`export_repaired_ground.py`用于从已修补源文件向基础GLB副本增量导出，需完成文中列出的源/基础、邻楼、服务路及性能验收后再更新清单。基础修补区外扩15米是导出处理范围，不是实体改建范围。结构平台已恢复首轮整栋通过，运输口和背立面仍待证。
-
-2026-09-30最新修补：动物学院侧翼接地（本地开发记录）已正式集成。基础修补支持有界局部简化参数，无命中道路保留原网格；地形精度导出临时剔除叉积严格为零的三角面并恢复源网格，保留原Draco精度与压缩级别。
-
-2026-09-30当前接续：结构平台西侧服务路（本地开发记录）按实际地形三角面贴地并封闭路边，保留三处邻路接缝。平台在此前接地审计后重开整栋验收，未知背立面、运输口和西门厅屋面继续核对；大厅与北楼不拆分计数。
-
-源文件 `blender/gxu-campus.blend` 当前由 Blender 5.2.2 LTS 构建，使用米制坐标；建筑、树木与道路水体为具名对象，建筑带 `featureId` / `landmark` / `sourceUrl` 属性。材质与自制 JPEG 纹理均打包在 .blend 内，不需要额外下载摄影贴图。
-
-此前仓库内只保留一份最新 `.blend` 源文件，现已按上方保存方式改为仅本地保留。2026-10-07 按用户要求移除崇左桥两侧题名牌，并再次清理 `dev` 中更新前的源文件历史对象，仅保留本次更新后的正式源文件；`main` 及其历史保持不变。2026-10-05 经用户授权重写 `dev` 历史，移除5个旧版 Blender 源文件对象，并清理本地修复前备份；此次清理后的 `dev` 历史只保留最新模型，旧模型不能再从该分支恢复。`main` 及其历史未修改。建模验收完成后清理 `work/` 中的候选源文件和 `.blend1` 等自动备份；保留建模脚本、参数、参考资料与检查报告。此前忽略规则允许正式路径的 `.blend` 文件进入版本控制；现已移除此例外，所有 `.blend` 文件均不再跟踪。
-
-树木朝向由树位稳定计算，网页与 Blender 共用同一角度约定，局部删树不影响其余树的朝向。已有开放区域由 `data/vegetation-zones.json` 配置，完整与增量准备复用分区解析器。仅更新源文件朝向使用 `blender/update_tree_layout.py`；完整建模也采用同一公式，详见植被分区与稳定朝向（本地开发记录）。背景候选按世界网格独立种子生成；完整建模通过 `blender/tree_layout.py` 采样最终地形三角面，将高程写入树位第五列并应用到源实例。数据准备后须完成模型构建再发布树位；只校正既有源实例高程时，可对上述增量命令添加 `-- --ground`，再更新网页生产包。
-
-行道树使用 `data/vegetation-avenues.json` → `scripts/vegetation_avenues.py`，在最终植被筛选前局部替换背景树。道路ID和线位哈希固定里程方向，候选按道路切线生成双侧偏移，再保留路口开口；重复准备保留已有树位的标高。首个博萃路试点（本地开发记录）保留14株树，全部3,061株继续经过占地、树冠保留区、显式禁植区及模型检查。个别树位、间距和高度为估算，模板仍由既有GLB实例化，未增加新的树模型资源。
-
-## 可重复构建
-
-平台基础修补由 `data/foundation-overrides.json` 派生 `public/data/foundations.json`。道路贴地在基础修补后执行，不修改原始DEM或楼底标高。网页加载基础GLB后，仅从静态地形与道路的索引中删除严格零面积三角形；有效顶点、法线、UV、包围盒和原资产不变，线框、位移、形变及局部绘制范围均不适用该优化。
-
-普通铺地样例使用 `data/paving-overrides.json` → `scripts/paving_data.py` → `public/data/pavings.json` → `blender/paving_geometry.py`。完整准备顺序为最终道路、入口场地、普通铺地、岸段、植被；完整几何构建先处理入口场地与铺地，再处理岸段，最后重算树根高程。修改道路或场地后，需同时刷新铺地和岸段上下文；构建会拒绝过期的派生结果。
-
-铺地节点归入 `roads` 图层，源文件与基础 GLB 成套更新。`update_roads.py` 和 `update_basketball.py` 已接入 `sync_source_pavings()`；2026-09-13 已在隔离副本中把铺地过渡宽度改为 4 米，核对两条实际增量命令及源文件/GLB 的参数响应。局部压低穿出铺面的底面，不修改原始 DEM JSON；详见 铺地校准与专项验证（本地开发记录）。
-
-细分地形由 `blender/terrain_export.py` 以匹配的 18 位位置和 UV 精度导出，替换基础模型内地形节点的压缩数据；普通道路的当前精度见上方三教修补说明，其他节点保持原精度。`compact_buffer_views()` 清除替换后不用的载荷，并共享元数据与字节完全相同的视图。基础模型的JPEG经jpegtran优化Huffman表，保留像素、量化精度与元数据；树木基础模板复用相同压缩载荷。见无损打包（本地开发记录）。铺地地形的 UV 投影在局部范围内固定为 XY，避免极小三角面的不稳定法线改变投影；其他区域保持原投影。完整构建与两条增量模型路径共用该逻辑。专项命令为 `blender --background --python-exit-code 1 --python blender/validate_terrain_texture.py`。
-
-网页运行只需要 npm；重新制作模型需要 Blender，以及提供 `jpegtran` 的 libjpeg-turbo（macOS可用 `brew install jpeg-turbo`，Debian/Ubuntu可用 `apt install libjpeg-turbo-progs`）。构建会在缺少编码器时报错；不重算几何的现有资产优化入口为 `python3 scripts/optimize_initial_models.py`。重新准备数据建议使用与 CI 一致的 Python 3.12，并通过约束文件固定几何处理依赖。
+使用 Node.js 22.13 或更高版本，CI 使用 Node.js 24。安装依赖后可直接使用仓库内的网页模型：
 
 ```sh
-python3 -m venv work/venv
+npm ci
+npm run dev
+npm run typecheck
+npm run lint
+npm test
+npm run build:pages
+```
+
+`build:pages` 生成 `out/`，当前 CI 发布到 GitHub Pages；`PAGES_BASE_PATH` 可指定仓库子路径。`npm run preview` 默认在 4300 端口预览 `out/`。运行中的预览可能仍读取该目录，清理或重建前先确认使用情况。
+
+## 数据和完整模型构建
+
+数据处理使用 Python 3.12 和仓库内的依赖约束。模型构建需要 Blender（当前源文件记录为 5.2.2 LTS）以及提供 `jpegtran` 的 libjpeg-turbo。字体和自制纹理已包含在仓库中。
+
+```sh
+python3.12 -m venv work/venv
 work/venv/bin/pip install -r scripts/requirements.txt -c scripts/constraints-geodata.txt
 npm run data:restore
 work/venv/bin/python scripts/prepare_geodata.py
 npm run models:build
 ```
 
-`blender` 必须位于 PATH，也可改用本机 Blender 可执行文件绝对路径。工作文件位于 `work/`，不纳入 Git。固定随机种子使植物配置和纹理一致；不同 Blender/Draco 版本可能改变二进制压缩结果。
+`blender` 需要位于 PATH，也可使用本机可执行文件的绝对路径。`data:restore` 使用已保存的 OSM 和高程快照；只有明确要更新底图时才运行 `scripts/fetch_geodata.py --refresh`。刷新后应同时核对来源日期、统计、稳定 ID 与模型。
 
-数据流程：OSM JSON → Shapely 合并关系和内环 → 校园外扩 300 米裁剪（建筑最终仅保留校内及距校界 20 米内的外部建筑） → Earcut 多边形三角化 → 米制地形、轮廓及 POI 目录 → Blender 几何 → 自包含 Draco GLB。`data:restore` 使用已发布快照；要更新数据，运行 `python3 scripts/fetch_geodata.py --refresh` 后重新准备和构建。
+完整构建会生成源文件及两档 GLB，但尚未验证能逐字节复现全部现有增量精修成果。更换 Blender、Draco 或几何依赖版本也可能改变导出结果。已有源文件和网页资产是增量修改的输入，不能无条件用一次全量重建覆盖。
 
-## 模型分级
+数据依次处理建筑、最终道路、入口场地、铺地、岸段和植被；模型阶段先形成最终地形与场地，再生成树根高程并筛除实际树冠穿插。只跑数据准备不代表模型净空检查已完成。上下文哈希不匹配时应重新生成依赖，不手改指纹绕过检查。
 
-### 两处田径场
+## 几何与参数入口
 
-`data/sports.json` 保存可编辑参数；`scripts/sports_data.py` 从 OSM 外轮廓推导米制中心和方向，`prepare_geodata.py` 生成完整运动场平整区和排树区。`blender/sports.py` 独立生成连续圆弧跑道、内场条纹、平面标线、球门网架和西场主席台。每个弯道使用 96 段；细白线位于面层之上，足球场与跑道不再随粗粒度 DEM 起伏。东场两侧原始直道铺地延伸保留。
-
-源文件中“西校园田径场”“东校园田径场”是独立可编辑对象，各有 6 个具名顶点组（铺地、跑道、草坪、分道线、足球标线、球门）。西场主席台有 3 个建筑构件组，开放台面替代原来的通用带窗房屋，基础和近景模型均同步。网页在基础 GLB 内为两场保留独立节点，统一归入 sports 图层；不进入精选地标导航。
-
-独立节点把 Draco 独立位置量化范围约束在单个场地，避免全校园范围量化将厘米级标线压入跑道表面。`validate_exported_sports.py` 解码实际发布 GLB，逐条检查分道线的高度间隔。仅调整基础导出布局时可用 `blender --background --python-exit-code 1 --python blender/build_campus.py -- --base-only`，保留既有源文件与近景资源；修改几何或数据后仍应运行完整构建。
-
-```sh
-blender --background --python-exit-code 1 --python blender/validate_sports.py
-blender --background --python-exit-code 1 --python blender/validate_exported_sports.py
-blender --background --python-exit-code 1 --python blender/validate_landmarks.py
-```
-
-西场模型预览（本地开发记录） · 东场模型预览（本地开发记录） · 几何检查结果（本地开发记录）。照片只作造型参考，未打包分发。完整精度边界见 [数据说明](DATA.md#东西田径场修订)。
-
-### 加载资源
-
-| 资源 | 用途 |
+| 对象 | 数据与实现 |
 | --- | --- |
-| base.glb | 地形、路面、水体、绿地、运动场、周边建筑、带窗格及入口/屋顶轮廓的全校基础建筑和地标体量 |
-| chunk-*.glb | 普通建筑近景，增加窗框、窗梃及按形制推定的阳台等；加载后替换对应基础分区 |
-| 20 个地标 GLB | 独立加载，可点选、巡游和单独修改；使用一致的米制位置 |
-| trees.glb | 3 个多材质模板，网页合并为顶点色几何后分块实例化 |
-
-模板材质包括石材、白色涂层、玻璃、深色金属、灰青屋瓦、铺装、草地、树皮和三种树冠色。10 张 128 × 128 自制 JPEG 纹理采用米制平面 UV；没有大尺寸摄影贴图。几何使用 Draco，解码器本地托管。东/西/北是场景加载分区，并不逐线等同于校方的行政分区。网页以视距触发普通分区近景，树木按空间块进行视锥剔除。首屏基础模型和树木模板共 5,947,236 字节（约5.95 MB，十进制）。自动画质按运行表现调整阴影、植被密度与近景预算，手机默认采用保守配置，详见 近期优化（本地开发记录）。
-
-### 普通建筑共享形体（2026-09-12）
-
-2026-09-21新增 `roofVolumes`：在显式指定的实体平顶分部上，按原外边方向布置少量矩形屋顶附加体。解析器检查支撑、内院与边沿0.5米净距、唯一ID、尺寸及体积重叠；共享生成器把附加体加入屋顶编辑组，两级模型一致。首批用于结构平台北楼屋顶（本地开发记录），尺寸和用途边界见专项。该首版不与其他专用屋顶特征或内缩彩色屋面组合；不将屋顶附加体计入楼层数。
-
-430 栋普通建筑采用 `scripts/building_overrides.py` 应用逐字段校准、`scripts/building_forms.py` 解析默认形体、`blender/generic_buildings.py` 生成网格。主体、屋顶和入口平台共用于基础与近景，近景只增加立面小构件；特殊地标、主席台和纪念柱保留专用模块。没有屋顶资料时使用推定平顶；两处 OSM 四坡顶按实际轮廓生成，尺寸估算边界见 DATA.md。
-
-可编辑源文件将普通楼分为主体、屋顶、入口平台、立面窗格四组，并合并重复顶点；屋檐与墙体共用顶点同时保留两个编辑分组。只调整普通楼形体时，可运行下列增量数据入口以保留当前地形、场地和植被派生结果，然后完整重建模型：
-
-```sh
-work/venv/bin/python scripts/building_overrides.py
-npm run models:build
-blender --background --python-exit-code 1 --python blender/validate_generic.py -- --report-prefix=s2-pilot
-```
-
-若分部调整改变了场地所引用的入口或立面记录，在模型构建前依次运行 `scripts/site_data.py`、`scripts/paving_data.py`、`scripts/shore_data.py`、`scripts/low_planting_data.py` 更新依赖。核对场地、树木和地形的实际差异，不手改校验指纹绕过过期检查。土木北翼批次的入口只变更所属分部名称，后续几何保持，见该批记录（本地开发记录）。
-
-完整 `prepare_geodata.py` 同样接入形体解析。S3 前置修复已让外围道路复用最终邻近建筑筛选，完整准备不再因已删除的楼栋留下缺口；来源目录可从人工输入独立重建。主路少量沥青/路缘分界仍有重算差异，合并铺地范围不变，详见重建核验（本地开发记录）。不能将依赖版本变动造成的轮廓差异混入楼栋校准。阶段基线、依赖约束、固定视角和待补资料见 执行记录（本地开发记录）。
-
-S2 首批包含 8 条记录；动物学院使用完整覆盖原轮廓的高低分段，每段有自己的屋面和窗层，入口定位在原外边。分段内部交界不生成窗列，原内院边的窗朝向院内空地。默认入口和未校准立面仍为示意；原始 OSM 标签不被覆盖，数据契约、资料局限与记录见 普通楼校准（本地开发记录）。旧 `building_forms.py` 命令仍可用，会转调同一覆盖流程。
-
-## 14 处地标检查
-
-下面两个视角由实际 .blend 源文件渲染。用于检查几何、屋顶、入口和未见面的处理，不表示两张参考照片均覆盖每个面。全部模型为人工规则生成的外部建筑模型，没有室内重建。
-
-| 地标 | 主要检查点及依据 | 视角 1 | 视角 2 |
-| --- | --- | --- | --- |
-| 南大门 | 2022 校方、2024 日期水印和 2026 活动照片：三跨石门、四门柱、弧形承托、叠檐、雕花嵌板、顶部小亭及红色立体校名；尺寸估算 | 查看 | 查看 |
-| 图书馆 | 2026 图文正面及图库侧面：檐架、阶梯体量、入口柱廊；已补北侧门廊与感应门，未见细部估算 | 查看 | 查看 |
-| 汇学堂 | 2026 图文正面：灰青坡顶、木门、竖向柱廊；入口按用户确认转向东，背面推定 | 查看 | 查看 |
-| 大礼堂 | 官方图库现状斜视：三角山花、六柱门廊、侧面窗列、台阶 | 查看 | 查看 |
-| 综合体育馆 | 2021 官方视频 7 秒/12 秒：浅坡大屋盖、采光构件、百叶、柱墩；辅以 2024 场馆用途 | 查看 | 查看 |
-| 大学生活动中心 | 2026 图文：曲线轮廓、白色水平带、深色玻璃；保留 OSM 内院 | 查看 | 查看 |
-| 第六教学楼 | 校方入口图：南北门、东西侧门及底层贯通；官方图库：窗框、挑檐、门厅、台阶，尺寸推定 | 查看 | 查看 |
-| 第二教学楼 | OSM 轮廓、7 层标签及 2024 导览位置；立面主要按教学楼类型推定，未取得可确认的近期外观 | 查看 | 查看 |
-| 综合实验大楼 | 校门与实验楼官方图库：双翼与中央上部桥体，底部通孔保持开放；后立面推定 | 查看 | 查看 |
-| 计算机与电子信息学院 | 官方 PDF 第 1 页：竖向玻璃核心、粉色侧墙、窗列与悬挑平檐；背面及细节推定 | 查看 | 查看 |
-
-重新生成视角：
-
-```sh
-blender --background --python-exit-code 1 --python blender/render_checks.py
-```
-
-维护时先修改 `data/landmarks.json` 的位置及来源，再修改 `blender/landmarks.py` 中对应造型。普通楼宇规则位于 `blender/build_campus.py`，几何组装器位于 `blender/geometry.py`。不要修改稳定 ID 来解决显示名称变化；模型、目录和拾取应保持一致。
-
-## 南大门现状重建与汇学堂朝向修正（2026-09-09）
-
-旧版误用了官方无日期图库中的旧南门柱列照片，现已完全替换为近期照片一致可见的三跨石门。现模型保留三处真实贯通门洞、四个分块石柱、弧形承托、叠层檐口、石雕嵌板、双排顶部小亭和横向红色校名。近景含门柱分缝、几何花纹、檐下纹饰、匾额嵌框及立体字；基础 LOD 保留相同现状轮廓与校名。门前按近期实拍重建铺装分流岛、盆栽展示与两侧通行空间，不包含临时活动帐篷。
-
-依据为 [2022 年校方毕业季第二张照片](https://news.gxu.edu.cn/info/1002/39575.htm)、[2024-10-10 日期水印现场照片](https://www.lun51.com/homepage/index.php?a=index&aid=1069&c=View&m=home)、[2026 年活动报道首图](https://www.5iidea.com/contents/47982)。2026 文章发布于 4 月 27 日、活动发生于 4 月 14 日，但单张门口照片的拍摄日未知。没有使用旧门照片恢复现门。
-
-门的位置、宽度和进深绑定 OSM way/1492215424 门楼轮廓；门高及构件比例、未见背面为照片估算；雕花为几何近似，非扫描。2026-10-04 南门校名改用[校方学校标识页](https://www.gxu.edu.cn/xdgl1/xxbs1.htm)校徽配套题字的轮廓，保存于 `blender/fonts/gxu-wordmark.json`（附原图地址、哈希和处理参数）。按字调整显示大小及间距，保留连笔、笔锋和镂空，生成厚约 4.5 厘米的红色立体字；基础与近景 LOD 共用字形。同步略收薄匾额上檐与山花，门洞、门柱、定位及占地不变。轮廓来自官方位图的简化描摹，不是校方原始矢量文件，也不是实门题字尺寸测绘。其他建筑题字继续使用 `blender/fonts/` 中的 Ma Shan Zheng 与 SIL OFL 许可；新南门轮廓不属于该字体。网页仅加载字形网格，不加载图片或字体。
-
-柱顶小亭保留四面贯通拱口与四坡尖顶；每根门柱前后两座小亭按用户指正等大、等高，几何检查直接比较保存网格的包围盒和屋顶标高。门洞仰拍支持中央三格吊顶和三盏铜鼓形灯，雕花、灯体细纹及未见背面仍为几何近似。
-
-### 门前路口：2024-11-30 卫星影像校准
-
-此前仅凭裁切地面照片估算路口，将花岛放得过近且过宽，并把斑马线做成水平横排，导致错误的对称车道与草地空隙。当前已按 [Esri World Imagery](https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer) 的近期影像重新描图。层级 19 的来源元数据给出拍摄日 **2024-11-30**、分辨率 **0.34 米**、位置精度 **8.47 米**；版本为 Vivid Advanced / LG01、Raster Basemaps 2025.R06，检索日为 2026-10-04。日期不取自网页发布时间。受影像位置误差、建筑投影和树冠遮挡影响，描图不等于精确测绘。
-
-- 门前入口沿影像中的左右路缘展开，接入大学东路路口；原先两条道路中心线之间错误留出的草地空隙已消除。
-- 花岛改为较狭长的轮廓，约 8.3 米宽、21 米长，位于门楼中心以南约 25—46 米；这些数值来自人工描图，受上述精度限制。
-- 斑马线顺影像中可见的斜向带状区域布置，东端更靠南；条带宽度、间隔及磨损程度仍简化处理。
-- [2024 日期水印照片](https://www.lun51.com/homepage/index.php?a=index&aid=1069&c=View&m=home)与[2025 发布的广角照](https://www.5iidea.com/contents/44980)用于交叉核对铺装、圆弧前端、黄色网格和盆栽。后者拍摄日未知，不作为精确道路定位依据。季节花境按新岛体宽度重新排布，仍为独立花盆。
-- 小门外不设交通护栏，保留花境前沿的矮栅。
-
-人工选取的影像像素点、地理换算、来源元数据与预处理网格保存在 `data/south-gate-site.json`。运行 `work/venv/bin/python scripts/prepare_south_gate_site.py` 可从像素点重算米制向量、局部路面网格与裁切范围，再运行南门增量构建。影像瓦片不打包到网页，也不作为模型贴图；网页只加载几何。场地生成位于 `blender/south_gate_site.py`，道路裁切保留范围外顶点及 UV。基础与近景共用道路、铺装、盆栽中心和校名字形。
-
-南门小改可运行 `blender --background --python-exit-code 1 --python blender/update_south_gate.py`，同步南门和局部道路的可编辑源对象、基础模型对应节点、独立近景 GLB 及清单哈希。道路修改限于描图路口与被替换的旧局部补丁之并集（包围范围约 87 × 91 米）；程序核对该范围外原道路面的坐标和 UV 保持不变，以及其余 95 个基础节点的压缩数据和其他 GLB 保持不变，结果见 南门增量检查（本地开发记录）。需要重提取轮廓时，将该官方原图保存至 `work/`，运行 `work/venv/bin/python scripts/prepare_gate_wordmark.py 原图路径`，再执行增量模型构建。
-
-源模型南大门保留具名顶点组，方便分别编辑门柱、各门跨、匾额、校名和景观。建筑规则位于 `blender/south_gate.py`，场地单独保留铺装、盆栽、花境前沿矮栅顶点组。汇学堂先交换建模局部宽深再绕中心旋转 +90°，入口由南转东且主体仍适配原 OSM 边界框；导览镜头同步切换到东侧。朝向修正依据用户确认，不代表 OSM 数据在该日重新测量。
-
-```sh
-npm run models:build
-blender --background --python-exit-code 1 --python blender/validate_landmarks.py
-blender --background --python-exit-code 1 --python blender/render_checks.py -- south-gate huixue
-```
-
-几何检查直接读取保存后的 .blend：射线检查三门洞贯通、四门柱和三横梁存在，另检查花盆底部落在铺装上、两侧车道净空、拍照区留白、路口连续沥青面、斜向条带与沥青间隙，以及新旧路面接缝，并检查汇学堂木门顶点位于东立面。结果见 geometry-check.json（本地开发记录）。
-
-现南门直接绑定 OSM `way/1492215424`（`building=gatehouse`、`man_made=ceremonial_gate`），替换原先在该轮廓生成的通用建筑。原版独立 POI 位于其北侧约 90 米，已经移除该误定位；稳定地标 ID 仍是 `south-gate`。
-
-入口轴线上 OSM 标注 `memorial=column` 的四根历史门柱按纪念构筑物生成柱身、凹槽和柱帽，避免套用通用房屋的窗格、入口规则。南门模型基底对齐抬高 0.40 米的网页路面，保留可见柱脚。
-
-模型清单保存各 GLB 的 SHA-256，网页把哈希附在资源 URL 上；更新模型后不会继续使用同名旧文件缓存。
-
-## 图书馆与留学生公寓
-
-图书馆规则位于 `blender/library.py`：OSM 轮廓经 `scripts/architecture_data.py` 划分为五个阶梯体量，内院保持贯通。近景包含蓝绿色幕墙与横竖分格、窗间墙、回纹腰线、镂空檐架、六柱门廊、立体馆名、台阶和扶手。馆名字体为随项目打包的 OFL 字体近似。源模型保留十二个具名顶点组（含北门门廊、门扇、台阶和北向馆名）；基础 LOD 保留体量、庭院、入口、檐架及大窗格，近景加载细回纹与密窗格。
-
-2026-09-12 的 S3 方向校准将高体量放回南楼，北侧为较低的两翼与略高中央区，双回形幕墙朝向北侧时光之门。窗层数读取分区 `levels`，不再从高度除以 3.6 反推。南楼 11 层源于建设资料；北楼六层表达由照片与开放区域约束，36/27/23.5 米高度及连廊分区仍为估算。南侧旧入口保留并明确属于待进一步核对部分，北门六柱、采购门洞和八级台阶不因方向修正而移位。下方历史截图不作为本批结果，当前对照见场地样板记录（本地开发记录）。
-
-留学生公寓规则位于 `blender/international_residence.py`：完整 OSM 底层轮廓作为国际学院裙楼，高层部分分为折角双翼。24 层住区带逐层阳台板、隔板、栏板和扶手，端面以大片实墙及窄窗带为主，转角连续玻璃窗带按层分隔；裙楼有独立遮阳竖板、门窗与入口雨棚，屋顶设置女儿墙、镂空框架和示意设备。源文件同样保留八个具名顶点组。高层退界、未见面与细部尺寸是照片估算，不宣称测绘级复原。
-
-| 模型 | 南侧视角 | 背侧视角 |
-|---|---|---|
-| 图书馆 | 查看 | 查看 |
-| 留学生公寓 | 查看 | 查看 |
-
-```sh
-blender --background --python-exit-code 1 --python blender/validate_architecture.py
-blender --background --python-exit-code 1 --python blender/render_checks.py -- library international-residence
-```
-
-参考照片年份和精度限制见 [数据说明](DATA.md#图书馆与留学生公寓资料)。公开参考照片不嵌入模型，不随站点重新分发。
-
-### 图书馆北入口补建（2026-09-09）
-
-北门柱数于 2026-09-12 依据[校方读书月现场图](https://news.gxu.edu.cn/info/1002/43647.htm)由四根修正为六根，中央保留宽开间。北门设在 OSM 轮廓北侧中央内凹处，门面沿建筑局部 +Y 朝北（实际方位约 11.6°），与南门分别建模。补齐六柱门廊、内凹馆名牌、玻璃门、不锈钢门头、平台台阶及扶手；基础与精细 LOD 均保留北入口，仍归属图书馆地标。
-
-[校方 2026-05-26 采购公告](http://www.lib.gxu.edu.cn/info/5662/12651.htm)明确北楼门洞为 6.60×2.55 米、六片门扇玻璃各 1.00×2.25 米；模型采用这些参数。该公告不证明安装验收已经完成。柱廊及牌匾参考[本馆介绍的北楼照片](http://www.lib.gxu.edu.cn/info/5692/8371.htm)与[官网页头近景](http://www.lib.gxu.edu.cn/__local/F/D1/F7/AD49D5886A41A265D4E96FE19B9_C206CD48_2A731.jpg)，照片拍摄日期未知；柱距、雨棚和台阶等尺寸按照片比例估算，不宣称实测。门扇为静态外观，不模拟开门。
-
-北入口源模型近景
-
-## 新东门、东门、西门
-
-重建入口模块为 `blender/campus_gates.py`，每座门均有基础 LOD 和独立 Draco GLB，具名顶点组保留在 Blender 源文件中。入口几何以局部南向创建，再按目录方位旋转；东门朝东、西门朝西、新东园门朝南。新增三门进入精选名单，原有 01—11 编号不变，新增 12 新东门、13 东门、14 西门。
-
-东门以 OSM 门节点定位，结合相邻建筑净空将宽度约束为估算 22 米、高度估算 8 米。采用三处真正贯通的椭圆拱洞、四座凹槽石柱、叶片状柱头浮雕、连续平檐、檐下齿饰、菱花嵌板和红色立体校名。雕饰是照片启发的几何近似，文字使用项目 OFL 字体，并非原书法描摹。西门保留开放式校道，以门窗框、玻璃、薄檐、扶栏、道闸等细化小型入口设施。新东门暂为有明确位置依据的门卫设施推定模型，需近年实拍才能校准门体；没有复制东门石拱。
-
-基础档保留拱洞、柱体、檐口和岗亭；细小雕饰、立体文字、栏杆竖杆、门把手与道闸色带仅在近景加载，控制首屏预算。模型资料及精度差异见 [DATA.md](DATA.md)。
-
-| 地标 | 正面检查 | 背面检查 |
-| --- | --- | --- |
-| 新东门（外观推定） | 正面 | 背面 |
-| 东门 | 正面 | 背面 |
-| 西门 | 正面 | 背面 |
-
-几何验证：`blender --background --python-exit-code 1 --python blender/validate_gates.py`，从各门真实朝向发射射线，检查三拱通道及另外两门中心通道贯通、东门四柱与横梁存在、对象唯一及可编辑分组保留。
-
-三门检查图使用 Blender Workbench 材质色与空隙阴影展示源几何；实际光照、贴图和近景切换另在 Three.js 网页检查。
-
-## 空间区块导出（2026-09-10）
-
-普通校内建筑按中心所在的 360 米网格分为 30 个区块；每栋建筑完整归入一块，保留庭院与稳定 ID。基础 GLB 各区块节点与近景文件共用 `chunk-…` 键，实现逐块替换。地标仍独立加载。清单保留 `zones` 数组字段以兼容资产检查，但内容已改为空间区块，并记录边界。
-
-基础 GLB 使用 15 位位置精度（2026-09-11 道路扩展后），法线使用 7 位量化以控制传输体积；运动场几何间距与单独量化范围保留。高精细区块保持 10 位法线。几何与源文件不因法线压缩而减面。`--base-only` 检查网格键与现有清单一致，网格发生变化时必须完整重建。
-
-## 近景材质与植物 LOD（2026-09-10）
-
-普通建筑按稳定 OSM ID 分配少量暖冷墙面色，局部窗格使用反射色差，细节层增加小型入口平台；保留原始轮廓、位置和高度。树冠提高分段并合并重合顶点形成平滑法线，棕榈采用连续弧形叶轴与成对叶片。以上为示意细化，未增加实测精度或新的树位。网页叠加轻微、可重复的植被色差，并按观看距离调整阴影偏移。
-
-`vegetation.py` 是完整构建与植物单独重建共用的模板。完整构建保存精细树冠到 Blender 源文件，网页同时导出 `trees.glb` 远景和 `trees-near.glb` 近景。仅调整植物时可运行 `blender --background --python-exit-code 1 --python blender/build_vegetation.py` 重导两份 GLB 与清单；若修改模板几何，仍需完整构建来更新 `.blend` 源文件。当前 `.blend` 已包含这次的近景几何。
-
-## 农院路及校园桥梁（2026-09-11）
-
-道路预处理模块为 `scripts/infrastructure_data.py`，完整数据准备自动调用它；Blender 几何在 `blender/infrastructure.py`。原始补充快照与查询随仓库提供。桥下坡道、地形开口与挡墙常驻基础模型，9 段道路和 7 座湖上桥梁细部按需加载，3 座主要立交各有独立地标 GLB。源文件保留道路分段对象、桥梁对象及护栏、排水设施等顶点组。
-
-仅更新道路推导参数时可运行：
-
-```sh
-work/venv/bin/python scripts/infrastructure_data.py
-npm run models:build
-blender --background --python-exit-code 1 --python blender/validate_infrastructure.py
-```
-
-道路或桥梁几何改变后使用完整构建，确保可编辑源文件、基础 LOD 和近景资产一致。基于实际源文件和导出 GLB 的检查与实拍对照记录见 农院路与桥梁（本地开发记录）。
-
-### 体育馆临路体量修正（2026-09-11）
-
-针对农院路穿模，体育馆按 `way/699156920` 的原凹形轮廓区分南侧主体与较窄北翼，取消在整个外接矩形东侧生成附楼的做法。既有照片用于屋顶和立面节奏，体量定位依据原 OSM 轮廓；没有新增照片或测绘证据。源文件、基础和精细 GLB 均同步，两个检查视角见 正面与北侧。
-
-## 时光之门（2026-09-11）
-
-图书馆北侧的时光之门是独立雕塑地标，归入文体。`data/sculptures.json` 定义参考参数，`scripts/sculpture_data.py` 读取 OSM 雕塑节点，`blender/time_gate.py` 构建三足相连的整体、顶部突起、褶皱金属表面、低矮铭牌与地面投光灯；使用体素融合消除脚柱和肩部接头。基础与近景模型采用不同几何密度，具名部件及金属材质保留于 Blender 源文件。
-
-主要近景依据为 [2025-03-21 校方研学活动](https://cjxy.gxu.edu.cn/info/1041/1477.htm)中的脚柱照片，整体轮廓辅以 [2023-09-06 地标导览转载](https://www.sohu.com/a/718274615_121123989)。2026 校友记录只确认参观节点仍在使用。约 20.5 米高度、朝向、背面褶皱和草地岛范围均为参考估算；没有测绘或扫描数据。夜间淡蓝照明为展示设计，不宣称对应真实灯具参数。照片仅链接，不作为纹理打包。
-
-| 正面检查 | 背面检查（未有完整照片覆盖，推定部分） |
+| 普通建筑 | `data/building-overrides.json` → `scripts/building_overrides.py` / `building_forms.py` → `blender/generic_buildings.py` |
+| 独立地标 | `data/landmarks.json` 及专用建筑模块，如 `library.py`、`teaching_six.py`、`south_gate.py` |
+| 道路与桥梁 | `scripts/infrastructure_data.py`、`campus_roads_data.py` → `blender/infrastructure.py`、`road_export.py` |
+| 入口与铺地 | `data/site-overrides.json`、`paving-overrides.json` → `scripts/site_data.py`、`paving_data.py` |
+| 岸段与局部基础 | `data/shore-overrides.json`、`foundation-overrides.json` → 对应数据和几何模块 |
+| 植被与绿篱 | `data/vegetation-zones.json`、`vegetation-avenues.json`、`low-planting.json` → 植被准备及 `blender/tree_layout.py` |
+| 南门字形与场地 | `blender/fonts/gxu-wordmark.json`、`data/south-gate-site.json`；维护入口为 `prepare_gate_wordmark.py`、`prepare_south_gate_site.py` |
+
+普通楼主体、屋顶、入口和主要立面在基础与近景中共用形体，近景增加窗框等细构件。常用约束如下，完整取值和相交检查由相应解析器与测试定义：
+
+- `parts` 必须覆盖原外环并保留内院；内部体量交界不生成默认窗。`floorHeights` 是逐层高度，不能用总高反推覆盖它。
+- `parts.baseDepth` 仅用于封闭墙脚，默认 0.5 米，显式范围 0.5–2 米，不用于 `openBelow`；不改变楼底和主体顶高，也不是实测基础深度。
+- `openBelow` 表达原轮廓内的开放底层；`entrances.attachedPortico` 表达外挑门廊。后者须有实体墙支撑，`parapetHeight: 0` 可关闭栏板，非零栏板仍需满足开孔尺寸约束。
+- `facadeRules.part` 把规则限定到一个体量分段。`windowBands` 的 `firstLevel/lastLevel` 为零基索引且包含末层；窗带背后仍是实体墙，不能当成开放走廊。
+- `openCorridor.lastLevel` 限定外廊或凹窗槽的楼层范围；窗带和面板不得侵入其完整楼板高度。工具名称不证明现实中的通行用途。
+- `windows: false` 关闭默认窗列但不关闭显式 `panels`。`wallFinish` 直接改变墙面材质，不叠加重合面；`round-window-wall` 使用带孔墙面和后退玻璃，不生成室内。
+- `exposedFacadeRules` 的 `above-roof` / `above-portico` 区域显式处理相邻低屋顶上方的墙面；`horizontalLedges`、显式窗和挑檐仍需检查相交。
+- `roofVolumes`、`roofDome` 需要实体平屋面支撑并保留边界与内院净距；不自动计作新增楼层。`openBelow.slattedRoof` 使用透空梁顶，不叠加普通女儿墙。
+- `courtyard-paving.stairConnection` 只连接有明确锚点的庭院边和楼梯底层，不自动推导远处道路路径。入口外扩前用 `scripts/audit_entry_road_context.py` 核对道路关系。
+
+北校园的人工补绘体块与现有 OSM 建筑区分标注。普通平顶、未见背面、入口尺寸、景观与夜景均可能包含估算；具体来源和未知项随数据字段保存。
+
+## 导出与增量修改
+
+| 资源 | 内容 |
 | --- | --- |
-| 时光之门正面模型 | 时光之门背面模型 |
+| `base.glb` | 地形、道路、水体、场地、基础建筑和地标体量 |
+| `chunk-*.glb` | 普通建筑近景，加载后替换对应基础区块 |
+| 地标与道路 GLB | 按目录和视距独立加载 |
+| `trees.glb` / `trees-near.glb` | 远近景植物模板，网页按空间块实例化 |
+| `public/data/models.json` | 资源 URL、大小、SHA256 和区块信息 |
 
-网页提供全貌、正面、背面、俯视、雕塑近景和环绕，索引编号 18；搜索同时识别 OSM 原名“时空之门”和“图书馆北广场”。重建仍使用完整的数据处理及模型构建流程，无需独立下载照片。构建完成后可运行 `blender --background --python-exit-code 1 --python blender/validate_time_gate.py`，检查源文件及两档 GLB 的三足截面和拱下净空。
+模型采用 Draco 压缩，纹理嵌入 GLB，解码器本地托管。资源哈希参与网页 URL，更新 GLB 后必须同步清单。初始基础模型与树模板须满足 6,000,000 字节预算，实际值以清单和测试为准。
 
-## 第十教学楼（2026-09-11）
+地形及普通道路使用共享量化范围；当前地形位置/UV 为18位，普通道路位置18位、普通UV12位、road材质UV10位，独立土木服务路保留专用编码。普通建筑和独立模型不因此统一改用同一精度。只去除严格零面积面和完全相同的重复载荷，保留有效几何、法线、材质与纹理像素。道路局部导出需要保留边界、垂直路缘和范围外网格。
 
-第十教学楼作为第 19 处精选地标，原有 18 处编号不变。复用 `way/759170254` 的真实外轮廓；原普通建筑区块中的十教由独立模型替换，避免双重渲染。`blender/teaching_ten.py` 保留七个具名部分，基础与近景模型均采用南低北高的结构。
+`--base-only` 只适用于区块键不变且不需要同步近景的基础导出。几何或数据改变后，应同时更新本地源对象、基础节点、相关近景及清单，并核对无关资产未变。现有增量入口包括：
 
-`architectural_envelope()` 以北侧长墙提取约 15.565° 轴线，在 OSM 轮廓内裁剪出南侧弧形区（9.9 米）、中央采光体量（13.2 米）、南北连接空间（6.6 米）及北翼（26.4 米）。四区面积之和与原轮廓一致，不填平两侧凹口。北翼依据 OSM 的八层标签按 3.3 米层高估算；其余高度与分界依据照片比例推定，不是测绘数据。
+- `blender/update_south_gate.py`、`update_basketball.py`、`update_roads.py`：同步各自模型及相关场地。
+- `blender/update_tree_layout.py`：同步树位和朝向；`-- --ground` 从最终地形更新树根高程。
+- `blender/build_vegetation.py`：重导植物模板；模板几何改变时，仍须同步 `.blend` 源模型。
+- `blender/repair_foundation_candidate.py`、`export_repaired_ground.py`：在独立候选中修补基础，再做局部导出与校验。
 
-外观依据[校方校园风光中的多媒体教学楼照片](https://www.gxu.edu.cn/info/1021/18800.htm)：浅色墙面、弧形教学区、圆弧楼梯间、竖向白色框架及平屋顶。该照片没有明确拍摄或原始发表年份，不能称为近年实景。2024 调研和 2026 面试公告只用于核对用途及近期使用。模型补充窗框、楼梯间窄窗、采光窗、女儿墙、屋顶设备、估算入口雨棚、台阶与楼名；入口构件和未见背面明确列为推定。
+各入口的修改范围不同，调用前先阅读参数和脚本说明。先修改输入，在独立候选中验证，通过后才替换正式资产；保留仍用于对比的基准。网页只按实际发布的 GLB 验收，不能用截图代替几何、净空和性能检查。
 
-| 南侧与东侧 | 北侧与西侧（未见面推定） |
-| --- | --- |
-| 十教南东侧模型 | 十教北西侧模型 |
-
-完整数据准备会自动生成高度分区、避让入口树冠并保持索引顺序。模型构建后可运行：
-
-```sh
-blender --background --python-exit-code 1 --python blender/validate_teaching_ten.py
-```
-
-## 第六教学楼四向入口核对（2026-09-11）
-
-旧模型为独立地标，但仅有南侧雨棚和台阶；首层整体挤出封住了实际入口，不足以视作完整精建。本次改为 `blender/teaching_six.py` 独立规则：保留 OSM `relation/11971046` 的三个内院，首层墙体按通道分割，二至六层保持原轮廓；补建南北门厅、东西侧门、台阶、雨棚、扶手、架空通道顶板和底面。基础和精细模型都保留通道，精细档增加窗框、线脚、竖向立柱与扶手。
-
-[校方 2025-12-17 考前通知](https://yjsc.gxu.edu.cn/info/1021/4254.htm)的附件 3 明确标示南大门、北大门及两侧出入口；图中安检门是考试管理位置，不作为永久门编号。[华蓝项目资料](https://www.gxhl.com/work/jianzhugongcheng/337.html)说明三个中庭及中央首层架空连通南北，并列出 2013 年设计、2016 年竣工。校方图库与设计单位外观照片均未标注拍摄日期，不能称为近期实景照片。
-
-入口位置关系有资料支持；约 14 米主入口、7 米侧入口、5.2 米顶板高度、台阶、背面和侧面立面细节为展示估算。通道宽高仅记录模型参数，未作现场测量。源模型按具名分组保留四个入口、楼层、通道和立面，网页新增六教“北门近景”。
-
-| 南侧与东门 | 北侧与西门 |
-| --- | --- |
-| 六教南东面 | 六教北西面 |
+## 校验与基准
 
 ```sh
-blender --background --python-exit-code 1 --python blender/validate_teaching_six.py
+work/venv/bin/python -m unittest discover -s scripts -p 'test_*.py'
+npm test
+npm run typecheck
+npm run lint
 ```
 
-北门及西侧门附近的 DEM 高于建筑锚点约 0.33 米，台阶基底抬高并收敛至同一门厅标高，避免地面穿出台阶；门前挡住近景的树木为示意配置，已作局部避让。
+Blender 专项校验必须提供本地源模型。常用入口为 `validate_generic.py`、`validate_landmarks.py`、`validate_terrain_texture.py`，以及对应楼栋校验；植物更新还需检查 `validate_tree_clearance.py`、`validate_site_tree_clearance.py`、`validate_vegetation.py`。模型检查通过不代表未见立面已获实景确认。
 
-## 周边道路规整与边界显示
-
-`scripts/surroundings_data.py` 在既有道路/桥梁与雕塑数据准备完成后运行。保留校内路面和详细农院路模型，仅替换校外同层地面道路：按道路等级或 OSM 宽度生成圆角路面，将交叉口合为一个面，浅色路缘与沥青、步道保持互不重叠，外围建筑留出估算间距。长条路缘先按 12 米网格切分再三角化，避免递归细分产生大量无用面。路面随 DEM 起伏，并按 Blender 与 GLB 实际使用的地形三角面采样高度，避免双线性插值与地形网格不一致造成遮挡。道路位置没有为了视觉整齐而拉直或迁移。
-
-边界线由 Three.js 绘制，固定屏幕线宽 2 像素、95% 不透明度的白色实线，开启深度遮挡，取消黄色虚线和外描边；与物理建筑独立，不生成围墙。Blender 保留更新后的可编辑周边道路面，边界 JSON 为公开地理数据交付的一部分。
+需要前后比较的数学研究中心、道路、铺地、岸段和侧向接路校验，必须显式提供基准，不再默认依赖旧实验目录。例如：
 
 ```sh
-python3 scripts/surroundings_data.py
-python3 scripts/test_surroundings.py
-python3 scripts/campus_roads_data.py
-blender --background --python-exit-code 1 --python blender/update_roads.py
-blender --background --python-exit-code 1 --python blender/validate_surroundings.py
+blender --background --python-exit-code 1 --python blender/validate_shore.py -- --baseline-root=/path/to/pre-shore-baseline --report-prefix=shore-check
+blender --background --python-exit-code 1 --python blender/validate_civil_whole.py -- --road-baseline-root=/path/to/pre-road-baseline --connection-baseline-root=/path/to/pre-connection-baseline --report-prefix=civil-review
 ```
 
-仅修改周边铺装时可运行上述更新脚本，重建基础 GLB 并替换源文件中的道路对象；完整 `build_campus.py` 同样读取派生数据。所有坐标以米为单位，原始 OSM GeoJSON 和道路中心线保留。
+这些命令中的路径是占位符，需换成实际保留的、与该项检查语义一致的修改前版本。基准目录按项目结构包含 `blender/gxu-campus.blend`；铺地和岸段还需 `public/models/base.glb`。单项命令兼容原有 `--baseline=` 参数。土木整栋套件分别接受道路和接路基准，不强行共用一个历史阶段。
 
+缺失基准时命令会停止并列出缺少的文件。不能用当前模型冒充修改前版本；旧 `.blend` 已删除的历史比较无法直接复跑，须有可靠基准后再做结论。校验不会因基准缺失而自动跳过。
 
-## 篮球场（2026-09-11）
-
-保留已有 OSM 定位的 19 片室外单场，其中西校园集中区 16 片；工业职业技术学院的 12 片已移除。其余为零散球场，不应把渲染数量理解为全校总数。学校 [2024 年体育设施介绍](https://tyxy.gxu.edu.cn/info/1166/2372.htm)记载东区 15 片、西区 16 片；当前地图没有东校园田径场旁的独立篮球场轮廓；后续依据校方导览图补绘西侧 15 片估算场地，布局及坐标不宣称实测，详见 东校园篮球场（本地开发记录）。一块仅标注整体范围的活动区继续保留铺地（财经学院的另一块已删除），去掉误导性的超大单场外框和中线；室内篮球馆保持原建筑。
-
-- 单场保留 OSM 中心、长轴与 ID，比赛区按 28×15 米统一归整；原地图宽度约 14.2—14.6 米，归整存在少量外扩，原轮廓保存在数据中。没有移动球场去迎合排布。
-- [FIBA 2024 规则](https://assets.fiba.basketball/image/upload/documents-corporate-fiba-official-rules-2024-v10a.pdf)用于场线比例：5 厘米线宽、三分线直段与圆弧衔接、中圈、罚球半圆及禁区、合理冲撞区。面层采用互不重叠的色块；白线单独抬高约 4 厘米并采用既有深度偏移，确保压缩后仍可见，此抬高是显示处理。
-- 篮架包含底座、防护立柱、悬臂、篮板及目标框、连续圆管篮圈和开放的锥形菱格篮网。篮圈上缘采用距比赛面 3.05 米的通用建模规格；不属于经实测的专业设备型号。
-- [2026 年东校园现场照片](https://zyhjcl.gxu.edu.cn/info/1106/4503.htm)辅助绿色场面、橙色局部铺装与绿色设施的视觉风格。该照片不能核对每片球场或西校园的确切配色；对应颜色、架型和缓冲区均按视觉估算记录。活动日期 2026-01-20，页面发布 2026-01-21，照片元数据拍摄日期未知。
-- 分成四组连续铺装，89 个局部地形单元重新分面，球场区域整平、边缘 1.5 米范围回接原地形。仅修改模型工程修正，原始 DEM 年代和高程数据不变。4 株侵入球场或缓冲区的示意树移除，树木总数为 3,120。
-
-`public/data/basketball.json` 保存定位、原轮廓、估算轮廓、分组、地形补片及来源。基础 GLB 按四个场地组聚合，避免每个篮架成为单独绘制对象；源文件保留 34 个独立球场（19 个 OSM 定位、15 个资料约束估算）及具名的标线、篮架、篮网分组。球场由“运动场地”图层控制，不加入搜索或自动巡游。
-
-```sh
-python3 scripts/basketball_data.py
-python3 scripts/test_basketball.py
-blender --background --python-exit-code 1 --python blender/update_basketball.py
-blender --background --python-exit-code 1 --python blender/validate_basketball.py
-```
-
-完整数据与模型构建也包含这些步骤。专项更新脚本重建基础 GLB、篮球场、地形与贴地道路，保留其他建筑、地标和近景资源。
-
-| 西校园整体 | 篮架近景 |
-| --- | --- |
-| 西校园篮球场（本地开发记录） | 篮板、篮圈与镂空篮网（本地开发记录） |
-
-## 荟萃楼（2026-09-11）
-
-按新闻传播学院共用楼体北翼精建，保留原关系及内院；2024—2026 年资料确认在用情况，清晰外观照片主要来自 2020 年校方全景和更早入口近景，不能当作近期实测。来源、复原范围与重建方式（本地开发记录）。
-
-
-## 紧邻校界建筑
-
-校外建筑保留规则来自 `scripts/context_data.py`，完整数据处理后应用。`blender/update_context.py` 仅重建基础 GLB 的 context 节点及可编辑源文件的同层对象；所有校内建筑、篮球场、道路、植被和地标近景文件保持原样。页面“紧邻校界建筑”图层控制这 13 栋建筑，删除的远处建筑不会在后续完整重建时恢复。
-
-### 校外零散色块与道路（2026-09-12）
-
-按用户圈选移除北侧公园、西侧湖岸色块、零散球场，以及西、东、南侧的多余支路。周边主干道与校门连接保留，三处断头段在连接处收束。此调整限定网页展示范围，不表示原地图要素不存在。
-
-`scripts/scene_cleanup.py` 按 OSM ID 记录范围，`external_surfaces_data.py` 在周边道路合并前执行清理，保留曲面索引和原始 OSM 快照。专项更新顺序：
-
-```sh
-python3 scripts/external_surfaces_data.py
-python3 scripts/surroundings_data.py
-python3 scripts/basketball_data.py
-blender --background --python-exit-code 1 --python blender/update_scene_cleanup.py
-```
-
-更新脚本同步基础 GLB 和 Blender 中的道路、水面、绿地与地形，移除三片校外篮球场及底板；保留建筑、地标、两处田径场、31 片校内篮球场及近景模型。
-
-## 校内主路与汇学堂草地（2026-09-11）
-
-`campus_roads_data.py` 合并既有主路面，将沥青、路缘和中心虚线分割为互不重叠的面，沿用桥下材质。Blender 使用实际地形三角面采样高度，源文件焊接道路重合顶点以缩小体积。`update_roads.py` 同步更新道路与草地树木对象，保留所有建筑、地标及近景 GLB。参数与重建方法见 CAMPUS_ROADS.md（本地开发记录）；可运行 `blender --background --python-exit-code 1 --python blender/validate_surroundings.py -- --campus` 检查实际源文件和 GLB 路面高程。
-
-## 图书馆中央前场建模（2026-09-12）
-
-完整准备链在 `infrastructure_data.py` 完成周边道路和校内主路后调用 `site_data.prepare_sites()`。`build_campus.py` 验证场地的道路几何摘要、建筑轮廓和入口参数；输入失效时要求重新准备，避免接缝使用旧道路。场地覆盖优先读取全部既有覆盖，保留 `surfaces` 数组槽位，最后生成场地及排除树冠。
-
-`blender/site_geometry.py` 使用原地形及道路实际三角面的 BVH，生成 1 米级铺面和局部地形。6 个原粗地形面局部替换，新增 3,066 面，最大削低 0.544 米，边缘 3 米过渡；原始 DEM 保留。原主路约 1 米深接触带被保形分割并移入小型场地对象，用埋入补口覆盖压缩接缝，原路宽与标高保留。
-
-`site-library-north` 常驻基础模型、归道路图层，源文件分成铺地、侧面、埋入接缝、原主路接口四组。首版仅支持一个图书馆场地；其他区域推广需要扩展契约及验证。完整重建应使用已固定依赖的 Python 环境执行数据准备，然后运行 `npm run models:build`；旧的道路或篮球场局部更新脚本未验证新场地联动，不用于交付此场地变更。
-
-```sh
-work/refinement-venv/bin/python scripts/prepare_geodata.py
-npm run models:build
-work/refinement-venv/bin/python -m unittest discover -s scripts -p 'test_*.py'
-blender --background --python-exit-code 1 --python blender/test_site_geometry.py
-blender --background --python-exit-code 1 --python blender/validate_site.py
-```
-
-场地记录及当前限制（本地开发记录） · 几何检查（本地开发记录）。
-
-## 普通建筑低门廊与内退入口（2026-09-12）
-
-`scripts/building_overrides.py` 解析 `parts.openBelow` 和 `entrances.recess`，`blender/generic_buildings.py` 在两个细节级别共用门廊顶板、底面、显式方柱、平台、台阶与内退门面。第一处应用是农学院南侧原映射凸部；主楼五层高度及原外环保持。柱间不按普通外墙排窗，相邻主体墙在低屋面上方补回窗列。
-
-门廊限定一层平屋面，柱位须在分段内且互不重叠；门面内退须经过唯一门廊并贴合主体墙，中央通路不得被柱子堵塞。底板、板底、顶面高度及柱距为照片约束估算，支持规则不是结构设计校核。字段和来源见农学院记录（本地开发记录）与楼栋契约（本地开发记录）。
-
-2026-09-13 后续扩展已支持平顶多层分段的底层开放空间，保留板底以上窗列，并排除等高分段共边的内部女儿墙；内退入口可独立配置台阶级数与落地基准，见动物学院入口（本地开发记录）。上述“一层”限制保留为初版规则背景。
-
-有照片依据的外廊通过 `facadeRules.openCorridor` 锚定原外环边，由 `blender/facade_corridors.py` 在原分段内部生成后退墙、端墙、楼板及栏板，基础和近景共用。支持平顶和坡顶实体分段，禁止与 `openBelow` 混用或侵入内院；普通窗口移到外廊后墙。动物学院两段四层外廊的来源、估算尺寸、固定镜头和当前验收状态见外廊校准（本地开发记录）。导出后使用 `blender --background --python-exit-code 1 --python blender/validate_facade_corridors.py` 检查实际源文件与两级 GLB，而非仅检查生成参数。
-
-中央正面八列窗格采用 `facadeRules.windowGrid` 与 `blender/facade_windows.py`，基础/近景共用连续竖向分隔和窗位，近景再增加细边框与窗内分格。规则可用于多层门廊上方，窗和分隔不得侵入底层开口；单层开放门廊及被体量切开的原立面边会明确报错。实际源文件和导出模型由 `blender --background --python-exit-code 1 --python blender/validate_window_grid.py` 验证，资料边界与示意尺寸见中央窗格校准（本地开发记录）。
-
-```sh
-work/refinement-venv/bin/python scripts/building_overrides.py
-npm run models:build
-blender --background --python-exit-code 1 --python blender/validate_generic.py -- --report-prefix=s3-agriculture
-blender --background --python-exit-code 1 --python blender/validate_agriculture.py
-```
-
-专项检查读取实际源文件、基础与近景 GLB，采样柱子、三个开放柱间、门面、门廊上方玻璃及三阶台阶。台阶还与实际地形和铺面比较；固定画面按普通场景、隐藏植被诊断视图分别记录。手机尺寸允许依照现有预算使用基础模型，需要单独调整角度避开前方邻楼遮挡。
-
-
-## 镜湖代表性岸段（2026-09-12）
-
-`data/shore-overrides.json` 保存水体 ID、岸线修订、边索引、来源和估算参数；`scripts/shore_data.py` 在最终道路和入口场地准备后生成 `public/data/shores.json`，随后执行植被分区。完整构建由 `blender/shore_geometry.py` 生成岸壁并局部抬高地形，之后统一重算树根高程。节点 `shore-jinghu-auditorium-bank` 属于 `water` 图层。
-
-局部裁切必须给相邻地形面插入一致的边顶点，防止 Draco 量化使长边与分段边错开；非平面四边形先保留原三角划分，再细分对应三角面。参数与验证范围见镜湖岸段校准（本地开发记录）。
-
-道路或篮球场增量模型更新通过 `sync_source_shores()` 同步依赖的岸段和地形对象。但增量数据准备不会自动刷新全部岸段约束：修改道路、场地、水体或建筑轮廓后，应先运行 `scripts/shore_data.py`（或完整 `npm run data:prepare`），再构建模型。构建会拒绝不匹配的环境修订哈希。本批最终交付使用完整模型构建。2026-09-13 已在隔离副本中提高岸顶参数并执行两条实际增量命令，源文件、GLB、场地与树根验证通过，见增量验收记录（本地开发记录）。
-
-专项检查：`blender --background --python-exit-code 1 --python blender/validate_shore.py`。树木检查可追加 `-- --report-prefix=s4-shore`，为不同工作包保存独立报告，避免覆盖先前已验收的树木记录。
-
-
-### 增量重建兼容性修复（2026-09-13）
-
-道路增量加载源文件时，生成器中未被对象使用的材质可能没有随 `.blend` 保存。现按名称复用已有材质，对缺失的调色板项重建基础着色参数，保持材质索引有效。篮球场和道路的保留检查通过 `preserve_glb_geometry.mesh_nodes_by_name()` 对齐完整/基础导出的逻辑对象名：仅忽略 Blender 末尾数字后缀，重复逻辑名直接报错，不能以忽略缺失节点代替核对。
-
-在两份独立的生产资产副本中，将 `data/shore-overrides.json` 的 `freeboard` 从 0.55 改为 0.65，重新运行 `scripts/shore_data.py`，随后分别执行 `blender/update_roads.py` 和 `blender/update_basketball.py`。两者均只改变岸段和地形的压缩几何，保留其他 79 个基础节点；所有节点的变换与图层属性保留，69 个资产清单有效，实际仅 `base.glb` 字节变化。全部树根和图书馆场地检查通过。此测试参数没有写回生产资产。
-
-复核时分别执行 `validate_shore.py`、`validate_site.py` 和 `validate_vegetation.py -- --report-prefix=s4-incremental`；检查报告及输入/代码哈希见 增量验收汇总（本地开发记录）。47 项 Python 测试包含跨数字后缀的几何保留与歧义节点拒绝回归。
-
-
-## 建筑与树冠的最终三维净空
-
-`build_campus.py` 在最终树根高程确定后调用 `tree_clearance.filter_building_collisions()`，用实际生成的基础/近景建筑（含非桥梁地标）和两级树模板判断表面穿插。三维包围盒只做初筛，最终使用三角面 BVH，相交余量为 0.03 m。规则不消耗随机序列，也不改变保留树的属性；数据准备后必须完成模型阶段才得到最终树数。
-
-两条已有道路/篮球场增量命令执行同一构建规则，再按稳定树位同步源实例；已用原始 3,111 株在隔离副本验证两者均保留相同 3,050 株。`update_tree_layout.py` 仅适用于树位数量和位置未变化的朝向/贴地更新，不能用它代替本次删树的完整或配套增量流程。
-
-```sh
-blender --background --python-exit-code 1 --python blender/test_tree_clearance.py
-blender --background --python-exit-code 1 --python blender/validate_tree_clearance.py
-blender --background --python-exit-code 1 --python blender/validate_vegetation.py -- --report-prefix=s4-tree-clearance
-```
-
-独立验证读取实际保存源文件及全部建筑 GLB，对运行时两级树模板均检查，不能以生成器报告代替该验证。后续已加入可识别闭合组件的双向包含检查，以及最终占地和模型树冠保留区筛选；开放网格不自动封口。场地独立检查（本地开发记录）另读取道路、桥梁、水面及运动场实际网格，覆盖源文件和运行资产。示意精度、未覆盖范围和源文件保留记录见植被记录（本地开发记录）。
-
-新增树位后，可用下列只读检查复核；每批使用新的报告前缀，保留历史结果：
-
-```sh
-blender --background --python-exit-code 1 --python blender/validate_tree_clearance.py -- --report-prefix=avenue-check-buildings
-blender --background --python-exit-code 1 --python blender/validate_site_tree_clearance.py -- --report-prefix=avenue-check-sites
-blender --background --python-exit-code 1 --python blender/validate_vegetation.py -- --report-prefix=avenue-check
-```
-
-## 独立低矮景观层（2026-09-13）
-
-`data/low-planting.json` 按稳定建筑 ID 和局部坐标定义绿篱，`scripts/low_planting_data.py` 在最终植被准备中检查整个占地并生成派生数据；轮廓或上下文过期会使构建报错。`blender/low_planting.py` 在最终地形上生成独立闭合叶团，使用单材质防止 Draco 跨材质量化破坏接缝，纳入基础模型的植被图层。
-
-道路和球场增量命令同步低矮景观源对象；已在隔离副本中分别验证抬高 3 米的错误源对象被实际命令修复，随后源文件与 69 个导出资产检查通过。该实验验证同步路径，没有模拟道路改线或新的实景种植。参数范围、照片依据、估算边界及原图对照见低矮绿化说明（本地开发记录）。
-
-### 普通建筑的外挑门廊
-
-林学院采用 `entrances.attachedPortico`，由 `scripts/attached_portico_data.py` 解析、`blender/attached_portico.py` 生成两级共用的平台、四柱、顶板和两排镂空栏板。门廊附着原外边，保留 OSM 主体和内院；它与原轮廓内的 `parts.openBelow` 门廊分开表达。外挑门廊可跨越同栋实心体量分段，但所有接触分段都必须高于雨棚顶，且不能附着于开放底层。所有尺寸明确录入，台阶起算标高与楼栋基准分别说明。
-
-外挑占地进入最终植被落点排除和低矮景观上下文。修改后运行楼栋与植被准备，再成套重建模型；通过 `blender/validate_forestry_entry.py` 检查实际源文件/GLB 门廊及台阶两侧地形，通过 `validate_generic.py` 检查共享形体。具体资料、参数与回退范围见林学院入口记录（本地开发记录），不以示意尺寸代表测绘结果。
-
-数学学院北门采用同一规则的实心平雨棚：`parapetHeight: 0` 明确关闭顶面栏板，`slabThickness` 表达板厚，保留四柱和独立录入的短台阶。非零栏板仍须高于 0.3 m，以容纳原有两排开口；原林学院配置和输出保持。分段、旋转、局部低屋顶及开放底层冲突由数据测试覆盖，数学学院实际几何由 `validate_mathematics.py` 检查。
-
-### 实体外墙上的宽窄窗带
-
-林学院南侧中段使用 `facadeRules.windowBands`：以原外边的 `from/to` 分数和 `firstLevel` 限定校准范围，再明确各窗组的局部起止点、近景分格及水平挑檐。可选 `lastLevel`（含该层，零起始）在指定楼层终止窗组、挑檐及通用窗替换；省略时继续至最高层。上方可配置独立面板，重叠检查采用同一楼层范围。范围外和底层沿用现有规则。`scripts/facade_bands_data.py` 检查窗框间隔、楼层和尺寸，`blender/facade_bands.py` 生成两级共同的挑檐及宽窄玻璃面；细窗框、窗梃仅在近景增加。
-
-该配置保留背后实体墙，不等同于 `openCorridor`。不能同时使用开放走廊、阳台、另一种窗格布局，也不能跨越高度分段或占据开放门廊。使用 `blender/validate_forestry_facades.py` 核对实际源文件和导出 GLB 的窗宽、墙体、窗间留白与挑檐。立面记录（本地开发记录）说明照片支持范围及估算参数。
-
-### 分段立面与简化平台
-
-数学学院使用可选的 `facadeRules.part`，将窗带或窗格规则限定到一个已存在的体量分段；归一化位置相对于该分段与原外边的唯一连续交段，楼层取分段值。未指定 `part` 的既有规则继续使用整条原边。未知分段、不相接或不连续的交段、同边混合整体和分段规则均报错。微斜边精确求交缺失时，只恢复 0.1 微米内的重合边界，不扩大体量范围。
-
-普通简化入口可用 `landingHeight` 设置平台顶面并同步门面和雨棚标高；默认生成两级实心平台，不与内退或独立门廊配置混用。有明确台阶资料时使用 `stairFlight: {width, landingDepth, riserCount, tread, baseHeight}`。`riserCount` 表示踢面总数，平台以下生成 `riserCount - 1` 个踏面，各级高差由平台顶面与基底均分；宽度须支承完整门面，外挑占地纳入树木及低矮景观排除。参数尺寸仍可为明确标注的估算。修改后运行数据测试、`validate_generic.py` 及 `validate_mathematics.py`，同时检查实际台阶与地形，见数学学院南门（本地开发记录）。
-
-简化入口可在 `landingHeight` 基础上设置 `doorFrame: {bays, pierWidth, pierDepth}`，分别指定开间数、门柱宽和深。解析器要求 1–6 个整数开间、有限尺寸、每个净开口至少 0.9 m，且最外门柱完整落在入口所依附的外边范围内。基础和近景共同生成 `bays + 1` 根石材柱、连续门楣和分开的玻璃门洞；普通近景窗避开整个门框范围，不在柱后保留玻璃。该字段用于现有简化门面，不能替代带独立立柱、外挑平台与栏杆的 `attachedPortico`。数学学院主门采用三开间配置，门柱和门楣验证包含实际导出模型。
-
-### 普通入口向侧面人行道连接
-
-`data/site-overrides.json` 可包含 `side-connection`：使用稳定楼栋 ID、入口 ID、楼栋轮廓版本和目标人行道版本，明确宽度、转折前出、搜索区间及资料依据。`scripts/side_connection_data.py` 在入口局部坐标中逐断面寻找人行道边界，并检查楼体/门廊冲突；`scripts/site_data.py` 支持多个场地，要求整地范围互不相交。当前实现向局部负 X 一侧连接，其他方向应先建立相应资料与几何约定。
-
-`blender/side_connection.py` 用实际道路平面和楼栋入口基底设置铺面标高；只在铺地下方裁切并降低地形，自由边补侧面。接触带保留原道路平面，裁切产生的长短边通过 `conform_edges` 共享分段，防止独立三角边在 Draco 量化后开裂。验证使用实际源文件与 GLB，不能以源几何通过代替导出检查。细节见数学学院北门连接（本地开发记录）。
-
-`front-connection` 通过 `scripts/front_connection_data.py` 从显式 `stairFlight` 最前缘沿局部正 Y 接至目标道路，保留台阶全宽；目标可为步道或平面服务道路，拒绝桥隧、非零层级、失效铺面版本和楼体/外挑入口冲突。与侧向连接共用实际道路采样、局部地形、收口和导出检查。运行 `validate_side_connection.py -- --site-id=mathematics-south-connection` 检查南门，默认仍检查北门。
-
-道路接触带材质在组合场地网格的 `xy_uv_materials` 中登记，沿用原路面的世界 XY 纹理投影；埋入接口的三角面不因法线倾斜改换投影轴。未标记的竖直侧面保留通常投影。`blender/test_side_connection.py` 同时覆盖两种连接各两种倾斜地形，以及接触带纹理和竖直侧面回归。
-
-### 基础模型未使用属性
-
-基础导出通过 `export_attributes.py` 的临时 glTF 钩子省去纯色材质未使用的 UV，保留源文件 UV 和所有近景导出。核心贴图槽及未知/启用材质扩展保留坐标，已知空扩展占位可以跳过；规则按实际导出材质判断。恢复旧压缩节点时同步恢复其原属性 accessor 集合。`test_export_attributes.py` 检查真实 Draco 导出与作用域清理，`scripts/check-export-attributes.mjs` 对变化分组进行解码后的有向三角面/法线精确比较；不以文件更小代替形体和材质验证。该优化批次首屏模型为 4,833,592 bytes，成本和验证边界见导出属性记录（本地开发记录）；后续数学学院立面批次为 4,847,648 bytes。
-
-### 上层玻璃与花格面板
-
-`facadeRules.panels` 使用 `id/type/from/to/bottom/top/columns/rows/frameWidth/depth` 明确上层面板范围，支持 `glazing` 和 `lattice`。`scripts/facade_panels_data.py` 校验边界、孔隙、重叠及窗带/挑檐冲突，要求外环实心分段并显式关闭阳台。底部须不低于 +3.2 m；地面门厅继续使用入口规则。每个 ID 在所属立面内唯一。
-
-`blender/facade_panels.py` 为基础和近景共同生成面板，并只替换与矩形范围相交的默认窗及外框。花格采用白色浅杆件和暗色背板，保留楼体实墙，不表示完整内部楼梯或穿墙开口。源对象保留 `05_立面专项` 顶点组。修改后运行 `blender/test_facade_panels.py` 的旋转/孔隙检查与 `blender/validate_mathematics.py` 的实际源文件及 GLB 检查；参数来源和未确认范围见数学学院立面（本地开发记录）。
-
-道路和篮球场增量更新均在导出后调用 `sync_source_sites`，替换可编辑源文件中的场地组件，保留 `siteId` 和道路图层属性。保留时光之门的既有压缩几何后调用 `compact_buffer_views` 清理未引用缓冲，随后计算清单字节数和哈希。增量检查应从缺少新场地的旧源文件启动，确认新组件能重建且基础/近景无关资产保持。
-
-### 数学研究中心分部屋顶与局部铺地
-
-分部可通过 `parts.roof` 显式设置 `type/rise`，与原轮廓分区一起核验。外廊支持 `piers` 和 `balusters`，底层开放必须给出柱列；坡顶增加外廊顶层板面。`entry-apron` 表达照片支持的短铺地，局部整地只降低旧三角面并渐变回原地面。参数、检查和局限见数学研究中心校准（本地开发记录）。
-
-`gallery-apron` 锚定带显式柱列的底层外廊立面，检查原轮廓和分段版本；整地范围向廊内延伸至廊深，清除楼板下的地形穿插，廊外用窄铺地和渐变带接回旧地面。构建时检查立面、原点与方向失效，并验证范围外地形。两类局部铺地均不自动代表已接至校园道路。完整数据准备后需完整构建，以同步楼栋高程；增量道路/篮球维护从成套已有资产启动。
-
-东翼两处廊道使用 `attachedGallery`，在原内退墙线之外表达实体底层、上层楼板与斜檐。零端部退让只在两侧有原映射凸部墙时有效，沿侧墙方向求交收口；原地图轮廓保留，新增占地进入最终植被排除。楼板侧面与下层墙面不重叠；原后墙底层不再生成窗格，玻璃移至新增外墙。实现和限制见东翼外廊（本地开发记录）。
-
-2026-09-16 临湖外楼梯：普通建筑新增开放外楼梯类型，基础与近景共用折返梯、弧形平台、薄顶棚及支柱；楼梯和附楼共用地形基准，三个上层门口由连接关系生成。 详见参数与验收记录（本地开发记录）。
-
-2026-09-16：外廊生成器按局部坐标系方向调整面的顶点顺序，确保后墙朝外、楼板顶朝上、板底朝下；三栋四个外廊已在实际导出中核验。 详见临湖端面与法线修复（本地开发记录）。
-
-## 普通建筑逐层高度（2026-09-16）
-
-`data/building-overrides.json`可用`floorHeights`代替统一层高。基础和近景窗层按累计高度生成；层数、显式总高与层高表必须一致。分段可从同一地面基准取前 N 层，分段高度必须等于对应层高之和；外廊、专项窗格等仍采用等层高假设的布局继续拒绝混用。实际使用和边界见办公南楼校准（本地开发记录）。
-
-低门厅可用 `openBelow.columns[].shape: cylinder` 表达圆柱，直径由相等的 `width` / `depth` 给出，基础和近景共享 16 边截面。入口台阶宽度限制在所属低门厅实际占据的原轮廓边区间。见办公南楼门厅（本地开发记录）。
-
-`entrances[].recessGlazing` 在已有内退柱廊后墙表达左右玻璃与中央门区，字段包括 `width`、`glazingHeight`、`transomHeight`、`sideColumns`、`doorWidth`、`doorHeight`、`frameWidth`、`bayGap`。玻璃范围同时受后墙、柱廊后缘和顶棚净高约束；仅允许与 `recess`、`steps`、`stepBaseHeight` 组合。与默认门片二选一，两个细节级别共享门窗分隔，详见柱后玻璃（本地开发记录）。
-
-## 2026-09-16：资环材学院整体尺度
-
-新增第19条普通楼部分对象校准：`relation/11564999`由类型默认5层改为设计院记载的最高地上11层。设计建筑高度48.9米暂换算成48.1米主体加既有0.8米示意女儿墙，主体和均分层高仍标为估算，保留三个原映射内院。仅本楼源对象与对应基础/近景区块变化，单一挤出体尚未拆分低门廊、连廊与退台，不提高整栋验收完成数。资料、前后图与局限（本地开发记录）。
-
-2026-09-16：开放柱廊可通过 `openBelow.slattedRoof` 生成透空梁顶。`scripts/slatted_roof_data.py` 校验近直角四边形、梁宽/梁数、最小净空和柱梁对位；Blender 使用同一 `roofGeometry` 生成顶、底和侧面，跳过该段普通女儿墙。资环材学院以共享顶点划分高主体与低框架，两级模型均保留八个几何开孔。详见框架专项（本地开发记录）。
-
-2026-09-16：显式入口新增或外扩前，运行 `scripts/audit_entry_road_context.py --report <报告路径>`；候选可用 `--proposal <含buildingId和proposalEntry的JSON>` 检查。平面重叠需先核对定位和层级，不能仅靠通过专用道路网格检查或抬高模型放行。资环材学院被撤回的试制说明见约束核查（本地开发记录）。
-
-2026-09-16：`roofDome`增加受限屋顶穹顶，参数为中心、半径、底座高度和曲面增高；需要一个实体平屋面分段完整支撑，保留0.5米边界/内院净距。基础与近景共享32周向分段、8曲面分带，屋顶基准由支撑分段派生，不改主体层数。详见物理学院屋顶（本地开发记录）。
-
-2026-09-16：`openCorridor.lastLevel`可将外廊限制到中间楼层，零基索引包含末层；省略保持原先直至最高层的行为。主体恢复上方实体墙，普通及显式窗户、柱、栏板同步采用该范围。照片约束实例见物理学院中部外廊（本地开发记录）。
-
-2026-09-16：显式 `facadeRules.panels` 允许与 `windows: false` 并用：仅停止该立面的默认窗列，保留显式面板。用于数学研究中心楼梯墙的稀疏小窗，避免在其余实墙上自动补出大窗；其余面板与立面冲突约束不变，见专项（本地开发记录）。
-
-2026-09-16：`courtyard-paving.stairConnection` 可在庭院直边与已派生的开放楼梯底层之间生成有界短接面，要求目标原轮廓与楼梯几何摘要有效。庭院端沿原地形三角面拆点，平台端采用楼梯共享基准，保持两端贴合及原树池。该字段不推导通向远处道路的路径，详见庭院接面（本地开发记录）。
-
-2026-09-20：普通建筑共享形体支持 `horizontalLedges` 独立水平挑檐，基础和近景共用构件，不改通用窗列。农学院采用范围、估算尺寸和复现检查见专项记录（本地开发记录）。
-
-2026-09-20 后续：农学院东侧顶层改为15扇显式窗，其中5扇较矮。`skipWindowLevels=[4]`只跳过该层默认窗，基础/近景共享面板；下部四层仍用原窗规则。面板与水平挑檐组合时检查空间相交，详见顶层窗列（本地开发记录）。
-
-土木学院顶层将有界 `openCorridor` 用作凹窗槽形体：同边的 `windowBands` 和 `panels` 可位于凹槽以外的楼层，但必须避开其底板至顶板的完整标高范围。保留通用窗时，`openings` 只允许位于凹槽层，且仅替换被明确配置的整行通用窗；其他行继续原规则。已关闭全立面通用窗的旧配置仍允许在凹槽内外配置开口。开口定义最多32项。形体工具名称不证明实际外廊通行用途，详见土木顶层专项（本地开发记录）。
-
-2026-09-21：`panels.type=round-window-wall` 支持有界白墙内1至16个圆孔。准备阶段对带孔墙面三角化，两档共享32边圆孔、孔壁及后退玻璃；默认方窗按外墙面范围移除，原主体墙保留，不生成室内空间。详见规则与精度范围（本地开发记录）。
-
-2026-09-21：土木学院北翼中央复用 `openCorridor` 的柱列与显式玻璃规则，坡屋顶保持，廊顶板带完整上下面。源模型及两档LOD共用退进，见北翼立面（本地开发记录）。
-
-2026-09-21：`facadeRules.wallFinish` 直接为完整实体外墙指定共享墙色，不加重叠面。`windowGrid` 两个壁柱尺寸同为零时省略壁柱；基础玻璃按外法线校正绕序，数学学院与动物科学技术学院已有窗格同步修正，见专项（本地开发记录）。
-
-2026-10-10：平台北楼南面采用三段显式上部窗网，内部相邻低屋面使用 `above-roof` 规则，按最高坡面与边缘构件留净空并禁用该内部墙面自动窗；西端墙上四层改为实墙。全部尺寸为估算；源/基础/近景同步，见模型记录（本地开发记录）。
-
-## 2026-10-10：封闭分部墙脚深度
-
-`parts.baseDepth`控制封闭主体墙体向楼底以下的延伸，默认0.5米；显式值限制为0.5–2米且不得用于`openBelow`。共享生成器保持楼底、主体顶高和入口不变，两个LOD一致。农学院采用1.1米以封闭西翼地面与墙脚间隙，属于模型接地修补，不是实测基础深度，见专项（本地开发记录）。
+浏览器检查脚本保留为可复用工具，使用 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`REFINEMENT_URL` 等显式输入；前后截图工具还需相机列表与基准资源目录。输出只在本地保存。性能比较应使用同一视口、相机、前端和画质，区分资源加载、静止帧率及持续活动帧率。
