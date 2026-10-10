@@ -24,14 +24,11 @@
 
 ## Features
 
-- Browse 20 selected places grouped into academic buildings, sports and culture, gates, roads and bridges, and daily life. Search supports Chinese aliases such as “六教” and “新东园门”, with results shown in a flat list.
-- Place entries and map markers highlight each other. Their numbers match the tour stops, making it easy to locate places in the list and the scene.
-- Place details include an introduction, viewing angles, and sharing options. The horizontally scrollable view bar offers overview, overhead, orbit, front, rear, and close-up views. You can also rotate, pan, and zoom freely.
-- Tour controls stay at the bottom of the panel, with options to pause, resume, and skip stops, plus progress for each 8.5-second stop. Pause and resume remain available when the panel is collapsed.
-- Choose morning, daytime, dusk, or night lighting. Automatic quality adjusts shadows, trees, and close-up details based on runtime performance.
-- Toggle campus buildings, trees, roads and bridges, water, sports grounds, surrounding buildings, the campus boundary, and place names independently.
-- Use the Share menu to copy a link to the current view or export a PNG with OpenStreetMap attribution.
-- On phones, a bottom panel supports summary, detail, and collapsed states. More tools brings together viewing angles, sharing, and controls help. Keyboard navigation and the system's reduced-motion preference are supported.
+- Find and browse 20 selected places with categories, Chinese alias search, and linked list and map highlights.
+- Explore freely with multiple viewing angles or follow a campus tour, with options to pause, resume, and skip stops.
+- Switch between morning, daytime, dusk, and night; toggle buildings, trees, roads, and other layers. Quality adapts automatically to performance.
+- Share a link to the current view or export a PNG with OpenStreetMap attribution.
+- Use the map on mobile, with keyboard navigation and support for the system's reduced-motion preference.
 
 | Place details on mobile | Mobile tools menu |
 | --- | --- |
@@ -43,7 +40,10 @@
 | :---: | :---: | :---: | :---: |
 | 446 buildings / volumes | 13 buildings | 20 places | 2,936 trees |
 
-The model covers the east, west, and north campus areas, including two athletics fields, 31 outdoor basketball courts, Nongyuan Road, and three major bridges with roads passing beneath them. A white line marks the approximate campus boundary, and Nongyuan Road is represented as a public road. Off-campus buildings are limited to those immediately adjacent to the boundary, within roughly 20 meters.
+Built from OpenStreetMap and public references, the model covers the east, west, and north campus areas. It has not been verified by an on-site survey, and some building heights, facades, and facility layouts are estimates. See the [data notes](docs/DATA.md) for details.
+
+<details>
+<summary>More screenshots</summary>
 
 | North side of the library | Road beneath Chongzuo Bridge |
 | --- | --- |
@@ -51,11 +51,9 @@ The model covers the east, west, and north campus areas, including two athletics
 
 ![Basketball court models west of the east athletics field](docs/screenshots/readme/basketball-east.jpg)
 
-Screenshots were updated on 2026-10-07 using a local development version of the `dev` branch, including the latest place-detail changes. They may be ahead of the live site. Mobile screenshots were captured in a desktop browser at a 390 × 844 viewport. Screenshot dates, versions, and viewing angles are recorded locally.
+</details>
 
-Building footprints primarily come from an **OpenStreetMap snapshot dated 2026-09-09**. Roads and bridges use supplementary data retrieved on 2026-09-11. Building appearances draw on public photographs and references from different years; those dates do not establish current conditions. This is an independent open-source project and has not been verified by an on-site campus survey.
-
-334 building records still use default heights for their building type. Other heights are calculated from documented floor counts and estimated floor heights, and should not be treated as measurements. The campus count includes 11 additional building and connecting-corridor volumes in the north campus area, so it does not represent only standalone buildings. Facades not covered by photographs, tree positions, and some facility layouts also involve inference. Of the basketball courts, 16 use map-derived positions, while another 15 in the east campus area use estimated layouts based on references. See the [data notes](docs/DATA.md) and [source records](public/data/sources.json) for evidence and limitations.
+Screenshots were captured from a development version on 2026-10-07 and may differ from the live site.
 
 ## Run locally
 
@@ -86,16 +84,7 @@ Pushes to `main` and pull requests targeting `main` run checks and builds. Pages
 
 ### Data tests and model rebuilding
 
-Data tests use Python 3.12:
-
-```sh
-python3.12 -m venv work/data-venv
-source work/data-venv/bin/activate
-python -m pip install -r scripts/requirements.txt -c scripts/constraints-geodata.txt
-npm run test:data
-```
-
-The editable Blender source is stored locally at `blender/gxu-campus.blend`, with named objects, materials, and packed textures. It is no longer tracked in Git, and no Release download is currently available. Running the website and standard tests does not require this file. Incremental model changes and source-model checks require the local source file and Blender; see the [modeling guide](docs/MODELING.md). [Raw data snapshots](data/snapshots/) support offline restoration. [Web models](public/models/) use Draco compression and load on demand. The asset manifest and tests keep the initial model payload below 6 MB (decimal), excluding scripts, JSON, and decoders.
+See the [modeling guide](docs/MODELING.md) for data tests and model rebuilding. The editable Blender source is not included in the repository and is not currently available for download. Running the website and standard tests does not require it.
 
 ## Project documentation
 
@@ -104,8 +93,6 @@ The following documents are in Chinese:
 - [Data sources and accuracy](docs/DATA.md)
 - [Model structure and rebuilding](docs/MODELING.md)
 - [Interface and interactions](docs/DESIGN.md)
-
-Development notes, acceptance reports, and screenshots are kept locally and are not distributed with the repository, except for baseline data required by tests and validation, and the screenshots shown in the READMEs.
 
 ## Licensing
 
