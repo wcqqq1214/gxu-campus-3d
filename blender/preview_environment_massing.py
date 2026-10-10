@@ -17,7 +17,7 @@ from mathutils.bvhtree import BVHTree
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'blender'))
-from geometry import material
+from geometry import material, Mesh
 from generic_buildings import ordinary_building
 
 parser = argparse.ArgumentParser(description=__doc__)
@@ -35,6 +35,16 @@ colors = {'white': (.86,.85,.80), 'stone': (.64,.60,.49), 'pink': (.77,.68,.66),
 C = {name: material(name, color) for name, color in colors.items()}
 
 
+def candidate_mesh(name,building,detail):
+    mesh=ordinary_building(building,0,C,detail)
+    stairs=proposal.get('stairCandidates',{}).get(name)
+    if stairs:
+        from switchback_stairs import add_switchback_stairs
+        study=Mesh();add_switchback_stairs(study,stairs,0,C['white'])
+        mesh.add_part('candidate-exterior-stairs',study)
+    return mesh
+
+
 def lower_faces(mesh):
     # Exclude the large spanning body walls in both versions. This checks that
     # all pre-existing entrance/window details below the revised roof remain.
@@ -45,6 +55,7 @@ def lower_faces(mesh):
 
 checks = []
 roof_geometry = {}
+stair_geometry = {}
 original = proposal['original']
 for detail in (False, True):
     before = ordinary_building(original, 0, C, detail)
@@ -52,6 +63,15 @@ for detail in (False, True):
     for name, building in proposal['variants'].items():
         mesh = ordinary_building(building, 0, C, detail)
         assert lower_faces(mesh) == lower_faces(before), (name, detail, 'lower details changed')
+        preserved_lower_faces=sum(lower_faces(mesh).values())
+        mesh=candidate_mesh(name,building,detail)
+        if name in proposal.get('stairCandidates',{}):
+            start,end=next((start,end) for label,start,end in mesh.parts if label=='candidate-exterior-stairs')
+            stair_faces=Counter((mesh.m[i],tuple(tuple(round(v,8) for v in mesh.v[j]) for j in face))
+                                for i,face in enumerate(mesh.f) if all(start<=j<end for j in face))
+            assert stair_faces,'Stair study was not appended'
+            if not detail:stair_geometry[name]=stair_faces
+            else:assert stair_geometry[name]==stair_faces,'Stair study changes across LODs'
         tree = BVHTree.FromPolygons(mesh.v, mesh.f)
         volume = building['form']['roofVolumes'][0]
         # Independent numerical expectations, not heights copied from the mesh.
@@ -119,7 +139,7 @@ for detail in (False, True):
                                         columnProjection=.12,oldCandidateFails=True))
         checks.append(dict(variant=name, detail=detail, samples=samples,
                            roofChecks=roof_checks,
-                           preservedLowerFaces=sum(lower_faces(mesh).values()),
+                           preservedLowerFaces=preserved_lower_faces,
                            trianglesBefore=sum(len(f)-2 for f in before.f),
                            trianglesAfter=sum(len(f)-2 for f in mesh.f)))
 
@@ -146,7 +166,7 @@ rendered_views = {}
 views = [('northwest', (230,-310,48), (322,-407,12), 125),
          ('southwest', (250,-500,55), (322,-407,12), 125)]
 for label, building in {'original': original, **proposal['variants']}.items():
-    obj = ordinary_building(building, 0, C, True).object(label, scene.collection)
+    obj = candidate_mesh(label,building,True).object(label, scene.collection)
     building_views = list(views)
     if proposal.get('roofDetails') and label != 'original':
         v = building['form']['roofVolumes'][0]
@@ -155,6 +175,11 @@ for label, building in {'original': original, **proposal['variants']}.items():
         u = Vector((math.cos(v['angle']),math.sin(v['angle']),0))
         position = target+n*35-u*25+Vector((0,0,12))
         building_views.append(('roof-close',tuple(position),tuple(target),38))
+    if label in proposal.get('stairCandidates',{}):
+        s=proposal['stairCandidates'][label]
+        target=Vector((*s['center'],13))+Vector((*s['normal'],0))*s['depth']/2
+        position=target+Vector((*s['normal'],0))*21+Vector((*s['tangent'],0))*13+Vector((0,0,4))
+        building_views.append(('stairs-close',tuple(position),tuple(target),43))
     rendered_views[label] = building_views
     for name, position, target, scale in building_views:
         camera.location = Vector(position)
@@ -181,6 +206,8 @@ report = dict(buildingId=original['id'], proposalSha256=hashlib.sha256(args.prop
               cameraViews=views, productionReady=False, productionModified=False,
               renderedViews=rendered_views,
               roofIdenticalAcrossLods=bool(proposal.get('roofDetails')),
+              isolatedStairStudy=bool(proposal.get('stairCandidates')),
+              stairsIdenticalAcrossLods=bool(proposal.get('stairCandidates')),
               reviewGlbs=exports,
               validationScope='Generated mesh height, roof normals, lower detail preservation and optional frame gaps/window normals; not real dimensions, facade registration, shipping assets or runtime performance.')
 (args.output/'geometry.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
