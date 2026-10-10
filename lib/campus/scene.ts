@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { batchSportsSurfaces } from './sports-batching';
-import { batchPlatformRoadContacts } from './road-batching';
+import { batchStaticRoadSurfaces } from './road-batching';
 import { pruneGroundTriangles } from './ground-triangles';
 import { isTap } from './math';
 import type { CameraSnapshot } from './share';
@@ -730,7 +730,7 @@ export function createScene(
       loadedBytes += a.bytes;
       styleMeshes(gltf.scene);
       batchSportsSurfaces(gltf.scene);
-      batchPlatformRoadContacts(gltf.scene);
+      batchStaticRoadSurfaces(gltf.scene);
       if (key === 'base') pruneGroundTriangles(gltf.scene);
       return gltf;
     } finally {
