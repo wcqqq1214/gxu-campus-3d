@@ -608,6 +608,15 @@
             "gxuAgricultureAdmission2026"
           ],
           "note": "官网具名横幅及招生片25秒支持中央五层墙顶部的白色宽檐口；以主楼分段第7边（原外环8→11顶点）为下缘锚点，非低门廊屋顶。底部向屋内0.6米、向外挑出1.6米、两端各放宽0.8米、抬高1.6米、顶边厚0.2米均为照片约束估算，斜面为外形近似，不声称测绘坡度或复刻内部构造；支撑标高沿用16.5米估算屋面。"
+        },
+        "exposedFacadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "gxuAgricultureBanner",
+            "gxuAgricultureAdmission2026"
+          ],
+          "note": "官网具名横幅及招生片25秒可辨中央门廊上方四层、每层五扇窗。绑定主楼分段第7边（原外环8→11），替换该处自动窗列；宽2.5米、五等间距、楼层基准上0.9–2.8米、三列与上亮窗分格（0.72高度分界）及0.06米框宽/0.10米深为照片约束估算。第二层保留原门廊后沿0.8米矮墙，仅表达4.95–6.1米的可见窗面；此截取不是实测窗台标高。玻璃为外表面近似；防护栏、空调、精确窗距和材料未复刻，底层门厅保持。"
         }
       },
       "review": {
@@ -639,6 +648,10 @@
             "gxuAgricultureBanner",
             "gxuAgricultureEvent2026"
           ]
+        },
+        "exposedFacadeRules": {
+          "status": "partial",
+          "note": "官网具名横幅及招生片25秒可辨中央门廊上方四层、每层五扇窗。绑定主楼分段第7边（原外环8→11），替换该处自动窗列；宽2.5米、五等间距、楼层基准上0.9–2.8米、三列与上亮窗分格（0.72高度分界）及0.06米框宽/0.10米深为照片约束估算。第二层保留原门廊后沿0.8米矮墙，仅表达4.95–6.1米的可见窗面；此截取不是实测窗台标高。玻璃为外表面近似；防护栏、空调、精确窗距和材料未复刻，底层门厅保持。"
         }
       },
       "archetype": "teaching-block",
@@ -1051,7 +1064,323 @@
         "sideOverhang": 0.8,
         "rise": 1.6,
         "capThickness": 0.2
-      }
+      },
+      "exposedFacadeRules": [
+        {
+          "part": "main-five-storeys",
+          "adjacentPart": "south-portico",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 7,
+          "region": "above-portico",
+          "rule": {
+            "windows": false,
+            "balconies": false,
+            "panels": [
+              {
+                "id": "central-level-2-window-1",
+                "type": "glazing",
+                "from": 0.0297926484583797,
+                "to": 0.1702073515416203,
+                "bottom": 4.95,
+                "top": 6.1,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-2-window-2",
+                "type": "glazing",
+                "from": 0.22979264845837968,
+                "to": 0.3702073515416203,
+                "bottom": 4.95,
+                "top": 6.1,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-2-window-3",
+                "type": "glazing",
+                "from": 0.4297926484583797,
+                "to": 0.5702073515416203,
+                "bottom": 4.95,
+                "top": 6.1,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-2-window-4",
+                "type": "glazing",
+                "from": 0.6297926484583797,
+                "to": 0.7702073515416202,
+                "bottom": 4.95,
+                "top": 6.1,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-2-window-5",
+                "type": "glazing",
+                "from": 0.8297926484583797,
+                "to": 0.9702073515416203,
+                "bottom": 4.95,
+                "top": 6.1,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-3-window-1",
+                "type": "glazing",
+                "from": 0.0297926484583797,
+                "to": 0.1702073515416203,
+                "bottom": 7.5,
+                "top": 9.4,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-3-window-2",
+                "type": "glazing",
+                "from": 0.22979264845837968,
+                "to": 0.3702073515416203,
+                "bottom": 7.5,
+                "top": 9.4,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-3-window-3",
+                "type": "glazing",
+                "from": 0.4297926484583797,
+                "to": 0.5702073515416203,
+                "bottom": 7.5,
+                "top": 9.4,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-3-window-4",
+                "type": "glazing",
+                "from": 0.6297926484583797,
+                "to": 0.7702073515416202,
+                "bottom": 7.5,
+                "top": 9.4,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-3-window-5",
+                "type": "glazing",
+                "from": 0.8297926484583797,
+                "to": 0.9702073515416203,
+                "bottom": 7.5,
+                "top": 9.4,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-4-window-1",
+                "type": "glazing",
+                "from": 0.0297926484583797,
+                "to": 0.1702073515416203,
+                "bottom": 10.8,
+                "top": 12.7,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-4-window-2",
+                "type": "glazing",
+                "from": 0.22979264845837968,
+                "to": 0.3702073515416203,
+                "bottom": 10.8,
+                "top": 12.7,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-4-window-3",
+                "type": "glazing",
+                "from": 0.4297926484583797,
+                "to": 0.5702073515416203,
+                "bottom": 10.8,
+                "top": 12.7,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-4-window-4",
+                "type": "glazing",
+                "from": 0.6297926484583797,
+                "to": 0.7702073515416202,
+                "bottom": 10.8,
+                "top": 12.7,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-4-window-5",
+                "type": "glazing",
+                "from": 0.8297926484583797,
+                "to": 0.9702073515416203,
+                "bottom": 10.8,
+                "top": 12.7,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-5-window-1",
+                "type": "glazing",
+                "from": 0.0297926484583797,
+                "to": 0.1702073515416203,
+                "bottom": 14.1,
+                "top": 16.0,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-5-window-2",
+                "type": "glazing",
+                "from": 0.22979264845837968,
+                "to": 0.3702073515416203,
+                "bottom": 14.1,
+                "top": 16.0,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-5-window-3",
+                "type": "glazing",
+                "from": 0.4297926484583797,
+                "to": 0.5702073515416203,
+                "bottom": 14.1,
+                "top": 16.0,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-5-window-4",
+                "type": "glazing",
+                "from": 0.6297926484583797,
+                "to": 0.7702073515416202,
+                "bottom": 14.1,
+                "top": 16.0,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              },
+              {
+                "id": "central-level-5-window-5",
+                "type": "glazing",
+                "from": 0.8297926484583797,
+                "to": 0.9702073515416203,
+                "bottom": 14.1,
+                "top": 16.0,
+                "columns": 3,
+                "rows": 2,
+                "rowFractions": [
+                  0.72
+                ],
+                "frameWidth": 0.06,
+                "depth": 0.1
+              }
+            ]
+          }
+        }
+      ]
     },
     "relation/12874251": {
       "name": "生命科学与技术学院",

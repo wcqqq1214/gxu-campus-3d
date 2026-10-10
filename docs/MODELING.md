@@ -1,5 +1,7 @@
 # Blender 模型与重建
 
+2026-10-10本批模型：[农学院中央窗列](AGRICULTURE_CENTRAL_WINDOWS.md)复用 `exposedFacadeRules` 的 `above-portico` 区域与显式玻璃面板，接管门廊上方自动窗；两档共享窗位、边框与上亮窗分隔，门廊后沿矮墙保持。仅更新该楼源对象、基础和所属近景区块，同步既有Pages包。
+
 2026-10-10当前集成：[办公北楼接地与整栋复核](OFFICE_NORTH_WHOLE_REVIEW.md)通过首轮。本批只修补基础地形，楼体及道路保持；受测源文件、基础GLB与派生数据同步到正式资产及既有Pages包，未新增全校或前端构建。`repair_foundation_candidate.py`仅在原BVH查询未通过0.1毫米距离门槛时，补原三角面的严格双精度XY包含判断，随后仍执行原材质边界检查；没有放宽容差。
 
 2026-10-10当前林学院模型：[西南角接地修补](FORESTRY_SOUTHWEST_FOUNDATION.md)及[南门接路](FORESTRY_SOUTH_ENTRY_CONNECTION.md)已进入正式源文件与基础GLB；外挑门廊直向接路按实际台阶外缘、全宽及起算标高生成。[整栋复核](FORESTRY_COLLEGE_WHOLE_REVIEW.md)通过首轮，内院保持；未定位屋顶体、背立面及其他入口仍为未知。
