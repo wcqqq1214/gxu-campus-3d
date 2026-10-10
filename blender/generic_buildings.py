@@ -142,6 +142,12 @@ def shared_form(b, z, C):
             top.box(*volume['center'], z+volume['baseHeight']+volume['rise']+cap['height']/2,
                     volume['width']+2*cap['overhang'], volume['depth']+2*cap['overhang'],
                     cap['height'], C['paleRoof'], volume['angle'])
+        if 'glazing' in volume:
+            from roof_volume_glazing import add_roof_volume_glazing
+            add_roof_volume_glazing(top, volume, z, C)
+    if 'roofEdgeFrames' in form:
+        from roof_edge_frames import add_roof_edge_frames
+        add_roof_edge_frames(top, form['roofEdgeFrames'], z, C['white'])
     if 'roofEave' in form:
         add_roof_eave(top, form['roofEave'], z, C['white'])
     if 'roofCrown' in form:

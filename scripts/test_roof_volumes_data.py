@@ -82,5 +82,25 @@ class RoofVolumeTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[neighbor,c])
         self.resolve(b,[c,{**neighbor,'rise':1}])
 
+    def test_glazing_bounds_faces_winding_and_projecting_frames(self):
+        b,c=self.fixture(); c.update(depth=4,rise=6)
+        g=dict(faces={'outer':8,'start':3},sill=3.6,height=2,margin=.35,frameWidth=.1,projection=.12)
+        c['glazing']=g
+        r=self.resolve(b,[c]);self.assertEqual(r,self.resolve(r,[c]))
+        self.assertEqual(r['form']['roofVolumes'][0]['outwardNormal'],[0,-1])
+        b['polygons'][0][0].reverse()
+        rev=self.resolve(b,[{**c,'edge':3,'from':.2,'to':.9}])
+        self.assertEqual(rev['form']['roofVolumes'][0]['outwardNormal'],[0,-1])
+        b,c0=self.fixture();c={**c0,**c}
+        for key,value in [('faces',{}),('faces',{'unknown':2}),('faces',{'outer':True}),
+                          ('faces',{'start':24}),('sill',float('nan')),('sill',4.2),
+                          ('height',0),('projection',True),('margin',2),('frameWidth',.5)]:
+            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
+                self.resolve(b,[{**c,'glazing':{**g,key:value}}])
+        # Solid masses miss one another, but the projecting frame intersects.
+        neighbor={**c0,'id':'neighbor','inset':8.05,'rise':6}
+        with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[c,neighbor])
+        with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[neighbor,c])
+
 
 if __name__=='__main__':unittest.main()
