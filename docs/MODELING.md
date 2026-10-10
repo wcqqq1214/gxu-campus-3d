@@ -1,6 +1,10 @@
 # Blender 模型与重建
 
+> 2026-10-10：本文涉及的过程截图已清理。文字观察和数值检查报告保留；历史报告中的截图路径不再保证可访问。
+
 ## 源文件保存方式
+
+过程截图不再纳入 Git。2026-10-10删除精修阶段截图与模型检查 PNG/JPEG 等栅格截图共1,934张，合计1,122,784,480字节；不另行留档。保留 README 展示图、精修目录外的专题效果图、相机参数及数值检查报告。文档中的对应图片链接改为文字说明，历史 JSON 报告内的截图路径仅作采集记录，不代表图片仍然存在。浏览器检查重新生成的过程截图由 `.gitignore` 排除；已有 Git 历史未重写。
 
 2026-10-10起，`blender/gxu-campus.blend` 仅在本地保存，不再纳入 Git；所有 `.blend` 与自动备份均被忽略。目前尚未提供 Release 下载。网页运行、网页构建和普通测试使用仓库内的 GLB 与数据，无需此源文件；增量建模及源模型校验仍读取上述本地路径，执行前须准备配套源文件。下文的完整构建命令可生成源文件，但不代表已经验证能逐字节复现当前增量精修成果。此次取消跟踪不清理既有 Git 历史。
 
@@ -114,16 +118,16 @@ S2 首批包含 8 条记录；动物学院使用完整覆盖原轮廓的高低�
 
 | 地标 | 主要检查点及依据 | 视角 1 | 视角 2 |
 | --- | --- | --- | --- |
-| 南大门 | 2022 校方、2024 日期水印和 2026 活动照片：三跨石门、四门柱、弧形承托、叠檐、雕花嵌板、顶部小亭及红色立体校名；尺寸估算 | [查看](model-checks/south-gate-1.png) | [查看](model-checks/south-gate-2.png) |
-| 图书馆 | 2026 图文正面及图库侧面：檐架、阶梯体量、入口柱廊；已补北侧门廊与感应门，未见细部估算 | [查看](model-checks/library-1.png) | [查看](model-checks/library-2.png) |
-| 汇学堂 | 2026 图文正面：灰青坡顶、木门、竖向柱廊；入口按用户确认转向东，背面推定 | [查看](model-checks/huixue-1.png) | [查看](model-checks/huixue-2.png) |
-| 大礼堂 | 官方图库现状斜视：三角山花、六柱门廊、侧面窗列、台阶 | [查看](model-checks/auditorium-1.png) | [查看](model-checks/auditorium-2.png) |
-| 综合体育馆 | 2021 官方视频 7 秒/12 秒：浅坡大屋盖、采光构件、百叶、柱墩；辅以 2024 场馆用途 | [查看](model-checks/stadium-1.png) | [查看](model-checks/stadium-2.png) |
-| 大学生活动中心 | 2026 图文：曲线轮廓、白色水平带、深色玻璃；保留 OSM 内院 | [查看](model-checks/student-center-1.png) | [查看](model-checks/student-center-2.png) |
-| 第六教学楼 | 校方入口图：南北门、东西侧门及底层贯通；官方图库：窗框、挑檐、门厅、台阶，尺寸推定 | [查看](model-checks/teaching-six-1.png) | [查看](model-checks/teaching-six-2.png) |
-| 第二教学楼 | OSM 轮廓、7 层标签及 2024 导览位置；立面主要按教学楼类型推定，未取得可确认的近期外观 | [查看](model-checks/teaching-two-1.png) | [查看](model-checks/teaching-two-2.png) |
-| 综合实验大楼 | 校门与实验楼官方图库：双翼与中央上部桥体，底部通孔保持开放；后立面推定 | [查看](model-checks/laboratory-1.png) | [查看](model-checks/laboratory-2.png) |
-| 计算机与电子信息学院 | 官方 PDF 第 1 页：竖向玻璃核心、粉色侧墙、窗列与悬挑平檐；背面及细节推定 | [查看](model-checks/computer-1.png) | [查看](model-checks/computer-2.png) |
+| 南大门 | 2022 校方、2024 日期水印和 2026 活动照片：三跨石门、四门柱、弧形承托、叠檐、雕花嵌板、顶部小亭及红色立体校名；尺寸估算 | 查看 | 查看 |
+| 图书馆 | 2026 图文正面及图库侧面：檐架、阶梯体量、入口柱廊；已补北侧门廊与感应门，未见细部估算 | 查看 | 查看 |
+| 汇学堂 | 2026 图文正面：灰青坡顶、木门、竖向柱廊；入口按用户确认转向东，背面推定 | 查看 | 查看 |
+| 大礼堂 | 官方图库现状斜视：三角山花、六柱门廊、侧面窗列、台阶 | 查看 | 查看 |
+| 综合体育馆 | 2021 官方视频 7 秒/12 秒：浅坡大屋盖、采光构件、百叶、柱墩；辅以 2024 场馆用途 | 查看 | 查看 |
+| 大学生活动中心 | 2026 图文：曲线轮廓、白色水平带、深色玻璃；保留 OSM 内院 | 查看 | 查看 |
+| 第六教学楼 | 校方入口图：南北门、东西侧门及底层贯通；官方图库：窗框、挑檐、门厅、台阶，尺寸推定 | 查看 | 查看 |
+| 第二教学楼 | OSM 轮廓、7 层标签及 2024 导览位置；立面主要按教学楼类型推定，未取得可确认的近期外观 | 查看 | 查看 |
+| 综合实验大楼 | 校门与实验楼官方图库：双翼与中央上部桥体，底部通孔保持开放；后立面推定 | 查看 | 查看 |
+| 计算机与电子信息学院 | 官方 PDF 第 1 页：竖向玻璃核心、粉色侧墙、窗列与悬挑平檐；背面及细节推定 | 查看 | 查看 |
 
 重新生成视角：
 
@@ -183,8 +187,8 @@ blender --background --python-exit-code 1 --python blender/render_checks.py -- s
 
 | 模型 | 南侧视角 | 背侧视角 |
 |---|---|---|
-| 图书馆 | [查看](model-checks/library-1.png) | [查看](model-checks/library-2.png) |
-| 留学生公寓 | [查看](model-checks/international-residence-1.png) | [查看](model-checks/international-residence-2.png) |
+| 图书馆 | 查看 | 查看 |
+| 留学生公寓 | 查看 | 查看 |
 
 ```sh
 blender --background --python-exit-code 1 --python blender/validate_architecture.py
@@ -199,7 +203,7 @@ blender --background --python-exit-code 1 --python blender/render_checks.py -- l
 
 [校方 2026-05-26 采购公告](http://www.lib.gxu.edu.cn/info/5662/12651.htm)明确北楼门洞为 6.60×2.55 米、六片门扇玻璃各 1.00×2.25 米；模型采用这些参数。该公告不证明安装验收已经完成。柱廊及牌匾参考[本馆介绍的北楼照片](http://www.lib.gxu.edu.cn/info/5692/8371.htm)与[官网页头近景](http://www.lib.gxu.edu.cn/__local/F/D1/F7/AD49D5886A41A265D4E96FE19B9_C206CD48_2A731.jpg)，照片拍摄日期未知；柱距、雨棚和台阶等尺寸按照片比例估算，不宣称实测。门扇为静态外观，不模拟开门。
 
-![北入口源模型近景](model-checks/library-north-entry.png)
+北入口源模型近景
 
 ## 新东门、东门、西门
 
@@ -211,9 +215,9 @@ blender --background --python-exit-code 1 --python blender/render_checks.py -- l
 
 | 地标 | 正面检查 | 背面检查 |
 | --- | --- | --- |
-| 新东门（外观推定） | [正面](model-checks/new-east-gate-1.png) | [背面](model-checks/new-east-gate-2.png) |
-| 东门 | [正面](model-checks/east-gate-1.png) | [背面](model-checks/east-gate-2.png) |
-| 西门 | [正面](model-checks/west-gate-1.png) | [背面](model-checks/west-gate-2.png) |
+| 新东门（外观推定） | 正面 | 背面 |
+| 东门 | 正面 | 背面 |
+| 西门 | 正面 | 背面 |
 
 几何验证：`blender --background --python-exit-code 1 --python blender/validate_gates.py`，从各门真实朝向发射射线，检查三拱通道及另外两门中心通道贯通、东门四柱与横梁存在、对象唯一及可编辑分组保留。
 
@@ -247,7 +251,7 @@ blender --background --python-exit-code 1 --python blender/validate_infrastructu
 
 ### 体育馆临路体量修正（2026-09-11）
 
-针对农院路穿模，体育馆按 `way/699156920` 的原凹形轮廓区分南侧主体与较窄北翼，取消在整个外接矩形东侧生成附楼的做法。既有照片用于屋顶和立面节奏，体量定位依据原 OSM 轮廓；没有新增照片或测绘证据。源文件、基础和精细 GLB 均同步，两个检查视角见 [正面](model-checks/stadium-1.png)与[北侧](model-checks/stadium-2.png)。
+针对农院路穿模，体育馆按 `way/699156920` 的原凹形轮廓区分南侧主体与较窄北翼，取消在整个外接矩形东侧生成附楼的做法。既有照片用于屋顶和立面节奏，体量定位依据原 OSM 轮廓；没有新增照片或测绘证据。源文件、基础和精细 GLB 均同步，两个检查视角见 正面与北侧。
 
 ## 时光之门（2026-09-11）
 
@@ -257,7 +261,7 @@ blender --background --python-exit-code 1 --python blender/validate_infrastructu
 
 | 正面检查 | 背面检查（未有完整照片覆盖，推定部分） |
 | --- | --- |
-| ![时光之门正面模型](model-checks/time-gate-front.png) | ![时光之门背面模型](model-checks/time-gate-rear.png) |
+| 时光之门正面模型 | 时光之门背面模型 |
 
 网页提供全貌、正面、背面、俯视、雕塑近景和环绕，索引编号 18；搜索同时识别 OSM 原名“时空之门”和“图书馆北广场”。重建仍使用完整的数据处理及模型构建流程，无需独立下载照片。构建完成后可运行 `blender --background --python-exit-code 1 --python blender/validate_time_gate.py`，检查源文件及两档 GLB 的三足截面和拱下净空。
 
@@ -271,7 +275,7 @@ blender --background --python-exit-code 1 --python blender/validate_infrastructu
 
 | 南侧与东侧 | 北侧与西侧（未见面推定） |
 | --- | --- |
-| ![十教南东侧模型](model-checks/teaching-ten-front.png) | ![十教北西侧模型](model-checks/teaching-ten-rear.png) |
+| 十教南东侧模型 | 十教北西侧模型 |
 
 完整数据准备会自动生成高度分区、避让入口树冠并保持索引顺序。模型构建后可运行：
 
@@ -289,7 +293,7 @@ blender --background --python-exit-code 1 --python blender/validate_teaching_ten
 
 | 南侧与东门 | 北侧与西门 |
 | --- | --- |
-| ![六教南东面](model-checks/teaching-six-1.png) | ![六教北西面](model-checks/teaching-six-2.png) |
+| 六教南东面 | 六教北西面 |
 
 ```sh
 blender --background --python-exit-code 1 --python blender/validate_teaching_six.py

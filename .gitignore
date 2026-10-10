@@ -39,6 +39,15 @@ next-env.d.ts
 
 *.blend
 *.blend[0-9]*
+# Browser checks may regenerate these local-only process screenshots.
+/docs/screenshots/refinement/**/*.png
+/docs/screenshots/refinement/**/*.jpg
+/docs/screenshots/refinement/**/*.jpeg
+/docs/screenshots/refinement/**/*.webp
+/docs/model-checks/**/*.png
+/docs/model-checks/**/*.jpg
+/docs/model-checks/**/*.jpeg
+/docs/model-checks/**/*.webp
 *.tsbuildinfo
 
 __pycache__/
