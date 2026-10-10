@@ -24,7 +24,7 @@ ARCHETYPE_LEVELS = {'dormitory':6,'residential-block':6,'teaching-block':5,
                     'courtyard-lab':5,'low-rise-service':2}
 ARCHETYPES = {'generic', 'dormitory', 'residential-block', 'canteen', 'teaching-block',
               'courtyard-lab', 'low-rise-service', 'external-stair'}
-FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'exposedFacadeRules', 'stairTower', 'roofDome', 'roofEave', 'terracedStairs', 'roofCrown', 'gableScreen', 'roofVolumes'}
+FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'exposedFacadeRules', 'stairTower', 'roofDome', 'roofEave', 'terracedStairs', 'roofCrown', 'gableScreen', 'roofVolumes', 'roofEdgeFrames'}
 
 
 def ordinary(b):
@@ -669,6 +669,9 @@ def resolve_building(building, record=None, source_ids=None):
     if 'roofVolumes' in record:
         from roof_volumes_data import resolve_roof_volumes
         form['roofVolumes'] = resolve_roof_volumes(b, form, record['roofVolumes'])
+    if 'roofEdgeFrames' in record:
+        from roof_edge_frames_data import resolve_roof_edge_frames
+        form['roofEdgeFrames'] = resolve_roof_edge_frames(b, form, record['roofEdgeFrames'])
     if 'entrances' in record:
         if not isinstance(record['entrances'],list):
             raise ValueError('Entrances must be an explicit list')
