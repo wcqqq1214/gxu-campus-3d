@@ -4,10 +4,12 @@ from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(ROOT/'blender'))
+from validation_inputs import baseline_root
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s2-math-center')
 b=next(b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if b['id']=='way/759129515')
-BASELINE=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--baseline-root=')),ROOT/'work/refinement-s2-math-center-before')
+BASELINE=baseline_root(sys.argv)
 def root_name(o):
  while o.parent:o=o.parent
  return o.name

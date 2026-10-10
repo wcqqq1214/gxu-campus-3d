@@ -5,8 +5,9 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from site_geometry import inside
+from validation_inputs import baseline_root
 record=json.loads((ROOT/'public/data/pavings.json').read_text())['pavings'][0]
-previous=ROOT/'work/refinement-s4-shore-complete'
+previous=baseline_root(sys.argv,files=('blender/gxu-campus.blend','public/models/base.glb'))
 REPORT_PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'paving')
 ring=record['vertices'];box=record['bounds'];prefix='paving-'+record['id']
 baseline=json.loads((ROOT/'docs/model-checks/refinement/s4-paving-before-geometry.json').read_text())
