@@ -24,7 +24,9 @@ def derive_front_connection(config,buildings,surface,source_ids):
         entry=next((e for e in b.get('form',{}).get('entrances',[]) if e['id']==config['entranceId']),None)
         recessed=bool(entry and all(k in entry for k in ('porticoId','recess','steps','platformHeight'))
                       and ('stepWidth' in entry or 'porticoWidth' in entry))
-        if not entry or not (recessed or any(k in entry for k in ('stairFlight','flushEntrance'))):raise ValueError('Front connection requires explicit stairs or a flush entrance')
+        attached=entry.get('attachedPortico') if entry else None
+        attached=bool(attached and all(k in attached for k in ('width','depth','steps','tread','stepBaseHeight','platformHeight','footprint')))
+        if not entry or not (recessed or attached or any(k in entry for k in ('stairFlight','flushEntrance'))):raise ValueError('Front connection requires explicit stairs or a flush entrance')
         frame={'origin':entry['center'],'angle':-math.radians(entry['bearing'])}
     if 'flushEntrance' in entry:
         width=config.get('pathWidth')
@@ -41,6 +43,12 @@ def derive_front_connection(config,buildings,surface,source_ids):
             # recessed steps span the resolved portico's full outer edge.
             p={'width':entry.get('stepWidth',entry.get('porticoWidth')),'front':entry['recess']+entry['steps']*.3+.01,
                'baseHeight':entry.get('stepBaseHeight',0)}
+        elif attached:
+            portico=entry['attachedPortico']
+            # add_attached_portico uses tread + .01 m solids centered on
+            # nominal treads: the actual outside face is another .005 m out.
+            p={'width':portico['width'],'front':portico['depth']+portico['steps']*portico['tread']+.005,
+               'baseHeight':portico['stepBaseHeight']}
         else:p=entry['stairFlight']
     if surface is None or surface['id']!=config['surfaceId'] or hashlib.sha256(json.dumps(surface,sort_keys=True,separators=(',',':')).encode()).hexdigest()!=config['surfaceRevision']:
         raise ValueError('Stale front connection surface')
@@ -67,7 +75,7 @@ def derive_front_connection(config,buildings,surface,source_ids):
             for kind in ['attachedPortico','stairFlight']:
                 if kind in e and area.intersection(Polygon(e[kind]['footprint'])).area>1e-5:raise ValueError('Connection overlaps an entrance platform')
     return {**copy.deepcopy(config),**frame,'buildingCenter':b['center'],'entry':copy.deepcopy(entry),
-            **({'halfWidth':half} if terrace or 'flushEntrance' in entry or 'porticoId' in entry else {}),
+            **({'halfWidth':half} if terrace or 'flushEntrance' in entry or 'porticoId' in entry or 'attachedPortico' in entry else {}),
             'startY':start,'stairBaseHeight':p['baseHeight'],'columns':columns,'localPolygon':list(shape.exterior.coords),
             'pavingPolygon':list(area.exterior.coords),'gradingBounds':list(area.bounds),'localMesh':triangulate(shape),
-            'layer':'roads','material':'path' if terrace or 'flushEntrance' in entry or 'porticoId' in entry else 'asphalt'},area,area
+            'layer':'roads','material':'path' if terrace or 'flushEntrance' in entry or 'porticoId' in entry or 'attachedPortico' in entry else 'asphalt'},area,area
