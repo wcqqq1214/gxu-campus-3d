@@ -4,6 +4,7 @@
  */
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
+import { openPanelTab } from './browser-check-helpers.mjs';
 import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 const { chromium } = await import(
@@ -37,13 +38,16 @@ async function settled(page) {
   await page.waitForTimeout(1800);
 }
 async function quality(page, name) {
-  if (await page.getByTitle('返回精选地标', { exact: true }).count())
-    await page.getByTitle('返回精选地标', { exact: true }).click();
-  await page.getByRole('tab', { name: '环境', exact: true }).click();
-  await page.getByRole('radio', { name: new RegExp(`^${name}`) }).click();
-  const back = page.getByRole('button', { name: /返回 图书馆/ });
-  if (await back.count()) await back.click();
-  else await page.getByRole('tab', { name: '探索', exact: true }).click();
+  const inDetail = await page
+    .getByRole('button', { name: '返回地点列表', exact: true })
+    .isVisible();
+  await openPanelTab(page, '光影');
+  const disclosure = page.locator('details.quality-disclosure');
+  if (!(await disclosure.evaluate((element) => element.open)))
+    await disclosure.locator('summary').click();
+  await page.getByRole('radio', { name, exact: true }).click();
+  if (inDetail) await page.locator('.return-landmark').click();
+  else await openPanelTab(page, '地点');
   await settled(page);
 }
 async function main() {
@@ -167,7 +171,9 @@ async function main() {
         const near = await metrics(page);
         if (!near.loadedDetails.some((id) => id.startsWith('chunk-')))
           throw new Error('Near camera did not load ordinary building chunks');
-        await page.getByTitle('返回全景', { exact: true }).click();
+        await page
+          .getByRole('button', { name: '返回校园全景', exact: true })
+          .click();
         await settled(page);
         // Metrics refresh after camera tween and resource reconciliation.
         await page.waitForFunction(
@@ -187,8 +193,8 @@ async function main() {
         if (far.loadedDetails.some((id) => id.startsWith('chunk-')))
           throw new Error('Overview did not unload ordinary building chunks');
         report.lodCycles.push({ repeat, near, far });
-        await page.getByRole('tab', { name: '探索', exact: true }).click();
-        await page.locator('button[data-place-id="library"]').click();
+        await openPanelTab(page, '地点');
+        await page.locator('.place-row[data-place-id="library"]').click();
         await settled(page);
       }
       for (const tier of ['精细', '流畅']) {
@@ -206,9 +212,7 @@ async function main() {
         for (let repeat = 1; repeat <= 3; repeat++) {
           await perf.getByRole('button', { name: '北侧', exact: true }).click();
           await settled(perf);
-          await perf
-            .getByRole('button', { name: '环绕观察', exact: true })
-            .click();
+          await perf.getByRole('button', { name: '环绕', exact: true }).click();
           const samples = [];
           const started = Date.now();
           while (Date.now() - started < 30000) {
