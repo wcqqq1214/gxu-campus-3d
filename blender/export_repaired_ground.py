@@ -72,7 +72,7 @@ def main():
     document,binary=unpack(args.target.read_bytes())
     mesh_nodes_by_name(document)['roads'].setdefault('extras',{}).update(
         positionQuantizationBits=18,sharedPositionQuantizationBounds=True,
-        roadMaterialPositionQuantizationBits=18,roadMaterialTexcoordQuantizationBits=10,
+        roadMaterialPositionQuantizationBits=18,roadMaterialTexcoordQuantizationBits=12,
         otherMaterialTexcoordQuantizationBits=12)
     header=json.dumps(document,separators=(',',':')).encode();header+=b' '*(-len(header)%4)
     args.target.write_bytes(struct.pack('<4sII',b'glTF',2,28+len(header)+len(binary))+

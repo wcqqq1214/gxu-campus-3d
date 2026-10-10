@@ -256,6 +256,10 @@ for foundation in foundations['foundations']:
         base['roads'],report=build_service_road(foundation['groundedServiceRoad'],C,base['terrain'],base['roads'])
         service_road_report.append(report)
 (ROOT/'docs/model-checks/refinement/service-road-build.json').write_text(json.dumps(service_road_report,ensure_ascii=False,indent=2)+'\n')
+from road_landing_contract import load_landings
+from road_landing_geometry import build_landings
+base['roads'],road_landing_report=build_landings(load_landings(ROOT),base['roads'],base['terrain'],C['road'])
+(ROOT/'docs/model-checks/refinement/road-landing-build.json').write_text(json.dumps(road_landing_report,ensure_ascii=False,indent=2)+'\n')
 base['terrain'].ground_uv_bounds=[[v+(-1 if i<2 else 1) for i,v in enumerate(p['bounds'])] for p in pavings['pavings']]+[s['gradingBounds'] for s in sites['sites'] if s.get('type') in ('side-connection','front-connection','terraced-stair-connection','entry-apron','gallery-apron','canopy-connection')]
 base['terrain'].ground_uv_bounds.extend(r['bounds'] for r in foundations['foundations'])
 (ROOT/'docs/model-checks/refinement/shore-build.json').write_text(json.dumps(shore_report,ensure_ascii=False,indent=2)+'\n')
@@ -411,7 +415,7 @@ def export(name,groups):
         if key.startswith('north-campus-'):props['layer']='sports' if key.endswith('sports') else 'roads'
         if key.startswith('vegetation-low-'):props.update(layer='vegetation',plantingId=key.removeprefix('vegetation-low-'))
         if key=='terrain':props.update(positionQuantizationBits=18,texcoordQuantizationBits=18)
-        if key=='roads':props.update(positionQuantizationBits=18,sharedPositionQuantizationBounds=True,roadMaterialPositionQuantizationBits=18,roadMaterialTexcoordQuantizationBits=10,otherMaterialTexcoordQuantizationBits=12)
+        if key=='roads':props.update(positionQuantizationBits=18,sharedPositionQuantizationBounds=True,roadMaterialPositionQuantizationBits=18,roadMaterialTexcoordQuantizationBits=12,otherMaterialTexcoordQuantizationBits=12)
         if key.startswith('site-'):props['siteId']=key[5:]
         o=mesh.object(key,EXPORT,props);o.select_set(True);objs.append(o)
     path=MODELS/name
