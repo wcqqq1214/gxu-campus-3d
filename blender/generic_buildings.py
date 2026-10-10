@@ -84,7 +84,8 @@ def shared_form(b, z, C):
         else:
             roof_material = C['blueRoof'] if roof.get('finish') == 'blue-metal' else C['paleRoof']
             top_indices = [[] for _ in part['polygons']] if 'inset' in roof else triangles
-            part_body.extrude(part['polygons'], top_indices, z-.5, h+.5, part_wall, roof_material)
+            depth = part.get('baseDepth', .5)
+            part_body.extrude(part['polygons'], top_indices, z-depth, h+depth, part_wall, roof_material)
             if 'inset' in roof:
                 for key, material in [('borderGeometry',C['dark']),('centerGeometry',roof_material)]:
                     geometry = roof[key]
