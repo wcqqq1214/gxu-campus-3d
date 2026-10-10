@@ -11,11 +11,11 @@ BASELINE=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswi
 TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)
 SITE_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--site-id=')),'mathematics-north-connection')
 FOUNDATION_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--foundation-id=')),None)
-site=next(s for s in json.loads((ROOT/'public/data/sites.json').read_text())['sites'] if s['id']==SITE_ID)
-grounded=next((p for p in json.loads((ROOT/'public/data/pavings.json').read_text())['pavings'] if p['surfaceId']==site.get('surfaceId') and 'groundedService' in p),None)
+site=next(s for s in json.loads((TARGET/'public/data/sites.json').read_text())['sites'] if s['id']==SITE_ID)
+grounded=next((p for p in json.loads((TARGET/'public/data/pavings.json').read_text())['pavings'] if p['surfaceId']==site.get('surfaceId') and 'groundedService' in p),None)
 front=site.get('type') in ('front-connection','terraced-stair-connection')
-b=next(b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if b['id']==site['buildingId'])
-foundation=next((r for r in json.loads((ROOT/'public/data/foundations.json').read_text())['foundations'] if r['id']==FOUNDATION_ID),None) if FOUNDATION_ID else None
+b=next(b for b in json.loads((TARGET/'public/data/buildings.json').read_text()) if b['id']==site['buildingId'])
+foundation=next((r for r in json.loads((TARGET/'public/data/foundations.json').read_text())['foundations'] if r['id']==FOUNDATION_ID),None) if FOUNDATION_ID else None
 if FOUNDATION_ID and (foundation is None or foundation['buildingId']!=b['id']):
     raise ValueError('Connection foundation must exist and belong to the same building')
 angle=site['angle'];cs,sn=math.cos(angle),math.sin(angle);ox,oy=site['origin']
@@ -96,12 +96,15 @@ def check(label):
             expected=(stairs['intermediateHeight']-stairs['baseHeight'])/stairs['lowerRisers']
         elif 'porticoId' in site['entry']:
             expected=(site['entry']['platformHeight']-site['stairBaseHeight'])/site['entry']['steps']
+        elif front and 'attachedPortico' in site['entry']:
+            stairs=site['entry']['attachedPortico']
+            expected=(stairs['platformHeight']-stairs['stepBaseHeight'])/stairs['steps']
         else:expected=(site['entry']['landingHeight']-site['stairBaseHeight'])/site['entry']['stairFlight']['riserCount'] if front else .12
         rises.append(tread-paved)
         assert (abs(tread-paved-expected)<.03 if front else .085<tread-paved<.15),('stair join height',x,tread-paved)
     joins=[];max_jump=0;gap_bounds=[];max_jump_at=None
     grades=[]
-    if 'porticoId' in site['entry']:
+    if 'porticoId' in site['entry'] or (front and 'attachedPortico' in site['entry']):
         # Include the narrow end missed by the half-metre area sampling grid.
         # Measure the actual surface across the full stair width; these are
         # model grades, not evidence of accessibility compliance.

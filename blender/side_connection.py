@@ -79,7 +79,7 @@ def build_side_connection(site,C,elevation,terrain,roads):
     # The new flush entrance uses a shallow buried overlap so such a crack
     # cannot expose the 12 cm terrain-clearance drop as a false road step.
     # This rendering overlap is independent of the clearance under the paving.
-    overlap_drop=.012 if any(k in site['entry'] for k in ('flushEntrance','terracedStairs','porticoId')) else site['groundClearance']
+    overlap_drop=.012 if any(k in site['entry'] for k in ('flushEntrance','terracedStairs','porticoId')) or (front and 'attachedPortico' in site['entry']) else site['groundClearance']
     roads,contact=contact_road(roads,road_triangles,contact_outline(0),outer,site['joinOverlap'],overlap_drop)
     # Clipping introduces vertices on retained long road edges. Split their
     # incident triangles too, or campus-wide Draco quantization opens cracks
