@@ -495,6 +495,14 @@ export function createScene(
       // explicit shared camera instead of fitting each asset set differently.
       if (benchmarkOrbit) {
         tween = null;
+        // Compare the same orbit directions across reloads. Otherwise the
+        // page's existing 1.5 s metrics timer gives each run a different phase.
+        const startedAt = performance.now();
+        sampleStart = startedAt;
+        lastFrame = startedAt;
+        lastRendered = 0;
+        activeFrameMs = 0;
+        activeFrames = 0;
         return;
       }
       // A sphere fits through a complete rotation, including the wider sides.
