@@ -39,15 +39,26 @@ next-env.d.ts
 
 *.blend
 *.blend[0-9]*
-# Browser checks may regenerate these local-only process screenshots.
-/docs/screenshots/refinement/**/*.png
-/docs/screenshots/refinement/**/*.jpg
-/docs/screenshots/refinement/**/*.jpeg
-/docs/screenshots/refinement/**/*.webp
-/docs/model-checks/**/*.png
-/docs/model-checks/**/*.jpg
-/docs/model-checks/**/*.jpeg
-/docs/model-checks/**/*.webp
+# Development reports, acceptance records and screenshots stay local.
+# Only maintained project documentation, README images and validation inputs are tracked.
+/docs/*
+!/docs/DATA.md
+!/docs/DESIGN.md
+!/docs/MODELING.md
+!/docs/screenshots/
+/docs/screenshots/*
+!/docs/screenshots/readme/
+/docs/screenshots/readme/*
+!/docs/screenshots/readme/*.jpg
+!/docs/model-checks/
+/docs/model-checks/*
+!/docs/model-checks/north-road-baseline.json.gz
+!/docs/model-checks/refinement/
+/docs/model-checks/refinement/*
+!/docs/model-checks/refinement/footprint-baseline.json
+!/docs/model-checks/refinement/s4-paving-before-geometry.json
+!/docs/model-checks/refinement/s4-shore-before-ground.json
+!/docs/model-checks/refinement/s2-office-entry-evidence.json
 *.tsbuildinfo
 
 __pycache__/
