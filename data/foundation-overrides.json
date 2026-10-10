@@ -96,6 +96,25 @@
         "weldDistance": 0.0001
       },
       "evidence": "模型修复：电气学院源/基础各81个采样地形侵入，最高约2.32米。保持原DEM、采用楼底、道路及邻楼，仅削低闭合楼体及3米过渡内高于楼底的地形；范围与坡度为模型估算，不代表现场土方。"
+    },
+    {
+      "id": "office-north-foundation",
+      "buildingId": "way/671978896",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "repairBounds": [
+        -262,
+        -644,
+        -247,
+        -611
+      ],
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "模型修复：办公北楼中央北端及西侧翼背面地形进入封闭楼体，原源/基础各483点检查检出15/17处超过0.3米容差，最高约0.33米。保留原楼底、DEM、入口铺地和道路；15×33米截取范围及3米过渡为局部模型修补参数，并非实测土方。修复后仍检查完整楼栋。"
     }
   ]
 }
