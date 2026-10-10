@@ -1,5 +1,7 @@
 # Blender 模型与重建
 
+2026-10-10当前集成：[办公北楼接地与整栋复核](OFFICE_NORTH_WHOLE_REVIEW.md)通过首轮。本批只修补基础地形，楼体及道路保持；受测源文件、基础GLB与派生数据同步到正式资产及既有Pages包，未新增全校或前端构建。`repair_foundation_candidate.py`仅在原BVH查询未通过0.1毫米距离门槛时，补原三角面的严格双精度XY包含判断，随后仍执行原材质边界检查；没有放宽容差。
+
 2026-10-10当前林学院模型：[西南角接地修补](FORESTRY_SOUTHWEST_FOUNDATION.md)及[南门接路](FORESTRY_SOUTH_ENTRY_CONNECTION.md)已进入正式源文件与基础GLB；外挑门廊直向接路按实际台阶外缘、全宽及起算标高生成。[整栋复核](FORESTRY_COLLEGE_WHOLE_REVIEW.md)通过首轮，内院保持；未定位屋顶体、背立面及其他入口仍为未知。
 
 2026-10-05：新增[北校园基础布局](NORTH_CAMPUS_LAYOUT.md)，依据公开校园图及 2024 年影像人工补绘 11 个建筑与连廊体块，补充小田径场、步道及校界显示。随后完成[照片约束精修](NORTH_CAMPUS_REFINEMENT.md)：图书馆门厅及台阶、体育馆拱顶、教学楼门洞与开放连廊。高度、未见面和运动场细节仍为估算；Blender 源文件及两档网页模型已同步。
