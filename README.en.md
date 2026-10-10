@@ -96,6 +96,6 @@ The following documents are in Chinese:
 
 ## Licensing
 
-Code is licensed under [MIT](LICENSE). Original models and materials are licensed under [CC BY 4.0](licenses/MODELS.md). The geographic database and its derivative data are licensed under ODbL, with attribution to **© OpenStreetMap contributors**. See the [third-party notices](licenses/THIRD_PARTY.md) for other data and font licenses.
+Original project code, documentation, models, materials, and renders are licensed under [MIT](LICENSE). OpenStreetMap geographic databases and derivative databases are licensed under ODbL, with attribution to **© OpenStreetMap contributors**. Other third-party resources retain their respective licenses; see the [third-party notices](licenses/THIRD_PARTY.md).
 
 Official photographs and videos are used only as modeling references. They are not distributed as website textures or repository images.
