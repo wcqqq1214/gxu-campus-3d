@@ -30,6 +30,24 @@ def source_mesh(obj):
     return result
 
 
+def containing_xy_triangle(points, triangles, center):
+    """Double-precision containment for thin triangles missed by the BVH."""
+    x, y = center[:2]
+    for index, ids in enumerate(triangles):
+        a, b, c = (points[i] for i in ids)
+        if not (min(a[0], b[0], c[0]) <= x <= max(a[0], b[0], c[0])
+                and min(a[1], b[1], c[1]) <= y <= max(a[1], b[1], c[1])):
+            continue
+        area = (b[0]-a[0])*(c[1]-a[1]) - (b[1]-a[1])*(c[0]-a[0])
+        if area == 0:
+            continue
+        sides = [(q[0]-p[0])*(y-p[1]) - (q[1]-p[1])*(x-p[0])
+                 for p, q in ((a, b), (b, c), (c, a))]
+        if min(sides) >= 0 or max(sides) <= 0:
+            return index
+    return None
+
+
 def replace_terrain(obj, result):
     old = obj.data
     if len(old.uv_layers) != 1:
@@ -41,6 +59,7 @@ def replace_terrain(obj, result):
     flat = [Vector((v.co.x, v.co.y, 0)) for v in old.vertices]
     triangles = list(old.loop_triangles)
     tree = BVHTree.FromPolygons(flat, [tuple(t.vertices) for t in triangles], all_triangles=True)
+    precise_xy = None
     mesh = bpy.data.meshes.new(old.name + '-foundation-repair')
     mesh.from_pydata(result.v, [], result.f)
     new_keys = {(tuple(tuple(mesh.vertices[i].co) for i in p.vertices), material)
@@ -56,7 +75,7 @@ def replace_terrain(obj, result):
     for material in old.materials:
         mesh.materials.append(material)
     uv = mesh.uv_layers.new(name=old.uv_layers.active.name)
-    unchanged = projected = 0
+    unchanged = projected = precise_fallbacks = 0
     for face, material in zip(mesh.polygons, result.m):
         face.material_index = material
         points = [mesh.vertices[i].co for i in face.vertices]
@@ -68,7 +87,16 @@ def replace_terrain(obj, result):
             center = sum((Vector((p.x, p.y, 0)) for p in points), Vector()) / len(points)
             _, _, index, distance = tree.find_nearest(center)
             if index is None or distance > .0001:
-                raise ValueError('Repaired terrain escaped the original XY surface')
+                # A millimetre-wide end on a metre-long triangle can make the
+                # float BVH return an edge distance for an interior point.
+                # Require actual containment; do not enlarge the distance gate.
+                if precise_xy is None:
+                    precise_xy = [tuple(v.co[:2]) for v in old.vertices]
+                index = containing_xy_triangle(precise_xy,
+                                               (t.vertices for t in triangles), center)
+                if index is None:
+                    raise ValueError('Repaired terrain escaped the original XY surface')
+                precise_fallbacks += 1
             tri = triangles[index]
             if tri.material_index != material:
                 raise ValueError('Repair crossed an original terrain material boundary')
@@ -78,7 +106,8 @@ def replace_terrain(obj, result):
         for k, value in zip(face.loop_indices, values):
             uv.data[k].uv = value
     obj.data = mesh
-    return {'unchangedFacesWithExactUVs': unchanged, 'projectedFaces': projected}
+    return {'unchangedFacesWithExactUVs': unchanged, 'projectedFaces': projected,
+            'preciseContainmentFallbackFaces': precise_fallbacks}
 
 
 def main():
