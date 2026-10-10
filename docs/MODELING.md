@@ -98,6 +98,8 @@ npm run models:build
 
 各入口的修改范围不同，调用前先阅读参数和脚本说明。先修改输入，在独立候选中验证，通过后才替换正式资产；保留仍用于对比的基准。网页只按实际发布的 GLB 验收，不能用截图代替几何、净空和性能检查。
 
+已完成的一次性工具退出版本跟踪，本地副本与历史记录保留。`preview_civil_platform_west.py` 的西墙候选已集成到正式参数，不能再以当前模型作为修改前输入；`update_chongzuo_bridge.py` 的题名牌移除也已完成，不再用于日常更新。这两份原脚本可从提交 `b6215ab` 的 `blender/` 目录追溯；复现时需使用对应历史输入及独立输出，不能直接重跑到当前生产资产。
+
 ## 校验与基准
 
 ```sh
@@ -121,6 +123,14 @@ blender --background --python-exit-code 1 --python blender/validate_civil_whole.
 缺失基准时命令会停止并列出缺少的文件。不能用当前模型冒充修改前版本；旧 `.blend` 已删除的历史比较无法直接复跑，须有可靠基准后再做结论。校验不会因基准缺失而自动跳过。
 
 浏览器检查脚本保留为可复用工具，使用 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`REFINEMENT_URL` 等显式输入；前后截图工具还需相机列表与基准资源目录。输出只在本地保存。性能比较应使用同一视口、相机、前端和画质，区分资源加载、静止帧率及持续活动帧率。
+
+`check-site-browser.mjs`、`check-paving-browser.mjs`、`check-shore-browser.mjs` 共用 `browser-check-helpers.mjs` 的面板导航、截图及报告流程，各自保留场地断言。可用 `REFINEMENT_CAMERAS` 指定相机列表；三个入口分别要求 `library-side`、`6b-paving-road-join`、`jinghu-auditorium-bank` 相机。省略时沿用本地历史相机文件，这些文件不随仓库发布，缺失时必须提供实际保留的输入。例如：
+
+```sh
+REFINEMENT_URL=http://127.0.0.1:4300/gxu-campus-3d/ REFINEMENT_CAMERAS=/path/to/paving-cameras.json node scripts/check-paving-browser.mjs paving-review
+```
+
+阶段名须唯一，已有报告不会被覆盖。当前前端检查使用“地点／图层／光影”和“返回地点列表”，画质检查会展开画质选项并返回原详情；`check-sports-batching-browser.mjs` 仅在修改前版本一侧兼容旧“探索”标签和“林木植被”开关，仍保留新旧前端对比能力。
 
 界面与相机回归需要正在运行的 `npm run dev`，分别覆盖桌面和手机视口。使用开发服务器实际地址运行：
 

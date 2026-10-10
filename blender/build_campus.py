@@ -111,7 +111,7 @@ for site in sites['sites']:
 bridge_by_id={b['id']:b for b in infrastructure['bridges']}
 for join in campus_roads.get('bridgeJoins',[]):bridge_by_id[join['bridgeId']]['joinTrim']=join['trim']
 lake_by_id={b['id']:b for b in infrastructure['lakeBridges']}
-for name,color,rough,metal in [('asphalt','#626664',.97,0),('pavingRed','#b97865',.93,0),('tactile','#d6b663',.95,0),('curb','#c7c9bd',.86,0),('roadWhite','#f0ecda',.92,0),('roadYellow','#e5c266',.92,0),('wallStone','#d6c8aa',.9,0),('fenceIron','#343e3d',.63,.4),('lampMetal','#929f9e',.48,.5),('lampGlass','#e7e8cf',.25,.15),('bridgeConcrete','#afb2a6',.91,0),('bridgeEdge','#c7c9bd',.86,0),('bridgeJoint','#525b59',.95,0),('bridgePlaque','#665d4f',.82,0),('drainStone','#bfc0b3',.94,0)]:
+for name,color,rough,metal in [('asphalt','#626664',.97,0),('pavingRed','#b97865',.93,0),('tactile','#d6b663',.95,0),('curb','#c7c9bd',.86,0),('roadWhite','#f0ecda',.92,0),('roadYellow','#e5c266',.92,0),('wallStone','#d6c8aa',.9,0),('fenceIron','#343e3d',.63,.4),('lampMetal','#929f9e',.48,.5),('lampGlass','#e7e8cf',.25,.15),('bridgeConcrete','#afb2a6',.91,0),('bridgeEdge','#c7c9bd',.86,0),('bridgeJoint','#525b59',.95,0),('drainStone','#bfc0b3',.94,0)]:
     C[name]=material(name,rgb(color),rough,metal)
 for name,color in [('track','#ba563f'),('trackAlt','#b7543e'),('trackApron','#a9513e'),('fieldGreen','#3d8650'),('fieldStripe','#458f57'),('sportWhite','#f5f3e7'),('goalNet','#c1cabb'),('seatYellow','#c9d92f'),('seatGreen','#6dbe33'),('seatBlue','#5cbdca')]:
     C[name]=material(name,rgb(color),.92,0)

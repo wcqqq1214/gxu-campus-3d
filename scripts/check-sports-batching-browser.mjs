@@ -1,6 +1,7 @@
 // Compare saved pre-change and current production builds, including layer switches.
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { openPanelTab, setLayerEnabled } from './browser-check-helpers.mjs';
 import assert from 'node:assert/strict';
 const { chromium } = await import(
   process.env.PLAYWRIGHT_MODULE || 'playwright'
@@ -127,14 +128,12 @@ try {
       );
       await settle();
       await page.getByRole('tab', { name: '图层', exact: true }).click();
-      for (const name of ['林木植被', '地点名称']) {
-        const control = page.getByRole('switch', {
-          name: new RegExp(`^${name}`),
+      for (const name of ['树木', '地点名称']) {
+        await setLayerEnabled(page, name, false, {
+          legacy: variant === 'before',
         });
-        if ((await control.getAttribute('aria-checked')) === 'true')
-          await control.click();
       }
-      await page.getByRole('tab', { name: '探索', exact: true }).click();
+      await openPanelTab(page, '地点', { legacy: variant === 'before' });
       await settle();
       const folder = `docs/screenshots/refinement/${phase}/${variant}`;
       await fs.mkdir(folder, { recursive: true });
