@@ -1,6 +1,10 @@
 <h1 align="center">广西大学 校园地图</h1>
 
 <p align="center">
+  <strong>简体中文</strong> · <a href="README.en.md">English</a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Three.js-000000?style=flat&amp;logo=threedotjs&amp;logoColor=white" alt="Three.js">
   <img src="https://img.shields.io/badge/Blender-E87D0D?style=flat&amp;logo=blender&amp;logoColor=white" alt="Blender">
   <img src="https://img.shields.io/badge/React-20232A?style=flat&amp;logo=react&amp;logoColor=61DAFB" alt="React">
@@ -13,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="https://wcqqq1214.github.io/gxu-campus-3d/">在线游览</a> · <a href="docs/DATA.md">数据来源</a> · <a href="docs/MODELING.md">建模说明</a>
+  <a href="https://wcqqq1214.github.io/gxu-campus-3d/">在线游览</a>
 </p>
 
 ![校园全景与按类别分组的地点列表](docs/screenshots/readme/overview.jpg)
