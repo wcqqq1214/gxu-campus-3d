@@ -1,4 +1,5 @@
-// Verify static-road batching against actual Draco-decoded base geometry and recorded camera poses.
+// Replay the historical contact-only -> static-road batching comparison.
+// The preserved baseline stage is not the current browser loading pipeline.
 // Usage: node --experimental-strip-types scripts/check-static-road-batching.mjs MODEL.glb REPORT.json
 import { createPrimitiveDecoder } from './draco-geometry.mjs';
 import fs from 'node:fs';
@@ -15,10 +16,8 @@ const bin = raw.subarray(28 + length);
 const decode = await createPrimitiveDecoder(doc, bin);
 
 import { batchSportsSurfaces } from '../lib/campus/sports-batching.ts';
-import {
-  batchPlatformRoadContacts,
-  batchStaticRoadSurfaces,
-} from '../lib/campus/road-batching.ts';
+import { batchPlatformRoadContacts } from './fixtures/legacy-road-batching.ts';
+import { batchStaticRoadSurfaces } from '../lib/campus/road-batching.ts';
 const textures = new Map();
 const materials = doc.materials.map((source) => {
   const pbr = source.pbrMetallicRoughness;

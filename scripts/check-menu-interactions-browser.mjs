@@ -30,25 +30,22 @@ try {
       results.push(`${width}: ${name}`);
       console.log(`PASS ${results.at(-1)}`);
     };
-    const expandDetails = async () => {
-      if (width < 760)
-        await page
-          .getByRole('button', { name: '更多视角', exact: true })
-          .click();
-    };
     const chooseGate = () =>
       page.locator('.place-row[data-place-id="south-gate"]').click();
     const back = () =>
       page.getByRole('button', { name: '返回地点列表', exact: true }).click();
     const search = page.getByRole('searchbox', { name: '搜索校园地点' });
     await chooseGate();
-    await expandDetails();
+    assert.equal(
+      await page.getByRole('group', { name: '地点观察视角' }).isVisible(),
+      true,
+      'Landmark views must be available in the compact detail panel',
+    );
     await page.getByRole('button', { name: '环绕', exact: true }).click();
     await back();
     await page
       .getByRole('button', { name: '返回 南大门', exact: true })
       .click();
-    await expandDetails();
     assert.equal(
       await page.getByRole('button', { name: '暂停环绕', exact: true }).count(),
       0,
@@ -90,10 +87,7 @@ try {
       await page.locator('.place-row').getAttribute('data-place-id'),
       'teaching-six',
     );
-    await page.getByRole('button', { name: '校门', exact: true }).click();
-    assert.equal(await page.locator('.place-row').count(), 0);
-    await page.locator('.search-reset').click();
-    assert.equal(await search.inputValue(), '六教');
+    assert.equal(await page.locator('.place-group h3').count(), 0);
     await page.locator('.place-row').click();
     await back();
     assert.equal(await search.inputValue(), '六教');
@@ -108,7 +102,24 @@ try {
       await search.evaluate((el) => document.activeElement === el),
       true,
     );
-    passed('别名搜索、跨分类恢复、返回列表和清除搜索');
+    assert.deepEqual(
+      await page
+        .locator('.place-group')
+        .evaluateAll((groups) =>
+          groups.map((group) => group.getAttribute('aria-label')),
+        ),
+      ['教学', '文体', '校门', '路桥', '生活'],
+    );
+    await search.fill('不存在的校园地点');
+    assert.equal(await page.locator('.place-row').count(), 0);
+    await page.getByRole('button', { name: '清空搜索', exact: true }).click();
+    assert.equal(await search.inputValue(), '');
+    assert.equal(await page.locator('.place-row').count(), 20);
+    assert.equal(
+      await search.evaluate((el) => document.activeElement === el),
+      true,
+    );
+    passed('别名搜索平铺、分类分组恢复、返回焦点和空结果重置');
     await page.getByRole('tab', { name: '光影', exact: true }).click();
     await page.getByRole('button', { name: '夜景', exact: true }).click();
     await page.getByRole('tab', { name: '图层', exact: true }).click();
@@ -127,9 +138,18 @@ try {
     assert.equal(await labels.getAttribute('aria-checked'), 'false');
     await labels.click();
     passed('切换菜单保留光照和图层状态');
-    if (width < 760) await page.getByTitle('更多工具', { exact: true }).click();
+    if (width < 760) {
+      await page.getByRole('button', { name: '更多工具', exact: true }).click();
+      await page
+        .getByRole('dialog')
+        .getByRole('button', { name: '分享', exact: true })
+        .click();
+    } else {
+      await page.getByRole('button', { name: '分享', exact: true }).click();
+    }
     await page
-      .getByRole('button', { name: '分享当前视角', exact: true })
+      .getByRole('dialog', { name: '分享校园', exact: true })
+      .getByRole('button', { name: '复制视角链接', exact: true })
       .click();
     const share = page.getByRole('dialog', { name: '分享这个校园视角' });
     await share.waitFor();

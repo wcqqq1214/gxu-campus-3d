@@ -42,11 +42,32 @@ try {
         source =
           source.slice(0, source.indexOf('export function createScene')) +
           baselineSource;
-      const marker = /return\s*\{\s*focus,\s*landmarkView,/;
-      assert.match(
+      const sceneModule = ts.createSourceFile(
+        'scene.js',
         source,
-        marker,
-        'Dev scene module must expose its controller',
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.JS,
+      );
+      const createScene = sceneModule.statements.find(
+        (statement) =>
+          ts.isFunctionDeclaration(statement) &&
+          statement.name?.text === 'createScene',
+      );
+      const controllerReturn = createScene?.body?.statements.find(
+        (statement) =>
+          ts.isReturnStatement(statement) &&
+          statement.expression &&
+          ts.isObjectLiteralExpression(statement.expression) &&
+          ['focus', 'landmarkView', 'getSnapshot'].every((name) =>
+            statement.expression.properties.some(
+              (property) => property.name?.getText(sceneModule) === name,
+            ),
+          ),
+      );
+      assert.ok(
+        controllerReturn,
+        'Dev createScene must return its scene controller',
       );
       const probe = `globalThis.__panelCameraProbe = () => ({
         position: camera.position.toArray(), target: controls.target.toArray(),
@@ -56,7 +77,10 @@ try {
       });\n`;
       await route.fulfill({
         response,
-        body: source.replace(marker, (text) => probe + text),
+        body:
+          source.slice(0, controllerReturn.getStart(sceneModule)) +
+          probe +
+          source.slice(controllerReturn.getStart(sceneModule)),
       });
     });
     await page.goto(
@@ -122,9 +146,19 @@ try {
     await toggleCycle('地标自动取景保持相机与投影');
     if (viewport.width < 760) {
       const before = await snapshot();
-      await page.getByRole('button', { name: '更多视角', exact: true }).click();
-      await page.waitForTimeout(650);
-      unchanged(before, await snapshot(), '展开手机详情');
+      const views = page.getByRole('group', { name: '地点观察视角' });
+      const controls = await views.getByRole('button').allTextContents();
+      for (const name of ['详情', '简要']) {
+        await page.getByRole('button', { name, exact: true }).click();
+        await page.waitForTimeout(650);
+        unchanged(before, await snapshot(), `手机详情切换为${name}`);
+        assert.deepEqual(
+          await views.getByRole('button').allTextContents(),
+          controls,
+        );
+      }
+      results.push('390: 简要与详情共用视角控件且保持构图');
+      console.log(`PASS ${results.at(-1)}`);
     }
     const beforeView = await snapshot();
     await page.getByRole('button', { name: '俯视', exact: true }).click();

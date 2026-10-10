@@ -162,14 +162,8 @@ a svg {
   margin: 14px 0 8px;
   letter-spacing: 1px;
 }
-.intro {
-  font-size: 14px;
-  color: #6b7d73;
-  margin: 0 0 20px;
-}
 .panel-tabs {
   display: flex;
-  gap: 8px;
   border-bottom: 1px solid var(--border);
   padding-bottom: 14px;
 }
@@ -194,8 +188,6 @@ a svg {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 0;
-  border-bottom: 1px solid #e8eee8;
   font-size: 14px;
 }
 .place-row strong {
@@ -204,9 +196,6 @@ a svg {
 }
 .place-index {
   font-family: var(--font-body);
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  color: #8a9d90;
 }
 .place-row svg {
   color: #93a496;
@@ -277,7 +266,6 @@ a svg {
   border-radius: 9px;
   box-shadow: none !important;
   gap: 6px;
-  color: #728575;
 }
 .panel-tabs [data-active] {
   background: #e3ede5 !important;
@@ -317,7 +305,6 @@ a svg {
 }
 .search-wrap > button {
   position: absolute;
-  right: 9px;
   background: none;
   border: 0;
   color: #7b8e7e;
@@ -325,30 +312,22 @@ a svg {
 .result-heading {
   display: flex;
   justify-content: space-between;
-  color: #94a095;
   font-size: 12px;
   margin: 10px 0 1px;
-  letter-spacing: 0.5px;
 }
 .places {
   min-height: 0;
   max-height: calc(100dvh - 450px);
 }
 .place-row {
-  width: 100%;
   border: 0;
   border-bottom: 1px solid #e8eee8;
   background: none;
   text-align: left;
-  padding: 9px 5px;
   transition: background 0.2s;
 }
 .place-row:hover {
   background: #edf3ed;
-}
-.place-row.selected {
-  background: #e5efe6;
-  border-radius: 10px;
 }
 .place-copy {
   flex: 1;
@@ -356,7 +335,6 @@ a svg {
 }
 .place-copy strong {
   display: block;
-  font-size: 14px;
   line-height: 1.5;
 }
 .place-row.selected .place-index,
@@ -389,7 +367,6 @@ a svg {
 .section-hint {
   font-size: 13px;
   color: #82907f;
-  margin: 18px 0;
 }
 .layer-row {
   display: flex;
@@ -424,36 +401,22 @@ a svg {
 }
 .preset-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
 }
 .preset-grid button {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  align-items: center;
   border: 1px solid #e0e7dd;
-  background: #f3f6f0;
-  padding: 18px 12px;
   border-radius: 10px;
   font-size: 14px;
-  color: #7d8d7a;
 }
 .preset-grid button.active {
   color: var(--primary);
-  border-color: #67977c;
-  background: #e6eee4;
 }
 .preset-grid button > svg:last-child:not(:first-child) {
   position: absolute;
   right: 8px;
   top: 8px;
-}
-.settings-title {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 25px 0 16px;
 }
 .quality-options {
   gap: 0 !important;
@@ -533,7 +496,6 @@ a svg {
   gap: 6px;
   align-items: center;
   padding: 5px 9px 5px 5px;
-  background: #fcfdfbde;
   color: #345141;
   font-size: 12px;
   border: 1px solid #ffffffce;
@@ -556,10 +518,6 @@ a svg {
   background: var(--primary);
   color: #fff;
 }
-.map-label.active > span {
-  background: #d4b475;
-  color: #223e2e;
-}
 .tour-bar {
   position: absolute;
   bottom: 48px;
@@ -576,15 +534,6 @@ a svg {
   box-shadow: 0 12px 40px #213d251a;
   backdrop-filter: blur(18px);
   white-space: nowrap;
-}
-.tour-symbol {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #e8f0e4;
-  display: grid;
-  place-items: center;
-  color: #598567;
 }
 .tour-copy strong {
   font-size: 14px;
@@ -629,13 +578,11 @@ a svg {
 .map-footer {
   position: absolute;
   bottom: 15px;
-  left: 28px;
   right: 28px;
   display: flex;
   justify-content: space-between;
   z-index: 3;
   color: #3b5749;
-  font-size: 11px;
   pointer-events: none;
   text-shadow: 0 1px 6px #fff;
 }
@@ -826,9 +773,6 @@ a svg {
   font-size: 13px;
   color: var(--primary);
 }
-.mobile-handle {
-  display: none;
-}
 .debug-metrics {
   position: absolute;
   right: 20px;
@@ -881,9 +825,6 @@ a svg {
     left: calc(50% + 90px);
     padding: 12px;
   }
-  .tour-symbol {
-    display: none;
-  }
   .tour-start {
     margin-left: 5px;
   }
@@ -903,7 +844,6 @@ a svg {
   .masthead h1 span {
     font-size: 15px;
     margin-left: 10px;
-    letter-spacing: 1.5px;
   }
   .brand-mark {
     width: 44px;
@@ -929,32 +869,6 @@ a svg {
     padding: 0 20px 0;
     z-index: 12;
     background: #fcfdfbf8;
-  }
-  .mobile-handle {
-    height: 35px;
-    border: 0;
-    background: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #83917d;
-    font-size: 11px;
-    gap: 6px;
-    flex-shrink: 0;
-  }
-  .mobile-handle > span {
-    position: absolute;
-    width: 34px;
-    height: 3px;
-    background: #cbd6c7;
-    border-radius: 3px;
-    top: 7px;
-  }
-  .mobile-handle > svg {
-    display: none;
-  }
-  .panel-heading {
-    display: none;
   }
   .panel-tabs {
     padding-bottom: 8px !important;
@@ -989,8 +903,6 @@ a svg {
   }
   .map-tools {
     right: 14px;
-    top: 96px;
-    gap: 10px;
   }
   .map-tools button {
     width: 40px;
@@ -1000,12 +912,10 @@ a svg {
     height: 53px !important;
   }
   .map-label {
-    font-size: 10px;
     padding: 4px 6px 4px 4px;
     gap: 4px;
   }
   .map-label > span {
-    font-size: 9px;
     padding: 2px 3px;
   }
   .tour-bar {
@@ -1040,10 +950,6 @@ a svg {
     margin-left: 0;
   }
   .map-footer {
-    bottom: calc(48dvh + 81px);
-    left: 16px;
-    right: 16px;
-    font-size: 9px;
     justify-content: flex-end;
   }
   .campus-app:has(.explorer.collapsed) .map-footer {
@@ -1103,9 +1009,6 @@ a svg {
   .quality-options > label {
     padding: 8px 0;
   }
-  .settings-title {
-    margin-top: 18px;
-  }
   .about-dialog {
     padding: 24px !important;
     max-width: calc(100vw - 28px) !important;
@@ -1121,9 +1024,6 @@ a svg {
   .explorer {
     top: 98px;
     max-height: calc(100dvh - 125px);
-  }
-  .panel-heading {
-    display: none;
   }
   .places {
     max-height: calc(100dvh - 300px);
@@ -1168,7 +1068,6 @@ a svg {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  padding: 3px 12px;
 }
 .dock-toggle,
 .dock-back {
@@ -1198,7 +1097,6 @@ a svg {
   color: #566d5f;
 }
 .dock-back {
-  width: 44px;
   justify-content: center;
 }
 .panel-dock.collapsed {
@@ -1232,9 +1130,6 @@ a svg {
   backdrop-filter: none;
   overflow: visible;
 }
-.panel-dock .panel-heading {
-  display: none;
-}
 .panel-dock .places {
   max-height: none;
   overflow: visible;
@@ -1250,14 +1145,12 @@ a svg {
   font-size: 12px;
 }
 .panel-dock .tour-bar {
-  position: static;
   transform: none;
   width: auto;
   flex-shrink: 0;
   flex-wrap: wrap;
   gap: 6px;
   padding: 12px 18px;
-  background: #f0f0e8;
   border: 0;
   border-top: 1px solid #dfe8da;
   border-radius: 0;
@@ -1358,7 +1251,6 @@ a svg {
 .map-footer {
   left: var(--scene-left, 368px);
   font-size: 12px;
-  gap: 12px;
 }
 .map-tools button {
   min-width: 44px;
@@ -1382,9 +1274,6 @@ a svg {
   }
   .panel-dock.collapsed {
     max-height: none;
-  }
-  .dock-heading {
-    padding: 3px 16px;
   }
   .panel-dock .tour-bar {
     display: grid;
@@ -1425,8 +1314,6 @@ a svg {
   .map-tools {
     top: 94px;
     gap: 8px;
-    max-height: calc(100dvh - var(--dock-height, 48dvh) - 126px);
-    overflow: auto;
     scrollbar-width: none;
   }
   .map-tools > * {
@@ -1434,9 +1321,7 @@ a svg {
   }
   .map-footer {
     left: 12px;
-    right: 12px;
     bottom: calc(var(--dock-height, 48dvh) + 9px);
-    font-size: 10px;
   }
   .map-label {
     font-size: 12px;
@@ -1637,10 +1522,6 @@ output.empty-state {
   .dock-heading {
     padding: 3px 12px;
   }
-  .dock-back {
-    min-width: 36px;
-    width: 36px;
-  }
   .detail-mode:not(.expanded) .place-detail,
   .detail-mode:not(.expanded) .campus-minimap {
     display: none;
@@ -1731,7 +1612,6 @@ output.empty-state {
 }
 .panel-dock .panel-tabs [data-active] {
   background: transparent !important;
-  border-bottom-color: var(--primary);
 }
 .panel-dock .search-wrap input {
   border-color: var(--border);
