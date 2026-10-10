@@ -529,3 +529,7 @@ blender --background --python-exit-code 1 --python blender/validate_vegetation.p
 2026-09-21：`facadeRules.wallFinish` 直接为完整实体外墙指定共享墙色，不加重叠面。`windowGrid` 两个壁柱尺寸同为零时省略壁柱；基础玻璃按外法线校正绕序，数学学院与动物科学技术学院已有窗格同步修正，见[专项](CIVIL_WING_END_WINDOWS.md)。
 
 2026-10-10：平台北楼南面采用三段显式上部窗网，内部相邻低屋面使用 `above-roof` 规则，按最高坡面与边缘构件留净空并禁用该内部墙面自动窗；西端墙上四层改为实墙。全部尺寸为估算；源/基础/近景同步，见[模型记录](CIVIL_PLATFORM_SOUTH_FACADE.md)。
+
+## 2026-10-10：封闭分部墙脚深度
+
+`parts.baseDepth`控制封闭主体墙体向楼底以下的延伸，默认0.5米；显式值限制为0.5–2米且不得用于`openBelow`。共享生成器保持楼底、主体顶高和入口不变，两个LOD一致。农学院采用1.1米以封闭西翼地面与墙脚间隙，属于模型接地修补，不是实测基础深度，见[专项](AGRICULTURE_WALL_FOOT.md)。

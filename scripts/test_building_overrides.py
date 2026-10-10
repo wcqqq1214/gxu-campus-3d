@@ -13,6 +13,23 @@ from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue
 
 
 class BuildingOverrideTests(unittest.TestCase):
+    def test_part_base_depth_keeps_heights_and_rejects_open_or_invalid_depths(self):
+        b = self.building()
+        part = dict(id='body', polygons=b['polygons'], height=16.5, levels=5, baseDepth=1.1)
+        result = self.resolve(b, parts=[part])
+        resolved = result['form']['parts'][0]
+        self.assertEqual(resolved['baseDepth'], 1.1)
+        self.assertEqual(resolved['height'], 16.5)
+        self.assertEqual(result['polygons'], b['polygons'])
+        without_depth = {k: v for k, v in part.items() if k != 'baseDepth'}
+        self.assertNotIn('baseDepth', self.resolve(result, parts=[without_depth])['form']['parts'][0])
+        self.assertEqual(self.resolve(b, parts=[{**part, 'baseDepth': .5}])['form']['parts'][0]['baseDepth'], .5)
+        for invalid in [True, 0, .49, 2.01, float('nan'), float('inf'), '1.1']:
+            with self.subTest(invalid=invalid), self.assertRaises(ValueError):
+                self.resolve(b, parts=[{**part, 'baseDepth': invalid}])
+        with self.assertRaises(ValueError):
+            self.resolve(b, parts=[{**part, 'openBelow': {}}])
+
     def eave_fixture(self):
         return dict(part='body', polygon=0, edge=0, backDepth=.6,
                     projection=1.6, sideOverhang=.8, rise=1.6, capThickness=.2)

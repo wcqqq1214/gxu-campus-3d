@@ -140,7 +140,7 @@ def resolve_parts(b, raw, roof):
         raise ValueError('parts must be a nonempty explicit partition')
     for part in raw:
         required = {'id', 'polygons', 'height', 'levels'}
-        if not required <= set(part) or set(part) - required - {'openBelow','roof','wallFinish'} or not isinstance(part['id'],str) or not part['id'] or part['id'] in ids:
+        if not required <= set(part) or set(part) - required - {'openBelow','roof','wallFinish','baseDepth'} or not isinstance(part['id'],str) or not part['id'] or part['id'] in ids:
             raise ValueError('Each part needs a unique ID, polygons, height and levels')
         ids.add(part['id'])
         polys = [Polygon(p[0], p[1:]) for p in part['polygons']]
@@ -202,6 +202,13 @@ def resolve_parts(b, raw, roof):
                 part_roof['geometry'] = roof_geometry(coords, part_roof['type'], part_roof['rise'])
         resolved = {'id':part['id'], 'polygons':coords, 'triangles':triangles,
                     'height':height, 'levels':levels, 'roof':part_roof}
+        if 'baseDepth' in part:
+            depth = part['baseDepth']
+            if (type(depth) not in (int, float) or not math.isfinite(depth)
+                    or not .5 <= depth <= 2 or 'openBelow' in part):
+                raise ValueError('Base depth must be 0.5–2 metres on a closed part')
+            # Model ground closure only; no change to the adopted floor datum.
+            resolved['baseDepth'] = depth
         if 'wallFinish' in part:
             if part['wallFinish'] != 'white':
                 raise ValueError('Part wall finish must use the shared white material')
