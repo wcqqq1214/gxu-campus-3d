@@ -10,6 +10,11 @@ import runpy
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'blender'))
+from validation_inputs import baseline_root
+
+ROAD_BASELINE = baseline_root(sys.argv, flags=('--road-baseline-root',))
+CONNECTION_BASELINE = baseline_root(sys.argv, flags=('--connection-baseline-root',))
 PREFIX = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-whole')
 OUT = ROOT / 'docs/model-checks/refinement'
 FILES = ['blender/gxu-campus.blend', 'public/models/base.glb',
@@ -43,13 +48,13 @@ CASES = [
     ('north_wing', []),
     ('wing_ends', []),
     ('wing_wrap', []),
-    ('forecourt_road', []),
+    ('forecourt_road', [f'--baseline-root={ROAD_BASELINE}']),
     ('garden', []),
 ]
 checks = [(f'blender/validate_civil_{name}.py', name.replace('_', '-'), args)
           for name, args in CASES]
 checks += [('blender/validate_side_connection.py', name,
-            [f'--site-id={site}', '--baseline=work/refinement-s2-civil-garden-before'])
+            [f'--site-id={site}', f'--baseline-root={CONNECTION_BASELINE}'])
            for name, site in [('main-connection', 'civil-main-front-connection'),
                               ('annex-connection', 'civil-annex-stair-connection')]]
 

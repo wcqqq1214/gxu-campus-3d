@@ -6,8 +6,9 @@ from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from site_geometry import polygon_distance
 from shore_geometry import core_stations
+from validation_inputs import baseline_root
 shore=json.loads((ROOT/'public/data/shores.json').read_text())['shores'][0]
-previous=ROOT/'work/refinement-s4-background-complete'
+previous=baseline_root(sys.argv,files=('blender/gxu-campus.blend','public/models/base.glb'))
 REPORT_PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'shore')
 
 def root(o):

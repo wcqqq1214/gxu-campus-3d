@@ -6,8 +6,9 @@ from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from site_geometry import inside,ring_distance
 from inspect_foundation_clearance import covers
+from validation_inputs import baseline_root
 PREFIX=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--report-prefix=')),'s3-mathematics-path')
-BASELINE=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--baseline=')),ROOT/'work/refinement-s3-mathematics-path-before')
+BASELINE=baseline_root(sys.argv)
 TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)
 SITE_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--site-id=')),'mathematics-north-connection')
 FOUNDATION_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--foundation-id=')),None)
