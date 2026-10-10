@@ -43,7 +43,9 @@ def check(objects,tolerance,detail):
     # the eastern corner, but inside the 0.45 m gap before the first panel.
     for t in [.01,.99]:probe('end-wall',t,15.05,.8,['stone'])
     count=int(edge.length/4)
-    for level in range(4):
+    # Fourth-storey windows now have their own photo-counted validator;
+    # only the bottom three storeys retain the generic window layout.
+    for level in range(3):
         for i in [1,5]:
             probe('lower-generic-window-preserved',(i+.5)/count+.4/edge.length,(level+.56)*3.3,.55 if detail else .73,['glass','shadeGlass'])
     return dict(passed=True,windowCount=15,smallWindowCount=5,sampleCount=len(samples),toleranceMeters=tolerance,samples=samples)

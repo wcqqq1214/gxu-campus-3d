@@ -6,7 +6,7 @@ from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1]
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s3-agriculture-ledges')
-b=next(x for x in json.loads((ROOT/'public/data/buildings.json').read_text()) if x['id']=='way/759185166')
+b=next(x for x in json.loads((TARGET/'public/data/buildings.json').read_text()) if x['id']=='way/759185166')
 def root_name(o):
     while o.parent:o=o.parent
     return o.name
