@@ -8,7 +8,7 @@ from export_attributes import omit_unused_uvs,omit_zero_area_terrain_faces
 
 TERRAIN_BITS=18
 ROAD_BITS=18
-ROAD_UV_BITS=10
+ROAD_UV_BITS=12
 LOCAL_ROAD_UV_BITS=11
 
 
