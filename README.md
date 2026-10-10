@@ -47,11 +47,11 @@
 
 ![东田径场西侧的篮球场模型](docs/screenshots/readme/basketball-east.jpg)
 
-截图更新于 2026-10-07，采自当前 `dev` 分支的本地开发版本（含最新详情页调整），可能领先于在线站点；手机图使用桌面浏览器的 390 × 844 视口采集。[截图日期、版本与视角](docs/screenshots/readme/captures.json)。
+截图更新于 2026-10-07，采自当前 `dev` 分支的本地开发版本（含最新详情页调整），可能领先于在线站点；手机图使用桌面浏览器的 390 × 844 视口采集。截图日期、版本与视角（本地开发记录）。
 
 建筑轮廓主要来自 **2026-09-09 的 OpenStreetMap 快照**，道路与桥梁使用 2026-09-11 获取的补充数据。建筑外观参考不同年份的公开照片和资料，资料日期不等于当前实景。这是独立开源项目，未经过校园实地测绘。
 
-334 条建筑记录仍沿用类型默认高度；另有楼栋按资料层数乘估算层高计算，不能视为实测。校内数量包括北校园新增的 11 个建筑与连廊体块，不能全部按独立楼栋理解。照片没有覆盖的立面、树位及部分设施布局也包含推定。篮球场中 16 片沿用地图定位，东区另有 15 片依据资料估算布置。具体依据与局限见 [数据说明](docs/DATA.md)、[北校园基础布局](docs/NORTH_CAMPUS_LAYOUT.md)、[北校园照片约束精修](docs/NORTH_CAMPUS_REFINEMENT.md)、[东区篮球场](docs/EAST_BASKETBALL.md) 和 [道路桥梁](docs/INFRASTRUCTURE.md)。
+334 条建筑记录仍沿用类型默认高度；另有楼栋按资料层数乘估算层高计算，不能视为实测。校内数量包括北校园新增的 11 个建筑与连廊体块，不能全部按独立楼栋理解。照片没有覆盖的立面、树位及部分设施布局也包含推定。篮球场中 16 片沿用地图定位，东区另有 15 片依据资料估算布置。具体依据与局限见 [数据说明](docs/DATA.md)、北校园基础布局（本地开发记录）、北校园照片约束精修（本地开发记录）、东区篮球场（本地开发记录） 和 道路桥梁（本地开发记录）。
 
 ## 本地运行
 
@@ -91,16 +91,15 @@ python -m pip install -r scripts/requirements.txt -c scripts/constraints-geodata
 npm run test:data
 ```
 
-Blender 可编辑源文件在本地保存为 `blender/gxu-campus.blend`，内含具名对象、材质和打包纹理，不再纳入 Git，目前尚未提供 Release 下载。运行网页与普通测试无需该文件；增量修改和源模型检查需要本地源文件及 Blender，步骤见 [建模说明](docs/MODELING.md)。[原始数据快照](data/snapshots/) 用于离线恢复，[网页模型](public/models/) 使用 Draco 压缩并按需加载。首屏模型和树木模板共 5,963,612 bytes，低于原定 6 MB（十进制）预算；[地形导出清理](docs/TERRAIN_EXPORT_BUDGET.md)仅移除量化后零面积面，保留所有有效面的坐标、法线和纹理坐标；[无损打包](docs/LOSSLESS_INITIAL_MODELS.md)共享重复载荷并保留纹理像素；[省去未使用纹理坐标](docs/EXPORT_ATTRIBUTE_BUDGET.md)后保留原形体与材质，并继续用于[数学学院立面校准](docs/MATHEMATICS_FACADE_PANELS.md)、[数学研究中心校准](docs/MATH_CENTER_CALIBRATION.md)及[东翼外廊](docs/MATH_CENTER_EAST_GALLERIES.md)。脚本、JSON 和解码器另计。
+Blender 可编辑源文件在本地保存为 `blender/gxu-campus.blend`，内含具名对象、材质和打包纹理，不再纳入 Git，目前尚未提供 Release 下载。运行网页与普通测试无需该文件；增量修改和源模型检查需要本地源文件及 Blender，步骤见 [建模说明](docs/MODELING.md)。[原始数据快照](data/snapshots/) 用于离线恢复，[网页模型](public/models/) 使用 Draco 压缩并按需加载。首屏模型和树木模板共 5,963,612 bytes，低于原定 6 MB（十进制）预算；地形导出清理（本地开发记录）仅移除量化后零面积面，保留所有有效面的坐标、法线和纹理坐标；无损打包（本地开发记录）共享重复载荷并保留纹理像素；省去未使用纹理坐标（本地开发记录）后保留原形体与材质，并继续用于数学学院立面校准（本地开发记录）、数学研究中心校准（本地开发记录）及东翼外廊（本地开发记录）。脚本、JSON 和解码器另计。
 
 ## 项目文档
 
 - [数据来源与精度](docs/DATA.md)
 - [模型结构与重建](docs/MODELING.md)
-- [校内主路与汇学堂草地](docs/CAMPUS_ROADS.md)
 - [界面与交互](docs/DESIGN.md)
-- [验证记录](docs/VALIDATION.md) · [近期优化](docs/FIXES.md)
-- [精细校准计划](docs/CAMPUS_REFINEMENT_PLAN.md) · [执行进度](docs/CAMPUS_REFINEMENT_PROGRESS.md) · [楼栋校准依据](docs/BUILDING_CALIBRATIONS.md)
+
+开发过程文档、验收报告和截图仅在本地保存，不随仓库分发；测试与校验依赖的基准数据及 README 展示图除外。
 
 ## 许可
 
