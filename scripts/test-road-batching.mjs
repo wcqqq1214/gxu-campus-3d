@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { batchPlatformRoadContacts } from '../lib/campus/road-batching.ts';
+import { batchPlatformRoadContacts } from './fixtures/legacy-road-batching.ts';
 function fixture() {
   const root = new THREE.Group(),
     road = new THREE.Group(),

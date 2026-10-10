@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import crypto from 'node:crypto';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import { batchPlatformRoadContacts } from '../lib/campus/road-batching.ts';
+import { batchPlatformRoadContacts } from './fixtures/legacy-road-batching.ts';
 
 const sha = (data) => crypto.createHash('sha256').update(data).digest('hex');
 const raw = fs.readFileSync('public/models/base.glb');
