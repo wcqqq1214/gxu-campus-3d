@@ -26,6 +26,7 @@ import {
   campusOverviewPoints,
   landmarkBox,
   landmarkDirection,
+  benchmarkOrbitEnabled,
 } from './camera';
 import { DEFAULT_LAYERS } from './types';
 import { AdaptiveQuality, qualityProfile } from './quality';
@@ -75,6 +76,7 @@ export function createScene(
   landmarks: Landmark[],
   callbacks: Callbacks,
 ): SceneController {
+  const benchmarkOrbit = benchmarkOrbitEnabled(location.search);
   const scene = new THREE.Scene();
   const contextStyle = createContextStyle();
   scene.background = new THREE.Color('#d8e5e5');
@@ -487,6 +489,12 @@ export function createScene(
     if (orbiting) {
       composeViewport();
       selectedView = 'oblique';
+      // Asset bounds change during calibration. A benchmark must retain the
+      // explicit shared camera instead of fitting each asset set differently.
+      if (benchmarkOrbit) {
+        tween = null;
+        return;
+      }
       // A sphere fits through a complete rotation, including the wider sides.
       const place = landmarks.find((p) => p.id === selected)!;
       const detail = loaded.get('landmark-' + place.id);
@@ -1314,6 +1322,12 @@ export function createScene(
     ).memory;
     return {
       readyMs,
+      ...(benchmarkOrbit ? { benchmark: {
+        orbiting,
+        camera: getSnapshot(),
+        viewport: [host.clientWidth, host.clientHeight],
+        frame: { ...cameraFrame },
+      } } : {}),
       heapMiB: mem ? Math.round(mem.usedJSHeapSize / 1048576) : null,
       fps: Math.round(fps),
       triangles: renderer.info.render.triangles,

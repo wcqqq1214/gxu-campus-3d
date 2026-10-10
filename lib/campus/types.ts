@@ -89,6 +89,16 @@ export interface Overview {
   layers: Record<string, number>;
 }
 export interface Metrics {
+  benchmark?: {
+    orbiting: boolean;
+    camera: {
+      position: [number, number, number];
+      target: [number, number, number];
+      span: number;
+    };
+    viewport: number[];
+    frame: ViewportFrame;
+  };
   readyMs: number;
   heapMiB: number | null;
   fps: number;
