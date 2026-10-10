@@ -64,6 +64,25 @@
       },
       "evidence": "模型修复：三教闭合楼体内源/基础各检出10个地形、17个道路侵入采样。保留楼底、轮廓与原DEM，局部削低地形并裁除冲突路面；3米过渡和15米临时导出边缘分段范围为模型参数，不代表现场土方或道路改建。",
       "roadExportConformMargin": 15
+    },
+    {
+      "id": "forestry-southwest-foundation",
+      "buildingId": "relation/11564703",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "repairBounds": [
+        113,
+        -130,
+        128,
+        -120
+      ],
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "模型修复：林学院封闭楼体西南角源/基础各4个采样地形高出原采用楼底超过0.3米，最高约0.318米。仅削低西南角局部地形，整栋622点复验；15×10米截取框与3米过渡为模型参数，保留原DEM、楼底、道路及邻楼，不代表现场土方或无障碍设计。"
     }
   ]
 }
