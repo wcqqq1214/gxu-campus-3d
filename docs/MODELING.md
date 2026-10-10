@@ -121,3 +121,14 @@ blender --background --python-exit-code 1 --python blender/validate_civil_whole.
 缺失基准时命令会停止并列出缺少的文件。不能用当前模型冒充修改前版本；旧 `.blend` 已删除的历史比较无法直接复跑，须有可靠基准后再做结论。校验不会因基准缺失而自动跳过。
 
 浏览器检查脚本保留为可复用工具，使用 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`REFINEMENT_URL` 等显式输入；前后截图工具还需相机列表与基准资源目录。输出只在本地保存。性能比较应使用同一视口、相机、前端和画质，区分资源加载、静止帧率及持续活动帧率。
+
+界面与相机回归需要正在运行的 `npm run dev`，分别覆盖桌面和手机视口。使用开发服务器实际地址运行：
+
+```sh
+MENU_TEST_URL=http://127.0.0.1:3000/ node scripts/check-menu-interactions-browser.mjs
+PANEL_TEST_URL=http://127.0.0.1:3000/ node scripts/check-panel-camera-browser.mjs
+```
+
+两项检查使用本地 Playwright 与 Chromium；未在项目安装 Playwright 时，将 `PLAYWRIGHT_MODULE` 指向可用模块的入口文件，`CHROMIUM_PATH` 指向浏览器可执行文件。它们不包含在 `npm test` 中；后者只运行 `scripts/test-*.mjs`。相机检查会在开发响应中注入观测代码，不能改用静态预览地址。
+
+道路运行逻辑由 `lib/campus/road-batching.ts` 的 `batchStaticRoadSurfaces` 负责。原接缝合批实现保存在 `scripts/fixtures/legacy-road-batching.ts`，只供旧阶段的解码检查、回归测试与性能比较使用；历史比较不代表当前网页的完整加载顺序。
