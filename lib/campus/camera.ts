@@ -1,6 +1,12 @@
 import { Box3, Vector3 } from 'three';
 import type { Building, Landmark, LandmarkView, ViewportFrame } from './types';
 
+/** Opt-in measurement mode: retain a shared pose when starting an orbit. */
+export function benchmarkOrbitEnabled(search: string) {
+  const params = new URLSearchParams(search);
+  return params.has('debug') && params.get('benchmark') === 'fixed-orbit';
+}
+
 /** WGS84 bearings: north is -Z, east is +X in the web scene. */
 export function landmarkDirection(
   place: Landmark,

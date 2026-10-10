@@ -9,7 +9,15 @@ import {
   landmarkBox,
   landmarkDirection,
   entranceBox,
+  benchmarkOrbitEnabled,
 } from '../lib/campus/camera.ts';
+
+test('fixed-pose benchmark requires both explicit debug and measurement mode', () => {
+  assert.equal(benchmarkOrbitEnabled('?debug&benchmark=fixed-orbit'), true);
+  for (const search of ['', '?debug', '?benchmark=fixed-orbit', '?debug&benchmark=other']) {
+    assert.equal(benchmarkOrbitEnabled(search), false);
+  }
+});
 const landmarks = JSON.parse(
   await readFile(new URL('../public/data/landmarks.json', import.meta.url)),
 );
