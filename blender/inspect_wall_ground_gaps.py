@@ -52,19 +52,21 @@ def probes(building, ground, roads):
             g = ground.ray_cast(origin, down, 100)[0]
             if g is None:
                 raise ValueError('Missing facade ground')
-            road_origin = Vector((origin.x, origin.y, datum - .01))
-            r = roads.ray_cast(road_origin, down, 100)[0]
+            r = roads.ray_cast(origin, down, 100)[0]
             surface = max(g.z, r.z if r is not None else -math.inf)
-            # Check every <=10 cm from 5 cm above ground to 5 cm below datum.
+            # Retain the below-datum band, but also test contact when grading
+            # reaches the floor. An empty below-floor band is not a closure test.
             low, high = surface + .05, datum - .05
             if low > high:
-                continue
-            intervals = max(1, math.ceil((high - low) / .1))
-            heights = [low + (high - low) * j / intervals for j in range(intervals + 1)]
-            rows.append(dict(facade=index, xy=[x, y], normal=normal,
+                heights = [low]
+            else:
+                intervals = max(1, math.ceil((high - low) / .1))
+                heights = [low + (high - low) * j / intervals for j in range(intervals + 1)]
+            rows.append(dict(facade=index, part=facade.get('part', 'body'),
+                             contactOnly=low > high, xy=[x, y], normal=normal,
                              surfaceHeight=surface, heights=heights))
     if not rows:
-        raise ValueError('No below-datum wall samples')
+        raise ValueError('No eligible closed ground-floor facades')
     return rows
 
 
@@ -81,9 +83,12 @@ def check(tree, rows):
             if hit is None:
                 missing.append(z)
         if missing:
-            failures.append(dict(facade=row['facade'], xy=row['xy'],
+            failures.append(dict(facade=row['facade'], part=row['part'], xy=row['xy'],
                                  ground=row['surfaceHeight'], missingHeights=missing))
     return dict(passed=not failures, facadeLocations=len(rows), rays=rays,
+                contactOnlyLocations=sum(r['contactOnly'] for r in rows),
+                parts={part:sum(r['part'] == part for r in rows)
+                       for part in sorted({r['part'] for r in rows})},
                 openGapLocations=len(failures), failures=failures)
 
 
@@ -121,6 +126,8 @@ def main():
                   passed=all(r['passed'] for r in results),
                   sampling=dict(horizontalSpacingMeters=2, verticalSpacingMaximumMeters=.1,
                                 groundClearanceMeters=.05, facadeOffsetMeters=.02,
+                                contactAtOrAboveDatum=True,
+                                surface='Highest actual terrain or road hit, including roads above datum',
                                 horizontalRayLengthMeters=.8),
                   limitations='Sampled model wall closure, not measured site elevations or proof of watertightness.',
                   fingerprints={k: hashlib.sha256(p.read_bytes()).hexdigest()
