@@ -4,6 +4,7 @@ import { AdaptiveQuality, qualityProfile } from '../lib/campus/quality.ts';
 
 test('持续低帧率分两级减少阴影、精细植被与资源预算，单次慢帧不降档', () => {
   const adaptive = new AdaptiveQuality();
+  adaptive.level = 0;
   assert.equal(adaptive.sample(18, 20), false);
   assert.equal(adaptive.sample(18, 20), true);
   let p = qualityProfile('auto', false, false, adaptive.level);
@@ -19,6 +20,7 @@ test('持续低帧率分两级减少阴影、精细植被与资源预算，单�
 
 test('流畅档30fps可恢复，但必须连续稳定并经过冷却，空闲和零样本不升级', () => {
   const adaptive = new AdaptiveQuality();
+  adaptive.level = 0;
   for (let i = 0; i < 4; i++) adaptive.sample(18, 20);
   for (let i = 0; i < 19; i++) adaptive.sample(30, 30);
   assert.equal(adaptive.level, 2);
@@ -39,6 +41,25 @@ test('手动画质、手机及省流量偏好保持优先，重置可重新采�
   adaptive.sample(12, 20);
   adaptive.sample(12, 20);
   adaptive.reset();
-  assert.equal(adaptive.level, 0);
+  assert.equal(adaptive.level, 1);
   assert.equal(adaptive.sample(12, 20), false);
+});
+
+test('自动档从均衡启动且昂贵后处理只用于手动精细', () => {
+  const a = new AdaptiveQuality();
+  assert.equal(a.level, 1);
+  assert.equal(qualityProfile('fine', false, false, 1).postprocessing, true);
+  for (const level of [0, 1, 2]) {
+    assert.equal(
+      qualityProfile('auto', false, false, level).postprocessing,
+      false,
+    );
+    assert.equal(
+      qualityProfile('smooth', false, false, level).postprocessing,
+      false,
+    );
+  }
+  a.sample(29, 30);
+  a.sample(29, 30);
+  assert.equal(a.level, 2);
 });

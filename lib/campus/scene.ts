@@ -1,3 +1,4 @@
+import { LIGHTING } from './lighting';
 import { navigationFootprints } from './navigation';
 import { treeRotation, treeElevation, prioritizeTreeRows } from './vegetation';
 import * as THREE from 'three';
@@ -89,9 +90,10 @@ export function createScene(
     powerPreference: 'high-performance',
     preserveDrawingBuffer: false,
   });
+  renderer.info.autoReset = false;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.92;
+  renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.type = THREE.PCFShadowMap;
   const canvas = renderer.domElement;
   canvas.setAttribute(
@@ -135,9 +137,9 @@ export function createScene(
       event.preventDefault();
   }
   wheelHost.addEventListener('wheel', onOverlayWheel, { passive: false });
-  const ambient = new THREE.HemisphereLight('#d9edff', '#60704e', 1.35);
+  const ambient = new THREE.HemisphereLight('#d4e6fa', '#818363', 0.72);
   scene.add(ambient);
-  const sun = new THREE.DirectionalLight('#fff3da', 2.6);
+  const sun = new THREE.DirectionalLight('#fff3de', 3.35);
   sun.position.set(-700, 1400, 600);
   sun.castShadow = true;
   sun.shadow.mapSize.set(2048, 2048);
@@ -145,7 +147,7 @@ export function createScene(
   sun.shadow.normalBias = 0.18;
   scene.add(sun);
   scene.add(sun.target);
-  const fill = new THREE.DirectionalLight('#b4d9ea', 0.35);
+  const fill = new THREE.DirectionalLight('#c3dcec', 0.18);
   fill.position.set(1000, 600, -700);
   scene.add(fill);
   const layers = { ...DEFAULT_LAYERS };
@@ -183,7 +185,7 @@ export function createScene(
   skyTexture.mapping = THREE.EquirectangularReflectionMapping;
   skyTexture.colorSpace = THREE.SRGBColorSpace;
   scene.environment = skyTexture;
-  scene.environmentIntensity = 0.45;
+  scene.environmentIntensity = 0.24;
   const loader = new GLTFLoader();
   const draco = new DRACOLoader();
   draco.setDecoderPath(asset('draco/'));
@@ -215,7 +217,43 @@ export function createScene(
   let loop = 0;
   let modeSmooth = false;
   const adaptive = new AdaptiveQuality();
-  let profile = qualityProfile('auto', false, false, 0);
+  let profile = qualityProfile('auto', false, false, adaptive.level);
+  let effects: ReturnType<
+    typeof import('./postprocessing').createPostprocessing
+  > | null = null;
+  let effectsLoading = false;
+  let effectsFailed = false;
+  function syncEffects() {
+    if (!profile.postprocessing) {
+      effects?.dispose();
+      effects = null;
+      return;
+    }
+    if (effects) {
+      effects.resize();
+      return;
+    }
+    if (effectsLoading || effectsFailed || !initialReady) return;
+    effectsLoading = true;
+    void import('./postprocessing')
+      .then(({ createPostprocessing }) => {
+        if (!disposed && profile.postprocessing) {
+          effects = createPostprocessing(renderer, scene, camera);
+          dirty = true;
+        }
+      })
+      .catch(() => {
+        effectsFailed = true;
+      })
+      .finally(() => {
+        effectsLoading = false;
+      });
+  }
+  function renderScene() {
+    renderer.info.reset();
+    if (effects && profile.postprocessing) effects.render();
+    else renderer.render(scene, camera);
+  }
   const saveData = () =>
     Boolean(
       (navigator as Navigator & { connection?: { saveData?: boolean } })
@@ -1107,6 +1145,7 @@ export function createScene(
         uv.needsUpdate = true;
       }
       initialReady = true;
+      syncEffects();
       readyMs = Math.round(performance.now());
       applyLayers();
       callbacks.onReady();
@@ -1124,7 +1163,10 @@ export function createScene(
     }
   }
   function setQuality(q: Quality) {
-    if (q !== quality) adaptive.reset();
+    if (q !== quality) {
+      adaptive.reset();
+      effectsFailed = false;
+    }
     quality = q;
     applyQuality();
   }
@@ -1136,6 +1178,7 @@ export function createScene(
     );
     renderer.shadowMap.enabled = profile.shadows;
     sun.castShadow = profile.shadows;
+    syncEffects();
     if (!profile.shadows) {
       sun.shadow.dispose();
       sun.shadow.map = null;
@@ -1161,19 +1204,25 @@ export function createScene(
   }
   function setPreset(p: Preset) {
     preset = p;
-    const settings = {
-      morning: ['#d8e5e1', '#fff0cc', 2.6, 1.2, [-1300, 500, 700]],
-      day: ['#d8e5e5', '#fff4df', 2.6, 1.35, [-700, 1400, 600]],
-      evening: ['#e8d7cb', '#ffc386', 2.8, 0.9, [1300, 380, 700]],
-      night: ['#182b3a', '#b3cdf4', 0.55, 0.26, [-700, 1000, -600]],
-    } as const;
-    const [sky, color, power, amb, pos] = settings[p];
+    const sky = {
+      morning: '#d8e5e1',
+      day: '#d8e5e5',
+      evening: '#e8d7cb',
+      night: '#182b3a',
+    }[p];
     scene.background = new THREE.Color(sky);
     scene.fog = new THREE.Fog(sky, 8500, 22000);
-    sun.color.set(color);
-    sun.intensity = power;
-    ambient.intensity = amb;
-    sun.position.set(pos[0], pos[1], pos[2]);
+    const light = LIGHTING[p];
+    sun.color.set(light.sun);
+    sun.intensity = light.power;
+    ambient.color.set(light.skyLight);
+    ambient.groundColor.set(light.bounce);
+    ambient.intensity = light.hemisphere;
+    fill.color.set(light.fill);
+    fill.intensity = light.fillPower;
+    scene.environmentIntensity = light.environment;
+    renderer.toneMappingExposure = light.exposure;
+    sun.position.set(...light.direction);
     scene.traverse((o) => {
       if (o instanceof THREE.Mesh) {
         for (const m of Array.isArray(o.material) ? o.material : [o.material])
@@ -1309,13 +1358,7 @@ export function createScene(
     const t = controls.target;
     sun.shadow.normalBias = size < 350 ? 0.18 : 0.6;
     sun.target.position.copy(t);
-    const directions = {
-      morning: [-1300, 500, 700],
-      day: [-700, 1400, 600],
-      evening: [1300, 380, 700],
-      night: [-700, 1000, -600],
-    };
-    const dir = directions[preset];
+    const dir = LIGHTING[preset].direction;
     sun.position.set(t.x + dir[0], t.y + dir[1], t.z + dir[2]);
     Object.assign(sun.shadow.camera, {
       left: -size,
@@ -1333,12 +1376,23 @@ export function createScene(
     ).memory;
     return {
       readyMs,
-      ...(benchmarkOrbit ? { benchmark: {
-        orbiting,
-        camera: getSnapshot(),
-        viewport: [host.clientWidth, host.clientHeight],
-        frame: { ...cameraFrame },
-      } } : {}),
+      postprocessing: effects
+        ? 'ready'
+        : effectsFailed
+          ? 'failed'
+          : effectsLoading
+            ? 'loading'
+            : 'off',
+      ...(benchmarkOrbit
+        ? {
+            benchmark: {
+              orbiting,
+              camera: getSnapshot(),
+              viewport: [host.clientWidth, host.clientHeight],
+              frame: { ...cameraFrame },
+            },
+          }
+        : {}),
       heapMiB: mem ? Math.round(mem.usedJSHeapSize / 1048576) : null,
       fps: Math.round(fps),
       triangles: renderer.info.render.triangles,
@@ -1412,7 +1466,7 @@ export function createScene(
       shadowFrustum();
       applyTreeLOD();
       convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
-      renderer.render(scene, camera);
+      renderScene();
       dirty = false;
       lastFrame = time;
       if (lastRendered && time - lastRendered < 1000) {
@@ -1530,7 +1584,7 @@ export function createScene(
     view,
     exportImage: async () => {
       convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
-      renderer.render(scene, camera);
+      renderScene();
       const out = document.createElement('canvas');
       out.width = canvas.width;
       out.height = canvas.height;
@@ -1597,6 +1651,8 @@ export function createScene(
         (p.material as THREE.Material).dispose();
       }
       contextStyle.dispose();
+      effects?.dispose();
+      skyTexture.dispose();
       renderer.dispose();
       canvas.remove();
       labels.remove();
