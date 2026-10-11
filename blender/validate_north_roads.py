@@ -6,7 +6,7 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1]
 b=json.loads((ROOT/'public/data/north-campus.json').read_text())['underpass']
-fixture=json.loads(gzip.decompress((ROOT/'docs/model-checks/north-road-baseline.json.gz').read_bytes()))
+fixture=json.loads(gzip.decompress((ROOT/'scripts/fixtures/north-road-baseline.json.gz').read_bytes()))
 
 def inside(p,ring):
     result=False

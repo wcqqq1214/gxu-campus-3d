@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class BuildingFormTests(unittest.TestCase):
     def test_refinement_preserves_every_existing_footprint(self):
-        baseline = json.loads((ROOT/'docs/model-checks/refinement/footprint-baseline.json').read_text())['footprints']
+        baseline = json.loads((ROOT/'scripts/fixtures/building-footprint-baseline.json').read_text())['footprints']
         buildings = json.loads((ROOT/'public/data/buildings.json').read_text())
         supplements=[b for b in buildings if b.get('geometrySource')=='manual-imagery-trace']
         config=json.loads((ROOT/'data/north-campus-layout.json').read_text())

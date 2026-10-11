@@ -68,7 +68,7 @@ def check(kind,old,current):
     assert min(freeboards)>.25,(kind,'land remains below water',min(freeboards))
     assert min(land_gaps)>-.01 and max(land_gaps)<.2,(kind,'wall/land join',min(land_gaps),max(land_gaps))
     assert max(water_errors)<.001,(kind,'water moved')
-    baseline=json.loads((ROOT/'docs/model-checks/refinement/s4-shore-before-ground.json').read_text())
+    baseline=json.loads((ROOT/'scripts/fixtures/shore-ground-baseline.json').read_text())
     baseline_contacts=[];stations=core_stations(shore)
     for sample in baseline['samples']:
         x,y=sample['xy'];_,normal=min(stations,key=lambda s:math.dist(s[0],(x,y)))
