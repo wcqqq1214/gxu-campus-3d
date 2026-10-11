@@ -54,7 +54,7 @@ def deduplicate_primitive_vertices(primitive):
     primitive.indices = replacement_index
 
 
-def share_position_quantization_bounds(primitives):
+def share_position_quantization_bounds(primitives, domain=None):
     """Give Draco material primitives one domain using unreferenced extrema.
 
     The exporter does not expose Draco's explicit quantization-domain API.
@@ -66,7 +66,7 @@ def share_position_quantization_bounds(primitives):
     import numpy as np
     from io_scene_gltf2.io.exp.binary_data import BinaryData
 
-    if len(primitives) < 2:
+    if len(primitives) < 2 and domain is None:
         return
     arrays = []
     for primitive in primitives:
@@ -83,8 +83,20 @@ def share_position_quantization_bounds(primitives):
     positions = np.concatenate(arrays)
     if not np.isfinite(positions).all():
         raise ValueError('Non-finite road positions')
-    indices = sorted(set(positions.argmin(axis=0).tolist() + positions.argmax(axis=0).tolist()))
-    anchors = positions[indices]
+    if domain is None:
+        indices = sorted(set(positions.argmin(axis=0).tolist() + positions.argmax(axis=0).tolist()))
+        anchors = positions[indices]
+    else:
+        # Incremental display trims must keep the shipping quantization grid.
+        # These unused anchors retain its origin and range without adding faces.
+        origin = np.asarray(domain['origin'], dtype=np.float32)
+        extent = np.float32(domain['range'])
+        if (origin.shape != (3,) or not np.isfinite(origin).all()
+                or not np.isfinite(extent) or extent <= 0
+                or np.any(positions.min(axis=0) < origin - .001)
+                or np.any(positions.max(axis=0) > origin + extent + .001)):
+            raise ValueError('Position domain does not cover the road geometry')
+        anchors = np.array([origin, origin + np.array([0, 0, extent], dtype=np.float32)])
     replacements = []
     for primitive in primitives:
         count = primitive.attributes['POSITION'].count

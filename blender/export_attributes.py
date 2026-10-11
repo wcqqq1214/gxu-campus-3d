@@ -4,6 +4,7 @@ import sys
 
 _deduplicate_vertices = False
 _share_position_bounds = False
+_position_domain = None
 
 
 def needs_texcoords(material):
@@ -44,16 +45,17 @@ class glTF2ExportUserExtension:
                 deduplicate_primitive_vertices(primitive)
         if _share_position_bounds:
             from vertex_dedup import share_position_quantization_bounds
-            share_position_quantization_bounds(mesh.primitives)
+            share_position_quantization_bounds(mesh.primitives, _position_domain)
 
 
 @contextmanager
-def omit_unused_uvs(*, deduplicate_vertices=False, share_position_bounds=False):
+def omit_unused_uvs(*, deduplicate_vertices=False, share_position_bounds=False, position_domain=None):
     """Register the supported exporter hook only for this process and scope."""
     import bpy
-    global _deduplicate_vertices, _share_position_bounds
+    global _deduplicate_vertices, _share_position_bounds, _position_domain
     previous_deduplication = _deduplicate_vertices
     previous_shared_bounds = _share_position_bounds
+    previous_domain = _position_domain
     name = __name__
     assert sys.modules[name].glTF2ExportUserExtension is glTF2ExportUserExtension
     existing = bpy.context.preferences.addons.get(name)
@@ -63,10 +65,12 @@ def omit_unused_uvs(*, deduplicate_vertices=False, share_position_bounds=False):
     try:
         _deduplicate_vertices = deduplicate_vertices
         _share_position_bounds = share_position_bounds
+        _position_domain = position_domain
         yield
     finally:
         _deduplicate_vertices = previous_deduplication
         _share_position_bounds = previous_shared_bounds
+        _position_domain = previous_domain
         if existing is None:
             bpy.context.preferences.addons.remove(addon)
 
