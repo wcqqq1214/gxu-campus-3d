@@ -120,6 +120,7 @@ export interface Metrics {
   detailGeometryMiB: number;
 }
 export interface SceneController {
+  getLightingState: () => { preset: Preset; labelTheme: 'day' | 'night' };
   setHovered: (id: string | null) => void;
   clearSelection: () => void;
   focus: (id: string, origin?: SelectionOrigin) => void;

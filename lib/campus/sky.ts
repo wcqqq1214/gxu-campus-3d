@@ -41,6 +41,9 @@ export function createSky() {
     gradient.addColorStop(1, sky.lower);
     context.fillStyle = gradient;
     context.fillRect(0, 0, 256, 128);
+    // Three caches equirectangular cubemaps/PMREM by texture identity.
+    // Dispose that cache before uploading a changed canvas (no network request).
+    texture.dispose();
     texture.needsUpdate = true;
     return new Fog(sky.horizon, preset === 'night' ? 2500 : 2700, sky.far);
   }

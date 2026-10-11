@@ -1,3 +1,4 @@
+import { createNightStyle, createRoadLights } from './night';
 import { createPalette } from './palette';
 import { createSky } from './sky';
 import { LIGHTING } from './lighting';
@@ -90,6 +91,8 @@ export function createScene(
   let convexCulling: ReturnType<typeof createConvexCulling> | null = null;
   const contextStyle = createContextStyle();
   const palette = createPalette(buildings);
+  const nightStyle = createNightStyle();
+  let roadLights: ReturnType<typeof createRoadLights> | null = null;
   const sky = createSky();
   scene.background = sky.texture;
   scene.fog = sky.fog;
@@ -230,6 +233,7 @@ export function createScene(
       .then(({ createPostprocessing }) => {
         if (!disposed && profile.postprocessing) {
           effects = createPostprocessing(renderer, scene, camera);
+          effects.setNight(preset === 'night');
           dirty = true;
         }
       })
@@ -241,6 +245,7 @@ export function createScene(
       });
   }
   function renderScene() {
+    renderer.setRenderTarget(null);
     renderer.info.reset();
     if (effects && profile.postprocessing) effects.render();
     else renderer.render(scene, camera);
@@ -657,6 +662,7 @@ export function createScene(
   function styleMeshes(root: THREE.Object3D) {
     root.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
+      palette.terrain(o);
       o.castShadow = true;
       o.receiveShadow = true;
       const mats = Array.isArray(o.material) ? o.material : [o.material];
@@ -687,13 +693,20 @@ export function createScene(
             m.emissiveIntensity =
               preset === 'night' ? (m.name === 'timeLight' ? 1.8 : 0.16) : 0;
           }
-          if (/glass$/i.test(m.name) && m.name !== 'courtGlass') {
-            m.emissive.set('#edbd71');
-            m.emissiveIntensity = preset === 'night' ? 0.42 : 0;
-          }
         }
       }
+      nightStyle.apply(o, preset === 'night');
     });
+  }
+  function syncRoadLights() {
+    if (preset === 'night' && baseRoot && !roadLights) {
+      roadLights = createRoadLights(baseRoot);
+      scene.add(roadLights);
+    }
+    if (roadLights) {
+      roadLights.visible = preset === 'night' && layers.roads;
+      roadLights.material.uniforms.pixelRatio.value = renderer.getPixelRatio();
+    }
   }
   function detailLayer(key: string): LayerKey {
     return key.startsWith('infra-') ||
@@ -713,6 +726,7 @@ export function createScene(
         child.visible =
           (layers[classify(child) as LayerKey] ?? true) &&
           !loaded.get(child.name)?.visible;
+    syncRoadLights();
     boundaryRoot.visible = layers.boundary;
     if (treesRoot) treesRoot.visible = layers.vegetation;
     labels.style.display = layers.labels ? '' : 'none';
@@ -1010,6 +1024,7 @@ export function createScene(
         const geometry = mergeGeometries(geometries)!;
         geometries.forEach((g) => g.dispose());
         const material = new THREE.MeshStandardMaterial({
+          name: 'treeCanopy',
           vertexColors: true,
           roughness: 0.94,
           side: THREE.DoubleSide,
@@ -1042,6 +1057,7 @@ export function createScene(
             inst.setMatrixAt(i, transform.matrix);
             inst.setColorAt(i, new THREE.Color(...appearance.tint));
           });
+          nightStyle.apply(inst, preset === 'night');
           inst.instanceMatrix.needsUpdate = true;
           inst.computeBoundingSphere();
           inst.castShadow = true;
@@ -1132,6 +1148,8 @@ export function createScene(
         const mat = terrainMesh[0].material as THREE.MeshStandardMaterial;
         ground.material.dispose();
         ground.material = mat.clone();
+        nightStyle.copyDayColor(mat, ground.material);
+        nightStyle.apply(ground, preset === 'night');
         contextStyle.apply(ground.material);
         const uv = ground.geometry.getAttribute('uv');
         for (let i = 0; i < uv.count; i++)
@@ -1210,21 +1228,19 @@ export function createScene(
     scene.environmentIntensity = light.environment;
     renderer.toneMappingExposure = light.exposure;
     sun.position.set(...light.direction);
+    effects?.setNight(p === 'night');
+    syncRoadLights();
+    labels.dataset.light = p;
     scene.traverse((o) => {
-      if (o instanceof THREE.Mesh) {
-        for (const m of Array.isArray(o.material) ? o.material : [o.material])
-          if (
-            m instanceof THREE.MeshStandardMaterial &&
-            ((/glass$/i.test(m.name) && m.name !== 'courtGlass') ||
-              m.name === 'timeLight' ||
-              m.name === 'timeSilver')
-          ) {
-            const silver = m.name === 'timeSilver';
-            const sculpture = silver || m.name === 'timeLight';
-            m.emissive.set(sculpture ? '#83b6e2' : '#edbd71');
-            m.emissiveIntensity =
-              p === 'night' ? (sculpture ? (silver ? 0.16 : 1.8) : 0.42) : 0;
-          }
+      if (!(o instanceof THREE.Mesh)) return;
+      nightStyle.apply(o, p === 'night');
+      for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+        if (!(m instanceof THREE.MeshStandardMaterial)) continue;
+        if (m.name === 'timeSilver' || m.name === 'timeLight') {
+          m.emissive.set('#83b6e2');
+          m.emissiveIntensity =
+            p === 'night' ? (m.name === 'timeSilver' ? 0.16 : 1.8) : 0;
+        }
       }
     });
     dirty = true;
@@ -1343,7 +1359,8 @@ export function createScene(
       Math.max(100, camera.position.distanceTo(controls.target) * 0.8),
     );
     const t = controls.target;
-    sun.shadow.normalBias = size < 350 ? 0.18 : 0.6;
+    sun.shadow.normalBias = preset === 'evening' ? 1.2 : size < 350 ? 0.3 : 0.8;
+    sun.shadow.bias = preset === 'evening' ? -0.00025 : -0.00012;
     sun.target.position.copy(t);
     const dir = LIGHTING[preset].direction;
     sun.position.set(t.x + dir[0], t.y + dir[1], t.z + dir[2]);
@@ -1612,6 +1629,10 @@ export function createScene(
           );
       }
     },
+    getLightingState: () => ({
+      preset,
+      labelTheme: preset === 'night' ? 'night' : 'day',
+    }),
     getMetrics: metrics,
     getSnapshot,
     restoreSnapshot,

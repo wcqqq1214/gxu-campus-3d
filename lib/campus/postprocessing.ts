@@ -9,6 +9,7 @@ import {
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { SAOPass } from 'three/addons/postprocessing/SAOPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 
 /** Loaded only for the explicit fine tier. No targets or passes in auto/smooth. */
@@ -34,15 +35,22 @@ export function createPostprocessing(
     saoBlurStdDev: 2,
     saoBlurDepthCutoff: 0.00008,
   });
+  const bloom = new UnrealBloomPass(new Vector2(1, 1), 0.14, 0.25, 1.35);
+  bloom.enabled = false;
   const output = new OutputPass();
   composer.addPass(beauty);
   composer.addPass(ao);
+  composer.addPass(bloom);
   composer.addPass(output);
   function resize() {
     const size = renderer.getSize(new Vector2());
     const ratio = renderer.getPixelRatio();
     composer.setPixelRatio(ratio);
     composer.setSize(size.x, size.y);
+    bloom.setSize(
+      Math.max(1, Math.floor((size.x * ratio) / 2)),
+      Math.max(1, Math.floor((size.y * ratio) / 2)),
+    );
     // Composer sizes every pass; override only AO, keeping beauty/output sharp.
     ao.setSize(
       Math.max(1, Math.floor((size.x * ratio) / 2)),
@@ -52,6 +60,9 @@ export function createPostprocessing(
   resize();
   return {
     resize,
+    setNight(on: boolean) {
+      bloom.enabled = on;
+    },
     render() {
       // Near plane and view offsets change with camera composition.
       ao.saoMaterial.uniforms.cameraInverseProjectionMatrix.value.copy(
@@ -66,6 +77,7 @@ export function createPostprocessing(
         false,
       );
       // RenderPass above updates shadows once; the normal pass must not repeat it.
+      renderer.setRenderTarget(null);
       renderer.shadowMap.autoUpdate = false;
       beauty.enabled = false;
       try {
@@ -78,6 +90,7 @@ export function createPostprocessing(
     dispose() {
       beauty.dispose();
       ao.dispose();
+      bloom.dispose();
       output.dispose();
       composer.dispose();
     },
