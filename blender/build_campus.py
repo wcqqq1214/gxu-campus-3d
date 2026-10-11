@@ -383,6 +383,8 @@ if (DATA/'north-campus.json').exists() and north_data.get('underpass'):
     from north_underpass import cut_meshes,upper_road_model,road_height_sampler
     base['north-campus-roads'].extend(upper_road_model(north_data['underpass'],C,road_height_sampler(base['roads'],elevation)))
     cut_meshes(base,north_data['underpass'])
+from road_display_cleanup import load_cuts,trim_mesh
+base['roads'],road_display_report=trim_mesh(base['roads'],load_cuts(ROOT))
 for k,m in base.items():
     if not BASE_ONLY and k.startswith('north-campus-'):
         m.object(k+' · 可编辑',GROUND,{'layer':'sports' if k.endswith('sports') else 'roads','northCampus':True})

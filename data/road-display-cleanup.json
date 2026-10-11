@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "basis": "2026-10-11 展示收边：保留路口及沿校连接，校外车道、辅路和路缘共用垂直于道路的截面。仅裁切普通道路模型，不修改原始 OSM 轴线、校园道路或独立桥梁。坐标为东 X、北 Y，单位米。",
+  "cuts": [
+    {
+      "id": "anyang-north",
+      "name": "安阳路北端：转弯连接之后保留约 25 米",
+      "origin": [520, 1209],
+      "outward": [-0.23, 0.974],
+      "halfWidth": 45,
+      "length": 220
+    },
+    {
+      "id": "xiuxiang-east",
+      "name": "秀厢大道东端：主辅路共用截面",
+      "origin": [669, 1040],
+      "outward": [0.99, -0.14],
+      "halfWidth": 80,
+      "length": 200
+    },
+    {
+      "id": "luban-south",
+      "name": "鲁班路南端：收齐双向车道与外侧转弯段",
+      "origin": [-935, -1217],
+      "outward": [-0.35, -0.937],
+      "halfWidth": 35,
+      "length": 150
+    },
+    {
+      "id": "daxue-west",
+      "name": "大学东路西端：路口外侧统一收边",
+      "origin": [-963, -1135],
+      "outward": [-0.96, 0.28],
+      "halfWidth": 50,
+      "length": 150
+    },
+    {
+      "id": "luban-isolated-service",
+      "name": "鲁班路西侧：移除无后续连接的校外短支路",
+      "origin": [-920, -1094.5],
+      "outward": [-0.96, 0.28],
+      "halfWidth": 5,
+      "length": 45
+    }
+  ]
+}
