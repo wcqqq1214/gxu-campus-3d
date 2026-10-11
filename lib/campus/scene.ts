@@ -1,3 +1,4 @@
+import { createPalette } from './palette';
 import { createSky } from './sky';
 import { LIGHTING } from './lighting';
 import { navigationFootprints } from './navigation';
@@ -83,6 +84,7 @@ export function createScene(
   const scene = new THREE.Scene();
   let convexCulling: ReturnType<typeof createConvexCulling> | null = null;
   const contextStyle = createContextStyle();
+  const palette = createPalette(buildings);
   const sky = createSky();
   scene.background = sky.texture;
   scene.fog = sky.fog;
@@ -655,6 +657,7 @@ export function createScene(
       const mats = Array.isArray(o.material) ? o.material : [o.material];
       for (const m of mats) {
         if (m instanceof THREE.MeshStandardMaterial) {
+          palette.surface(m);
           contextStyle.apply(m);
           if (
             ['sportWhite', 'roadWhite', 'roadYellow', 'tactile'].includes(
@@ -760,6 +763,7 @@ export function createScene(
         throw new DOMException('Request cancelled', 'AbortError');
       }
       loadedBytes += a.bytes;
+      palette.buildings(gltf.scene, key);
       styleMeshes(gltf.scene);
       batchSportsSurfaces(gltf.scene);
       batchStaticRoadSurfaces(gltf.scene);
