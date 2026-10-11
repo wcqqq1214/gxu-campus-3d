@@ -13,9 +13,9 @@ export class AdaptiveQuality {
     this.good = 0;
     this.cooldown = 0;
   }
-  sample(fps: number, frames: number): boolean {
+  sample(fps: number, frames: number, continuous = false): boolean {
     this.cooldown = Math.max(0, this.cooldown - 1);
-    if (frames < 6 || !Number.isFinite(fps) || fps <= 0) {
+    if (frames < (continuous ? 1 : 6) || !Number.isFinite(fps) || fps <= 0) {
       this.low = 0;
       this.good = 0;
       return false;
@@ -50,6 +50,7 @@ export function qualityProfile(
   return {
     level,
     pixelRatio: [1.75, 1.4, 1.25][level],
+    resolutionScale: level === 2 ? 0.9 : 1,
     shadows: level === 0,
     postprocessing: quality === 'fine' && level === 0,
     nearTrees: level === 0,

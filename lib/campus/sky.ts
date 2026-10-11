@@ -36,8 +36,11 @@ export function createSky() {
     const sky = SKIES[preset];
     const gradient = context.createLinearGradient(0, 0, 0, 128);
     gradient.addColorStop(0, sky.zenith);
-    gradient.addColorStop(0.48, sky.horizon);
-    gradient.addColorStop(0.52, sky.horizon);
+    // Keep a blue upper sky visible in the low-angle views used by the map;
+    // concentrate the warm haze within roughly 20 degrees of the horizon.
+    gradient.addColorStop(0.38, sky.zenith);
+    gradient.addColorStop(0.49, sky.horizon);
+    gradient.addColorStop(0.51, sky.horizon);
     gradient.addColorStop(1, sky.lower);
     context.fillStyle = gradient;
     context.fillRect(0, 0, 256, 128);

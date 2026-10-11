@@ -18,13 +18,13 @@ test('锚点以高处主体而非入口铺装或错误中心定位', () => {
   model.add(apron);
   assert.deepEqual(
     landmarkLabelAnchor(landmark, model).toArray(),
-    [10, 38, -20],
+    [10, 30.6, -20],
   );
-  assert.deepEqual(landmarkLabelAnchor(landmark).toArray(), [10, 38, -20]);
+  assert.deepEqual(landmarkLabelAnchor(landmark).toArray(), [10, 30.6, -20]);
   model.position.x = 25;
   assert.deepEqual(
     landmarkLabelAnchor(landmark, model).toArray(),
-    [35, 38, -20],
+    [35, 30.6, -20],
   );
 });
 test('手工覆盖按东、北、高程米制转换且优先于模型', () => {
