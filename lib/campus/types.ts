@@ -89,6 +89,7 @@ export interface Overview {
   layers: Record<string, number>;
 }
 export interface Metrics {
+  postprocessing?: 'ready' | 'failed' | 'loading' | 'off';
   benchmark?: {
     orbiting: boolean;
     camera: {
