@@ -75,8 +75,19 @@ def preserve_geometry(previous,path,names,materials=None):
     for name in names:
         a=old_nodes[name];b=new_nodes[name]
         before=old['meshes'][a['mesh']]['primitives'];after=new['meshes'][b['mesh']]['primitives']
-        assert len(before)==len(after)
-        for p,q in zip(before,after):
+        if materials is None:
+            assert len(before)==len(after)
+            pairs=list(zip(before,after))
+        else:
+            # A bounded update may export only changed material primitives.
+            # Match by material name so omitted primitives remain byte-exact.
+            pairs=[]
+            present={old['materials'][p['material']]['name'] for p in before}
+            for material in materials & present:
+                p,=[p for p in before if old['materials'][p['material']]['name']==material]
+                q,=[q for q in after if new['materials'][q['material']]['name']==material]
+                pairs.append((p,q))
+        for p,q in pairs:
             assert old['materials'][p['material']]['name']==new['materials'][q['material']]['name']
             if materials is not None and old['materials'][p['material']]['name'] not in materials:continue
             ext=copy.deepcopy(p['extensions']['KHR_draco_mesh_compression']);view=old['bufferViews'][ext['bufferView']];offset=view.get('byteOffset',0);blob=oldbin[offset:offset+view['byteLength']]

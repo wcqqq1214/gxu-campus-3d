@@ -41,6 +41,8 @@ def signatures(raw):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir', type=Path, required=True)
+    parser.add_argument('--input-root', type=Path, default=ROOT, help='Original repository or a preceding candidate')
+    parser.add_argument('--layer', choices=['roads', 'sports'], default='roads')
     parser.add_argument('--cut-id', action='append', help='Apply only these new cuts; repeat for multiple IDs')
     parser.add_argument('--repair-clearance', action='store_true', help='Repair configured terrain poke-throughs')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
@@ -48,7 +50,12 @@ def main():
     if output == ROOT or ROOT/'public' in output.parents or ROOT/'blender' in output.parents:
         raise ValueError('Use an isolated candidate output directory')
     output.mkdir(parents=True, exist_ok=True)
-    cuts = load_cuts(ids=args.cut_id)
+    input_root = args.input_root.resolve()
+    layer = args.layer
+    source_name = 'roads' if layer == 'roads' else '其他运动场地'
+    cuts = load_cuts(ids=args.cut_id, filename='road-display-cleanup.json' if layer == 'roads' else 'surface-display-cleanup.json')
+    if layer != 'roads' and args.repair_clearance:
+        raise ValueError('Terrain clearance repair applies only to roads')
     repairs = load_repairs() if args.repair_clearance else []
     def repair(mesh, road):
         if not repairs:
@@ -62,13 +69,13 @@ def main():
                                          list(road.data.materials).index(bpy.data.materials['asphalt']), repairs)
         assert report['changedFaces'] > 0, report
         return result, report
-    original = (ROOT/'public/models/base.glb').read_bytes()
+    original = (input_root/'public/models/base.glb').read_bytes()
     document, _ = unpack(original)
     metadata = mesh_nodes_by_name(document)['roads'].get('extras', {})
-    if metadata.get('positionQuantizationBits') != 18 or not metadata.get('sharedPositionQuantizationBounds'):
+    if layer == 'roads' and (metadata.get('positionQuantizationBits') != 18 or not metadata.get('sharedPositionQuantizationBounds')):
         raise ValueError('Road display update requires the existing shared 18-bit position grid')
-    bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'))
-    source = bpy.data.objects['roads']
+    bpy.ops.wm.open_mainfile(filepath=str(input_root/'blender/gxu-campus.blend'))
+    source = bpy.data.objects[source_name]
     untouched = {o.name: (o.as_pointer(), o.data.as_pointer() if o.data else None)
                  for o in bpy.data.objects if o != source}
     mesh = Mesh()
@@ -107,7 +114,7 @@ def main():
     bpy.data.objects.remove(source, do_unlink=True)
     if source_data.users == 0:
         bpy.data.meshes.remove(source_data)
-    obj.name = 'roads'
+    obj.name = source_name
     assert all((bpy.data.objects[k].as_pointer(), bpy.data.objects[k].data.as_pointer()
                 if bpy.data.objects[k].data else None) == value for k, value in untouched.items())
     (output/'blender').mkdir(exist_ok=True)
@@ -115,10 +122,10 @@ def main():
     # The shipping road contains past export-only seam/UV fixes. Trim its actual
     # decoded triangles rather than recreating those unrelated corrections.
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/models/base.glb'))
+    bpy.ops.import_scene.gltf(filepath=str(input_root/'public/models/base.glb'))
     bpy.context.view_layer.update()
     delivered = next(o for o in bpy.context.scene.objects
-                     if o.type == 'MESH' and o.name.split('.')[0] == 'roads')
+                     if o.type == 'MESH' and o.name.split('.')[0] == layer)
     mesh = Mesh()
     mesh.v = [tuple(delivered.matrix_world @ v.co) for v in delivered.data.vertices]
     mesh.f = [tuple(p.vertices) for p in delivered.data.polygons]
@@ -129,12 +136,21 @@ def main():
     # Read Draco's encoded lattice instead of inferring it from decoded bounds.
     domain = json.loads(subprocess.check_output(
         ['node', str(ROOT/'scripts/road-position-domain.mjs'),
-         str(ROOT/'public/models/base.glb')], cwd=ROOT, text=True))
+         str(input_root/'public/models/base.glb'), *([] if layer == 'roads' else ['sports', 'sport'])], cwd=ROOT, text=True))
     fixed, decoded_report = trim_mesh(mesh, cuts)
     fixed, decoded_clearance_report = repair(fixed, delivered)
     geometry.MATERIALS = list(delivered.data.materials)
     assert changed == {delivered.data.materials[i].name for i in fixed.changed_materials}
-    exported = fixed.object('roads', bpy.context.scene.collection, {'layer': 'roads'})
+    if layer == 'sports':
+        assert changed == {'sport'}, changed
+        # Other sports materials have independent compression domains and are
+        # copied verbatim from the published GLB instead of being re-exported.
+        keep = [i for i, mat in enumerate(fixed.m) if delivered.data.materials[mat].name in changed]
+        fixed.f = [fixed.f[i] for i in keep]
+        fixed.m = [fixed.m[i] for i in keep]
+        fixed.source_uvs = [fixed.source_uvs[i] for i in keep]
+        fixed.source_face_indices = [fixed.source_face_indices[i] for i in keep]
+    exported = fixed.object(layer, bpy.context.scene.collection, {'layer': layer})
     for p, uvs, old_index in zip(exported.data.polygons, fixed.source_uvs, fixed.source_face_indices):
         p.use_smooth = delivered.data.polygons[old_index].use_smooth
         for i, uv in zip(p.loop_indices, uvs):
@@ -145,19 +161,19 @@ def main():
         bpy.ops.export_scene.gltf(
             filepath=str(output/'roads.glb'), export_format='GLB', use_selection=True,
             export_extras=True, export_draco_mesh_compression_enable=True,
-            export_draco_mesh_compression_level=6, export_draco_position_quantization=18,
+            export_draco_mesh_compression_level=6, export_draco_position_quantization=domain['bits'],
             export_draco_texcoord_quantization=12, export_draco_normal_quantization=6,
             export_materials='EXPORT', export_cameras=False, export_lights=False)
     candidate = output/'public/models/base.glb'
     candidate.parent.mkdir(parents=True, exist_ok=True)
     candidate.write_bytes(original)
-    preserve_geometry((output/'roads.glb').read_bytes(), candidate, ['roads'], materials=changed)
+    preserve_geometry((output/'roads.glb').read_bytes(), candidate, [layer], materials=changed)
     compact_buffer_views(candidate)
     before, after = signatures(original), signatures(candidate.read_bytes())
     assert before.keys() == after.keys()
-    assert all(v == after[k] for k, v in before.items() if k != 'roads')
-    assert all(p == q for p, q in zip(before['roads'], after['roads']) if p[0] not in changed)
-    manifest = json.loads((ROOT/'public/data/models.json').read_text())
+    assert all(v == after[k] for k, v in before.items() if k != layer)
+    assert all(p == q for p, q in zip(before[layer], after[layer]) if p[0] not in changed)
+    manifest = json.loads((input_root/'public/data/models.json').read_text())
     raw = candidate.read_bytes()
     manifest['base'].update(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
     assert len(raw) + manifest['trees']['bytes'] < 6_000_000
@@ -165,7 +181,7 @@ def main():
     (output/'public/data/models.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
     summary = dict(cuts=report, decodedCuts=decoded_report,
                    clearance=clearance_report, decodedClearance=decoded_clearance_report,
-                   changedBaseNodes=['roads'], changedRoadMaterials=sorted(changed),
+                   changedBaseNodes=[layer], changedMaterials=sorted(changed),
                    retainedBaseNodes=len(before)-1, retainedSourceObjects=len(untouched),
                    outsideChangedFaces=outside_changed, positionDomain=domain, baseBytes=len(raw))
     (output/'report.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2)+'\n')

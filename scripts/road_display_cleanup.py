@@ -10,8 +10,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def load_cuts(root=ROOT, ids=None):
-    data = json.loads((root / 'data/road-display-cleanup.json').read_text())
+def load_cuts(root=ROOT, ids=None, filename='road-display-cleanup.json'):
+    data = json.loads((root / 'data' / filename).read_text())
     if data['version'] != 1:
         raise ValueError('Unsupported road display cleanup version')
     result = []

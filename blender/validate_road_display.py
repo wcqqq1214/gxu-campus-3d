@@ -23,15 +23,16 @@ def surface_bvh(name, material=None):
     return BVHTree.FromPolygons(vertices, faces, all_triangles=True)
 
 
-def load(path, source):
+def load(path, source, layer='roads'):
     if source:
         bpy.ops.wm.open_mainfile(filepath=str(path))
     else:
         bpy.ops.wm.read_factory_settings(use_empty=True)
         bpy.ops.import_scene.gltf(filepath=str(path))
         bpy.context.view_layer.update()
+    name = '其他运动场地' if source and layer == 'sports' else layer
     obj, = [o for o in bpy.context.scene.objects
-            if o.type == 'MESH' and o.name.split('.')[0] == 'roads']
+            if o.type == 'MESH' and o.name.split('.')[0] == name]
     obj.data.calc_loop_triangles()
     vertices = [tuple(obj.matrix_world @ v.co) for v in obj.data.vertices]
     faces = [tuple(t.vertices) for t in obj.data.loop_triangles]
@@ -59,9 +60,13 @@ def main():
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--cut-id', action='append', help='Validate only cuts newly applied to this baseline')
     parser.add_argument('--repair-clearance', action='store_true')
+    parser.add_argument('--layer', choices=['roads', 'sports'], default='roads')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
-    cuts = load_cuts(ids=args.cut_id)
-    config = json.loads((ROOT/'data/road-display-cleanup.json').read_text())
+    filename = 'road-display-cleanup.json' if args.layer == 'roads' else 'surface-display-cleanup.json'
+    cuts = load_cuts(ids=args.cut_id, filename=filename)
+    config = json.loads((ROOT/'data'/filename).read_text())
+    if args.layer != 'roads' and args.repair_clearance:
+        raise ValueError('Terrain clearance repair applies only to roads')
     repairs = load_repairs() if args.repair_clearance else []
     def repair_point(point):
         return any(r['bounds'][0]-.08 <= point[0] <= r['bounds'][2]+.08
@@ -69,9 +74,9 @@ def main():
     report = {}
     for kind, relative, source in [('source', 'blender/gxu-campus.blend', True),
                                    ('decoded', 'public/models/base.glb', False)]:
-        vertices, faces, before = load(args.baseline_root.resolve()/relative, source)
+        vertices, faces, before = load(args.baseline_root.resolve()/relative, source, args.layer)
         old_asphalt = surface_bvh('roads', 'asphalt') if repairs else None
-        _, _, after = load(args.candidate_root.resolve()/relative, source)
+        _, _, after = load(args.candidate_root.resolve()/relative, source, args.layer)
         new_asphalt = surface_bvh('roads', 'asphalt') if repairs else None
         terrain = surface_bvh('terrain') if repairs else None
         kept = removed = boundary = 0
@@ -110,13 +115,13 @@ def main():
                 if delta > (.02 if touched and not source else .002) and not repair_point(point):
                     problems.append(('height changed', point, old.z, new.z))
         assert not problems, (kind, len(problems), problems[:10])
-        assert kept > 50_000 and removed > 0, (kind, kept, removed)
+        assert kept > (50_000 if args.layer == 'roads' else 500) and removed > 0, (kind, kept, removed)
         # Former road-tail witnesses detect a no-op build independently of the
         # clipping implementation. Junction centres detect accidental severing.
-        for point in [c['removedProbe'] for c in cuts]:
+        for point in [p for c in cuts for p in c.get('removedProbes', [c.get('removedProbe')])]:
             assert ray(before, *point) is not None, ('baseline tail missing', kind, point)
             assert ray(after, *point) is None, ('tail remains', kind, point)
-        for point in config['retainedProbes']:
+        for point in config.get('retainedProbes', []):
             assert ray(before, *point) is not None, ('baseline junction missing', kind, point)
             assert ray(after, *point) is not None, ('junction missing', kind, point)
         report[kind] = dict(retainedSamples=kept, removedSamples=removed,
