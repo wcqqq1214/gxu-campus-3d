@@ -22,7 +22,7 @@ export async function createPrimitiveDecoder(doc, bin) {
     fs.rmSync(temporary, { recursive: true, force: true });
   }
 
-  function decode(primitive) {
+  function decode(primitive, { positionDomainOnly = false } = {}) {
     const ext = primitive.extensions.KHR_draco_mesh_compression;
     const view = doc.bufferViews[ext.bufferView];
     const bytes = bin.subarray(
@@ -33,8 +33,21 @@ export async function createPrimitiveDecoder(doc, bin) {
       input = new draco.DecoderBuffer(),
       mesh = new draco.Mesh();
     input.Init(new Int8Array(bytes), bytes.length);
+    if (positionDomainOnly) decoder.SkipAttributeTransform(draco.POSITION);
     const status = decoder.DecodeBufferToMesh(input, mesh);
     assert(status.ok(), status.error_msg());
+    if (positionDomainOnly) {
+      const attribute = decoder.GetAttributeByUniqueId(mesh, ext.attributes.POSITION);
+      const transform = new draco.AttributeQuantizationTransform();
+      assert(transform.InitFromAttribute(attribute), 'Road positions are not quantized');
+      const domain = {
+        origin: [0, 1, 2].map((i) => transform.min_value(i)),
+        range: transform.range(),
+        bits: transform.quantization_bits(),
+      };
+      for (const object of [transform, status, mesh, input, decoder]) draco.destroy(object);
+      return domain;
+    }
     const geometry = new THREE.BufferGeometry();
     for (const [semantic, id] of Object.entries(ext.attributes)) {
       const attribute = decoder.GetAttributeByUniqueId(mesh, id);

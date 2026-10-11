@@ -1,5 +1,7 @@
 """Removing an extremal road tail must not move the surviving decoded vertices."""
 import sys
+import json
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -13,7 +15,7 @@ from export_attributes import omit_unused_uvs
 
 
 def export(mesh, path, domain=None):
-    obj = mesh.object('test-road', bpy.context.scene.collection)
+    obj = mesh.object('roads', bpy.context.scene.collection)
     bpy.ops.object.select_all(action='DESELECT')
     obj.select_set(True)
     with omit_unused_uvs(deduplicate_vertices=True, share_position_bounds=True,
@@ -64,4 +66,18 @@ with tempfile.TemporaryDirectory() as directory:
     assert any(min(np.linalg.norm(np.array(p)-q) for q in unpinned.v) > .0001 for p in expected)
     assert set(pinned.v) == expected, (set(pinned.v)-expected, expected-set(pinned.v))
     assert len(pinned.f) == 2, 'Quantization anchors must not become visible geometry'
+    # A second cleanup must recover the first export's original encoded grid,
+    # even though its northmost vertices no longer exist in the decoded mesh.
+    project = Path(__file__).resolve().parents[1]
+    encoded_domain = json.loads(subprocess.check_output(
+        ['node', str(project/'scripts/road-position-domain.mjs'), str(root/'pinned.glb')],
+        cwd=project, text=True))
+    assert encoded_domain == {**domain, 'bits': 18}
+    second = Mesh()
+    for face, mat in zip(pinned.f, pinned.m):
+        if mat == 0:
+            second.face([pinned.v[i] for i in face], mat)
+    expected_second = set(second.v)
+    export(second, root/'second.glb', encoded_domain)
+    assert set(decode(root/'second.glb').v) == expected_second
 print('ROAD_DISPLAY_FIXED_QUANTIZATION passed', flush=True)

@@ -10,6 +10,7 @@ import hashlib
 import json
 from pathlib import Path
 import sys
+import subprocess
 
 import bpy
 
@@ -39,12 +40,13 @@ def signatures(raw):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir', type=Path, required=True)
+    parser.add_argument('--cut-id', action='append', help='Apply only these new cuts; repeat for multiple IDs')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
     output = args.output_dir.resolve()
     if output == ROOT or ROOT/'public' in output.parents or ROOT/'blender' in output.parents:
         raise ValueError('Use an isolated candidate output directory')
     output.mkdir(parents=True, exist_ok=True)
-    cuts = load_cuts()
+    cuts = load_cuts(ids=args.cut_id)
     original = (ROOT/'public/models/base.glb').read_bytes()
     document, _ = unpack(original)
     metadata = mesh_nodes_by_name(document)['roads'].get('extras', {})
@@ -107,14 +109,11 @@ def main():
     mesh.m = [p.material_index for p in delivered.data.polygons]
     mesh.source_uvs = [[tuple(delivered.data.uv_layers.active.data[i].uv)
                        for i in p.loop_indices] for p in delivered.data.polygons]
-    # glTF is Y-up. Retain the full decoded road's shared grid, including the
-    # northmost extrema about to be removed, so every old vertex re-encodes
-    # onto the same lattice as the untouched material primitives.
-    import numpy as np
-    positions = np.array(mesh.v, dtype=np.float32)[:, [0, 2, 1]]
-    positions[:, 2] *= -1
-    origin = positions.min(axis=0)
-    domain = {'origin': origin.tolist(), 'range': float((positions.max(axis=0)-origin).max())}
+    # Earlier trims may already have removed every original extremal vertex.
+    # Read Draco's encoded lattice instead of inferring it from decoded bounds.
+    domain = json.loads(subprocess.check_output(
+        ['node', str(ROOT/'scripts/road-position-domain.mjs'),
+         str(ROOT/'public/models/base.glb')], cwd=ROOT, text=True))
     fixed, decoded_report = trim_mesh(mesh, cuts)
     geometry.MATERIALS = list(delivered.data.materials)
     assert changed == {delivered.data.materials[i].name for i in fixed.changed_materials}
