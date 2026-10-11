@@ -8,6 +8,7 @@
 | Draco 解码器 public/draco | Apache 2.0，© The Draco Authors，完整许可见 [DRACO-LICENSE.txt](DRACO-LICENSE.txt)。 |
 | React、Vinext、shadcn / Base UI、Lucide 等依赖 | 各 npm 包的 LICENSE 与 package-lock.json 保留版本；未改变第三方权利。 |
 | Ma Shan Zheng 字体 blender/fonts/MaShanZheng-Regular.ttf | SIL Open Font License 1.1，版权声明与完整许可见 [OFL.txt](../blender/fonts/OFL.txt)。南门立体校名字形由此字体生成，是对原校名书法的近似替代；原字体不属于项目原创。 |
+| Noto Serif SC 子集 app/fonts/gxu-serif.woff2 | SIL Open Font License 1.1，© 2017-2024 Adobe (http://www.adobe.com/)，完整许可见 [NOTO-SERIF-OFL.txt](NOTO-SERIF-OFL.txt)。界面标题使用按项目文案裁剪的子集，原字体不属于项目原创。 |
 | 校方照片、视频、PDF | 校方或摄影者版权所有；仅作建筑参考并提供链接，不包含于网页纹理和发布模型资源。 |
 
 项目原创代码、文档、模型、材质和渲染图采用 [MIT](../LICENSE)，不重新许可第三方数据库、字体、参考摄影或依赖代码。使用 OSM 原始与衍生数据库时保留其 ODbL 署名和共享相同方式义务；对应地理数据见 `public/data/geography.geojson` 和 `data/snapshots`。
