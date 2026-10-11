@@ -40,7 +40,7 @@ next-env.d.ts
 *.blend
 *.blend[0-9]*
 # Development reports, acceptance records and screenshots stay local.
-# Only maintained project documentation, README images and validation inputs are tracked.
+# Only maintained project documentation and README images are tracked.
 /docs/*
 !/docs/DATA.md
 !/docs/DESIGN.md
@@ -50,15 +50,6 @@ next-env.d.ts
 !/docs/screenshots/readme/
 /docs/screenshots/readme/*
 !/docs/screenshots/readme/*.jpg
-!/docs/model-checks/
-/docs/model-checks/*
-!/docs/model-checks/north-road-baseline.json.gz
-!/docs/model-checks/refinement/
-/docs/model-checks/refinement/*
-!/docs/model-checks/refinement/footprint-baseline.json
-!/docs/model-checks/refinement/s4-paving-before-geometry.json
-!/docs/model-checks/refinement/s4-shore-before-ground.json
-!/docs/model-checks/refinement/s2-office-entry-evidence.json
 *.tsbuildinfo
 
 __pycache__/
