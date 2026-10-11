@@ -1,3 +1,4 @@
+import { createSky } from './sky';
 import { LIGHTING } from './lighting';
 import { navigationFootprints } from './navigation';
 import { treeRotation, treeElevation, prioritizeTreeRows } from './vegetation';
@@ -82,8 +83,9 @@ export function createScene(
   const scene = new THREE.Scene();
   let convexCulling: ReturnType<typeof createConvexCulling> | null = null;
   const contextStyle = createContextStyle();
-  scene.background = new THREE.Color('#d8e5e5');
-  scene.fog = new THREE.Fog('#d8e5e5', 8500, 22000);
+  const sky = createSky();
+  scene.background = sky.texture;
+  scene.fog = sky.fog;
   const renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: false,
@@ -166,25 +168,7 @@ export function createScene(
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = -22;
   scene.add(ground);
-  const skyCanvas = document.createElement('canvas');
-  skyCanvas.width = 256;
-  skyCanvas.height = 128;
-  const skyContext = skyCanvas.getContext('2d')!;
-  const gradient = skyContext.createLinearGradient(0, 0, 0, 128);
-  gradient.addColorStop(0, '#719cc4');
-  gradient.addColorStop(0.5, '#e2ebdf');
-  gradient.addColorStop(0.52, '#9ca989');
-  gradient.addColorStop(1, '#52684e');
-  skyContext.fillStyle = gradient;
-  skyContext.fillRect(0, 0, 256, 128);
-  skyContext.fillStyle = '#fff5d8';
-  skyContext.beginPath();
-  skyContext.arc(55, 30, 5, 0, Math.PI * 2);
-  skyContext.fill();
-  const skyTexture = new THREE.CanvasTexture(skyCanvas);
-  skyTexture.mapping = THREE.EquirectangularReflectionMapping;
-  skyTexture.colorSpace = THREE.SRGBColorSpace;
-  scene.environment = skyTexture;
+  scene.environment = sky.texture;
   scene.environmentIntensity = 0.24;
   const loader = new GLTFLoader();
   const draco = new DRACOLoader();
@@ -1204,14 +1188,7 @@ export function createScene(
   }
   function setPreset(p: Preset) {
     preset = p;
-    const sky = {
-      morning: '#d8e5e1',
-      day: '#d8e5e5',
-      evening: '#e8d7cb',
-      night: '#182b3a',
-    }[p];
-    scene.background = new THREE.Color(sky);
-    scene.fog = new THREE.Fog(sky, 8500, 22000);
+    scene.fog = sky.setPreset(p);
     const light = LIGHTING[p];
     sun.color.set(light.sun);
     sun.intensity = light.power;
@@ -1652,7 +1629,7 @@ export function createScene(
       }
       contextStyle.dispose();
       effects?.dispose();
-      skyTexture.dispose();
+      sky.dispose();
       renderer.dispose();
       canvas.remove();
       labels.remove();
