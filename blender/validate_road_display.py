@@ -50,8 +50,10 @@ def main():
     parser.add_argument('--baseline-root', type=Path, required=True)
     parser.add_argument('--candidate-root', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
+    parser.add_argument('--cut-id', action='append', help='Validate only cuts newly applied to this baseline')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
-    cuts = load_cuts()
+    cuts = load_cuts(ids=args.cut_id)
+    config = json.loads((ROOT/'data/road-display-cleanup.json').read_text())
     report = {}
     for kind, relative, source in [('source', 'blender/gxu-campus.blend', True),
                                    ('decoded', 'public/models/base.glb', False)]:
@@ -94,11 +96,11 @@ def main():
         assert kept > 50_000 and removed > 500, (kind, kept, removed)
         # Former road-tail witnesses detect a no-op build independently of the
         # clipping implementation. Junction centres detect accidental severing.
-        for point in [(505, 1270), (745, 1030), (-942, -1242),
-                      (-979, -1128), (-946, -1087)]:
+        for point in [c['removedProbe'] for c in cuts]:
             assert ray(before, *point) is not None, ('baseline tail missing', kind, point)
             assert ray(after, *point) is None, ('tail remains', kind, point)
-        for point in [(555, 1045), (-915, -1148)]:
+        for point in config['retainedProbes']:
+            assert ray(before, *point) is not None, ('baseline junction missing', kind, point)
             assert ray(after, *point) is not None, ('junction missing', kind, point)
         report[kind] = dict(retainedSamples=kept, removedSamples=removed,
                             boundarySamples=boundary, maxUncutHeightDelta=maximum,

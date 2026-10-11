@@ -61,7 +61,7 @@ npm run models:build
 | 植被与绿篱 | `data/vegetation-zones.json`、`vegetation-avenues.json`、`low-planting.json` → 植被准备及 `blender/tree_layout.py` |
 | 南门字形与场地 | `blender/fonts/gxu-wordmark.json`、`data/south-gate-site.json`；维护入口为 `prepare_gate_wordmark.py`、`prepare_south_gate_site.py` |
 
-周边道路的展示收边由 `data/road-display-cleanup.json` 配置，`scripts/road_display_cleanup.py` 在最终普通道路网格上同步裁切路面、辅路和路缘。该步骤不修改 OSM 轴线及场地计算使用的原始道路数据；完整建模也会应用同一组裁切。当前范围为安阳路—秀厢大道、鲁班路—大学东路两处路口及一条校外孤立支路。
+周边道路的展示收边由 `data/road-display-cleanup.json` 配置，`scripts/road_display_cleanup.py` 在最终普通道路网格上同步裁切路面、辅路和路缘。该步骤不修改 OSM 轴线及场地计算使用的原始道路数据；完整建模也会应用同一组裁切。当前覆盖东北、西北、西南路口、南门东侧大学东路及新东门外秀灵路西一里的外伸尾段。火炬路、农院路、秀灵路西二里及校门连接保留。
 
 增量更新生成独立候选目录，保留其他 GLB 节点和源场景对象。网页候选从已发布道路的解码网格裁切，并固定原有 18 位压缩坐标范围，以保留既有导出接缝修整；源文件单独应用相同裁切。以下基准目录须包含修改前的 `blender/gxu-campus.blend` 和 `public/models/base.glb`。核对几何和浏览器效果后，成套更新 `.blend`、`base.glb` 和 `models.json`。
 
@@ -69,6 +69,8 @@ npm run models:build
 blender --background --python-exit-code 1 --python blender/update_road_display.py -- --output-dir=work/road-cleanup-candidate
 blender --background --python-exit-code 1 --python blender/validate_road_display.py -- --baseline-root=/path/to/before --candidate-root=work/road-cleanup-candidate --report=work/road-cleanup-check.json
 ```
+
+在已经收边的模型上继续增量清理时，两个命令均用可重复的 `--cut-id` 指定本轮新增截面，例如 `--cut-id=xiuxiang-west --cut-id=daxue-east --cut-id=xiuling-west-first-east`。更新工具通过 Node.js 和仓库自带的 Draco 解码器读取原有量化范围，避免多次裁切后因范围缩小导致未修改道路偏移。每个截面的 `removedProbe` 验证旧尾段确实被移除，`retainedProbes` 验证路口和必要连接仍在。
 
 普通楼主体、屋顶、入口和主要立面在基础与近景中共用形体，近景增加窗框等细构件。常用约束如下，完整取值和相交检查由相应解析器与测试定义：
 

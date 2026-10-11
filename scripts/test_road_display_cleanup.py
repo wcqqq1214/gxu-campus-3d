@@ -44,16 +44,21 @@ class RoadDisplayCleanupTests(unittest.TestCase):
         mask = unary_union([Polygon(c['polygon']) for c in cuts])
         self.assertLess(mask.intersection(campus).area, 1e-8)
         # Junction centres and every mapped campus destination remain clear.
-        anchors = [(555, 1045), (-915, -1148)]
+        anchors = json.loads((ROOT/'data/road-display-cleanup.json').read_text())['retainedProbes']
         landmarks = json.loads((ROOT/'public/data/landmarks.json').read_text())
         anchors.extend(l['center'] for l in landmarks)
         for point in anchors:
             self.assertGreater(mask.distance(Point(point)), 10)
         # Explicit former tail witnesses must fall inside their intended masks.
-        witnesses = [(505, 1270), (745, 1030), (-942, -1242),
-                     (-979, -1128), (-946, -1087)]
-        for cut, point in zip(cuts, witnesses):
-            self.assertTrue(Polygon(cut['polygon']).contains(Point(point)), cut['id'])
+        for cut in cuts:
+            self.assertTrue(Polygon(cut['polygon']).contains(Point(cut['removedProbe'])), cut['id'])
+
+    def test_incremental_cut_selection_is_explicit(self):
+        cuts = load_cuts(ids=['xiuxiang-west', 'daxue-east', 'xiuling-west-first-east'])
+        self.assertEqual([c['id'] for c in cuts],
+                         ['xiuxiang-west', 'daxue-east', 'xiuling-west-first-east'])
+        with self.assertRaises(ValueError):
+            load_cuts(ids=['misspelled-cut'])
 
 
 if __name__ == '__main__':

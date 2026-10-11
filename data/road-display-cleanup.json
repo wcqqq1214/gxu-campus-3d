@@ -1,6 +1,7 @@
 {
   "version": 1,
   "basis": "2026-10-11 展示收边：保留路口及沿校连接，校外车道、辅路和路缘共用垂直于道路的截面。仅裁切普通道路模型，不修改原始 OSM 轴线、校园道路或独立桥梁。坐标为东 X、北 Y，单位米。",
+  "retainedProbes": [[555, 1045], [-915, -1148], [-940, 1180], [-310, -1335], [535, -675], [900, 20], [629.67, -293.08], [260, -982]],
   "cuts": [
     {
       "id": "anyang-north",
@@ -8,7 +9,8 @@
       "origin": [520, 1209],
       "outward": [-0.23, 0.974],
       "halfWidth": 45,
-      "length": 220
+      "length": 220,
+      "removedProbe": [505, 1270]
     },
     {
       "id": "xiuxiang-east",
@@ -16,7 +18,8 @@
       "origin": [669, 1040],
       "outward": [0.99, -0.14],
       "halfWidth": 80,
-      "length": 200
+      "length": 200,
+      "removedProbe": [745, 1030]
     },
     {
       "id": "luban-south",
@@ -24,7 +27,8 @@
       "origin": [-935, -1217],
       "outward": [-0.35, -0.937],
       "halfWidth": 35,
-      "length": 150
+      "length": 150,
+      "removedProbe": [-942, -1242]
     },
     {
       "id": "daxue-west",
@@ -32,7 +36,8 @@
       "origin": [-963, -1135],
       "outward": [-0.96, 0.28],
       "halfWidth": 50,
-      "length": 150
+      "length": 150,
+      "removedProbe": [-979, -1128]
     },
     {
       "id": "luban-isolated-service",
@@ -40,7 +45,35 @@
       "origin": [-920, -1094.5],
       "outward": [-0.96, 0.28],
       "halfWidth": 5,
-      "length": 45
+      "length": 45,
+      "removedProbe": [-946, -1087]
+    },
+    {
+      "id": "xiuxiang-west",
+      "name": "秀厢大道西端：保留鲁班路转弯后统一收边",
+      "origin": [-1050, 1190],
+      "outward": [-1, 0],
+      "halfWidth": 55,
+      "length": 190,
+      "removedProbe": [-1140, 1190]
+    },
+    {
+      "id": "daxue-east",
+      "name": "大学东路东端：保留南门与火炬路连接后收边",
+      "origin": [-240, -1370],
+      "outward": [0.94, -0.34],
+      "halfWidth": 60,
+      "length": 230,
+      "removedProbe": [-100, -1420]
+    },
+    {
+      "id": "xiuling-west-first-east",
+      "name": "秀灵路西一里东端：保留新东门及沿校路段，移除校外折角尾段",
+      "origin": [740, -675],
+      "outward": [1, 0.01],
+      "halfWidth": 85,
+      "length": 320,
+      "removedProbe": [920, -670]
     }
   ]
 }

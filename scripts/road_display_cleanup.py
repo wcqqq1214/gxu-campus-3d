@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def load_cuts(root=ROOT):
+def load_cuts(root=ROOT, ids=None):
     data = json.loads((root / 'data/road-display-cleanup.json').read_text())
     if data['version'] != 1:
         raise ValueError('Unsupported road display cleanup version')
@@ -33,6 +33,11 @@ def load_cuts(root=ROOT):
                                   max(p[0] for p in points), max(p[1] for p in points)]})
     if len({c['id'] for c in result}) != len(result):
         raise ValueError('Duplicate road display cut ID')
+    if ids is not None:
+        unknown = set(ids) - {c['id'] for c in result}
+        if unknown:
+            raise ValueError(f'Unknown road display cuts: {sorted(unknown)}')
+        result = [c for c in result if c['id'] in ids]
     return result
 
 
