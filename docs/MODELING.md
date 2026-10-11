@@ -74,6 +74,8 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 
 南门西侧空地的环路、向北断头段及残余接头由 `southwest-empty-loop`、`southwest-dead-end`、`southwest-service-stub` 三个截面移除；不规则截面可使用逆时针凸多边形 `polygon`，保留沿街辅路及楼栋入口。大学东路—火炬路口的地形穿透修复另见 `data/road-surface-clearance.json`：`scripts/road_surface_clearance.py` 在实际地形三角面交界处拆分原路面，仅抬高净空不足的部分，保持原 UV，避免叠加补丁。完整建模自动应用；增量更新和校验命令均加 `--repair-clearance`，校验会比较修改前穿透点及修改后路面与地形的间距。
 
+西侧空地用户圈选的横支路、三角岔路和小水塘两侧细支路使用 `west-vacant-spur`、`west-pond-service-loop` 截面；水体保留。两组棕色场地面另由 `data/surface-display-cleanup.json` 配置，记录对应的三个原始场地 ID。完整建模在创建普通运动场源对象之前应用同一组裁切。增量更新及校验均支持 `--layer=sports`；更新可用 `--input-root` 接续上一阶段候选目录。场地更新只替换 `sport` 材质的压缩网格，沿用其原始坐标量化范围，其余材质与模型节点逐字节保留。
+
 普通楼主体、屋顶、入口和主要立面在基础与近景中共用形体，近景增加窗框等细构件。常用约束如下，完整取值和相交检查由相应解析器与测试定义：
 
 - `parts` 必须覆盖原外环并保留内院；内部体量交界不生成默认窗。`floorHeights` 是逐层高度，不能用总高反推覆盖它。

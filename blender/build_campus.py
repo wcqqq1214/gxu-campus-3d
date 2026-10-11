@@ -276,6 +276,8 @@ for b in infrastructure['bridges']:
 from bridge_joins import bridge_join_mesh
 for join in campus_roads.get('bridgeJoins',[]):
     base['infra-approach-'+join['bridgeId']].extend(bridge_join_mesh(join,C,elevation,base['terrain']))
+from road_display_cleanup import load_cuts,trim_mesh
+base['sports'],surface_display_report=trim_mesh(base['sports'],load_cuts(ROOT,filename='surface-display-cleanup.json'))
 if not BASE_ONLY:base['sports'].object('其他运动场地',GROUND,{'layer':'sports'})
 for field in fields:
     mesh=athletics(field,C)

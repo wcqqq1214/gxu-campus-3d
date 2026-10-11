@@ -43,6 +43,27 @@ class IncrementalGLBTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'Ambiguous'):
             mesh_nodes_by_name({'nodes':[{'name':'terrain','mesh':0},{'name':'terrain.001','mesh':1}]})
 
+    def test_partial_material_export_keeps_omitted_primitive(self):
+        donor=self.encode('sports',b'updated-stone',6)
+        doc,buf=unpack(self.encode('sports',b'original-data',9))
+        doc['materials'].append({'name':'pitch'})
+        extra=copy.deepcopy(doc['meshes'][0]['primitives'][0]);extra['material']=1
+        extra['attributes']['POSITION']=2;extra['indices']=3
+        doc['accessors']+=copy.deepcopy(doc['accessors'])
+        # Put the omitted primitive first to exercise material-name matching.
+        doc['meshes'][0]['primitives'].insert(0,extra)
+        header=json.dumps(doc).encode();header+=b' '*(-len(header)%4)
+        raw=struct.pack('<4sII',b'glTF',2,28+len(header)+len(buf))+struct.pack('<I4s',len(header),b'JSON')+header+struct.pack('<I4s',len(buf),b'BIN\0')+buf
+        with tempfile.TemporaryDirectory() as directory:
+            p=Path(directory)/'base.glb';p.write_bytes(raw)
+            preserve_geometry(donor,p,['sports'],materials={'stone'})
+            compact_buffer_views(p)
+            result,binary=unpack(p.read_bytes())
+            for primitive,expected,count in zip(result['meshes'][0]['primitives'],[b'original-data',b'updated-stone'],[9,6]):
+                view=result['bufferViews'][primitive['extensions']['KHR_draco_mesh_compression']['bufferView']]
+                self.assertEqual(binary[view['byteOffset']:view['byteOffset']+view['byteLength']],expected)
+                self.assertEqual(result['accessors'][primitive['attributes']['POSITION']]['count'],count)
+
     def test_preserved_payload_restores_its_original_attribute_set(self):
         # A plain-material export can omit UVs; restoring an older Draco node
         # must restore that payload's accessor map as well as its bytes.

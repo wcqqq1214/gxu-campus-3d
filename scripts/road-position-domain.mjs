@@ -4,20 +4,27 @@ import assert from 'node:assert/strict';
 import { createPrimitiveDecoder } from './draco-geometry.mjs';
 
 export async function roadPositionDomain(file) {
+  return positionDomain(file, 'roads');
+}
+
+async function positionDomain(file, name, material) {
   const raw = fs.readFileSync(file), size = raw.readUInt32LE(12);
   const doc = JSON.parse(raw.subarray(20, 20 + size));
   const decode = await createPrimitiveDecoder(doc, raw.subarray(28 + size));
-  const nodes = doc.nodes.filter((n) => n.name.replace(/\.\d{3,}$/, '') === 'roads');
+  const nodes = doc.nodes.filter((n) => n.name.replace(/\.\d{3,}$/, '') === name);
   assert.equal(nodes.length, 1);
-  const domains = doc.meshes[nodes[0].mesh].primitives.map((p) =>
+  const domains = doc.meshes[nodes[0].mesh].primitives.filter((p) =>
+    !material || doc.materials[p.material].name === material,
+  ).map((p) =>
     decode(p, { positionDomainOnly: true }),
   );
-  assert.equal(domains[0].bits, 18);
+  assert(domains.length > 0);
+  if (name === 'roads') assert.equal(domains[0].bits, 18);
   for (const domain of domains) assert.deepEqual(domain, domains[0]);
   return domains[0];
 }
 
 if (process.argv[1]?.endsWith('/road-position-domain.mjs')) {
   assert(process.argv[2], 'Usage: node scripts/road-position-domain.mjs BASE_GLB');
-  console.log(JSON.stringify(await roadPositionDomain(process.argv[2])));
+  console.log(JSON.stringify(await positionDomain(process.argv[2], process.argv[3] ?? 'roads', process.argv[4])));
 }
