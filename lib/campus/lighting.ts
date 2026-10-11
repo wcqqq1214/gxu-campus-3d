@@ -54,14 +54,14 @@ export const LIGHTING: Record<
   },
   night: {
     sun: '#aac8ed',
-    power: 0.32,
-    hemisphere: 0.12,
+    power: 0.65,
+    hemisphere: 0.25,
     skyLight: '#7895bc',
     bounce: '#253342',
     fill: '#779ec8',
     fillPower: 0.04,
-    environment: 0.055,
-    exposure: 0.86,
+    environment: 0.12,
+    exposure: 0.98,
     direction: [-700, 1000, -600],
   },
 };
