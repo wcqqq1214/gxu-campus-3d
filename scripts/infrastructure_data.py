@@ -399,11 +399,12 @@ def prepare_infrastructure():
     prepare_pavings()
     from shore_data import prepare_shores
     prepare_shores()
-    from foundation_data import prepare_foundations
-    prepare_foundations()
     from vegetation_data import prepare_vegetation
     prepare_vegetation()
     from north_campus_data import prepare as prepare_north_campus
     prepare_north_campus()
+    # Fingerprint the final north-campus buildings and shore context.
+    from foundation_data import prepare_foundations
+    prepare_foundations()
 
 if __name__=='__main__':prepare_infrastructure()

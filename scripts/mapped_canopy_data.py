@@ -1,5 +1,6 @@
 """Attach a sourced doorway to a separately mapped, already modelled canopy."""
 import copy,hashlib,json,math
+from public_data_fields import without_documentation
 
 
 def validate_mapped_canopy(config):
@@ -49,15 +50,19 @@ def resolve_mapped_canopy_context(buildings,check_only=False):
             shelter={**copy.deepcopy(c),'floorHeight':floor,'clearHeight':opening['clearHeight'],
                      'canopyCenter':roof['center'],'canopyPolygons':part['polygons'],'passages':passages,
                      'contextRevision':context_revision(e,roof,part),
-                     'partRevision':hashlib.sha256(json.dumps(part,sort_keys=True,separators=(',',':')).encode()).hexdigest()}
+                     'partRevision':part_revision(part)}
             if check_only:
-                if e.get('shelter')!=shelter:raise ValueError('Resolved mapped canopy is stale; prepare the data')
+                if without_documentation(e.get('shelter'))!=without_documentation(shelter):raise ValueError('Resolved mapped canopy is stale; prepare the data')
             else:e['shelter']=shelter
+
+
+def part_revision(part):
+    return hashlib.sha256(json.dumps(without_documentation(part),sort_keys=True,separators=(',',':')).encode()).hexdigest()
 
 
 def context_revision(entry,roof,part):
     payload=[{k:v for k,v in entry.items() if k!='shelter'},roof['center'],roof['polygons'],part]
-    return hashlib.sha256(json.dumps(payload,sort_keys=True,separators=(',',':')).encode()).hexdigest()
+    return hashlib.sha256(json.dumps(without_documentation(payload),sort_keys=True,separators=(',',':')).encode()).hexdigest()
 
 
 def check_prepared_mapped_canopies(buildings):
@@ -69,7 +74,7 @@ def check_prepared_mapped_canopies(buildings):
             c=e['mappedCanopy'];validate_mapped_canopy(c)
             roof=by_id.get(c['buildingId']);s=e.get('shelter',{})
             part=next((p for p in (roof or {}).get('form',{}).get('parts',[]) if p['id']==c['partId']),None)
-            if not roof or not part or s.get('contextRevision')!=context_revision(e,roof,part):
+            if not roof or not part or s.get('contextRevision')!=context_revision(e,roof,part) or s.get('partRevision')!=part_revision(part):
                 raise ValueError('Mapped canopy context is stale; prepare the data')
             if any(s.get(k)!=v for k,v in c.items()) or s.get('canopyCenter')!=roof['center'] or s.get('canopyPolygons')!=part['polygons'] or any(s.get(k)!=part['openBelow'][k] for k in ['floorHeight','clearHeight']):
                 raise ValueError('Mapped canopy derived geometry is stale; prepare the data')

@@ -45,8 +45,6 @@ export interface Building {
   landmark: string | null;
   polygons: number[][][][];
   bounds: number[];
-  heightBasis: string;
-  facadeBasis: string;
   osmEditedAt: string;
   sourceUrl: string;
   zone: string;
