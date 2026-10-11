@@ -569,47 +569,50 @@ export default function Home() {
     <main className={`campus-app ${keyboardOpen ? 'keyboard-open' : ''}`}>
       <div className="scene-host" ref={host} />
       <header className="masthead">
-        <button
-          className="brand-mark"
-          onClick={() => view('overview')}
-          title="返回全景"
-          aria-label="返回校园全景"
-        >
-          <Image
-            src={`${BASE}/favicon.svg`}
-            alt=""
-            width={44}
-            height={44}
-            unoptimized
-          />
-        </button>
-        <div>
+        <div className="masthead-brand">
+          <button
+            className="brand-mark"
+            onClick={() => view('overview')}
+            title="返回全景"
+            aria-label="返回校园全景"
+          >
+            <Image
+              src={`${BASE}/favicon.svg`}
+              alt=""
+              width={44}
+              height={44}
+              unoptimized
+            />
+          </button>
           <h1>
             广西大学 <span>校园地图</span>
           </h1>
         </div>
-        <div className="header-location">
-          <span className="live-dot" />
-          南宁 · 大学东路主校区
+        <div className="masthead-actions">
+          <div className="header-location">
+            <span className="live-dot" />
+            南宁 · 大学东路主校区
+          </div>
+          <button
+            className="icon-button about-button"
+            onClick={() => {
+              pauseMotion();
+              setAbout(true);
+            }}
+            title="项目说明"
+            aria-label="项目说明"
+          >
+            <Info size={19} />
+          </button>
+          <a
+            className="repo-link"
+            href="https://github.com/wcqqq1214/gxu-campus-3d"
+            target="_blank"
+            rel="noreferrer"
+          >
+            GitHub <ArrowUpRight size={15} />
+          </a>
         </div>
-        <button
-          className="icon-button about-button"
-          onClick={() => {
-            pauseMotion();
-            setAbout(true);
-          }}
-          title="项目说明"
-        >
-          <Info size={19} />
-        </button>
-        <a
-          className="repo-link"
-          href="https://github.com/wcqqq1214/gxu-campus-3d"
-          target="_blank"
-          rel="noreferrer"
-        >
-          GitHub <ArrowUpRight size={15} />
-        </a>
       </header>
       <aside
         ref={dock}
