@@ -19,29 +19,76 @@ export interface TreeTerrain {
 }
 
 /** Legacy four-column fallback; current rows carry final terrain triangle heights. */
-export function treeGroundHeight(terrain: TreeTerrain, x: number, y: number): number {
-  const { bounds: [x0, y0, x1, y1], cols, rows, heights } = terrain;
-  const u = Math.max(0, Math.min(cols - 1.001, ((x - x0) / (x1 - x0)) * (cols - 1)));
-  const v = Math.max(0, Math.min(rows - 1.001, ((y - y0) / (y1 - y0)) * (rows - 1)));
-  const i = Math.floor(u), j = Math.floor(v), a = u - i, b = v - j;
-  return (heights[j * cols + i] * (1 - a) + heights[j * cols + i + 1] * a) * (1 - b)
-    + (heights[(j + 1) * cols + i] * (1 - a) + heights[(j + 1) * cols + i + 1] * a) * b;
+export function treeGroundHeight(
+  terrain: TreeTerrain,
+  x: number,
+  y: number,
+): number {
+  const {
+    bounds: [x0, y0, x1, y1],
+    cols,
+    rows,
+    heights,
+  } = terrain;
+  const u = Math.max(
+    0,
+    Math.min(cols - 1.001, ((x - x0) / (x1 - x0)) * (cols - 1)),
+  );
+  const v = Math.max(
+    0,
+    Math.min(rows - 1.001, ((y - y0) / (y1 - y0)) * (rows - 1)),
+  );
+  const i = Math.floor(u),
+    j = Math.floor(v),
+    a = u - i,
+    b = v - j;
+  return (
+    (heights[j * cols + i] * (1 - a) + heights[j * cols + i + 1] * a) *
+      (1 - b) +
+    (heights[(j + 1) * cols + i] * (1 - a) +
+      heights[(j + 1) * cols + i + 1] * a) *
+      b
+  );
 }
 
 export function treeElevation(row: number[], terrain: TreeTerrain): number {
-  return Number.isFinite(row[4]) ? row[4] : treeGroundHeight(terrain, row[0], row[1]);
+  return Number.isFinite(row[4])
+    ? row[4]
+    : treeGroundHeight(terrain, row[0], row[1]);
 }
 
 /** Stable partition inside each existing template/sector budget. Sourced groups
  * must not vanish merely because preparation appends them after background trees.
  * Counts, transforms and the background's relative order stay unchanged.
  */
-export function prioritizeTreeRows(rows: number[][], positions: number[][]): number[][] {
+export function prioritizeTreeRows(
+  rows: number[][],
+  positions: number[][],
+): number[][] {
   const keys = new Set(positions.map(([x, y]) => `${x},${y}`));
   if (!keys.size) return rows;
-  const priority: number[][] = [], background: number[][] = [];
+  const priority: number[][] = [],
+    background: number[][] = [];
   for (const row of rows) {
     (keys.has(`${row[0]},${row[1]}`) ? priority : background).push(row);
   }
   return [...priority, ...background];
+}
+
+/** Coordinates, not instance order, seed both LOD templates identically. */
+export function treeAppearance(x: number, y: number) {
+  const seed = treeRotation(x + 173.7, y - 291.3) / (Math.PI * 2);
+  const hue = Math.floor(seed * 3);
+  const brightness =
+    0.92 + (treeRotation(x - 41.2, y + 18.9) / (Math.PI * 2)) * 0.16;
+  const palettes = [
+    [1.04, 1.0, 0.87],
+    [0.9, 0.98, 0.94],
+    [1.02, 1.03, 0.94],
+  ];
+  return {
+    width: 0.75 + seed * 0.5,
+    height: 0.8 + (treeRotation(x + 19.1, y + 91.4) / (Math.PI * 2)) * 0.4,
+    tint: palettes[hue].map((v) => v * brightness) as [number, number, number],
+  };
 }

@@ -2,7 +2,12 @@ import { createPalette } from './palette';
 import { createSky } from './sky';
 import { LIGHTING } from './lighting';
 import { navigationFootprints } from './navigation';
-import { treeRotation, treeElevation, prioritizeTreeRows } from './vegetation';
+import {
+  treeAppearance,
+  treeRotation,
+  treeElevation,
+  prioritizeTreeRows,
+} from './vegetation';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
@@ -1027,14 +1032,15 @@ export function createScene(
             const [x, y, h] = row;
             transform.position.set(x, treeElevation(row, terrain), -y);
             transform.rotation.set(0, treeRotation(x, y), 0);
-            transform.scale.setScalar(h / 9);
+            const appearance = treeAppearance(x, y);
+            transform.scale.set(
+              (appearance.width * h) / 9,
+              (appearance.height * h) / 9,
+              (appearance.width * h) / 9,
+            );
             transform.updateMatrix();
             inst.setMatrixAt(i, transform.matrix);
-            const tint =
-              0.92 +
-              (((Math.sin(x * 12.9898 + y * 78.233) * 43758.5453) % 1) + 1) *
-                0.07;
-            inst.setColorAt(i, new THREE.Color(tint * 0.98, tint, tint * 0.96));
+            inst.setColorAt(i, new THREE.Color(...appearance.tint));
           });
           inst.instanceMatrix.needsUpdate = true;
           inst.computeBoundingSphere();
