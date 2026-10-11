@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  A 3D map of Guangxi University's main campus on Daxue East Road. Built with Three.js and Blender using OpenStreetMap and publicly available references, it lets you find places, explore buildings, tour the campus, and switch between day and night in your browser.
+  A 3D map of Guangxi University's main campus on Daxue East Road, built with Three.js and Blender using OpenStreetMap and public references.
 </p>
 
 <p align="center">
@@ -24,51 +24,46 @@
 
 ## Features
 
-- Find and browse 20 selected places with categories, Chinese alias search, and linked list and map highlights.
-- Explore freely with multiple viewing angles or follow a campus tour, with options to pause, resume, and skip stops.
-- Switch between morning, daytime, dusk, and night; toggle buildings, trees, roads, and other layers. Quality adapts automatically to performance.
-- Share a link to the current view or export a PNG with OpenStreetMap attribution.
-- Use the map on mobile, with keyboard navigation and support for the system's reduced-motion preference.
-
-| Place details on mobile | Mobile tools menu |
-| --- | --- |
-| ![Summary of Teaching Building 6 on mobile](docs/screenshots/readme/mobile-detail.jpg) | ![More tools menu on mobile](docs/screenshots/readme/mobile-tools.jpg) |
-
-## Model coverage
-
-| Campus buildings | Surrounding buildings | Selected landmarks | Schematic trees |
-| :---: | :---: | :---: | :---: |
-| 446 buildings / volumes | 13 buildings | 20 places | 2,936 trees |
-
-Built from OpenStreetMap and public references, the model covers the east, west, and north campus areas. It has not been verified by an on-site survey, and some building heights, facades, and facility layouts are estimates. See the [data notes](docs/DATA.md) for details.
+- Search 20 selected places, switch building views, and follow a campus tour.
+- Choose morning, daytime, dusk, or night; toggle layers and use automatic or manual quality.
+- Share the current view or export a PNG with OpenStreetMap attribution.
+- Explore on mobile, with keyboard navigation and reduced-motion support.
 
 <details>
-<summary>More screenshots</summary>
+<summary>More screenshots: lighting, close-ups, and mobile</summary>
 
-| North side of the library | Road beneath Chongzuo Bridge |
+| Morning | Daytime |
 | --- | --- |
-| ![North side and entrance of the library](docs/screenshots/readme/library-north.jpg) | ![Road and sidewalks beneath Chongzuo Bridge](docs/screenshots/readme/chongzuo-bridge.jpg) |
+| ![Library in morning light](docs/screenshots/readme/library-morning.jpg) | ![Library in daylight](docs/screenshots/readme/library-day.jpg) |
+| Dusk | Night |
+| ![Library at dusk](docs/screenshots/readme/library-evening.jpg) | ![Library at night](docs/screenshots/readme/library-night.jpg) |
+| North side of the library | Road beneath Chongzuo Bridge |
+| ![North side and entrance of the library](docs/screenshots/readme/library-north.jpg) | ![Road beneath Chongzuo Bridge](docs/screenshots/readme/chongzuo-bridge.jpg) |
+| Mobile place details | Mobile tools |
+| ![Teaching Building 6 on mobile](docs/screenshots/readme/mobile-detail.jpg) | ![Mobile tools menu](docs/screenshots/readme/mobile-tools.jpg) |
 
-![Basketball court models west of the east athletics field](docs/screenshots/readme/basketball-east.jpg)
+![Basketball courts west of the east athletics field](docs/screenshots/readme/basketball-east.jpg)
 
 </details>
 
-Screenshots were captured from a development version on 2026-10-07 and may differ from the live site.
+Screenshots: 2026-10-12, local static build of `dev`, automatic quality; mobile is browser-simulated. The live site may differ.
+
+## Model coverage
+
+The east, west, and north campus areas include 446 campus buildings / volumes, 13 surrounding buildings, and 2,936 schematic trees. No on-site survey was performed; some heights, facades, and facility layouts are estimates. See the [data notes](docs/DATA.md).
 
 ## Run locally
 
-Use Node.js 24 to match CI.
+Use Node.js 24. No map API key or backend service is required.
 
 ```sh
-git clone https://github.com/wcqqq1214/gxu-campus-3d.git
+git clone --branch dev https://github.com/wcqqq1214/gxu-campus-3d.git
 cd gxu-campus-3d
 npm ci
 npm run dev
 ```
 
-Open the Local URL printed in your terminal. The project uses React, TypeScript, vinext, and Vite. Running the website requires no map API key or backend service.
-
-### Checks and static build
+Open the Local URL printed in your terminal. Checks and static build:
 
 ```sh
 npm run typecheck
@@ -78,24 +73,14 @@ npm run build:pages
 npm run preview
 ```
 
-Static files are generated in `out/`. The default preview URL is `http://127.0.0.1:4300/gxu-campus-3d/`. Serve the files over HTTP instead of opening the HTML files directly.
+Static files are generated in `out/`; preview at `http://127.0.0.1:4300/gxu-campus-3d/`. Push development commits to `origin/dev`; updating `main` requires explicit authorization.
 
-Pushes to `main` and pull requests targeting `main` run checks and builds. Pages deployment runs only on pushes to the main branch and manual workflow runs.
+## Documentation and licensing
 
-### Data tests and model rebuilding
-
-See the [modeling guide](docs/MODELING.md) for data tests and model rebuilding. The editable Blender source is not included in the repository and is not currently available for download. Running the website and standard tests does not require it.
-
-## Project documentation
-
-The following documents are in Chinese:
+Documentation is in Chinese:
 
 - [Data sources and accuracy](docs/DATA.md)
-- [Model structure and rebuilding](docs/MODELING.md)
+- [Model structure, data tests, and rebuilding](docs/MODELING.md) (Blender source is not distributed or required to run the website)
 - [Interface and interactions](docs/DESIGN.md)
 
-## Licensing
-
-Original project code, documentation, models, materials, and renders are licensed under [MIT](LICENSE). OpenStreetMap geographic databases and derivative databases are licensed under ODbL, with attribution to **© OpenStreetMap contributors**. Other third-party resources retain their respective licenses; see the [third-party notices](licenses/THIRD_PARTY.md).
-
-Official photographs and videos are used only as modeling references. They are not distributed as website textures or repository images.
+Original code, documentation, models, materials, and renders use [MIT](LICENSE). OpenStreetMap geographic databases and derivatives use ODbL, attributed to **© OpenStreetMap contributors**. See the [third-party notices](licenses/THIRD_PARTY.md) for other resources. Official photos and videos are modeling references only and are not distributed.
