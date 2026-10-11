@@ -113,7 +113,7 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 
 各入口的修改范围不同，调用前先阅读参数和脚本说明。先修改输入，在独立候选中验证，通过后才替换正式资产；保留仍用于对比的基准。网页只按实际发布的 GLB 验收，不能用截图代替几何、净空和性能检查。
 
-已完成的一次性工具退出版本跟踪，本地副本与历史记录保留。`preview_civil_platform_west.py` 的西墙候选已集成到正式参数，不能再以当前模型作为修改前输入；`update_chongzuo_bridge.py` 的题名牌移除也已完成，不再用于日常更新。这两份原脚本可从提交 `b6215ab` 的 `blender/` 目录追溯；复现时需使用对应历史输入及独立输出，不能直接重跑到当前生产资产。
+已完成的一次性工具退出版本跟踪，可从历史记录追溯；本地退役脚本及 `__pycache__` 缓存可清理。正式源模型 `blender/gxu-campus.blend`、仍在使用的建模与校验脚本、纹理和对比基准须保留。`preview_civil_platform_west.py` 的西墙候选已集成到正式参数，不能再以当前模型作为修改前输入；`update_chongzuo_bridge.py` 的题名牌移除也已完成，不再用于日常更新。这两份原脚本可从提交 `b6215ab` 的 `blender/` 目录追溯；复现时需使用对应历史输入及独立输出，不能直接重跑到当前生产资产。
 
 ## 校验与基准
 
