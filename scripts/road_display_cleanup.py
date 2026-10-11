@@ -16,6 +16,16 @@ def load_cuts(root=ROOT, ids=None):
         raise ValueError('Unsupported road display cleanup version')
     result = []
     for item in data['cuts']:
+        if 'polygon' in item:
+            points = item['polygon']
+            if len(points) < 3 or any(len(p) != 2 or not all(math.isfinite(v) for v in p) for p in points):
+                raise ValueError('Invalid display cut polygon')
+            for a, b, c in zip(points, points[1:]+points[:1], points[2:]+points[:2]):
+                if (b[0]-a[0])*(c[1]-b[1])-(b[1]-a[1])*(c[0]-b[0]) <= 0:
+                    raise ValueError('Display cut polygon must be strictly convex and counterclockwise')
+            result.append({**item, 'bounds': [min(p[0] for p in points), min(p[1] for p in points),
+                                            max(p[0] for p in points), max(p[1] for p in points)]})
+            continue
         x, y = item['origin']
         dx, dy = item['outward']
         width, length = item['halfWidth'], item['length']
