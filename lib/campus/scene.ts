@@ -674,10 +674,10 @@ export function createScene(
     }
     return '';
   }
-  function styleMeshes(root: THREE.Object3D) {
+  function styleMeshes(root: THREE.Object3D, refineTerrain = true) {
     root.traverse((o) => {
       if (!(o instanceof THREE.Mesh)) return;
-      palette.terrain(o);
+      if (refineTerrain) palette.terrain(o);
       o.castShadow = true;
       o.receiveShadow = true;
       const mats = Array.isArray(o.material) ? o.material : [o.material];
@@ -797,8 +797,8 @@ export function createScene(
         throw new DOMException('Request cancelled', 'AbortError');
       }
       loadedBytes += a.bytes;
-      palette.buildings(gltf.scene, key);
-      styleMeshes(gltf.scene);
+      if (key !== 'base') palette.buildings(gltf.scene, key);
+      styleMeshes(gltf.scene, key !== 'base');
       batchSportsSurfaces(gltf.scene);
       batchStaticRoadSurfaces(gltf.scene);
       if (key === 'base') pruneGroundTriangles(gltf.scene);
@@ -1182,6 +1182,22 @@ export function createScene(
       applyLayers();
       callbacks.onReady();
       callbacks.onStatus('');
+      // Publish and paint the base before optional CPU-side colour/normal refinement.
+      // No additional model or texture transfer; deferred work keeps startup latency flat.
+      requestAnimationFrame(() => {
+        if (disposed) return;
+        const refine = () => {
+          if (disposed || !baseRoot) return;
+          palette.buildings(baseRoot, 'base');
+          baseRoot.traverse((o) => {
+            if (o instanceof THREE.Mesh) palette.terrain(o);
+          });
+          dirty = true;
+        };
+        if ('requestIdleCallback' in window)
+          window.requestIdleCallback(refine, { timeout: 1500 });
+        else setTimeout(refine, 0);
+      });
       void loadBoundary();
       reconcileDetails();
       void loadTrees().catch(() => {
@@ -1206,7 +1222,8 @@ export function createScene(
     profile = qualityProfile(quality, compact(), saveData(), adaptive.level);
     modeSmooth = profile.level === 2;
     renderer.setPixelRatio(
-      Math.min(window.devicePixelRatio, profile.pixelRatio),
+      Math.min(window.devicePixelRatio, profile.pixelRatio) *
+        profile.resolutionScale,
     );
     renderer.shadowMap.enabled = profile.shadows;
     sun.castShadow = profile.shadows;
@@ -1263,6 +1280,12 @@ export function createScene(
         }
       }
     });
+    if (p === 'night') {
+      // Pane attributes are created lazily; include them in the existing LOD budget.
+      for (const [key, root] of loaded)
+        geometryCosts.set(key, detailCost(root));
+      reconcileDetails();
+    }
     dirty = true;
   }
   function view(v: string) {
@@ -1493,7 +1516,10 @@ export function createScene(
       renderScene();
       dirty = false;
       lastFrame = time;
-      if (lastRendered && time - lastRendered < 1000) {
+      if (
+        lastRendered &&
+        (time - lastRendered < 1000 || orbiting || moving || tween)
+      ) {
         activeFrameMs += time - lastRendered;
         activeFrames++;
       }
@@ -1548,10 +1574,18 @@ export function createScene(
       cameraChanged = false;
     }
     if (time - sampleStart > 1500) {
-      if (activeFrames > 3) fps = (1000 * activeFrames) / activeFrameMs;
+      if (activeFrames > 0 && activeFrameMs > 0)
+        fps = (1000 * activeFrames) / activeFrameMs;
       callbacks.onMetrics(metrics());
       if (quality === 'auto' && !compact() && !saveData() && !document.hidden) {
-        if (adaptive.sample(fps, activeFrames)) applyQuality();
+        if (
+          adaptive.sample(
+            fps,
+            activeFrames,
+            orbiting || Boolean(tween) || Boolean(moving),
+          )
+        )
+          applyQuality();
       }
       activeFrameMs = 0;
       activeFrames = 0;

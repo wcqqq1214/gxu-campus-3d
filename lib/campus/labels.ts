@@ -9,7 +9,7 @@ export function landmarkLabelAnchor(landmark: Landmark, model?: Object3D) {
   }
   const fallback = new Vector3(
     (landmark.bounds[0] + landmark.bounds[2]) / 2,
-    landmark.elevation + landmark.height + 8,
+    landmark.elevation + landmark.height + 0.6,
     -(landmark.bounds[1] + landmark.bounds[3]) / 2,
   );
   if (!model) return fallback;
@@ -31,7 +31,7 @@ export function landmarkLabelAnchor(landmark: Landmark, model?: Object3D) {
   const box = roof.isEmpty() ? all : roof;
   return new Vector3(
     (box.min.x + box.max.x) / 2,
-    box.max.y + 8,
+    box.max.y + 0.6,
     (box.min.z + box.max.z) / 2,
   );
 }
