@@ -52,6 +52,8 @@ export interface Building {
   zone: string;
 }
 export interface Landmark {
+  /** Optional east/north/up label position in metres. */
+  labelAnchor?: [number, number, number];
   modelingBasis: 'photo' | 'type' | 'inferred';
   placeKind?: 'sports' | 'gate' | 'bridge' | 'sculpture';
   pickPolygon?: number[][];

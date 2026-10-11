@@ -1,3 +1,4 @@
+import { landmarkLabelAnchor } from './labels';
 import { createNightStyle, createRoadLights } from './night';
 import { createPalette } from './palette';
 import { createSky } from './sky';
@@ -323,13 +324,22 @@ export function createScene(
     return {
       l,
       el,
-      point: new THREE.Vector3(
-        l.center[0],
-        l.elevation + l.height + 8,
-        -l.center[1],
-      ),
+      point: landmarkLabelAnchor(l),
     };
   });
+  function updateLabelAnchors(id?: string) {
+    for (const node of labelNodes) {
+      if (id && node.l.id !== id) continue;
+      const key = 'landmark-' + node.l.id;
+      const model = loaded.get(key) ?? baseRoot?.getObjectByName(key);
+      node.point.copy(landmarkLabelAnchor(node.l, model));
+      node.el.dataset.anchor = node.point
+        .toArray()
+        .map((v) => v.toFixed(2))
+        .join(',');
+    }
+    dirty = true;
+  }
   function setHovered(id: string | null) {
     if (hovered === id) return;
     hovered = id;
@@ -479,6 +489,11 @@ export function createScene(
     let box = detail
       ? new THREE.Box3().setFromObject(detail)
       : landmarkBox(place);
+    if (selectedView === 'oblique') {
+      const anchor = labelNodes.find((node) => node.l.id === place.id)!.point;
+      // Full views include the label above small gates, which otherwise clips.
+      box.expandByPoint(anchor.clone().add(new THREE.Vector3(0, 5, 0)));
+    }
     if (selectedView === 'entrance' || selectedView === 'rear-entrance')
       box = entranceBox(
         place,
@@ -799,6 +814,8 @@ export function createScene(
     dynamic.remove(root);
     disposeObject(root, [scene]);
     loaded.delete(key);
+    if (key.startsWith('landmark-'))
+      updateLabelAnchors(key.slice('landmark-'.length));
     recentlyUsed.delete(key);
   }
   function detailCost(root: THREE.Object3D) {
@@ -923,6 +940,8 @@ export function createScene(
         }
         dynamic.add(g.scene);
         loaded.set(key, g.scene);
+        if (key.startsWith('landmark-'))
+          updateLabelAnchors(key.slice('landmark-'.length));
         recentlyUsed.set(key, performance.now());
         geometryCosts.set(key, detailCost(g.scene));
         failed.delete(key);
@@ -1135,6 +1154,7 @@ export function createScene(
       baseRoot = gltf.scene;
       convexCulling = createConvexCulling(baseRoot);
       scene.add(baseRoot);
+      updateLabelAnchors();
       const terrainMesh: THREE.Mesh[] = [];
       baseRoot.traverse((o) => {
         if (
