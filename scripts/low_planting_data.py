@@ -9,7 +9,7 @@ from building_overrides import footprint_revision, read_json, source_catalogue
 from site_data import world_shape
 from vegetation_exclusions import INPUT_NAMES, ground_masks
 from vegetation_reservations import INPUT_NAMES as RESERVATION_INPUTS, crown_reservations
-from low_planting_contract import digest, context_value
+from low_planting_contract import digest, context_value, context_revision
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -82,7 +82,7 @@ def prepare_low_planting(root=ROOT):
     campus = transform(project, shape(next(f['geometry'] for f in geo['features'] if f['id'] == 'campus')))
     plantings = derive_plantings(config, data['buildings'], {s['id'] for s in source_catalogue(root)}, campus, exclusions, open_zones)
     report = {'schemaVersion': 1, 'plantings': plantings,
-              'contextRevision': digest(context_value(root, config, data)),
+              'contextRevision': context_revision(context_value(root, config, data)),
               'configRevision': digest(config), 'placementPassed': True,
               'scope': 'Entire low-planting footprints avoid final ground masks, existing structural reservations and explicit open zones. Actual terrain support and mesh checks run after modeling.'}
     (out / 'low-planting.json').write_text(json.dumps(report, ensure_ascii=False, separators=(',', ':')) + '\n')

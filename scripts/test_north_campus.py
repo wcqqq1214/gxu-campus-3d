@@ -26,7 +26,9 @@ class NorthCampusTests(unittest.TestCase):
             self.assertEqual(b['geometrySource'],'manual-imagery-trace')
             self.assertIsNone(b['osmEditedAt'])
             self.assertNotIn('openstreetmap.org',b['sourceUrl'])
-            self.assertIn('估算',b['heightBasis'])
+            source=next(item for item in raw['buildings'] if item['id']==b['id'])
+            self.assertIn('估算',source['heightBasis'])
+            self.assertNotIn('heightBasis',b)
 
     def test_blocks_are_disjoint_and_outside_the_public_arterial(self):
         shapes=[Polygon(p[0],p[1:]) for b in self.buildings for p in b['polygons']]
@@ -100,8 +102,10 @@ class NorthCampusTests(unittest.TestCase):
     def test_documented_storeys_and_estimated_heights_are_separate(self):
         lab=next(b for b in self.buildings if b['id']=='north-campus/teaching-nw')
         self.assertEqual(lab['levels'],5)
-        self.assertIn('2022',lab['levelsBasis'])
-        self.assertIn('估算',lab['heightBasis'])
+        source=next(b for b in self.read('data/north-campus-layout.json')['buildings'] if b['id']==lab['id'])
+        self.assertIn('2022',source['levelsBasis'])
+        self.assertIn('估算',source['heightBasis'])
+        self.assertNotIn('levelsBasis',lab)
         gym=next(b for b in self.buildings if b['id']=='north-campus/gym')
         self.assertGreater(gym['height']-gym['northForm']['bodyHeight'],5)
         library=next(b for b in self.buildings if b['id']=='north-campus/library')

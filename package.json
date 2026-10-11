@@ -14,6 +14,7 @@
     "typecheck": "tsc --noEmit",
     "build:pages": "node scripts/build-pages.mjs",
     "data:fetch": "python3 scripts/fetch_geodata.py",
+    "data:export": "python3 scripts/export_public_data.py",
     "data:prepare": "python3 scripts/prepare_geodata.py",
     "models:build": "blender --background --python-exit-code 1 --python blender/build_campus.py",
     "test": "node --experimental-strip-types --test scripts/test-*.mjs",

@@ -247,3 +247,6 @@ if __name__=='__main__':
     prepare()
     from infrastructure_data import prepare_infrastructure
     prepare_infrastructure()
+
+    from export_public_data import export_public_data
+    export_public_data(ROOT)

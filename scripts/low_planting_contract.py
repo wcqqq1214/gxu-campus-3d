@@ -1,6 +1,7 @@
 """Standard-library fingerprints used by data preparation and Blender."""
 import hashlib
 import json
+from public_data_fields import without_documentation
 
 CONTEXT_FILES = ('surfaces', 'infrastructure', 'surroundings', 'campus-roads',
                  'sites', 'pavings', 'shores', 'sports', 'buildings', 'landmarks', 'basketball')
@@ -8,6 +9,10 @@ CONTEXT_FILES = ('surfaces', 'infrastructure', 'surroundings', 'campus-roads',
 
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+
+def context_revision(value):
+    return digest(without_documentation(value))
 
 
 def context_value(root, config, data):
@@ -34,7 +39,7 @@ def load_prepared(root):
     config = json.loads((root / 'data/low-planting.json').read_text())
     prepared = json.loads((root / 'public/data/low-planting.json').read_text())
     data = {name:json.loads((root / 'public/data' / (name + '.json')).read_text()) for name in CONTEXT_FILES}
-    if prepared['configRevision'] != digest(config) or prepared['contextRevision'] != digest(context_value(root, config, data)):
+    if prepared['configRevision'] != digest(config) or prepared['contextRevision'] != context_revision(context_value(root, config, data)):
         raise ValueError('Low-planting context is stale; run vegetation preparation')
     if not prepared['placementPassed']:
         raise ValueError('Low-planting placement was not validated')

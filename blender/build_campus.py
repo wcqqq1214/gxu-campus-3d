@@ -335,7 +335,8 @@ for index,b in enumerate(buildings):
             if b.get('customModel')=='huicui':
                 obj['customModel']='huicui';obj['precision']=b['architecture']['precision'];compact_source(obj)
             elif 'form' in b:
-                obj['archetype']=b['form']['archetype'];obj['roofBasis']=b['roofBasis']
+                obj['archetype']=b['form']['archetype']
+                if 'roofBasis' in b:obj['roofBasis']=b['roofBasis']
                 compact_form_source(obj)
     if index%100==0:print('Buildings',index,'/',len(buildings),flush=True)
 for l in landmarks:
