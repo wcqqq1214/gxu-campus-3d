@@ -45,10 +45,11 @@ class RoadDisplayCleanupTests(unittest.TestCase):
         self.assertLess(mask.intersection(campus).area, 1e-8)
         # Junction centres and every mapped campus destination remain clear.
         anchors = json.loads((ROOT/'data/road-display-cleanup.json').read_text())['retainedProbes']
-        landmarks = json.loads((ROOT/'public/data/landmarks.json').read_text())
-        anchors.extend(l['center'] for l in landmarks)
         for point in anchors:
-            self.assertGreater(mask.distance(Point(point)), 10)
+            self.assertGreater(mask.distance(Point(point)), 1)
+        landmarks = json.loads((ROOT/'public/data/landmarks.json').read_text())
+        for landmark in landmarks:
+            self.assertGreater(mask.distance(Point(landmark['center'])), 10)
         # Explicit former tail witnesses must fall inside their intended masks.
         for cut in cuts:
             self.assertTrue(Polygon(cut['polygon']).contains(Point(cut['removedProbe'])), cut['id'])

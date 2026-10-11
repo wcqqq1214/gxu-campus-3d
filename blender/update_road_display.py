@@ -20,6 +20,7 @@ sys.path.insert(0, str(ROOT/'scripts'))
 import geometry
 from geometry import Mesh
 from road_display_cleanup import load_cuts, trim_mesh
+from road_surface_clearance import load_repairs, repair_clearance
 from export_attributes import omit_unused_uvs
 from preserve_glb_geometry import preserve_geometry, compact_buffer_views, unpack, mesh_nodes_by_name
 
@@ -41,12 +42,26 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir', type=Path, required=True)
     parser.add_argument('--cut-id', action='append', help='Apply only these new cuts; repeat for multiple IDs')
+    parser.add_argument('--repair-clearance', action='store_true', help='Repair configured terrain poke-throughs')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
     output = args.output_dir.resolve()
     if output == ROOT or ROOT/'public' in output.parents or ROOT/'blender' in output.parents:
         raise ValueError('Use an isolated candidate output directory')
     output.mkdir(parents=True, exist_ok=True)
     cuts = load_cuts(ids=args.cut_id)
+    repairs = load_repairs() if args.repair_clearance else []
+    def repair(mesh, road):
+        if not repairs:
+            return mesh, {}
+        ground = next(o for o in bpy.context.scene.objects
+                      if o.type == 'MESH' and o.name.split('.')[0] == 'terrain')
+        terrain = Mesh()
+        terrain.v = [tuple(ground.matrix_world @ v.co) for v in ground.data.vertices]
+        terrain.f = [tuple(p.vertices) for p in ground.data.polygons]
+        result, report = repair_clearance(mesh, terrain,
+                                         list(road.data.materials).index(bpy.data.materials['asphalt']), repairs)
+        assert report['changedFaces'] > 0, report
+        return result, report
     original = (ROOT/'public/models/base.glb').read_bytes()
     document, _ = unpack(original)
     metadata = mesh_nodes_by_name(document)['roads'].get('extras', {})
@@ -67,6 +82,7 @@ def main():
                        for i in p.loop_indices] for p in source.data.polygons]
     fixed, report = trim_mesh(mesh, cuts)
     assert all(r['removedArea'] > 0 for r in report.values()), report
+    fixed, clearance_report = repair(fixed, source)
     geometry.MATERIALS = list(source.data.materials)
     changed = {source.data.materials[i].name for i in fixed.changed_materials}
     obj = fixed.object('road-display-candidate', source.users_collection[0], dict(source.items()))
@@ -84,7 +100,7 @@ def main():
         if not any(max(p[0] for p in points) > c['bounds'][0]
                    and min(p[0] for p in points) < c['bounds'][2]
                    and max(p[1] for p in points) > c['bounds'][1]
-                   and min(p[1] for p in points) < c['bounds'][3] for c in cuts):
+                   and min(p[1] for p in points) < c['bounds'][3] for c in cuts+repairs):
             outside_changed += 1
     assert not outside_changed
     source_data = source.data
@@ -115,6 +131,7 @@ def main():
         ['node', str(ROOT/'scripts/road-position-domain.mjs'),
          str(ROOT/'public/models/base.glb')], cwd=ROOT, text=True))
     fixed, decoded_report = trim_mesh(mesh, cuts)
+    fixed, decoded_clearance_report = repair(fixed, delivered)
     geometry.MATERIALS = list(delivered.data.materials)
     assert changed == {delivered.data.materials[i].name for i in fixed.changed_materials}
     exported = fixed.object('roads', bpy.context.scene.collection, {'layer': 'roads'})
@@ -147,6 +164,7 @@ def main():
     (output/'public/data').mkdir(exist_ok=True)
     (output/'public/data/models.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
     summary = dict(cuts=report, decodedCuts=decoded_report,
+                   clearance=clearance_report, decodedClearance=decoded_clearance_report,
                    changedBaseNodes=['roads'], changedRoadMaterials=sorted(changed),
                    retainedBaseNodes=len(before)-1, retainedSourceObjects=len(untouched),
                    outsideChangedFaces=outside_changed, positionDomain=domain, baseBytes=len(raw))

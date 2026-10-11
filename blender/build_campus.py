@@ -385,6 +385,8 @@ if (DATA/'north-campus.json').exists() and north_data.get('underpass'):
     cut_meshes(base,north_data['underpass'])
 from road_display_cleanup import load_cuts,trim_mesh
 base['roads'],road_display_report=trim_mesh(base['roads'],load_cuts(ROOT))
+from road_surface_clearance import load_repairs,repair_clearance
+base['roads'],road_clearance_report=repair_clearance(base['roads'],base['terrain'],C['asphalt'],load_repairs(ROOT))
 for k,m in base.items():
     if not BASE_ONLY and k.startswith('north-campus-'):
         m.object(k+' · 可编辑',GROUND,{'layer':'sports' if k.endswith('sports') else 'roads','northCampus':True})

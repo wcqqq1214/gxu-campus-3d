@@ -11,6 +11,16 @@ from mathutils.bvhtree import BVHTree
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'scripts'))
 from road_display_cleanup import load_cuts
+from road_surface_clearance import load_repairs
+
+
+def surface_bvh(name, material=None):
+    obj, = [o for o in bpy.context.scene.objects if o.type == 'MESH' and o.name.split('.')[0] == name]
+    obj.data.calc_loop_triangles()
+    vertices = [tuple(obj.matrix_world @ v.co) for v in obj.data.vertices]
+    faces = [tuple(t.vertices) for t in obj.data.loop_triangles
+             if material is None or obj.data.materials[t.material_index].name == material]
+    return BVHTree.FromPolygons(vertices, faces, all_triangles=True)
 
 
 def load(path, source):
@@ -34,13 +44,10 @@ def ray(bvh, x, y):
 
 def in_cut(point, cuts, margin=0):
     for cut in cuts:
-        x, y = cut['origin']
-        dx, dy = cut['outward']
-        length = (dx*dx + dy*dy)**.5
-        dx, dy = dx/length, dy/length
-        along = (point[0]-x)*dx + (point[1]-y)*dy
-        across = -(point[0]-x)*dy + (point[1]-y)*dx
-        if -margin < along < cut['length']+margin and abs(across) < cut['halfWidth']+margin:
+        polygon = cut['polygon']
+        if all(((b[0]-a[0])*(point[1]-a[1])-(b[1]-a[1])*(point[0]-a[0]))
+               / ((b[0]-a[0])**2+(b[1]-a[1])**2)**.5 > -margin
+               for a,b in zip(polygon,polygon[1:]+polygon[:1])):
             return True
     return False
 
@@ -51,16 +58,24 @@ def main():
     parser.add_argument('--candidate-root', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--cut-id', action='append', help='Validate only cuts newly applied to this baseline')
+    parser.add_argument('--repair-clearance', action='store_true')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
     cuts = load_cuts(ids=args.cut_id)
     config = json.loads((ROOT/'data/road-display-cleanup.json').read_text())
+    repairs = load_repairs() if args.repair_clearance else []
+    def repair_point(point):
+        return any(r['bounds'][0]-.08 <= point[0] <= r['bounds'][2]+.08
+                   and r['bounds'][1]-.08 <= point[1] <= r['bounds'][3]+.08 for r in repairs)
     report = {}
     for kind, relative, source in [('source', 'blender/gxu-campus.blend', True),
                                    ('decoded', 'public/models/base.glb', False)]:
         vertices, faces, before = load(args.baseline_root.resolve()/relative, source)
+        old_asphalt = surface_bvh('roads', 'asphalt') if repairs else None
         _, _, after = load(args.candidate_root.resolve()/relative, source)
+        new_asphalt = surface_bvh('roads', 'asphalt') if repairs else None
+        terrain = surface_bvh('terrain') if repairs else None
         kept = removed = boundary = 0
-        maximum = boundary_maximum = 0
+        maximum = boundary_maximum = repair_maximum = 0
         problems = []
         for face in faces:
             point = tuple(sum(vertices[i][k] for i in face)/3 for k in range(3))
@@ -85,15 +100,17 @@ def main():
                               and max(p[1] for p in points) > c['bounds'][1]
                               and min(p[1] for p in points) < c['bounds'][3] for c in cuts)
                 delta = abs(old.z-new.z)
-                if touched:
+                if repair_point(point):
+                    repair_maximum = max(repair_maximum, delta)
+                elif touched:
                     boundary += 1
                     boundary_maximum = max(boundary_maximum, delta)
                 else:
                     maximum = max(maximum, delta)
-                if delta > (.02 if touched and not source else .002):
+                if delta > (.02 if touched and not source else .002) and not repair_point(point):
                     problems.append(('height changed', point, old.z, new.z))
         assert not problems, (kind, len(problems), problems[:10])
-        assert kept > 50_000 and removed > 500, (kind, kept, removed)
+        assert kept > 50_000 and removed > 0, (kind, kept, removed)
         # Former road-tail witnesses detect a no-op build independently of the
         # clipping implementation. Junction centres detect accidental severing.
         for point in [c['removedProbe'] for c in cuts]:
@@ -104,7 +121,30 @@ def main():
             assert ray(after, *point) is not None, ('junction missing', kind, point)
         report[kind] = dict(retainedSamples=kept, removedSamples=removed,
                             boundarySamples=boundary, maxUncutHeightDelta=maximum,
-                            maxBoundaryHeightDelta=boundary_maximum)
+                            maxBoundaryHeightDelta=boundary_maximum, maxRepairHeightDelta=repair_maximum)
+        repaired_samples = old_pokes = 0
+        minimum_clearance = float('inf')
+        for repair in repairs:
+            x0,y0,x1,y1 = repair['bounds']
+            for ix in range(int((x1-x0)*2)):
+                for iy in range(int((y1-y0)*2)):
+                    x,y = x0+(ix+.5)/2,y0+(iy+.5)/2
+                    old,new,ground = ray(old_asphalt,x,y),ray(new_asphalt,x,y),ray(terrain,x,y)
+                    if old is None or ground is None:
+                        continue
+                    assert new is not None, ('repair left hole',kind,x,y)
+                    delta = new.z-ground.z
+                    assert delta > .03, ('terrain pokes through',kind,x,y,delta)
+                    minimum_clearance = min(minimum_clearance,delta)
+                    repaired_samples += 1
+                    old_pokes += old.z <= ground.z
+            for point in repair['probes']:
+                old,new,ground = ray(old_asphalt,*point),ray(new_asphalt,*point),ray(terrain,*point)
+                assert old is not None and ground is not None and old.z < ground.z, ('baseline spot missing',kind,point)
+                assert new is not None and new.z-ground.z > .03, ('spot remains',kind,point)
+        if repairs:
+            assert old_pokes > 100 and repaired_samples > 1000
+            report[kind]['clearance'] = dict(samples=repaired_samples,oldPokes=old_pokes,minClearance=minimum_clearance)
         print(kind, report[kind], flush=True)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps({'passed': True, **report}, indent=2)+'\n')

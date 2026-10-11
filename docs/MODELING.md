@@ -72,6 +72,8 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 
 在已经收边的模型上继续增量清理时，两个命令均用可重复的 `--cut-id` 指定本轮新增截面，例如 `--cut-id=xiuxiang-west --cut-id=daxue-east --cut-id=xiuling-west-first-east`。更新工具通过 Node.js 和仓库自带的 Draco 解码器读取原有量化范围，避免多次裁切后因范围缩小导致未修改道路偏移。每个截面的 `removedProbe` 验证旧尾段确实被移除，`retainedProbes` 验证路口和必要连接仍在。
 
+南门西侧空地的环路、向北断头段及残余接头由 `southwest-empty-loop`、`southwest-dead-end`、`southwest-service-stub` 三个截面移除；不规则截面可使用逆时针凸多边形 `polygon`，保留沿街辅路及楼栋入口。大学东路—火炬路口的地形穿透修复另见 `data/road-surface-clearance.json`：`scripts/road_surface_clearance.py` 在实际地形三角面交界处拆分原路面，仅抬高净空不足的部分，保持原 UV，避免叠加补丁。完整建模自动应用；增量更新和校验命令均加 `--repair-clearance`，校验会比较修改前穿透点及修改后路面与地形的间距。
+
 普通楼主体、屋顶、入口和主要立面在基础与近景中共用形体，近景增加窗框等细构件。常用约束如下，完整取值和相交检查由相应解析器与测试定义：
 
 - `parts` 必须覆盖原外环并保留内院；内部体量交界不生成默认窗。`floorHeights` 是逐层高度，不能用总高反推覆盖它。
