@@ -640,6 +640,16 @@ function CampusMap() {
             </svg>
             GitHub <ArrowUpRight size={15} />
           </a>
+          <button
+            type="button"
+            className="language-switch"
+            data-locale={locale}
+            aria-label={locale === 'zh' ? 'Switch to English' : '切换为中文'}
+            onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
+          >
+            <span lang="en">EN</span>
+            <span lang="zh-CN">中文</span>
+          </button>
         </div>
       </header>
       <aside
@@ -1148,16 +1158,6 @@ function CampusMap() {
           )}
         </div>
       </aside>
-      <button
-        type="button"
-        className="language-switch"
-        data-locale={locale}
-        aria-label={locale === 'zh' ? 'Switch to English' : '切换为中文'}
-        onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
-      >
-        <span lang="en">EN</span>
-        <span lang="zh-CN">中文</span>
-      </button>
       <Tooltip.Provider delay={200}>
         <div className="map-tools" aria-label={t('视角控制')}>
           <MapToolButton

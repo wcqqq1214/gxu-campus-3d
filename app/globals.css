@@ -2236,10 +2236,8 @@ output.empty-state {
 .language-switch {
   display: inline-flex;
   align-items: center;
-  position: absolute;
-  top: 84px;
-  right: 78px;
-  z-index: 5;
+  position: relative;
+  flex: 0 0 auto;
   width: 96px;
   height: 44px;
   min-width: 0;
@@ -2361,13 +2359,6 @@ output.empty-state {
   overflow-wrap: anywhere;
 }
 @media (max-width: 759px) {
-  .language-switch {
-    top: 98px;
-    right: 66px;
-  }
-  .keyboard-open .language-switch {
-    display: none;
-  }
   .masthead {
     gap: 6px;
   }
