@@ -887,9 +887,6 @@ function CampusMap() {
                   <output className="result-heading" aria-atomic="true">
                     <span>
                       {query.trim() ? t('搜索结果') : t('地点')}
-                      <small className="index-note">
-                        {t('编号为游览站号')}
-                      </small>
                     </span>
                     <span>{t('{count} 处', { count: places.length })}</span>
                   </output>

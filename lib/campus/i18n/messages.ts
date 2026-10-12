@@ -81,7 +81,6 @@ export const englishMessages: Record<string, string> = {
   '搜索地点，如图书馆、六教': 'Search places, e.g. Library',
   搜索校园地点: 'Search campus places',
   清除搜索: 'Clear search',
-  编号为游览站号: 'Numbers indicate tour stops',
   '地点资料暂时无法加载，请检查网络后重试。':
     'Place data is unavailable. Check your connection and try again.',
   重新加载地点: 'Reload places',
