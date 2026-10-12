@@ -45,7 +45,6 @@ export const englishMessages: Record<string, string> = {
   返回校园全景: 'Return to campus overview',
   广西大学: 'Guangxi University',
   校园地图: 'Campus Map',
-  '南宁 · 大学东路主校区': 'Nanning · Daxue East Road Campus',
   项目说明: 'About this map',
   校园浏览面板: 'Campus explorer',
   返回地点列表: 'Back to places',

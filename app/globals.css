@@ -210,25 +210,8 @@ a svg {
 .icon-button:hover {
   background: #e6eee8;
 }
-.header-location {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-  margin-right: 16px;
-  font-size: 13px;
-  color: #637c6d;
-}
 .brand-mark {
   border: 0;
-}
-.live-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #498e6e;
-  display: inline-block;
-  flex-shrink: 0;
 }
 .scene-host canvas {
   width: 100%;
@@ -795,9 +778,6 @@ a svg {
   .masthead {
     padding: 0 22px;
   }
-  .header-location {
-    display: none;
-  }
   .masthead .about-button {
     margin-left: auto;
   }
@@ -841,9 +821,6 @@ a svg {
     height: 44px;
   }
   .masthead .repo-link {
-    display: none;
-  }
-  .header-location {
     display: none;
   }
   .masthead .about-button {
@@ -2148,10 +2125,6 @@ output.empty-state {
     gap: 2px;
     padding: 0 6px 0 14px;
   }
-  .masthead-actions .header-location {
-    margin: 0 8px 0 0;
-    font-size: 12px;
-  }
   .masthead-actions .icon-button {
     min-width: 36px;
     min-height: 36px;
@@ -2386,11 +2359,6 @@ output.empty-state {
 :lang(en) .about-stats span {
   min-width: 0;
   overflow-wrap: anywhere;
-}
-@media (min-width: 760px) and (max-width: 1100px) {
-  .header-location {
-    display: none;
-  }
 }
 @media (max-width: 759px) {
   .language-switch {

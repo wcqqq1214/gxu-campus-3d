@@ -611,10 +611,6 @@ function CampusMap() {
           </h1>
         </div>
         <div className="masthead-actions">
-          <div className="header-location">
-            <span className="live-dot" />
-            {t('南宁 · 大学东路主校区')}
-          </div>
           <button
             className="icon-button about-button"
             onClick={() => {
