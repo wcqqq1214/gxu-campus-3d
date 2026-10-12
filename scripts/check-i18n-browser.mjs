@@ -1,17 +1,22 @@
-/* Run against the dev server or a static preview. PLAYWRIGHT_MODULE / CHROMIUM_PATH are optional. */
+/* Set I18N_BROWSER=webkit and BROWSER_PATH for WebKit; Chromium is the default. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-const { chromium } = await import(
-  process.env.PLAYWRIGHT_MODULE || 'playwright'
-);
+const playwright = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+const engine = process.env.I18N_BROWSER || 'chromium';
 const base = process.env.I18N_URL || 'http://127.0.0.1:4310/';
 const output = new URL('../outputs/i18n-browser/', import.meta.url);
 await fs.mkdir(output, { recursive: true });
-const browser = await chromium.launch({
-  executablePath: process.env.CHROMIUM_PATH,
+const browser = await playwright[engine].launch({
+  executablePath: process.env.BROWSER_PATH || process.env.CHROMIUM_PATH,
 });
 const errors = [];
 const results = [];
+const waitForSceneReady = (page) =>
+  page.waitForFunction(
+    () => document.querySelector('.tour-start')?.disabled === false,
+    undefined,
+    { timeout: 120000 },
+  );
 try {
   for (const width of [1280, 390, 320]) {
     const page = await browser.newPage({
@@ -174,12 +179,16 @@ try {
     await page
       .getByRole('searchbox', { name: 'Search campus places' })
       .waitFor();
+    // Language restores before model decoding finishes. Let this document finish
+    // initializing before navigating again: WebKit rejects blob loads in a departing document.
+    await waitForSceneReady(page);
     // Explicit share language overrides the stored preference, without changing the place hash.
     await page.goto(base + '?lang=zh#place=library');
     await page.waitForFunction(() => document.documentElement.lang === 'zh-CN');
     await page
       .getByRole('button', { name: 'Switch to English', exact: true })
       .waitFor();
+    await waitForSceneReady(page);
     results.push({ width, ...layout, passed: true });
     await page.close();
   }

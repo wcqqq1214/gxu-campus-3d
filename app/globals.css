@@ -687,20 +687,26 @@ a svg {
   padding: 30px 5px;
 }
 .about-dialog {
+  display: flex;
+  flex-direction: column;
   max-width: min(600px, calc(100vw - 40px)) !important;
+  max-height: calc(100dvh - 32px);
   padding: 30px !important;
   border-radius: 18px !important;
   color: #234936;
 }
 .about-dialog [data-slot='dialog-title'] {
+  flex-shrink: 0;
   font: 600 25px var(--font-serif);
   margin-bottom: 0;
 }
 .about-dialog [data-slot='dialog-description'] {
+  flex-shrink: 0;
   font-size: 14px;
   color: #7f917a;
 }
 .about-scroll {
+  min-height: 0;
   max-height: 65dvh;
   overflow: auto;
   padding-right: 8px;
