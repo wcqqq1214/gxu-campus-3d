@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  A 3D map of Guangxi University's main campus on Daxue East Road, built with Three.js and Blender using OpenStreetMap and public references.
+  A browser-based 3D map of Guangxi University's main campus on Daxue East Road, built with Three.js, Blender, OpenStreetMap data, and public sources.
 </p>
 
 <p align="center">
@@ -24,10 +24,10 @@
 
 ## Features
 
-- Search 20 selected places, switch building views, and follow a campus tour.
-- Choose morning, daytime, dusk, or night; toggle layers and use automatic or manual quality.
-- Share the current view or export a PNG with OpenStreetMap attribution.
-- Explore on mobile, with keyboard navigation and reduced-motion support.
+- Find 20 featured places, explore buildings from different angles, and take a guided campus tour.
+- Switch between morning, day, dusk, and night; toggle map layers and adjust rendering quality.
+- Share a link to your current view or export a PNG with OpenStreetMap attribution.
+- Use desktop or mobile controls, keyboard navigation, and system reduced-motion preferences.
 
 <details>
 <summary>More screenshots: lighting, close-ups, and mobile</summary>
@@ -46,11 +46,11 @@
 
 </details>
 
-Screenshots: 2026-10-12, local static build of `dev`, automatic quality; mobile is browser-simulated. The live site may differ.
+Captured on 2026-10-12 from a local `dev` build with automatic quality and simulated mobile viewports. The live site may differ.
 
 ## Model coverage
 
-The east, west, and north campus areas include 446 campus buildings / volumes, 13 surrounding buildings, and 2,936 schematic trees. No on-site survey was performed; some heights, facades, and facility layouts are estimates. See the [data notes](docs/DATA.md).
+The model covers the east, west, and north campus areas: 446 campus buildings and building volumes, 13 surrounding buildings, and 2,936 illustrative trees. It is not based on an on-site survey; some heights, facades, and layouts are estimated. See the [data notes](docs/DATA.md).
 
 ## Run locally
 
@@ -63,7 +63,7 @@ npm ci
 npm run dev
 ```
 
-Open the Local URL printed in your terminal. Checks and static build:
+Open the Local URL shown in the terminal. To check, build, and preview:
 
 ```sh
 npm run typecheck
@@ -73,14 +73,14 @@ npm run build:pages
 npm run preview
 ```
 
-Static files are generated in `out/`; preview at `http://127.0.0.1:4300/gxu-campus-3d/`. Push development commits to `origin/dev`; updating `main` requires explicit authorization.
+The static build is saved to `out/` and served at `http://127.0.0.1:4300/gxu-campus-3d/` by the preview command. Push development commits to `origin/dev`; updates to `main` require explicit authorization.
 
 ## Documentation and licensing
 
 Documentation is in Chinese:
 
 - [Data sources and accuracy](docs/DATA.md)
-- [Model structure, data tests, and rebuilding](docs/MODELING.md) (Blender source is not distributed or required to run the website)
+- [Model structure, data tests, and rebuilding](docs/MODELING.md) (Blender source files are not distributed; the website runs without them)
 - [Interface and interactions](docs/DESIGN.md)
 
-Original code, documentation, models, materials, and renders use [MIT](LICENSE). OpenStreetMap geographic databases and derivatives use ODbL, attributed to **© OpenStreetMap contributors**. See the [third-party notices](licenses/THIRD_PARTY.md) for other resources. Official photos and videos are modeling references only and are not distributed.
+Original code, documentation, models, materials, and renders are [MIT-licensed](LICENSE). OpenStreetMap geographic databases and derived databases use ODbL, with attribution to **© OpenStreetMap contributors**. See the [third-party notices](licenses/THIRD_PARTY.md) for other resources. Official photos and videos are used only as modeling references and are not distributed.
