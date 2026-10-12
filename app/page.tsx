@@ -615,30 +615,6 @@ function CampusMap() {
             <span className="live-dot" />
             {t('南宁 · 大学东路主校区')}
           </div>
-          <fieldset
-            className="language-switch"
-            data-locale={locale}
-            aria-label={t('选择语言')}
-          >
-            <button
-              type="button"
-              lang="en"
-              aria-label="Switch to English"
-              aria-pressed={locale === 'en'}
-              onClick={() => setLocale('en')}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              lang="zh-CN"
-              aria-label="切换为中文"
-              aria-pressed={locale === 'zh'}
-              onClick={() => setLocale('zh')}
-            >
-              中文
-            </button>
-          </fieldset>
           <button
             className="icon-button about-button"
             onClick={() => {
@@ -885,9 +861,7 @@ function CampusMap() {
                     )}
                   </div>
                   <output className="result-heading" aria-atomic="true">
-                    <span>
-                      {query.trim() ? t('搜索结果') : t('地点')}
-                    </span>
+                    <span>{query.trim() ? t('搜索结果') : t('地点')}</span>
                     <span>{t('{count} 处', { count: places.length })}</span>
                   </output>
                   <div className="places">
@@ -1168,6 +1142,16 @@ function CampusMap() {
           )}
         </div>
       </aside>
+      <button
+        type="button"
+        className="language-switch"
+        data-locale={locale}
+        aria-label={locale === 'zh' ? 'Switch to English' : '切换为中文'}
+        onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
+      >
+        <span lang="en">EN</span>
+        <span lang="zh-CN">中文</span>
+      </button>
       <Tooltip.Provider delay={200}>
         <div className="map-tools" aria-label={t('视角控制')}>
           <MapToolButton

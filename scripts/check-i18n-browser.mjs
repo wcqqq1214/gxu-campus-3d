@@ -40,6 +40,7 @@ try {
         const header = document.querySelector('.masthead');
         return {
           x: rect.x,
+          y: rect.y,
           width: rect.width,
           fits: header.scrollWidth <= header.clientWidth + 1,
           buttonsFit: [...header.querySelectorAll('button')].every((el) => {
@@ -50,16 +51,13 @@ try {
       });
     const chineseHeader = await checkHeader();
     assert.ok(chineseHeader.fits && chineseHeader.buttonsFit);
-    await page
-      .getByRole('button', { name: 'Switch to English', exact: true })
-      .click();
+    // The whole capsule toggles, including the currently selected side.
+    await page.locator('.language-switch span[lang="zh-CN"]').click();
     await page.waitForFunction(() => document.documentElement.lang === 'en');
     assert.deepEqual(await checkHeader(), chineseHeader);
     assert.equal(
-      await page
-        .getByRole('button', { name: 'Switch to English', exact: true })
-        .getAttribute('aria-pressed'),
-      'true',
+      await page.locator('.language-switch').getAttribute('data-locale'),
+      'en',
     );
     assert.equal(await page.title(), 'Guangxi University Campus Map');
     const search = page.getByRole('searchbox', {
@@ -75,7 +73,7 @@ try {
       .waitFor();
     await page.waitForTimeout(1600); // Let the existing focus animation finish before checking preservation.
     const before = await page.locator('.debug-metrics').textContent();
-    await page.getByRole('button', { name: '切换为中文', exact: true }).click();
+    await page.locator('.language-switch span[lang="en"]').click();
     await page
       .getByRole('heading', { name: '计算机与电子信息学院', exact: true })
       .waitFor();

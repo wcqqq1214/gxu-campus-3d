@@ -2263,14 +2263,18 @@ output.empty-state {
 .language-switch {
   display: inline-flex;
   align-items: center;
-  position: relative;
-  flex: 0 0 auto;
+  position: absolute;
+  top: 84px;
+  right: 78px;
+  z-index: 5;
   width: 96px;
   height: 44px;
   min-width: 0;
   margin: 0;
   padding: 0;
   border: 0;
+  border-radius: 999px;
+  background: transparent;
   isolation: isolate;
 }
 .language-switch::after,
@@ -2296,7 +2300,7 @@ output.empty-state {
 .language-switch[data-locale='zh']::before {
   transform: translateX(48px);
 }
-.language-switch button {
+.language-switch span {
   display: grid;
   place-items: center;
   width: 48px;
@@ -2309,13 +2313,14 @@ output.empty-state {
   font-size: 12px;
   font-weight: 600;
 }
-.language-switch button:hover {
+.language-switch:hover span {
   color: var(--primary);
 }
-.language-switch button[aria-pressed='true'] {
+.language-switch[data-locale='en'] span[lang='en'],
+.language-switch[data-locale='zh'] span[lang='zh-CN'] {
   color: white;
 }
-.language-switch button:focus-visible {
+.language-switch:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: -1px;
 }
@@ -2388,6 +2393,13 @@ output.empty-state {
   }
 }
 @media (max-width: 759px) {
+  .language-switch {
+    top: 98px;
+    right: 66px;
+  }
+  .keyboard-open .language-switch {
+    display: none;
+  }
   .masthead {
     gap: 6px;
   }
