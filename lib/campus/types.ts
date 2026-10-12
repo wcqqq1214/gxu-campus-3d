@@ -120,6 +120,7 @@ export interface Metrics {
   detailGeometryMiB: number;
 }
 export interface SceneController {
+  setLocale: (locale: import('./i18n').Locale) => void;
   getLightingState: () => { preset: Preset; labelTheme: 'day' | 'night' };
   setHovered: (id: string | null) => void;
   clearSelection: () => void;

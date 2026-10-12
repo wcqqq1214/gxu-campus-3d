@@ -7,6 +7,12 @@ import {
   useState,
   type ComponentProps,
 } from 'react';
+import {
+  CampusLocaleProvider,
+  useCampusLocale,
+} from '@/components/campus-locale';
+import { statusText, type Message } from '@/lib/campus/i18n';
+import { landmarkDescription } from '@/lib/campus/i18n/descriptions';
 import { Tooltip } from '@base-ui/react/tooltip';
 import Image from 'next/image';
 import {
@@ -29,6 +35,7 @@ import {
   Ellipsis,
   CircleHelp,
   Layers3,
+  Languages,
   LoaderCircle,
   MapPin,
   Minus,
@@ -106,6 +113,15 @@ const QUALITY_NAMES: Record<Quality, string> = {
 };
 const refs = sourceIndex(sourceData.sources);
 export default function Home() {
+  return (
+    <CampusLocaleProvider>
+      <CampusMap />
+    </CampusLocaleProvider>
+  );
+}
+function CampusMap() {
+  const { locale, setLocale, t, name } = useCampusLocale();
+  const localeRef = useRef(locale);
   const dock = useRef<HTMLElement>(null);
   const detailBack = useRef<HTMLButtonElement>(null);
   const tourEntry = useRef<HTMLButtonElement>(null);
@@ -119,7 +135,7 @@ export default function Home() {
     [landmarks, setLandmarks] = useState<Landmark[]>([]),
     [overview, setOverview] = useState<Overview | null>(null);
   const [ready, setReady] = useState(false),
-    [status, setStatus] = useState('正在铺开校园…'),
+    [status, setStatus] = useState<Message>('正在铺开校园…'),
     [loadProgress, setLoadProgress] = useState<number | undefined>(undefined),
     [error, setError] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
@@ -142,6 +158,10 @@ export default function Home() {
     quality: 'auto' as Quality,
   });
   const presetEdited = useRef(false);
+  useEffect(() => {
+    localeRef.current = locale;
+    controller.current?.setLocale(locale);
+  }, [locale]);
   const [framingRequest, setFramingRequest] = useState(0);
   const framedRequest = useRef(0);
   const [overviewRetry, setOverviewRetry] = useState(0);
@@ -268,6 +288,7 @@ export default function Home() {
               if (active) setMetrics(m);
             },
           });
+          c.setLocale(localeRef.current);
           controller.current = c;
           cleanup = () => c.dispose();
           c.setQuality(settings.current.quality);
@@ -460,7 +481,7 @@ export default function Home() {
     [landmarks, query],
   );
   const groups = query.trim()
-    ? [{ key: 'search', name: '搜索结果', places }]
+    ? [{ key: 'search', name: t('搜索结果'), places }]
     : (
         [
           'academic',
@@ -473,7 +494,7 @@ export default function Home() {
       )
         .map((key) => ({
           key,
-          name: CATEGORY_NAMES[key],
+          name: t(CATEGORY_NAMES[key]),
           places: places.filter((p) => p.category === key),
         }))
         .filter((group) => group.places.length);
@@ -522,6 +543,7 @@ export default function Home() {
     const snapshot = controller.current?.getSnapshot();
     if (!snapshot) return;
     const url = new URL(location.pathname, location.origin);
+    url.searchParams.set('lang', locale);
     url.hash = encodeShare(snapshot);
     try {
       await navigator.clipboard.writeText(url.href);
@@ -573,8 +595,8 @@ export default function Home() {
           <button
             className="brand-mark"
             onClick={() => view('overview')}
-            title="返回全景"
-            aria-label="返回校园全景"
+            title={t('返回全景')}
+            aria-label={t('返回校园全景')}
           >
             <Image
               src={`${BASE}/favicon.svg`}
@@ -585,13 +607,25 @@ export default function Home() {
             />
           </button>
           <h1>
-            广西大学 <span>校园地图</span>
+            {t('广西大学')}
+            <span>{t('校园地图')}</span>
           </h1>
         </div>
         <div className="masthead-actions">
+          <button
+            className="language-switch"
+            onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
+            aria-label={locale === 'zh' ? 'Switch to English' : '切换为中文'}
+            title={locale === 'zh' ? 'Switch to English' : '切换为中文'}
+          >
+            <Languages size={17} />
+            <span lang={locale === 'zh' ? 'en' : 'zh-CN'}>
+              {locale === 'zh' ? 'EN' : '中文'}
+            </span>
+          </button>
           <div className="header-location">
             <span className="live-dot" />
-            南宁 · 大学东路主校区
+            {t('南宁 · 大学东路主校区')}
           </div>
           <button
             className="icon-button about-button"
@@ -599,8 +633,8 @@ export default function Home() {
               pauseMotion();
               setAbout(true);
             }}
-            title="项目说明"
-            aria-label="项目说明"
+            title={t('项目说明')}
+            aria-label={t('项目说明')}
           >
             <Info size={19} />
           </button>
@@ -617,36 +651,36 @@ export default function Home() {
       <aside
         ref={dock}
         className={`panel-dock ${collapsed ? 'collapsed' : ''} ${panelExpanded ? 'expanded' : ''} ${panelMode === 'detail' ? 'detail-mode' : ''}`}
-        aria-label="校园浏览面板"
+        aria-label={t('校园浏览面板')}
       >
         <div className="dock-heading">
           {panelMode === 'detail' && current && (
             <button
               ref={detailBack}
               className="dock-back"
-              title="返回地点列表"
-              aria-label="返回地点列表"
+              title={t('返回地点列表')}
+              aria-label={t('返回地点列表')}
               onClick={returnToMenu}
             >
               <ChevronLeft size={16} />
-              <span>返回列表</span>
+              <span>{t('返回列表')}</span>
             </button>
           )}
           <button
             className="dock-toggle"
             aria-expanded={!collapsed}
             aria-controls="campus-panel-body"
-            aria-label={collapsed ? '展开面板' : '收起面板'}
+            aria-label={collapsed ? t('展开面板') : t('收起面板')}
             onClick={() => setCollapsed((v) => !v)}
           >
             <span>
               {panelMode === 'detail' && current
                 ? collapsed
-                  ? current.name
+                  ? name(current.name)
                   : ''
-                : '校园浏览'}
+                : t('校园浏览')}
             </span>
-            <small>{collapsed ? '展开' : '收起面板'}</small>
+            <small>{collapsed ? t('展开') : t('收起面板')}</small>
             <ChevronDown size={16} />
           </button>
           {!collapsed && (
@@ -658,10 +692,10 @@ export default function Home() {
               }}
             >
               {panelExpanded
-                ? '简要'
+                ? t('简要')
                 : panelMode === 'detail'
-                  ? '详情'
-                  : '展开面板'}
+                  ? t('详情')
+                  : t('展开面板')}
             </button>
           )}
         </div>
@@ -675,44 +709,47 @@ export default function Home() {
           }}
         >
           {panelMode === 'detail' && current ? (
-            <section className="place-detail" aria-label="地点详情">
+            <section className="place-detail" aria-label={t('地点详情')}>
               <div className="detail-heading">
                 <div>
                   <div className="eyebrow">
-                    {CATEGORY_NAMES[current.category]}
+                    {t(CATEGORY_NAMES[current.category])}
                   </div>
-                  <h2>{current.name}</h2>
+                  <h2>{name(current.name)}</h2>
                 </div>
               </div>
               <p>
-                {currentLandmark?.description ??
-                  `${CATEGORY_NAMES[currentBuilding!.category]}建筑。`}
+                {currentLandmark
+                  ? landmarkDescription(currentLandmark, locale)
+                  : t('{category}建筑。', {
+                      category: t(CATEGORY_NAMES[currentBuilding!.category]),
+                    })}
               </p>
               {currentLandmark && (
                 <div key={current.id}>
                   <fieldset
                     className="landmark-views"
-                    aria-label="地点观察视角"
+                    aria-label={t('地点观察视角')}
                   >
                     <button
                       aria-pressed={!orbit && landmarkView === 'oblique'}
                       onClick={() => changeLandmarkView('oblique')}
                     >
-                      全貌
+                      {t('全貌')}
                     </button>
                     <button
                       aria-pressed={!orbit && landmarkView === 'top'}
                       onClick={() => changeLandmarkView('top')}
                     >
-                      俯视
+                      {t('俯视')}
                     </button>
                     <button
                       aria-pressed={orbit}
                       disabled={reducedMotion}
                       title={
                         reducedMotion
-                          ? '系统已启用减少动态效果'
-                          : '环绕当前地点，拖动画面可暂停'
+                          ? t('系统已启用减少动态效果')
+                          : t('环绕当前地点，拖动画面可暂停')
                       }
                       onClick={() => {
                         setTour(false);
@@ -720,7 +757,7 @@ export default function Home() {
                       }}
                     >
                       {orbit ? <Pause size={14} /> : <Orbit size={14} />}
-                      {orbit ? '暂停环绕' : '环绕'}
+                      {orbit ? t('暂停环绕') : t('环绕')}
                     </button>
 
                     {(
@@ -730,33 +767,33 @@ export default function Home() {
                           ['library', 'teaching-six'].includes(
                             currentLandmark.id,
                           )
-                            ? '南侧'
-                            : '正面',
+                            ? t('南侧')
+                            : t('正面'),
                         ],
                         [
                           'back',
                           ['library', 'teaching-six'].includes(
                             currentLandmark.id,
                           )
-                            ? '北侧'
-                            : '背面',
+                            ? t('北侧')
+                            : t('背面'),
                         ],
                         [
                           'entrance',
                           ['library', 'teaching-six'].includes(
                             currentLandmark.id,
                           )
-                            ? '南门近景'
+                            ? t('南门近景')
                             : currentLandmark.placeKind === 'bridge'
-                              ? '桥下近景'
+                              ? t('桥下近景')
                               : currentLandmark.placeKind === 'sculpture'
-                                ? '雕塑近景'
-                                : '入口近景',
+                                ? t('雕塑近景')
+                                : t('入口近景'),
                         ],
                         ...(['library', 'teaching-six'].includes(
                           currentLandmark.id,
                         )
-                          ? [['rear-entrance', '北门近景']]
+                          ? [['rear-entrance', t('北门近景')]]
                           : []),
                       ] as [LandmarkView, string][]
                     ).map(([value, label]) => (
@@ -765,7 +802,7 @@ export default function Home() {
                         aria-pressed={!orbit && landmarkView === value}
                         onClick={() => changeLandmarkView(value)}
                       >
-                        {label}
+                        {t(label)}
                       </button>
                     ))}
                   </fieldset>
@@ -774,7 +811,7 @@ export default function Home() {
               <div className="detail-actions">
                 <button onClick={openShare}>
                   <Share2 size={14} />
-                  分享视角
+                  {t('分享视角')}
                 </button>
               </div>
             </section>
@@ -794,15 +831,15 @@ export default function Home() {
                 <TabsList className="panel-tabs">
                   <TabsTrigger value="explore">
                     <MapPin size={17} />
-                    地点
+                    {t('地点')}
                   </TabsTrigger>
                   <TabsTrigger value="layers">
                     <Layers3 size={17} />
-                    图层
+                    {t('图层')}
                   </TabsTrigger>
                   <TabsTrigger value="environment">
                     <Sun size={17} />
-                    光影
+                    {t('光影')}
                   </TabsTrigger>
                 </TabsList>
                 <TabsContent value="explore" className="explore-content">
@@ -816,12 +853,12 @@ export default function Home() {
                       }}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      placeholder="搜索地点，如图书馆、六教"
-                      aria-label="搜索校园地点"
+                      placeholder={t('搜索地点，如图书馆、六教')}
+                      aria-label={t('搜索校园地点')}
                     />
                     {query && (
                       <button
-                        title="清除搜索"
+                        title={t('清除搜索')}
                         onClick={() => {
                           setQuery('');
                           dock.current
@@ -837,22 +874,26 @@ export default function Home() {
                   </div>
                   <output className="result-heading" aria-atomic="true">
                     <span>
-                      {query.trim() ? '搜索结果' : '地点'}
-                      <small className="index-note">编号为游览站号</small>
+                      {query.trim() ? t('搜索结果') : t('地点')}
+                      <small className="index-note">
+                        {t('编号为游览站号')}
+                      </small>
                     </span>
-                    <span>{places.length} 处</span>
+                    <span>{t('{count} 处', { count: places.length })}</span>
                   </output>
                   <div className="places">
                     {!landmarks.length ? (
                       error ? (
                         <div className="empty-state">
-                          <p>地点资料暂时无法加载，请检查网络后重试。</p>
+                          <p>{t('地点资料暂时无法加载，请检查网络后重试。')}</p>
                           <button className="search-reset" onClick={retry}>
-                            重新加载地点
+                            {t('重新加载地点')}
                           </button>
                         </div>
                       ) : (
-                        <output className="empty-state">正在加载地点…</output>
+                        <output className="empty-state">
+                          {t('正在加载地点…')}
+                        </output>
                       )
                     ) : places.length ? (
                       <PlaceGroups
@@ -867,16 +908,16 @@ export default function Home() {
                       />
                     ) : (
                       <div className="empty-state">
-                        <p>没有找到相关地点。试试“图书馆”或“六教”。</p>
+                        <p>{t('没有找到相关地点。试试“图书馆”或“六教”。')}</p>
                         <button className="search-reset" onClick={resetSearch}>
-                          清空搜索
+                          {t('清空搜索')}
                         </button>
                       </div>
                     )}
                   </div>
                 </TabsContent>
                 <TabsContent value="layers" className="settings-content">
-                  <p className="section-hint">选择地图中显示的内容</p>
+                  <p className="section-hint">{t('选择地图中显示的内容')}</p>
                   {LAYER_ITEMS.map(([key, label, desc, Icon]) => (
                     <label
                       className="layer-row"
@@ -885,8 +926,8 @@ export default function Home() {
                     >
                       <Icon size={19} />
                       <span>
-                        <strong id={`layer-title-${key}`}>{label}</strong>
-                        <small id={`layer-description-${key}`}>{desc}</small>
+                        <strong id={`layer-title-${key}`}>{t(label)}</strong>
+                        <small id={`layer-description-${key}`}>{t(desc)}</small>
                       </span>
                       <Switch
                         id={`layer-${key}`}
@@ -899,15 +940,18 @@ export default function Home() {
                   ))}
                   <details className="menu-disclosure layer-note">
                     <summary>
-                      关于校园边界 <ChevronDown size={15} />
+                      {t('关于校园边界')}
+                      <ChevronDown size={15} />
                     </summary>
                     <p className="settings-note">
-                      白色细线表示校园大致范围；农院路为公共道路，不代表封闭校区。
+                      {t(
+                        '白色细线表示校园大致范围；农院路为公共道路，不代表封闭校区。',
+                      )}
                     </p>
                   </details>
                 </TabsContent>
                 <TabsContent value="environment" className="settings-content">
-                  <p className="section-hint">同一座校园，不同的光景</p>
+                  <p className="section-hint">{t('同一座校园，不同的光景')}</p>
                   <div className="preset-grid">
                     {PRESETS.map(([p, label, caption, Icon]) => (
                       <button
@@ -915,7 +959,7 @@ export default function Home() {
                         className={preset === p ? 'active' : ''}
                         onClick={() => changePreset(p)}
                         aria-pressed={preset === p}
-                        aria-label={label}
+                        aria-label={t(label)}
                       >
                         <Image
                           src={`${BASE}/images/presets/${p}.jpg`}
@@ -927,17 +971,18 @@ export default function Home() {
                         />
                         <span className="preset-caption">
                           <Icon size={16} />
-                          <strong>{label}</strong>
+                          <strong>{t(label)}</strong>
                           {preset === p && <Check size={14} />}
                         </span>
-                        <small>{caption}</small>
+                        <small>{t(caption)}</small>
                       </button>
                     ))}
                   </div>
                   <details className="menu-disclosure quality-disclosure">
                     <summary>
                       <span>
-                        画质 <strong>{QUALITY_NAMES[quality]}</strong>
+                        {t('画质')}
+                        <strong>{t(QUALITY_NAMES[quality])}</strong>
                       </span>
                       <ChevronDown size={15} />
                     </summary>
@@ -945,12 +990,12 @@ export default function Home() {
                       value={quality}
                       onValueChange={(v) => changeQuality(v as Quality)}
                       className="quality-options"
-                      aria-label="画质"
+                      aria-label={t('画质')}
                     >
                       {[
-                        ['auto', '自动', '根据屏幕与运行表现调节'],
-                        ['fine', '精细', '完整植被、阴影与近景细节'],
-                        ['smooth', '流畅', '降低植被密度与渲染分辨率'],
+                        ['auto', t('自动'), t('根据屏幕与运行表现调节')],
+                        ['fine', t('精细'), t('完整植被、阴影与近景细节')],
+                        ['smooth', t('流畅'), t('降低植被密度与渲染分辨率')],
                       ].map(([q, name, desc]) => (
                         <label key={q} htmlFor={`quality-${q}`}>
                           <RadioGroupItem
@@ -960,33 +1005,35 @@ export default function Home() {
                           />
                           <span>
                             <strong id={`quality-title-${q}`}>{name}</strong>
-                            <small>{desc}</small>
+                            <small>{t(desc)}</small>
                           </span>
                         </label>
                       ))}
                     </RadioGroup>
                   </details>
                   <p className="settings-note">
-                    预览取自图书馆同一视角，光照为氛围模拟。
+                    {t('预览取自图书馆同一视角，光照为氛围模拟。')}
                   </p>
                 </TabsContent>
               </Tabs>
               <div className="panel-foot">
                 {overviewError ? (
                   <button onClick={() => setOverviewRetry((n) => n + 1)}>
-                    地图数据暂不可用 · 重试
+                    {t('地图数据暂不可用 · 重试')}
                   </button>
                 ) : overview ? (
-                  `地图数据 · ${overview.snapshotAt.slice(0, 10).replaceAll('-', '.')}`
+                  t('地图数据 · {date}', {
+                    date: overview.snapshotAt.slice(0, 10).replaceAll('-', '.'),
+                  })
                 ) : (
-                  '地图数据加载中…'
+                  t('地图数据加载中…')
                 )}
                 <button
                   onClick={() => {
                     pauseMotion();
                     setAbout(true);
                   }}
-                  title="查看数据来源"
+                  title={t('查看数据来源')}
                 >
                   <Info size={14} />
                 </button>
@@ -1000,7 +1047,8 @@ export default function Home() {
                     setPanelExpanded(false);
                   }}
                 >
-                  返回 {current.name} <ArrowUpRight size={14} />
+                  {t('返回 {name}', { name: name(current.name) })}{' '}
+                  <ArrowUpRight size={14} />
                 </button>
               )}
             </div>
@@ -1018,7 +1066,7 @@ export default function Home() {
             onClick={() => setTour((value) => !value)}
           >
             {tour ? <Pause size={15} /> : <Play size={15} />}
-            {tour ? '暂停游览' : '继续游览'} · {tourIndex + 1}/
+            {tour ? t('暂停游览') : t('继续游览')} · {tourIndex + 1}/
             {landmarks.length}
           </button>
         )}
@@ -1033,16 +1081,17 @@ export default function Home() {
           {tourStarted && (
             <div className="tour-heading">
               <div className="tour-copy">
-                <strong>{tour ? '正在游览' : '游览已暂停'}</strong>
+                <strong>{tour ? t('正在游览') : t('游览已暂停')}</strong>
                 <small>
                   {String(tourIndex + 1).padStart(2, '0')} / {landmarks.length}{' '}
-                  · {landmarks[tourIndex]?.name}
+                  ·{' '}
+                  {landmarks[tourIndex] ? name(landmarks[tourIndex].name) : ''}
                 </small>
               </div>
               <button
                 className="tour-end"
-                title="结束游览"
-                aria-label="结束游览"
+                title={t('结束游览')}
+                aria-label={t('结束游览')}
                 onClick={() => {
                   setTour(false);
                   setTourStarted(false);
@@ -1071,11 +1120,15 @@ export default function Home() {
           >
             {tour ? <Pause size={15} /> : <Play size={15} />}
             <span>
-              {tour ? '暂停游览' : tourStarted ? '继续游览' : '开始游览'}
+              {tour
+                ? t('暂停游览')
+                : tourStarted
+                  ? t('继续游览')
+                  : t('开始游览')}
             </span>
             {!tourStarted && (
               <small className="tour-count">
-                {landmarks.length || '—'} 个地点
+                {t('{count} 个地点', { count: landmarks.length })}
               </small>
             )}
             {tourStarted && (
@@ -1088,7 +1141,7 @@ export default function Home() {
             <>
               <button
                 className="tour-skip"
-                title="上一站"
+                title={t('上一站')}
                 disabled={!ready}
                 onClick={() => jump(-1)}
               >
@@ -1096,7 +1149,7 @@ export default function Home() {
               </button>
               <button
                 className="tour-skip"
-                title="下一站"
+                title={t('下一站')}
                 disabled={!ready}
                 onClick={() => jump(1)}
               >
@@ -1107,12 +1160,12 @@ export default function Home() {
         </div>
       </aside>
       <Tooltip.Provider delay={200}>
-        <div className="map-tools" aria-label="视角控制">
+        <div className="map-tools" aria-label={t('视角控制')}>
           <MapToolButton
             className="north-button"
             onClick={() => view('north')}
-            aria-label="正北朝向"
-            tooltip="正北朝向"
+            aria-label={t('正北朝向')}
+            tooltip={t('正北朝向')}
           >
             <Navigation
               size={20}
@@ -1125,15 +1178,15 @@ export default function Home() {
           <div className="tool-stack zoom-tools">
             <MapToolButton
               onClick={() => view('zoomIn')}
-              aria-label="放大"
-              tooltip="放大 · +（聚焦画面）"
+              aria-label={t('放大')}
+              tooltip={t('放大 · +（聚焦画面）')}
             >
               <Plus size={19} />
             </MapToolButton>
             <MapToolButton
               onClick={() => view('zoomOut')}
-              aria-label="缩小"
-              tooltip="缩小 · −（聚焦画面）"
+              aria-label={t('缩小')}
+              tooltip={t('缩小 · −（聚焦画面）')}
             >
               <Minus size={19} />
             </MapToolButton>
@@ -1141,35 +1194,35 @@ export default function Home() {
           <div className="tool-stack secondary-tools">
             <MapToolButton
               onClick={() => view('top')}
-              aria-label="俯视校园"
-              tooltip="俯视校园"
+              aria-label={t('俯视校园')}
+              tooltip={t('俯视校园')}
             >
               <Grid2X2 size={18} />
             </MapToolButton>
             <MapToolButton
               onClick={() => view('tilt')}
-              aria-label="倾斜鸟瞰"
-              tooltip="倾斜鸟瞰"
+              aria-label={t('倾斜鸟瞰')}
+              tooltip={t('倾斜鸟瞰')}
             >
               <ScanEye size={18} />
             </MapToolButton>
             <MapToolButton
               onClick={() => view('overview')}
-              aria-label="全景复位"
-              tooltip="全景复位 · Home（聚焦画面）"
+              aria-label={t('全景复位')}
+              tooltip={t('全景复位 · Home（聚焦画面）')}
             >
               <House size={18} />
             </MapToolButton>
             <MapToolButton
-              aria-label="全屏"
-              tooltip="全屏"
+              aria-label={t('全屏')}
+              tooltip={t('全屏')}
               onClick={toggleFullscreen}
             >
               <Expand size={18} />
             </MapToolButton>
             <MapToolButton
-              aria-label="分享"
-              tooltip="分享"
+              aria-label={t('分享')}
+              tooltip={t('分享')}
               disabled={!ready}
               onClick={openShare}
             >
@@ -1180,8 +1233,8 @@ export default function Home() {
             <MapToolButton
               className="mobile-reset"
               onClick={() => view('overview')}
-              aria-label="全景复位"
-              tooltip="全景复位 · Home（聚焦画面）"
+              aria-label={t('全景复位')}
+              tooltip={t('全景复位 · Home（聚焦画面）')}
             >
               <House size={18} />
             </MapToolButton>
@@ -1192,11 +1245,11 @@ export default function Home() {
                 setToolsOpen(true);
               }}
               aria-haspopup="dialog"
-              aria-label="更多工具"
-              tooltip="更多工具"
+              aria-label={t('更多工具')}
+              tooltip={t('更多工具')}
             >
               <Ellipsis size={20} />
-              <span>更多</span>
+              <span>{t('更多')}</span>
             </MapToolButton>
           </div>
         </div>
@@ -1209,12 +1262,12 @@ export default function Home() {
             setHelpOpen(true);
           }}
         >
-          操作说明 · 拖动旋转 · 滚轮缩放
+          {t('操作说明 · 拖动旋转 · 滚轮缩放')}
         </button>
         {layers.boundary && (
           <span className="boundary-legend">
             <i />
-            校园大致边界
+            {t('校园大致边界')}
           </span>
         )}
         <a
@@ -1231,17 +1284,21 @@ export default function Home() {
           role={error ? 'alert' : 'status'}
         >
           {!error && <LoaderCircle className="spin" size={16} />}
-          <span>{status}</span>
+          <span>{statusText(locale, status)}</span>
           {loadProgress !== undefined && (
-            <progress aria-label="模型加载进度" max={1} value={loadProgress} />
+            <progress
+              aria-label={t('模型加载进度')}
+              max={1}
+              value={loadProgress}
+            />
           )}
-          {error && <button onClick={retry}>重试</button>}
+          {error && <button onClick={retry}>{t('重试')}</button>}
         </div>
       )}
       {toast && (
         <output className="toast">
           <Check size={15} />
-          {toast}
+          {t(toast)}
         </output>
       )}
       {debug && metrics && (
@@ -1249,9 +1306,9 @@ export default function Home() {
       )}
       <Dialog open={toolsOpen} onOpenChange={setToolsOpen}>
         <DialogContent className="tools-dialog">
-          <DialogTitle>校园工具</DialogTitle>
+          <DialogTitle>{t('校园工具')}</DialogTitle>
           <DialogDescription>
-            调整视角、分享画面，或查看操作说明。
+            {t('调整视角、分享画面，或查看操作说明。')}
           </DialogDescription>
           <div className="tools-grid">
             <button
@@ -1261,7 +1318,7 @@ export default function Home() {
               }}
             >
               <House size={20} />
-              全景复位
+              {t('全景复位')}
             </button>
             <button
               onClick={() => {
@@ -1270,7 +1327,7 @@ export default function Home() {
               }}
             >
               <Navigation size={20} />
-              正北朝向
+              {t('正北朝向')}
             </button>
             <button
               onClick={() => {
@@ -1279,7 +1336,7 @@ export default function Home() {
               }}
             >
               <Grid2X2 size={20} />
-              俯视校园
+              {t('俯视校园')}
             </button>
             <button
               onClick={() => {
@@ -1288,7 +1345,7 @@ export default function Home() {
               }}
             >
               <ScanEye size={20} />
-              倾斜鸟瞰
+              {t('倾斜鸟瞰')}
             </button>
             <button
               onClick={() => {
@@ -1297,7 +1354,7 @@ export default function Home() {
               }}
             >
               <Expand size={20} />
-              切换全屏
+              {t('切换全屏')}
             </button>
             <button
               disabled={!ready}
@@ -1307,7 +1364,7 @@ export default function Home() {
               }}
             >
               <Share2 size={20} />
-              分享
+              {t('分享')}
             </button>
             <button
               onClick={() => {
@@ -1317,41 +1374,44 @@ export default function Home() {
               }}
             >
               <CircleHelp size={20} />
-              操作说明
+              {t('操作说明')}
             </button>
           </div>
         </DialogContent>
       </Dialog>
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
         <DialogContent className="tools-dialog">
-          <DialogTitle>怎样游览校园</DialogTitle>
+          <DialogTitle>{t('怎样游览校园')}</DialogTitle>
           <DialogDescription>
-            选择一个地点，或点击“开始游览”依次浏览校园。
+            {t('选择一个地点，或点击“开始游览”依次浏览校园。')}
           </DialogDescription>
           <dl className="gesture-instructions">
-            <dt>手机触控</dt>
-            <dd>单指拖动旋转；双指拖动平移；双指捏合缩放。</dd>
-            <dt>鼠标与触控板</dt>
-            <dd>拖动旋转，右键拖动平移，滚轮缩放。</dd>
-            <dt>键盘</dt>
+            <dt>{t('手机触控')}</dt>
+            <dd>{t('单指拖动旋转；双指拖动平移；双指捏合缩放。')}</dd>
+            <dt>{t('鼠标与触控板')}</dt>
+            <dd>{t('拖动旋转，右键拖动平移，滚轮缩放。')}</dd>
+            <dt>{t('键盘')}</dt>
             <dd>
-              Tab 选择控件，Enter 确认。聚焦三维画面后，方向键平移，+ / −
-              缩放，Home 返回全景。
+              {t(
+                'Tab 选择控件，Enter 确认。聚焦三维画面后，方向键平移，+ / − 缩放，Home 返回全景。',
+              )}
             </dd>
-            <dt>查看地点</dt>
+            <dt>{t('查看地点')}</dt>
             <dd>
-              搜索“六教”等名称或别名，在详情视角栏选择全貌、俯视、环绕、正背面及近景；可横向滑动查看更多视角。
+              {t(
+                '搜索“六教”等名称或别名，在详情视角栏选择全貌、俯视、环绕、正背面及近景；可横向滑动查看更多视角。',
+              )}
             </dd>
-            <dt>暂停游览</dt>
-            <dd>拖动画面即可暂停，也可使用“暂停游览”按钮。</dd>
+            <dt>{t('暂停游览')}</dt>
+            <dd>{t('拖动画面即可暂停，也可使用“暂停游览”按钮。')}</dd>
           </dl>
         </DialogContent>
       </Dialog>
       <Dialog open={shareOpen} onOpenChange={setShareOpen}>
         <DialogContent className="share-dialog">
-          <DialogTitle>分享校园</DialogTitle>
+          <DialogTitle>{t('分享校园')}</DialogTitle>
           <DialogDescription>
-            保存当前视角链接，或下载带署名的校园画面。
+            {t('保存当前视角链接，或下载带署名的校园画面。')}
           </DialogDescription>
           <div className="tools-grid">
             <button
@@ -1362,7 +1422,7 @@ export default function Home() {
               }}
             >
               <Share2 size={20} />
-              复制视角链接
+              {t('复制视角链接')}
             </button>
             <button
               disabled={!ready}
@@ -1372,7 +1432,7 @@ export default function Home() {
               }}
             >
               <Download size={20} />
-              下载画面
+              {t('下载画面')}
             </button>
           </div>
         </DialogContent>
@@ -1384,67 +1444,79 @@ export default function Home() {
         }}
       >
         <DialogContent className="share-dialog">
-          <DialogTitle>分享这个校园视角</DialogTitle>
+          <DialogTitle>{t('分享这个校园视角')}</DialogTitle>
           <DialogDescription>
-            链接保留当前地点、镜头和光照，换一块屏幕也能继续浏览。
+            {t('链接保留当前地点、镜头和光照，换一块屏幕也能继续浏览。')}
           </DialogDescription>
           <Input
-            aria-label="校园视角链接"
+            aria-label={t('校园视角链接')}
             value={shareLink}
             readOnly
             onFocus={(event) => event.currentTarget.select()}
           />
-          <p>复制上方链接即可分享。</p>
+          <p>{t('复制上方链接即可分享。')}</p>
         </DialogContent>
       </Dialog>
       <Dialog open={about} onOpenChange={setAbout}>
         <DialogContent className="about-dialog">
-          <DialogTitle>关于「广西大学 校园地图」</DialogTitle>
+          <DialogTitle>{t('关于「广西大学 校园地图」')}</DialogTitle>
           <DialogDescription>
-            广西大学主校区的三维建筑与地理环境复现。
+            {t('广西大学主校区的三维建筑与地理环境复现。')}
           </DialogDescription>
           <div className="about-scroll">
             <p>
-              以大学东路主校区为中心，涵盖东、西、北校园。校外建筑仅保留紧邻校界的部分，周边道路用于交代位置。
+              {t(
+                '以大学东路主校区为中心，涵盖东、西、北校园。校外建筑仅保留紧邻校界的部分，周边道路用于交代位置。',
+              )}
             </p>
             {overviewError && (
               <output className="metadata-status">
-                统计资料暂不可用，仍可游览校园。
+                {t('统计资料暂不可用，仍可游览校园。')}
                 <button onClick={() => setOverviewRetry((n) => n + 1)}>
-                  重试统计资料
+                  {t('重试统计资料')}
                 </button>
               </output>
             )}
             <div className="about-stats">
               <span>
-                <b>{overview?.campusBuildings ?? '—'}</b>校内建筑
+                <b>{overview?.campusBuildings ?? '—'}</b>
+                {t('校内建筑')}
               </span>
               <span>
-                <b>{landmarks.length || '—'}</b>精选地点
+                <b>{landmarks.length || '—'}</b>
+                {t('精选地点')}
               </span>
               <span>
-                <b>{overview?.trees ?? '—'}</b>示意树木
+                <b>{overview?.trees ?? '—'}</b>
+                {t('示意树木')}
               </span>
             </div>
-            <h3>地图与建模依据</h3>
+            <h3>{t('地图与建模依据')}</h3>
             <p>
-              OSM 快照：{overview?.snapshotAt.slice(0, 10) ?? '暂不可用'}
-              。获取日期不代表所有要素都在当年更新。近期资料以 2024—2026
-              年校方发布内容为优先，照片未注明拍摄日期时保留未知状态。
+              {t(
+                'OSM 快照：{date}。获取日期不代表所有要素都在当年更新。近期资料以 2024—2026 年校方发布内容为优先，照片未注明拍摄日期时保留未知状态。',
+                { date: overview?.snapshotAt.slice(0, 10) ?? t('暂不可用') },
+              )}
             </p>
             <p>
-              农院路为贯穿校园区域的公共道路，两侧校园通过立交通道连接。道路与桥梁快照：
-              {overview?.infrastructureSnapshotAt?.slice(0, 10) ?? '暂不可用'}
-              ；走廊约{' '}
-              {overview?.publicRoadMeters == null
-                ? '—'
-                : (overview.publicRoadMeters / 1000).toFixed(2)}{' '}
-              千米。围墙、路幅及桥梁净高含估算，展示范围不代表权属或实际通行权限。
+              {t(
+                '农院路为贯穿校园区域的公共道路，两侧校园通过立交通道连接。道路与桥梁快照：{date}；走廊约 {distance} 千米。围墙、路幅及桥梁净高含估算，展示范围不代表权属或实际通行权限。',
+                {
+                  date:
+                    overview?.infrastructureSnapshotAt?.slice(0, 10) ??
+                    t('暂不可用'),
+                  distance:
+                    overview?.publicRoadMeters == null
+                      ? '—'
+                      : (overview.publicRoadMeters / 1000).toFixed(2),
+                },
+              )}
             </p>
             <p>
-              建筑轮廓来自公开地图，{overview?.estimatedHeights ?? '部分'}{' '}
-              处建筑高度按类型估算。重点地标依据照片独立建模；未被照片覆盖的立面、树位和植物种类包含推定。地形使用
-              Mapzen / SRTM 历史高程，SRTM 采集于 2000 年，非近期校园测绘。
+              {t(
+                '建筑轮廓来自公开地图，{count}处建筑高度按类型估算。重点地标依据照片独立建模；未被照片覆盖的立面、树位和植物种类包含推定。地形使用 Mapzen / SRTM 历史高程，SRTM 采集于 2000 年，非近期校园测绘。',
+                { count: overview?.estimatedHeights ?? t('部分') },
+              )}
             </p>
             <div className="source-links">
               {Object.entries(refs)
@@ -1461,13 +1533,13 @@ export default function Home() {
                 )
                 .map(([k, r]) => (
                   <a href={r.url} key={k} target="_blank" rel="noreferrer">
-                    {r.name}
+                    {t(r.name)}
                     <ArrowUpRight size={14} />
                   </a>
                 ))}
             </div>
-            <h3>如何操作</h3>
-            <p>选择地点或开始游览，拖动画面探索校园。</p>
+            <h3>{t('如何操作')}</h3>
+            <p>{t('选择地点或开始游览，拖动画面探索校园。')}</p>
             <button
               className="help-link"
               onClick={() => {
@@ -1475,12 +1547,14 @@ export default function Home() {
                 setHelpOpen(true);
               }}
             >
-              查看操作说明 <ArrowUpRight size={14} />
+              {t('查看操作说明')}
+              <ArrowUpRight size={14} />
             </button>
-            <h3>开源与许可</h3>
+            <h3>{t('开源与许可')}</h3>
             <p>
-              Three.js + Blender。原创代码、文档、模型、材质和渲染图 MIT，OSM 数据
-              ODbL。公开照片用于造型参考，未作为贴图再分发。
+              {t(
+                'Three.js + Blender。原创代码、文档、模型、材质和渲染图 MIT，OSM 数据 ODbL。公开照片用于造型参考，未作为贴图再分发。',
+              )}
             </p>
             <a
               className="source-link"
@@ -1488,7 +1562,8 @@ export default function Home() {
               target="_blank"
               rel="noreferrer"
             >
-              查看源代码、模型与完整说明 <ArrowUpRight size={14} />
+              {t('查看源代码、模型与完整说明')}
+              <ArrowUpRight size={14} />
             </a>
           </div>
         </DialogContent>
@@ -1516,6 +1591,7 @@ function PlaceGroups({
   onHover: (id: string | null) => void;
   onChoose: (id: string) => void;
 }) {
+  const { name } = useCampusLocale();
   return (
     <>
       {' '}
@@ -1550,7 +1626,7 @@ function PlaceGroups({
                 )}
               </span>
               <span className="place-copy">
-                <strong>{p.name}</strong>
+                <strong>{name(p.name)}</strong>
               </span>
               <ChevronRight size={16} aria-hidden="true" />
             </button>

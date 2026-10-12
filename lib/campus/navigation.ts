@@ -1,3 +1,4 @@
+import { placeName } from './i18n/index.ts';
 import type { Building, Category, Landmark } from './types';
 
 export const LANDMARK_ALIASES: Record<string, string[]> = {
@@ -29,9 +30,13 @@ export function searchLandmarks(
   return landmarks.filter(
     (place) =>
       (category === 'all' || place.category === category) &&
-      [place.name, ...(LANDMARK_ALIASES[place.id] ?? [])].some((name) =>
-        name.toLocaleLowerCase().includes(term),
-      ),
+      [
+        place.name,
+        placeName(place.name, 'zh'),
+        placeName(place.name, 'en'),
+        ...(LANDMARK_ALIASES[place.id] ?? []),
+        ...(ENGLISH_ALIASES[place.id] ?? []),
+      ].some((name) => name.toLocaleLowerCase().includes(term)),
   );
 }
 
@@ -86,3 +91,29 @@ export function navigationFootprints(
       }),
   ];
 }
+
+/** Search associations do not change the canonical name or merge physical places. */
+export const ENGLISH_ALIASES: Record<string, string[]> = {
+  computer: [
+    'School of Computer and Electronic Information',
+    'Computer Science',
+  ],
+  huixue: ['Huixuetang Hall', 'Junwu Center for Culture and Arts Education'],
+  huicui: ['Huicui Building Hotel', 'School of Journalism and Communication'],
+  'teaching-ten': [
+    'Multimedia Teaching Building',
+    'Teaching Building 10',
+    'Shijiao',
+  ],
+  'teaching-six': ['Teaching Building 6', 'Liu Jiao'],
+  'teaching-two': ['Nanning Building', 'Teaching Building 2'],
+  'international-residence': [
+    'International Students Dormitory',
+    'International Students’ Dormitory',
+  ],
+  'new-east-gate': ['New East Gate', 'Xiuling Road West Lane 1'],
+  'chongzuo-bridge': ['Nongyuan Road'],
+  'bocui-bridge': ['Nongyuan Road'],
+  'huixian-bridge': ['Nongyuan Road'],
+  'time-gate': ['Time Square', 'Library North Square'],
+};

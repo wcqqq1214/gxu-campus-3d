@@ -1,3 +1,4 @@
+import { placeName, translate, type Locale, type Message } from './i18n';
 import { landmarkLabelAnchor } from './labels';
 import { createNightStyle, createRoadLights } from './night';
 import { createPalette } from './palette';
@@ -69,7 +70,7 @@ interface Manifest {
   infrastructure?: Asset[];
 }
 interface Callbacks {
-  onStatus: (message: string, error?: boolean, progress?: number) => void;
+  onStatus: (message: Message, error?: boolean, progress?: number) => void;
   onReady: () => void;
   onHover: (id: string | null) => void;
   onSelect: (
@@ -87,6 +88,9 @@ export function createScene(
   landmarks: Landmark[],
   callbacks: Callbacks,
 ): SceneController {
+  let locale: Locale = 'zh';
+  const t = (source: string, values?: Record<string, string | number>) =>
+    translate(locale, source, values);
   const benchmarkOrbit = benchmarkOrbitEnabled(location.search);
   const scene = new THREE.Scene();
   let convexCulling: ReturnType<typeof createConvexCulling> | null = null;
@@ -289,7 +293,10 @@ export function createScene(
   const failed = new Map<string, Asset>();
   const detailQueue = new ResourceQueue<void>(2);
   const lifecycle = new AbortController();
-  const progresses = new Map<string, { label: string; fraction: number }>();
+  const progresses = new Map<
+    string,
+    { label: string; name?: string; fraction: number }
+  >();
   const geometryCosts = new Map<string, number>();
   const wanted = new Set<string>();
   const recentlyUsed = new Map<string, number>();
@@ -314,8 +321,11 @@ export function createScene(
     const number = document.createElement('span');
     number.textContent = String(i + 1).padStart(2, '0');
     el.appendChild(number);
-    el.appendChild(document.createTextNode(l.name));
-    el.title = `查看${l.name}`;
+    const caption = document.createElement('span');
+    caption.className = 'map-label-name';
+    caption.textContent = placeName(l.name, locale);
+    el.appendChild(caption);
+    el.title = t('查看{name}', { name: placeName(l.name, locale) });
     el.onclick = () => {
       callbacks.onInteract();
       focus(l.id);
@@ -324,9 +334,42 @@ export function createScene(
     return {
       l,
       el,
+      caption,
+      width: 0,
+      height: 0,
       point: landmarkLabelAnchor(l),
     };
   });
+  function measureLabels() {
+    const layerDisplay = labels.style.display;
+    labels.style.display = '';
+    const displays = labelNodes.map(({ el }) => el.style.display);
+    for (const { el } of labelNodes) el.style.display = '';
+    for (const node of labelNodes) {
+      node.width = node.el.offsetWidth;
+      node.height = node.el.offsetHeight;
+    }
+    labelNodes.forEach(({ el }, i) => {
+      el.style.display = displays[i];
+    });
+    labels.style.display = layerDisplay;
+    dirty = true;
+  }
+  function setLocale(value: Locale) {
+    locale = value;
+    labels.lang = value === 'zh' ? 'zh-CN' : 'en';
+    canvas.setAttribute(
+      'aria-label',
+      t('广西大学三维校园，方向键平移，加减键缩放，Home返回全景'),
+    );
+    for (const { l, el, caption } of labelNodes) {
+      const name = placeName(l.name, locale);
+      caption.textContent = name;
+      el.title = t('查看{name}', { name });
+      el.setAttribute('aria-label', el.title);
+    }
+    measureLabels();
+  }
   function updateLabelAnchors(id?: string) {
     for (const node of labelNodes) {
       if (id && node.l.id !== id) continue;
@@ -756,7 +799,16 @@ export function createScene(
       progresses.values().next().value;
     if (foreground)
       callbacks.onStatus(
-        `${foreground.label} · ${Math.round(foreground.fraction * 100)}%`,
+        {
+          text: foreground.name
+            ? '正在细化{name} · {percent}%'
+            : '{label} · {percent}%',
+          values: {
+            label: foreground.label,
+            name: foreground.name ?? '',
+            percent: Math.round(foreground.fraction * 100),
+          },
+        },
         false,
         foreground.fraction,
       );
@@ -778,7 +830,7 @@ export function createScene(
         : key.startsWith('trees')
           ? '正在添上林荫'
           : key.startsWith('landmark-')
-            ? `正在细化${landmarks.find((l) => 'landmark-' + l.id === key)?.name ?? '地标'}`
+            ? '正在细化{name}'
             : '正在补充周边细节';
     try {
       const buffer = await fetchModel(
@@ -786,7 +838,14 @@ export function createScene(
         a.bytes,
         signal,
         (fraction) => {
-          progresses.set(key, { label, fraction });
+          progresses.set(key, {
+            label,
+            fraction,
+            name: key.startsWith('landmark-')
+              ? (landmarks.find((l) => 'landmark-' + l.id === key)?.name ??
+                '地标')
+              : undefined,
+          });
           updateLoadStatus();
         },
       );
@@ -1376,6 +1435,7 @@ export function createScene(
     pendingRequest = performance.now();
   });
   function resize() {
+    measureLabels();
     const w = host.clientWidth,
       h = host.clientHeight;
     renderer.setSize(w, h);
@@ -1526,7 +1586,7 @@ export function createScene(
       lastRendered = time;
       const rect = host.getBoundingClientRect();
       const occupied: number[][] = [];
-      for (const { l, el, point } of [...labelNodes].sort(
+      for (const { l, el, point, width, height } of [...labelNodes].sort(
         (a, b) =>
           Number(b.l.id === hovered) * 2 +
           Number(b.l.id === selected) -
@@ -1536,8 +1596,7 @@ export function createScene(
         const dist = camera.position.distanceTo(point);
         const x = ((p.x + 1) * rect.width) / 2,
           y = ((-p.y + 1) * rect.height) / 2;
-        const width = l.name.length * 12 + 38;
-        const bounds = [x - width / 2, y - 28, x + width / 2, y];
+        const bounds = [x - width / 2, y - height, x + width / 2, y];
         const overlap = occupied.some(
           (r) =>
             bounds[0] < r[2] + 6 &&
@@ -1651,13 +1710,34 @@ export function createScene(
       ctx.drawImage(canvas, 0, 0);
       const size = Math.max(15, Math.round(out.width / 110));
       ctx.font = `${size}px sans-serif`;
-      const label =
-        '广西大学 校园地图  |  © OpenStreetMap contributors · ODbL' +
-        (layers.boundary && boundaryReady ? '  |  白色细线：校园大致边界' : '');
+      const segments = [
+        t('广西大学 校园地图'),
+        '© OpenStreetMap contributors · ODbL',
+      ];
+      if (layers.boundary && boundaryReady)
+        segments.push(t('白色细线：校园大致边界'));
+      const label = segments.join('  |  ');
+      const available = out.width - size * 2;
+      const lines =
+        ctx.measureText(label).width <= available ? [label] : segments;
+      const lineHeight = size * 1.5;
+      const footerHeight = lineHeight * lines.length + size;
       ctx.fillStyle = '#15382ddd';
-      ctx.fillRect(0, out.height - size * 3, out.width, size * 3);
+      ctx.fillRect(0, out.height - footerHeight, out.width, footerHeight);
       ctx.fillStyle = 'white';
-      ctx.fillText(label, size, out.height - size);
+      for (let i = 0; i < lines.length; i++) {
+        ctx.font = `${size}px sans-serif`;
+        const fittedSize = Math.min(
+          size,
+          (size * available) / ctx.measureText(lines[i]).width,
+        );
+        ctx.font = `${fittedSize}px sans-serif`;
+        ctx.fillText(
+          lines[i],
+          size,
+          out.height - footerHeight + size + lineHeight * i,
+        );
+      }
       const blob = await new Promise<Blob | null>((resolve) =>
         out.toBlob(resolve, 'image/png'),
       );
@@ -1665,7 +1745,7 @@ export function createScene(
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = '广西大学-校园视图.png';
+      link.download = t('广西大学-校园视图.png');
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     },
@@ -1683,6 +1763,7 @@ export function createScene(
           );
       }
     },
+    setLocale,
     getLightingState: () => ({
       preset,
       labelTheme: preset === 'night' ? 'night' : 'day',

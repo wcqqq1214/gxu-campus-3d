@@ -499,7 +499,7 @@ a svg {
   pointer-events: auto;
   will-change: transform;
 }
-.map-label > span {
+.map-label > span:first-child {
   background: var(--primary);
   color: #fff;
   border-radius: 4px;
@@ -614,8 +614,7 @@ a svg {
   letter-spacing: 1.5px;
 }
 .detail-heading h2 {
-  font:
-    600 23px var(--font-serif);
+  font: 600 23px var(--font-serif);
   line-height: 1.5;
   margin: 6px 0;
 }
@@ -711,8 +710,7 @@ a svg {
   color: #234936;
 }
 .about-dialog [data-slot='dialog-title'] {
-  font:
-    600 25px var(--font-serif);
+  font: 600 25px var(--font-serif);
   margin-bottom: 0;
 }
 .about-dialog [data-slot='dialog-description'] {
@@ -908,7 +906,7 @@ a svg {
     padding: 4px 6px 4px 4px;
     gap: 4px;
   }
-  .map-label > span {
+  .map-label > span:first-child {
     padding: 2px 3px;
   }
   .tour-bar {
@@ -1320,7 +1318,7 @@ a svg {
     font-size: 12px;
     min-height: 32px;
   }
-  .map-label > span {
+  .map-label > span:first-child {
     font-size: 10px;
   }
   .masthead h1 span {
@@ -1982,7 +1980,7 @@ output.empty-state {
   background: var(--label-fill);
   color: white;
 }
-.map-label.active > span {
+.map-label.active > span:first-child {
   background: white;
   color: var(--phoenix);
 }
@@ -2265,5 +2263,128 @@ output.empty-state {
 @media (min-width: 760px) and (max-width: 1100px) {
   .masthead-actions {
     padding-left: 6px;
+  }
+}
+
+/* Bilingual copy: full place names remain readable, including narrow screens. */
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  flex: 0 0 auto;
+  min-width: 58px;
+  min-height: 44px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+.language-switch:hover {
+  background: var(--surface-hover);
+}
+.language-switch:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+.place-copy strong,
+.panel-dock .detail-heading h2,
+.minimap-toggle span,
+.return-landmark {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+.place-copy strong {
+  display: block;
+}
+.minimap-toggle > svg,
+.map-label > span:first-child {
+  flex-shrink: 0;
+}
+.map-label .map-label-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 210px;
+  line-height: 1.35;
+  text-align: left;
+}
+:lang(en) .masthead h1 {
+  letter-spacing: 0;
+  font-size: 18px;
+  line-height: 1.15;
+}
+:lang(en) .masthead h1 span {
+  display: block;
+  margin-left: 0;
+  letter-spacing: 0.3px;
+  font-size: 12px;
+  margin-top: 3px;
+}
+:lang(en) .dock-toggle > span {
+  letter-spacing: 0;
+}
+:lang(en) .panel-dock .detail-heading h2 {
+  font-size: 22px;
+}
+:lang(en) .result-heading {
+  align-items: flex-start;
+  gap: 8px;
+}
+:lang(en) .result-heading > span:last-child {
+  white-space: nowrap;
+}
+:lang(en) .index-note {
+  display: block;
+  margin-left: 0;
+  font-size: 10px;
+}
+:lang(en) .tour-heading .tour-copy small {
+  white-space: normal;
+  line-height: 1.4;
+}
+:lang(en) .scene-status {
+  max-width: min(520px, calc(100vw - 32px));
+}
+:lang(en) .about-stats span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 760px) and (max-width: 1100px) {
+  :lang(en) .header-location {
+    display: none;
+  }
+}
+@media (max-width: 759px) {
+  .language-switch {
+    min-width: 54px;
+    padding: 0 5px;
+  }
+  :lang(en) .masthead h1 {
+    font-size: 15px;
+    white-space: normal;
+  }
+  :lang(en) .masthead h1 span {
+    font-size: 10px;
+  }
+  :lang(en) .masthead .repo-link {
+    display: none;
+  }
+  :lang(en) .masthead h1 {
+    flex: 1;
+    min-width: 0;
+  }
+  :lang(en) .dock-toggle small {
+    white-space: nowrap;
+    font-size: 11px;
+  }
+  :lang(en) .panel-dock .detail-heading h2 {
+    font-size: 18px;
+  }
+  .map-label .map-label-name {
+    max-width: 165px;
   }
 }
