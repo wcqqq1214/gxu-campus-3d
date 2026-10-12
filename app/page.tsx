@@ -35,7 +35,6 @@ import {
   Ellipsis,
   CircleHelp,
   Layers3,
-  Languages,
   LoaderCircle,
   MapPin,
   Minus,
@@ -612,21 +611,34 @@ function CampusMap() {
           </h1>
         </div>
         <div className="masthead-actions">
-          <button
-            className="language-switch"
-            onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
-            aria-label={locale === 'zh' ? 'Switch to English' : '切换为中文'}
-            title={locale === 'zh' ? 'Switch to English' : '切换为中文'}
-          >
-            <Languages size={17} />
-            <span lang={locale === 'zh' ? 'en' : 'zh-CN'}>
-              {locale === 'zh' ? 'EN' : '中文'}
-            </span>
-          </button>
           <div className="header-location">
             <span className="live-dot" />
             {t('南宁 · 大学东路主校区')}
           </div>
+          <fieldset
+            className="language-switch"
+            data-locale={locale}
+            aria-label={t('选择语言')}
+          >
+            <button
+              type="button"
+              lang="en"
+              aria-label="Switch to English"
+              aria-pressed={locale === 'en'}
+              onClick={() => setLocale('en')}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              lang="zh-CN"
+              aria-label="切换为中文"
+              aria-pressed={locale === 'zh'}
+              onClick={() => setLocale('zh')}
+            >
+              中文
+            </button>
+          </fieldset>
           <button
             className="icon-button about-button"
             onClick={() => {

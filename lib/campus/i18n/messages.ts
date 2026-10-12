@@ -1,5 +1,6 @@
 /** Chinese source messages are stable keys; placeholders preserve sentence structure. */
 export const englishMessages: Record<string, string> = {
+  选择语言: 'Choose language',
   '正在细化{name} · {percent}%': 'Loading details: {name} · {percent}%',
   地点名称: 'Place labels',
   在地图上显示地点名称: 'Show place names on the map',

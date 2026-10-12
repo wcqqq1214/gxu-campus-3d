@@ -121,8 +121,19 @@ test('all displayed landmark descriptions and static UI messages have English tr
           englishMessages[node.arguments[0].text],
           node.arguments[0].text,
         );
-      if (ts.isJsxText(node))
-        assert.ok(!/\p{Script=Han}/u.test(node.text), node.text);
+      if (ts.isJsxText(node) && /\p{Script=Han}/u.test(node.text)) {
+        // A language selector names the language in its own script in both locales.
+        const languageChoice =
+          node.text.trim() === '中文' &&
+          ts.isJsxElement(node.parent) &&
+          node.parent.openingElement.attributes.properties.some(
+            (attribute) =>
+              ts.isJsxAttribute(attribute) &&
+              attribute.name.text === 'lang' &&
+              attribute.initializer?.text === 'zh-CN',
+          );
+        assert.ok(languageChoice, node.text);
+      }
       ts.forEachChild(node, walk);
     }
     walk(ast);

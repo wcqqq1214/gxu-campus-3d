@@ -33,10 +33,34 @@ try {
     await page.evaluate(() => {
       window.i18nCanvas = document.querySelector('.scene-host canvas');
     });
+    const checkHeader = () =>
+      page.evaluate(() => {
+        const control = document.querySelector('.language-switch');
+        const rect = control.getBoundingClientRect();
+        const header = document.querySelector('.masthead');
+        return {
+          x: rect.x,
+          width: rect.width,
+          fits: header.scrollWidth <= header.clientWidth + 1,
+          buttonsFit: [...header.querySelectorAll('button')].every((el) => {
+            const bounds = el.getBoundingClientRect();
+            return bounds.left >= 0 && bounds.right <= innerWidth;
+          }),
+        };
+      });
+    const chineseHeader = await checkHeader();
+    assert.ok(chineseHeader.fits && chineseHeader.buttonsFit);
     await page
       .getByRole('button', { name: 'Switch to English', exact: true })
       .click();
     await page.waitForFunction(() => document.documentElement.lang === 'en');
+    assert.deepEqual(await checkHeader(), chineseHeader);
+    assert.equal(
+      await page
+        .getByRole('button', { name: 'Switch to English', exact: true })
+        .getAttribute('aria-pressed'),
+      'true',
+    );
     assert.equal(await page.title(), 'Guangxi University Campus Map');
     const search = page.getByRole('searchbox', {
       name: 'Search campus places',
