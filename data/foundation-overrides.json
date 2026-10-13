@@ -282,6 +282,27 @@
         "weldDistance": 0.0001
       },
       "evidence": "Model repair: lower terrain crossing the existing closed ground-floor volume. Retain the adopted building datum, footprint, original DEM and roads, with a bounded 3 m transition. This is not a surveyed elevation or a building calibration."
+    },
+    {
+      "id": "mechanical-center-foundation",
+      "buildingId": "way/759090376",
+      "repairBounds": [
+        -700,
+        -1056,
+        -615,
+        -919
+      ],
+      "coreMargin": 0.05,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "roadProtectionMargin": 0.1,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: lower terrain crossing the existing closed ground-floor volume. Retain the adopted building datum, footprint, original DEM and roads, with a bounded 3 m transition. This is not a surveyed elevation or a building calibration."
     }
   ]
 }
