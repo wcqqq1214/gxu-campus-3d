@@ -36,6 +36,14 @@ class RoadLandingContractTests(unittest.TestCase):
     def test_changed_entry_rejected(self):
         self.config['anchorRevision']='stale'
         with self.assertRaisesRegex(ValueError,'anchors changed'):self.load()
+    def test_documentation_export_preserves_anchor_but_geometry_changes_fail(self):
+        self.entry['basis']='Estimated from the entrance photograph'
+        self.entry['evidence']={'note':'Not surveyed'}
+        self.write('public/data/buildings.json',[dict(id='building',elevation=5,form={'entrances':[self.entry]})])
+        self.assertEqual(self.load()[0]['targetElevation'],5)
+        self.entry['outerCenter'][0]+=1
+        self.write('public/data/buildings.json',[dict(id='building',elevation=5,form={'entrances':[self.entry]})])
+        with self.assertRaisesRegex(ValueError,'anchors changed'):self.load()
     def test_changed_overlay_rejected(self):
         self.write('public/data/sites.json',{'surfaceOverrides':{'0':{'vertices':[]}}})
         with self.assertRaisesRegex(ValueError,'anchors changed'):self.load()

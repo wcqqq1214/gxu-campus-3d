@@ -6,10 +6,11 @@ resolves the same source data. Blender can load this without Shapely.
 import hashlib
 import json
 import math
+from public_data_fields import without_documentation
 
 
 def revision(value):
-    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+    return hashlib.sha256(json.dumps(without_documentation(value), sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
 def load_landings(root, configuration='data/road-landing-overrides.json'):
