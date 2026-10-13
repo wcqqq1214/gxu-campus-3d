@@ -4,6 +4,7 @@ import path from 'node:path';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { openPanelTab } from './browser-check-helpers.mjs';
+import { beginBenchmarkCapture } from './benchmark-capture.mjs';
 
 const baseline = process.env.BASELINE_URL;
 const candidate = process.env.REFINEMENT_URL;
@@ -91,7 +92,8 @@ const angle = (m) => {
 const angularDistance = (a, b) =>
   Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
 let failure = null,
-  summary = null;
+  summary = null,
+  lastObservedWindow = null;
 try {
   for (const tier of ['精细', '流畅'])
     for (let repeat = 1; repeat <= 3; repeat++)
@@ -140,51 +142,65 @@ try {
           assert.deepEqual(initial.benchmark, rows[0].initial.benchmark);
         const samples = [];
         const started = Date.now();
-        await page.getByRole('button', { name: '环绕', exact: true }).click();
-        while (samples.length < 21) {
-          assert.ok(Date.now() - started < 45000, 'Sampling stalled');
-          await page.waitForTimeout(60);
-          const m = await metric();
-          if (
-            !m.benchmark.orbiting ||
-            m.benchmark.sampleIndex <= samples.length
-          )
-            continue;
-          assert.equal(
-            m.benchmark.sampleIndex,
-            samples.length + 1,
-            'Missing metric window',
-          );
-          assert.equal(m.quality, tier);
-          assert.equal(m.automaticQualityLevel, 1);
-          assert.equal(m.queuedDetails, 0);
-          assert.equal(m.postprocessing, tier === '精细' ? 'ready' : 'off');
-          assert.equal(m.pixelRatio, tier === '精细' ? 1.75 : 1.125);
-          assert.deepEqual(m.benchmark.frame, initial.benchmark.frame);
-          assert.deepEqual(m.benchmark.viewport, [1280, 720]);
-          assert.deepEqual(
-            m.benchmark.camera.target,
-            initial.benchmark.camera.target,
-          );
-          assert.ok(
-            Math.abs(m.benchmark.camera.span - initial.benchmark.camera.span) <
-              1e-9,
-            'Camera span changed',
-          );
-          const lateness =
-            m.benchmark.elapsedMs - m.benchmark.sampleIndex * 1500;
-          assert.ok(
-            lateness >= 0 && lateness < 200,
-            `Late metric window: ${lateness}ms`,
-          );
-          assert.ok(
-            angularDistance(
-              angle(m),
-              angle(initial) + m.benchmark.elapsedMs * 0.00013,
-            ) < 1e-7,
-            'Orbit deviated from wall-clock route',
-          );
-          samples.push(m);
+        const capture = await page.evaluateHandle(beginBenchmarkCapture);
+        try {
+          await page.getByRole('button', { name: '环绕', exact: true }).click();
+          while (samples.length < 21) {
+            assert.ok(Date.now() - started < 45000, 'Sampling stalled');
+            await page.waitForTimeout(60);
+            const published = await capture.evaluate((state) =>
+              state.samples.splice(0),
+            );
+            for (const m of published) {
+              if (samples.length === 21) break;
+              lastObservedWindow = {
+                label,
+                tier,
+                repeat,
+                expectedIndex: samples.length + 1,
+                metric: m,
+              };
+              assert.equal(
+                m.benchmark.sampleIndex,
+                samples.length + 1,
+                'Missing metric window',
+              );
+              assert.equal(m.quality, tier);
+              assert.equal(m.automaticQualityLevel, 1);
+              assert.equal(m.queuedDetails, 0);
+              assert.equal(m.postprocessing, tier === '精细' ? 'ready' : 'off');
+              assert.equal(m.pixelRatio, tier === '精细' ? 1.75 : 1.125);
+              assert.deepEqual(m.benchmark.frame, initial.benchmark.frame);
+              assert.deepEqual(m.benchmark.viewport, [1280, 720]);
+              assert.deepEqual(
+                m.benchmark.camera.target,
+                initial.benchmark.camera.target,
+              );
+              assert.ok(
+                Math.abs(
+                  m.benchmark.camera.span - initial.benchmark.camera.span,
+                ) < 1e-9,
+                'Camera span changed',
+              );
+              const lateness =
+                m.benchmark.elapsedMs - m.benchmark.sampleIndex * 1500;
+              assert.ok(
+                lateness >= 0 && lateness < 200,
+                `Late metric window: ${lateness}ms`,
+              );
+              assert.ok(
+                angularDistance(
+                  angle(m),
+                  angle(initial) + m.benchmark.elapsedMs * 0.00013,
+                ) < 1e-7,
+                'Orbit deviated from wall-clock route',
+              );
+              samples.push(m);
+            }
+          }
+        } finally {
+          await capture.evaluate((state) => state.observer.disconnect());
+          await capture.dispose();
         }
         const row = {
           label,
@@ -269,8 +285,9 @@ try {
       {
         passed: !failure && !errors.length,
         failure,
+        failedWindow: failure ? lastObservedWindow : null,
         scope:
-          '12 alternating S0/candidate rounds, three per manual tier. Fixed shared camera and frontend; 21 timed publications, discard first two; median per round then median of three. Enforce sample indices, elapsed-time camera path, <=200ms sample lateness, <0.03rad paired phase, identical viewport/profile and zero queued details. No FPS-based exclusions. No exclusive-device, cold-cache or physical-mobile claim.',
+          '12 alternating S0/candidate rounds, three per manual tier. Fixed shared camera and frontend; 21 timed publications captured by an in-page observer, discard first two; median per round then median of three. Enforce sample indices, elapsed-time camera path, <=200ms sample lateness, <0.03rad paired phase, identical viewport/profile and zero queued details. No FPS-based exclusions. No exclusive-device, cold-cache or physical-mobile claim.',
         summary,
         rows,
         hashes,
