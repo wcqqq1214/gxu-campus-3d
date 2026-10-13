@@ -1684,6 +1684,13 @@
             "gxuDonationProjects"
           ],
           "note": "项目册PDF第38页具名照片的可见主体以平屋面/女儿墙表达；屋面背部和设备层未完全可见。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm"
+          ],
+          "note": "Model ground repair: extend closed walls below the adopted datum from 0.5 to 1 metre to close southern wall gaps. Retain the seven-storey body, mapped outline, roof, entrances and floor datum. This is model closure depth, not a surveyed foundation."
         }
       },
       "review": {
@@ -1706,8 +1713,86 @@
         "facadeRules": {
           "status": "partial",
           "note": "已核对照片可见窗层；未把不可见立面、精确窗列及小构件视作已核实。"
+        },
+        "parts": {
+          "status": "partial",
+          "note": "Model ground repair: extend closed walls below the adopted datum from 0.5 to 1 metre to close southern wall gaps. Retain the seven-storey body, mapped outline, roof, entrances and floor datum. This is model closure depth, not a surveyed foundation."
         }
-      }
+      },
+      "parts": [
+        {
+          "id": "body",
+          "polygons": [
+            [
+              [
+                [
+                  -658.9834345231544,
+                  -1101.400079999909
+                ],
+                [
+                  -593.9642554203521,
+                  -1101.4780040000285
+                ],
+                [
+                  -593.9539967937754,
+                  -1088.4535640000865
+                ],
+                [
+                  -571.9389828541837,
+                  -1088.4758279999512
+                ],
+                [
+                  -571.9492414807603,
+                  -1096.7135079997186
+                ],
+                [
+                  -570.3181197588647,
+                  -1096.7135079997186
+                ],
+                [
+                  -570.3181197588647,
+                  -1101.789699999716
+                ],
+                [
+                  -565.8556169327202,
+                  -1101.8008319998462
+                ],
+                [
+                  -565.8658755592967,
+                  -1114.1016920000332
+                ],
+                [
+                  -571.0772581692677,
+                  -1114.090559999903
+                ],
+                [
+                  -571.0875167973021,
+                  -1120.224291999999
+                ],
+                [
+                  -607.0337464559593,
+                  -1120.1908960000042
+                ],
+                [
+                  -607.0337464559593,
+                  -1123.9869080000701
+                ],
+                [
+                  -659.0142104057999,
+                  -1123.9312479998152
+                ],
+                [
+                  -658.9834345231544,
+                  -1101.400079999909
+                ]
+              ]
+            ]
+          ],
+          "height": 23.099999999999998,
+          "levels": 7.0,
+          "baseDepth": 1
+        }
+      ]
     },
     "way/759129516": {
       "name": "数学与信息科学学院",

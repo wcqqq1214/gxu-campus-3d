@@ -12,6 +12,7 @@ from foundation_contract import foundation_context, revision
 
 
 def convex_masks(shape):
+    if shape.is_empty:return []
     data = triangulate(shape)
     pieces = [Polygon([data['vertices'][k] for k in data['triangles'][i:i+3]])
               for i in range(0,len(data['triangles']),3)]
@@ -43,6 +44,9 @@ def prepare_foundations(root=ROOT):
     if len({i['id'] for i in config['foundations']}) != len(config['foundations']):
         raise ValueError('Duplicate foundation repair ID')
     for item in config['foundations']:
+        preserve_roads=item.get('preserveRoads',False)
+        if type(preserve_roads) is not bool:
+            raise ValueError('Invalid foundation preserve roads flag')
         road_protection_margin=item.get('roadProtectionMargin',.1)
         if (type(road_protection_margin) not in (int,float)
                 or not math.isfinite(road_protection_margin)
@@ -88,7 +92,15 @@ def prepare_foundations(root=ROOT):
             vs, ts = layer['vertices'], layer['triangles']
             road_shapes.extend(Polygon([vs[k][:2] for k in ts[i:i+3]]) for i in range(0,len(ts),3))
         roads = unary_union(road_shapes)
-        protection = [roads.difference(trim).buffer(road_protection_margin, join_style=2)]
+        protected_road=roads.difference(trim).buffer(road_protection_margin, join_style=2)
+        if preserve_roads:
+            # Leave a transition between the retained road and lowered core.
+            # The source building footprint itself is never rewritten.
+            protected_road=roads.buffer(road_protection_margin,join_style=2)
+            core=core.difference(roads.buffer(road_protection_margin+item['coreMargin'],join_style=2))
+            trim=Polygon()
+            if core.is_empty:raise ValueError('Retained roads cover the foundation core')
+        protection = [protected_road]
         protection.extend(Polygon(p[0],p[1:]).buffer(.5,join_style=2)
                           for other in context['buildings'] if other['id'] != b['id'] for p in other['polygons'])
         protection.extend(box(*s['gradingBounds']) for s in context['sites']['sites'] if 'gradingBounds' in s)
@@ -107,9 +119,11 @@ def prepare_foundations(root=ROOT):
         record = {**item, 'datum': datum, 'bounds': list(area.bounds),
                   'corePolygons': geometry_rings(core), 'gradingPolygons': geometry_rings(area),
                   'coreMasks': convex_masks(core), 'transitionMasks': convex_masks(ring),
-                  'roadTrimMasks': convex_masks(trim), 'roadTrimBounds': list(trim.bounds),
+                  'roadTrimMasks': convex_masks(trim), 'roadTrimBounds': None if trim.is_empty else list(trim.bounds),
                   'closedArea': closed.area, 'gradingArea': area.area,
                   'trimmedRoadArea': roads.intersection(trim).area}
+        if preserve_roads:
+            record['roadProtectedClosedArea']=closed.intersection(protected_road).area
         if 'repairBounds' in item:
             record['buildingClosedArea']=building_closed_area
         # Every mask must cover exactly its intended region, including holes.

@@ -80,6 +80,30 @@ class FoundationPreparationTests(unittest.TestCase):
                 (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
                 with self.assertRaisesRegex(ValueError,'road protection margin'):prepare_foundations(self.root)
 
+    def test_preserved_road_excludes_grade_and_trim_but_keeps_building_outline(self):
+        road=Polygon([(3.98,-1),(6,-1),(6,5),(3.98,5)])
+        self.write('surfaces',[{'id':'road','kind':'roads','vertices':list(road.exterior.coords)[:-1],
+                                'triangles':[0,1,2,0,2,3]}])
+        before=(self.root/'public/data/buildings.json').read_bytes()
+        self.config['foundations'][0].update(preserveRoads=True,roadProtectionMargin=0)
+        (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+        prepare_foundations(self.root);r=load_foundations(self.root)['foundations'][0]
+        self.assertEqual(r['roadTrimMasks'],[]);self.assertIsNone(r['roadTrimBounds'])
+        self.assertEqual(r['trimmedRoadArea'],0)
+        self.assertAlmostEqual(r['roadProtectedClosedArea'],.08)
+        core=unary_union([Polygon(p[0],p[1:]) for p in r['corePolygons']])
+        grading=unary_union([Polygon(p[0],p[1:]) for p in r['gradingPolygons']])
+        self.assertAlmostEqual(grading.intersection(road).area,0)
+        self.assertAlmostEqual(core.distance(road),.1)
+        self.assertTrue(core.contains(Point(2,2)))
+        self.assertEqual((self.root/'public/data/buildings.json').read_bytes(),before)
+
+    def test_preserve_roads_requires_boolean(self):
+        for value in [None,1,'true']:
+            self.config['foundations'][0]['preserveRoads']=value
+            (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+            with self.assertRaisesRegex(ValueError,'preserve roads'):prepare_foundations(self.root)
+
     def test_simplification_limits_are_checked_before_preparation(self):
         for value in [{'weldDistance':.001},{'normalTolerance':.001},
                       {'weldDistance':float('nan')},{'normalTolerance':True},
