@@ -75,13 +75,20 @@ def prepare_foundations(root=ROOT):
         closed = unary_union([Polygon(p[0], p[1:]) for part in parts
                               if not part.get('openBelow') for p in part['polygons']])
         building_closed_area=closed.area
-        if 'repairBounds' in item:
-            repair_bounds=item['repairBounds']
-            if (not isinstance(repair_bounds,list) or len(repair_bounds)!=4
+        if 'repairBounds' in item and 'repairRegions' in item:
+            raise ValueError('Use either foundation repair bounds or regions')
+        if 'repairBounds' in item or 'repairRegions' in item:
+            regions=item.get('repairRegions',[item.get('repairBounds')])
+            if not isinstance(regions,list) or not 1<=len(regions)<=8:
+                raise ValueError('Invalid foundation repair regions')
+            for repair_bounds in regions:
+                if (not isinstance(repair_bounds,list) or len(repair_bounds)!=4
                     or any(type(v) not in (int,float) or not math.isfinite(v) for v in repair_bounds)
                     or repair_bounds[0]>=repair_bounds[2] or repair_bounds[1]>=repair_bounds[3]):
-                raise ValueError('Invalid foundation repair bounds')
-            closed=closed.intersection(box(*repair_bounds))
+                    raise ValueError('Invalid foundation repair bounds')
+            # Union the selected regions before grading. Sequential repairs
+            # would repeatedly split and lower their shared transition zone.
+            closed=closed.intersection(unary_union([box(*bounds) for bounds in regions]))
             if closed.is_empty or closed.area<=1e-7:
                 raise ValueError('Foundation repair bounds do not intersect a closed floor')
         core = closed.buffer(item['coreMargin'], join_style=2)
@@ -124,7 +131,7 @@ def prepare_foundations(root=ROOT):
                   'trimmedRoadArea': roads.intersection(trim).area}
         if preserve_roads:
             record['roadProtectedClosedArea']=closed.intersection(protected_road).area
-        if 'repairBounds' in item:
+        if 'repairBounds' in item or 'repairRegions' in item:
             record['buildingClosedArea']=building_closed_area
         # Every mask must cover exactly its intended region, including holes.
         for masks, shape in ((record['coreMasks'],core),(record['transitionMasks'],ring),(record['roadTrimMasks'],trim)):

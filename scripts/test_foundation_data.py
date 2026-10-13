@@ -47,6 +47,27 @@ class FoundationPreparationTests(unittest.TestCase):
         self.write('sites',{'surfaceOverrides':{},'sites':[{'gradingBounds':[1,1,2,2]}]})
         with self.assertRaisesRegex(ValueError,'protected'):prepare_foundations(self.root)
 
+    def test_repair_regions_are_unioned_before_grading(self):
+        before=(self.root/'public/data/buildings.json').read_bytes()
+        self.config['foundations'][0]['repairRegions']=[[0,0,2.5,4],[2,0,4,2]]
+        (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+        prepare_foundations(self.root);r=load_foundations(self.root)['foundations'][0]
+        self.assertAlmostEqual(r['closedArea'],13)
+        self.assertAlmostEqual(r['buildingClosedArea'],16)
+        core=unary_union([Polygon(p[0],p[1:]) for p in r['corePolygons']])
+        self.assertTrue(core.contains(Point(2.25,1)))
+        self.assertTrue(core.contains(Point(1,3)))
+        self.assertFalse(core.contains(Point(3,3)))
+        self.assertEqual((self.root/'public/data/buildings.json').read_bytes(),before)
+
+    def test_invalid_or_ambiguous_repair_regions_are_rejected(self):
+        item=self.config['foundations'][0];path=self.root/'data/foundation-overrides.json'
+        for value in [[],None,[[0,0,1,1]]*9,[[0,0,0,1]],[[0,0,True,1]],[[0,0,float('nan'),1]]]:
+            item['repairRegions']=value;path.write_text(json.dumps(self.config))
+            with self.assertRaisesRegex(ValueError,'repair'):prepare_foundations(self.root)
+        item.update(repairRegions=[[0,0,1,1]],repairBounds=[0,0,1,1]);path.write_text(json.dumps(self.config))
+        with self.assertRaisesRegex(ValueError,'either'):prepare_foundations(self.root)
+
     def test_config_change_requires_repreparation(self):
         prepare_foundations(self.root)
         self.config['foundations'][0]['haloMeters']=5

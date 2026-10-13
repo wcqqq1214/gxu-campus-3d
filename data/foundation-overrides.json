@@ -190,6 +190,35 @@
         535,
         46
       ]
+    },
+    {
+      "id": "teaching-five-foundation",
+      "buildingId": "way/759129515",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "roadProtectionMargin": 0.1,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: lower terrain intruding into the existing three-part teaching building, with a bounded 3 m transition. Preserve the adopted building datum, mapped outline, original DEM, roads and neighboring buildings. This is model grading, not a surveyed site elevation.",
+      "repairRegions": [
+        [
+          -286,
+          -847,
+          -196,
+          -836
+        ],
+        [
+          -250.5,
+          -850,
+          -196,
+          -846.9
+        ]
+      ]
     }
   ]
 }

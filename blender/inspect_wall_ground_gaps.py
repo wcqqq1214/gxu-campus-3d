@@ -1,7 +1,8 @@
 """Probe actual closed facade walls above shared ground, including both LODs.
 
 This detects sampled open gaps under walls; it does not establish real site
-levels. Open porticos and facades explicitly beginning above ground are excluded.
+levels. Ground-level gallery contact checks its actual floor and rear wall.
+Open porticos and facades explicitly beginning above ground are excluded.
 """
 import argparse
 import hashlib
@@ -62,9 +63,16 @@ def probes(building, ground, roads):
             else:
                 intervals = max(1, math.ceil((high - low) / .1))
                 heights = [low + (high - low) * j / intervals for j in range(intervals + 1)]
+            corridor = facade.get('rule', {}).get('openCorridor')
+            contact = None
+            if (low > high and corridor and corridor['firstLevel'] == 0
+                    and corridor['endInset'] < t * math.dist(a, b)
+                    < math.dist(a, b) - corridor['endInset']):
+                contact = dict(depth=corridor['depth'], datum=datum)
             rows.append(dict(facade=index, part=facade.get('part', 'body'),
                              contactOnly=low > high, xy=[x, y], normal=normal,
-                             surfaceHeight=surface, heights=heights))
+                             surfaceHeight=surface, heights=heights,
+                             openCorridorContact=contact))
     if not rows:
         raise ValueError('No eligible closed ground-floor facades')
     return rows
@@ -76,6 +84,29 @@ def check(tree, rows):
     for row in rows:
         x, y = row['xy']; nx, ny = row['normal']
         missing = []
+        contact = row.get('openCorridorContact')
+        if contact:
+            # At floor level an open gallery has a slab and a recessed rear
+            # wall, not a solid front wall. Below-floor plinth probes keep the
+            # ordinary path. Actual geometry must prove both contact surfaces.
+            depth, datum = contact['depth'], contact['datum']
+            inset = min(.25, depth / 2)
+            floor = tree.ray_cast(Vector((x-nx*inset, y-ny*inset, datum+.15)),
+                                  Vector((0, 0, -1)), .3)[0]
+            rear = tree.ray_cast(Vector((x-nx*(depth-.3), y-ny*(depth-.3), datum+.05)),
+                                 Vector((-nx, -ny, 0)), .6)[0]
+            rays += 2
+            reasons = []
+            if floor is None or abs(floor.z-datum) > .05:
+                reasons.append('missing or displaced gallery floor')
+            if rear is None or abs((rear.x-x)*nx+(rear.y-y)*ny+depth) > .05:
+                reasons.append('missing or displaced gallery rear wall')
+            if row['surfaceHeight'] > datum+.05:
+                reasons.append('ground or road buries gallery floor')
+            if reasons:
+                failures.append(dict(facade=row['facade'], part=row['part'], xy=row['xy'],
+                                     ground=row['surfaceHeight'], reasons=reasons))
+            continue
         for z in row['heights']:
             rays += 1
             hit = tree.ray_cast(Vector((x + nx * .4, y + ny * .4, z)),
@@ -87,6 +118,7 @@ def check(tree, rows):
                                  ground=row['surfaceHeight'], missingHeights=missing))
     return dict(passed=not failures, facadeLocations=len(rows), rays=rays,
                 contactOnlyLocations=sum(r['contactOnly'] for r in rows),
+                openCorridorContactLocations=sum(bool(r.get('openCorridorContact')) for r in rows),
                 parts={part:sum(r['part'] == part for r in rows)
                        for part in sorted({r['part'] for r in rows})},
                 openGapLocations=len(failures), failures=failures)
@@ -127,6 +159,7 @@ def main():
                   sampling=dict(horizontalSpacingMeters=2, verticalSpacingMaximumMeters=.1,
                                 groundClearanceMeters=.05, facadeOffsetMeters=.02,
                                 contactAtOrAboveDatum=True,
+                                groundGalleryContact='Actual floor and recessed rear wall, 0.05m tolerance; below-floor plinths and end walls retain horizontal probes',
                                 surface='Highest actual terrain or road hit, including roads above datum',
                                 horizontalRayLengthMeters=.8),
                   limitations='Sampled model wall closure, not measured site elevations or proof of watertightness.',
