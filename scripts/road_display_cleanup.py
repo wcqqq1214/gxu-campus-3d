@@ -56,6 +56,18 @@ def area(poly):
                    for a, b in zip(poly, poly[1:] + poly[:1]))) / 2
 
 
+def surface_area(poly):
+    """Keep vertical road sides when clipping a polygon in an XY prism."""
+    if not poly or len(poly[0]) < 3:
+        return area(poly)
+    normal = [0., 0., 0.]
+    for a, b in zip(poly, poly[1:] + poly[:1]):
+        normal[0] += a[1]*b[2] - a[2]*b[1]
+        normal[1] += a[2]*b[0] - a[0]*b[2]
+        normal[2] += a[0]*b[1] - a[1]*b[0]
+    return math.sqrt(sum(n*n for n in normal)) / 2
+
+
 def clip_edge(poly, a, b, inside):
     result = []
     sign = 1 if inside else -1
@@ -70,9 +82,9 @@ def clip_edge(poly, a, b, inside):
     # Shared cut vertices must not leave zero-length edges or sliver faces.
     clean = []
     for p in result:
-        if not clean or math.dist(p[:2], clean[-1][:2]) > 1e-9:
+        if not clean or math.dist(p[:3], clean[-1][:3]) > 1e-9:
             clean.append(p)
-    if len(clean) > 1 and math.dist(clean[0][:2], clean[-1][:2]) < 1e-9:
+    if len(clean) > 1 and math.dist(clean[0][:3], clean[-1][:3]) < 1e-9:
         clean.pop()
     return clean
 
@@ -85,12 +97,12 @@ def subtract(poly, mask):
         intersection = clip_edge(intersection, a, b, True)
         if len(intersection) < 3:
             return [poly]
-    if area(intersection) < 1e-9:
+    if surface_area(intersection) < 1e-9:
         return [poly]
     result, remaining = [], poly
     for a, b in edges:
         outside = clip_edge(remaining, a, b, False)
-        if len(outside) >= 3 and area(outside) > 1e-9:
+        if len(outside) >= 3 and surface_area(outside) > 1e-9:
             result.append(outside)
         remaining = clip_edge(remaining, a, b, True)
         if len(remaining) < 3:

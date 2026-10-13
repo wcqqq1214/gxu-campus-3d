@@ -94,6 +94,8 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 
 育才广场、办公楼片区及医学院前场均已通过本地性能复验：固定测量轨迹并复用未变化的太阳阴影后，原始S0与当前模型的精细/流畅两档共12轮通过原门槛。既有失败记录保留；几何、入口和模型指纹保持。冷缓存及实机手机仍另验。
 
+土木学院北翼两个端部采用 `civil-north-west-overlap`、`civil-north-east-overlap` 裁切掩膜，限制在 `relation/12875606` 的既有封闭主体内，移除约33.2平方米穿楼普通路面和路缘。增量更新及比较校验均重复传入对应 `--cut-id`。源/基础整栋各1,023点的道路侵入从28点降为0，三种表示各238个墙脚位置通过；建筑、地形及楼外道路保持。裁切测试对带 `buildingId` 的内部掩膜检查闭合楼体包含关系，禁止侵占内院及开放门廊；其余校外截面沿用校园口、地标和校园重叠范围约束。竖直路缘按三维面积裁切，UV随新交点插值。
+
 西侧空地标注的横支路、三角岔路和小水塘两侧细支路使用 `west-vacant-spur`、`west-pond-service-loop` 截面；水体保留。两组棕色场地面另由 `data/surface-display-cleanup.json` 配置，记录对应的三个原始场地 ID。完整建模在创建普通运动场源对象之前应用同一组裁切。增量更新及校验均支持 `--layer=sports`；更新可用 `--input-root` 接续上一阶段候选目录。场地更新只替换 `sport` 材质的压缩网格，沿用其原始坐标量化范围，其余材质与模型节点逐字节保留。
 
 普通楼主体、屋顶、入口和主要立面在基础与近景中共用形体，近景增加窗框等细构件。常用约束如下，完整取值和相交检查由相应解析器与测试定义：
@@ -148,7 +150,7 @@ npm run typecheck
 npm run lint
 ```
 
-Blender 专项校验必须提供本地源模型。常用入口为 `validate_generic.py`、`validate_landmarks.py`、`validate_terrain_texture.py`，以及对应楼栋校验；植物更新还需检查 `validate_tree_clearance.py`、`validate_site_tree_clearance.py`、`validate_vegetation.py`。模型检查通过不代表未见立面已获实景确认。
+Blender 专项校验必须提供本地源模型。`inspect_foundation_clearance.py --root=/path/to/candidate --building-id=... --report=/path/to/report.json --fail-on-intrusion` 可在隔离候选上检查完整闭合楼体的地形与普通道路侵入；`inspect_wall_ground_gaps.py` 另验实际墙脚接触。土木学院整栋套件已将两项检查接在既有23项建筑/入口专项后，不能仅凭立面与屋顶检查宣称接地通过。常用入口为 `validate_generic.py`、`validate_landmarks.py`、`validate_terrain_texture.py`，以及对应楼栋校验；植物更新还需检查 `validate_tree_clearance.py`、`validate_site_tree_clearance.py`、`validate_vegetation.py`。模型检查通过不代表未见立面已获实景确认。
 
 需要前后比较的数学研究中心、道路、铺地、岸段和侧向接路校验，必须显式提供基准，不再默认依赖旧实验目录。例如：
 
