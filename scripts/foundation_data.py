@@ -11,6 +11,32 @@ ROOT = Path(__file__).resolve().parents[1]
 from foundation_contract import foundation_context, revision
 
 
+def protected_site_shape(site):
+    """Protect the courtyard outline (including soil pits) and its connector.
+
+    A courtyard's AABB can overlap the surrounding building wings. Its prepared
+    polygon is the actual protected ground; unknown site types retain the AABB.
+    """
+    if site.get('type') != 'courtyard-paving':
+        return box(*site['gradingBounds'])
+    rings = [site.get('pavingPolygon')]
+    if 'stairConnection' in site:
+        rings.append(site['stairConnection'].get('polygon'))
+    shapes = []
+    for ring in rings:
+        if (not isinstance(ring, list) or len(ring) < 4 or ring[0] != ring[-1]
+                or any(not isinstance(p, (list, tuple)) or len(p) != 2
+                       or any(type(v) not in (int, float) or not math.isfinite(v) for v in p)
+                       for p in ring)):
+            raise ValueError('Invalid protected courtyard polygon')
+        shape = Polygon(ring)
+        if not shape.is_valid or shape.area <= 1e-7:
+            raise ValueError('Invalid protected courtyard polygon')
+        shapes.append(shape)
+    # Do not subtract pavingHoles: their soil and tree roots need protection too.
+    return unary_union(shapes)
+
+
 def convex_masks(shape):
     if shape.is_empty:return []
     data = triangulate(shape)
@@ -110,7 +136,7 @@ def prepare_foundations(root=ROOT):
         protection = [protected_road]
         protection.extend(Polygon(p[0],p[1:]).buffer(.5,join_style=2)
                           for other in context['buildings'] if other['id'] != b['id'] for p in other['polygons'])
-        protection.extend(box(*s['gradingBounds']) for s in context['sites']['sites'] if 'gradingBounds' in s)
+        protection.extend(protected_site_shape(s) for s in context['sites']['sites'] if 'gradingBounds' in s)
         protected = unary_union(protection)
         if core.intersection(protected).area > 1e-7:
             raise ValueError('Foundation core intersects protected road, site, or neighboring building')

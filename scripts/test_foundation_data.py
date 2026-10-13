@@ -47,6 +47,31 @@ class FoundationPreparationTests(unittest.TestCase):
         self.write('sites',{'surfaceOverrides':{},'sites':[{'gradingBounds':[1,1,2,2]}]})
         with self.assertRaisesRegex(ValueError,'protected'):prepare_foundations(self.root)
 
+    def test_courtyard_actual_outline_and_soil_pits_are_protected(self):
+        ring=[[3,6],[3,5],[5,5],[5,3],[6,3],[6,6],[3,6]]
+        connector=[[6,5],[7,5],[7,6],[6,6],[6,5]]
+        site=dict(type='courtyard-paving',gradingBounds=[3,3,6,6],pavingPolygon=ring,
+                  pavingHoles=[[[5.2,5.2],[5.8,5.2],[5.8,5.8],[5.2,5.8],[5.2,5.2]]],
+                  stairConnection={'polygon':connector})
+        self.write('sites',{'surfaceOverrides':{},'sites':[site]})
+        prepare_foundations(self.root)
+        r=load_foundations(self.root)['foundations'][0]
+        grading=unary_union([Polygon(p[0],p[1:]) for p in r['gradingPolygons']])
+        self.assertTrue(grading.contains(Point(3.5,3.5)))
+        self.assertEqual(grading.intersection(Polygon(ring)).area,0)
+        self.assertEqual(grading.intersection(Polygon(connector)).area,0)
+        self.assertFalse(grading.covers(Point(5.5,5.5)))
+
+    def test_courtyard_floor_overlap_and_malformed_boundary_are_rejected(self):
+        for ring in [None,[],[[0,0],[1,0],[1,1],[0,1]],
+                     [[0,0],[2,2],[0,2],[2,0],[0,0]]]:
+            self.write('sites',{'surfaceOverrides':{},'sites':[dict(type='courtyard-paving',
+                       gradingBounds=[0,0,3,3],pavingPolygon=ring)]})
+            with self.assertRaisesRegex(ValueError,'courtyard polygon'):prepare_foundations(self.root)
+        self.write('sites',{'surfaceOverrides':{},'sites':[dict(type='courtyard-paving',
+                   gradingBounds=[0,0,3,3],pavingPolygon=[[1,1],[2,1],[2,2],[1,2],[1,1]])]})
+        with self.assertRaisesRegex(ValueError,'protected'):prepare_foundations(self.root)
+
     def test_repair_regions_are_unioned_before_grading(self):
         before=(self.root/'public/data/buildings.json').read_bytes()
         self.config['foundations'][0]['repairRegions']=[[0,0,2.5,4],[2,0,4,2]]
