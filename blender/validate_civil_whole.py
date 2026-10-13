@@ -57,6 +57,12 @@ checks += [('blender/validate_side_connection.py', name,
             [f'--site-id={site}', f'--baseline-root={CONNECTION_BASELINE}'])
            for name, site in [('main-connection', 'civil-main-front-connection'),
                               ('annex-connection', 'civil-annex-stair-connection')]]
+checks += [
+    ('blender/inspect_foundation_clearance.py', 'whole-ground',
+     ['--building-id=relation/12875606', '--fail-on-intrusion']),
+    ('blender/inspect_wall_ground_gaps.py', 'whole-wall-contact',
+     ['--building-id=relation/12875606', '--fail-on-gap']),
+]
 
 report_path = OUT / f'{PREFIX}-geometry-suite.json'
 assert not report_path.exists(), 'Do not overwrite an existing suite result'
@@ -67,7 +73,9 @@ try:
         check_prefix = f'{PREFIX}-{name}'
         target = OUT / f'{check_prefix}-geometry.json'
         assert not target.exists(), f'Do not overwrite {target}'
-        sys.argv = ['blender', '--', f'--report-prefix={check_prefix}', *flags]
+        output_flag = (f'--report-prefix={check_prefix}' if Path(script).name.startswith('validate_')
+                       else f'--report={target}')
+        sys.argv = ['blender', '--', output_flag, *flags]
         print(f'WHOLE CHECK START: {name}', flush=True)
         runpy.run_path(str(ROOT / script), run_name='__main__')
         result = json.loads(target.read_text())

@@ -45,7 +45,13 @@ def main():
     parser.add_argument('--layer', choices=['roads', 'sports'], default='roads')
     parser.add_argument('--cut-id', action='append', help='Apply only these new cuts; repeat for multiple IDs')
     parser.add_argument('--repair-clearance', action='store_true', help='Repair configured terrain poke-throughs')
+    parser.add_argument('--clearance-only', action='store_true', help='Skip previously applied road cuts')
+    parser.add_argument('--repair-id', action='append', help='Apply only these clearance repairs; repeat for multiple IDs')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
+    if (args.clearance_only or args.repair_id) and not args.repair_clearance:
+        parser.error('--clearance-only and --repair-id require --repair-clearance')
+    if args.clearance_only and args.cut_id:
+        parser.error('--clearance-only cannot be combined with --cut-id')
     output = args.output_dir.resolve()
     if output == ROOT or ROOT/'public' in output.parents or ROOT/'blender' in output.parents:
         raise ValueError('Use an isolated candidate output directory')
@@ -53,10 +59,10 @@ def main():
     input_root = args.input_root.resolve()
     layer = args.layer
     source_name = 'roads' if layer == 'roads' else '其他运动场地'
-    cuts = load_cuts(ids=args.cut_id, filename='road-display-cleanup.json' if layer == 'roads' else 'surface-display-cleanup.json')
+    cuts = load_cuts(ids=[] if args.clearance_only else args.cut_id, filename='road-display-cleanup.json' if layer == 'roads' else 'surface-display-cleanup.json')
     if layer != 'roads' and args.repair_clearance:
         raise ValueError('Terrain clearance repair applies only to roads')
-    repairs = load_repairs() if args.repair_clearance else []
+    repairs = load_repairs(ids=args.repair_id) if args.repair_clearance else []
     def repair(mesh, road):
         if not repairs:
             return mesh, {}
@@ -66,7 +72,7 @@ def main():
         terrain.v = [tuple(ground.matrix_world @ v.co) for v in ground.data.vertices]
         terrain.f = [tuple(p.vertices) for p in ground.data.polygons]
         result, report = repair_clearance(mesh, terrain,
-                                         list(road.data.materials).index(bpy.data.materials['asphalt']), repairs)
+                                         {m.name: i for i, m in enumerate(road.data.materials)}, repairs)
         assert report['changedFaces'] > 0, report
         return result, report
     original = (input_root/'public/models/base.glb').read_bytes()

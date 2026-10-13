@@ -10,7 +10,7 @@ def derive_front_connection(config,buildings,surface,source_ids):
     keys={'id','type','buildingId','footprintRevision','surfaceId','surfaceRevision',
           'roadSearchDistance','meshStep','groundClearance','joinOverlap','roadContactDepth','roadContactSideMargin','sourceRefs','evidence'}
     if not terrace:keys.add('entranceId')
-    optional=set() if terrace else {'pathWidth'}
+    optional=set() if terrace else {'pathWidth','roadSpan'}
     if not keys <= set(config) or set(config)-keys-optional or config['type'] not in ('front-connection','terraced-stair-connection'):raise ValueError('Invalid front connection fields')
     b=next((b for b in buildings if b['id']==config['buildingId']),None)
     if not b or footprint_revision(b)!=config['footprintRevision']:raise ValueError('Stale front connection building')
@@ -62,7 +62,16 @@ def derive_front_connection(config,buildings,surface,source_ids):
     search=config['roadSearchDistance']
     if not isinstance(search,list) or len(search)!=2 or any(type(v) not in (int,float) or not math.isfinite(v) for v in search) or not 0<search[0]<search[1]<=80:raise ValueError('Invalid front road search')
     start=p['front'];half=p['width']/2;target=local_shape(surface_shape(surface),frame)
-    columns=road_columns(target,-half,half,start,search,config['meshStep'])
+    span=config.get('roadSpan',[-half,half])
+    # Keep the whole stair toe, while allowing a narrower mapped road edge.
+    # This is an explicit estimated forecourt outline, never an inferred road widening.
+    if (not isinstance(span,list) or len(span)!=2
+            or any(type(v) not in (int,float) or not math.isfinite(v) for v in span)
+            or not -half<=span[0]<0<span[1]<=half or span[1]-span[0]<min(2,p['width'])):
+        raise ValueError('Invalid front connection road span')
+    if 'roadSpan' in config and 'flushEntrance' in entry:
+        raise ValueError('Road span is only supported for stair connections')
+    columns=road_columns(target,*span,start,search,config['meshStep'])
     shape=Polygon([(-half,start),(half,start),*reversed(columns)]);area=world_shape(shape,frame)
     if not shape.is_valid or not 5<shape.area<500 or shape.intersection(target).area>1e-5:raise ValueError('Invalid front connection footprint')
     for other in buildings:

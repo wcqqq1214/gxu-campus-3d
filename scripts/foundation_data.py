@@ -11,7 +11,34 @@ ROOT = Path(__file__).resolve().parents[1]
 from foundation_contract import foundation_context, revision
 
 
+def protected_site_shape(site):
+    """Protect the courtyard outline (including soil pits) and its connector.
+
+    A courtyard's AABB can overlap the surrounding building wings. Its prepared
+    polygon is the actual protected ground; unknown site types retain the AABB.
+    """
+    if site.get('type') != 'courtyard-paving':
+        return box(*site['gradingBounds'])
+    rings = [site.get('pavingPolygon')]
+    if 'stairConnection' in site:
+        rings.append(site['stairConnection'].get('polygon'))
+    shapes = []
+    for ring in rings:
+        if (not isinstance(ring, list) or len(ring) < 4 or ring[0] != ring[-1]
+                or any(not isinstance(p, (list, tuple)) or len(p) != 2
+                       or any(type(v) not in (int, float) or not math.isfinite(v) for v in p)
+                       for p in ring)):
+            raise ValueError('Invalid protected courtyard polygon')
+        shape = Polygon(ring)
+        if not shape.is_valid or shape.area <= 1e-7:
+            raise ValueError('Invalid protected courtyard polygon')
+        shapes.append(shape)
+    # Do not subtract pavingHoles: their soil and tree roots need protection too.
+    return unary_union(shapes)
+
+
 def convex_masks(shape):
+    if shape.is_empty:return []
     data = triangulate(shape)
     pieces = [Polygon([data['vertices'][k] for k in data['triangles'][i:i+3]])
               for i in range(0,len(data['triangles']),3)]
@@ -43,6 +70,14 @@ def prepare_foundations(root=ROOT):
     if len({i['id'] for i in config['foundations']}) != len(config['foundations']):
         raise ValueError('Duplicate foundation repair ID')
     for item in config['foundations']:
+        preserve_roads=item.get('preserveRoads',False)
+        if type(preserve_roads) is not bool:
+            raise ValueError('Invalid foundation preserve roads flag')
+        road_protection_margin=item.get('roadProtectionMargin',.1)
+        if (type(road_protection_margin) not in (int,float)
+                or not math.isfinite(road_protection_margin)
+                or not 0 <= road_protection_margin <= .1):
+            raise ValueError('Invalid foundation road protection margin')
         if 'roadExportConformMargin' in item:
             margin=item['roadExportConformMargin']
             if type(margin) not in (int,float) or not math.isfinite(margin) or not 0<margin<=50:
@@ -66,13 +101,20 @@ def prepare_foundations(root=ROOT):
         closed = unary_union([Polygon(p[0], p[1:]) for part in parts
                               if not part.get('openBelow') for p in part['polygons']])
         building_closed_area=closed.area
-        if 'repairBounds' in item:
-            repair_bounds=item['repairBounds']
-            if (not isinstance(repair_bounds,list) or len(repair_bounds)!=4
+        if 'repairBounds' in item and 'repairRegions' in item:
+            raise ValueError('Use either foundation repair bounds or regions')
+        if 'repairBounds' in item or 'repairRegions' in item:
+            regions=item.get('repairRegions',[item.get('repairBounds')])
+            if not isinstance(regions,list) or not 1<=len(regions)<=8:
+                raise ValueError('Invalid foundation repair regions')
+            for repair_bounds in regions:
+                if (not isinstance(repair_bounds,list) or len(repair_bounds)!=4
                     or any(type(v) not in (int,float) or not math.isfinite(v) for v in repair_bounds)
                     or repair_bounds[0]>=repair_bounds[2] or repair_bounds[1]>=repair_bounds[3]):
-                raise ValueError('Invalid foundation repair bounds')
-            closed=closed.intersection(box(*repair_bounds))
+                    raise ValueError('Invalid foundation repair bounds')
+            # Union the selected regions before grading. Sequential repairs
+            # would repeatedly split and lower their shared transition zone.
+            closed=closed.intersection(unary_union([box(*bounds) for bounds in regions]))
             if closed.is_empty or closed.area<=1e-7:
                 raise ValueError('Foundation repair bounds do not intersect a closed floor')
         core = closed.buffer(item['coreMargin'], join_style=2)
@@ -83,10 +125,18 @@ def prepare_foundations(root=ROOT):
             vs, ts = layer['vertices'], layer['triangles']
             road_shapes.extend(Polygon([vs[k][:2] for k in ts[i:i+3]]) for i in range(0,len(ts),3))
         roads = unary_union(road_shapes)
-        protection = [roads.difference(trim).buffer(.1, join_style=2)]
+        protected_road=roads.difference(trim).buffer(road_protection_margin, join_style=2)
+        if preserve_roads:
+            # Leave a transition between the retained road and lowered core.
+            # The source building footprint itself is never rewritten.
+            protected_road=roads.buffer(road_protection_margin,join_style=2)
+            core=core.difference(roads.buffer(road_protection_margin+item['coreMargin'],join_style=2))
+            trim=Polygon()
+            if core.is_empty:raise ValueError('Retained roads cover the foundation core')
+        protection = [protected_road]
         protection.extend(Polygon(p[0],p[1:]).buffer(.5,join_style=2)
                           for other in context['buildings'] if other['id'] != b['id'] for p in other['polygons'])
-        protection.extend(box(*s['gradingBounds']) for s in context['sites']['sites'] if 'gradingBounds' in s)
+        protection.extend(protected_site_shape(s) for s in context['sites']['sites'] if 'gradingBounds' in s)
         protected = unary_union(protection)
         if core.intersection(protected).area > 1e-7:
             raise ValueError('Foundation core intersects protected road, site, or neighboring building')
@@ -102,10 +152,12 @@ def prepare_foundations(root=ROOT):
         record = {**item, 'datum': datum, 'bounds': list(area.bounds),
                   'corePolygons': geometry_rings(core), 'gradingPolygons': geometry_rings(area),
                   'coreMasks': convex_masks(core), 'transitionMasks': convex_masks(ring),
-                  'roadTrimMasks': convex_masks(trim), 'roadTrimBounds': list(trim.bounds),
+                  'roadTrimMasks': convex_masks(trim), 'roadTrimBounds': None if trim.is_empty else list(trim.bounds),
                   'closedArea': closed.area, 'gradingArea': area.area,
                   'trimmedRoadArea': roads.intersection(trim).area}
-        if 'repairBounds' in item:
+        if preserve_roads:
+            record['roadProtectedClosedArea']=closed.intersection(protected_road).area
+        if 'repairBounds' in item or 'repairRegions' in item:
             record['buildingClosedArea']=building_closed_area
         # Every mask must cover exactly its intended region, including holes.
         for masks, shape in ((record['coreMasks'],core),(record['transitionMasks'],ring),(record['roadTrimMasks'],trim)):

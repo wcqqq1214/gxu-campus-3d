@@ -128,7 +128,9 @@ def build_foundations(data,terrain,roads):
         terrain = simplify_local_planes(terrain,record,
             normal_tolerance=simplification.get('normalTolerance',1e-6),
             weld_distance=simplification.get('weldDistance',0))
-        roads,road_report = clipped_mesh(roads,masks_for(record['roadTrimMasks']),record['roadTrimBounds'])
+        road_report={'affectedTriangles':0,'maximumLoweringMeters':0}
+        if record['roadTrimMasks']:
+            roads,road_report = clipped_mesh(roads,masks_for(record['roadTrimMasks']),record['roadTrimBounds'])
         after = sum(len(f)-2 for f in terrain.f)+sum(len(f)-2 for f in roads.f)
         reports.append({'id':record['id'],'terrain':ground_report,'roads':road_report,
                         'triangleDelta':after-before,'datum':record['datum'],'gradingBounds':record['bounds']})

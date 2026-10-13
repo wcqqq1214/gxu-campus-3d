@@ -115,6 +115,194 @@
         "weldDistance": 0.0001
       },
       "evidence": "模型修复：办公北楼中央北端及西侧翼背面地形进入封闭楼体，原源/基础各483点检查检出15/17处超过0.3米容差，最高约0.33米。保留原楼底、DEM、入口铺地和道路；15×33米截取范围及3米过渡为局部模型修补参数，并非实测土方。修复后仍检查完整楼栋。"
+    },
+    {
+      "id": "physics-west-foundation",
+      "buildingId": "way/957404989",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "repairBounds": [
+        -704,
+        -868,
+        -689,
+        -811
+      ],
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: western closed body intersects terrain by up to 0.8 m. Lower only terrain above the adopted floor datum within the bounded footprint and 3 m transition; retain roads, neighbors, original DEM and building heights. Dimensions are repair estimates, not surveyed grading."
+    },
+    {
+      "id": "materials-northeast-foundation",
+      "buildingId": "relation/11564999",
+      "coreMargin": 0.005,
+      "roadTrimMargin": 0.01,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "repairBounds": [
+        -574,
+        -898,
+        -507,
+        -876
+      ],
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "模型修复：东北封闭主体原有228/227个源/基础采样点地形侵入，最大约1.62米。仅降低局部闭合主体内高于既有楼底的地形，并以3米范围过渡；保留内院、开放框架、楼高、原DEM及周边道路。范围和过渡为模型修补参数，不是实测场地标高。",
+      "roadProtectionMargin": 0
+    },
+    {
+      "id": "light-food-foundation",
+      "buildingId": "way/759080588",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: broad closed-body terrain intrusion reaches about 0.59 m. Lower only terrain above the existing datum within the mapped building and a 3 m transition; retain roads, neighbors, original DEM and building height. This is a model correction, not surveyed grading.",
+      "preserveRoads": true,
+      "roadProtectionMargin": 0
+    },
+    {
+      "id": "bihu-canteen-foundation",
+      "buildingId": "way/759609659",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "roadProtectionMargin": 0.1,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: lower terrain intruding into the existing two-storey closed canteen, with a bounded 3 m transition. Preserve the adopted building datum, mapped outline, original DEM, roads and neighboring buildings. This is model grading, not a surveyed site elevation.",
+      "repairBounds": [
+        485,
+        18,
+        535,
+        46
+      ]
+    },
+    {
+      "id": "teaching-five-foundation",
+      "buildingId": "way/759129515",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "roadProtectionMargin": 0.1,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: lower terrain intruding into the existing three-part teaching building, with a bounded 3 m transition. Preserve the adopted building datum, mapped outline, original DEM, roads and neighboring buildings. This is model grading, not a surveyed site elevation.",
+      "repairRegions": [
+        [
+          -286,
+          -847,
+          -196,
+          -836
+        ],
+        [
+          -250.5,
+          -850,
+          -196,
+          -846.9
+        ]
+      ]
+    },
+    {
+      "id": "arts-main-foundation",
+      "buildingId": "way/759165563",
+      "repairBounds": [
+        374,
+        -165,
+        405,
+        -90
+      ],
+      "coreMargin": 0.05,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "roadProtectionMargin": 0.1,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: lower terrain intruding into the existing three-storey arts college wings, with a bounded 3 m transition. Preserve the adopted building datum, mapped outline, original DEM, roads and neighboring buildings. This is model grading, not a surveyed site elevation."
+    },
+    {
+      "id": "junwu-culture-foundation",
+      "buildingId": "way/759337787",
+      "repairBounds": [
+        -540,
+        -657,
+        -470,
+        -601
+      ],
+      "coreMargin": 0.05,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "roadProtectionMargin": 0.1,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: lower terrain crossing the existing closed ground-floor volume. Retain the adopted building datum, footprint, original DEM and roads, with a bounded 3 m transition. This is not a surveyed elevation or a building calibration."
+    },
+    {
+      "id": "engineering-practice-foundation",
+      "buildingId": "way/759079685",
+      "repairBounds": [
+        -274,
+        -1073,
+        -179,
+        -1032
+      ],
+      "coreMargin": 0.05,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "roadProtectionMargin": 0.1,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: lower terrain crossing the existing closed ground-floor volume. Retain the adopted building datum, footprint, original DEM and roads, with a bounded 3 m transition. This is not a surveyed elevation or a building calibration."
+    },
+    {
+      "id": "mechanical-center-foundation",
+      "buildingId": "way/759090376",
+      "repairBounds": [
+        -700,
+        -1056,
+        -615,
+        -919
+      ],
+      "coreMargin": 0.05,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "roadProtectionMargin": 0.1,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: lower terrain crossing the existing closed ground-floor volume. Retain the adopted building datum, footprint, original DEM and roads, with a bounded 3 m transition. This is not a surveyed elevation or a building calibration."
     }
   ]
 }

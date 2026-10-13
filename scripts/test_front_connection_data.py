@@ -40,3 +40,21 @@ class FrontConnectionTests(unittest.TestCase):
         s['vertices']=[rot(p) for p in s['vertices']];c['surfaceRevision']=revision(s)
         c['footprintRevision']=hashlib.sha256(json.dumps(x['polygons'],separators=(',',':')).encode()).hexdigest()
         self.assertAlmostEqual(derive_front_connection(c,b,s,refs)[1].area,area.area,places=6)
+
+    def test_taper_keeps_full_stair_toe_and_uses_only_selected_road_span(self):
+        c,b,s,refs=self.fixture()
+        full,area,_=derive_front_connection(c,b,s,refs)
+        narrowed,path,_=derive_front_connection({**c,'roadSpan':[-3,2]},b,s,refs)
+        self.assertLess(path.area,area.area)
+        self.assertEqual(narrowed['localPolygon'][:2],full['localPolygon'][:2])
+        self.assertEqual(narrowed['columns'][0][0],-3)
+        self.assertEqual(narrowed['columns'][-1][0],2)
+        self.assertAlmostEqual(path.intersection(Polygon(s['vertices'])).area,0,places=7)
+        stairs=Polygon(narrowed['entry']['stairFlight']['footprint'])
+        self.assertGreater(path.boundary.intersection(stairs.boundary.buffer(1e-6)).length,8.39)
+
+    def test_invalid_road_spans_fail_instead_of_widening_or_offsetting_route(self):
+        c,b,s,refs=self.fixture()
+        for span in [None,[],[-3],[-3,2,4],[-100,2],[-2,100],[1,3],[-3,-1],[-.5,.5],[-3,True],[-3,float('nan')],[-float('inf'),2]]:
+            with self.subTest(span=span),self.assertRaisesRegex(ValueError,'road span'):
+                derive_front_connection({**c,'roadSpan':span},b,s,refs)

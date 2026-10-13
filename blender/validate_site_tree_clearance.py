@@ -64,7 +64,7 @@ for key,lod in [('trees','base'),('treesNear','near')]:
     assert set(templates[lod])=={0,1,2}
     bpy.ops.wm.read_factory_settings(use_empty=True)
 meshes=[];inventory=[]
-assets=[manifest['base']]+manifest['zones']+manifest['landmarks']+manifest['infrastructure']
+assets=[manifest['base']]+manifest['zones']+manifest['landmarks']+manifest['infrastructure']+manifest.get('sports',[])
 for asset in assets:
     path=ROOT/'public'/asset['url']
     asset_hashes[asset['url']]=sha(path)

@@ -8,6 +8,7 @@ from pathlib import Path
 from export_public_data import export_public_data, EXPORTS
 from foundation_contract import foundation_context, load_foundations, revision
 from low_planting_contract import CONTEXT_FILES, context_value, digest, load_prepared
+from road_landing_contract import load_landings
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -51,6 +52,7 @@ class PublicExportTests(unittest.TestCase):
         export_public_data(self.root)
         load_foundations(self.root)
         load_prepared(self.root)
+        load_landings(self.root)
         self.assertNotIn('heightBasis', self.read('buildings.json')[0])
         self.assertNotIn('evidence', self.read('sites.json')['sites'][0])
         first = self.snapshot()

@@ -61,13 +61,19 @@ def main():
     parser.add_argument('--cut-id', action='append', help='Validate only cuts newly applied to this baseline')
     parser.add_argument('--repair-clearance', action='store_true')
     parser.add_argument('--layer', choices=['roads', 'sports'], default='roads')
+    parser.add_argument('--clearance-only', action='store_true', help='Skip previously applied road cuts')
+    parser.add_argument('--repair-id', action='append', help='Apply only these clearance repairs; repeat for multiple IDs')
     args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
+    if (args.clearance_only or args.repair_id) and not args.repair_clearance:
+        parser.error('--clearance-only and --repair-id require --repair-clearance')
+    if args.clearance_only and args.cut_id:
+        parser.error('--clearance-only cannot be combined with --cut-id')
     filename = 'road-display-cleanup.json' if args.layer == 'roads' else 'surface-display-cleanup.json'
-    cuts = load_cuts(ids=args.cut_id, filename=filename)
+    cuts = load_cuts(ids=[] if args.clearance_only else args.cut_id, filename=filename)
     config = json.loads((ROOT/'data'/filename).read_text())
     if args.layer != 'roads' and args.repair_clearance:
         raise ValueError('Terrain clearance repair applies only to roads')
-    repairs = load_repairs() if args.repair_clearance else []
+    repairs = load_repairs(ids=args.repair_id) if args.repair_clearance else []
     def repair_point(point):
         return any(r['bounds'][0]-.08 <= point[0] <= r['bounds'][2]+.08
                    and r['bounds'][1]-.08 <= point[1] <= r['bounds'][3]+.08 for r in repairs)
@@ -75,9 +81,9 @@ def main():
     for kind, relative, source in [('source', 'blender/gxu-campus.blend', True),
                                    ('decoded', 'public/models/base.glb', False)]:
         vertices, faces, before = load(args.baseline_root.resolve()/relative, source, args.layer)
-        old_asphalt = surface_bvh('roads', 'asphalt') if repairs else None
+        old_surfaces = {r.get('material', 'asphalt'): surface_bvh('roads', r.get('material', 'asphalt')) for r in repairs}
         _, _, after = load(args.candidate_root.resolve()/relative, source, args.layer)
-        new_asphalt = surface_bvh('roads', 'asphalt') if repairs else None
+        new_surfaces = {m: surface_bvh('roads', m) for m in old_surfaces}
         terrain = surface_bvh('terrain') if repairs else None
         kept = removed = boundary = 0
         maximum = boundary_maximum = repair_maximum = 0
@@ -103,7 +109,7 @@ def main():
                 touched = any(max(p[0] for p in points) > c['bounds'][0]
                               and min(p[0] for p in points) < c['bounds'][2]
                               and max(p[1] for p in points) > c['bounds'][1]
-                              and min(p[1] for p in points) < c['bounds'][3] for c in cuts)
+                              and min(p[1] for p in points) < c['bounds'][3] for c in cuts+repairs)
                 delta = abs(old.z-new.z)
                 if repair_point(point):
                     repair_maximum = max(repair_maximum, delta)
@@ -115,7 +121,7 @@ def main():
                 if delta > (.02 if touched and not source else .002) and not repair_point(point):
                     problems.append(('height changed', point, old.z, new.z))
         assert not problems, (kind, len(problems), problems[:10])
-        assert kept > (50_000 if args.layer == 'roads' else 500) and removed > 0, (kind, kept, removed)
+        assert kept > (50_000 if args.layer == 'roads' else 500) and (not cuts or removed > 0), (kind, kept, removed)
         # Former road-tail witnesses detect a no-op build independently of the
         # clipping implementation. Junction centres detect accidental severing.
         for point in [p for c in cuts for p in c.get('removedProbes', [c.get('removedProbe')])]:
@@ -129,8 +135,25 @@ def main():
                             maxBoundaryHeightDelta=boundary_maximum, maxRepairHeightDelta=repair_maximum)
         repaired_samples = old_pokes = 0
         minimum_clearance = float('inf')
+        boundary_samples = 0
+        boundary_delta = 0
         for repair in repairs:
             x0,y0,x1,y1 = repair['bounds']
+            material = repair.get('material', 'asphalt')
+            old_asphalt, new_asphalt = old_surfaces[material], new_surfaces[material]
+            # The bounded correction must meet unchanged road levels, rather
+            # than introduce a new step along its rectangular boundary.
+            perimeter = [(x0+(i+.5)/4, y) for i in range(int((x1-x0)*4)) for y in (y0,y1)]
+            perimeter += [(x, y0+(i+.5)/4) for i in range(int((y1-y0)*4)) for x in (x0,x1)]
+            for x, y in perimeter:
+                old, new = ray(old_asphalt,x,y), ray(new_asphalt,x,y)
+                if old is None:
+                    continue
+                assert new is not None, ('boundary road missing',kind,repair['id'],x,y)
+                delta = abs(old.z-new.z)
+                assert delta < (.002 if source else .02), ('repair boundary step',kind,repair['id'],x,y,delta)
+                boundary_delta = max(boundary_delta, delta)
+                boundary_samples += 1
             for ix in range(int((x1-x0)*2)):
                 for iy in range(int((y1-y0)*2)):
                     x,y = x0+(ix+.5)/2,y0+(iy+.5)/2
@@ -149,7 +172,8 @@ def main():
                 assert new is not None and new.z-ground.z > .03, ('spot remains',kind,point)
         if repairs:
             assert old_pokes > 100 and repaired_samples > 1000
-            report[kind]['clearance'] = dict(samples=repaired_samples,oldPokes=old_pokes,minClearance=minimum_clearance)
+            report[kind]['clearance'] = dict(samples=repaired_samples,oldPokes=old_pokes,minClearance=minimum_clearance,
+                                             boundarySamples=boundary_samples,maxBoundaryDelta=boundary_delta)
         print(kind, report[kind], flush=True)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps({'passed': True, **report}, indent=2)+'\n')

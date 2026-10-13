@@ -2,6 +2,7 @@
 
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 
+import { useCampusLocale } from '@/components/campus-locale';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { XIcon } from 'lucide-react';
@@ -38,6 +39,7 @@ function DialogContent({
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
 }) {
+  const { t } = useCampusLocale();
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -62,7 +64,7 @@ function DialogContent({
             }
           >
             <XIcon />
-            <span className="sr-only">关闭</span>
+            <span className="sr-only">{t('关闭')}</span>
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>

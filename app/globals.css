@@ -210,25 +210,8 @@ a svg {
 .icon-button:hover {
   background: #e6eee8;
 }
-.header-location {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
-  margin-right: 16px;
-  font-size: 13px;
-  color: #637c6d;
-}
 .brand-mark {
   border: 0;
-}
-.live-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #498e6e;
-  display: inline-block;
-  flex-shrink: 0;
 }
 .scene-host canvas {
   width: 100%;
@@ -499,7 +482,7 @@ a svg {
   pointer-events: auto;
   will-change: transform;
 }
-.map-label > span {
+.map-label > span:first-child {
   background: var(--primary);
   color: #fff;
   border-radius: 4px;
@@ -614,8 +597,7 @@ a svg {
   letter-spacing: 1.5px;
 }
 .detail-heading h2 {
-  font:
-    600 23px var(--font-serif);
+  font: 600 23px var(--font-serif);
   line-height: 1.5;
   margin: 6px 0;
 }
@@ -705,21 +687,26 @@ a svg {
   padding: 30px 5px;
 }
 .about-dialog {
+  display: flex;
+  flex-direction: column;
   max-width: min(600px, calc(100vw - 40px)) !important;
+  max-height: calc(100dvh - 32px);
   padding: 30px !important;
   border-radius: 18px !important;
   color: #234936;
 }
 .about-dialog [data-slot='dialog-title'] {
-  font:
-    600 25px var(--font-serif);
+  flex-shrink: 0;
+  font: 600 25px var(--font-serif);
   margin-bottom: 0;
 }
 .about-dialog [data-slot='dialog-description'] {
+  flex-shrink: 0;
   font-size: 14px;
   color: #7f917a;
 }
 .about-scroll {
+  min-height: 0;
   max-height: 65dvh;
   overflow: auto;
   padding-right: 8px;
@@ -797,9 +784,6 @@ a svg {
   .masthead {
     padding: 0 22px;
   }
-  .header-location {
-    display: none;
-  }
   .masthead .about-button {
     margin-left: auto;
   }
@@ -843,9 +827,6 @@ a svg {
     height: 44px;
   }
   .masthead .repo-link {
-    display: none;
-  }
-  .header-location {
     display: none;
   }
   .masthead .about-button {
@@ -908,7 +889,7 @@ a svg {
     padding: 4px 6px 4px 4px;
     gap: 4px;
   }
-  .map-label > span {
+  .map-label > span:first-child {
     padding: 2px 3px;
   }
   .tour-bar {
@@ -1320,7 +1301,7 @@ a svg {
     font-size: 12px;
     min-height: 32px;
   }
-  .map-label > span {
+  .map-label > span:first-child {
     font-size: 10px;
   }
   .masthead h1 span {
@@ -1982,7 +1963,7 @@ output.empty-state {
   background: var(--label-fill);
   color: white;
 }
-.map-label.active > span {
+.map-label.active > span:first-child {
   background: white;
   color: var(--phoenix);
 }
@@ -2073,13 +2054,6 @@ output.empty-state {
   }
 }
 
-.index-note {
-  display: block;
-  margin-top: 4px;
-  font-size: 10px;
-  color: var(--muted-foreground);
-}
-
 .detail-heading > div {
   display: flex;
   align-items: center;
@@ -2156,10 +2130,6 @@ output.empty-state {
     height: 44px;
     gap: 2px;
     padding: 0 6px 0 14px;
-  }
-  .masthead-actions .header-location {
-    margin: 0 8px 0 0;
-    font-size: 12px;
   }
   .masthead-actions .icon-button {
     min-width: 36px;
@@ -2265,5 +2235,175 @@ output.empty-state {
 @media (min-width: 760px) and (max-width: 1100px) {
   .masthead-actions {
     padding-left: 6px;
+  }
+}
+
+/* Bilingual copy: full place names remain readable, including narrow screens. */
+.language-switch {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  flex: 0 0 auto;
+  width: 96px;
+  height: 44px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  isolation: isolate;
+}
+.language-switch::after,
+.language-switch::before {
+  content: '';
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+}
+.language-switch::after {
+  inset: 6px 0;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  z-index: -2;
+}
+.language-switch::before {
+  inset: 8px auto 8px 2px;
+  width: 44px;
+  background: var(--primary);
+  transition: transform 180ms ease;
+  z-index: -1;
+}
+.language-switch[data-locale='zh']::before {
+  transform: translateX(48px);
+}
+.language-switch span {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted-foreground);
+  font-size: 12px;
+  font-weight: 600;
+}
+.language-switch:hover span {
+  color: var(--primary);
+}
+.language-switch[data-locale='en'] span[lang='en'],
+.language-switch[data-locale='zh'] span[lang='zh-CN'] {
+  color: white;
+}
+.language-switch:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -1px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .language-switch::before {
+    transition: none;
+  }
+}
+.place-copy strong,
+.panel-dock .detail-heading h2,
+.minimap-toggle span,
+.return-landmark {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+.place-copy strong {
+  display: block;
+}
+.minimap-toggle > svg,
+.map-label > span:first-child {
+  flex-shrink: 0;
+}
+.map-label .map-label-name {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-width: 210px;
+  line-height: 1.35;
+  text-align: left;
+}
+:lang(en) .masthead h1 {
+  letter-spacing: 0;
+  font-size: 18px;
+  line-height: 1.15;
+}
+:lang(en) .masthead h1 span {
+  display: block;
+  margin-left: 0;
+  letter-spacing: 0.3px;
+  font-size: 12px;
+  margin-top: 3px;
+}
+:lang(en) .dock-toggle > span {
+  letter-spacing: 0;
+}
+:lang(en) .panel-dock .detail-heading h2 {
+  font-size: 22px;
+}
+:lang(en) .result-heading {
+  align-items: flex-start;
+  gap: 8px;
+}
+:lang(en) .result-heading > span:last-child {
+  white-space: nowrap;
+}
+:lang(en) .tour-heading .tour-copy small {
+  white-space: normal;
+  line-height: 1.4;
+}
+:lang(en) .scene-status {
+  max-width: min(520px, calc(100vw - 32px));
+}
+:lang(en) .about-stats span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 759px) {
+  .masthead {
+    gap: 6px;
+  }
+  .masthead .brand-mark {
+    width: 36px;
+    height: 36px;
+  }
+  .masthead h1 {
+    flex: 1;
+    min-width: 0;
+    font-size: 18px;
+    letter-spacing: 0;
+    white-space: normal;
+  }
+  .masthead h1 span {
+    display: block;
+    margin: 3px 0 0;
+    font-size: 11px;
+    letter-spacing: 0;
+  }
+  .masthead .about-button {
+    margin-left: 0;
+    flex: 0 0 44px;
+  }
+  :lang(en) .masthead h1 {
+    font-size: 15px;
+    white-space: normal;
+  }
+  :lang(en) .masthead h1 span {
+    font-size: 10px;
+  }
+  :lang(en) .dock-toggle small {
+    white-space: nowrap;
+    font-size: 11px;
+  }
+  :lang(en) .panel-dock .detail-heading h2 {
+    font-size: 18px;
+  }
+  .map-label .map-label-name {
+    max-width: 165px;
   }
 }

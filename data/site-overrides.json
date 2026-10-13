@@ -476,6 +476,37 @@
         "extent": "沿既有9米全宽台阶真实外实体边接至way/759170262服务路，约6.2–6.5米深度来自模型地图关系；宽度、铺装材质和标高为估算，不补画未定位的学院石、树池或完整庭院。",
         "grading": "近端沿用原台阶0.24米起算标高，远端贴合实际路面三角网；仅下削铺地下方地形，保留道路边界。坡度不代表现场测量或无障碍路线认证。"
       }
+    },
+    {
+      "id": "office-south-front-connection",
+      "type": "front-connection",
+      "buildingId": "way/759132930",
+      "footprintRevision": "4c0966b274526bf2c5c2496a60c82e4131af6f447d81219ad5f7377d11a6d2ca",
+      "entranceId": "west-main",
+      "surfaceId": "way/759628239",
+      "surfaceRevision": "caccab6da72e35ff2bc916f1304f1ed405f4dd72253e75aeef707215871d4099",
+      "roadSearchDistance": [
+        3,
+        5
+      ],
+      "roadSpan": [
+        -11.7,
+        8.0
+      ],
+      "meshStep": 2,
+      "groundClearance": 0.12,
+      "joinOverlap": 0.2,
+      "roadContactDepth": 1,
+      "roadContactSideMargin": 0.3,
+      "sourceRefs": [
+        "osm",
+        "gxuOfficeSouthCleanup2025"
+      ],
+      "evidence": {
+        "presence": "2025年寒假环卫简报具名照片可见分析测试中心四柱门厅、全宽台阶前连续硬质铺地。",
+        "extent": "保留模型24.7549米全宽台阶，约3.4至4.0米外接地图way/759628239服务路；接路横向范围[-11.7,8.0]米、梯形边界及铺装材质为估算。地图路边不足以承接整段等宽铺地，不扩大道路轮廓；不代表完整前场实测平面。",
+        "grading": "近端沿用台阶起算高3.35米，远端贴合实际道路三角网，仅下削连接铺地下的地形；标高与坡度为模型关系，不是实测或无障碍认证。"
+      }
     }
   ]
 }

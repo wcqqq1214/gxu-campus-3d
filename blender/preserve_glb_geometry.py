@@ -23,6 +23,70 @@ def unpack(raw):
     size=struct.unpack_from('<I',raw,12)[0]
     return json.loads(raw[20:20+size]),raw[28+size:]
 
+def replace_compressed_node_parts(path,name,parts):
+    """Replace one node with disjoint Draco parts using existing named materials.
+
+    Donors must each contain one mesh with the same transform. Only geometry
+    is imported; destination scene structure, materials and textures remain.
+    """
+    if not parts:raise ValueError('Missing compressed mesh parts')
+    doc,raw=unpack(path.read_bytes());binary=bytearray(raw)
+    node=mesh_nodes_by_name(doc)[name];primitives=[]
+    if sum(n.get('mesh')==node['mesh'] for n in doc['nodes'])!=1:
+        raise ValueError('Cannot replace a mesh shared by multiple nodes')
+    def accessor_ids(mesh):
+        ids=set()
+        for p in mesh['primitives']:
+            ids.update(p.get('attributes',{}).values())
+            if 'indices' in p:ids.add(p['indices'])
+            for target in p.get('targets',[]):ids.update(target.values())
+        return ids
+    retained=set()
+    for i,mesh in enumerate(doc['meshes']):
+        if i!=node['mesh']:retained.update(accessor_ids(mesh))
+    for skin in doc.get('skins',[]):
+        if 'inverseBindMatrices' in skin:retained.add(skin['inverseBindMatrices'])
+    for animation in doc.get('animations',[]):
+        for sampler in animation['samplers']:retained.update([sampler['input'],sampler['output']])
+    free=sorted(accessor_ids(doc['meshes'][node['mesh']])-retained,reverse=True)
+    transform=lambda n:{k:v for k,v in n.items() if k not in ('name','mesh','extras')}
+    for part in parts:
+        source,payload=unpack(part);nodes=list(mesh_nodes_by_name(source).values())
+        if len(nodes)!=1 or transform(nodes[0])!=transform(node):
+            raise ValueError('Compressed mesh part has an incompatible transform')
+        for original in source['meshes'][nodes[0]['mesh']]['primitives']:
+            if set(original)-{'mode','material','attributes','indices','extensions'}:
+                raise ValueError('Unsupported compressed primitive fields')
+            p=copy.deepcopy(original)
+            if set(p.get('extensions',{}))!={'KHR_draco_mesh_compression'}:
+                raise ValueError('Expected a Draco mesh part')
+            ext=p['extensions']['KHR_draco_mesh_compression']
+            view=source['bufferViews'][ext['bufferView']];offset=view.get('byteOffset',0)
+            if view['buffer']!=0:raise ValueError('External mesh part buffer')
+            binary.extend(b'\0'*(-len(binary)%4));ext['bufferView']=len(doc['bufferViews'])
+            doc['bufferViews'].append({'buffer':0,'byteOffset':len(binary),'byteLength':view['byteLength']})
+            binary.extend(payload[offset:offset+view['byteLength']])
+            for field in ['indices',*p['attributes']]:
+                container=p if field=='indices' else p['attributes']
+                accessor=copy.deepcopy(source['accessors'][container[field]])
+                if 'bufferView' in accessor or 'sparse' in accessor:
+                    raise ValueError('Expected compressed-only accessors')
+                if free:
+                    index=free.pop();doc['accessors'][index]=accessor
+                else:
+                    index=len(doc['accessors']);doc['accessors'].append(accessor)
+                container[field]=index
+            material=source['materials'][p['material']]['name']
+            matches=[i for i,m in enumerate(doc['materials']) if m['name']==material]
+            if len(matches)!=1:raise ValueError('Missing or ambiguous mesh part material')
+            p['material']=matches[0];primitives.append(p)
+    doc['meshes'][node['mesh']]['primitives']=primitives
+    binary.extend(b'\0'*(-len(binary)%4));doc['buffers'][0]['byteLength']=len(binary)
+    header=json.dumps(doc,separators=(',',':')).encode();header+=b' '*(-len(header)%4)
+    path.write_bytes(struct.pack('<4sII',b'glTF',2,28+len(header)+len(binary))+
+                     struct.pack('<I4s',len(header),b'JSON')+header+
+                     struct.pack('<I4s',len(binary),b'BIN\0')+binary)
+
 def compact_buffer_views(path, *, optimize_jpegs=False):
     """Pack live views, sharing exact duplicates without decoding geometry.
 

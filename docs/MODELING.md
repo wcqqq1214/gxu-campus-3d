@@ -10,11 +10,11 @@
 | 建模规则与参数 | `blender/`、`scripts/`、`data/`，随代码版本管理。 |
 | 网页资产 | `public/models/`、`public/data/`，网页直接使用，须成套更新。 |
 | 参考资料、候选模型、临时输出 | `work/`，不纳入 Git。 |
-| 验收记录和过程截图 | `docs/` 默认忽略，仅保留三份正式说明、README 展示图及五份校验输入；例外在 `.gitignore` 中列明。 |
+| 验收记录和过程截图 | `docs/` 默认忽略，仅保留三份正式说明和 README 展示图；校验输入保存在 `scripts/fixtures/`、`blender/fixtures/`。 |
 
 网页开发和普通测试无需 `.blend`。本地源文件保留具名对象、材质、打包纹理以及 `featureId`、`landmark`、`sourceUrl` 属性；楼栋 ID 是关联模型、目录和拾取的稳定标识，不随显示名称变更。
 
-开发、提交和推送使用 `dev`。主分支更新须另行取得授权。`dev` 已清除旧 Blender 源文件、过程截图和报告历史；主分支和本地恢复引用可能仍保存旧对象。不要把工作目录大小与完整 Git 对象库大小混为一谈。
+开发、提交和推送使用 `dev`。主分支更新须另行取得授权。本地归档保存在 Git 忽略的 `work/archive/`；移出版本跟踪不删除历史对象，工作目录大小与完整 Git 对象库大小不同。
 
 ## 网页开发和检查
 
@@ -47,6 +47,8 @@ npm run models:build
 
 `npm run data:export` 是离线发布收尾步骤：从已准备的数据中移除浏览器不使用的说明字段，只迁移通过校验的基础、绿篱与映射雨棚指纹，不抓取网络数据、不重算几何或导出 GLB。完整 `data:prepare` 在生成链结束时执行同一步骤。可用 `python3 scripts/check-public-export.py <导出前提交>` 核对仅有说明字段移除和指纹迁移。说明与依据仍保留在 `data/` 源数据中；需要完整说明字段的数据增量脚本，应从完整数据准备链中运行。
 
+道路接台阶的 `anchorRevision` 和 `surfaceRevision` 同样排除说明字段；旧指纹迁移须先核对完整入口与发布入口的几何一致性。坐标、方向、标高、台阶或路面变化仍使校验失败，不能用刷新指纹代替核对几何。
+
 完整构建会生成源文件及两档 GLB，但尚未验证能逐字节复现全部现有增量精修成果。更换 Blender、Draco 或几何依赖版本也可能改变导出结果。已有源文件和网页资产是增量修改的输入，不能无条件用一次全量重建覆盖。
 
 数据依次处理建筑、最终道路、入口场地、铺地、岸段和植被；模型阶段先形成最终地形与场地，再生成树根高程并筛除实际树冠穿插。只跑数据准备不代表模型净空检查已完成。上下文哈希不匹配时应重新生成依赖，不手改指纹绕过检查。
@@ -76,6 +78,20 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 
 南门西侧空地的环路、向北断头段及残余接头由 `southwest-empty-loop`、`southwest-dead-end`、`southwest-service-stub` 三个截面移除；不规则截面可使用逆时针凸多边形 `polygon`，保留沿街辅路及楼栋入口。大学东路—火炬路口的地形穿透修复另见 `data/road-surface-clearance.json`：`scripts/road_surface_clearance.py` 在实际地形三角面交界处拆分原路面，仅抬高净空不足的部分，保持原 UV，避免叠加补丁。完整建模自动应用；增量更新和校验命令均加 `--repair-clearance`，校验会比较修改前穿透点及修改后路面与地形的间距。
 
+净空配置还支持按 `material` 分别选择 `asphalt`（默认）、`road` 和 `path`。育才广场北端与办公楼片区服务路分别使用 `yucai-plaza-north`、`office-service-network`；仅修复地形遮挡，不改变地图平面轮廓。相同材质的修复范围不得重叠；最大抬升受 `maxLift` 限制。拆分后补齐共享边顶点并插值原 UV，避免压缩在长边与细分边之间产生裂缝。保留原地形和建筑高度，不用此方法消除有真实台阶或平台依据的高差。
+
+例如，只处理育才广场和办公楼片区时，更新和校验均附加以下参数：
+
+```sh
+--repair-clearance --clearance-only --repair-id=yucai-plaza-north --repair-id=office-service-network
+```
+
+`--clearance-only` 跳过既有道路裁切；`--repair-id` 可重复。校验同时检查区域内净空、旧穿透点、修复边界与原路面的标高一致，以及范围外道路保留情况。办公楼片区仍须联验办公南楼入口连接。
+
+医学院与研究生院之间前场使用 `--repair-id=medical-plaza`。修复须保留三处 `highway=steps` 标注范围（`way/1501460955`、`way/1501460957`、`way/1501460959`）内及边界的表面高度，邻接范围外的净空修复另验。现有台阶标注仍以简化坡面表达，不代表现场平台高程或入口已完成校准。
+
+土木学院北翼采用 `civil-north-west-overlap`、`civil-north-east-overlap` 裁切掩膜，限制在 `relation/12875606` 的既有封闭主体内；增量更新及比较校验均重复传入对应 `--cut-id`。带 `buildingId` 的内部掩膜必须包含于闭合楼体，禁止侵占内院及开放门廊；校外截面沿用校园口、地标和校园重叠范围约束。竖直路缘按三维面积裁切，UV随新交点插值。
+
 西侧空地标注的横支路、三角岔路和小水塘两侧细支路使用 `west-vacant-spur`、`west-pond-service-loop` 截面；水体保留。两组棕色场地面另由 `data/surface-display-cleanup.json` 配置，记录对应的三个原始场地 ID。完整建模在创建普通运动场源对象之前应用同一组裁切。增量更新及校验均支持 `--layer=sports`；更新可用 `--input-root` 接续上一阶段候选目录。场地更新只替换 `sport` 材质的压缩网格，沿用其原始坐标量化范围，其余材质与模型节点逐字节保留。
 
 普通楼主体、屋顶、入口和主要立面在基础与近景中共用形体，近景增加窗框等细构件。常用约束如下，完整取值和相交检查由相应解析器与测试定义：
@@ -90,6 +106,16 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 - `roofVolumes`、`roofDome` 需要实体平屋面支撑并保留边界与内院净距；不自动计作新增楼层。`openBelow.slattedRoof` 使用透空梁顶，不叠加普通女儿墙。
 - `courtyard-paving.stairConnection` 只连接有明确锚点的庭院边和楼梯底层，不自动推导远处道路路径。入口外扩前用 `scripts/audit_entry_road_context.py` 核对道路关系。
 
+局部接地修补由 `data/foundation-overrides.json` 与建筑的 `parts.baseDepth` 配合定义；逐栋范围、数值和依据以源配置为准。这些参数用于修复模型的悬空与地形侵入，不代表实测基础深度或场地标高，也不修改原始DEM。修复须联验完整楼体、墙脚、相邻建筑、道路支承及树根；地形侵入的0.3米诊断门槛不等于测绘精度。主要约束如下：
+
+- `roadProtectionMargin` 默认0.1米，允许0–0.1米；改变后须重做准备并联验整栋、道路支承、范围外地形和邻楼。资环材学院采用0值按道路原边界保护地形，不裁去路面；该值不是实测退距。
+- `preserveRoads: true` 保留邻接道路，默认关闭。启用后准备阶段输出空的 `roadTrimMasks` 与 `roadTrimBounds: null`，几何阶段跳过道路裁切；地形核心退让道路保护区及 `coreMargin`，外侧过渡也不得进入保护道路。须记录道路与主体相交面积，不能把退让区当作已修复区域。
+- `repairBounds` 将修整限制在局部矩形内，用于保护共边邻楼及其支承地形，例如碧湖苑餐厅。整栋采样仍须覆盖选区以外的主体。
+- `repairRegions` 接受1–8个有限有序矩形，先合并选区再生成一次过渡，不能与 `repairBounds` 同用。第五教学楼使用此方式保护入口及西外廊铺地；避免分开修整重复切分交叠区，并核对资源预算。
+- `courtyard-paving` 保护实际 `pavingPolygon` 外环并合入 `stairConnection.polygon`，包含树池土壤；不能用可能跨入楼翼的矩形包围盒代替庭院。其他场地类型仍保护 `gradingBounds`。无效边界及侵入庭院的主体修整均拒绝。
+
+墙脚校验对首层开放外廊检查实际楼板及退后的后墙，楼底以下的基座和两端实墙仍沿用横向射线。缺楼板、缺后墙、楼板错高或被地形/道路埋住均失败，不能填实外廊来消除误报。
+
 北校园的人工补绘体块与现有 OSM 建筑区分标注。普通平顶、未见背面、入口尺寸、景观与夜景均可能包含估算；具体来源和未知项随数据字段保存。
 
 ## 导出与增量修改
@@ -99,12 +125,21 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 | `base.glb` | 地形、道路、水体、场地、基础建筑和地标体量 |
 | `chunk-*.glb` | 普通建筑近景，加载后替换对应基础区块 |
 | 地标与道路 GLB | 按目录和视距独立加载 |
+| `basketball-bank-*.glb` | 两处篮球场完整篮圈与镂空篮网，靠近后替换同名基础球场 |
 | `trees.glb` / `trees-near.glb` | 远近景植物模板，网页按空间块实例化 |
 | `public/data/models.json` | 资源 URL、大小、SHA256 和区块信息 |
 
 模型采用 Draco 压缩，纹理嵌入 GLB，解码器本地托管。资源哈希参与网页 URL，更新 GLB 后必须同步清单。初始基础模型与树模板须满足 6,000,000 字节预算，实际值以清单和测试为准。
 
+篮球场源对象保留完整细节，基础档篮圈使用16×4段且省去镂空篮网，近景沿用40×8段篮圈与完整篮网；场地、标线、篮架及篮板保持。两档使用相同位置/法线精度，避免切换时地面跳动。允许近景时，相机距目标小于300米且目标距球场边界小于120米才请求完整场地；它排在道路与建筑之后，共用解码内存预算。加载失败或切换流畅档保留基础球场。`models.json` 的可选 `sports` 数组记录配套资源，旧清单仍可加载。
+
+完整构建和 `--base-only` 均更新两档球场及清单，普通建筑近景仍遵循原规则。`basketball_export.py --source=源文件.blend --candidate=候选目录` 仅用于从尚含完整球场的基础GLB迁移：直接保留旧完整图元作为近景，远景仅替换篮圈并去除篮网；重复对已简化基础执行会拒绝。迁移须联验实际解码、加载失败回退、图层/画质/距离切换及预算，不能只看文件变小。
+
 地形及普通道路使用共享量化范围；当前地形位置/UV 为18位，普通道路位置18位、普通UV12位、road材质UV10位，独立土木服务路保留专用编码。普通建筑和独立模型不因此统一改用同一精度。只去除严格零面积面和完全相同的重复载荷，保留有效几何、法线、材质与纹理像素。道路局部导出需要保留边界、垂直路缘和范围外网格。
+
+增量地形导出使用 `terrain_export.py --source=候选.blend --target=候选/base.glb`，只替换地形，避免重新导出普通道路覆盖既有修补。墙脚延伸可能改变材质坐标量化范围，须检查所在整个区块在两个LOD中的实际解码几何；源文件的局部一致不能代替无关楼体的保留验证。
+
+狭窄地形过渡可由 `data/terrain-export-regions.json` 指定局部高精度范围。`terrain_precision.py` 按完整源面分区，外围沿用18位位置编码，局部采用26位；局部接缝顶点先吸附至外围实际解码坐标，再验两边解码差小于0.1毫米。两个不重叠的图元仍属于同一个 `terrain` 节点，保留原材质和纹理，并非覆盖补丁。配置为空或缺失时沿用单图元导出。完整构建和增量地形导出均自动读取该配置；新增范围须回归已有精度区域、范围外地形及性能预算。
 
 `--base-only` 只适用于区块键不变且不需要同步近景的基础导出。几何或数据改变后，应同时更新本地源对象、基础节点、相关近景及清单，并核对无关资产未变。现有增量入口包括：
 
@@ -115,7 +150,13 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 
 各入口的修改范围不同，调用前先阅读参数和脚本说明。先修改输入，在独立候选中验证，通过后才替换正式资产；保留仍用于对比的基准。网页只按实际发布的 GLB 验收，不能用截图代替几何、净空和性能检查。
 
+普通台阶的 `front-connection` 可显式配置 `roadSpan: [左端, 右端]`，单位米、坐标相对入口局部横轴。它保留台阶全宽，只在道路一端收窄；两端必须位于原台阶宽度内、跨过入口中轴，并落在同一已映射道路上。未配置时仍等宽连接；不适用于无台阶门口或阶梯建筑。该参数不能扩大道路轮廓，也不能代替前场实测边界。
+
+办公南楼 `way/759132930` 西门以此方式连接 `way/759628239` 服务路，片区道路净空另由 `office-service-network` 修复，两者须联验。照片支持连续硬质前场，梯形边界、材质与标高仍为估算，不构成无障碍路线认定；完整前场需单独核对。
+
 已完成的一次性工具退出版本跟踪，可从历史记录追溯；本地退役脚本及 `__pycache__` 缓存可清理。正式源模型 `blender/gxu-campus.blend`、仍在使用的建模与校验脚本、纹理和对比基准须保留。`preview_civil_platform_west.py` 的西墙候选已集成到正式参数，不能再以当前模型作为修改前输入；`update_chongzuo_bridge.py` 的题名牌移除也已完成，不再用于日常更新。这两份原脚本可从提交 `b6215ab` 的 `blender/` 目录追溯；复现时需使用对应历史输入及独立输出，不能直接重跑到当前生产资产。
+
+旧土木门廊候选生成、专项校验及冻结输入已移至本地 `work/archive/2026-10-14-modeling-cleanup-3004b87/`，归档说明记录原路径和校验值；清理前的完整文档也保存在该目录。三份候选文件可从提交 `3004b87` 追溯，仅供历史复现；当前建模、整栋校验及浏览器检查入口继续保留。逐次修复面积、采样数量和性能结果在本地验收记录中维护。
 
 ## 校验与基准
 
@@ -126,7 +167,7 @@ npm run typecheck
 npm run lint
 ```
 
-Blender 专项校验必须提供本地源模型。常用入口为 `validate_generic.py`、`validate_landmarks.py`、`validate_terrain_texture.py`，以及对应楼栋校验；植物更新还需检查 `validate_tree_clearance.py`、`validate_site_tree_clearance.py`、`validate_vegetation.py`。模型检查通过不代表未见立面已获实景确认。
+Blender 专项校验必须提供本地源模型。`inspect_foundation_clearance.py --root=/path/to/candidate --building-id=... --report=/path/to/report.json --fail-on-intrusion` 可在隔离候选上检查完整闭合楼体的地形与普通道路侵入；`inspect_wall_ground_gaps.py` 另验实际墙脚接触。土木学院整栋套件已将两项检查接在既有23项建筑/入口专项后，不能仅凭立面与屋顶检查宣称接地通过。常用入口为 `validate_generic.py`、`validate_landmarks.py`、`validate_terrain_texture.py`，以及对应楼栋校验；植物更新还需检查 `validate_tree_clearance.py`、`validate_site_tree_clearance.py`、`validate_vegetation.py`。模型检查通过不代表未见立面已获实景确认。
 
 需要前后比较的数学研究中心、道路、铺地、岸段和侧向接路校验，必须显式提供基准，不再默认依赖旧实验目录。例如：
 
@@ -139,7 +180,17 @@ blender --background --python-exit-code 1 --python blender/validate_civil_whole.
 
 缺失基准时命令会停止并列出缺少的文件。不能用当前模型冒充修改前版本；旧 `.blend` 已删除的历史比较无法直接复跑，须有可靠基准后再做结论。校验不会因基准缺失而自动跳过。
 
-浏览器检查脚本保留为可复用工具，使用 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`REFINEMENT_URL` 等显式输入；前后截图工具还需相机列表与基准资源目录。输出只在本地保存。性能比较应使用同一视口、相机、前端和画质，区分资源加载、静止帧率及持续活动帧率。
+浏览器检查脚本保留为可复用工具，使用 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`REFINEMENT_URL` 等显式输入；前后截图工具还需相机列表与基准资源目录。输出只在本地保存。性能比较应使用同一视口、相机、前端和画质，区分资源加载、静止帧率及持续活动帧率。 性能脚本在页面内用 `MutationObserver` 保存每次指标发布，外部按序读取；自动化读取延迟不会丢掉中间窗口。页面自身跳号、超过200毫秒的采样迟到、相机相位不匹配等仍按原门槛失败。`scripts/check-benchmark-capture.mjs` 使用真实浏览器夹具验证延迟读取、重复发布、真实缺号及指标元素缺失；使用与性能脚本相同的显式Playwright环境变量。
+
+`check-campus-performance.mjs` 提供原始S0与当前模型的固定镜头活动对照。两个预览应使用**同一份构建后的前端**，只替换对应的模型与清单；脚本会核对实际响应的JS哈希。每档三组交替对照，各采21个1.5秒窗口，丢弃前两个预热窗口，再比较各轮中位数的中位数。不得按FPS筛掉失败轮次。
+
+```sh
+BASELINE_URL=http://127.0.0.1:4432/gxu-campus-3d/ REFINEMENT_URL=http://127.0.0.1:4430/gxu-campus-3d/ PERFORMANCE_REPORT=work/performance-check.json node scripts/check-campus-performance.mjs
+```
+
+同样可设置 `PLAYWRIGHT_MODULE` 和 `CHROMIUM_PATH`。报告路径须唯一；失败也写出原因和已完成轮次。`debug&benchmark=fixed-orbit` 模式按起始姿态和实际经过时间计算角度；普通游览保留原来的慢帧限幅。指标带 `sampleIndex` 和 `elapsedMs`，检查会拒绝漏采、超过200毫秒的窗口延迟或超过0.03弧度的配对偏差；失败时保留完整记录并排查原因。
+
+阴影按变化刷新：`ShadowFrustum` 比较太阳方向、目标点和覆盖范围；仅环绕相机时复用既有阴影图。平移、缩放、光照切换、模型加载/释放、图层和树木LOD变化、画质切换及图形上下文恢复会触发更新。后续若加入移动的投影物体或修改几何，必须同时使 `renderer.shadowMap.needsUpdate` 生效，不能仅设置普通重绘标记。`shadowUpdates` 调试指标用于观察刷新次数。
 
 `check-site-browser.mjs`、`check-paving-browser.mjs`、`check-shore-browser.mjs` 共用 `browser-check-helpers.mjs` 的面板导航、截图及报告流程，各自保留场地断言。可用 `REFINEMENT_CAMERAS` 指定相机列表；三个入口分别要求 `library-side`、`6b-paving-road-join`、`jinghu-auditorium-bank` 相机。省略时沿用本地历史相机文件，这些文件不随仓库发布，缺失时必须提供实际保留的输入。例如：
 

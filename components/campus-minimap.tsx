@@ -1,4 +1,5 @@
 'use client';
+import { useCampusLocale } from '@/components/campus-locale';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { MapPin, ChevronDown } from 'lucide-react';
 import type { Building, Landmark } from '@/lib/campus/types';
@@ -15,6 +16,7 @@ export const CampusMinimap = memo(function CampusMinimap({
   camera: CameraSnapshot | null;
   showBoundary: boolean;
 }) {
+  const { t, name } = useCampusLocale();
   const [open, setOpen] = useState(false);
   const [boundary, setBoundary] = useState<number[][][]>([]);
   useEffect(() => {
@@ -109,7 +111,7 @@ export const CampusMinimap = memo(function CampusMinimap({
   return (
     <section
       className={`campus-minimap ${open ? 'open' : ''}`}
-      aria-label="校园位置小图"
+      aria-label={t('校园位置小图')}
     >
       <button
         className="minimap-toggle"
@@ -117,14 +119,18 @@ export const CampusMinimap = memo(function CampusMinimap({
         onClick={() => setOpen(!open)}
       >
         <MapPin size={16} />
-        <span>{current ? `${current.name}的位置` : '校园位置小图'}</span>
+        <span>
+          {current
+            ? t('{name}的位置', { name: name(current.name) })
+            : t('校园位置小图')}
+        </span>
         <ChevronDown size={14} />
       </button>
       {open && (
         <div className="minimap-body">
           <svg
             viewBox={`0 0 ${map.width} ${map.height}`}
-            aria-label="北向朝上的校园建筑分布与镜头方向"
+            aria-label={t('北向朝上的校园建筑分布与镜头方向')}
           >
             {map.shapes.map((shape) => (
               <path
@@ -150,7 +156,7 @@ export const CampusMinimap = memo(function CampusMinimap({
                   strokeOpacity={1}
                   style={{ filter: 'drop-shadow(0 0 1px #45584c)' }}
                 >
-                  <title>校园大致边界</title>
+                  <title>{t('校园大致边界')}</title>
                 </path>
               ))}
             {publicRoad.length > 0 && (
@@ -166,7 +172,7 @@ export const CampusMinimap = memo(function CampusMinimap({
                 strokeWidth={2.4}
                 strokeLinecap="round"
               >
-                <title>农院路 · 公共道路</title>
+                <title>{t('农院路 · 公共道路')}</title>
               </path>
             )}
             {point && (
@@ -197,8 +203,8 @@ export const CampusMinimap = memo(function CampusMinimap({
           </svg>
           <small>
             {outside
-              ? '观察中心位于图外，箭头显示朝向'
-              : `${publicRoad.length ? '棕线为公共农院路 · ' : ''}${showBoundary && boundary.length ? '白色细线为校园大致边界 · ' : ''}金点为地标，箭头为观察中心与朝向`}
+              ? t('观察中心位于图外，箭头显示朝向')
+              : `${publicRoad.length ? t('棕线为公共农院路 ·') + ' ' : ''}${showBoundary && boundary.length ? t('白色细线为校园大致边界 ·') + ' ' : ''}${t('金点为地标，箭头为观察中心与朝向')}`}
           </small>
         </div>
       )}

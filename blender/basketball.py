@@ -3,7 +3,7 @@ import math
 from geometry import Mesh
 from sports import strip
 
-def court_model(court,C):
+def court_model(court,C,detail=True):
     m=Mesh();z=court['elevation']+.025
     floor=Mesh()
     # Disjoint color regions avoid coplanar overlapping paint under Draco.
@@ -51,14 +51,16 @@ def court_model(court,C):
         hoop.line((0,board-sign*.03,z+3.041),(0,rim+sign*.22,z+3.041),.025,C['courtOrange'],6)
         # 450 mm clear opening and 18 mm rim tube; top is 3.05 m above floor.
         rr=.234;rz=z+3.041
-        for i in range(40):
-            for j in range(8):
+        ring_segments,tube_segments=(40,8) if detail else (16,4)
+        for i in range(ring_segments):
+            for j in range(tube_segments):
                 coords=[]
                 for u,v in [(i,j),(i+1,j),(i+1,j+1),(i,j+1)]:
-                    a=u*math.tau/40;b=v*math.tau/8
+                    a=u*math.tau/ring_segments;b=v*math.tau/tube_segments
                     coords.append(((rr+.009*math.cos(b))*math.cos(a),rim+(rr+.009*math.cos(b))*math.sin(a),rz+.009*math.sin(b)))
                 hoop.face(coords,C['courtOrange'])
         m.add_part(label+'篮架篮板与篮圈',hoop)
+        if not detail:continue
         net=Mesh()
         # Open tapered net, real diamond links rather than a solid white cone.
         for level in range(2):
@@ -79,8 +81,8 @@ def bank_paving(bank,C):
     for a,b in zip(bank['ground'],bank['ground'][1:]):mesh.face([(*a,bank['terrainLevel']),(*b,bank['terrainLevel']),(*b,z),(*a,z)],C['courtApron'])
     return mesh
 
-def bank_model(bank,courts,C):
+def bank_model(bank,courts,C,detail=True):
     mesh=bank_paving(bank,C)
     for court in courts:
-        if court['bank']==bank['id']:mesh.extend(court_model(court,C))
+        if court['bank']==bank['id']:mesh.extend(court_model(court,C,detail))
     return mesh

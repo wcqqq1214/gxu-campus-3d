@@ -53,6 +53,7 @@ for (const a of [
   ...manifest.zones,
   ...manifest.landmarks,
   ...(manifest.infrastructure ?? []),
+  ...(manifest.sports ?? []),
 ])
   await access(path.join(out, a.url));
 for (const a of [

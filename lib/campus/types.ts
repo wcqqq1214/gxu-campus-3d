@@ -92,6 +92,8 @@ export interface Metrics {
   postprocessing?: 'ready' | 'failed' | 'loading' | 'off';
   benchmark?: {
     orbiting: boolean;
+    elapsedMs: number;
+    sampleIndex: number;
     camera: {
       position: [number, number, number];
       target: [number, number, number];
@@ -102,6 +104,7 @@ export interface Metrics {
   };
   readyMs: number;
   heapMiB: number | null;
+  shadowUpdates?: number;
   fps: number;
   triangles: number;
   drawCalls: number;
@@ -120,6 +123,7 @@ export interface Metrics {
   detailGeometryMiB: number;
 }
 export interface SceneController {
+  setLocale: (locale: import('./i18n').Locale) => void;
   getLightingState: () => { preset: Preset; labelTheme: 'day' | 'night' };
   setHovered: (id: string | null) => void;
   clearSelection: () => void;

@@ -47,11 +47,108 @@ class FoundationPreparationTests(unittest.TestCase):
         self.write('sites',{'surfaceOverrides':{},'sites':[{'gradingBounds':[1,1,2,2]}]})
         with self.assertRaisesRegex(ValueError,'protected'):prepare_foundations(self.root)
 
+    def test_courtyard_actual_outline_and_soil_pits_are_protected(self):
+        ring=[[3,6],[3,5],[5,5],[5,3],[6,3],[6,6],[3,6]]
+        connector=[[6,5],[7,5],[7,6],[6,6],[6,5]]
+        site=dict(type='courtyard-paving',gradingBounds=[3,3,6,6],pavingPolygon=ring,
+                  pavingHoles=[[[5.2,5.2],[5.8,5.2],[5.8,5.8],[5.2,5.8],[5.2,5.2]]],
+                  stairConnection={'polygon':connector})
+        self.write('sites',{'surfaceOverrides':{},'sites':[site]})
+        prepare_foundations(self.root)
+        r=load_foundations(self.root)['foundations'][0]
+        grading=unary_union([Polygon(p[0],p[1:]) for p in r['gradingPolygons']])
+        self.assertTrue(grading.contains(Point(3.5,3.5)))
+        self.assertEqual(grading.intersection(Polygon(ring)).area,0)
+        self.assertEqual(grading.intersection(Polygon(connector)).area,0)
+        self.assertFalse(grading.covers(Point(5.5,5.5)))
+
+    def test_courtyard_floor_overlap_and_malformed_boundary_are_rejected(self):
+        for ring in [None,[],[[0,0],[1,0],[1,1],[0,1]],
+                     [[0,0],[2,2],[0,2],[2,0],[0,0]]]:
+            self.write('sites',{'surfaceOverrides':{},'sites':[dict(type='courtyard-paving',
+                       gradingBounds=[0,0,3,3],pavingPolygon=ring)]})
+            with self.assertRaisesRegex(ValueError,'courtyard polygon'):prepare_foundations(self.root)
+        self.write('sites',{'surfaceOverrides':{},'sites':[dict(type='courtyard-paving',
+                   gradingBounds=[0,0,3,3],pavingPolygon=[[1,1],[2,1],[2,2],[1,2],[1,1]])]})
+        with self.assertRaisesRegex(ValueError,'protected'):prepare_foundations(self.root)
+
+    def test_repair_regions_are_unioned_before_grading(self):
+        before=(self.root/'public/data/buildings.json').read_bytes()
+        self.config['foundations'][0]['repairRegions']=[[0,0,2.5,4],[2,0,4,2]]
+        (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+        prepare_foundations(self.root);r=load_foundations(self.root)['foundations'][0]
+        self.assertAlmostEqual(r['closedArea'],13)
+        self.assertAlmostEqual(r['buildingClosedArea'],16)
+        core=unary_union([Polygon(p[0],p[1:]) for p in r['corePolygons']])
+        self.assertTrue(core.contains(Point(2.25,1)))
+        self.assertTrue(core.contains(Point(1,3)))
+        self.assertFalse(core.contains(Point(3,3)))
+        self.assertEqual((self.root/'public/data/buildings.json').read_bytes(),before)
+
+    def test_invalid_or_ambiguous_repair_regions_are_rejected(self):
+        item=self.config['foundations'][0];path=self.root/'data/foundation-overrides.json'
+        for value in [[],None,[[0,0,1,1]]*9,[[0,0,0,1]],[[0,0,True,1]],[[0,0,float('nan'),1]]]:
+            item['repairRegions']=value;path.write_text(json.dumps(self.config))
+            with self.assertRaisesRegex(ValueError,'repair'):prepare_foundations(self.root)
+        item.update(repairRegions=[[0,0,1,1]],repairBounds=[0,0,1,1]);path.write_text(json.dumps(self.config))
+        with self.assertRaisesRegex(ValueError,'either'):prepare_foundations(self.root)
+
     def test_config_change_requires_repreparation(self):
         prepare_foundations(self.root)
         self.config['foundations'][0]['haloMeters']=5
         (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
         with self.assertRaisesRegex(ValueError,'stale'):load_foundations(self.root)
+
+    def test_close_road_is_retained_with_explicit_narrow_protection(self):
+        road=Polygon([(4.02,-1),(6,-1),(6,5),(4.02,5)])
+        self.write('surfaces',[{'id':'road','kind':'roads','vertices':list(road.exterior.coords)[:-1],
+                                'triangles':[0,1,2,0,2,3]}])
+        item=self.config['foundations'][0]
+        item.update(coreMargin=.005,roadTrimMargin=.01)
+        path=self.root/'data/foundation-overrides.json'
+        path.write_text(json.dumps(self.config))
+        with self.assertRaisesRegex(ValueError,'protected'):prepare_foundations(self.root)
+        for margin in [.005,0]:
+            item['roadProtectionMargin']=margin;path.write_text(json.dumps(self.config))
+            prepare_foundations(self.root);r=load_foundations(self.root)['foundations'][0]
+            self.assertEqual(r['trimmedRoadArea'],0)
+            grading=unary_union([Polygon(p[0],p[1:]) for p in r['gradingPolygons']])
+            self.assertAlmostEqual(grading.intersection(road).area,0)
+            self.assertTrue(grading.covers(Polygon([(0,0),(4,0),(4,4),(0,4)])))
+            self.assertAlmostEqual(grading.distance(road),margin)
+        item['roadProtectionMargin']=.004;path.write_text(json.dumps(self.config))
+        with self.assertRaisesRegex(ValueError,'stale'):load_foundations(self.root)
+
+    def test_road_protection_margin_is_bounded(self):
+        for value in [-.001,.101,True,float('nan'),float('inf')]:
+            with self.subTest(value=value):
+                self.config['foundations'][0]['roadProtectionMargin']=value
+                (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+                with self.assertRaisesRegex(ValueError,'road protection margin'):prepare_foundations(self.root)
+
+    def test_preserved_road_excludes_grade_and_trim_but_keeps_building_outline(self):
+        road=Polygon([(3.98,-1),(6,-1),(6,5),(3.98,5)])
+        self.write('surfaces',[{'id':'road','kind':'roads','vertices':list(road.exterior.coords)[:-1],
+                                'triangles':[0,1,2,0,2,3]}])
+        before=(self.root/'public/data/buildings.json').read_bytes()
+        self.config['foundations'][0].update(preserveRoads=True,roadProtectionMargin=0)
+        (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+        prepare_foundations(self.root);r=load_foundations(self.root)['foundations'][0]
+        self.assertEqual(r['roadTrimMasks'],[]);self.assertIsNone(r['roadTrimBounds'])
+        self.assertEqual(r['trimmedRoadArea'],0)
+        self.assertAlmostEqual(r['roadProtectedClosedArea'],.08)
+        core=unary_union([Polygon(p[0],p[1:]) for p in r['corePolygons']])
+        grading=unary_union([Polygon(p[0],p[1:]) for p in r['gradingPolygons']])
+        self.assertAlmostEqual(grading.intersection(road).area,0)
+        self.assertAlmostEqual(core.distance(road),.1)
+        self.assertTrue(core.contains(Point(2,2)))
+        self.assertEqual((self.root/'public/data/buildings.json').read_bytes(),before)
+
+    def test_preserve_roads_requires_boolean(self):
+        for value in [None,1,'true']:
+            self.config['foundations'][0]['preserveRoads']=value
+            (self.root/'data/foundation-overrides.json').write_text(json.dumps(self.config))
+            with self.assertRaisesRegex(ValueError,'preserve roads'):prepare_foundations(self.root)
 
     def test_simplification_limits_are_checked_before_preparation(self):
         for value in [{'weldDistance':.001},{'normalTolerance':.001},

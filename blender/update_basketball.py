@@ -83,8 +83,9 @@ for name,node in old_nodes.items():
         removed.append(name);continue
     if signature(a,ab,node)!=signature(c,cb,other):changed.append(name)
     else:retained.append(name)
-assert set(changed)<=set(['terrain','roads','sports','green'])|{k for k in ns['base'] if k.startswith(('site-','shore-','paving-','vegetation-low-'))},changed
-assert all(hashlib.sha256((ROOT/'public/models'/n).read_bytes()).hexdigest()==h for n,h in before.items() if n!='base.glb')
+bank_ids={b['id'] for b in ns['basketball']['banks']}
+assert set(changed)<=set(['terrain','roads','sports','green'])|bank_ids|{k for k in ns['base'] if k.startswith(('site-','shore-','paving-','vegetation-low-'))},changed
+assert all(hashlib.sha256((ROOT/'public/models'/n).read_bytes()).hexdigest()==h for n,h in before.items() if n!='base.glb' and n.removesuffix('.glb') not in bank_ids)
 report={'removedNodes':removed,'changedExistingNodes':changed,'preservedNodeCount':len(retained),'newNodes':sorted(set(new_nodes)-set(old_nodes)),'method':'Exact Draco primitive bytes; logical names ignore only Blender numeric suffixes, ambiguous names rejected; all unrelated GLBs retained','initialBytes':manifest['base']['bytes']+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
 (ROOT/'docs/model-checks/basketball-retained-nodes.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
 print(report,flush=True)

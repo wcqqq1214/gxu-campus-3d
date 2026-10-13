@@ -1,3 +1,4 @@
+import { placeName, translate, type Locale, type Message } from './i18n';
 import { landmarkLabelAnchor } from './labels';
 import { createNightStyle, createRoadLights } from './night';
 import { createPalette } from './palette';
@@ -42,6 +43,8 @@ import {
 import { DEFAULT_LAYERS } from './types';
 import { AdaptiveQuality, qualityProfile } from './quality';
 import { FramePacer } from './frame-pacing';
+import { BenchmarkOrbit } from './benchmark-orbit';
+import { ShadowFrustum } from './shadow-frustum';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import { createContextStyle } from './context-style';
@@ -67,9 +70,10 @@ interface Manifest {
   zones: Asset[];
   landmarks: Asset[];
   infrastructure?: Asset[];
+  sports?: Asset[];
 }
 interface Callbacks {
-  onStatus: (message: string, error?: boolean, progress?: number) => void;
+  onStatus: (message: Message, error?: boolean, progress?: number) => void;
   onReady: () => void;
   onHover: (id: string | null) => void;
   onSelect: (
@@ -87,6 +91,9 @@ export function createScene(
   landmarks: Landmark[],
   callbacks: Callbacks,
 ): SceneController {
+  let locale: Locale = 'zh';
+  const t = (source: string, values?: Record<string, string | number>) =>
+    translate(locale, source, values);
   const benchmarkOrbit = benchmarkOrbitEnabled(location.search);
   const scene = new THREE.Scene();
   let convexCulling: ReturnType<typeof createConvexCulling> | null = null;
@@ -108,6 +115,10 @@ export function createScene(
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
+  const shadowVolume = new ShadowFrustum();
+  let shadowUpdates = 0;
   const canvas = renderer.domElement;
   canvas.setAttribute(
     'aria-label',
@@ -248,6 +259,8 @@ export function createScene(
   function renderScene() {
     renderer.setRenderTarget(null);
     renderer.info.reset();
+    if (renderer.shadowMap.enabled && renderer.shadowMap.needsUpdate)
+      shadowUpdates++;
     if (effects && profile.postprocessing) effects.render();
     else renderer.render(scene, camera);
   }
@@ -257,6 +270,7 @@ export function createScene(
         .connection?.saveData,
     );
   let lastFrame = 0;
+  let benchmarkRun: BenchmarkOrbit | null = null;
   const framePacer = new FramePacer();
   let sampleStart = performance.now();
   let fps = 0;
@@ -289,7 +303,10 @@ export function createScene(
   const failed = new Map<string, Asset>();
   const detailQueue = new ResourceQueue<void>(2);
   const lifecycle = new AbortController();
-  const progresses = new Map<string, { label: string; fraction: number }>();
+  const progresses = new Map<
+    string,
+    { label: string; name?: string; fraction: number }
+  >();
   const geometryCosts = new Map<string, number>();
   const wanted = new Set<string>();
   const recentlyUsed = new Map<string, number>();
@@ -314,8 +331,11 @@ export function createScene(
     const number = document.createElement('span');
     number.textContent = String(i + 1).padStart(2, '0');
     el.appendChild(number);
-    el.appendChild(document.createTextNode(l.name));
-    el.title = `查看${l.name}`;
+    const caption = document.createElement('span');
+    caption.className = 'map-label-name';
+    caption.textContent = placeName(l.name, locale);
+    el.appendChild(caption);
+    el.title = t('查看{name}', { name: placeName(l.name, locale) });
     el.onclick = () => {
       callbacks.onInteract();
       focus(l.id);
@@ -324,9 +344,42 @@ export function createScene(
     return {
       l,
       el,
+      caption,
+      width: 0,
+      height: 0,
       point: landmarkLabelAnchor(l),
     };
   });
+  function measureLabels() {
+    const layerDisplay = labels.style.display;
+    labels.style.display = '';
+    const displays = labelNodes.map(({ el }) => el.style.display);
+    for (const { el } of labelNodes) el.style.display = '';
+    for (const node of labelNodes) {
+      node.width = node.el.offsetWidth;
+      node.height = node.el.offsetHeight;
+    }
+    labelNodes.forEach(({ el }, i) => {
+      el.style.display = displays[i];
+    });
+    labels.style.display = layerDisplay;
+    dirty = true;
+  }
+  function setLocale(value: Locale) {
+    locale = value;
+    labels.lang = value === 'zh' ? 'zh-CN' : 'en';
+    canvas.setAttribute(
+      'aria-label',
+      t('广西大学三维校园，方向键平移，加减键缩放，Home返回全景'),
+    );
+    for (const { l, el, caption } of labelNodes) {
+      const name = placeName(l.name, locale);
+      caption.textContent = name;
+      el.title = t('查看{name}', { name });
+      el.setAttribute('aria-label', el.title);
+    }
+    measureLabels();
+  }
   function updateLabelAnchors(id?: string) {
     for (const node of labelNodes) {
       if (id && node.l.id !== id) continue;
@@ -536,6 +589,7 @@ export function createScene(
   function setOrbit(on: boolean) {
     restoredPose = null;
     orbiting = on && Boolean(selected) && !reduced.matches;
+    benchmarkRun = null;
     callbacks.onOrbit(orbiting);
     if (orbiting) {
       composeViewport();
@@ -547,6 +601,10 @@ export function createScene(
         // Compare the same orbit directions across reloads. Otherwise the
         // page's existing 1.5 s metrics timer gives each run a different phase.
         const startedAt = performance.now();
+        benchmarkRun = new BenchmarkOrbit(
+          startedAt,
+          camera.position.clone().sub(controls.target),
+        );
         sampleStart = startedAt;
         lastFrame = startedAt;
         lastRendered = 0;
@@ -724,6 +782,7 @@ export function createScene(
     }
   }
   function detailLayer(key: string): LayerKey {
+    if (key.startsWith('basketball-bank-')) return 'sports';
     return key.startsWith('infra-') ||
       landmarks.some(
         (l) => 'landmark-' + l.id === key && l.placeKind === 'bridge',
@@ -733,7 +792,10 @@ export function createScene(
   }
   function applyLayers() {
     for (const [key, root] of loaded) {
-      const isZone = key.startsWith('chunk-') || key.startsWith('infra-');
+      const isZone =
+        key.startsWith('chunk-') ||
+        key.startsWith('infra-') ||
+        key.startsWith('basketball-bank-');
       root.visible = layers[detailLayer(key)] && (!isZone || !modeSmooth);
     }
     if (baseRoot)
@@ -746,6 +808,8 @@ export function createScene(
     if (treesRoot) treesRoot.visible = layers.vegetation;
     labels.style.display = layers.labels ? '' : 'none';
     highlight.visible = layers[detailLayer('landmark-' + selected)];
+    // Model attach/release, tree density, quality and layer changes all arrive here.
+    renderer.shadowMap.needsUpdate = true;
     dirty = true;
   }
   function updateLoadStatus() {
@@ -756,7 +820,16 @@ export function createScene(
       progresses.values().next().value;
     if (foreground)
       callbacks.onStatus(
-        `${foreground.label} · ${Math.round(foreground.fraction * 100)}%`,
+        {
+          text: foreground.name
+            ? '正在细化{name} · {percent}%'
+            : '{label} · {percent}%',
+          values: {
+            label: foreground.label,
+            name: foreground.name ?? '',
+            percent: Math.round(foreground.fraction * 100),
+          },
+        },
         false,
         foreground.fraction,
       );
@@ -778,7 +851,7 @@ export function createScene(
         : key.startsWith('trees')
           ? '正在添上林荫'
           : key.startsWith('landmark-')
-            ? `正在细化${landmarks.find((l) => 'landmark-' + l.id === key)?.name ?? '地标'}`
+            ? '正在细化{name}'
             : '正在补充周边细节';
     try {
       const buffer = await fetchModel(
@@ -786,7 +859,14 @@ export function createScene(
         a.bytes,
         signal,
         (fraction) => {
-          progresses.set(key, { label, fraction });
+          progresses.set(key, {
+            label,
+            fraction,
+            name: key.startsWith('landmark-')
+              ? (landmarks.find((l) => 'landmark-' + l.id === key)?.name ??
+                '地标')
+              : undefined,
+          });
           updateLoadStatus();
         },
       );
@@ -870,6 +950,12 @@ export function createScene(
             )
           : [],
       buildings: candidates.map(({ asset }) => asset),
+      sports:
+        near && layers.sports && destinationCamera.distanceTo(destination) < 300
+          ? nearbyChunks(manifest.sports ?? [], x, y, 120).map(
+              ({ asset }) => asset,
+            )
+          : [],
       costs: geometryCosts,
       cap,
     });
@@ -1114,7 +1200,9 @@ export function createScene(
         highTreesReady &&
         profile.nearTrees &&
         camera.position.distanceTo(o.userData.center) < 500;
-      o.visible = o.userData.lod === 1 ? near : !near;
+      const visible = o.userData.lod === 1 ? near : !near;
+      if (o.visible !== visible) renderer.shadowMap.needsUpdate = true;
+      o.visible = visible;
     }
   }
   async function loadBoundary() {
@@ -1192,6 +1280,7 @@ export function createScene(
           baseRoot.traverse((o) => {
             if (o instanceof THREE.Mesh) palette.terrain(o);
           });
+          renderer.shadowMap.needsUpdate = true;
           dirty = true;
         };
         if ('requestIdleCallback' in window)
@@ -1264,7 +1353,8 @@ export function createScene(
     fill.intensity = light.fillPower;
     scene.environmentIntensity = light.environment;
     renderer.toneMappingExposure = light.exposure;
-    sun.position.set(...light.direction);
+    // shadowFrustum owns the target-relative light position, including when
+    // reapplying the same preset while its cached volume is unchanged.
     effects?.setNight(p === 'night');
     syncRoadLights();
     labels.dataset.light = p;
@@ -1376,6 +1466,7 @@ export function createScene(
     pendingRequest = performance.now();
   });
   function resize() {
+    measureLabels();
     const w = host.clientWidth,
       h = host.clientHeight;
     renderer.setSize(w, h);
@@ -1402,6 +1493,8 @@ export function createScene(
       Math.max(100, camera.position.distanceTo(controls.target) * 0.8),
     );
     const t = controls.target;
+    if (!shadowVolume.changed(t.x, t.y, t.z, size, preset)) return;
+    renderer.shadowMap.needsUpdate = true;
     sun.shadow.normalBias = preset === 'evening' ? 1.2 : size < 350 ? 0.3 : 0.8;
     sun.shadow.bias = preset === 'evening' ? -0.00025 : -0.00012;
     sun.target.position.copy(t);
@@ -1434,6 +1527,8 @@ export function createScene(
         ? {
             benchmark: {
               orbiting,
+              elapsedMs: benchmarkRun?.elapsedMs ?? 0,
+              sampleIndex: benchmarkRun?.sampleIndex ?? 0,
               camera: getSnapshot(),
               viewport: [host.clientWidth, host.clientHeight],
               frame: { ...cameraFrame },
@@ -1441,6 +1536,7 @@ export function createScene(
           }
         : {}),
       heapMiB: mem ? Math.round(mem.usedJSHeapSize / 1048576) : null,
+      shadowUpdates,
       fps: Math.round(fps),
       triangles: renderer.info.render.triangles,
       drawCalls: renderer.info.render.calls,
@@ -1461,6 +1557,7 @@ export function createScene(
           (manifest?.landmarks.find((a) => 'landmark-' + a.id === key)?.bytes ??
             manifest?.zones.find((a) => a.id === key)?.bytes ??
             manifest?.infrastructure?.find((a) => a.id === key)?.bytes ??
+            manifest?.sports?.find((a) => a.id === key)?.bytes ??
             0),
         0,
       ),
@@ -1483,11 +1580,15 @@ export function createScene(
     if (orbiting && !tween) {
       if (reduced.matches) setOrbit(false);
       else {
-        const offset = camera.position.clone().sub(controls.target);
-        offset.applyAxisAngle(
-          new THREE.Vector3(0, 1, 0),
-          Math.min(0.05, (time - lastFrame) / 1000) * 0.13,
-        );
+        const offset = benchmarkRun
+          ? benchmarkRun.position(time)
+          : camera.position
+              .clone()
+              .sub(controls.target)
+              .applyAxisAngle(
+                new THREE.Vector3(0, 1, 0),
+                Math.min(0.05, (time - lastFrame) / 1000) * 0.13,
+              );
         camera.position.copy(controls.target).add(offset);
         camera.lookAt(controls.target);
         dirty = true;
@@ -1526,7 +1627,7 @@ export function createScene(
       lastRendered = time;
       const rect = host.getBoundingClientRect();
       const occupied: number[][] = [];
-      for (const { l, el, point } of [...labelNodes].sort(
+      for (const { l, el, point, width, height } of [...labelNodes].sort(
         (a, b) =>
           Number(b.l.id === hovered) * 2 +
           Number(b.l.id === selected) -
@@ -1536,8 +1637,7 @@ export function createScene(
         const dist = camera.position.distanceTo(point);
         const x = ((p.x + 1) * rect.width) / 2,
           y = ((-p.y + 1) * rect.height) / 2;
-        const width = l.name.length * 12 + 38;
-        const bounds = [x - width / 2, y - 28, x + width / 2, y];
+        const bounds = [x - width / 2, y - height, x + width / 2, y];
         const overlap = occupied.some(
           (r) =>
             bounds[0] < r[2] + 6 &&
@@ -1573,7 +1673,7 @@ export function createScene(
       cameraSampleAt = time;
       cameraChanged = false;
     }
-    if (time - sampleStart > 1500) {
+    if (benchmarkRun ? benchmarkRun.sampleDue() : time - sampleStart > 1500) {
       if (activeFrames > 0 && activeFrameMs > 0)
         fps = (1000 * activeFrames) / activeFrameMs;
       callbacks.onMetrics(metrics());
@@ -1612,6 +1712,8 @@ export function createScene(
   };
   const onRestored = () => {
     callbacks.onStatus('');
+    renderer.shadowMap.autoUpdate = false;
+    renderer.shadowMap.needsUpdate = true;
     dirty = true;
   };
   canvas.addEventListener('webglcontextlost', onLost);
@@ -1633,7 +1735,8 @@ export function createScene(
       if (!on) setHovered(null);
       layers[key] = on;
       applyLayers();
-      if (key === 'buildings' || key === 'roads') reconcileDetails();
+      if (key === 'buildings' || key === 'roads' || key === 'sports')
+        reconcileDetails();
       if (key === 'boundary' && on) void loadBoundary();
       updateLoadStatus();
     },
@@ -1651,13 +1754,34 @@ export function createScene(
       ctx.drawImage(canvas, 0, 0);
       const size = Math.max(15, Math.round(out.width / 110));
       ctx.font = `${size}px sans-serif`;
-      const label =
-        '广西大学 校园地图  |  © OpenStreetMap contributors · ODbL' +
-        (layers.boundary && boundaryReady ? '  |  白色细线：校园大致边界' : '');
+      const segments = [
+        t('广西大学 校园地图'),
+        '© OpenStreetMap contributors · ODbL',
+      ];
+      if (layers.boundary && boundaryReady)
+        segments.push(t('白色细线：校园大致边界'));
+      const label = segments.join('  |  ');
+      const available = out.width - size * 2;
+      const lines =
+        ctx.measureText(label).width <= available ? [label] : segments;
+      const lineHeight = size * 1.5;
+      const footerHeight = lineHeight * lines.length + size;
       ctx.fillStyle = '#15382ddd';
-      ctx.fillRect(0, out.height - size * 3, out.width, size * 3);
+      ctx.fillRect(0, out.height - footerHeight, out.width, footerHeight);
       ctx.fillStyle = 'white';
-      ctx.fillText(label, size, out.height - size);
+      for (let i = 0; i < lines.length; i++) {
+        ctx.font = `${size}px sans-serif`;
+        const fittedSize = Math.min(
+          size,
+          (size * available) / ctx.measureText(lines[i]).width,
+        );
+        ctx.font = `${fittedSize}px sans-serif`;
+        ctx.fillText(
+          lines[i],
+          size,
+          out.height - footerHeight + size + lineHeight * i,
+        );
+      }
       const blob = await new Promise<Blob | null>((resolve) =>
         out.toBlob(resolve, 'image/png'),
       );
@@ -1665,7 +1789,7 @@ export function createScene(
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = '广西大学-校园视图.png';
+      link.download = t('广西大学-校园视图.png');
       link.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     },
@@ -1683,6 +1807,7 @@ export function createScene(
           );
       }
     },
+    setLocale,
     getLightingState: () => ({
       preset,
       labelTheme: preset === 'night' ? 'night' : 'day',

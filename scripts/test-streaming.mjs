@@ -238,3 +238,33 @@ test('JSON请求503自动恢复，超时退出并可重试，生命周期取消�
     { recovered: true },
   );
 });
+
+test('sports details share the memory cap and cannot displace building details', () => {
+  const asset = (id) => ({ id, url: `${id}.glb`, bytes: 10 });
+  const roads = [asset('infra-1')],
+    buildings = [asset('chunk-1')];
+  const sports = [asset('basketball-bank-east'), asset('basketball-bank-west')];
+  const costs = new Map(
+    [...roads, ...buildings, ...sports].map((a) => [a.id, 100]),
+  );
+  const options = {
+    foregroundReady: true,
+    roads,
+    buildings,
+    sports,
+    costs,
+    cap: 300,
+  };
+  assert.deepEqual(
+    planDetails(options).assets.map(([key]) => key),
+    ['infra-1', 'chunk-1', 'basketball-bank-east'],
+  );
+  assert.equal(planDetails(options).allocation, 300);
+  assert.equal(planDetails({ ...options, cap: 200 }).assets.length, 2);
+  assert.equal(planDetails({ ...options, sports: [] }).assets.length, 2);
+  assert.equal(
+    nearbyChunks(sports, 0, 0, 120).length,
+    0,
+    'missing bounds do not load a bank everywhere',
+  );
+});

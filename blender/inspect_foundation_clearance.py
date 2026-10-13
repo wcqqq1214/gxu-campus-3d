@@ -136,6 +136,7 @@ def measure(building, samples, tolerance, name):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--root', type=Path, default=ROOT)
     parser.add_argument('--building-id', required=True)
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--samples-output', type=Path)
@@ -147,13 +148,13 @@ def main():
         parser.error('spacing must be 0.5–5 metres')
     if not math.isfinite(args.tolerance) or not 0 <= args.tolerance <= .5:
         parser.error('tolerance must be 0–0.5 metres')
-    data = ROOT / 'public/data/buildings.json'
+    data = args.root / 'public/data/buildings.json'
     building = next((b for b in json.loads(data.read_text()) if b['id'] == args.building_id), None)
     if building is None:
         parser.error('unknown building id')
     samples = sample_parts(building, args.spacing)
     representations, full_samples = [], {}
-    files = {'source': ROOT / 'blender/gxu-campus.blend', 'base': ROOT / 'public/models/base.glb'}
+    files = {'source': args.root / 'blender/gxu-campus.blend', 'base': args.root / 'public/models/base.glb'}
     for name, path in files.items():
         if name == 'source':
             bpy.ops.wm.open_mainfile(filepath=str(path))
