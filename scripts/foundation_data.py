@@ -43,6 +43,11 @@ def prepare_foundations(root=ROOT):
     if len({i['id'] for i in config['foundations']}) != len(config['foundations']):
         raise ValueError('Duplicate foundation repair ID')
     for item in config['foundations']:
+        road_protection_margin=item.get('roadProtectionMargin',.1)
+        if (type(road_protection_margin) not in (int,float)
+                or not math.isfinite(road_protection_margin)
+                or not 0 <= road_protection_margin <= .1):
+            raise ValueError('Invalid foundation road protection margin')
         if 'roadExportConformMargin' in item:
             margin=item['roadExportConformMargin']
             if type(margin) not in (int,float) or not math.isfinite(margin) or not 0<margin<=50:
@@ -83,7 +88,7 @@ def prepare_foundations(root=ROOT):
             vs, ts = layer['vertices'], layer['triangles']
             road_shapes.extend(Polygon([vs[k][:2] for k in ts[i:i+3]]) for i in range(0,len(ts),3))
         roads = unary_union(road_shapes)
-        protection = [roads.difference(trim).buffer(.1, join_style=2)]
+        protection = [roads.difference(trim).buffer(road_protection_margin, join_style=2)]
         protection.extend(Polygon(p[0],p[1:]).buffer(.5,join_style=2)
                           for other in context['buildings'] if other['id'] != b['id'] for p in other['polygons'])
         protection.extend(box(*s['gradingBounds']) for s in context['sites']['sites'] if 'gradingBounds' in s)

@@ -134,6 +134,26 @@
         "weldDistance": 0.0001
       },
       "evidence": "Model repair: western closed body intersects terrain by up to 0.8 m. Lower only terrain above the adopted floor datum within the bounded footprint and 3 m transition; retain roads, neighbors, original DEM and building heights. Dimensions are repair estimates, not surveyed grading."
+    },
+    {
+      "id": "materials-northeast-foundation",
+      "buildingId": "relation/11564999",
+      "coreMargin": 0.005,
+      "roadTrimMargin": 0.01,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "repairBounds": [
+        -574,
+        -898,
+        -507,
+        -876
+      ],
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "模型修复：东北封闭主体原有228/227个源/基础采样点地形侵入，最大约1.62米。仅降低局部闭合主体内高于既有楼底的地形，并以3米范围过渡；保留内院、开放框架、楼高、原DEM及周边道路。范围和过渡为模型修补参数，不是实测场地标高。",
+      "roadProtectionMargin": 0
     }
   ]
 }

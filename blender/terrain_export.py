@@ -3,8 +3,9 @@ import bpy,tempfile,re,sys,json
 from contextlib import nullcontext
 from pathlib import Path
 if __name__=='__main__':sys.path.insert(0,str(Path(__file__).resolve().parent))
-from preserve_glb_geometry import preserve_geometry,compact_buffer_views
+from preserve_glb_geometry import preserve_geometry,compact_buffer_views,replace_compressed_node_parts
 from export_attributes import omit_unused_uvs,omit_zero_area_terrain_faces
+from terrain_precision_config import load_precision_regions
 
 TERRAIN_BITS=18
 ROAD_BITS=18
@@ -12,13 +13,15 @@ ROAD_UV_BITS=12
 LOCAL_ROAD_UV_BITS=11
 
 
-def replace_precise_terrain(path,objects,*,terrain_only=False,planar_report_directory=None):
+def replace_precise_terrain(path,objects,*,terrain_only=False,planar_report_directory=None,precision_regions=None):
     if planar_report_directory is not None:
         if not terrain_only or Path(path).resolve()==(Path(__file__).resolve().parents[1]/'public/models/base.glb').resolve():
             raise ValueError('Diagnostic dumps require an isolated terrain candidate export')
     terrain=[o for o in objects if o.get('layer')=='terrain']
     if not terrain:return
     if len(terrain)!=1:raise ValueError('Expected one aggregated terrain object')
+    if precision_regions is None:
+        precision_regions=load_precision_regions(Path(__file__).resolve().parents[1])
     roads=[o for o in objects if re.sub(r'\.\d{3,}$','',o.name)=='roads']
     if not terrain_only and len(roads)!=1:raise ValueError('Expected one aggregated ordinary road object')
     # Ordinary materials share a position domain so common vertices decode
@@ -33,6 +36,10 @@ def replace_precise_terrain(path,objects,*,terrain_only=False,planar_report_dire
         exports.extend((o,15,LOCAL_ROAD_UV_BITS,'paving-civil-platform-service-export',{'road'}) for o in objects
                        if re.sub(r'\.\d{3,}$','',o.name)=='paving-civil-platform-service-export')
     for obj,bits,uvbits,name,materials in exports:
+        if name=='terrain' and precision_regions:
+            from terrain_precision import replace_with_local_precision
+            replace_with_local_precision(path,obj,precision_regions,report_directory=planar_report_directory)
+            continue
         bpy.ops.object.select_all(action='DESELECT');obj.select_set(True)
         with tempfile.TemporaryDirectory(prefix='gxu-ground-export-') as directory:
             precise=Path(directory)/'ground.glb'
@@ -46,7 +53,8 @@ def replace_precise_terrain(path,objects,*,terrain_only=False,planar_report_dire
                     export_draco_normal_quantization=6,export_materials='EXPORT',export_cameras=False,export_lights=False)
                 if report is not None and planar_report_directory is not None:
                     (planar_report_directory/'simplification.json').write_text(json.dumps(report,indent=2)+'\n')
-            preserve_geometry(precise.read_bytes(),path,[name],materials=materials)
+            if name=='terrain':replace_compressed_node_parts(path,name,[precise.read_bytes()])
+            else:preserve_geometry(precise.read_bytes(),path,[name],materials=materials)
     compact_buffer_views(path,optimize_jpegs=True)
 
 

@@ -2,7 +2,7 @@
 import copy,json,struct,sys,tempfile,unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'blender'))
-from preserve_glb_geometry import mesh_nodes_by_name,preserve_geometry,unpack,compact_buffer_views
+from preserve_glb_geometry import mesh_nodes_by_name,preserve_geometry,unpack,compact_buffer_views,replace_compressed_node_parts
 
 class IncrementalGLBTests(unittest.TestCase):
     def encode(self,name,payload,count):
@@ -26,6 +26,35 @@ class IncrementalGLBTests(unittest.TestCase):
             self.assertEqual(doc['accessors'][0]['count'],6)
             self.assertEqual(doc['accessors'][1]['count'],6)
             self.assertEqual(doc['nodes'][0]['name'],'shore-jinghu')
+
+    def test_disjoint_parts_replace_one_mesh_with_separate_accessors(self):
+        raw=self.encode('terrain',b'old-terrain',9)
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'base.glb';path.write_bytes(raw)
+            parts=[self.encode('main',b'main-geometry',12),self.encode('patch',b'precise-geometry',3)]
+            replace_compressed_node_parts(path,'terrain',parts);compact_buffer_views(path)
+            doc,binary=unpack(path.read_bytes())
+            self.assertEqual(doc['nodes'],unpack(raw)[0]['nodes'])
+            self.assertEqual(doc['materials'],unpack(raw)[0]['materials'])
+            primitives=doc['meshes'][0]['primitives'];self.assertEqual(len(primitives),2)
+            for p,count,payload in zip(primitives,[12,3],[b'main-geometry',b'precise-geometry']):
+                self.assertEqual(doc['accessors'][p['attributes']['POSITION']]['count'],count)
+                self.assertEqual(doc['accessors'][p['indices']]['count'],count)
+                v=doc['bufferViews'][p['extensions']['KHR_draco_mesh_compression']['bufferView']]
+                self.assertEqual(binary[v['byteOffset']:v['byteOffset']+v['byteLength']],payload)
+            self.assertNotIn(b'old-terrain',binary)
+            first=path.read_bytes()
+            replace_compressed_node_parts(path,'terrain',parts);compact_buffer_views(path)
+            self.assertEqual(path.read_bytes(),first)
+            replace_compressed_node_parts(path,'terrain',parts[:1]);compact_buffer_views(path)
+            self.assertEqual(len(unpack(path.read_bytes())[0]['meshes'][0]['primitives']),1)
+
+    def test_invalid_parts_do_not_overwrite_destination(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'base.glb';original=self.encode('terrain',b'old-terrain',9);path.write_bytes(original)
+            for parts in [[],[self.encode('main',b'new-main',3),self.encode('patch',b'bad',3).replace(b'stone',b'other')]]:
+                with self.assertRaises(ValueError):replace_compressed_node_parts(path,'terrain',parts)
+                self.assertEqual(path.read_bytes(),original)
 
     def test_material_filter_preserves_unselected_compressed_payload(self):
         old=self.encode('roads',b'precise-stone',6)
