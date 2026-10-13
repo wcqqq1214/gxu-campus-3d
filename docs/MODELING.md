@@ -88,7 +88,7 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 
 `--clearance-only` 跳过既有道路裁切；`--repair-id` 可重复。校验同时检查区域内净空、旧穿透点、修复边界与原路面的标高一致，以及范围外道路保留情况。办公楼片区仍须联验办公南楼入口连接。医学院前场包含地图标注台阶，待独立核对其平台与入口高程后再处理。
 
-当前两区域为 `dev` 开发候选：几何、入口联验及浏览器功能检查通过，精细档活动性能仍存在帧率与对照轨迹偏差，尚未通过完整验收。保留失败记录，稳定复现后再判断是否需要整体降低近景成本。
+两区域已补齐本地性能复验：固定测量轨迹并复用未变化的太阳阴影后，原始S0与当前模型的精细/流畅两档共12轮通过原门槛。既有失败记录保留；几何、入口和模型指纹保持。冷缓存及实机手机仍另验。
 
 西侧空地标注的横支路、三角岔路和小水塘两侧细支路使用 `west-vacant-spur`、`west-pond-service-loop` 截面；水体保留。两组棕色场地面另由 `data/surface-display-cleanup.json` 配置，记录对应的三个原始场地 ID。完整建模在创建普通运动场源对象之前应用同一组裁切。增量更新及校验均支持 `--layer=sports`；更新可用 `--input-root` 接续上一阶段候选目录。场地更新只替换 `sport` 材质的压缩网格，沿用其原始坐标量化范围，其余材质与模型节点逐字节保留。
 
@@ -158,6 +158,16 @@ blender --background --python-exit-code 1 --python blender/validate_civil_whole.
 缺失基准时命令会停止并列出缺少的文件。不能用当前模型冒充修改前版本；旧 `.blend` 已删除的历史比较无法直接复跑，须有可靠基准后再做结论。校验不会因基准缺失而自动跳过。
 
 浏览器检查脚本保留为可复用工具，使用 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`REFINEMENT_URL` 等显式输入；前后截图工具还需相机列表与基准资源目录。输出只在本地保存。性能比较应使用同一视口、相机、前端和画质，区分资源加载、静止帧率及持续活动帧率。
+
+`check-campus-performance.mjs` 提供原始S0与当前模型的固定镜头活动对照。两个预览应使用**同一份构建后的前端**，只替换对应的模型与清单；脚本会核对实际响应的JS哈希。每档三组交替对照，各采21个1.5秒窗口，丢弃前两个预热窗口，再比较各轮中位数的中位数。不得按FPS筛掉失败轮次。
+
+```sh
+BASELINE_URL=http://127.0.0.1:4432/gxu-campus-3d/ REFINEMENT_URL=http://127.0.0.1:4430/gxu-campus-3d/ PERFORMANCE_REPORT=work/performance-check.json node scripts/check-campus-performance.mjs
+```
+
+同样可设置 `PLAYWRIGHT_MODULE` 和 `CHROMIUM_PATH`。报告路径须唯一；失败也写出原因和已完成轮次。`debug&benchmark=fixed-orbit` 模式按起始姿态和实际经过时间计算角度；普通游览保留原来的慢帧限幅。指标带 `sampleIndex` 和 `elapsedMs`，检查会拒绝漏采、超过200毫秒的窗口延迟或超过0.03弧度的配对偏差；失败时保留完整记录并排查原因。
+
+阴影按变化刷新：`ShadowFrustum` 比较太阳方向、目标点和覆盖范围；仅环绕相机时复用既有阴影图。平移、缩放、光照切换、模型加载/释放、图层和树木LOD变化、画质切换及图形上下文恢复会触发更新。后续若加入移动的投影物体或修改几何，必须同时使 `renderer.shadowMap.needsUpdate` 生效，不能仅设置普通重绘标记。`shadowUpdates` 调试指标用于观察刷新次数。
 
 `check-site-browser.mjs`、`check-paving-browser.mjs`、`check-shore-browser.mjs` 共用 `browser-check-helpers.mjs` 的面板导航、截图及报告流程，各自保留场地断言。可用 `REFINEMENT_CAMERAS` 指定相机列表；三个入口分别要求 `library-side`、`6b-paving-road-join`、`jinghu-auditorium-bank` 相机。省略时沿用本地历史相机文件，这些文件不随仓库发布，缺失时必须提供实际保留的输入。例如：
 

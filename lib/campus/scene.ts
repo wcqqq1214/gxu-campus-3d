@@ -43,6 +43,8 @@ import {
 import { DEFAULT_LAYERS } from './types';
 import { AdaptiveQuality, qualityProfile } from './quality';
 import { FramePacer } from './frame-pacing';
+import { BenchmarkOrbit } from './benchmark-orbit';
+import { ShadowFrustum } from './shadow-frustum';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import { createContextStyle } from './context-style';
@@ -112,6 +114,10 @@ export function createScene(
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.0;
   renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.autoUpdate = false;
+  renderer.shadowMap.needsUpdate = true;
+  const shadowVolume = new ShadowFrustum();
+  let shadowUpdates = 0;
   const canvas = renderer.domElement;
   canvas.setAttribute(
     'aria-label',
@@ -252,6 +258,8 @@ export function createScene(
   function renderScene() {
     renderer.setRenderTarget(null);
     renderer.info.reset();
+    if (renderer.shadowMap.enabled && renderer.shadowMap.needsUpdate)
+      shadowUpdates++;
     if (effects && profile.postprocessing) effects.render();
     else renderer.render(scene, camera);
   }
@@ -261,6 +269,7 @@ export function createScene(
         .connection?.saveData,
     );
   let lastFrame = 0;
+  let benchmarkRun: BenchmarkOrbit | null = null;
   const framePacer = new FramePacer();
   let sampleStart = performance.now();
   let fps = 0;
@@ -579,6 +588,7 @@ export function createScene(
   function setOrbit(on: boolean) {
     restoredPose = null;
     orbiting = on && Boolean(selected) && !reduced.matches;
+    benchmarkRun = null;
     callbacks.onOrbit(orbiting);
     if (orbiting) {
       composeViewport();
@@ -590,6 +600,10 @@ export function createScene(
         // Compare the same orbit directions across reloads. Otherwise the
         // page's existing 1.5 s metrics timer gives each run a different phase.
         const startedAt = performance.now();
+        benchmarkRun = new BenchmarkOrbit(
+          startedAt,
+          camera.position.clone().sub(controls.target),
+        );
         sampleStart = startedAt;
         lastFrame = startedAt;
         lastRendered = 0;
@@ -789,6 +803,8 @@ export function createScene(
     if (treesRoot) treesRoot.visible = layers.vegetation;
     labels.style.display = layers.labels ? '' : 'none';
     highlight.visible = layers[detailLayer('landmark-' + selected)];
+    // Model attach/release, tree density, quality and layer changes all arrive here.
+    renderer.shadowMap.needsUpdate = true;
     dirty = true;
   }
   function updateLoadStatus() {
@@ -1173,7 +1189,9 @@ export function createScene(
         highTreesReady &&
         profile.nearTrees &&
         camera.position.distanceTo(o.userData.center) < 500;
-      o.visible = o.userData.lod === 1 ? near : !near;
+      const visible = o.userData.lod === 1 ? near : !near;
+      if (o.visible !== visible) renderer.shadowMap.needsUpdate = true;
+      o.visible = visible;
     }
   }
   async function loadBoundary() {
@@ -1251,6 +1269,7 @@ export function createScene(
           baseRoot.traverse((o) => {
             if (o instanceof THREE.Mesh) palette.terrain(o);
           });
+          renderer.shadowMap.needsUpdate = true;
           dirty = true;
         };
         if ('requestIdleCallback' in window)
@@ -1323,7 +1342,8 @@ export function createScene(
     fill.intensity = light.fillPower;
     scene.environmentIntensity = light.environment;
     renderer.toneMappingExposure = light.exposure;
-    sun.position.set(...light.direction);
+    // shadowFrustum owns the target-relative light position, including when
+    // reapplying the same preset while its cached volume is unchanged.
     effects?.setNight(p === 'night');
     syncRoadLights();
     labels.dataset.light = p;
@@ -1462,6 +1482,8 @@ export function createScene(
       Math.max(100, camera.position.distanceTo(controls.target) * 0.8),
     );
     const t = controls.target;
+    if (!shadowVolume.changed(t.x, t.y, t.z, size, preset)) return;
+    renderer.shadowMap.needsUpdate = true;
     sun.shadow.normalBias = preset === 'evening' ? 1.2 : size < 350 ? 0.3 : 0.8;
     sun.shadow.bias = preset === 'evening' ? -0.00025 : -0.00012;
     sun.target.position.copy(t);
@@ -1494,6 +1516,8 @@ export function createScene(
         ? {
             benchmark: {
               orbiting,
+              elapsedMs: benchmarkRun?.elapsedMs ?? 0,
+              sampleIndex: benchmarkRun?.sampleIndex ?? 0,
               camera: getSnapshot(),
               viewport: [host.clientWidth, host.clientHeight],
               frame: { ...cameraFrame },
@@ -1501,6 +1525,7 @@ export function createScene(
           }
         : {}),
       heapMiB: mem ? Math.round(mem.usedJSHeapSize / 1048576) : null,
+      shadowUpdates,
       fps: Math.round(fps),
       triangles: renderer.info.render.triangles,
       drawCalls: renderer.info.render.calls,
@@ -1543,11 +1568,15 @@ export function createScene(
     if (orbiting && !tween) {
       if (reduced.matches) setOrbit(false);
       else {
-        const offset = camera.position.clone().sub(controls.target);
-        offset.applyAxisAngle(
-          new THREE.Vector3(0, 1, 0),
-          Math.min(0.05, (time - lastFrame) / 1000) * 0.13,
-        );
+        const offset = benchmarkRun
+          ? benchmarkRun.position(time)
+          : camera.position
+              .clone()
+              .sub(controls.target)
+              .applyAxisAngle(
+                new THREE.Vector3(0, 1, 0),
+                Math.min(0.05, (time - lastFrame) / 1000) * 0.13,
+              );
         camera.position.copy(controls.target).add(offset);
         camera.lookAt(controls.target);
         dirty = true;
@@ -1632,7 +1661,7 @@ export function createScene(
       cameraSampleAt = time;
       cameraChanged = false;
     }
-    if (time - sampleStart > 1500) {
+    if (benchmarkRun ? benchmarkRun.sampleDue() : time - sampleStart > 1500) {
       if (activeFrames > 0 && activeFrameMs > 0)
         fps = (1000 * activeFrames) / activeFrameMs;
       callbacks.onMetrics(metrics());
@@ -1671,6 +1700,8 @@ export function createScene(
   };
   const onRestored = () => {
     callbacks.onStatus('');
+    renderer.shadowMap.autoUpdate = false;
+    renderer.shadowMap.needsUpdate = true;
     dirty = true;
   };
   canvas.addEventListener('webglcontextlost', onLost);

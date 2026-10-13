@@ -92,6 +92,8 @@ export interface Metrics {
   postprocessing?: 'ready' | 'failed' | 'loading' | 'off';
   benchmark?: {
     orbiting: boolean;
+    elapsedMs: number;
+    sampleIndex: number;
     camera: {
       position: [number, number, number];
       target: [number, number, number];
@@ -102,6 +104,7 @@ export interface Metrics {
   };
   readyMs: number;
   heapMiB: number | null;
+  shadowUpdates?: number;
   fps: number;
   triangles: number;
   drawCalls: number;
