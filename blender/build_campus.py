@@ -287,7 +287,7 @@ for field in fields:
     base['sports-'+field['id']]=mesh
 from basketball import bank_model,court_model,bank_paving
 for bank in basketball['banks']:
-    base[bank['id']]=bank_model(bank,basketball['courts'],C)
+    base[bank['id']]=bank_model(bank,basketball['courts'],C,False)
     if not BASE_ONLY:
         bank_paving(bank,C).object(bank['id']+'-paving',GROUND,{'layer':'sports','basketballBank':bank['id']})
 if not BASE_ONLY:
@@ -427,8 +427,8 @@ def export(name,groups):
         o=mesh.object(key,EXPORT,props);o.select_set(True);objs.append(o)
     path=MODELS/name
     from export_attributes import omit_unused_uvs
-    with omit_unused_uvs() if name=='base.glb' else nullcontext():
-        bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=15 if name=='base.glb' else 16,export_draco_normal_quantization=6 if name=='base.glb' else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
+    with omit_unused_uvs() if name=='base.glb' or name.startswith('basketball-bank-') else nullcontext():
+        bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=15 if name=='base.glb' or name.startswith('basketball-bank-') else 16,export_draco_normal_quantization=6 if name=='base.glb' or name.startswith('basketball-bank-') else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
     if name=='base.glb':
         from terrain_export import replace_precise_terrain
         replace_precise_terrain(path,objs)
@@ -436,15 +436,24 @@ def export(name,groups):
         north_keys={b['chunk'] for b in buildings if b.get('customModel')=='north-campus'}
         north_keys.update(k for k in groups if k.startswith('north-campus-'))
         if north_keys:repack_north_base(path,objs,north_keys)
+    if name.startswith('basketball-bank-'):
+        from basketball_export import extract_bank
+        extract_bank(path.read_bytes(),name.removesuffix('.glb'),path)
     for o in objs:mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
     print('Export',name,round(path.stat().st_size/1e6,2),'MB',flush=True);return path.stat().st_size
 sizes={};sizes['base.glb']=export('base.glb',base)
+# Base-only rebuilds also refresh these paired assets, so changing court data
+# cannot leave an older full-detail bank over a newer distant representation.
+for bank in basketball['banks']:
+    sizes[bank['id']+'.glb']=export(bank['id']+'.glb',{bank['id']:bank_model(bank,basketball['courts'],C)})
+from basketball_export import manifest_entries
 if BASE_ONLY:
     manifest=json.loads((DATA/'models.json').read_text())
     from vegetation_priorities import priority_positions
     manifest['treePriorityPositions']=priority_positions(json.loads((DATA/'vegetation-zones.json').read_text()),trees)
     if {z['id'] for z in manifest['zones']}!=set(near):raise RuntimeError('Chunk layout changed; run a full build before --base-only')
     manifest['base'].update(bytes=sizes['base.glb'],sha256=hashlib.sha256((MODELS/'base.glb').read_bytes()).hexdigest())
+    manifest['sports']=manifest_entries(basketball,MODELS)
     (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
     print('Base-only export complete; retained editable source and near models',flush=True)
     sys.exit(0)
@@ -470,6 +479,7 @@ for o in low_templates:
 (DATA/'landmarks.json').write_text(json.dumps(landmarks,ensure_ascii=False,separators=(',',':')))
 manifest={'version':2,'chunkSizeMeters':CHUNK_METERS,'units':'meters','axes':{'x':'east','y':'up','z':'south'},'base':{'url':'models/base.glb','bytes':sizes['base.glb']},'trees':{'url':'models/trees.glb','bytes':(MODELS/'trees.glb').stat().st_size},'treesNear':{'url':'models/trees-near.glb','bytes':(MODELS/'trees-near.glb').stat().st_size},'zones':[{'id':k,'url':f'models/{k}.glb','bytes':sizes[k+'.glb'],'featureIds':zoneids[k],'bounds':chunkbounds[k]} for k in sorted(near)],'landmarks':[{'id':l['id'],'url':f"models/{l['id']}.glb",'bytes':sizes[l['id']+'.glb']} for l in landmarks]}
 manifest['infrastructure']=[{'id':c['id'],'url':f"models/{c['id']}.glb",'bytes':sizes[c['id']+'.glb'],'bounds':c['bounds'],'layer':'roads'} for c in infrastructure['chunks']]
+manifest['sports']=manifest_entries(basketball,MODELS)
 from vegetation_priorities import priority_positions
 manifest['treePriorityPositions']=priority_positions(json.loads((DATA/'vegetation-zones.json').read_text()),trees)
 for entry in [manifest['base'],manifest['trees'],manifest['treesNear']]+manifest['zones']+manifest['landmarks']+manifest['infrastructure']:

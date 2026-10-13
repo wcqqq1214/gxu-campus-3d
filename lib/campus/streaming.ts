@@ -34,12 +34,13 @@ export function nearbyChunks(
     );
 }
 
-/** Foreground, roads and buildings share a byte budget, not a slot count. */
+/** All details share a decoded-byte budget; sports follow roads and buildings. */
 export function planDetails(options: {
   foreground?: [string, StreamAsset];
   foregroundReady: boolean;
   roads: StreamAsset[];
   buildings: StreamAsset[];
+  sports?: StreamAsset[];
   costs: ReadonlyMap<string, number>;
   cap: number;
 }) {
@@ -63,6 +64,7 @@ export function planDetails(options: {
   };
   append(roads.slice(0, 3), 3, 28);
   append(buildings, foreground && !foregroundReady ? 1 : 3, 32);
+  append(options.sports ?? [], 2, 32);
   return { assets, allocation };
 }
 

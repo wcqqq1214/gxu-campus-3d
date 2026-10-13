@@ -70,6 +70,7 @@ interface Manifest {
   zones: Asset[];
   landmarks: Asset[];
   infrastructure?: Asset[];
+  sports?: Asset[];
 }
 interface Callbacks {
   onStatus: (message: Message, error?: boolean, progress?: number) => void;
@@ -781,6 +782,7 @@ export function createScene(
     }
   }
   function detailLayer(key: string): LayerKey {
+    if (key.startsWith('basketball-bank-')) return 'sports';
     return key.startsWith('infra-') ||
       landmarks.some(
         (l) => 'landmark-' + l.id === key && l.placeKind === 'bridge',
@@ -790,7 +792,10 @@ export function createScene(
   }
   function applyLayers() {
     for (const [key, root] of loaded) {
-      const isZone = key.startsWith('chunk-') || key.startsWith('infra-');
+      const isZone =
+        key.startsWith('chunk-') ||
+        key.startsWith('infra-') ||
+        key.startsWith('basketball-bank-');
       root.visible = layers[detailLayer(key)] && (!isZone || !modeSmooth);
     }
     if (baseRoot)
@@ -945,6 +950,12 @@ export function createScene(
             )
           : [],
       buildings: candidates.map(({ asset }) => asset),
+      sports:
+        near && layers.sports && destinationCamera.distanceTo(destination) < 300
+          ? nearbyChunks(manifest.sports ?? [], x, y, 120).map(
+              ({ asset }) => asset,
+            )
+          : [],
       costs: geometryCosts,
       cap,
     });
@@ -1546,6 +1557,7 @@ export function createScene(
           (manifest?.landmarks.find((a) => 'landmark-' + a.id === key)?.bytes ??
             manifest?.zones.find((a) => a.id === key)?.bytes ??
             manifest?.infrastructure?.find((a) => a.id === key)?.bytes ??
+            manifest?.sports?.find((a) => a.id === key)?.bytes ??
             0),
         0,
       ),
@@ -1723,7 +1735,8 @@ export function createScene(
       if (!on) setHovered(null);
       layers[key] = on;
       applyLayers();
-      if (key === 'buildings' || key === 'roads') reconcileDetails();
+      if (key === 'buildings' || key === 'roads' || key === 'sports')
+        reconcileDetails();
       if (key === 'boundary' && on) void loadBoundary();
       updateLoadStatus();
     },
