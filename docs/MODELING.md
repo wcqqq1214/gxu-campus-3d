@@ -110,6 +110,10 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 - `roofVolumes`、`roofDome` 需要实体平屋面支撑并保留边界与内院净距；不自动计作新增楼层。`openBelow.slattedRoof` 使用透空梁顶，不叠加普通女儿墙。
 - `courtyard-paving.stairConnection` 只连接有明确锚点的庭院边和楼梯底层，不自动推导远处道路路径。入口外扩前用 `scripts/audit_entry_road_context.py` 核对道路关系。
 
+物理学院 `way/957404989` 使用覆盖原轮廓及双内院的单一 `body` 分段，`baseDepth: 2` 将原封闭墙脚下延1.5米；九层主体、楼底标高、第五层外廊和穹顶保持。西侧 `physics-west-foundation` 仅修整约455.46平方米闭合主体范围，外加3米过渡，最大下调约0.863米；不修改原始DEM。两项参数用于修复当前模型的悬空与地形侵入，并非实测基础深度或场地标高。
+
+该修复须联验完整楼体接地、墙脚、穹顶、外廊、相邻结构平台及树根。源/基础各1,389个接地点的超限地形侵入由73/72点降为0，源/基础/近景各290个墙脚位置的空隙由91处降为0；地形侵入沿用0.3米诊断门槛，不等于精确测绘。普通道路压缩网格保持，基础中的其他101个节点和69个其他GLB保持。增量地形导出使用 `terrain_export.py --source=候选.blend --target=候选/base.glb`，只替换地形，避免重新导出普通道路覆盖既有修补。
+
 北校园的人工补绘体块与现有 OSM 建筑区分标注。普通平顶、未见背面、入口尺寸、景观与夜景均可能包含估算；具体来源和未知项随数据字段保存。
 
 ## 导出与增量修改

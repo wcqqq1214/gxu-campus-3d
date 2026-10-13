@@ -115,6 +115,25 @@
         "weldDistance": 0.0001
       },
       "evidence": "模型修复：办公北楼中央北端及西侧翼背面地形进入封闭楼体，原源/基础各483点检查检出15/17处超过0.3米容差，最高约0.33米。保留原楼底、DEM、入口铺地和道路；15×33米截取范围及3米过渡为局部模型修补参数，并非实测土方。修复后仍检查完整楼栋。"
+    },
+    {
+      "id": "physics-west-foundation",
+      "buildingId": "way/957404989",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "repairBounds": [
+        -704,
+        -868,
+        -689,
+        -811
+      ],
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: western closed body intersects terrain by up to 0.8 m. Lower only terrain above the adopted floor datum within the bounded footprint and 3 m transition; retain roads, neighbors, original DEM and building heights. Dimensions are repair estimates, not surveyed grading."
     }
   ]
 }
