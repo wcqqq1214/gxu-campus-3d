@@ -169,6 +169,27 @@
       "evidence": "Model repair: broad closed-body terrain intrusion reaches about 0.59 m. Lower only terrain above the existing datum within the mapped building and a 3 m transition; retain roads, neighbors, original DEM and building height. This is a model correction, not surveyed grading.",
       "preserveRoads": true,
       "roadProtectionMargin": 0
+    },
+    {
+      "id": "bihu-canteen-foundation",
+      "buildingId": "way/759609659",
+      "coreMargin": 0.1,
+      "roadTrimMargin": 0.4,
+      "haloMeters": 3,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "roadProtectionMargin": 0.1,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "Model repair: lower terrain intruding into the existing two-storey closed canteen, with a bounded 3 m transition. Preserve the adopted building datum, mapped outline, original DEM, roads and neighboring buildings. This is model grading, not a surveyed site elevation.",
+      "repairBounds": [
+        485,
+        18,
+        535,
+        46
+      ]
     }
   ]
 }
