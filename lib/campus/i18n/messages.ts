@@ -45,7 +45,7 @@ export const englishMessages: Record<string, string> = {
   返回校园全景: 'Return to campus overview',
   广西大学: 'Guangxi University',
   校园地图: 'Campus Map',
-  项目说明: 'About this map',
+  '查看 GitHub 仓库': 'View GitHub repository',
   校园浏览面板: 'Campus explorer',
   返回地点列表: 'Back to places',
   返回列表: 'Back to list',
@@ -99,7 +99,6 @@ export const englishMessages: Record<string, string> = {
     'Previews show the same view of the library. Lighting is simulated.',
   '地图数据暂不可用 · 重试': 'Map data unavailable · Retry',
   '地图数据加载中…': 'Loading map data…',
-  查看数据来源: 'View data sources',
   暂停游览: 'Pause tour',
   继续游览: 'Resume tour',
   正在游览: 'Tour in progress',
@@ -158,28 +157,6 @@ export const englishMessages: Record<string, string> = {
     'The link preserves your place, camera and lighting so you can continue on another screen.',
   校园视角链接: 'Campus view link',
   '复制上方链接即可分享。': 'Copy the link above to share this view.',
-  '关于「广西大学 校园地图」': 'About Guangxi University Campus Map',
-  '广西大学主校区的三维建筑与地理环境复现。':
-    'A 3D recreation of the buildings and landscape of Guangxi University’s main campus.',
-  '以大学东路主校区为中心，涵盖东、西、北校园。校外建筑仅保留紧邻校界的部分，周边道路用于交代位置。':
-    'Centered on the Daxue East Road main campus, the map includes the east, west and north campus areas. Only nearby buildings and surrounding roads are shown for context.',
-  '统计资料暂不可用，仍可游览校园。':
-    'Statistics are unavailable. You can still explore the campus.',
-  重试统计资料: 'Retry statistics',
-  校内建筑: 'Campus buildings',
-  精选地点: 'Featured places',
-  示意树木: 'Illustrative trees',
-  地图与建模依据: 'Map and modeling sources',
-  暂不可用: 'Unavailable',
-  部分: 'Some',
-  如何操作: 'Getting around',
-  '选择地点或开始游览，拖动画面探索校园。':
-    'Choose a place or start a tour. Drag the map to explore.',
-  查看操作说明: 'View controls',
-  开源与许可: 'Source and licenses',
-  'Three.js + Blender。原创代码、文档、模型、材质和渲染图 MIT，OSM 数据 ODbL。公开照片用于造型参考，未作为贴图再分发。':
-    'Built with Three.js and Blender. Original code, documentation, models, materials and renders use the MIT license; OSM data uses ODbL. Public photographs are modeling references and are not redistributed as textures.',
-  '查看源代码、模型与完整说明': 'Source code, models and documentation',
   校园位置小图: 'Campus minimap',
   北向朝上的校园建筑分布与镜头方向:
     'North-up map of campus buildings and camera direction',
@@ -233,22 +210,4 @@ export const englishMessages: Record<string, string> = {
   '广西大学-校园视图.png': 'Guangxi-University-Campus.png',
   '广西大学主校区三维地图，支持地标搜索、游览和昼夜切换。使用 Three.js 和 Blender 制作。':
     'Explore Guangxi University’s main campus in 3D. Search landmarks, take a tour and switch between day and night. Built with Three.js and Blender.',
-  'OSM 快照：{date}。获取日期不代表所有要素都在当年更新。近期资料以 2024—2026 年校方发布内容为优先，照片未注明拍摄日期时保留未知状态。':
-    'OSM snapshot: {date}. The retrieval date does not mean every feature was updated that year. Recent references prioritize official university publications from 2024–2026; undated photographs remain marked as unknown.',
-  '农院路为贯穿校园区域的公共道路，两侧校园通过立交通道连接。道路与桥梁快照：{date}；走廊约 {distance} 千米。围墙、路幅及桥梁净高含估算，展示范围不代表权属或实际通行权限。':
-    'Nongyuan Road is a public road through the campus area, with grade-separated connections between the two sides. Road and bridge snapshot: {date}; corridor length: about {distance} km. Walls, road widths and bridge clearances include estimates. The displayed area does not establish ownership or access rights.',
-  '建筑轮廓来自公开地图，{count}处建筑高度按类型估算。重点地标依据照片独立建模；未被照片覆盖的立面、树位和植物种类包含推定。地形使用 Mapzen / SRTM 历史高程，SRTM 采集于 2000 年，非近期校园测绘。':
-    'Building footprints come from public maps; heights for {count} buildings are estimated by type. Featured landmarks are modeled from photographs; unseen facades, tree locations and species include assumptions. Terrain uses historical Mapzen / SRTM elevation data collected in 2000, not a recent campus survey.',
-  '2025 年研考广西大学考点考前须知及导览图':
-    '2025 postgraduate entrance exam guide and campus map',
-  '校方校园图文：苏林去的这所大学，太宝藏了吧！':
-    'University campus photo feature',
-  广西大学校园风光: 'Guangxi University campus gallery',
-  '创意星球：2026 春季广西大学站活动报道': '2026 spring campus event report',
-  '留学生管理与服务中心：国际学院与公寓外观':
-    'International student services: college and residence exteriors',
-  '校园环卫绿化服务工作简报（2023年春季第十九周）· 崇左桥坡道':
-    'Campus maintenance bulletin: Chongzuo Bridge ramps (2023)',
-  '校方后勤维护 · 荟贤桥路段保洁':
-    'University maintenance: Huixian Bridge area',
 };
