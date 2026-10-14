@@ -2122,14 +2122,12 @@ output.empty-state {
   padding: 0;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fbfaf6f2;
+  background: #fbfaf6cc;
   color: var(--muted-foreground);
-  box-shadow: 0 4px 16px #233d330a;
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(8px);
   text-decoration: none;
 }
 .header-action[data-popup-open] {
-  background: var(--surface-hover);
   color: var(--primary);
   border-color: var(--primary);
 }
@@ -2139,23 +2137,21 @@ output.empty-state {
 }
 @media (hover: hover) {
   .header-action:hover {
-    background: var(--surface-hover);
-    color: var(--primary);
-    border-color: var(--primary);
+    color: var(--foreground);
   }
 }
 .language-menu-positioner {
   z-index: 30;
 }
 .language-menu {
-  min-width: 160px;
-  padding: 5px;
+  min-width: 150px;
+  padding: 4px;
   border: 1px solid var(--border);
-  border-radius: 14px;
+  border-radius: 10px;
   background: #fbfaf6f5;
   color: var(--foreground);
-  box-shadow: 0 8px 28px #233d331c;
-  backdrop-filter: blur(16px);
+  box-shadow: 0 4px 12px #233d3310;
+  backdrop-filter: blur(8px);
   outline: none;
 }
 .language-menu-item {
@@ -2163,9 +2159,9 @@ output.empty-state {
   align-items: center;
   justify-content: space-between;
   min-height: 44px;
-  gap: 24px;
-  padding: 0 12px;
-  border-radius: 9px;
+  gap: 12px;
+  padding: 0 10px;
+  border-radius: 6px;
   font-size: 14px;
   cursor: pointer;
   outline: none;

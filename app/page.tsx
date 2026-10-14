@@ -613,7 +613,7 @@ function CampusMap() {
               className="header-action"
               aria-label="语言 / Language"
             >
-              <Globe size={20} aria-hidden="true" />
+              <Globe size={18} aria-hidden="true" />
             </Menu.Trigger>
             <Menu.Portal>
               <Menu.Positioner
@@ -660,8 +660,8 @@ function CampusMap() {
             aria-label={t('查看 GitHub 仓库')}
           >
             <svg
-              width={20}
-              height={20}
+              width={18}
+              height={18}
               viewBox="0 0 24 24"
               fill="currentColor"
               aria-hidden="true"
