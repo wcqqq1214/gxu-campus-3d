@@ -131,14 +131,6 @@ a svg {
   margin-left: 16px;
   letter-spacing: 3px;
 }
-.masthead .repo-link {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 14px;
-  text-decoration: none;
-}
 .scene-host {
   position: absolute;
   inset: 0;
@@ -686,73 +678,6 @@ a svg {
   text-align: center;
   padding: 30px 5px;
 }
-.about-dialog {
-  display: flex;
-  flex-direction: column;
-  max-width: min(600px, calc(100vw - 40px)) !important;
-  max-height: calc(100dvh - 32px);
-  padding: 30px !important;
-  border-radius: 18px !important;
-  color: #234936;
-}
-.about-dialog [data-slot='dialog-title'] {
-  flex-shrink: 0;
-  font: 600 25px var(--font-serif);
-  margin-bottom: 0;
-}
-.about-dialog [data-slot='dialog-description'] {
-  flex-shrink: 0;
-  font-size: 14px;
-  color: #7f917a;
-}
-.about-scroll {
-  min-height: 0;
-  max-height: 65dvh;
-  overflow: auto;
-  padding-right: 8px;
-  scrollbar-width: thin;
-}
-.about-scroll p {
-  font-size: 14px;
-  line-height: 1.85;
-  color: #6d8066;
-}
-.about-scroll h3 {
-  font-size: 15px;
-  font-weight: 600;
-  margin: 25px 0 10px;
-}
-.about-stats {
-  display: flex;
-  justify-content: space-around;
-  background: #edf3e7;
-  padding: 18px 0;
-  border-radius: 12px;
-  margin: 20px 0;
-  color: #75886b;
-  font-size: 12px;
-}
-.about-stats b {
-  font-family: var(--font-body);
-  font-size: 28px;
-  font-variant-numeric: tabular-nums;
-  display: block;
-  color: var(--primary);
-  margin-bottom: 6px;
-}
-.source-links {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.source-links a,
-.source-link {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--primary);
-}
 .debug-metrics {
   position: absolute;
   right: 20px;
@@ -783,9 +708,6 @@ a svg {
 @media (max-width: 1100px) {
   .masthead {
     padding: 0 22px;
-  }
-  .masthead .about-button {
-    margin-left: auto;
   }
   .explorer {
     left: 20px;
@@ -825,12 +747,6 @@ a svg {
   .brand-mark {
     width: 44px;
     height: 44px;
-  }
-  .masthead .repo-link {
-    display: none;
-  }
-  .masthead .about-button {
-    margin-left: auto;
   }
   .explorer {
     top: auto;
@@ -982,16 +898,6 @@ a svg {
   }
   .quality-options > label {
     padding: 8px 0;
-  }
-  .about-dialog {
-    padding: 24px !important;
-    max-width: calc(100vw - 28px) !important;
-  }
-  .about-scroll p {
-    font-size: 14px;
-  }
-  .about-scroll {
-    max-height: 65dvh;
   }
 }
 @media (max-height: 560px) and (min-width: 760px) {
@@ -1476,7 +1382,6 @@ a svg {
   line-height: 1.7;
   color: #52674c;
 }
-.metadata-status,
 output.empty-state {
   display: block;
 }
@@ -1984,16 +1889,6 @@ output.empty-state {
 .tool-stack {
   overflow: visible;
 }
-.help-link {
-  display: inline-flex;
-  gap: 4px;
-  align-items: center;
-  color: var(--primary);
-  background: none;
-  border: 0;
-  padding: 8px 0;
-  text-decoration: underline;
-}
 @media (max-width: 759px) {
   .dock-expand,
   .mobile-tour-progress,
@@ -2073,9 +1968,8 @@ output.empty-state {
   }
 }
 
-/* PC chrome: the header floats as two cards so the scene runs edge to edge. */
-.masthead-brand,
-.masthead-actions {
+/* Desktop header floats above the scene, which runs edge to edge. */
+.masthead-brand {
   display: contents;
 }
 .masthead h1 {
@@ -2095,8 +1989,7 @@ output.empty-state {
     backdrop-filter: none;
     pointer-events: none;
   }
-  .masthead-brand,
-  .masthead-actions {
+  .masthead-brand {
     display: flex;
     align-items: center;
     pointer-events: auto;
@@ -2125,24 +2018,6 @@ output.empty-state {
     margin-left: 10px;
     letter-spacing: 2px;
     color: var(--muted-foreground);
-  }
-  .masthead-actions {
-    height: 44px;
-    gap: 2px;
-    padding: 0 6px 0 14px;
-  }
-  .masthead-actions .icon-button {
-    min-width: 36px;
-    min-height: 36px;
-    width: 36px;
-    height: 36px;
-  }
-  .masthead .repo-link {
-    margin: 0;
-    padding: 0 8px;
-    min-height: 36px;
-    border-radius: 9px;
-    font-size: 13px;
   }
   .panel-dock {
     top: 84px;
@@ -2220,92 +2095,103 @@ output.empty-state {
     border-color: var(--primary);
     background: var(--surface-hover);
   }
-  .masthead .repo-link:hover {
-    background: var(--surface-hover);
-  }
 }
 @media (min-width: 760px) and (prefers-reduced-transparency: reduce) {
   .masthead-brand,
-  .masthead-actions,
   .map-footer > * {
     background: #fbfaf6;
     backdrop-filter: none;
   }
 }
-@media (min-width: 760px) and (max-width: 1100px) {
+
+/* Independent header actions keep the campus visible between controls. */
+.masthead-actions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 8px;
+  margin-left: auto;
+  pointer-events: auto;
+}
+.header-action {
+  display: grid;
+  place-items: center;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fbfaf6f2;
+  color: var(--muted-foreground);
+  box-shadow: 0 4px 16px #233d330a;
+  backdrop-filter: blur(16px);
+  text-decoration: none;
+}
+.header-action[data-popup-open] {
+  background: var(--surface-hover);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.header-action:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+@media (hover: hover) {
+  .header-action:hover {
+    background: var(--surface-hover);
+    color: var(--primary);
+    border-color: var(--primary);
+  }
+}
+.header-tooltip-positioner,
+.language-menu-positioner {
+  z-index: 30;
+}
+.language-menu {
+  min-width: 160px;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fbfaf6f5;
+  color: var(--foreground);
+  box-shadow: 0 8px 28px #233d331c;
+  backdrop-filter: blur(16px);
+  outline: none;
+}
+.language-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  gap: 24px;
+  padding: 0 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+.language-menu-item[data-checked] {
+  color: var(--primary);
+  font-weight: 600;
+}
+.language-menu-item[data-highlighted] {
+  background: var(--surface-hover);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .header-action,
+  .language-menu {
+    background: #fbfaf6;
+    backdrop-filter: none;
+  }
+}
+@media (max-width: 759px) {
   .masthead-actions {
-    padding-left: 6px;
+    gap: 6px;
   }
 }
 
 /* Bilingual copy: full place names remain readable, including narrow screens. */
-.language-switch {
-  display: inline-flex;
-  align-items: center;
-  position: relative;
-  flex: 0 0 auto;
-  width: 96px;
-  height: 44px;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  isolation: isolate;
-}
-.language-switch::after,
-.language-switch::before {
-  content: '';
-  position: absolute;
-  border-radius: 999px;
-  pointer-events: none;
-}
-.language-switch::after {
-  inset: 6px 0;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  z-index: -2;
-}
-.language-switch::before {
-  inset: 8px auto 8px 2px;
-  width: 44px;
-  background: var(--primary);
-  transition: transform 180ms ease;
-  z-index: -1;
-}
-.language-switch[data-locale='zh']::before {
-  transform: translateX(48px);
-}
-.language-switch span {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 44px;
-  padding: 0;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--muted-foreground);
-  font-size: 12px;
-  font-weight: 600;
-}
-.language-switch:hover span {
-  color: var(--primary);
-}
-.language-switch[data-locale='en'] span[lang='en'],
-.language-switch[data-locale='zh'] span[lang='zh-CN'] {
-  color: white;
-}
-.language-switch:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: -1px;
-}
-@media (prefers-reduced-motion: reduce) {
-  .language-switch::before {
-    transition: none;
-  }
-}
 .place-copy strong,
 .panel-dock .detail-heading h2,
 .minimap-toggle span,
@@ -2360,10 +2246,6 @@ output.empty-state {
 :lang(en) .scene-status {
   max-width: min(520px, calc(100vw - 32px));
 }
-:lang(en) .about-stats span {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
 @media (max-width: 759px) {
   .masthead {
     gap: 6px;
@@ -2384,10 +2266,6 @@ output.empty-state {
     margin: 3px 0 0;
     font-size: 11px;
     letter-spacing: 0;
-  }
-  .masthead .about-button {
-    margin-left: 0;
-    flex: 0 0 44px;
   }
   :lang(en) .masthead h1 {
     font-size: 15px;

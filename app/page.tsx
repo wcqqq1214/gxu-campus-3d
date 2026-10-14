@@ -13,6 +13,7 @@ import {
 } from '@/components/campus-locale';
 import { statusText, type Message } from '@/lib/campus/i18n';
 import { landmarkDescription } from '@/lib/campus/i18n/descriptions';
+import { Menu } from '@base-ui/react/menu';
 import { Tooltip } from '@base-ui/react/tooltip';
 import Image from 'next/image';
 import {
@@ -25,13 +26,13 @@ import {
   Download,
   Expand,
   Grid2X2,
+  Globe,
   House,
   Orbit,
   Scan,
   Dumbbell,
   RectangleEllipsis,
   ScanEye,
-  Info,
   Ellipsis,
   CircleHelp,
   Layers3,
@@ -83,9 +84,7 @@ import {
   cameraBearing,
   type CameraSnapshot,
 } from '@/lib/campus/share';
-import sourceData from '@/public/data/sources.json';
 import { fetchJson } from '@/lib/campus/streaming';
-import { sourceIndex } from '@/lib/campus/sources';
 import { CampusMinimap } from '@/components/campus-minimap';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const TOUR_STOP_MS = 8500;
@@ -110,7 +109,6 @@ const QUALITY_NAMES: Record<Quality, string> = {
   fine: '精细',
   smooth: '流畅',
 };
-const refs = sourceIndex(sourceData.sources);
 export default function Home() {
   return (
     <CampusLocaleProvider>
@@ -147,7 +145,6 @@ function CampusMap() {
     [tourStarted, setTourStarted] = useState(false),
     [tourIndex, setTourIndex] = useState(0),
     [collapsed, setCollapsed] = useState(false),
-    [about, setAbout] = useState(false),
     [toast, setToast] = useState(''),
     [retrySeed, setRetrySeed] = useState(0),
     [metrics, setMetrics] = useState<Metrics | null>(null);
@@ -610,47 +607,82 @@ function CampusMap() {
             <span>{t('校园地图')}</span>
           </h1>
         </div>
-        <div className="masthead-actions">
-          <button
-            className="icon-button about-button"
-            onClick={() => {
-              pauseMotion();
-              setAbout(true);
-            }}
-            title={t('项目说明')}
-            aria-label={t('项目说明')}
-          >
-            <Info size={19} />
-          </button>
-          <a
-            className="repo-link"
-            href="https://github.com/wcqqq1214/gxu-campus-3d"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <svg
-              width={16}
-              height={16}
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path d="M12 .297C5.37.297 0 5.67 0 12.297c0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.043-1.61-4.043-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.93 0-1.31.467-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.404c1.02.005 2.045.138 3 .404 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
-            </svg>
-            GitHub <ArrowUpRight size={15} />
-          </a>
-          <button
-            type="button"
-            className="language-switch"
-            data-locale={locale}
-            aria-label={locale === 'zh' ? 'Switch to English' : '切换为中文'}
-            onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
-          >
-            <span lang="en">EN</span>
-            <span lang="zh-CN">中文</span>
-          </button>
-        </div>
+        <Tooltip.Provider delay={200}>
+          <div className="masthead-actions">
+            <Menu.Root>
+              <HeaderActionTooltip
+                label="语言 / Language"
+                render={
+                  <Menu.Trigger
+                    className="header-action"
+                    aria-label="语言 / Language"
+                  >
+                    <Globe size={20} aria-hidden="true" />
+                  </Menu.Trigger>
+                }
+              />
+              <Menu.Portal>
+                <Menu.Positioner
+                  className="language-menu-positioner"
+                  side="bottom"
+                  align="end"
+                  sideOffset={8}
+                >
+                  <Menu.Popup
+                    className="language-menu"
+                    aria-label="语言 / Language"
+                  >
+                    <Menu.RadioGroup value={locale} onValueChange={setLocale}>
+                      <Menu.RadioItem
+                        className="language-menu-item"
+                        value="zh"
+                        closeOnClick
+                      >
+                        <span lang="zh-CN">中文</span>
+                        <Menu.RadioItemIndicator>
+                          <Check size={16} aria-hidden="true" />
+                        </Menu.RadioItemIndicator>
+                      </Menu.RadioItem>
+                      <Menu.RadioItem
+                        className="language-menu-item"
+                        value="en"
+                        closeOnClick
+                      >
+                        <span lang="en">English</span>
+                        <Menu.RadioItemIndicator>
+                          <Check size={16} aria-hidden="true" />
+                        </Menu.RadioItemIndicator>
+                      </Menu.RadioItem>
+                    </Menu.RadioGroup>
+                  </Menu.Popup>
+                </Menu.Positioner>
+              </Menu.Portal>
+            </Menu.Root>
+            <HeaderActionTooltip
+              label={t('查看 GitHub 仓库')}
+              render={
+                <a
+                  className="header-action"
+                  href="https://github.com/wcqqq1214/gxu-campus-3d"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={t('查看 GitHub 仓库')}
+                >
+                  <svg
+                    width={20}
+                    height={20}
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    aria-hidden="true"
+                    focusable="false"
+                  >
+                    <path d="M12 .297C5.37.297 0 5.67 0 12.297c0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.043-1.61-4.043-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.838 1.237 1.838 1.237 1.07 1.835 2.809 1.305 3.495.998.108-.776.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.93 0-1.31.467-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23a11.5 11.5 0 0 1 3-.404c1.02.005 2.045.138 3 .404 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" />
+                  </svg>
+                </a>
+              }
+            />
+          </div>
+        </Tooltip.Provider>
       </header>
       <aside
         ref={dock}
@@ -1027,15 +1059,6 @@ function CampusMap() {
                 ) : (
                   t('地图数据加载中…')
                 )}
-                <button
-                  onClick={() => {
-                    pauseMotion();
-                    setAbout(true);
-                  }}
-                  title={t('查看数据来源')}
-                >
-                  <Info size={14} />
-                </button>
               </div>
               {current && (
                 <button
@@ -1456,117 +1479,6 @@ function CampusMap() {
           <p>{t('复制上方链接即可分享。')}</p>
         </DialogContent>
       </Dialog>
-      <Dialog open={about} onOpenChange={setAbout}>
-        <DialogContent className="about-dialog">
-          <DialogTitle>{t('关于「广西大学 校园地图」')}</DialogTitle>
-          <DialogDescription>
-            {t('广西大学主校区的三维建筑与地理环境复现。')}
-          </DialogDescription>
-          <div className="about-scroll">
-            <p>
-              {t(
-                '以大学东路主校区为中心，涵盖东、西、北校园。校外建筑仅保留紧邻校界的部分，周边道路用于交代位置。',
-              )}
-            </p>
-            {overviewError && (
-              <output className="metadata-status">
-                {t('统计资料暂不可用，仍可游览校园。')}
-                <button onClick={() => setOverviewRetry((n) => n + 1)}>
-                  {t('重试统计资料')}
-                </button>
-              </output>
-            )}
-            <div className="about-stats">
-              <span>
-                <b>{overview?.campusBuildings ?? '—'}</b>
-                {t('校内建筑')}
-              </span>
-              <span>
-                <b>{landmarks.length || '—'}</b>
-                {t('精选地点')}
-              </span>
-              <span>
-                <b>{overview?.trees ?? '—'}</b>
-                {t('示意树木')}
-              </span>
-            </div>
-            <h3>{t('地图与建模依据')}</h3>
-            <p>
-              {t(
-                'OSM 快照：{date}。获取日期不代表所有要素都在当年更新。近期资料以 2024—2026 年校方发布内容为优先，照片未注明拍摄日期时保留未知状态。',
-                { date: overview?.snapshotAt.slice(0, 10) ?? t('暂不可用') },
-              )}
-            </p>
-            <p>
-              {t(
-                '农院路为贯穿校园区域的公共道路，两侧校园通过立交通道连接。道路与桥梁快照：{date}；走廊约 {distance} 千米。围墙、路幅及桥梁净高含估算，展示范围不代表权属或实际通行权限。',
-                {
-                  date:
-                    overview?.infrastructureSnapshotAt?.slice(0, 10) ??
-                    t('暂不可用'),
-                  distance:
-                    overview?.publicRoadMeters == null
-                      ? '—'
-                      : (overview.publicRoadMeters / 1000).toFixed(2),
-                },
-              )}
-            </p>
-            <p>
-              {t(
-                '建筑轮廓来自公开地图，{count}处建筑高度按类型估算。重点地标依据照片独立建模；未被照片覆盖的立面、树位和植物种类包含推定。地形使用 Mapzen / SRTM 历史高程，SRTM 采集于 2000 年，非近期校园测绘。',
-                { count: overview?.estimatedHeights ?? t('部分') },
-              )}
-            </p>
-            <div className="source-links">
-              {Object.entries(refs)
-                .filter(([k]) =>
-                  [
-                    'gate2026',
-                    'campus2026',
-                    'campus2024',
-                    'campusGallery',
-                    'apartmentOfficial',
-                    'chongzuo2023',
-                    'huixian2025',
-                  ].includes(k),
-                )
-                .map(([k, r]) => (
-                  <a href={r.url} key={k} target="_blank" rel="noreferrer">
-                    {t(r.name)}
-                    <ArrowUpRight size={14} />
-                  </a>
-                ))}
-            </div>
-            <h3>{t('如何操作')}</h3>
-            <p>{t('选择地点或开始游览，拖动画面探索校园。')}</p>
-            <button
-              className="help-link"
-              onClick={() => {
-                setAbout(false);
-                setHelpOpen(true);
-              }}
-            >
-              {t('查看操作说明')}
-              <ArrowUpRight size={14} />
-            </button>
-            <h3>{t('开源与许可')}</h3>
-            <p>
-              {t(
-                'Three.js + Blender。原创代码、文档、模型、材质和渲染图 MIT，OSM 数据 ODbL。公开照片用于造型参考，未作为贴图再分发。',
-              )}
-            </p>
-            <a
-              className="source-link"
-              href="https://github.com/wcqqq1214/gxu-campus-3d"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {t('查看源代码、模型与完整说明')}
-              <ArrowUpRight size={14} />
-            </a>
-          </div>
-        </DialogContent>
-      </Dialog>
     </main>
   );
 }
@@ -1633,6 +1545,30 @@ function PlaceGroups({
         </section>
       ))}{' '}
     </>
+  );
+}
+
+function HeaderActionTooltip({
+  label,
+  render,
+}: {
+  label: string;
+  render: ComponentProps<typeof Tooltip.Trigger>['render'];
+}) {
+  return (
+    <Tooltip.Root>
+      <Tooltip.Trigger render={render} />
+      <Tooltip.Portal>
+        <Tooltip.Positioner
+          className="header-tooltip-positioner"
+          side="bottom"
+          align="end"
+          sideOffset={8}
+        >
+          <Tooltip.Popup className="map-tool-tooltip">{label}</Tooltip.Popup>
+        </Tooltip.Positioner>
+      </Tooltip.Portal>
+    </Tooltip.Root>
   );
 }
 
