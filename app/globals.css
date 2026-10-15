@@ -2280,28 +2280,6 @@ output.empty-state {
     bottom: calc(var(--dock-height, 48dvh) + 44px);
   }
 }
-/* Name of the building under the mouse; the scene positions it next to the cursor. */
-.building-tip {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 2;
-  max-width: 260px;
-  padding: 5px 9px;
-  border-radius: var(--radius-sm);
-  background: var(--foreground);
-  color: var(--background);
-  font-size: 12px;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
-  box-shadow: var(--shadow-2);
-}
-.building-tip[hidden] {
-  display: none;
-}
 /* Named buildings in search results and their detail card. */
 .place-copy small {
   display: block;

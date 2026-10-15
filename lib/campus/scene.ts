@@ -439,19 +439,9 @@ export function createScene(
   const namedBuildings = new Map(
     searchableBuildings(buildings, landmarks).map((b) => [b.id, b]),
   );
-  // Named buildings are pickable too; their proxies are built once, on first use.
-  let buildingProxies: THREE.Mesh[] | null = null;
+  // Only curated places participate in map hover and click selection.
   function pickTargets() {
-    if (!buildingProxies) {
-      buildingProxies = [...namedBuildings.values()].map((b) => {
-        const mesh = footprintMesh(b);
-        mesh.userData = { id: b.id, layer: 'buildings', building: true };
-        return mesh;
-      });
-    }
-    return [...proxies, ...buildingProxies].filter(
-      (p) => layers[p.userData.layer as LayerKey],
-    );
+    return proxies.filter((p) => layers[p.userData.layer as LayerKey]);
   }
   function pick(clientX: number, clientY: number) {
     const rect = canvas.getBoundingClientRect();
@@ -461,33 +451,20 @@ export function createScene(
     );
     raycaster.setFromCamera(pointer, camera);
     return raycaster.intersectObjects(pickTargets(), false)[0]?.object
-      .userData as { id: string; building?: boolean } | undefined;
+      .userData as { id: string } | undefined;
   }
-  const buildingTip = document.createElement('div');
-  buildingTip.className = 'building-tip';
-  buildingTip.hidden = true;
-  labels.appendChild(buildingTip);
   let hoverFrame = 0;
   let hoverPoint: { x: number; y: number } | null = null;
-  function hideBuildingTip() {
-    buildingTip.hidden = true;
+  function clearPointerHover() {
     canvas.style.cursor = '';
+    setHovered(null);
   }
   function updatePointerHover() {
     hoverFrame = 0;
     if (!hoverPoint || tween || downPointers > 0) return;
     const hit = pick(hoverPoint.x, hoverPoint.y);
-    const building = hit?.building ? namedBuildings.get(hit.id) : undefined;
-    setHovered(hit && !hit.building ? hit.id : null);
+    setHovered(hit?.id ?? null);
     canvas.style.cursor = hit ? 'pointer' : '';
-    if (!building || building.id === selected) {
-      buildingTip.hidden = true;
-      return;
-    }
-    const rect = host.getBoundingClientRect();
-    buildingTip.textContent = placeName(building.name, locale);
-    buildingTip.style.transform = `translate(${hoverPoint.x - rect.left + 14}px, ${hoverPoint.y - rect.top + 16}px)`;
-    buildingTip.hidden = false;
   }
   const highlight = new THREE.Group();
   scene.add(highlight);
@@ -507,7 +484,7 @@ export function createScene(
       Math.hypot(e.clientX - down.x, e.clientY - down.y),
     );
     if (e.pointerType !== 'mouse' || e.buttons) {
-      hideBuildingTip();
+      clearPointerHover();
       return;
     }
     hoverPoint = { x: e.clientX, y: e.clientY };
@@ -515,8 +492,7 @@ export function createScene(
   }
   function onLeave() {
     hoverPoint = null;
-    hideBuildingTip();
-    setHovered(null);
+    clearPointerHover();
   }
   function onUp(e: PointerEvent) {
     if (e.button !== 0) {
@@ -533,7 +509,7 @@ export function createScene(
     )
       return;
     const hit = pick(e.clientX, e.clientY);
-    hideBuildingTip();
+    clearPointerHover();
     if (hit) focus(hit.id);
   }
   function onCancel() {
@@ -615,8 +591,7 @@ export function createScene(
     origin: import('./types').SelectionOrigin = 'manual',
   ) {
     const b = namedBuildings.get(id)!;
-    setHovered(null);
-    hideBuildingTip();
+    clearPointerHover();
     selected = id;
     restoredPose = null;
     selectedView = 'oblique';
@@ -1982,10 +1957,6 @@ export function createScene(
       canvas.removeEventListener('pointercancel', onCancel);
       canvas.removeEventListener('pointerleave', onLeave);
       cancelAnimationFrame(hoverFrame);
-      for (const proxy of buildingProxies ?? []) {
-        proxy.geometry.dispose();
-        (proxy.material as THREE.Material).dispose();
-      }
       canvas.removeEventListener('keydown', onKey);
       canvas.removeEventListener('webglcontextlost', onLost);
       canvas.removeEventListener('webglcontextrestored', onRestored);

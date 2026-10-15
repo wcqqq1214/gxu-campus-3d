@@ -137,7 +137,7 @@ const EXCLUDED_BUILDINGS = new Set([
   'north-campus/lab-east',
 ]);
 
-/** Named campus buildings outside the curated catalogue: searchable, hoverable, not toured. */
+/** Named campus buildings outside the curated catalogue: search-only destinations, not toured. */
 export function searchableBuildings(
   buildings: Building[],
   landmarks: Landmark[],
