@@ -24,7 +24,7 @@
 
 ## Features
 
-- Find 20 featured places and about 300 named campus buildings, explore buildings from different angles, and take a guided campus tour.
+- Find 20 featured places and about 290 named campus buildings, explore buildings from different angles, and take a guided campus tour.
 - Switch between morning, day, dusk, and night; toggle map layers and adjust rendering quality.
 - Share a link to your current view or export a PNG with OpenStreetMap attribution.
 - Use desktop or mobile controls, keyboard navigation, and system reduced-motion preferences.

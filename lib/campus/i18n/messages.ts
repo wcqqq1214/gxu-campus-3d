@@ -211,6 +211,17 @@ export const englishMessages: Record<string, string> = {
   '广西大学主校区三维地图，支持地标搜索、游览和昼夜切换。使用 Three.js 和 Blender 制作。':
     'Explore Guangxi University’s main campus in 3D. Search landmarks, take a tour and switch between day and night. Built with Three.js and Blender.',
   搜索地点或建筑: 'Search places or buildings',
+  东: 'east',
+  东北: 'northeast',
+  北: 'north',
+  西北: 'northwest',
+  西: 'west',
+  西南: 'southwest',
+  南: 'south',
+  东南: 'southeast',
+  '{name}附近': 'Near {name}',
+  '{name}{direction}侧约 {distance} 米':
+    'About {distance} m {direction} of {name}',
   '没有找到相关地点或建筑。试试“图书馆”或“宿舍”。':
     'No matching places or buildings. Try “Library” or “Residence”.',
   精选地点: 'Featured places',

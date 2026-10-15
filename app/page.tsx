@@ -78,6 +78,7 @@ import type {
 import { DEFAULT_LAYERS, CATEGORY_NAMES } from '@/lib/campus/types';
 import { nextTourIndex } from '@/lib/campus/math';
 import {
+  buildingLocationLabel,
   searchBuildings,
   searchableBuildings,
   searchLandmarks,
@@ -108,11 +109,6 @@ const PRESETS: [Preset, string, string, typeof Sun][] = [
   ['evening', '黄昏', '余晖入窗', Sunset],
   ['night', '夜景', '灯火渐明', Moon],
 ];
-const ZONE_NAMES: Record<string, string> = {
-  east: '东校园',
-  west: '西校园',
-  north: '北校园',
-};
 const BUILDING_RESULT_LIMIT = 40;
 const QUALITY_NAMES: Record<Quality, string> = {
   auto: '自动',
@@ -772,12 +768,7 @@ function CampusMap() {
               <div className="detail-heading">
                 <div>
                   <div className="eyebrow">
-                    {currentLandmark
-                      ? t(CATEGORY_NAMES[current.category])
-                      : t('{zone} · {category}', {
-                          zone: t(ZONE_NAMES[currentBuilding!.zone] ?? '建筑'),
-                          category: t(CATEGORY_NAMES[current.category]),
-                        })}
+                    {t(CATEGORY_NAMES[current.category])}
                   </div>
                   <h2>{name(current.name)}</h2>
                 </div>
@@ -786,6 +777,9 @@ function CampusMap() {
                 <p>{landmarkDescription(currentLandmark, locale)}</p>
               ) : (
                 <>
+                  <p className="building-location">
+                    {buildingLocationLabel(currentBuilding!, landmarks, locale)}
+                  </p>
                   <p className="building-facts">
                     {currentBuilding!.levels >= 1
                       ? t('约 {levels} 层 · 高约 {height} 米', {
@@ -999,6 +993,7 @@ function CampusMap() {
                         />
                         <BuildingResults
                           buildings={buildingMatches}
+                          landmarks={landmarks}
                           selected={selected}
                           ready={ready}
                           titled={places.length > 0}
@@ -1637,18 +1632,20 @@ function PlaceGroups({
 
 function BuildingResults({
   buildings,
+  landmarks,
   selected,
   ready,
   titled,
   onChoose,
 }: {
   buildings: Building[];
+  landmarks: Landmark[];
   selected: string | null;
   ready: boolean;
   titled: boolean;
   onChoose: (id: string) => void;
 }) {
-  const { t, name } = useCampusLocale();
+  const { t, name, locale } = useCampusLocale();
   if (!buildings.length) return null;
   const shown = buildings.slice(0, BUILDING_RESULT_LIMIT);
   return (
@@ -1674,10 +1671,9 @@ function BuildingResults({
           <span className="place-copy">
             <strong>{name(b.name)}</strong>
             <small>
-              {t('{zone} · {category}', {
-                zone: t(ZONE_NAMES[b.zone] ?? '建筑'),
-                category: t(CATEGORY_NAMES[b.category]),
-              })}
+              {t(CATEGORY_NAMES[b.category])}
+              {' · '}
+              {buildingLocationLabel(b, landmarks, locale)}
             </small>
           </span>
           <ChevronRight size={16} aria-hidden="true" />

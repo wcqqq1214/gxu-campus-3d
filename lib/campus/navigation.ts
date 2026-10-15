@@ -1,10 +1,11 @@
-import { placeName } from './i18n/index.ts';
+import { placeName, translate, type Locale } from './i18n/index.ts';
 import type { Building, Category, Landmark } from './types';
 
 export const LANDMARK_ALIASES: Record<string, string[]> = {
   'time-gate': ['时空之门', '时光广场', '图书馆北广场'],
   'south-gate': ['南门', '大学东路校门'],
   library: ['校图书馆', '西大图书馆'],
+  huixue: ['君武文化艺术教育中心'],
   huicui: ['荟萃楼酒店', '西大荟萃楼', '新闻传播学院', '新闻与传播学院'],
   'teaching-ten': ['十教', '10教', '教学十楼', '多媒体教学楼'],
   'teaching-six': ['六教', '6教'],
@@ -20,7 +21,7 @@ export const LANDMARK_ALIASES: Record<string, string[]> = {
   'huixian-bridge': ['荟贤', '汇贤桥', '农院路'],
 };
 
-/** All navigation surfaces share the curated catalogue, never the footprint index. */
+/** Search the curated catalogue, including its confirmed bilingual aliases. */
 export function searchLandmarks(
   landmarks: Landmark[],
   query: string,
@@ -121,6 +122,21 @@ export const ENGLISH_ALIASES: Record<string, string[]> = {
 /** OSM objects without a usable name keep a numeric placeholder; they are not searchable. */
 const PLACEHOLDER_NAME = /^校内建筑 \d+$/;
 
+// Navigation eligibility is entity-specific; do not rename or merge source footprints.
+const EXCLUDED_BUILDINGS = new Set([
+  // Conflicts with the confirmed huixue landmark, about 311 m away. Identity pending.
+  'way/759337787',
+  // data/i18n-name-sources.json marks these as internal modeling descriptions (技),
+  // not named destinations. Retain their geometry until real building names are verified.
+  'north-campus/office',
+  'north-campus/link-west',
+  'north-campus/teaching-ne',
+  'north-campus/teaching-south-middle',
+  'north-campus/teaching-se',
+  'north-campus/link-middle',
+  'north-campus/lab-east',
+]);
+
 /** Named campus buildings outside the curated catalogue: searchable, hoverable, not toured. */
 export function searchableBuildings(
   buildings: Building[],
@@ -130,17 +146,55 @@ export function searchableBuildings(
   return buildings.filter(
     (building) =>
       building.insideCampus &&
+      !EXCLUDED_BUILDINGS.has(building.id) &&
       building.name.trim() !== '' &&
       !PLACEHOLDER_NAME.test(building.name) &&
       !(building.landmark && curated.has(building.landmark)),
   );
 }
 
-const ZONE_ORDER: Record<string, number> = { east: 0, west: 1, north: 2 };
 const collators = {
   zh: new Intl.Collator('zh-CN', { numeric: true }),
   en: new Intl.Collator('en', { numeric: true }),
 };
+
+const DIRECTIONS = ['东', '东北', '北', '西北', '西', '西南', '南', '东南'];
+
+/** Approximate map position, not a claim about campus membership or walking distance. */
+export function buildingLocationLabel(
+  building: Building,
+  landmarks: Landmark[],
+  locale: Locale = 'zh',
+): string {
+  let nearest: Landmark | undefined;
+  let distance = Infinity;
+  for (const landmark of landmarks) {
+    const candidate = Math.hypot(
+      building.center[0] - landmark.center[0],
+      building.center[1] - landmark.center[1],
+    );
+    if (
+      candidate < distance ||
+      (candidate === distance && nearest && landmark.id < nearest.id)
+    ) {
+      nearest = landmark;
+      distance = candidate;
+    }
+  }
+  if (!nearest) return '';
+  const name = placeName(nearest.name, locale);
+  if (distance < 10) return translate(locale, '{name}附近', { name });
+  const angle = Math.atan2(
+    building.center[1] - nearest.center[1],
+    building.center[0] - nearest.center[0],
+  );
+  const direction = DIRECTIONS[(Math.round(angle / (Math.PI / 4)) + 8) % 8];
+  return translate(locale, '{name}{direction}侧约 {distance} 米', {
+    name,
+    direction: translate(locale, direction),
+    distance: Math.round(distance / 10) * 10,
+  });
+}
 
 /** Exact names first, then prefixes, then any substring in either language; ties sort by displayed name. */
 export function searchBuildings(
@@ -167,12 +221,11 @@ export function searchBuildings(
     .sort(
       (a, b) =>
         a.rank - b.rank ||
-        (ZONE_ORDER[a.building.zone] ?? 3) -
-          (ZONE_ORDER[b.building.zone] ?? 3) ||
         collators[locale].compare(
           placeName(a.building.name, locale),
           placeName(b.building.name, locale),
-        ),
+        ) ||
+        a.building.id.localeCompare(b.building.id),
     )
     .map(({ building }) => building);
 }
