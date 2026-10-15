@@ -587,7 +587,7 @@ a svg {
   z-index: 3;
   color: var(--ink-2);
   pointer-events: none;
-  text-shadow: 0 1px 6px var(--text-halo);
+  text-shadow: none;
 }
 .map-footer a {
   pointer-events: auto;
@@ -1340,8 +1340,8 @@ a svg {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #ffffff;
-  text-shadow: 0 1px 3px #263c2c;
+  color: var(--foreground);
+  text-shadow: none;
   font-size: 11px;
   white-space: nowrap;
 }
@@ -1441,7 +1441,7 @@ output.empty-state {
     flex-wrap: wrap;
   }
   .keyboard-open .panel-dock.expanded {
-    max-height: calc(var(--app-height, 100dvh) - 82px);
+    max-height: calc(var(--app-height, 100dvh) - 118px);
   }
   .keyboard-open .panel-dock .explorer {
     padding-top: 0;
@@ -1895,7 +1895,6 @@ output.empty-state {
 }
 @media (max-width: 759px) {
   .keyboard-open .map-tools,
-  .keyboard-open .map-footer,
   .keyboard-open .panel-tabs,
   .keyboard-open .tour-bar,
   .keyboard-open .return-landmark,
@@ -2005,27 +2004,6 @@ output.empty-state {
 
   /* All landmark views stay visible; nothing is clipped at the panel edge. */
 
-  /* Footer items sit on small cards so they read over any lighting preset. */
-  .map-footer {
-    bottom: 14px;
-    align-items: center;
-    color: var(--foreground);
-    text-shadow: none;
-  }
-  .map-footer > * {
-    display: inline-flex;
-    align-items: center;
-    min-height: 26px;
-    padding: 3px 10px;
-    border-radius: var(--radius-pill);
-    background: var(--panel-soft);
-    box-shadow: var(--shadow-1);
-    backdrop-filter: blur(10px);
-    pointer-events: auto;
-  }
-  .map-footer .gesture-help {
-    padding: 3px 10px;
-  }
   .boundary-legend {
     color: var(--foreground);
     text-shadow: none;
@@ -2045,7 +2023,7 @@ output.empty-state {
     background: var(--surface-hover);
   }
 }
-@media (min-width: 760px) and (prefers-reduced-transparency: reduce) {
+@media (prefers-reduced-transparency: reduce) {
   .masthead-brand,
   .map-footer > * {
     background: var(--background);
@@ -2471,5 +2449,45 @@ output.empty-state {
   .detail-mode .tour-idle .tour-count {
     color: var(--muted-foreground);
     font-weight: 400;
+  }
+}
+
+/* Compact, legible attribution above the observed dock edge in every theme. */
+.map-footer {
+  bottom: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: var(--foreground);
+  font-size: 11px;
+}
+.map-footer > * {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--background) 72%, transparent);
+  backdrop-filter: blur(8px);
+  font-size: 11px;
+  text-shadow: none;
+  pointer-events: auto;
+}
+@media (max-width: 759px) {
+  .map-footer {
+    bottom: calc(var(--dock-height, 48dvh) + 9px);
+    justify-content: flex-start;
+  }
+  .keyboard-open .map-footer {
+    right: 12px;
+  }
+  .keyboard-open .map-footer > :not(a) {
+    display: none;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .map-footer > * {
+    background: var(--background);
+    backdrop-filter: none;
   }
 }
