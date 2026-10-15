@@ -28,7 +28,6 @@ import {
   Grid2X2,
   Globe,
   House,
-  Orbit,
   Scan,
   Dumbbell,
   RectangleEllipsis,
@@ -91,6 +90,7 @@ import {
 } from '@/lib/campus/share';
 import { fetchJson } from '@/lib/campus/streaming';
 import { CampusMinimap } from '@/components/campus-minimap';
+import { CampusViewControls } from '@/components/campus-view-controls';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const TOUR_STOP_MS = 8500;
 const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
@@ -793,108 +793,19 @@ function CampusMap() {
                   <p className="building-note">
                     {t('外观按 OpenStreetMap 轮廓与层数估算，未经实地测绘。')}
                   </p>
-                  <fieldset
-                    className="landmark-views"
-                    aria-label={t('地点观察视角')}
-                  >
-                    <button
-                      aria-pressed={landmarkView === 'oblique'}
-                      onClick={() => changeLandmarkView('oblique')}
-                    >
-                      {t('全貌')}
-                    </button>
-                    <button
-                      aria-pressed={landmarkView === 'top'}
-                      onClick={() => changeLandmarkView('top')}
-                    >
-                      {t('俯视')}
-                    </button>
-                  </fieldset>
                 </>
               )}
-              {currentLandmark && (
-                <div key={current.id}>
-                  <fieldset
-                    className="landmark-views"
-                    aria-label={t('地点观察视角')}
-                  >
-                    <button
-                      aria-pressed={!orbit && landmarkView === 'oblique'}
-                      onClick={() => changeLandmarkView('oblique')}
-                    >
-                      {t('全貌')}
-                    </button>
-                    <button
-                      aria-pressed={!orbit && landmarkView === 'top'}
-                      onClick={() => changeLandmarkView('top')}
-                    >
-                      {t('俯视')}
-                    </button>
-                    <button
-                      aria-pressed={orbit}
-                      disabled={reducedMotion}
-                      title={
-                        reducedMotion
-                          ? t('系统已启用减少动态效果')
-                          : t('环绕当前地点，拖动画面可暂停')
-                      }
-                      onClick={() => {
-                        setTour(false);
-                        controller.current?.setOrbit(!orbit);
-                      }}
-                    >
-                      {orbit ? <Pause size={14} /> : <Orbit size={14} />}
-                      {orbit ? t('暂停环绕') : t('环绕')}
-                    </button>
-
-                    {(
-                      [
-                        [
-                          'front',
-                          ['library', 'teaching-six'].includes(
-                            currentLandmark.id,
-                          )
-                            ? t('南侧')
-                            : t('正面'),
-                        ],
-                        [
-                          'back',
-                          ['library', 'teaching-six'].includes(
-                            currentLandmark.id,
-                          )
-                            ? t('北侧')
-                            : t('背面'),
-                        ],
-                        [
-                          'entrance',
-                          ['library', 'teaching-six'].includes(
-                            currentLandmark.id,
-                          )
-                            ? t('南门近景')
-                            : currentLandmark.placeKind === 'bridge'
-                              ? t('桥下近景')
-                              : currentLandmark.placeKind === 'sculpture'
-                                ? t('雕塑近景')
-                                : t('入口近景'),
-                        ],
-                        ...(['library', 'teaching-six'].includes(
-                          currentLandmark.id,
-                        )
-                          ? [['rear-entrance', t('北门近景')]]
-                          : []),
-                      ] as [LandmarkView, string][]
-                    ).map(([value, label]) => (
-                      <button
-                        key={value}
-                        aria-pressed={!orbit && landmarkView === value}
-                        onClick={() => changeLandmarkView(value)}
-                      >
-                        {t(label)}
-                      </button>
-                    ))}
-                  </fieldset>
-                </div>
-              )}
+              <CampusViewControls
+                landmark={currentLandmark}
+                view={landmarkView}
+                orbit={orbit}
+                reducedMotion={reducedMotion}
+                onViewChange={changeLandmarkView}
+                onOrbitChange={() => {
+                  setTour(false);
+                  controller.current?.setOrbit(!orbit);
+                }}
+              />
               <div className="detail-actions">
                 <button onClick={openShare}>
                   <Share2 size={14} />

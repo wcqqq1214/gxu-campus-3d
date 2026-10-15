@@ -1094,35 +1094,6 @@ a svg {
   color: var(--primary-ink);
   font-size: 14px;
 }
-.landmark-views {
-  border: 0;
-  padding: 0;
-  min-width: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
-  margin: 16px 0;
-}
-.landmark-views button {
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  font-size: 14px;
-  color: var(--ink-2);
-  background: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-}
-.landmark-views button[aria-pressed='true'] {
-  background: var(--primary);
-  color: #fff;
-  border-color: var(--primary-ink);
-}
-.landmark-views button:last-child {
-  grid-column: auto;
-}
 .panel-dock .detail-heading h2 {
   font-size: 24px;
 }
@@ -1206,14 +1177,6 @@ a svg {
   .panel-dock .place-detail > p {
     margin-top: 0;
     font-size: 14px;
-  }
-  .panel-dock .landmark-views {
-    grid-template-columns: repeat(4, 1fr);
-    margin: 10px 0;
-    gap: 6px;
-  }
-  .panel-dock .landmark-views button {
-    font-size: 13px;
   }
   .panel-dock .panel-foot {
     display: none;
@@ -1725,10 +1688,6 @@ output.empty-state {
   background: transparent;
   border-radius: var(--radius-sm);
 }
-.panel-dock .landmark-views button[aria-pressed='true'] {
-  background: var(--primary);
-  color: white;
-}
 @media (hover: hover) {
   .place-row:hover {
     background: var(--surface-hover);
@@ -1845,25 +1804,6 @@ output.empty-state {
   background: transparent;
   border-bottom-color: var(--phoenix);
 }
-.panel-dock .landmark-views {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 14px 0 8px;
-  display: flex;
-  flex-wrap: nowrap;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 3px 2px 8px;
-  scroll-padding: 2px;
-  scrollbar-width: thin;
-}
-.panel-dock .landmark-views button {
-  background: var(--muted);
-  border-color: transparent;
-  flex: 0 0 auto;
-  min-height: 44px;
-  padding: 8px 12px;
-  white-space: nowrap;
-}
 .tour-timer {
   position: absolute;
   top: 0;
@@ -1953,9 +1893,6 @@ output.empty-state {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
-  }
-  .panel-dock .landmark-views {
-    display: flex;
   }
   .map-tool-tooltip-positioner {
     display: none;
@@ -2088,15 +2025,6 @@ output.empty-state {
   }
 
   /* All landmark views stay visible; nothing is clipped at the panel edge. */
-  .panel-dock .landmark-views {
-    flex-wrap: wrap;
-    overflow: visible;
-    padding: 3px 0 8px;
-  }
-  .panel-dock .landmark-views button {
-    min-height: 38px;
-    padding: 6px 12px;
-  }
 
   /* Footer items sit on small cards so they read over any lighting preset. */
   .map-footer {
@@ -2433,4 +2361,123 @@ output.empty-state {
 [data-slot='dialog-content'] {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-3);
+}
+
+/* Fixed viewpoints, motion and directional close-ups have separate roles. */
+.landmark-views {
+  border: 0;
+  padding: 0;
+  margin: 14px 0 8px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.view-primary-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+.view-segment {
+  margin: 0;
+  border: 0;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+  padding: 2px;
+  background: var(--muted);
+  border-radius: var(--radius-sm);
+}
+.landmark-views button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+  line-height: 1.4;
+  transition:
+    background 200ms ease,
+    box-shadow 200ms ease,
+    color 200ms ease;
+}
+.view-segment button {
+  flex: 1;
+}
+.landmark-views button[aria-pressed='true'] {
+  background: var(--surface);
+  color: var(--primary-ink);
+  box-shadow:
+    var(--edge),
+    0 1px 2px var(--shadow);
+}
+.landmark-views .orbit-toggle {
+  flex: 0 0 auto;
+  border-color: var(--border);
+  white-space: nowrap;
+}
+.view-direction-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 6px;
+}
+.view-direction-label {
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.view-directions {
+  margin: 0;
+  border: 0;
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+}
+.view-directions button {
+  padding: 6px 2px;
+  overflow-wrap: anywhere;
+}
+.landmark-views button:focus-visible {
+  outline-offset: -3px;
+}
+@media (max-width: 759px) {
+  .landmark-views {
+    margin: 10px 0;
+  }
+  .view-directions {
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 6px;
+    scrollbar-width: none;
+  }
+  .view-directions::-webkit-scrollbar {
+    display: none;
+  }
+  .view-directions button {
+    flex: 0 0 auto;
+    min-width: 44px;
+    padding: 8px 12px;
+    white-space: nowrap;
+  }
+  .view-directions[data-fade='right'] {
+    mask-image: linear-gradient(to right, #000 calc(100% - 18px), transparent);
+  }
+  .view-directions[data-fade='left'] {
+    mask-image: linear-gradient(to right, transparent, #000 18px);
+  }
 }
