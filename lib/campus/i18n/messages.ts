@@ -1,5 +1,7 @@
 /** Chinese source messages are stable keys; placeholders preserve sentence structure. */
 export const englishMessages: Record<string, string> = {
+  展开列表: 'Expand list',
+  收回列表: 'Shrink list',
   视角: 'View',
   方位: 'Angle',
   方位与近景: 'Directions and close-ups',

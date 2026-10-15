@@ -738,7 +738,7 @@ function CampusMap() {
             <small>{collapsed ? t('展开') : t('收起面板')}</small>
             <ChevronDown size={16} />
           </button>
-          {!collapsed && (
+          {!collapsed && panelMode === 'menu' && (
             <button
               className="dock-expand"
               aria-expanded={panelExpanded}
@@ -746,11 +746,7 @@ function CampusMap() {
                 setPanelExpanded((value) => !value);
               }}
             >
-              {panelExpanded
-                ? t('简要')
-                : panelMode === 'detail'
-                  ? t('详情')
-                  : t('展开面板')}
+              {panelExpanded ? t('收回列表') : t('展开列表')}
             </button>
           )}
         </div>

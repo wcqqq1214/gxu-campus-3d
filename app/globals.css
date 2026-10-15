@@ -987,7 +987,7 @@ a svg {
   flex: 1;
   gap: 8px;
   text-align: left;
-  min-width: 0;
+  min-width: 44px;
   font-size: 14px;
 }
 .dock-toggle small {
@@ -1406,10 +1406,6 @@ output.empty-state {
   .dock-heading {
     padding: 3px 12px;
   }
-  .detail-mode:not(.expanded) .place-detail,
-  .detail-mode:not(.expanded) .campus-minimap {
-    display: none;
-  }
   .mobile-tour-progress {
     display: inline;
     font-size: 12px;
@@ -1769,10 +1765,8 @@ output.empty-state {
 .map-tools .mobile-tools {
   display: none;
 }
-@media (min-width: 760px) {
-  .dock-toggle small {
-    display: none;
-  }
+.dock-toggle small {
+  display: none;
 }
 .place-group + .place-group {
   margin-top: 16px;
@@ -1882,18 +1876,6 @@ output.empty-state {
     color: var(--primary-ink);
     font-size: 14px;
   }
-  .detail-mode:not(.expanded) .place-detail {
-    display: block;
-  }
-  .detail-mode:not(.expanded) .detail-actions {
-    display: none;
-  }
-  .detail-mode:not(.expanded) .place-detail > p {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
   .map-tool-tooltip-positioner {
     display: none;
   }
@@ -1912,9 +1894,6 @@ output.empty-state {
   font-size: 14px;
 }
 @media (max-width: 759px) {
-  .detail-mode:not(.expanded) .campus-minimap {
-    display: none;
-  }
   .keyboard-open .map-tools,
   .keyboard-open .map-footer,
   .keyboard-open .panel-tabs,
@@ -2479,5 +2458,18 @@ output.empty-state {
   }
   .view-directions[data-fade='left'] {
     mask-image: linear-gradient(to right, transparent, #000 18px);
+  }
+}
+
+@media (max-width: 759px) {
+  .panel-dock.detail-mode .tour-idle .tour-start {
+    background: var(--surface);
+    color: var(--primary-ink);
+    border: 1px solid var(--border);
+    font-weight: 600;
+  }
+  .detail-mode .tour-idle .tour-count {
+    color: var(--muted-foreground);
+    font-weight: 400;
   }
 }
