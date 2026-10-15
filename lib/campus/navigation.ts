@@ -117,3 +117,62 @@ export const ENGLISH_ALIASES: Record<string, string[]> = {
   'huixian-bridge': ['Nongyuan Road'],
   'time-gate': ['Time Square', 'Library North Square'],
 };
+
+/** OSM objects without a usable name keep a numeric placeholder; they are not searchable. */
+const PLACEHOLDER_NAME = /^校内建筑 \d+$/;
+
+/** Named campus buildings outside the curated catalogue: searchable, hoverable, not toured. */
+export function searchableBuildings(
+  buildings: Building[],
+  landmarks: Landmark[],
+): Building[] {
+  const curated = new Set(landmarks.map((place) => place.id));
+  return buildings.filter(
+    (building) =>
+      building.insideCampus &&
+      building.name.trim() !== '' &&
+      !PLACEHOLDER_NAME.test(building.name) &&
+      !(building.landmark && curated.has(building.landmark)),
+  );
+}
+
+const ZONE_ORDER: Record<string, number> = { east: 0, west: 1, north: 2 };
+const collators = {
+  zh: new Intl.Collator('zh-CN', { numeric: true }),
+  en: new Intl.Collator('en', { numeric: true }),
+};
+
+/** Exact names first, then prefixes, then any substring in either language; ties sort by displayed name. */
+export function searchBuildings(
+  buildings: Building[],
+  landmarks: Landmark[],
+  query: string,
+  locale: 'zh' | 'en' = 'zh',
+): Building[] {
+  const term = query.trim().toLocaleLowerCase();
+  if (!term) return [];
+  const rank = (building: Building) => {
+    const names = [
+      building.name,
+      placeName(building.name, 'zh'),
+      placeName(building.name, 'en'),
+    ].map((name) => name.toLocaleLowerCase());
+    if (names.some((name) => name === term)) return 0;
+    if (names.some((name) => name.startsWith(term))) return 1;
+    return names.some((name) => name.includes(term)) ? 2 : -1;
+  };
+  return searchableBuildings(buildings, landmarks)
+    .map((building) => ({ building, rank: rank(building) }))
+    .filter(({ rank }) => rank >= 0)
+    .sort(
+      (a, b) =>
+        a.rank - b.rank ||
+        (ZONE_ORDER[a.building.zone] ?? 3) -
+          (ZONE_ORDER[b.building.zone] ?? 3) ||
+        collators[locale].compare(
+          placeName(a.building.name, locale),
+          placeName(b.building.name, locale),
+        ),
+    )
+    .map(({ building }) => building);
+}

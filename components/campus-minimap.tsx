@@ -12,7 +12,7 @@ export const CampusMinimap = memo(function CampusMinimap({
   showBoundary,
 }: {
   buildings: Building[];
-  current?: Landmark;
+  current?: Pick<Landmark, 'name' | 'center'>;
   camera: CameraSnapshot | null;
   showBoundary: boolean;
 }) {
@@ -136,7 +136,7 @@ export const CampusMinimap = memo(function CampusMinimap({
               <path
                 key={shape.id}
                 d={shape.path}
-                fill="#a8bda4"
+                className="minimap-building"
                 fillRule="evenodd"
               />
             ))}
@@ -191,13 +191,18 @@ export const CampusMinimap = memo(function CampusMinimap({
               >
                 <path
                   d="M0 -13 L-7 7 L0 4 L7 7 Z"
-                  fill="#1a5743"
+                  className="minimap-camera"
                   stroke="white"
                   strokeWidth={1.5}
                 />
               </g>
             )}
-            <text x={map.width - 16} y={16} fontSize="12" fill="#244d36">
+            <text
+              x={map.width - 16}
+              y={16}
+              fontSize="12"
+              className="minimap-north"
+            >
               N
             </text>
           </svg>

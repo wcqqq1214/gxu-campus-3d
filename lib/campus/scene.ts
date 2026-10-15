@@ -4,7 +4,7 @@ import { createNightStyle, createRoadLights } from './night';
 import { createPalette } from './palette';
 import { createSky } from './sky';
 import { LIGHTING } from './lighting';
-import { navigationFootprints } from './navigation';
+import { navigationFootprints, searchableBuildings } from './navigation';
 import {
   treeAppearance,
   treeRotation,
@@ -402,7 +402,11 @@ export function createScene(
     dirty = true;
   }
   const proxies: THREE.Mesh[] = [];
-  for (const b of navigationFootprints(buildings, landmarks)) {
+  function footprintMesh(b: {
+    polygons: number[][][][];
+    height: number;
+    elevation: number;
+  }) {
     const groupShapes = b.polygons.map((poly) => {
       const s = new THREE.Shape(
         poly[0].map((v) => new THREE.Vector2(v[0], v[1])),
@@ -425,8 +429,65 @@ export function createScene(
     );
     mesh.position.y = b.elevation;
     mesh.updateMatrixWorld();
+    return mesh;
+  }
+  for (const b of navigationFootprints(buildings, landmarks)) {
+    const mesh = footprintMesh(b);
     mesh.userData = { id: b.landmark ?? b.id, layer: b.layer };
     proxies.push(mesh);
+  }
+  const namedBuildings = new Map(
+    searchableBuildings(buildings, landmarks).map((b) => [b.id, b]),
+  );
+  // Named buildings are pickable too; their proxies are built once, on first use.
+  let buildingProxies: THREE.Mesh[] | null = null;
+  function pickTargets() {
+    if (!buildingProxies) {
+      buildingProxies = [...namedBuildings.values()].map((b) => {
+        const mesh = footprintMesh(b);
+        mesh.userData = { id: b.id, layer: 'buildings', building: true };
+        return mesh;
+      });
+    }
+    return [...proxies, ...buildingProxies].filter(
+      (p) => layers[p.userData.layer as LayerKey],
+    );
+  }
+  function pick(clientX: number, clientY: number) {
+    const rect = canvas.getBoundingClientRect();
+    pointer.set(
+      ((clientX - rect.left) / rect.width) * 2 - 1,
+      (-(clientY - rect.top) / rect.height) * 2 + 1,
+    );
+    raycaster.setFromCamera(pointer, camera);
+    return raycaster.intersectObjects(pickTargets(), false)[0]?.object
+      .userData as { id: string; building?: boolean } | undefined;
+  }
+  const buildingTip = document.createElement('div');
+  buildingTip.className = 'building-tip';
+  buildingTip.hidden = true;
+  labels.appendChild(buildingTip);
+  let hoverFrame = 0;
+  let hoverPoint: { x: number; y: number } | null = null;
+  function hideBuildingTip() {
+    buildingTip.hidden = true;
+    canvas.style.cursor = '';
+  }
+  function updatePointerHover() {
+    hoverFrame = 0;
+    if (!hoverPoint || tween || downPointers > 0) return;
+    const hit = pick(hoverPoint.x, hoverPoint.y);
+    const building = hit?.building ? namedBuildings.get(hit.id) : undefined;
+    setHovered(hit && !hit.building ? hit.id : null);
+    canvas.style.cursor = hit ? 'pointer' : '';
+    if (!building || building.id === selected) {
+      buildingTip.hidden = true;
+      return;
+    }
+    const rect = host.getBoundingClientRect();
+    buildingTip.textContent = placeName(building.name, locale);
+    buildingTip.style.transform = `translate(${hoverPoint.x - rect.left + 14}px, ${hoverPoint.y - rect.top + 16}px)`;
+    buildingTip.hidden = false;
   }
   const highlight = new THREE.Group();
   scene.add(highlight);
@@ -445,6 +506,17 @@ export function createScene(
       maxTravel,
       Math.hypot(e.clientX - down.x, e.clientY - down.y),
     );
+    if (e.pointerType !== 'mouse' || e.buttons) {
+      hideBuildingTip();
+      return;
+    }
+    hoverPoint = { x: e.clientX, y: e.clientY };
+    if (!hoverFrame) hoverFrame = requestAnimationFrame(updatePointerHover);
+  }
+  function onLeave() {
+    hoverPoint = null;
+    hideBuildingTip();
+    setHovered(null);
   }
   function onUp(e: PointerEvent) {
     if (e.button !== 0) {
@@ -460,17 +532,9 @@ export function createScene(
       )
     )
       return;
-    const rect = canvas.getBoundingClientRect();
-    pointer.set(
-      ((e.clientX - rect.left) / rect.width) * 2 - 1,
-      (-(e.clientY - rect.top) / rect.height) * 2 + 1,
-    );
-    raycaster.setFromCamera(pointer, camera);
-    const hit = raycaster.intersectObjects(
-      proxies.filter((p) => layers[p.userData.layer as LayerKey]),
-      false,
-    )[0];
-    if (hit) focus(hit.object.userData.id);
+    const hit = pick(e.clientX, e.clientY);
+    hideBuildingTip();
+    if (hit) focus(hit.id);
   }
   function onCancel() {
     downPointers = 0;
@@ -480,6 +544,7 @@ export function createScene(
   canvas.addEventListener('pointermove', onMove);
   canvas.addEventListener('pointerup', onUp);
   canvas.addEventListener('pointercancel', onCancel);
+  canvas.addEventListener('pointerleave', onLeave);
   function moveTo(target: THREE.Vector3, position: THREE.Vector3) {
     dirty = true;
     tween = null;
@@ -501,7 +566,10 @@ export function createScene(
     origin: import('./types').SelectionOrigin = 'manual',
   ) {
     const l = landmarks.find((l) => l.id === id);
-    if (!l) return;
+    if (!l) {
+      if (namedBuildings.has(id)) focusBuilding(id, origin);
+      return;
+    }
     setHovered(null);
     selected = id;
     restoredPose = null;
@@ -535,8 +603,85 @@ export function createScene(
     callbacks.onSelect(id, origin);
     reconcileDetails(true);
   }
+  function buildingBox(b: Building) {
+    const [x0, y0, x1, y1] = b.bounds;
+    return new THREE.Box3(
+      new THREE.Vector3(x0 - 4, b.elevation - 0.5, -y1 - 4),
+      new THREE.Vector3(x1 + 4, b.elevation + b.height + 4, -y0 + 4),
+    );
+  }
+  function focusBuilding(
+    id: string,
+    origin: import('./types').SelectionOrigin = 'manual',
+  ) {
+    const b = namedBuildings.get(id)!;
+    setHovered(null);
+    hideBuildingTip();
+    selected = id;
+    restoredPose = null;
+    selectedView = 'oblique';
+    autoFramed = true;
+    setOrbit(false);
+    composeViewport();
+    frameLandmark();
+    clearGroup(highlight);
+    // A thin outline traces the footprint and roof so the building reads among its neighbours.
+    const proxy = footprintMesh(b);
+    const outline = new THREE.LineSegments(
+      new THREE.EdgesGeometry(proxy.geometry, 30),
+      new THREE.LineBasicMaterial({
+        color: '#e0b552',
+        transparent: true,
+        opacity: 0.95,
+        depthTest: false,
+      }),
+    );
+    outline.position.copy(proxy.position);
+    outline.renderOrder = 10;
+    proxy.geometry.dispose();
+    (proxy.material as THREE.Material).dispose();
+    highlight.add(outline);
+    const [x0, y0, x1, y1] = b.bounds;
+    const radius = Math.max(10, Math.hypot(x1 - x0, y1 - y0) * 0.54);
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(radius, radius + 0.6, 64),
+      new THREE.MeshBasicMaterial({
+        color: '#d9ae56',
+        transparent: true,
+        opacity: 0.8,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      }),
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.set(b.center[0], b.elevation + 0.6, -b.center[1]);
+    highlight.add(ring);
+    callbacks.onSelect(id, origin);
+    reconcileDetails(true);
+  }
   function frameLandmark(animate = true) {
     const place = landmarks.find((p) => p.id === selected);
+    const building = place ? undefined : namedBuildings.get(selected ?? '');
+    if (building) {
+      const fit = fitBox(
+        buildingBox(building),
+        selectedView === 'top'
+          ? new THREE.Vector3(0, 1, 0.025).normalize()
+          : new THREE.Vector3(-0.5, 0.66, 1).normalize(),
+        cameraFrame,
+        { width: host.clientWidth, height: host.clientHeight },
+        camera.fov,
+      );
+      if (animate) moveTo(fit.target, fit.position);
+      else {
+        tween = null;
+        controls.target.copy(fit.target);
+        camera.position.copy(fit.position);
+        controls.update();
+        dirty = true;
+      }
+      return;
+    }
     if (!place) return;
     const detail = loaded.get('landmark-' + place.id);
     let box = detail
@@ -588,7 +733,8 @@ export function createScene(
   }
   function setOrbit(on: boolean) {
     restoredPose = null;
-    orbiting = on && Boolean(selected) && !reduced.matches;
+    orbiting =
+      on && landmarks.some((p) => p.id === selected) && !reduced.matches;
     benchmarkRun = null;
     callbacks.onOrbit(orbiting);
     if (orbiting) {
@@ -818,22 +964,28 @@ export function createScene(
       progresses.get('landmark-' + selected) ??
       progresses.get('base') ??
       progresses.values().next().value;
-    if (foreground)
+    if (foreground) {
+      const percent = Math.round(foreground.fraction * 100);
+      // A request that has not reported bytes yet shows no misleading 0%.
       callbacks.onStatus(
         {
           text: foreground.name
-            ? '正在细化{name} · {percent}%'
-            : '{label} · {percent}%',
+            ? percent
+              ? '正在细化{name} · {percent}%'
+              : '正在细化{name}'
+            : percent
+              ? '{label} · {percent}%'
+              : '{label}',
           values: {
             label: foreground.label,
             name: foreground.name ?? '',
-            percent: Math.round(foreground.fraction * 100),
+            percent,
           },
         },
         false,
         foreground.fraction,
       );
-    else if (boundaryFailed && layers.boundary)
+    } else if (boundaryFailed && layers.boundary)
       callbacks.onStatus(
         '校园边界暂未加载，现有场景可继续浏览；可重试。',
         true,
@@ -1828,6 +1980,12 @@ export function createScene(
       canvas.removeEventListener('pointermove', onMove);
       canvas.removeEventListener('pointerup', onUp);
       canvas.removeEventListener('pointercancel', onCancel);
+      canvas.removeEventListener('pointerleave', onLeave);
+      cancelAnimationFrame(hoverFrame);
+      for (const proxy of buildingProxies ?? []) {
+        proxy.geometry.dispose();
+        (proxy.material as THREE.Material).dispose();
+      }
       canvas.removeEventListener('keydown', onKey);
       canvas.removeEventListener('webglcontextlost', onLost);
       canvas.removeEventListener('webglcontextrestored', onRestored);

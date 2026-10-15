@@ -77,7 +77,11 @@ import type {
 } from '@/lib/campus/types';
 import { DEFAULT_LAYERS, CATEGORY_NAMES } from '@/lib/campus/types';
 import { nextTourIndex } from '@/lib/campus/math';
-import { searchLandmarks } from '@/lib/campus/navigation';
+import {
+  searchBuildings,
+  searchableBuildings,
+  searchLandmarks,
+} from '@/lib/campus/navigation';
 import {
   decodeShare,
   encodeShare,
@@ -104,6 +108,12 @@ const PRESETS: [Preset, string, string, typeof Sun][] = [
   ['evening', '黄昏', '余晖入窗', Sunset],
   ['night', '夜景', '灯火渐明', Moon],
 ];
+const ZONE_NAMES: Record<string, string> = {
+  east: '东校园',
+  west: '西校园',
+  north: '北校园',
+};
+const BUILDING_RESULT_LIMIT = 40;
 const QUALITY_NAMES: Record<Quality, string> = {
   auto: '自动',
   fine: '精细',
@@ -155,6 +165,11 @@ function CampusMap() {
   });
   const presetEdited = useRef(false);
   useEffect(() => {
+    // Portals (dialogs, menus, tooltips) render outside the app, so the theme sits on <html>.
+    document.documentElement.dataset.theme =
+      preset === 'night' ? 'night' : 'day';
+  }, [preset]);
+  useEffect(() => {
     localeRef.current = locale;
     controller.current?.setLocale(locale);
   }, [locale]);
@@ -177,6 +192,17 @@ function CampusMap() {
   );
   const [orbit, setOrbit] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [backgroundStatusVisible, setBackgroundStatusVisible] = useState(false);
+  const backgroundStatus = Boolean(status) && ready && !error;
+  useEffect(() => {
+    if (!backgroundStatus) {
+      queueMicrotask(() => setBackgroundStatusVisible(false));
+      return;
+    }
+    // Most nearby details arrive quickly; only slower loads are worth mentioning.
+    const timer = setTimeout(() => setBackgroundStatusVisible(true), 600);
+    return () => clearTimeout(timer);
+  }, [backgroundStatus]);
   const notify = useCallback((message: string) => setToast(message), []);
   const pauseMotion = useCallback(() => {
     setTour(false);
@@ -247,7 +273,9 @@ function CampusMap() {
                 setSelected(id);
                 setFramingRequest((value) => value + 1);
                 setLandmarkView('oblique');
-                if (id) setTourIndex(ls.findIndex((place) => place.id === id));
+                const stop = ls.findIndex((place) => place.id === id);
+                // Ordinary buildings are not tour stops; the tour keeps its place.
+                if (stop >= 0) setTourIndex(stop);
                 if (origin !== 'tour') {
                   setPanelMode(id ? 'detail' : 'menu');
                   setCollapsed(false);
@@ -291,10 +319,10 @@ function CampusMap() {
           c.setPreset(settings.current.preset);
           for (const key of Object.keys(settings.current.layers) as LayerKey[])
             c.setLayer(key, settings.current.layers[key]);
-          const shared = decodeShare(
-            location.hash,
-            ls.map((l) => l.id),
-          );
+          const shared = decodeShare(location.hash, [
+            ...ls.map((l) => l.id),
+            ...searchableBuildings(bs, ls).map((b) => b.id),
+          ]);
           if (shared) {
             if (presetEdited.current) shared.preset = settings.current.preset;
             c.restoreSnapshot(shared);
@@ -476,8 +504,15 @@ function CampusMap() {
     () => searchLandmarks(landmarks, query),
     [landmarks, query],
   );
+  const buildingMatches = useMemo(
+    () => searchBuildings(buildings, landmarks, query, locale),
+    [buildings, landmarks, query, locale],
+  );
+  const resultCount = places.length + buildingMatches.length;
   const groups = query.trim()
-    ? [{ key: 'search', name: t('搜索结果'), places }]
+    ? places.length
+      ? [{ key: 'search', name: t('精选地点'), places }]
+      : []
     : (
         [
           'academic',
@@ -737,18 +772,52 @@ function CampusMap() {
               <div className="detail-heading">
                 <div>
                   <div className="eyebrow">
-                    {t(CATEGORY_NAMES[current.category])}
+                    {currentLandmark
+                      ? t(CATEGORY_NAMES[current.category])
+                      : t('{zone} · {category}', {
+                          zone: t(ZONE_NAMES[currentBuilding!.zone] ?? '建筑'),
+                          category: t(CATEGORY_NAMES[current.category]),
+                        })}
                   </div>
                   <h2>{name(current.name)}</h2>
                 </div>
               </div>
-              <p>
-                {currentLandmark
-                  ? landmarkDescription(currentLandmark, locale)
-                  : t('{category}建筑。', {
-                      category: t(CATEGORY_NAMES[currentBuilding!.category]),
-                    })}
-              </p>
+              {currentLandmark ? (
+                <p>{landmarkDescription(currentLandmark, locale)}</p>
+              ) : (
+                <>
+                  <p className="building-facts">
+                    {currentBuilding!.levels >= 1
+                      ? t('约 {levels} 层 · 高约 {height} 米', {
+                          levels: Math.round(currentBuilding!.levels),
+                          height: Math.round(currentBuilding!.height),
+                        })
+                      : t('高约 {height} 米', {
+                          height: Math.round(currentBuilding!.height),
+                        })}
+                  </p>
+                  <p className="building-note">
+                    {t('外观按 OpenStreetMap 轮廓与层数估算，未经实地测绘。')}
+                  </p>
+                  <fieldset
+                    className="landmark-views"
+                    aria-label={t('地点观察视角')}
+                  >
+                    <button
+                      aria-pressed={landmarkView === 'oblique'}
+                      onClick={() => changeLandmarkView('oblique')}
+                    >
+                      {t('全貌')}
+                    </button>
+                    <button
+                      aria-pressed={landmarkView === 'top'}
+                      onClick={() => changeLandmarkView('top')}
+                    >
+                      {t('俯视')}
+                    </button>
+                  </fieldset>
+                </>
+              )}
               {currentLandmark && (
                 <div key={current.id}>
                   <fieldset
@@ -877,7 +946,7 @@ function CampusMap() {
                       }}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      placeholder={t('搜索地点，如图书馆、六教')}
+                      placeholder={t('搜索地点或建筑，如图书馆、六教')}
                       aria-label={t('搜索校园地点')}
                     />
                     {query && (
@@ -898,7 +967,7 @@ function CampusMap() {
                   </div>
                   <output className="result-heading" aria-atomic="true">
                     <span>{query.trim() ? t('搜索结果') : t('地点')}</span>
-                    <span>{t('{count} 处', { count: places.length })}</span>
+                    <span>{t('{count} 处', { count: resultCount })}</span>
                   </output>
                   <div className="places">
                     {!landmarks.length ? (
@@ -914,20 +983,33 @@ function CampusMap() {
                           {t('正在加载地点…')}
                         </output>
                       )
-                    ) : places.length ? (
-                      <PlaceGroups
-                        groups={groups}
-                        landmarks={landmarks}
-                        selected={selected}
-                        hovered={hovered}
-                        ready={ready}
-                        searching={Boolean(query.trim())}
-                        onHover={hoverPlace}
-                        onChoose={choose}
-                      />
+                    ) : resultCount ? (
+                      <>
+                        <PlaceGroups
+                          groups={groups}
+                          landmarks={landmarks}
+                          selected={selected}
+                          hovered={hovered}
+                          ready={ready}
+                          searching={
+                            Boolean(query.trim()) && !buildingMatches.length
+                          }
+                          onHover={hoverPlace}
+                          onChoose={choose}
+                        />
+                        <BuildingResults
+                          buildings={buildingMatches}
+                          selected={selected}
+                          ready={ready}
+                          titled={places.length > 0}
+                          onChoose={choose}
+                        />
+                      </>
                     ) : (
                       <div className="empty-state">
-                        <p>{t('没有找到相关地点。试试“图书馆”或“六教”。')}</p>
+                        <p>
+                          {t('没有找到相关地点或建筑。试试“图书馆”或“宿舍”。')}
+                        </p>
                         <button className="search-reset" onClick={resetSearch}>
                           {t('清空搜索')}
                         </button>
@@ -1065,7 +1147,7 @@ function CampusMap() {
           )}
           <CampusMinimap
             buildings={buildings}
-            current={currentLandmark}
+            current={currentLandmark ?? currentBuilding}
             camera={cameraState}
             showBoundary={layers.boundary}
           />
@@ -1288,7 +1370,24 @@ function CampusMap() {
           © OpenStreetMap contributors · ODbL
         </a>
       </footer>
-      {status && (
+      {status && ready && !error ? (
+        // Streaming after the first paint is background work: a small, delayed pill.
+        <output className="load-pill-lane">
+          {backgroundStatusVisible && (
+            <div className="load-pill">
+              <LoaderCircle className="spin" size={14} aria-hidden="true" />
+              <span>{statusText(locale, status)}</span>
+              {Boolean(loadProgress) && (
+                <i
+                  aria-hidden="true"
+                  style={{ transform: `scaleX(${loadProgress})` }}
+                />
+              )}
+            </div>
+          )}
+        </output>
+      ) : null}
+      {status && !(ready && !error) && (
         <div
           className={`scene-status ${error ? 'error' : ''}`}
           role={error ? 'alert' : 'status'}
@@ -1533,6 +1632,65 @@ function PlaceGroups({
         </section>
       ))}{' '}
     </>
+  );
+}
+
+function BuildingResults({
+  buildings,
+  selected,
+  ready,
+  titled,
+  onChoose,
+}: {
+  buildings: Building[];
+  selected: string | null;
+  ready: boolean;
+  titled: boolean;
+  onChoose: (id: string) => void;
+}) {
+  const { t, name } = useCampusLocale();
+  if (!buildings.length) return null;
+  const shown = buildings.slice(0, BUILDING_RESULT_LIMIT);
+  return (
+    <section
+      className="place-group building-results"
+      aria-label={t('其他建筑')}
+    >
+      {titled && (
+        <h3>
+          {t('其他建筑')}
+          <span>{buildings.length}</span>
+        </h3>
+      )}
+      {shown.map((b) => (
+        <button
+          key={b.id}
+          data-place-id={b.id}
+          className={`place-row building-row ${selected === b.id ? 'selected' : ''}`}
+          onClick={() => onChoose(b.id)}
+          disabled={!ready}
+        >
+          <Building2 size={15} className="place-kind" aria-hidden="true" />
+          <span className="place-copy">
+            <strong>{name(b.name)}</strong>
+            <small>
+              {t('{zone} · {category}', {
+                zone: t(ZONE_NAMES[b.zone] ?? '建筑'),
+                category: t(CATEGORY_NAMES[b.category]),
+              })}
+            </small>
+          </span>
+          <ChevronRight size={16} aria-hidden="true" />
+        </button>
+      ))}
+      {buildings.length > shown.length && (
+        <p className="result-more">
+          {t('还有 {count} 处，请输入更完整的名称', {
+            count: buildings.length - shown.length,
+          })}
+        </p>
+      )}
+    </section>
   );
 }
 
