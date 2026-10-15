@@ -331,7 +331,6 @@ a svg {
 }
 .place-row {
   border: 0;
-  border-bottom: 1px solid var(--divider);
   background: none;
   text-align: left;
   transition: background 0.2s;
@@ -349,7 +348,7 @@ a svg {
 }
 .place-row.selected .place-index,
 .place-row.selected svg {
-  color: var(--primary-ink);
+  color: var(--muted-foreground);
 }
 .panel-foot {
   font-size: 11px;
@@ -1550,7 +1549,6 @@ output.empty-state {
   box-shadow: none;
 }
 .place-row {
-  border-bottom-color: var(--divider);
   border-radius: var(--radius-sm);
   min-height: 44px;
   padding: 10px 6px;
@@ -1558,10 +1556,12 @@ output.empty-state {
 .place-copy strong {
   color: var(--foreground);
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
 }
-.place-row.selected {
-  background: var(--surface-hover);
+.place-row.selected,
+.place-row.selected:hover,
+.place-row.selected.linked-hover {
+  background: color-mix(in srgb, var(--primary) 10%, var(--surface));
   border-radius: var(--radius-sm);
 }
 .place-row > svg {
@@ -1733,9 +1733,6 @@ output.empty-state {
   .place-row:hover {
     background: var(--surface-hover);
   }
-  .place-row.selected:hover {
-    background: var(--surface-hover);
-  }
   .menu-disclosure > summary:hover,
   .dock-back:hover,
   .tour-end:hover {
@@ -1818,10 +1815,13 @@ output.empty-state {
     display: none;
   }
 }
+.place-group + .place-group {
+  margin-top: 16px;
+}
 .place-group h3 {
   display: flex;
   justify-content: space-between;
-  margin: 16px 6px 4px;
+  margin: 0 6px 6px;
   font-size: 12px;
   font-weight: 600;
   color: var(--muted-foreground);
@@ -1836,11 +1836,10 @@ output.empty-state {
 }
 .place-row.linked-hover {
   background: var(--surface-hover);
-  box-shadow: inset 3px 0 var(--primary);
 }
-.place-row.selected .place-index {
-  background: var(--phoenix-soft);
-  color: var(--phoenix);
+.place-row.selected .place-copy strong {
+  color: var(--primary-ink);
+  font-weight: 600;
 }
 .panel-dock .panel-tabs [data-active] {
   background: transparent;
@@ -2228,7 +2227,6 @@ output.empty-state {
   }
 }
 /* Bilingual copy: full place names remain readable, including narrow screens. */
-.place-copy strong,
 .panel-dock .detail-heading h2,
 .minimap-toggle span,
 .return-landmark {
@@ -2238,6 +2236,9 @@ output.empty-state {
 }
 .place-copy strong {
   display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .minimap-toggle > svg,
 .map-label > span:first-child {
@@ -2405,7 +2406,7 @@ output.empty-state {
   display: block;
   margin-top: 1px;
   font-size: 12px;
-  color: var(--subtle-foreground);
+  color: var(--muted-foreground);
 }
 .building-row .place-kind {
   color: var(--subtle-foreground);
