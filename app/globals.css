@@ -59,6 +59,16 @@
   --warn-fg: #80602f;
   --toast: #244b38;
   --scene-bg: #dce7dd;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-sheet: 20px;
+  --radius-pill: 999px;
+  --edge: 0 0 0 1px color-mix(in srgb, var(--foreground) 10%, transparent);
+  --shadow-1: var(--edge), 0 1px 2px var(--shadow), 0 4px 16px var(--shadow);
+  --shadow-2: var(--edge), 0 2px 4px var(--shadow), 0 8px 24px var(--shadow);
+  --shadow-3: var(--edge), 0 4px 8px var(--shadow), 0 16px 40px var(--shadow);
   color-scheme: light;
   font-family: var(--font-body);
   font-synthesis: none;
@@ -96,6 +106,16 @@
   --warn-fg: #f1cd8c;
   --toast: #2e6a51;
   --scene-bg: #142029;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-sheet: 20px;
+  --radius-pill: 999px;
+  --edge: inset 0 0 0 1px rgb(255 255 255 / 9%);
+  --shadow-1: var(--edge), 0 1px 2px var(--shadow), 0 4px 16px var(--shadow);
+  --shadow-2: var(--edge), 0 2px 4px var(--shadow), 0 8px 24px var(--shadow);
+  --shadow-3: var(--edge), 0 4px 8px var(--shadow), 0 16px 40px var(--shadow);
   color-scheme: dark;
 }
 * {
@@ -242,39 +262,38 @@ a svg {
   padding: 24px;
   background: var(--panel-glass);
   border: 1px solid var(--glass-edge);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   backdrop-filter: blur(20px);
-  box-shadow: 0 16px 60px var(--shadow);
+  box-shadow: var(--shadow-1);
   padding-bottom: 0;
   overflow: hidden;
 }
 .main-tabs {
   min-height: 0;
   flex: 1;
-  gap: 0 !important;
+  gap: 0;
 }
 .panel-tabs {
   display: flex;
   border-bottom: 1px solid var(--border);
-  padding-bottom: 14px;
-  background: transparent !important;
-  border-radius: 0 !important;
-  height: auto !important;
-  width: 100% !important;
+  background: transparent;
+  border-radius: 0;
+  height: auto;
+  width: 100%;
   gap: 2px;
-  padding: 0 0 12px !important;
+  padding: 0 0 12px;
   flex-shrink: 0;
 }
 .panel-tabs [data-slot='tabs-trigger'] {
-  height: 38px !important;
-  font-size: 14px !important;
-  border-radius: 9px;
-  box-shadow: none !important;
+  height: 38px;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
   gap: 6px;
 }
 .panel-tabs [data-active] {
-  background: var(--surface-hover) !important;
-  color: var(--primary-ink) !important;
+  background: var(--surface-hover);
+  color: var(--primary-ink);
   font-weight: 600;
 }
 .explore-content {
@@ -395,7 +414,7 @@ a svg {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   font-size: 14px;
 }
 .preset-grid button > svg:last-child:not(:first-child) {
@@ -438,17 +457,17 @@ a svg {
   justify-content: center;
   color: var(--ink-2);
 }
-.north-button,
+.map-tools .north-button,
 .tool-stack {
-  border: 1px solid var(--glass-edge) !important;
-  border-radius: 12px;
-  background: var(--panel-glass) !important;
-  box-shadow: 0 4px 18px var(--shadow);
+  border: 1px solid var(--glass-edge);
+  border-radius: var(--radius-md);
+  background: var(--panel-glass);
+  box-shadow: var(--shadow-1);
   backdrop-filter: blur(15px);
   overflow: hidden;
 }
-.north-button {
-  height: 60px !important;
+.map-tools .north-button {
+  height: 60px;
   flex-direction: column;
   gap: 2px;
 }
@@ -484,15 +503,15 @@ a svg {
   color: var(--ink-2);
   font-size: 12px;
   border: 1px solid var(--glass-edge);
-  border-radius: 7px;
-  box-shadow: 0 3px 10px var(--shadow);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-2);
   pointer-events: auto;
   will-change: transform;
 }
 .map-label > span:first-child {
   background: var(--primary);
   color: #fff;
-  border-radius: 4px;
+  border-radius: var(--radius-xs);
   padding: 3px 4px;
   font-family: var(--font-body);
   font-size: 10px;
@@ -515,8 +534,8 @@ a svg {
   padding: 13px 16px;
   background: var(--panel-glass);
   border: 1px solid var(--glass-edge);
-  border-radius: 14px;
-  box-shadow: 0 12px 40px var(--shadow);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
   backdrop-filter: blur(18px);
   white-space: nowrap;
 }
@@ -536,7 +555,7 @@ a svg {
   align-items: center;
   gap: 8px;
   border: 0;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--primary);
   color: white;
   height: 38px;
@@ -586,9 +605,9 @@ a svg {
   width: 300px;
   padding: 22px;
   background: var(--panel-glass);
-  border-radius: 15px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--glass-edge);
-  box-shadow: 0 10px 40px var(--shadow);
+  box-shadow: var(--shadow-1);
   backdrop-filter: blur(18px);
   max-height: calc(100dvh - 235px);
   overflow: auto;
@@ -646,10 +665,10 @@ a svg {
   color: var(--muted-foreground);
   border: 1px solid var(--border);
   padding: 12px 16px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   z-index: 15;
   font-size: 13px;
-  box-shadow: 0 6px 30px var(--shadow);
+  box-shadow: var(--shadow-2);
 }
 .scene-status.error {
   color: var(--warn-fg);
@@ -664,6 +683,7 @@ a svg {
   }
 }
 .toast {
+  box-shadow: var(--shadow-2);
   position: absolute;
   z-index: 60;
   top: 110px;
@@ -672,7 +692,7 @@ a svg {
   background: var(--toast);
   color: #fff;
   padding: 12px 20px;
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   display: flex;
   gap: 8px;
   align-items: center;
@@ -762,13 +782,13 @@ a svg {
     right: 0;
     width: 100%;
     max-height: 48dvh;
-    border-radius: 20px 20px 0 0;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
     padding: 0 20px 0;
     z-index: 12;
     background: var(--panel-glass);
   }
   .panel-tabs {
-    padding-bottom: 8px !important;
+    padding-bottom: 8px;
   }
   .panel-tabs [data-slot='tabs-trigger'] {
     min-height: 38px;
@@ -805,8 +825,8 @@ a svg {
     width: 40px;
     height: 40px;
   }
-  .north-button {
-    height: 53px !important;
+  .map-tools .north-button {
+    height: 53px;
   }
   .map-label {
     padding: 4px 6px 4px 4px;
@@ -823,7 +843,7 @@ a svg {
     justify-content: space-between;
     padding: 10px 12px;
     gap: 4px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
   .campus-app:has(.explorer.collapsed) .tour-bar {
     bottom: 56px;
@@ -946,9 +966,9 @@ a svg {
   z-index: 8;
   background: var(--panel-glass);
   border: 1px solid var(--border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px var(--shadow);
+  box-shadow: var(--shadow-1);
 }
 .dock-heading {
   display: flex;
@@ -1021,6 +1041,11 @@ a svg {
   font-size: 12px;
 }
 .panel-dock .tour-bar {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  background: var(--muted);
   transform: none;
   width: auto;
   flex-shrink: 0;
@@ -1028,7 +1053,7 @@ a svg {
   gap: 6px;
   padding: 12px 18px;
   border: 0;
-  border-top: 1px solid var(--divider);
+  border-top: 1px solid var(--border);
   border-radius: 0;
   box-shadow: none;
   backdrop-filter: none;
@@ -1058,7 +1083,7 @@ a svg {
   margin: 0;
   color: var(--ink-2);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 .return-landmark {
   display: flex;
@@ -1089,7 +1114,7 @@ a svg {
   color: var(--ink-2);
   background: var(--muted);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 .landmark-views button[aria-pressed='true'] {
   background: var(--primary);
@@ -1139,7 +1164,7 @@ a svg {
   background: transparent;
   width: 36px;
   height: 36px;
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   min-width: 44px;
   min-height: 44px;
 }
@@ -1152,7 +1177,7 @@ a svg {
     right: 0;
     width: 100%;
     max-height: 48dvh;
-    border-radius: 20px 20px 0 0;
+    border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .panel-dock.collapsed {
@@ -1265,7 +1290,7 @@ a svg {
   height: 160px;
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--map-bg);
 }
 .minimap-building {
@@ -1299,7 +1324,7 @@ a svg {
   color: #fff;
   border: 0;
   padding: 5px 10px;
-  border-radius: 5px;
+  border-radius: var(--radius-xs);
   white-space: nowrap;
   min-height: 44px;
   min-width: 44px;
@@ -1330,7 +1355,7 @@ a svg {
   height: 40px;
   padding: 0 12px 0 36px;
   border: 1px solid var(--border);
-  border-radius: 9px;
+  border-radius: var(--radius-sm);
   font-size: 14px;
   box-shadow: none;
   background: var(--surface);
@@ -1364,6 +1389,7 @@ a svg {
   filter: drop-shadow(0 1px 1px #45584c);
 }
 .tour-compact {
+  box-shadow: var(--shadow-1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1499,14 +1525,14 @@ output.empty-state {
   display: none;
 }
 .panel-dock .panel-tabs {
-  padding-bottom: 6px !important;
+  padding-bottom: 6px;
 }
 .panel-tabs [data-slot='tabs-trigger'] {
   color: var(--muted-foreground);
 }
 .panel-dock .panel-tabs [data-slot='tabs-trigger'] {
   min-height: 44px;
-  height: 44px !important;
+  height: 44px;
   border-radius: 0;
   border-bottom: 2px solid transparent;
   transition:
@@ -1523,13 +1549,9 @@ output.empty-state {
   outline-offset: 2px;
   box-shadow: none;
 }
-.panel-dock .tour-bar {
-  background: var(--muted);
-  border-top-color: var(--border);
-}
 .place-row {
   border-bottom-color: var(--divider);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   min-height: 44px;
   padding: 10px 6px;
 }
@@ -1540,7 +1562,7 @@ output.empty-state {
 }
 .place-row.selected {
   background: var(--surface-hover);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 .place-row > svg {
   color: var(--subtle-foreground);
@@ -1564,7 +1586,7 @@ output.empty-state {
   min-height: 44px;
   padding: 8px 14px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   color: var(--primary-ink);
   background: var(--surface);
 }
@@ -1605,7 +1627,7 @@ output.empty-state {
 .menu-disclosure > summary:focus-visible {
   outline: 3px solid var(--focus);
   outline-offset: -3px;
-  border-radius: 5px;
+  border-radius: var(--radius-xs);
 }
 .menu-disclosure .settings-note {
   margin-top: 0;
@@ -1701,7 +1723,7 @@ output.empty-state {
   color: var(--ink-2);
   border: 0;
   background: transparent;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
 }
 .panel-dock .landmark-views button[aria-pressed='true'] {
   background: var(--primary);
@@ -1821,7 +1843,7 @@ output.empty-state {
   color: var(--phoenix);
 }
 .panel-dock .panel-tabs [data-active] {
-  background: transparent !important;
+  background: transparent;
   border-bottom-color: var(--phoenix);
 }
 .panel-dock .landmark-views {
@@ -1842,12 +1864,6 @@ output.empty-state {
   min-height: 44px;
   padding: 8px 12px;
   white-space: nowrap;
-}
-.panel-dock .tour-bar {
-  position: relative;
-  left: auto;
-  right: auto;
-  bottom: auto;
 }
 .tour-timer {
   position: absolute;
@@ -1902,8 +1918,9 @@ output.empty-state {
   visibility: hidden;
 }
 .map-tool-tooltip {
+  box-shadow: var(--shadow-2);
   padding: 7px 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   background: var(--foreground);
   color: var(--background);
   white-space: nowrap;
@@ -1921,7 +1938,7 @@ output.empty-state {
   .dock-expand {
     min-height: 44px;
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: var(--muted);
     color: var(--primary-ink);
     font-size: 14px;
@@ -1953,7 +1970,7 @@ output.empty-state {
   text-align: left;
   min-height: 44px;
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   background: var(--muted);
   color: var(--primary-ink);
   font-size: 14px;
@@ -2021,8 +2038,8 @@ output.empty-state {
     pointer-events: auto;
     background: var(--panel-glass);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    box-shadow: 0 6px 24px var(--shadow);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-1);
     backdrop-filter: blur(16px);
   }
   .masthead-brand {
@@ -2094,9 +2111,9 @@ output.empty-state {
     align-items: center;
     min-height: 26px;
     padding: 3px 10px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--panel-soft);
-    box-shadow: 0 2px 10px var(--shadow);
+    box-shadow: var(--shadow-1);
     backdrop-filter: blur(10px);
     pointer-events: auto;
   }
@@ -2146,7 +2163,7 @@ output.empty-state {
   height: 44px;
   padding: 0;
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: var(--panel-soft);
   color: var(--muted-foreground);
   backdrop-filter: blur(8px);
@@ -2172,10 +2189,10 @@ output.empty-state {
   min-width: 150px;
   padding: 4px;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--panel-glass);
   color: var(--foreground);
-  box-shadow: 0 4px 12px var(--shadow);
+  box-shadow: var(--shadow-2);
   backdrop-filter: blur(8px);
   outline: none;
 }
@@ -2186,7 +2203,7 @@ output.empty-state {
   min-height: 44px;
   gap: 12px;
   padding: 0 10px;
-  border-radius: 6px;
+  border-radius: var(--radius-xs);
   font-size: 14px;
   cursor: pointer;
   outline: none;
@@ -2324,10 +2341,10 @@ output.empty-state {
   min-height: 30px;
   padding: 5px 12px;
   overflow: hidden;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--panel-glass);
   border: 1px solid var(--glass-edge);
-  box-shadow: 0 4px 14px var(--shadow);
+  box-shadow: var(--shadow-2);
   backdrop-filter: blur(12px);
   color: var(--muted-foreground);
   font-size: 12px;
@@ -2369,7 +2386,7 @@ output.empty-state {
   z-index: 2;
   max-width: 260px;
   padding: 5px 9px;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   background: var(--foreground);
   color: var(--background);
   font-size: 12px;
@@ -2378,7 +2395,7 @@ output.empty-state {
   overflow: hidden;
   text-overflow: ellipsis;
   pointer-events: none;
-  box-shadow: 0 4px 12px var(--shadow);
+  box-shadow: var(--shadow-2);
 }
 .building-tip[hidden] {
   display: none;
@@ -2409,4 +2426,10 @@ output.empty-state {
   font-size: 12px;
   line-height: 1.6;
   color: var(--subtle-foreground);
+}
+
+/* Dialogs use the strongest elevation; nested controls keep their existing borders. */
+[data-slot='dialog-content'] {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-3);
 }
