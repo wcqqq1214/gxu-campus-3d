@@ -1328,15 +1328,17 @@ a svg {
 }
 .search-wrap input {
   height: 40px;
-  padding: 0 32px 0 36px;
+  padding: 0 12px 0 36px;
   border: 1px solid var(--border);
   border-radius: 9px;
   font-size: 14px;
   box-shadow: none;
   background: var(--surface);
   min-width: 0;
-  padding-right: 46px;
   min-height: 44px;
+}
+.search-wrap:has(> button) input {
+  padding-right: 46px;
 }
 .section-hint,
 .settings-note,
@@ -1516,7 +1518,10 @@ output.empty-state {
   background: var(--surface);
 }
 .panel-dock .search-wrap input:focus-visible {
-  border-color: var(--primary-ink);
+  border-color: color-mix(in srgb, var(--focus) 55%, var(--border));
+  outline: 1px solid color-mix(in srgb, var(--focus) 40%, transparent);
+  outline-offset: 2px;
+  box-shadow: none;
 }
 .panel-dock .tour-bar {
   background: var(--muted);

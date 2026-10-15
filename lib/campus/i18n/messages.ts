@@ -210,7 +210,7 @@ export const englishMessages: Record<string, string> = {
   '广西大学-校园视图.png': 'Guangxi-University-Campus.png',
   '广西大学主校区三维地图，支持地标搜索、游览和昼夜切换。使用 Three.js 和 Blender 制作。':
     'Explore Guangxi University’s main campus in 3D. Search landmarks, take a tour and switch between day and night. Built with Three.js and Blender.',
-  '搜索地点或建筑，如图书馆、六教': 'Search places or buildings, e.g. Library',
+  搜索地点或建筑: 'Search places or buildings',
   '没有找到相关地点或建筑。试试“图书馆”或“宿舍”。':
     'No matching places or buildings. Try “Library” or “Residence”.',
   精选地点: 'Featured places',

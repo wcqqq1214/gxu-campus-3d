@@ -946,7 +946,7 @@ function CampusMap() {
                       }}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
-                      placeholder={t('搜索地点或建筑，如图书馆、六教')}
+                      placeholder={t('搜索地点或建筑')}
                       aria-label={t('搜索校园地点')}
                     />
                     {query && (
