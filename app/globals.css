@@ -8,6 +8,13 @@
   font-display: swap;
 }
 @theme inline {
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 15px;
+  --text-lg: 17px;
+  --text-xl: 22px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
@@ -128,6 +135,9 @@ body {
   height: 100%;
   overflow: hidden;
 }
+body {
+  font-size: 15px;
+}
 button,
 input,
 a {
@@ -183,16 +193,18 @@ a svg {
   height: 100%;
 }
 .masthead h1 {
+  font-family: var(--font-serif);
   font-size: 22px;
   font-weight: 650;
-  letter-spacing: 2px;
+  letter-spacing: 0;
   margin: 0;
 }
 .masthead h1 span {
+  font-family: var(--font-body);
   font-weight: 400;
   font-size: 17px;
   margin-left: 16px;
-  letter-spacing: 3px;
+  letter-spacing: 0;
 }
 .scene-host {
   position: absolute;
@@ -200,7 +212,7 @@ a svg {
 }
 .eyebrow {
   font-size: 12px;
-  letter-spacing: 2px;
+  letter-spacing: 0;
   color: var(--subtle-foreground);
 }
 .panel-tabs button {
@@ -209,14 +221,14 @@ a svg {
   align-items: center;
   background: none;
   border: 0;
-  font-size: 14px;
+  font-size: 13px;
   padding: 7px;
 }
 .place-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  font-size: 14px;
+  font-size: 13px;
 }
 .place-row strong {
   font-weight: 500;
@@ -286,7 +298,7 @@ a svg {
 }
 .panel-tabs [data-slot='tabs-trigger'] {
   height: 38px;
-  font-size: 14px;
+  font-size: 13px;
   border-radius: var(--radius-sm);
   box-shadow: none;
   gap: 6px;
@@ -390,7 +402,7 @@ a svg {
 }
 .layer-row strong,
 .quality-options strong {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   display: block;
 }
@@ -414,7 +426,7 @@ a svg {
   flex-direction: column;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: 13px;
 }
 .preset-grid button > svg:last-child:not(:first-child) {
   position: absolute;
@@ -513,7 +525,7 @@ a svg {
   border-radius: var(--radius-xs);
   padding: 3px 4px;
   font-family: var(--font-body);
-  font-size: 10px;
+  font-size: 11px;
   font-variant-numeric: tabular-nums;
 }
 .map-label:hover,
@@ -539,7 +551,7 @@ a svg {
   white-space: nowrap;
 }
 .tour-copy strong {
-  font-size: 14px;
+  font-size: 13px;
   display: block;
   font-weight: 500;
 }
@@ -594,7 +606,7 @@ a svg {
   text-decoration: none;
 }
 .gesture-help {
-  letter-spacing: 0.7px;
+  letter-spacing: 0;
 }
 .place-detail {
   position: absolute;
@@ -618,16 +630,16 @@ a svg {
   gap: 8px;
 }
 .detail-heading .eyebrow {
-  font-size: 10px;
-  letter-spacing: 1.5px;
+  font-size: 11px;
+  letter-spacing: 0;
 }
 .detail-heading h2 {
-  font: 600 23px var(--font-serif);
+  font: 600 22px var(--font-serif);
   line-height: 1.5;
   margin: 6px 0;
 }
 .place-detail > p {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--subtle-foreground);
   line-height: 1.8;
   margin: 9px 0 16px;
@@ -695,10 +707,10 @@ a svg {
   display: flex;
   gap: 8px;
   align-items: center;
-  font-size: 14px;
+  font-size: 13px;
 }
 .empty-state {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--muted-foreground);
   line-height: 2;
   text-align: center;
@@ -764,7 +776,7 @@ a svg {
     gap: 11px;
   }
   .masthead h1 {
-    font-size: 21px;
+    font-size: 22px;
   }
   .masthead h1 span {
     font-size: 15px;
@@ -807,7 +819,7 @@ a svg {
   .panel-foot {
     margin-top: 3px;
     padding: 9px 0;
-    font-size: 10px;
+    font-size: 11px;
   }
   .explorer.collapsed {
     max-height: 42px;
@@ -851,7 +863,7 @@ a svg {
     font-size: 12px;
   }
   .tour-copy small {
-    font-size: 10px;
+    font-size: 11px;
   }
   .tour-start {
     font-size: 12px;
@@ -894,7 +906,7 @@ a svg {
     padding-top: 10px;
   }
   .detail-heading .eyebrow {
-    font-size: 9px;
+    font-size: 11px;
   }
   .scene-status {
     top: 85px;
@@ -988,7 +1000,7 @@ a svg {
   gap: 8px;
   text-align: left;
   min-width: 44px;
-  font-size: 14px;
+  font-size: 13px;
 }
 .dock-toggle small {
   font-size: 12px;
@@ -1062,7 +1074,7 @@ a svg {
   margin-bottom: 4px;
 }
 .panel-dock .tour-copy strong {
-  font-size: 14px;
+  font-size: 13px;
 }
 .panel-dock .tour-copy small {
   font-size: 12px;
@@ -1074,7 +1086,7 @@ a svg {
   margin: 0;
   height: 44px;
   justify-content: center;
-  font-size: 14px;
+  font-size: 13px;
 }
 .panel-dock .tour-skip {
   width: 44px;
@@ -1092,16 +1104,16 @@ a svg {
   border: 0;
   background: none;
   color: var(--primary-ink);
-  font-size: 14px;
+  font-size: 13px;
 }
 .panel-dock .detail-heading h2 {
-  font-size: 24px;
+  font-size: 22px;
 }
 .panel-dock .detail-heading .eyebrow {
   font-size: 12px;
 }
 .panel-dock .place-detail > p {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--muted-foreground);
   line-height: 1.8;
 }
@@ -1110,7 +1122,7 @@ a svg {
 }
 .panel-dock .detail-actions button {
   min-height: 44px;
-  font-size: 14px;
+  font-size: 13px;
 }
 .place-index,
 .result-heading,
@@ -1166,7 +1178,7 @@ a svg {
     display: none;
   }
   .panel-dock .tour-start span {
-    font-size: 14px;
+    font-size: 13px;
   }
   .panel-dock .place-detail {
     padding-top: 0;
@@ -1176,7 +1188,7 @@ a svg {
   }
   .panel-dock .place-detail > p {
     margin-top: 0;
-    font-size: 14px;
+    font-size: 13px;
   }
   .panel-dock .panel-foot {
     display: none;
@@ -1198,7 +1210,7 @@ a svg {
     min-height: 32px;
   }
   .map-label > span:first-child {
-    font-size: 10px;
+    font-size: 11px;
   }
   .masthead h1 span {
     letter-spacing: 0;
@@ -1237,7 +1249,7 @@ a svg {
   background: none;
   color: var(--ink-2);
   text-align: left;
-  font-size: 14px;
+  font-size: 13px;
 }
 .minimap-toggle span {
   flex: 1;
@@ -1275,10 +1287,10 @@ a svg {
 .share-dialog input {
   min-height: 44px;
   width: 100%;
-  font-size: 14px;
+  font-size: 13px;
 }
 .share-dialog p {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--muted-foreground);
 }
 .scene-status button {
@@ -1296,7 +1308,7 @@ a svg {
     gap: 14px;
   }
   .panel-dock .detail-actions button {
-    font-size: 14px;
+    font-size: 13px;
   }
   .minimap-body svg {
     height: 140px;
@@ -1318,7 +1330,7 @@ a svg {
   padding: 0 12px 0 36px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 13px;
   box-shadow: none;
   background: var(--surface);
   min-width: 0;
@@ -1436,7 +1448,7 @@ output.empty-state {
   }
   .map-footer {
     gap: 6px;
-    font-size: 10px;
+    font-size: 11px;
     right: 76px;
     flex-wrap: wrap;
   }
@@ -1467,9 +1479,9 @@ output.empty-state {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 600;
-  font-family: var(--font-serif);
-  font-size: 18px;
-  letter-spacing: 1px;
+  font-family: var(--font-body);
+  font-size: 17px;
+  letter-spacing: 0;
 }
 .dock-back {
   justify-content: center;
@@ -1708,7 +1720,7 @@ output.empty-state {
 }
 @media (max-width: 759px) {
   .dock-toggle > span {
-    font-size: 16px;
+    font-size: 15px;
   }
   .dock-back {
     width: auto;
@@ -1748,7 +1760,7 @@ output.empty-state {
     align-items: center;
     right: 80px;
     gap: 2px 10px;
-    font-size: 10px;
+    font-size: 11px;
   }
   .map-footer > * {
     white-space: nowrap;
@@ -1851,6 +1863,10 @@ output.empty-state {
   visibility: hidden;
 }
 .map-tool-tooltip {
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease;
+  transform-origin: var(--transform-origin);
   box-shadow: var(--shadow-2);
   padding: 7px 10px;
   border-radius: var(--radius-xs);
@@ -1874,7 +1890,7 @@ output.empty-state {
     border-radius: var(--radius-sm);
     background: var(--muted);
     color: var(--primary-ink);
-    font-size: 14px;
+    font-size: 13px;
   }
   .map-tool-tooltip-positioner {
     display: none;
@@ -1891,7 +1907,7 @@ output.empty-state {
   border-radius: var(--radius-sm);
   background: var(--muted);
   color: var(--primary-ink);
-  font-size: 14px;
+  font-size: 13px;
 }
 @media (max-width: 759px) {
   .keyboard-open .map-tools,
@@ -1967,13 +1983,13 @@ output.empty-state {
     height: 40px;
   }
   .masthead h1 {
-    font-size: 19px;
-    letter-spacing: 1.5px;
+    font-size: 17px;
+    letter-spacing: 0;
   }
   .masthead h1 span {
     font-size: 15px;
     margin-left: 10px;
-    letter-spacing: 2px;
+    letter-spacing: 0;
     color: var(--muted-foreground);
   }
   .panel-dock {
@@ -2088,7 +2104,7 @@ output.empty-state {
   gap: 12px;
   padding: 0 10px;
   border-radius: var(--radius-xs);
-  font-size: 14px;
+  font-size: 13px;
   cursor: pointer;
   outline: none;
 }
@@ -2138,7 +2154,7 @@ output.empty-state {
 }
 :lang(en) .masthead h1 {
   letter-spacing: 0;
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1.15;
 }
 :lang(en) .masthead h1 span {
@@ -2179,7 +2195,7 @@ output.empty-state {
   .masthead h1 {
     flex: 1;
     min-width: 0;
-    font-size: 18px;
+    font-size: 17px;
     letter-spacing: 0;
     white-space: normal;
   }
@@ -2194,14 +2210,14 @@ output.empty-state {
     white-space: normal;
   }
   :lang(en) .masthead h1 span {
-    font-size: 10px;
+    font-size: 11px;
   }
   :lang(en) .dock-toggle small {
     white-space: nowrap;
     font-size: 11px;
   }
   :lang(en) .panel-dock .detail-heading h2 {
-    font-size: 18px;
+    font-size: 17px;
   }
   .map-label .map-label-name {
     max-width: 165px;
@@ -2490,4 +2506,10 @@ output.empty-state {
     background: var(--background);
     backdrop-filter: none;
   }
+}
+
+.map-tool-tooltip[data-starting-style],
+.map-tool-tooltip[data-ending-style] {
+  opacity: 0;
+  transform: scale(0.98);
 }
