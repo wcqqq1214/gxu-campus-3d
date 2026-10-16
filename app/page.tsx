@@ -866,7 +866,11 @@ function CampusMap() {
                       </button>
                     )}
                   </div>
-                  <output className="result-heading" aria-atomic="true">
+                  <output
+                    className="result-heading"
+                    data-searching={Boolean(query.trim())}
+                    aria-atomic="true"
+                  >
                     <span>{query.trim() ? t('搜索结果') : t('地点')}</span>
                     <span>{t('{count} 处', { count: resultCount })}</span>
                   </output>
@@ -1256,7 +1260,10 @@ function CampusMap() {
             setHelpOpen(true);
           }}
         >
-          {t('操作说明 · 拖动旋转 · 滚轮缩放')}
+          <span className="pointer-help">
+            {t('操作说明 · 拖动旋转 · 滚轮缩放')}
+          </span>
+          <span className="touch-help">{t('操作说明')}</span>
         </button>
         {layers.boundary && (
           <span className="boundary-legend">

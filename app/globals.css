@@ -2400,7 +2400,13 @@ output.empty-state {
 }
 .view-directions button {
   padding: 6px 2px;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
+}
+@media (min-width: 760px) {
+  :lang(en) .view-directions {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 .landmark-views button:focus-visible {
   outline-offset: -3px;
@@ -2472,6 +2478,11 @@ output.empty-state {
     bottom: calc(var(--dock-height, 48dvh) + 9px);
     justify-content: flex-start;
   }
+  /* Controls remain in More tools; the boundary explanation lives in Layers. */
+  .map-footer > .gesture-help,
+  .map-footer > .boundary-legend {
+    display: none;
+  }
   .keyboard-open .map-footer {
     right: 12px;
   }
@@ -2490,4 +2501,46 @@ output.empty-state {
 .map-tool-tooltip[data-ending-style] {
   opacity: 0;
   transform: scale(0.98);
+}
+
+.touch-help {
+  display: none;
+}
+@media (hover: none), (pointer: coarse) {
+  .pointer-help {
+    display: none;
+  }
+  .touch-help {
+    display: inline;
+  }
+}
+
+/* Spend the short screen's space on places, keeping every touch target 44px. */
+@media (max-width: 759px) {
+  .panel-dock .dock-heading {
+    padding: 0 12px;
+  }
+  .panel-dock .explorer {
+    padding-top: 0;
+  }
+  .panel-dock .panel-tabs {
+    padding-bottom: 0 !important;
+  }
+  .panel-dock .search-wrap {
+    margin: 4px 0;
+  }
+  .panel-dock .result-heading[data-searching='false'] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  .panel-dock .result-heading[data-searching='true'] {
+    margin: 4px 0;
+  }
+  .panel-dock .place-group h3 {
+    margin-bottom: 2px;
+  }
 }

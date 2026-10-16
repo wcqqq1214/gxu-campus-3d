@@ -2,7 +2,7 @@ import { placeName, translate, type Locale, type Message } from './i18n';
 import { landmarkLabelAnchor } from './labels';
 import { createNightStyle, createRoadLights } from './night';
 import { createPalette } from './palette';
-import { createSky } from './sky';
+import { createSky, fogRange } from './sky';
 import { LIGHTING } from './lighting';
 import { navigationFootprints, searchableBuildings } from './navigation';
 import {
@@ -257,6 +257,12 @@ export function createScene(
       });
   }
   function renderScene() {
+    if (scene.fog instanceof THREE.Fog) {
+      Object.assign(
+        scene.fog,
+        fogRange(preset, camera.position.distanceTo(controls.target)),
+      );
+    }
     renderer.setRenderTarget(null);
     renderer.info.reset();
     if (renderer.shadowMap.enabled && renderer.shadowMap.needsUpdate)
