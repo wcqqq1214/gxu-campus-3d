@@ -1,5 +1,10 @@
 /** Chinese source messages are stable keys; placeholders preserve sentence structure. */
 export const englishMessages: Record<string, string> = {
+  展开列表: 'Expand list',
+  收回列表: 'Shrink list',
+  视角: 'View',
+  方位: 'Angle',
+  方位与近景: 'Directions and close-ups',
   '正在细化{name} · {percent}%': 'Loading details: {name} · {percent}%',
   地点名称: 'Place labels',
   在地图上显示地点名称: 'Show place names on the map',
@@ -210,4 +215,31 @@ export const englishMessages: Record<string, string> = {
   '广西大学-校园视图.png': 'Guangxi-University-Campus.png',
   '广西大学主校区三维地图，支持地标搜索、游览和昼夜切换。使用 Three.js 和 Blender 制作。':
     'Explore Guangxi University’s main campus in 3D. Search landmarks, take a tour and switch between day and night. Built with Three.js and Blender.',
+  搜索地点或建筑: 'Search places or buildings',
+  东: 'east',
+  东北: 'northeast',
+  北: 'north',
+  西北: 'northwest',
+  西: 'west',
+  西南: 'southwest',
+  南: 'south',
+  东南: 'southeast',
+  '{name}附近': 'Near {name}',
+  '{name}{direction}侧约 {distance} 米':
+    'About {distance} m {direction} of {name}',
+  '没有找到相关地点或建筑。试试“图书馆”或“宿舍”。':
+    'No matching places or buildings. Try “Library” or “Residence”.',
+  精选地点: 'Featured places',
+  其他建筑: 'Other buildings',
+  '还有 {count} 处，请输入更完整的名称': '{count} more. Type more of the name.',
+  建筑: 'Building',
+  东校园: 'East Campus',
+  西校园: 'West Campus',
+  北校园: 'North Campus',
+  '{zone} · {category}': '{zone} · {category}',
+  '约 {levels} 层 · 高约 {height} 米':
+    'About {levels} floors · {height} m tall',
+  '高约 {height} 米': 'About {height} m tall',
+  '外观按 OpenStreetMap 轮廓与层数估算，未经实地测绘。':
+    'Shape estimated from the OpenStreetMap footprint and floor count; not surveyed.',
 };

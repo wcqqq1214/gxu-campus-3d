@@ -23,6 +23,17 @@ const SKIES = {
   night: { zenith: '#101d32', horizon: '#344558', lower: '#1b2833', far: 5800 },
 };
 
+/** Keep the local haze band legible when fitting the campus into a narrow viewport. */
+export function fogRange(preset: Preset, viewDistance: number) {
+  // Desktop overview is about 3.7 km away; narrow screens need 9–11 km.
+  // Compensate only the extra viewing distance, retaining the haze band's width.
+  const offset = Math.max(0, viewDistance - 4000);
+  return {
+    near: (preset === 'night' ? 2500 : 2700) + offset,
+    far: SKIES[preset].far + offset,
+  };
+}
+
 /** A small, local equirectangular sky; reused for background and reflections. */
 export function createSky() {
   const canvas = document.createElement('canvas');
@@ -48,7 +59,8 @@ export function createSky() {
     // Dispose that cache before uploading a changed canvas (no network request).
     texture.dispose();
     texture.needsUpdate = true;
-    return new Fog(sky.horizon, preset === 'night' ? 2500 : 2700, sky.far);
+    const range = fogRange(preset, 0);
+    return new Fog(sky.horizon, range.near, range.far);
   }
   const fog = setPreset('day');
   return { texture, fog, setPreset, dispose: () => texture.dispose() };
