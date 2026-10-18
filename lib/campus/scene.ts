@@ -1857,13 +1857,6 @@ export function createScene(
     landmarkView,
     setOrbit,
     setViewport,
-    clearSelection: () => {
-      selected = null;
-      autoFramed = false;
-      setOrbit(false);
-      clearGroup(highlight);
-      dirty = true;
-    },
     setLayer: (key, on) => {
       if (!on) setHovered(null);
       layers[key] = on;
@@ -1941,11 +1934,6 @@ export function createScene(
       }
     },
     setLocale,
-    getLightingState: () => ({
-      preset,
-      labelTheme: preset === 'night' ? 'night' : 'day',
-    }),
-    getMetrics: metrics,
     getSnapshot,
     restoreSnapshot,
     dispose: () => {

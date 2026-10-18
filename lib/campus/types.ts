@@ -124,9 +124,7 @@ export interface Metrics {
 }
 export interface SceneController {
   setLocale: (locale: import('./i18n').Locale) => void;
-  getLightingState: () => { preset: Preset; labelTheme: 'day' | 'night' };
   setHovered: (id: string | null) => void;
-  clearSelection: () => void;
   focus: (id: string, origin?: SelectionOrigin) => void;
   landmarkView: (view: LandmarkView) => void;
   setOrbit: (on: boolean) => void;
@@ -140,7 +138,6 @@ export interface SceneController {
   exportImage: () => Promise<void>;
   retry: () => void;
   dispose: () => void;
-  getMetrics: () => Metrics;
   getSnapshot: () => CameraSnapshot;
   restoreSnapshot: (snapshot: Partial<CameraSnapshot>) => void;
 }

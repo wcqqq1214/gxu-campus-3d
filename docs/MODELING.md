@@ -167,7 +167,19 @@ npm run typecheck
 npm run lint
 ```
 
-Blender 专项校验必须提供本地源模型。`inspect_foundation_clearance.py --root=/path/to/candidate --building-id=... --report=/path/to/report.json --fail-on-intrusion` 可在隔离候选上检查完整闭合楼体的地形与普通道路侵入；`inspect_wall_ground_gaps.py` 另验实际墙脚接触。土木学院整栋套件已将两项检查接在既有23项建筑/入口专项后，不能仅凭立面与屋顶检查宣称接地通过。常用入口为 `validate_generic.py`、`validate_landmarks.py`、`validate_terrain_texture.py`，以及对应楼栋校验；植物更新还需检查 `validate_tree_clearance.py`、`validate_site_tree_clearance.py`、`validate_vegetation.py`。模型检查通过不代表未见立面已获实景确认。
+不依赖本地源模型的几何回归：
+
+```sh
+npm run test:geometry
+# Blender 不在 PATH 时，指定可执行文件路径：
+BLENDER_BIN=/path/to/blender npm run test:geometry
+```
+
+入口自动运行 `blender/test_*.py`，每份脚本使用独立的 Blender factory 启动环境，禁用自动执行，并在测试异常时返回非零状态。测试只依赖 Blender 内置 Python 模块，不需要 `work/venv`，不打开本地 `.blend`、重建校园或写入发布资产。CI 下载并校验固定版本 Blender 5.2.2，运行同一入口。
+
+基础回归 `test_foundation_geometry.py` 复用 `fixtures/civil-foundation-boundary.json` 的历史生产网格，覆盖原平面插值、边界保留、道路裁切及保护洞，并在默认和焊接简化配置下检查真实三角面、材质和 BVH 射线；历史约 6.7 毫米边界下降由该夹具保护。外廊回归 `test_attached_gallery.py` 复用现行第五教学楼数据、`ordinary_building` 和 `gallery_checks.check_galleries`，检查两档模型、多个朝向下的空廊、楼板、栏杆缝、斜屋顶、翼端接缝和墙洞；负对照直接破坏生成网格，确认检查会拒绝缺陷。已有篮球 LOD 和墙脚接触回归也由同一入口运行。
+
+这些测试保护源网格生成合同，不能代替当前发布 GLB 的解码验收。针对源模型及发布资产的 Blender 专项校验仍须提供对应输入。`inspect_foundation_clearance.py --root=/path/to/candidate --building-id=... --report=/path/to/report.json --fail-on-intrusion` 可在隔离候选上检查完整闭合楼体的地形与普通道路侵入；`inspect_wall_ground_gaps.py` 另验实际墙脚接触。土木学院整栋套件已将两项检查接在既有23项建筑/入口专项后，不能仅凭立面与屋顶检查宣称接地通过。常用入口为 `validate_generic.py`、`validate_landmarks.py`、`validate_terrain_texture.py`，以及对应楼栋校验；植物更新还需检查 `validate_tree_clearance.py`、`validate_site_tree_clearance.py`、`validate_vegetation.py`。模型检查通过不代表未见立面已获实景确认。
 
 需要前后比较的数学研究中心、道路、铺地、岸段和侧向接路校验，必须显式提供基准，不再默认依赖旧实验目录。例如：
 
@@ -209,4 +221,4 @@ PANEL_TEST_URL=http://127.0.0.1:3000/ node scripts/check-panel-camera-browser.mj
 
 两项检查使用本地 Playwright 与 Chromium；未在项目安装 Playwright 时，将 `PLAYWRIGHT_MODULE` 指向可用模块的入口文件，`CHROMIUM_PATH` 指向浏览器可执行文件。它们不包含在 `npm test` 中；后者只运行 `scripts/test-*.mjs`。相机检查会在开发响应中注入观测代码，不能改用静态预览地址。
 
-道路运行逻辑由 `lib/campus/road-batching.ts` 的 `batchStaticRoadSurfaces` 负责。原接缝合批实现保存在 `scripts/fixtures/legacy-road-batching.ts`，只供旧阶段的解码检查、回归测试与性能比较使用；历史比较不代表当前网页的完整加载顺序。
+道路运行逻辑由 `lib/campus/road-batching.ts` 的 `batchStaticRoadSurfaces` 负责，`scripts/test-static-road-batching.mjs` 覆盖几何、材质、图层及资源释放。旧接缝合批阶段的比较工具已归档，其实现及专用自测也已退役；历史复现可从提交 `e927d0f` 及更早记录取回，并使用对应阶段的输入。历史比较不代表当前网页的完整加载顺序。

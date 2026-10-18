@@ -32,10 +32,23 @@ jobs:
         if: github.event_name != 'pull_request'
       - run: npm ci
       - run: python -m pip install -r scripts/requirements.txt -c scripts/constraints-geodata.txt
+      - name: 安装 Blender 几何测试运行时
+        run: |
+          set -euo pipefail
+          geometry_blender_archive="$RUNNER_TEMP/blender-5.2.2-linux-x64.tar.xz"
+          curl --fail --location --retry 3 \
+            https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz \
+            --output "$geometry_blender_archive"
+          # 固定校验值来自同版本的官方 blender-5.2.2.sha256。
+          echo "84098912789dc450e95697c4184fb8a90acbe5111c2ba4aede3fecb57806a168  $geometry_blender_archive" | sha256sum --check
+          tar -xf "$geometry_blender_archive" -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/blender-5.2.2-linux-x64/blender" --version
+          echo "$RUNNER_TEMP/blender-5.2.2-linux-x64" >> "$GITHUB_PATH"
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
       - run: npm run test:data
+      - run: npm run test:geometry
       - run: npm run build:pages
         env:
           PAGES_BASE_PATH: ${{ github.event_name == 'pull_request' && '/gxu-campus-3d' || steps.pages.outputs.base_path }}

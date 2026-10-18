@@ -82,13 +82,26 @@ try {
     passed('收起面板可暂停继续，搜索暂停游览');
     await page.getByRole('button', { name: '结束游览', exact: true }).click();
     await search.fill('六教');
-    assert.equal(await page.locator('.place-row').count(), 1);
-    assert.equal(
-      await page.locator('.place-row').getAttribute('data-place-id'),
-      'teaching-six',
+    assert.deepEqual(
+      await page.locator('.place-group').evaluateAll((groups) =>
+        groups.map((group) => ({
+          name: group.getAttribute('aria-label'),
+          ids: [...group.querySelectorAll('.place-row')].map((row) =>
+            row.getAttribute('data-place-id'),
+          ),
+        })),
+      ),
+      [
+        { name: '精选地点', ids: ['teaching-six'] },
+        { name: '其他建筑', ids: ['north-campus/teaching-north-middle'] },
+      ],
     );
-    assert.equal(await page.locator('.place-group h3').count(), 0);
-    await page.locator('.place-row').click();
+    assert.equal(
+      await page.locator('.building-row strong').textContent(),
+      '第十六教学楼',
+    );
+    assert.equal(await page.locator('.place-group h3').count(), 2);
+    await page.locator('.place-row[data-place-id="teaching-six"]').click();
     await back();
     assert.equal(await search.inputValue(), '六教');
     await page.waitForFunction(
@@ -119,7 +132,7 @@ try {
       await search.evaluate((el) => document.activeElement === el),
       true,
     );
-    passed('别名搜索平铺、分类分组恢复、返回焦点和空结果重置');
+    passed('精选与普通建筑搜索分组、分类恢复、返回焦点和空结果重置');
     await page.getByRole('tab', { name: '光影', exact: true }).click();
     await page.getByRole('button', { name: '夜景', exact: true }).click();
     await page.getByRole('tab', { name: '图层', exact: true }).click();

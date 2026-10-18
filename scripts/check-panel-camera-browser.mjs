@@ -123,7 +123,7 @@ try {
         `${label}: zoom span changed`,
       );
     };
-    const toggleCycle = async (label) => {
+    const toggleCycle = async (label, controls) => {
       await settle();
       const before = await snapshot();
       for (const name of ['收起面板', '展开面板']) {
@@ -134,6 +134,19 @@ try {
           await snapshot(),
           `${viewport.width}/${label}/${name}`,
         );
+        if (controls)
+          assert.deepEqual(
+            await page
+              .getByRole('group', {
+                name: '地点观察视角',
+                exact: true,
+                includeHidden: true,
+              })
+              .getByRole('button', { includeHidden: true })
+              .allTextContents(),
+            controls,
+            `手机详情${name}后须保留同一组视角控件`,
+          );
       }
       results.push(`${viewport.width}: ${label}`);
       console.log(`PASS ${results.at(-1)}`);
@@ -143,23 +156,20 @@ try {
       .locator('.panel-dock')
       .getByRole('button', { name: '01 南大门', exact: true })
       .click();
-    await toggleCycle('地标自动取景保持相机与投影');
-    if (viewport.width < 760) {
-      const before = await snapshot();
-      const views = page.getByRole('group', { name: '地点观察视角' });
-      const controls = await views.getByRole('button').allTextContents();
-      for (const name of ['详情', '简要']) {
-        await page.getByRole('button', { name, exact: true }).click();
-        await page.waitForTimeout(650);
-        unchanged(before, await snapshot(), `手机详情切换为${name}`);
-        assert.deepEqual(
-          await views.getByRole('button').allTextContents(),
-          controls,
-        );
-      }
-      results.push('390: 简要与详情共用视角控件且保持构图');
-      console.log(`PASS ${results.at(-1)}`);
-    }
+    const controls =
+      viewport.width < 760
+        ? await page
+            .getByRole('group', { name: '地点观察视角', exact: true })
+            .getByRole('button')
+            .allTextContents()
+        : undefined;
+    if (controls) assert.ok(controls.length > 0);
+    await toggleCycle(
+      controls
+        ? '手机详情收起展开保留视角控件、相机与投影'
+        : '地标自动取景保持相机与投影',
+      controls,
+    );
     const beforeView = await snapshot();
     await page.getByRole('button', { name: '俯视', exact: true }).click();
     await toggleCycle('俯视保持相机与投影');
