@@ -29,7 +29,7 @@ jobs:
           cache-dependency-path: scripts/requirements.txt
       - uses: actions/configure-pages@v5
         id: pages
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
       - run: npm ci
       - run: python -m pip install -r scripts/requirements.txt -c scripts/constraints-geodata.txt
       - name: 安装 Blender 几何测试运行时
@@ -51,14 +51,14 @@ jobs:
       - run: npm run test:geometry
       - run: npm run build:pages
         env:
-          PAGES_BASE_PATH: ${{ github.event_name == 'pull_request' && '/gxu-campus-3d' || steps.pages.outputs.base_path }}
+          PAGES_BASE_PATH: ${{ (github.event_name == 'pull_request' || github.ref != 'refs/heads/main') && '/gxu-campus-3d' || steps.pages.outputs.base_path }}
       - uses: actions/upload-pages-artifact@v4
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         with:
           path: out
   deploy:
     needs: build
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       pages: write

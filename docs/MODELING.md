@@ -31,6 +31,8 @@ npm run build:pages
 
 `build:pages` 生成 `out/`，当前 CI 发布到 GitHub Pages；`PAGES_BASE_PATH` 可指定仓库子路径。`npm run preview` 默认在 4300 端口预览 `out/`。运行中的预览可能仍读取该目录，清理或重建前先确认使用情况。
 
+使用 `gh workflow run pages.yml --ref dev` 可在 Linux 上单独运行完整检查，包括 Blender 几何回归。非 `main` 分支使用 `/gxu-campus-3d` 构建前缀，并跳过 Pages 配置、产物上传和部署；只有 `main` 的非 PR 运行允许发布。
+
 ## 数据和完整模型构建
 
 数据处理使用 Python 3.12 和仓库内的依赖约束。模型构建需要 Blender（当前源文件记录为 5.2.2 LTS）以及提供 `jpegtran` 的 libjpeg-turbo。字体和自制纹理已包含在仓库中。
