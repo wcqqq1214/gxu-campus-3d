@@ -32,6 +32,11 @@ jobs:
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
       - run: npm ci
       - run: python -m pip install -r scripts/requirements.txt -c scripts/constraints-geodata.txt
+      - name: 安装无损 JPEG 测试依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends libjpeg-turbo-progs
+          command -v jpegtran
       - name: 安装 Blender 几何测试运行时
         run: |
           set -euo pipefail
