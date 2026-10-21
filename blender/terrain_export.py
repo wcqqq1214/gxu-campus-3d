@@ -44,8 +44,8 @@ def replace_precise_terrain(path,objects,*,terrain_only=False,planar_report_dire
         with tempfile.TemporaryDirectory(prefix='gxu-ground-export-') as directory:
             precise=Path(directory)/'ground.glb'
             from terrain_planar import planar_terrain_candidate
-            candidate=(planar_terrain_candidate(obj,dump_directory=planar_report_directory)
-                       if name=='terrain' else nullcontext())
+            candidate=(planar_terrain_candidate(obj,dump_directory=planar_report_directory,shared_position_bounds=name=='roads')
+                       if name in ('terrain','roads') else nullcontext())
             with omit_zero_area_terrain_faces(obj,position_quantization_bits=bits),candidate as report,omit_unused_uvs(deduplicate_vertices=name in ('terrain','roads'),share_position_bounds=name=='roads'):
                 bpy.ops.export_scene.gltf(filepath=str(precise),export_format='GLB',use_selection=True,export_extras=True,
                     export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,

@@ -27,10 +27,18 @@ def clear_paving_ground(terrain,paving,record):
             leftovers=[]
             for part in remaining:
                 if not overlaps(bounds(part),area):leftovers.append(part);continue
-                kept,outside=split_convex(part,outline);leftovers.extend(outside)
-                if len(kept)<3:continue
+                kept,outside=split_convex(part,outline)
                 a=outline[0]
                 def ceiling(p):return a[2]-(normal.x*(p[0]-a[0])+normal.y*(p[1]-a[1]))/normal.z-clearance
+                # Dense ground samples can differ by float32 roundoff. For
+                # explicitly tolerant records keep the entire original face
+                # when this mask needs no meaningful lowering; do not add
+                # hundreds of unnecessary clipping seams to a sound plane.
+                tolerance=record.get('roundoffTolerance',0)
+                if tolerance and (len(kept)<3 or max(p[2]-ceiling(p) for p in kept)<=tolerance):
+                    leftovers.append(part);continue
+                leftovers.extend(outside)
+                if len(kept)<3:continue
                 # Split where the original terrain intersects the clearance
                 # plane, so the minimum of two planes is represented exactly.
                 sides=[[],[]]

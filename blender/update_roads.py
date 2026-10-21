@@ -3,6 +3,7 @@ import hashlib,json,sys
 from pathlib import Path
 import bpy
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
+from initial_model_budget import check_initial_model_budget
 from geometry import MATERIALS
 from preserve_glb_geometry import preserve_geometry,compact_buffer_views,unpack,mesh_nodes_by_name
 previous=(ROOT/'public/models/base.glb').read_bytes()
@@ -85,6 +86,6 @@ assert set(changed)<= {'roads','terrain','green'}|{'infra-approach-'+k for k in 
 assert all(hashlib.sha256((ROOT/'public/models'/n).read_bytes()).hexdigest()==h for n,h in before.items() if n not in {'base.glb'}|{k+'.glb' for k in high})
 report={'changedBaseNodes':changed,'retainedBaseNodes':len(retained),'retainedNearAndTreeGlbs':len(before)-1-len(high),'trees':len(trees),'initialBytes':len(blob)+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
 (ROOT/'docs/model-checks/bridge-joins-models.json').write_text(json.dumps(report,indent=2)+'\n')
-assert report['initialBytes']<6_000_000,report
+check_initial_model_budget(report['initialBytes'])
 assert report['blendBytes']<100*1024*1024,report
 print(report,flush=True)

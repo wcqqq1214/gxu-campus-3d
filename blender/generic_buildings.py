@@ -9,6 +9,7 @@ from attached_portico import add_attached_portico
 from facade_bands import add_band_ledges, add_band_windows, band_replaces_window, add_horizontal_ledges
 from facade_panels import add_panels, panel_replaces_window
 from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
+from recessed_stair_entry import add_recessed_stair_entry, recessed_entry_blocks_window
 from roof_eave import add_roof_eave, replaces_parapet
 from terraced_stairs import blocks_window as stairs_block_window
 from roof_crown import side_wall_blocks_window
@@ -64,7 +65,10 @@ def shared_form(b, z, C):
                 vertices=[p for ring in poly for p in ring[:-1]]
                 for i in range(0,len(indices),3):
                     part_body.face([(vertices[k][0],vertices[k][1],z+soffit) for k in reversed(indices[i:i+3])],roof_wall)
-            part_body.extrude(part['polygons'],triangles,z-.15,floor+.15,C['stone'],C['stone'])
+            entry_floor=next((e['recessedStairEntry']['frameFloor'] for e in form['entrances']
+                              if e.get('recessedStairEntry',{}).get('framePart')==part.get('id')),None)
+            floor_geometry=entry_floor or {'polygons':part['polygons'],'triangles':triangles}
+            part_body.extrude(floor_geometry['polygons'],floor_geometry['triangles'],z-.15,floor+.15,C['stone'],C['stone'])
             for column in opening['columns']:
                 column_material=C[column['finish']] if 'finish' in column else part_wall
                 if column.get('shape')=='cylinder':
@@ -85,7 +89,19 @@ def shared_form(b, z, C):
             roof_material = C['blueRoof'] if roof.get('finish') == 'blue-metal' else C['paleRoof']
             top_indices = [[] for _ in part['polygons']] if 'inset' in roof else triangles
             depth = part.get('baseDepth', .5)
-            part_body.extrude(part['polygons'], top_indices, z-depth, h+depth, part_wall, roof_material)
+            hall_entry=next((e['recessedStairEntry'] for e in form['entrances']
+                             if 'hall' in e.get('recessedStairEntry',{}) and e['recessedStairEntry']['hall']['part']==part.get('id')),None)
+            if hall_entry:
+                hall=hall_entry['hall'];floor=hall_entry['doorLandingHeight'];ceiling=floor+hall['clearHeight']
+                empty=[[] for _ in part['polygons']]
+                # The opening is a real omission of wall geometry. Keep the
+                # mapped footprint and roof above it exactly where they were.
+                part_body.extrude(part['polygons'],empty,z-depth,floor+depth,part_wall,part_wall)
+                cut=hall['wallGeometry']
+                part_body.extrude(cut['polygons'],[[] for _ in cut['polygons']],z+floor,hall['clearHeight'],part_wall,part_wall)
+                part_body.extrude(part['polygons'],top_indices,z+ceiling,h-ceiling,part_wall,roof_material)
+            else:
+                part_body.extrude(part['polygons'], top_indices, z-depth, h+depth, part_wall, roof_material)
             if 'inset' in roof:
                 for key, material in [('borderGeometry',C['dark']),('centerGeometry',roof_material)]:
                     geometry = roof[key]
@@ -171,6 +187,9 @@ def shared_form(b, z, C):
         from stair_tower import stair_access_door
         stair_access_door(entrance,door,z,C)
     for e in form['entrances']:
+        if 'recessedStairEntry' in e:
+            add_recessed_stair_entry(entrance,e,z,C)
+            continue
         if 'flushEntrance' in e:
             add_flush_entrance(entrance,e,z,C)
             continue
@@ -331,6 +350,8 @@ def ordinary_building(b, z, C, detail):
                     continue
                 blocked_by_door=False
                 for entry in form['entrances']:
+                    if recessed_entry_blocks_window(entry,x,y,nx,ny,zz-z-wh/2,zz-z+wh/2,ww):
+                        blocked_by_door=True;break
                     if flush_entrance_blocks_window(entry,x,y,nx,ny,zz-z-wh/2,zz-z+wh/2,ww):
                         blocked_by_door=True;break
                     if 'attachedPortico' not in entry and 'doorFrame' not in entry and 'shelter' not in entry and not floor_heights:continue

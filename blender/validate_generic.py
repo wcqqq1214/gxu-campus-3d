@@ -114,6 +114,11 @@ def samples(b):
         return points
     for e in form['entrances']:
         x,y=e['center'];a=math.radians(e['bearing']);nx,ny=math.sin(a),math.cos(a)
+        if 'recessedStairEntry' in e:
+            p=e['recessedStairEntry'];distance=(p['outerEnd']+p['innerStart'])/2
+            points.append({'kind':'recessed-entry-landing','x':x-nx*distance,'y':y-ny*distance,
+                           'top':z+p['platformHeight']+.2,'expected':z+p['platformHeight']})
+            continue
         if 'flushEntrance' in e:
             p=e['flushEntrance'];expected=z+p['floorHeight']+p['doorHeight']+p['frameWidth']/2
             points.append({'kind':'flush-door-header','x':x+nx*.13,'y':y+ny*.13,
@@ -169,7 +174,7 @@ def main():
     prefix=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'generic')
     if not re.fullmatch('[a-z0-9-]+',prefix):raise ValueError('Invalid report prefix')
     bs = [b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if ordinary(b)]
-    colors = ['pink','livingWarm','livingCool','stone','stoneWarm','stoneCool','white','paleRoof','blueRoof','red','dark','path','shadeGlass','glass']
+    colors = ['pink','livingWarm','livingCool','stone','stoneWarm','stoneCool','white','paleRoof','blueRoof','red','dark','path','shadeGlass','glass','grass','green']
     C = {k:i for i,k in enumerate(colors)}
     MATERIALS[:]=[bpy.data.materials.new('generic-check-'+name) for name in colors]
     generated = []

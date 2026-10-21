@@ -11,6 +11,7 @@ import bpy
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
+from initial_model_budget import check_initial_model_budget
 import geometry
 from geometry import MATERIALS, Mesh
 from south_gate_site import ensure_materials, repair_roads, REPAIR_BOUNDS
@@ -213,7 +214,7 @@ def main():
         assert a.keys() == b.keys()
         assert all(a[k] == b[k] for k in a if k not in ('landmark-south-gate','roads'))
         manifest_before=json.loads((ROOT/'public/data/models.json').read_text())
-        assert candidate.stat().st_size+manifest_before['trees']['bytes']<=6_000_000,'Initial load budget exceeded'
+        check_initial_model_budget(candidate.stat().st_size+manifest_before['trees']['bytes'])
         old_mesh = old.data
         bpy.data.objects.remove(old, do_unlink=True)
         if old_mesh.users == 0:

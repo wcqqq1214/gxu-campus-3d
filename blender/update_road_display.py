@@ -16,6 +16,7 @@ import bpy
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'blender'))
+from initial_model_budget import check_initial_model_budget
 sys.path.insert(0, str(ROOT/'scripts'))
 import geometry
 from geometry import Mesh
@@ -182,7 +183,7 @@ def main():
     manifest = json.loads((input_root/'public/data/models.json').read_text())
     raw = candidate.read_bytes()
     manifest['base'].update(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
-    assert len(raw) + manifest['trees']['bytes'] < 6_000_000
+    check_initial_model_budget(len(raw) + manifest['trees']['bytes'])
     (output/'public/data').mkdir(exist_ok=True)
     (output/'public/data/models.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
     summary = dict(cuts=report, decodedCuts=decoded_report,

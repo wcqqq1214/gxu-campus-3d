@@ -3,6 +3,7 @@ import sys,json,hashlib
 from pathlib import Path
 import bpy
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
+from initial_model_budget import check_initial_model_budget
 from geometry import MATERIALS,Mesh
 from basketball import court_model,bank_paving
 previous_base=(ROOT/'public/models/base.glb').read_bytes()
@@ -65,7 +66,7 @@ bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'),compre
 print('Basketball updated in editable source and base GLB',flush=True)
 
 assert (ROOT/'blender/gxu-campus.blend').stat().st_size<100*1024*1024
-assert manifest['base']['bytes']+manifest['trees']['bytes']<6_000_000
+check_initial_model_budget(manifest['base']['bytes']+manifest['trees']['bytes'])
 from preserve_glb_geometry import unpack,mesh_nodes_by_name
 a,ab=unpack(previous_base);c,cb=unpack((ROOT/'public/models/base.glb').read_bytes())
 def signature(doc,binary,node):

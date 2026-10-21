@@ -507,6 +507,27 @@
         "extent": "保留模型24.7549米全宽台阶，约3.4至4.0米外接地图way/759628239服务路；接路横向范围[-11.7,8.0]米、梯形边界及铺装材质为估算。地图路边不足以承接整段等宽铺地，不扩大道路轮廓；不代表完整前场实测平面。",
         "grading": "近端沿用台阶起算高3.35米，远端贴合实际道路三角网，仅下削连接铺地下的地形；标高与坡度为模型关系，不是实测或无障碍认证。"
       }
+    },
+    {
+      "id": "materials-east-forecourt",
+      "type": "recessed-entry-ground",
+      "buildingId": "relation/11564999",
+      "footprintRevision": "45ebc66d4707c14423baedc11266da9b8997aaa0336d6b51afa1bca1c2093b94",
+      "entranceId": "east-recessed-entry",
+      "groundClearance": 0.04,
+      "sourceRefs": [
+        "gxuMaterialsEnglishExterior",
+        "gxuMaterialsEntry2022",
+        "gxuMaterialsFacade",
+        "esriMaterialsGroundContext",
+        "osm"
+      ],
+      "evidence": {
+        "presence": "校方正面与设计院斜侧照片均可见向东外伸的台阶、铺装前场和侧向停车。",
+        "extent": "前场铺装向东24米，抬高平台宽32米，两侧停车铺装接南北横向道路。以道路地面配准，避开航拍屋顶视差。北侧停车带由设计院照片支撑，南侧仅按航拍保守表达其边界，不声明实测车位。",
+        "grading": "外部铺装由源场景地面采样；低台阶底2.8米、平台4.0米、主平台6.6米、门厅9.9米，两侧庭院底1.3米为模型相对标高。庭院局部下挖并加挡墙，原DEM不改。 停车带接路边缘另按源场景最终保留路面采样校正，并在整条停车带/通行带宽度内线性过渡，内侧边缘保持原高程；不把DEM与重建道路的差异当作真实路坎。",
+        "road": "北停车带按当前道路边界退让0.03米，南侧保留通行带接南横路；君武路和两侧横路不移动，不让横穿旧服务路穿过台阶或庭院。"
+      }
     }
   ]
 }

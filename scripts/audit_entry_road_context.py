@@ -16,6 +16,19 @@ VEHICLE_ROADS={'motorway','trunk','primary','secondary','tertiary','unclassified
 FOOTPRINT_CONFIGS=('attachedPortico','stairFlight','recessedStairEntry')
 
 
+def effective_road_surfaces(root=ROOT):
+    """Audit the same overlay order used by the scene and foundation build."""
+    from shore_data import effective_surfaces
+    read=lambda name:json.loads((root/'public/data'/f'{name}.json').read_text())
+    layers=[read(k) for k in ('infrastructure','surroundings','campus-roads','sites')]
+    surfaces=effective_surfaces(read('surfaces'),[v['surfaceOverrides'] for v in layers],set(layers[0]['replaceSurfaceIds']))
+    # Replaced OSM roads can have empty triangles. Their rendered replacement
+    # layers still carry traffic and must participate in entrance audits.
+    surfaces += [{**v,'id':'campus-roads:'+v['id'],'kind':'roads','tags':{'highway':'service'}}
+                 for v in layers[2]['layers'] if v['material']=='asphalt']
+    return surfaces
+
+
 def conflicts_for_entry(building_id,entry,surfaces):
     shapes=[Polygon(entry[k]['footprint']) for k in FOOTPRINT_CONFIGS if k in entry and 'footprint' in entry[k]]
     if not shapes:return []
@@ -39,7 +52,7 @@ def main():
     parser.add_argument('--report',type=Path,required=True)
     args=parser.parse_args()
     read=lambda p:json.loads(p.read_text())
-    surfaces=read(ROOT/'public/data/surfaces.json');bs=read(ROOT/'public/data/buildings.json')
+    surfaces=effective_road_surfaces();bs=read(ROOT/'public/data/buildings.json')
     if args.proposal:
         proposal=read(args.proposal)
         if proposal['buildingId'] not in {b['id'] for b in bs}:raise ValueError('Unknown proposal building')
@@ -49,7 +62,7 @@ def main():
         if args.building_id and args.building_id not in {b['id'] for b in bs}:raise ValueError('Unknown building ID')
         entries=[(b['id'],e) for b in bs if not args.building_id or b['id']==args.building_id for e in b.get('form',{}).get('entrances',[]) if any('footprint' in e.get(k,{}) for k in FOOTPRINT_CONFIGS)]
     conflicts=[r for ident,e in entries for r in conflicts_for_entry(ident,e,surfaces)]
-    files=[ROOT/'public/data/buildings.json',ROOT/'public/data/surfaces.json']+([args.proposal] if args.proposal else [])
+    files=[ROOT/'public/data'/f'{name}.json' for name in ('buildings','surfaces','infrastructure','surroundings','campus-roads','sites')]+([args.proposal] if args.proposal else [])
     report=dict(status='needs-review' if conflicts else 'no-plan-overlap-in-tested-footprints',mode='proposal' if args.proposal else 'current-snapshot',testedEntries=len(entries),testedEntryIds=[{'buildingId':ident,'entranceId':e['id']} for ident,e in entries],conflicts=conflicts,limitations=['Only explicit attached-portico/stair footprints and mapped motor-vehicle surface roads are tested.','No overlap is not whole-entrance acceptance; terrain, pedestrian paths, level separation, crown clearance and actual geometry require separate checks.','A bridge/tunnel/layer tag is retained for review, never silently excluded.'],fingerprints={str(p.relative_to(ROOT) if p.is_absolute() and p.is_relative_to(ROOT) else p):hashlib.sha256(p.read_bytes()).hexdigest() for p in files})
     args.report.parent.mkdir(parents=True,exist_ok=True);args.report.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps(report,ensure_ascii=False,indent=2))

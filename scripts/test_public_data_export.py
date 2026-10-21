@@ -31,7 +31,48 @@ class PublicExportTests(unittest.TestCase):
         (self.root / 'public/data' / name).write_text(json.dumps(value, ensure_ascii=False, separators=(',', ':')) + '\n')
 
     def snapshot(self):
-        return {name:(self.root / 'public/data' / name).read_bytes() for name in (*EXPORTS, 'low-planting.json')}
+        return {name:(self.root / 'public/data' / name).read_bytes() for name in (*EXPORTS, 'low-planting.json', 'pavings.json', 'shores.json')}
+
+    def ground_contexts(self):
+        sites=self.read('sites.json')
+        paving=[self.read(name+'.json') for name in ('surfaces','infrastructure','surroundings','campus-roads')]+[sites]
+        shore={'surfaces':paving[0],'infrastructure':paving[1],'surroundings':paving[2],
+               'roads':paving[3],'sites':sites,'buildings':[[b['id'],b['polygons']] for b in self.read('buildings.json')]}
+        return {'pavings.json':paving,'shores.json':shore}
+
+    def prepare_dependent_fingerprints(self):
+        foundation=self.read('foundations.json')
+        foundation['contextRevision']=revision(foundation_context(self.root))
+        self.write('foundations.json',foundation)
+        config=json.loads((self.root/'data/low-planting.json').read_text())
+        data={name:self.read(name+'.json') for name in CONTEXT_FILES}
+        low=self.read('low-planting.json')
+        low['contextRevision']=digest(context_value(self.root,config,data))
+        self.write('low-planting.json',low)
+
+    def test_fresh_preparation_fingerprints_follow_exported_site_fields(self):
+        sites=self.read('sites.json')
+        sites['sites'][0]['evidence']={'dimensions':'fresh preparation evidence'}
+        self.write('sites.json',sites)
+        for name,context in self.ground_contexts().items():
+            value=self.read(name);value['contextRevision']=digest(context);self.write(name,value)
+        self.prepare_dependent_fingerprints()
+        export_public_data(self.root)
+        load_foundations(self.root);load_prepared(self.root)
+        for name,context in self.ground_contexts().items():
+            self.assertEqual(self.read(name)['contextRevision'],digest(context))
+        first=self.snapshot();export_public_data(self.root)
+        self.assertEqual(self.snapshot(),first)
+
+    def test_stale_ground_fingerprints_are_not_blessed_by_export(self):
+        for name in ('pavings.json','shores.json'):
+            with self.subTest(name=name):
+                original=self.read(name);broken=dict(original,contextRevision='stale')
+                self.write(name,broken);self.prepare_dependent_fingerprints();before=self.snapshot()
+                with self.assertRaisesRegex(ValueError,name+' context is stale'):
+                    export_public_data(self.root)
+                self.assertEqual(self.snapshot(),before)
+                self.write(name,original)
 
     def test_legacy_migration_idempotence_and_documentation_independence(self):
         buildings = self.read('buildings.json')
