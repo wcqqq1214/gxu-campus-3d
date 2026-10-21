@@ -162,6 +162,16 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 - `blender/build_vegetation.py`：重导植物模板；模板几何改变时，仍须同步 `.blend` 源模型。
 - `blender/repair_foundation_candidate.py`、`export_repaired_ground.py`：在独立候选中修补基础，再做局部导出与校验。
 
+道路与篮球更新入口现在先复制当前已发布资产和本地源模型到独立候选目录。基础 GLB 从原文件逐节点合成，只导入本轮目标节点；无关节点的压缩载荷、访问器、材质、嵌入纹理、变换和附加属性全部保留。道路更新同时保留篮球近景及其清单，篮球更新保留其他近景。源对象保留检查、土木道路边缘/坡度、资环材入口、普通建筑两档几何、资源哈希及首屏预算全部通过后，才覆盖正式资产。构建或校验失败只留下候选和日志；发布前检测并发修改，普通文件替换失败时回滚已替换文件。
+
+默认直接运行原更新命令即可完成上述流程；加 `-- --output-root=/path/to/new-candidate` 只生成并验证候选，不覆盖正式资产。回归测试从当前 `public/` 和本地 `blender/gxu-campus.blend` 分别运行两个入口，检查正式输入未变，并再次核对无关节点的完整资源引用：
+
+```sh
+npm run test:incremental -- --output-root=/path/to/new-regression-directory
+```
+
+测试需要 Blender 和 Node.js 在 PATH 中（也可设置 `BLENDER_BIN`、`NODE_BIN`），输出目录必须尚不存在。`test:data` 另包含已发布节点保留、目标节点增删、纹理损坏检测、构建/校验及预算失败不发布、并发修改拒绝和文件替换失败回滚的快速回归。
+
 各入口的修改范围不同，调用前先阅读参数和脚本说明。先修改输入，在独立候选中验证，通过后才替换正式资产；保留仍用于对比的基准。网页只按实际发布的 GLB 验收，不能用截图代替几何、净空和性能检查。
 
 普通台阶的 `front-connection` 可显式配置 `roadSpan: [左端, 右端]`，单位米、坐标相对入口局部横轴。它保留台阶全宽，只在道路一端收窄；两端必须位于原台阶宽度内、跨过入口中轴，并落在同一已映射道路上。未配置时仍等宽连接；不适用于无台阶门口或阶梯建筑。该参数不能扩大道路轮廓，也不能代替前场实测边界。
@@ -193,7 +203,7 @@ BLENDER_BIN=/path/to/blender npm run test:geometry
 
 基础回归 `test_foundation_geometry.py` 复用 `fixtures/civil-foundation-boundary.json` 的历史生产网格，覆盖原平面插值、边界保留、道路裁切及保护洞，并在默认和焊接简化配置下检查真实三角面、材质和 BVH 射线；历史约 6.7 毫米边界下降由该夹具保护。外廊回归 `test_attached_gallery.py` 复用现行第五教学楼数据、`ordinary_building` 和 `gallery_checks.check_galleries`，检查两档模型、多个朝向下的空廊、楼板、栏杆缝、斜屋顶、翼端接缝和墙洞；负对照直接破坏生成网格，确认检查会拒绝缺陷。已有篮球 LOD 和墙脚接触回归也由同一入口运行。
 
-这些测试保护源网格生成合同，不能代替当前发布 GLB 的解码验收。针对源模型及发布资产的 Blender 专项校验仍须提供对应输入。`inspect_foundation_clearance.py --root=/path/to/candidate --building-id=... --report=/path/to/report.json --fail-on-intrusion` 可在隔离候选上检查完整闭合楼体的地形与普通道路侵入；`inspect_wall_ground_gaps.py` 另验实际墙脚接触。土木学院整栋套件已将两项检查接在既有23项建筑/入口专项后，不能仅凭立面与屋顶检查宣称接地通过。常用入口为 `validate_generic.py`、`validate_landmarks.py`、`validate_terrain_texture.py`，以及对应楼栋校验；植物更新还需检查 `validate_tree_clearance.py`、`validate_site_tree_clearance.py`、`validate_vegetation.py`。模型检查通过不代表未见立面已获实景确认。
+普通建筑源模型比较统一使用世界坐标，以兼容已有增量平移/旋转；几何测试同时检查真实位置偏差仍会被检出。这些测试保护源网格生成合同，不能代替当前发布 GLB 的解码验收。针对源模型及发布资产的 Blender 专项校验仍须提供对应输入。`inspect_foundation_clearance.py --root=/path/to/candidate --building-id=... --report=/path/to/report.json --fail-on-intrusion` 可在隔离候选上检查完整闭合楼体的地形与普通道路侵入；`inspect_wall_ground_gaps.py` 另验实际墙脚接触。土木学院整栋套件已将两项检查接在既有23项建筑/入口专项后，不能仅凭立面与屋顶检查宣称接地通过。常用入口为 `validate_generic.py`、`validate_landmarks.py`、`validate_terrain_texture.py`，以及对应楼栋校验；植物更新还需检查 `validate_tree_clearance.py`、`validate_site_tree_clearance.py`、`validate_vegetation.py`。模型检查通过不代表未见立面已获实景确认。
 
 需要前后比较的数学研究中心、道路、铺地、岸段和侧向接路校验，必须显式提供基准，不再默认依赖旧实验目录。例如：
 

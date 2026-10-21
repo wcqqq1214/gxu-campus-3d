@@ -21,7 +21,8 @@
     "test:data": "python3 -m unittest discover -s scripts -p 'test_*.py'",
     "test:geometry": "node scripts/run-geometry-tests.mjs",
     "data:restore": "python3 scripts/restore_snapshot.py",
-    "preview": "node scripts/preview.mjs"
+    "preview": "node scripts/preview.mjs",
+    "test:incremental": "python3 scripts/test-incremental-updates.py"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",

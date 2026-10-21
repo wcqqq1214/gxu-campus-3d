@@ -24,6 +24,13 @@ def ordinary(b):
             and b['tags'].get('memorial') != 'column')
 
 
+def component_vertices(obj, group):
+    # Generator coordinates and roof probes are world-space. Incremental
+    # adjustments may retain a translated/rotated editable object.
+    return [obj.matrix_world @ v.co for v in obj.data.vertices
+            if any(g.group == group.index for g in v.groups)]
+
+
 def mesh_tree(obj):
     return BVHTree.FromPolygons([obj.matrix_world@v.co for v in obj.data.vertices],
                                 [tuple(p.vertices) for p in obj.data.polygons])
@@ -223,7 +230,7 @@ def main():
         for name,start,end in expected.parts[:3]:
             group=o.vertex_groups.get(name)
             assert group is not None,(b['id'],name,'missing editable component')
-            actual=[v.co for v in o.data.vertices if any(g.group==group.index for g in v.groups)]
+            actual=component_vertices(o,group)
             # Source vertices are welded for file size; compare geometry in
             # both directions, independent of duplicate count or mesh ordering.
             predicted=expected.v[start:end]
