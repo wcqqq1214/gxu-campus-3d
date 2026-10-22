@@ -114,7 +114,7 @@ def publish_locked(root, candidate, before):
     changed = [name for name, digest in after.items() if before.get(name) != digest]
     directory = Path(tempfile.mkdtemp(prefix='gxu-publish-', dir=root / 'work'))
     backup = directory / 'backup'; prepared = directory / 'prepared'
-    installed = []
+    attempted = []
     retain = False
     record = {'state': 'publishing', 'root': str(root.resolve()), 'candidate': str(candidate.resolve()),
               'files': {name: {'before': before.get(name), 'after': after[name],
@@ -142,12 +142,15 @@ def publish_locked(root, candidate, before):
                 target = root / name; target.parent.mkdir(parents=True, exist_ok=True)
                 if file_digest(target) != before.get(name):
                     raise RuntimeError(f'Formal asset changed before replacement: {name}')
-                os.replace(prepared / name, target); installed.append(name)
+                # Record intent first: SIGINT can arrive after rename succeeds but
+                # before Python resumes. Rollback reconciles either outcome by hash.
+                attempted.append(name)
+                os.replace(prepared / name, target)
             if snapshot(root) != after:
                 raise RuntimeError('Formal assets changed during publication')
         except BaseException as error:
             failures = {}
-            for name in reversed(installed):
+            for name in reversed(attempted):
                 try:
                     target = root / name
                     current = file_digest(target)
@@ -169,8 +172,17 @@ def publish_locked(root, candidate, before):
                         target.unlink()
                 except BaseException as restore_error:
                     failures[name] = repr(restore_error)
+            # A successful restore call is not enough: earlier restored files may
+            # have changed while later files were recovering. Keep backups unless
+            # every attempted target is back to its baseline (or absent if new).
+            for name in attempted:
+                try:
+                    if file_digest(root / name) != before.get(name):
+                        failures.setdefault(name, 'Rollback verification differs from baseline')
+                except BaseException as verify_error:
+                    failures.setdefault(name, repr(verify_error))
             if failures:
-                record.update(state='rollback_incomplete', installed=installed,
+                record.update(state='rollback_incomplete', attempted=attempted,
                               publicationError=repr(error), rollbackErrors=failures)
                 journal_error = ''
                 try:

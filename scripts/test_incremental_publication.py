@@ -54,6 +54,41 @@ except Exception as error:
 '''
 
 
+SIGNAL_CHILD = r'''
+import os, signal, sys
+from pathlib import Path
+sys.path.insert(0, sys.argv[1])
+from incremental_update import publish, snapshot
+root, candidate = map(Path, sys.argv[2:4])
+interrupt_target, timing, fail_restore = sys.argv[4:7]
+original_replace = os.replace
+signal.signal(signal.SIGINT, signal.default_int_handler)
+
+def replace(source, target):
+    source, target = Path(source), Path(target)
+    interrupt = 'prepared' in source.parts and target == root / interrupt_target
+    if interrupt and timing == 'before':
+        os.kill(os.getpid(), signal.SIGINT)
+    if fail_restore == 'yes' and 'restore' in source.parts and target == root / interrupt_target:
+        raise PermissionError('injected restore failure')
+    result = original_replace(source, target)
+    if interrupt and timing == 'after':
+        # The rename has completed, but the caller has not resumed bookkeeping.
+        os.kill(os.getpid(), signal.SIGINT)
+    return result
+
+os.replace = replace
+try:
+    publish(root, candidate, snapshot(root))
+except KeyboardInterrupt:
+    print('INTERRUPTED', flush=True)
+except RuntimeError as error:
+    print(str(error), flush=True)
+else:
+    raise AssertionError('SIGINT was not delivered')
+'''
+
+
 class PublicationFaultTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -69,6 +104,75 @@ class PublicationFaultTests(unittest.TestCase):
 
     def transactions(self):
         return list((self.root/'work').glob('gxu-publish-*'))
+
+    def interrupt_publication(self, target, timing='after', fail_restore=False):
+        result = subprocess.run(
+            [sys.executable, '-c', SIGNAL_CHILD, str(ROOT / 'blender'),
+             str(self.root), str(self.candidate), target, timing, 'yes' if fail_restore else 'no'],
+            capture_output=True, text=True, timeout=10)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout
+
+    def test_sigint_after_successful_replace_restores_every_attempted_file(self):
+        for name in self.names:
+            with self.subTest(interrupted=name):
+                self.assertIn('INTERRUPTED', self.interrupt_publication(name))
+                self.assertEqual(snapshot(self.root), self.before)
+                self.assertEqual(self.transactions(), [])
+        # A real publisher must be able to acquire the released lock and proceed.
+        retry = self.start(self.candidate, 'plain')
+        output, error = retry.communicate(timeout=10)
+        self.assertEqual(retry.returncode, 0, error)
+        self.assertIn(b'SUCCESS', output)
+        self.assertEqual(snapshot(self.root), snapshot(self.candidate))
+
+    def test_sigint_before_replace_preserves_unmodified_target(self):
+        self.assertIn('INTERRUPTED', self.interrupt_publication(self.names[1], timing='before'))
+        self.assertEqual(snapshot(self.root), self.before)
+        self.assertEqual(self.transactions(), [])
+
+    def test_sigint_after_new_file_install_removes_it_during_rollback(self):
+        name = 'public/data/added.json'
+        (self.candidate / name).write_bytes(b'new file')
+        self.assertIn('INTERRUPTED', self.interrupt_publication(name))
+        self.assertFalse((self.root / name).exists())
+        self.assertEqual(snapshot(self.root), self.before)
+        self.assertEqual(self.transactions(), [])
+
+    def test_sigint_with_failed_restore_retains_backups_and_restores_other_files(self):
+        name = self.names[1]
+        self.assertIn('Recovery backups retained', self.interrupt_publication(name, fail_restore=True))
+        self.assertEqual((self.root / self.names[0]).read_bytes(), b'old ' + self.names[0].encode())
+        self.assertEqual((self.root / name).read_bytes(), b'new ' + name.encode())
+        transaction, = self.transactions()
+        record = json.loads((transaction / 'recovery.json').read_text())
+        self.assertEqual(record['state'], 'rollback_incomplete')
+        self.assertIn(name, record['rollbackErrors'])
+        for original in self.names:
+            self.assertEqual((transaction / 'backup' / original).read_bytes(), b'old ' + original.encode())
+        with self.assertRaisesRegex(RuntimeError, 'recovery'):
+            publish(self.root, self.candidate, snapshot(self.root))
+
+    def test_rollback_verifies_all_restored_files_before_deleting_backups(self):
+        original = os.replace
+        edited = self.names[1]
+        def replace(source, target):
+            source, target = Path(source), Path(target)
+            if 'prepared' in source.parts and target == self.root / self.names[-1]:
+                raise OSError('install failed')
+            result = original(source, target)
+            if 'restore' in source.parts and target == self.root / self.names[0]:
+                # The manifest was restored earlier, then another writer changed it.
+                (self.root / edited).write_bytes(b'concurrent edit')
+            return result
+        with patch('incremental_update.os.replace', side_effect=replace):
+            with self.assertRaisesRegex(RuntimeError, 'Recovery'):
+                publish(self.root, self.candidate, self.before)
+        self.assertEqual((self.root / edited).read_bytes(), b'concurrent edit')
+        transaction, = self.transactions()
+        record = json.loads((transaction / 'recovery.json').read_text())
+        self.assertIn(edited, record['rollbackErrors'])
+        self.assertEqual((transaction / 'backup' / edited).read_bytes(), b'old ' + edited.encode())
 
     def test_failed_restore_keeps_backups_and_attempts_remaining_files(self):
         original=os.replace;attempted=[]
