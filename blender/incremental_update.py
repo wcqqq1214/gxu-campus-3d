@@ -1,5 +1,7 @@
 """Stage and validate legacy incremental workers before publishing any assets."""
 import argparse
+from contextlib import contextmanager
+import fcntl
 import hashlib
 import json
 import os
@@ -64,8 +66,45 @@ def validate_candidate(root, candidate, blender, kind):
                  'scripts/test-campus.mjs', 'scripts/test-basketball.mjs'], candidate, 'assets')
 
 
+@contextmanager
+def publication_lock(root):
+    """Serialize publishers and input copies; keep the lock inode across runs."""
+    (root / 'work').mkdir(parents=True, exist_ok=True)
+    with (root / 'work/.incremental-publish.lock').open('a+b') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+
+
+def require_recovered(root):
+    pending = sorted((root / 'work').glob('gxu-publish-*/recovery.json'))
+    if pending:
+        raise RuntimeError(f'Unresolved publication recovery; inspect before retrying: {pending}')
+
+
+def file_digest(path):
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest()
+    except FileNotFoundError:
+        return None
+
+
+def write_recovery(directory, record):
+    temporary = directory / 'recovery.tmp'
+    temporary.write_text(json.dumps(record, indent=2) + '\n')
+    os.replace(temporary, directory / 'recovery.json')
+
+
 def publish(root, candidate, before):
-    """Reject concurrent edits; prepare all replacements and roll back ordinary I/O failures."""
+    """Publish under a repository lock; retain recovery files if rollback is incomplete."""
+    with publication_lock(root):
+        require_recovered(root)
+        return publish_locked(root, candidate, before)
+
+
+def publish_locked(root, candidate, before):
     if snapshot(root) != before:
         raise RuntimeError('Formal assets changed while building; candidate retained, nothing published')
     after = snapshot(candidate)
@@ -73,28 +112,79 @@ def publish(root, candidate, before):
     if removed:
         raise ValueError(f'Incremental update unexpectedly deleted files: {sorted(removed)}')
     changed = [name for name, digest in after.items() if before.get(name) != digest]
-    with tempfile.TemporaryDirectory(prefix='gxu-publish-', dir=root / 'work') as directory:
-        backup = Path(directory) / 'backup'; prepared = Path(directory) / 'prepared'
+    directory = Path(tempfile.mkdtemp(prefix='gxu-publish-', dir=root / 'work'))
+    backup = directory / 'backup'; prepared = directory / 'prepared'
+    installed = []
+    retain = False
+    record = {'state': 'publishing', 'root': str(root.resolve()), 'candidate': str(candidate.resolve()),
+              'files': {name: {'before': before.get(name), 'after': after[name],
+                               'backup': str(backup / name) if name in before else None}
+                        for name in changed}}
+    try:
         for name in changed:
             target = root / name
-            if target.exists():
+            if name in before:
                 saved = backup / name; saved.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(target, saved)
+                if file_digest(saved) != before[name]:
+                    raise RuntimeError(f'Formal asset changed during preparation: {name}')
             ready = prepared / name; ready.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(candidate / name, ready)
-        installed = []
+            if file_digest(ready) != after[name]:
+                raise RuntimeError(f'Candidate changed during preparation: {name}')
+        if snapshot(root) != before:
+            raise RuntimeError('Formal assets changed during preparation; nothing published')
+        write_recovery(directory, record)
+        # Keep a recovery record on unexpected interruption until rollback completes.
+        retain = True
         try:
             for name in changed:
                 target = root / name; target.parent.mkdir(parents=True, exist_ok=True)
+                if file_digest(target) != before.get(name):
+                    raise RuntimeError(f'Formal asset changed before replacement: {name}')
                 os.replace(prepared / name, target); installed.append(name)
-        except BaseException:
+            if snapshot(root) != after:
+                raise RuntimeError('Formal assets changed during publication')
+        except BaseException as error:
+            failures = {}
             for name in reversed(installed):
-                saved = backup / name
-                if saved.exists():
-                    os.replace(saved, root / name)
-                else:
-                    (root / name).unlink()
+                try:
+                    target = root / name
+                    current = file_digest(target)
+                    if current == before.get(name):
+                        continue
+                    if current != after[name]:
+                        raise RuntimeError('Changed after installation; preserving external edit')
+                    if name in before:
+                        # Restore from a copy so every original backup survives a failed rollback.
+                        ready = directory / 'restore' / name
+                        ready.parent.mkdir(parents=True, exist_ok=True)
+                        shutil.copy2(backup / name, ready)
+                        if file_digest(ready) != before[name]:
+                            raise RuntimeError('Backup digest mismatch')
+                        if file_digest(target) != current:
+                            raise RuntimeError('Changed during rollback; preserving external edit')
+                        os.replace(ready, target)
+                    else:
+                        target.unlink()
+                except BaseException as restore_error:
+                    failures[name] = repr(restore_error)
+            if failures:
+                record.update(state='rollback_incomplete', installed=installed,
+                              publicationError=repr(error), rollbackErrors=failures)
+                journal_error = ''
+                try:
+                    write_recovery(directory, record)
+                except BaseException as recovery_error:
+                    journal_error = f'; recovery record update failed: {recovery_error!r}'
+                raise RuntimeError(f'Publication failed ({error!r}); rollback incomplete: {failures}. '
+                                   f'Recovery backups retained at {directory}{journal_error}') from error
+            retain = False
             raise
+        retain = False
+    finally:
+        if not retain:
+            shutil.rmtree(directory)
     return changed
 
 
@@ -112,8 +202,12 @@ def staged_update(root, script):
     else:
         directory = Path(tempfile.mkdtemp(prefix='incremental-', dir=root / 'work'))
         candidate = directory / 'candidate'
-    before = snapshot(root)
-    copy_inputs(root, candidate)
+    with publication_lock(root):
+        require_recovered(root)
+        before = snapshot(root)
+        copy_inputs(root, candidate)
+        if snapshot(root) != before:
+            raise RuntimeError('Formal assets changed while copying inputs; nothing published')
     worker = candidate / 'blender' / Path(script).name
     expression = f"import runpy; runpy.run_path({str(worker)!r}, init_globals={{'_INCREMENTAL_CANDIDATE': True}}, run_name='__main__')"
     run_checked([bpy.app.binary_path, '-b', '--factory-startup', '--disable-autoexec',

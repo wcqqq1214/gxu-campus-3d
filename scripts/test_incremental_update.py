@@ -119,9 +119,10 @@ class PublicationTests(unittest.TestCase):
         original = os.replace
         calls = []
         def fail_second(source, target):
-            calls.append(target)
-            if len(calls) == 2:
-                raise OSError('injected disk failure')
+            if 'prepared' in Path(source).parts:
+                calls.append(target)
+                if len(calls) == 2:
+                    raise OSError('injected disk failure')
             return original(source, target)
         with patch('incremental_update.os.replace', side_effect=fail_second):
             with self.assertRaisesRegex(OSError, 'disk failure'):
