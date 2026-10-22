@@ -9,7 +9,7 @@ if not globals().get('_INCREMENTAL_CANDIDATE'):
     raise SystemExit(0)
 from incremental_glb import splice_nodes, validate_retained
 from initial_model_budget import check_initial_model_budget
-from geometry import MATERIALS,Mesh
+from geometry import MATERIALS
 from basketball import court_model,bank_paving
 previous_base=(ROOT/'public/models/base.glb').read_bytes()
 before={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'public/models').glob('*.glb')}
@@ -18,7 +18,6 @@ sys.argv.append('--base-only')
 try:exec(compile(script.read_text(),str(script),'exec'),ns)
 except SystemExit as e:
     if e.code not in (0,None):raise
-bank_ids={b['id'] for b in ns['basketball']['banks']}
 from preserve_glb_geometry import unpack, mesh_nodes_by_name
 path=ROOT/'public/models/base.glb'
 generated=path.read_bytes()
@@ -77,7 +76,6 @@ print('Basketball updated in editable source and base GLB',flush=True)
 
 assert (ROOT/'blender/gxu-campus.blend').stat().st_size<100*1024*1024
 check_initial_model_budget(manifest['base']['bytes']+manifest['trees']['bytes'])
-from preserve_glb_geometry import unpack,mesh_nodes_by_name
 a,ab=unpack(previous_base);c,cb=unpack((ROOT/'public/models/base.glb').read_bytes())
 def signature(doc,binary,node):
     result=[]
