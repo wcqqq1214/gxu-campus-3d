@@ -207,8 +207,8 @@ export const campusNames: Record<string, readonly [string, string]> = {
   育才广场: ['育才广场', 'Yucai Square'],
   花卉公园: ['花卉公园', 'Huahui Park'],
   '广西大学 · 大学东路主校区': [
-    '广西大学 · 大学东路主校区',
-    'Guangxi University · Daxue East Road Main Campus',
+    '广西大学 大学东路主校区',
+    'Guangxi University, Daxue East Road Main Campus',
   ],
   时空之门: ['时光之门', 'Gate of Time'],
   第一教学楼: ['第一教学楼', 'No. 1 Teaching Building'],
@@ -238,32 +238,32 @@ export const campusNames: Record<string, readonly [string, string]> = {
     'North Campus Northern Area Base Layout',
   ],
   北校园教学组团·东北翼: [
-    '北校园教学组团·东北翼',
-    'North Campus Teaching Complex · Northeast Wing',
+    '北校园教学组团 东北翼',
+    'North Campus Teaching Complex, Northeast Wing',
   ],
   北校园教学组团·东南翼: [
-    '北校园教学组团·东南翼',
-    'North Campus Teaching Complex · Southeast Wing',
+    '北校园教学组团 东南翼',
+    'North Campus Teaching Complex, Southeast Wing',
   ],
   北校园教学组团·东端楼: [
-    '北校园教学组团·东端楼',
-    'North Campus Teaching Complex · East End Building',
+    '北校园教学组团 东端楼',
+    'North Campus Teaching Complex, East End Building',
   ],
   北校园教学组团·中南翼: [
-    '北校园教学组团·中南翼',
-    'North Campus Teaching Complex · South Central Wing',
+    '北校园教学组团 中南翼',
+    'North Campus Teaching Complex, South Central Wing',
   ],
   北校园教学组团·中连廊: [
-    '北校园教学组团·中连廊',
-    'North Campus Teaching Complex · Central Corridor',
+    '北校园教学组团 中连廊',
+    'North Campus Teaching Complex, Central Corridor',
   ],
   北校园教学组团·西南翼: [
-    '北校园教学组团·西南翼',
-    'North Campus Teaching Complex · Southwest Wing',
+    '北校园教学组团 西南翼',
+    'North Campus Teaching Complex, Southwest Wing',
   ],
   北校园教学组团·西连廊: [
-    '北校园教学组团·西连廊',
-    'North Campus Teaching Complex · West Corridor',
+    '北校园教学组团 西连廊',
+    'North Campus Teaching Complex, West Corridor',
   ],
   北校园桥洞下穿: ['北校园桥洞下穿', 'North Campus Underpass'],
   北校园田径场基础布局: [
@@ -291,12 +291,12 @@ export const campusNames: Record<string, readonly [string, string]> = {
     'South Building Eleven-Storey Main Volume',
   ],
   '首层及夹层 · 北侧退进门厅': [
-    '首层及夹层 · 北侧退进门厅',
-    'Ground Floor and Mezzanine · Recessed North Lobby',
+    '首层及夹层 北侧退进门厅',
+    'Ground Floor and Mezzanine, Recessed North Lobby',
   ],
   '三至七层 · 保留映射内院与西侧凹口': [
-    '三至七层 · 保留映射内院与西侧凹口',
-    'Levels 3–7 · Mapped Courtyard and West Recess Retained',
+    '三至七层 保留映射内院与西侧凹口',
+    'Levels 3–7, Mapped Courtyard and West Recess Retained',
   ],
   北侧柱廊顶板: ['北侧柱廊顶板', 'North Colonnade Roof Slab'],
   首层教室与门厅实墙: [

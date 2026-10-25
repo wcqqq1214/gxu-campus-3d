@@ -952,10 +952,10 @@ export function createScene(
         {
           text: foreground.name
             ? percent
-              ? '正在细化{name} · {percent}%'
-              : '正在细化{name}'
+              ? '正在加载{name} {percent}%'
+              : '正在加载{name}'
             : percent
-              ? '{label} · {percent}%'
+              ? '{label} {percent}%'
               : '{label}',
           values: {
             label: foreground.label,
@@ -967,25 +967,22 @@ export function createScene(
         foreground.fraction,
       );
     } else if (boundaryFailed && layers.boundary)
-      callbacks.onStatus(
-        '校园边界暂未加载，现有场景可继续浏览；可重试。',
-        true,
-      );
+      callbacks.onStatus('校园边界加载失败，可重试', true);
     else if (treesFailed || (highTreesFailed && !modeSmooth))
-      callbacks.onStatus('部分植被暂未加载，已保留现有场景，可重试。', true);
+      callbacks.onStatus('部分树木加载失败，可重试', true);
     else if ([...failed.keys()].some((key) => wanted.has(key)))
-      callbacks.onStatus('部分近景暂未加载，已保留基础校园；可重试。', true);
+      callbacks.onStatus('部分细节加载失败，可重试', true);
     else if (initialReady) callbacks.onStatus('');
   }
   async function loadGLB(a: Asset, key = 'base', signal = lifecycle.signal) {
     const label =
       key === 'base'
-        ? '正在铺开校园'
+        ? '正在加载校园'
         : key.startsWith('trees')
-          ? '正在添上林荫'
+          ? '正在加载树木'
           : key.startsWith('landmark-')
-            ? '正在细化{name}'
-            : '正在补充周边细节';
+            ? '正在加载{name}'
+            : '正在加载周边细节';
     try {
       const buffer = await fetchModel(
         asset(a.url) + (a.sha256 ? `?v=${a.sha256}` : ''),
@@ -1134,10 +1131,7 @@ export function createScene(
         .enqueue('trees-near', 5, (signal) => loadTrees(true, signal))
         .catch((error) => {
           if (!disposed && error?.name !== 'AbortError')
-            callbacks.onStatus(
-              '近景植被暂未加载，已保留远景林荫，可重试。',
-              true,
-            );
+            callbacks.onStatus('近处树木加载失败，可重试', true);
         });
     applyLayers();
     updateLoadStatus();
@@ -1364,7 +1358,7 @@ export function createScene(
   async function initialize() {
     if (loading.has('base') || initialReady) return;
     loading.add('base');
-    callbacks.onStatus('正在铺开校园…');
+    callbacks.onStatus('正在加载校园…');
     try {
       manifest = await fetchJson<Manifest>(
         asset('data/models.json'),
@@ -1423,11 +1417,10 @@ export function createScene(
       void loadBoundary();
       reconcileDetails();
       void loadTrees().catch(() => {
-        if (!disposed) callbacks.onStatus('植被暂未加载，可重试。', true);
+        if (!disposed) callbacks.onStatus('树木加载失败，可重试', true);
       });
     } catch {
-      if (!disposed)
-        callbacks.onStatus('校园加载失败，请检查网络后重试。', true);
+      if (!disposed) callbacks.onStatus('校园加载失败，请检查网络后重试', true);
     } finally {
       loading.delete('base');
     }
@@ -1838,10 +1831,7 @@ export function createScene(
   void initialize();
   const onLost = (event: Event) => {
     event.preventDefault();
-    callbacks.onStatus(
-      '图形设备暂时中断。恢复后将重新绘制；也可刷新页面。',
-      true,
-    );
+    callbacks.onStatus('图形显示中断，恢复后将自动重绘，也可刷新页面', true);
   };
   const onRestored = () => {
     callbacks.onStatus('');
@@ -1880,10 +1870,7 @@ export function createScene(
       ctx.drawImage(canvas, 0, 0);
       const size = Math.max(15, Math.round(out.width / 110));
       ctx.font = `${size}px sans-serif`;
-      const segments = [
-        t('广西大学 校园地图'),
-        '© OpenStreetMap contributors · ODbL',
-      ];
+      const segments = [t('广西大学 校园地图'), '© OpenStreetMap contributors'];
       if (layers.boundary && boundaryReady)
         segments.push(t('白色细线：校园大致边界'));
       const label = segments.join('  |  ');
@@ -1892,7 +1879,7 @@ export function createScene(
         ctx.measureText(label).width <= available ? [label] : segments;
       const lineHeight = size * 1.5;
       const footerHeight = lineHeight * lines.length + size;
-      ctx.fillStyle = '#15382ddd';
+      ctx.fillStyle = '#1d3b31dd'; // Radix jade-12
       ctx.fillRect(0, out.height - footerHeight, out.width, footerHeight);
       ctx.fillStyle = 'white';
       for (let i = 0; i < lines.length; i++) {
@@ -1929,7 +1916,7 @@ export function createScene(
         reconcileDetails();
         if (!treesRoot)
           void loadTrees().catch(() =>
-            callbacks.onStatus('植被加载失败，请稍后重试。', true),
+            callbacks.onStatus('树木加载失败，请稍后重试', true),
           );
       }
     },
