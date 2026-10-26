@@ -302,9 +302,10 @@ def ordinary_building(b, z, C, detail):
         raise ValueError(f"{b['id']}: run data:prepare before rebuilding ordinary buildings")
     m = shared_form(b, z, C)
     if b['id'] in NEW_EAST_NEIGHBOURS:
-        m.add_part('04_立面窗格', facade_details(b, z, C, detail, facade_segments(b)))
+        facades = facade_segments(b)
+        m.add_part('04_立面窗格', facade_details(b, z, C, detail, facades))
         if b['id'] in SHOP_BUILDINGS:
-            m.add_part('05_临街店面', shopfront_details(b, z, C, detail, facade_segments(b)))
+            m.add_part('05_临街店面', shopfront_details(b, z, C, detail, facades))
         return m
     if 'stairTower' in b['form']:return m
     windows = Mesh(); form = b['form']; h = form['height']; wall = wall_material(b, C)

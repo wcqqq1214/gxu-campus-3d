@@ -37,16 +37,18 @@ def mesh_tree(obj):
                                 [tuple(p.vertices) for p in obj.data.polygons])
 
 
-def check_neighbour_facade(b, objects, C, detail):
-    if b['id'] not in NEW_EAST_NEIGHBOURS:
-        return
-    expected = ordinary_building(b, b['elevation'], C, detail)
-    ranges = [(start, end) for name, start, end in expected.parts if name in ('04_立面窗格', '05_临街店面')]
+def vertex_tree(objects):
     points = [obj.matrix_world @ v.co for obj in objects for v in obj.data.vertices]
     kd = KDTree(len(points))
     for i, point in enumerate(points):
         kd.insert(point, i)
     kd.balance()
+    return kd
+
+
+def check_neighbour_facade(b, kd, C, detail):
+    expected = ordinary_building(b, b['elevation'], C, detail)
+    ranges = [(start, end) for name, start, end in expected.parts if name in ('04_立面窗格', '05_临街店面')]
     # Includes catalogue datum rounding (5 mm) and the chunk's Draco grid.
     assert all(kd.find(p)[2] < .012 for start, end in ranges for p in expected.v[start:end]), (b['id'], 'missing exported facade')
 
@@ -290,24 +292,31 @@ def main():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/models/base.glb'))
     bpy.context.view_layer.update()
-    trees={}
+    objects={}
     for o in bpy.context.scene.objects:
-        if o.type=='MESH': trees.setdefault(root_name(o),[]).append(mesh_tree(o))
+        if o.type=='MESH': objects.setdefault(root_name(o),[]).append(o)
+    trees={key:[mesh_tree(o) for o in group] for key,group in objects.items()}
+    neighbour_keys={b['chunk'] if b['insideCampus'] else 'context' for b in neighbours}
+    facade_trees={key:vertex_tree(objects[key]) for key in neighbour_keys}
     report['base']=[]
     for b in bs:
         key=b['chunk'] if b['insideCampus'] else 'context'
         report['base'].append({'id':b['id'],'samples':check_samples(b,trees[key],.05)})
-        check_neighbour_facade(b, [o for o in bpy.context.scene.objects if o.type == 'MESH' and root_name(o) == key], C, False)
+        if b['id'] in NEW_EAST_NEIGHBOURS:
+            check_neighbour_facade(b, facade_trees[key], C, False)
     report['near']=[]
     for chunk in sorted({b['chunk'] for b in bs if b['insideCampus']}):
         bpy.ops.wm.read_factory_settings(use_empty=True)
         bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/models'/f'{chunk}.glb'))
         bpy.context.view_layer.update()
-        trees=[mesh_tree(o) for o in bpy.context.scene.objects if o.type=='MESH']
+        objects=[o for o in bpy.context.scene.objects if o.type=='MESH']
+        trees=[mesh_tree(o) for o in objects]
+        facade_tree=vertex_tree(objects) if chunk in neighbour_keys else None
         for b in bs:
             if b.get('chunk')==chunk:
                 report['near'].append({'id':b['id'],'samples':check_samples(b,trees,.02)})
-                check_neighbour_facade(b, [o for o in bpy.context.scene.objects if o.type == 'MESH'], C, True)
+                if b['id'] in NEW_EAST_NEIGHBOURS:
+                    check_neighbour_facade(b, facade_tree, C, True)
     report['passed']=True
     (target/(prefix+'-geometry.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print(f'Source/base/near form passed: {len(bs)} buildings',flush=True)

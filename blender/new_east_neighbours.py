@@ -76,13 +76,6 @@ def wall_finish(b, C):
     return C['eastNeighbourOchre' if b['id'] == EAST_25 else 'eastNeighbourCream']
 
 
-def shop_facade(b, facade):
-    # Only the mapped south face beside the tower: the opposite street has
-    # no mapped building here and must not be invented from a narrow video.
-    return (b['id'] == WEST_SHOPS and facade['normal'][1] < -.99
-            and math.dist(facade['start'], facade['end']) > 60)
-
-
 def shop_layout(b, facade):
     """Only street-facing frontage; the East 25 location is user-confirmed.
 
@@ -125,8 +118,8 @@ def facade_details(b, z, C, detail, facades):
             continue
         count = max(1, int(length/4))
         width = min(2.1, length/count*.60)
-        street_side = shop_facade(b, facade)
         shops = shop_layout(b, facade)
+        street_side = b['id'] == WEST_SHOPS and shops is not None
         for level in range(levels):
             # The historical street view shows taller upper-storey openings
             # and pale warm panels below them; unseen elevations stay unchanged.
