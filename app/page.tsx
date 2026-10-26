@@ -23,6 +23,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronsUp,
+  ChevronsDown,
   Download,
   Expand,
   Grid2X2,
@@ -120,6 +122,7 @@ function CampusMap() {
   const { locale, setLocale, t, name } = useCampusLocale();
   const localeRef = useRef(locale);
   const dock = useRef<HTMLElement>(null);
+  const panelToggle = useRef<HTMLButtonElement>(null);
   const detailBack = useRef<HTMLButtonElement>(null);
   const tourEntry = useRef<HTMLButtonElement>(null);
   const tourProgress = useRef<HTMLSpanElement>(null);
@@ -436,6 +439,12 @@ function CampusMap() {
       if (body) body.scrollTop = menuScroll.current;
     }
   }, [selected, panelMode, collapsed, panelExpanded]);
+  function togglePanel() {
+    setCollapsed((value) => !value);
+    requestAnimationFrame(() =>
+      panelToggle.current?.focus({ preventScroll: true }),
+    );
+  }
   function returnToMenu() {
     pauseMotion();
     returnPlace.current = selected;
@@ -698,47 +707,39 @@ function CampusMap() {
         className={`panel-dock ${collapsed ? 'collapsed' : ''} ${panelExpanded ? 'expanded' : ''} ${panelMode === 'detail' ? 'detail-mode' : ''}`}
         aria-label={t('校园浏览面板')}
       >
-        <div className="dock-heading">
-          {panelMode === 'detail' && current && (
+        {(collapsed || panelMode === 'detail') && (
+          <div className="dock-heading">
+            {panelMode === 'detail' && current && (
+              <button
+                ref={detailBack}
+                className="dock-back"
+                title={t('返回地点列表')}
+                aria-label={t('返回地点列表')}
+                onClick={returnToMenu}
+              >
+                <ChevronLeft size={16} />
+                <span>{t('返回列表')}</span>
+              </button>
+            )}
             <button
-              ref={detailBack}
-              className="dock-back"
-              title={t('返回地点列表')}
-              aria-label={t('返回地点列表')}
-              onClick={returnToMenu}
+              ref={panelToggle}
+              className="dock-toggle"
+              aria-expanded={!collapsed}
+              aria-controls="campus-panel-body"
+              aria-label={collapsed ? t('展开面板') : t('收起面板')}
+              onClick={togglePanel}
             >
-              <ChevronLeft size={16} />
-              <span>{t('返回列表')}</span>
+              <span>
+                {panelMode === 'detail' && current
+                  ? collapsed
+                    ? name(current.name)
+                    : ''
+                  : t('校园浏览')}
+              </span>
+              <ChevronDown size={16} />
             </button>
-          )}
-          <button
-            className="dock-toggle"
-            aria-expanded={!collapsed}
-            aria-controls="campus-panel-body"
-            aria-label={collapsed ? t('展开面板') : t('收起面板')}
-            onClick={() => setCollapsed((v) => !v)}
-          >
-            <span>
-              {panelMode === 'detail' && current
-                ? collapsed
-                  ? name(current.name)
-                  : ''
-                : t('校园浏览')}
-            </span>
-            <ChevronDown size={16} />
-          </button>
-          {!collapsed && panelMode === 'menu' && (
-            <button
-              className="dock-expand"
-              aria-expanded={panelExpanded}
-              onClick={() => {
-                setPanelExpanded((value) => !value);
-              }}
-            >
-              {panelExpanded ? t('收起列表') : t('展开列表')}
-            </button>
-          )}
-        </div>
+          </div>
+        )}
         <div
           id="campus-panel-body"
           className="dock-body"
@@ -806,20 +807,47 @@ function CampusMap() {
                 }}
                 className="main-tabs"
               >
-                <TabsList className="panel-tabs">
-                  <TabsTrigger value="explore">
-                    <MapPin size={17} />
-                    {t('地点')}
-                  </TabsTrigger>
-                  <TabsTrigger value="layers">
-                    <Layers3 size={17} />
-                    {t('图层')}
-                  </TabsTrigger>
-                  <TabsTrigger value="environment">
-                    <Sun size={17} />
-                    {t('光影')}
-                  </TabsTrigger>
-                </TabsList>
+                <div className="explorer-toolbar">
+                  <TabsList className="panel-tabs">
+                    <TabsTrigger value="explore">
+                      <MapPin size={17} />
+                      {t('地点')}
+                    </TabsTrigger>
+                    <TabsTrigger value="layers">
+                      <Layers3 size={17} />
+                      {t('图层')}
+                    </TabsTrigger>
+                    <TabsTrigger value="environment">
+                      <Sun size={17} />
+                      {t('光影')}
+                    </TabsTrigger>
+                  </TabsList>
+                  <button
+                    className="dock-expand"
+                    aria-expanded={panelExpanded}
+                    aria-controls="campus-panel-body"
+                    aria-label={panelExpanded ? t('收起列表') : t('展开列表')}
+                    title={panelExpanded ? t('收起列表') : t('展开列表')}
+                    onClick={() => setPanelExpanded((value) => !value)}
+                  >
+                    {panelExpanded ? (
+                      <ChevronsDown size={16} />
+                    ) : (
+                      <ChevronsUp size={16} />
+                    )}
+                  </button>
+                  <button
+                    ref={collapsed ? undefined : panelToggle}
+                    className="menu-collapse"
+                    aria-expanded={!collapsed}
+                    aria-controls="campus-panel-body"
+                    aria-label={t('收起面板')}
+                    title={t('收起面板')}
+                    onClick={togglePanel}
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
                 <TabsContent value="explore" className="explore-content">
                   <div className="search-wrap">
                     <Search size={16} />
@@ -1021,7 +1049,6 @@ function CampusMap() {
           {tourStarted && (
             <div className="tour-heading">
               <div className="tour-copy">
-                <strong>{tour ? t('正在游览') : t('游览已暂停')}</strong>
                 <small>
                   <span className="tour-position">
                     {tourIndex + 1}/{landmarks.length}
@@ -1074,11 +1101,6 @@ function CampusMap() {
             {!tourStarted && (
               <small className="tour-count">
                 {t('{count} 个地点', { count: landmarks.length })}
-              </small>
-            )}
-            {tourStarted && (
-              <small className="mobile-tour-progress">
-                {tourIndex + 1}/{landmarks.length}
               </small>
             )}
           </button>

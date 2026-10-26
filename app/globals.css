@@ -399,9 +399,48 @@ kbd {
 .explorer {
   display: flex;
   flex-direction: column;
+  padding-top: 4px;
 }
 
 /* Tabs */
+.explorer-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  background: var(--panel);
+  border-bottom: var(--hairline) solid var(--line);
+}
+.explorer-toolbar .panel-tabs {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+  border-bottom: 0;
+}
+.menu-collapse,
+.dock-expand {
+  flex: 0 0 44px;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-2);
+}
+.menu-collapse {
+  display: flex;
+}
+@media (hover: hover) {
+  .menu-collapse:hover,
+  .dock-expand:hover {
+    background: var(--hover);
+    color: var(--text-1);
+  }
+}
 .main-tabs {
   min-height: 0;
   flex: 1;
@@ -528,6 +567,7 @@ kbd {
   color: var(--text-2);
 }
 .place-row {
+  scroll-margin-top: 48px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -741,7 +781,7 @@ kbd {
   justify-content: center;
   gap: 4px;
   min-width: 0;
-  min-height: 40px;
+  min-height: 44px;
   padding: 0 8px;
   border: var(--hairline) solid transparent;
   border-radius: var(--radius-control);
@@ -999,14 +1039,9 @@ kbd {
 .tour-copy {
   min-width: 0;
 }
-.tour-copy strong {
-  display: block;
-  font-weight: 600;
-}
 .tour-copy small {
   display: flex;
   gap: 8px;
-  margin-top: 2px;
   font-size: var(--size-meta);
   color: var(--text-2);
 }
@@ -1087,9 +1122,6 @@ kbd {
 .tour-compact span {
   font-weight: 400;
   font-variant-numeric: tabular-nums;
-}
-.mobile-tour-progress {
-  display: none;
 }
 @media (hover: hover) {
   .tour-start:hover {
@@ -1346,7 +1378,7 @@ kbd {
 }
 .scene-status button {
   min-width: 44px;
-  min-height: 36px;
+  min-height: 44px;
   padding: 0 12px;
   border: 0;
   border-radius: var(--radius-control);
@@ -1621,15 +1653,14 @@ kbd {
     padding: 0 12px 0 18px;
   }
   .dock-expand {
-    display: block;
-    flex-shrink: 0;
-    min-height: 36px;
-    padding: 0 12px;
-    border: 0;
-    border-radius: var(--radius-control);
-    background: var(--sage-3);
-    color: var(--text-1);
-    font-size: var(--size-body);
+    display: flex;
+  }
+  .explorer-toolbar .panel-tabs {
+    gap: 0;
+  }
+  .explorer-toolbar .panel-tabs [data-slot='tabs-trigger'] {
+    gap: 4px;
+    padding-inline: 4px;
   }
   .search-wrap {
     margin: 8px 0 4px;
@@ -1684,18 +1715,6 @@ kbd {
   }
   .tour-idle {
     display: flex;
-  }
-  .tour-heading .tour-copy strong {
-    display: none;
-  }
-  .mobile-tour-progress {
-    display: inline;
-    margin-left: 4px;
-    font-size: var(--size-meta);
-    font-weight: 400;
-  }
-  .tour-active .mobile-tour-progress {
-    display: none;
   }
 
   .map-tools {
@@ -1783,6 +1802,12 @@ kbd {
     right: 12px;
   }
   .keyboard-open .map-footer > :not(a) {
+    display: none;
+  }
+}
+
+@media (max-width: 359px) {
+  .explorer-toolbar .panel-tabs [data-slot='tabs-trigger'] > svg {
     display: none;
   }
 }

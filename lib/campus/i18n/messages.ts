@@ -52,8 +52,6 @@ export const englishMessages: Record<string, string> = {
   画质: 'Graphics',
   暂停游览: 'Pause tour',
   继续游览: 'Resume tour',
-  正在游览: 'Tour in progress',
-  游览已暂停: 'Tour paused',
   结束游览: 'End tour',
   开始游览: 'Start tour',
   上一站: 'Previous stop',

@@ -134,7 +134,7 @@ try {
     );
     passed('精选与普通建筑搜索分组、分类恢复、返回焦点和空结果重置');
     await page.getByRole('tab', { name: '光影', exact: true }).click();
-    await page.getByRole('button', { name: '夜景', exact: true }).click();
+    await page.getByRole('button', { name: '夜晚', exact: true }).click();
     await page.getByRole('tab', { name: '图层', exact: true }).click();
     const labels = page.getByRole('switch', { name: '地点名称', exact: true });
     await labels.click();
@@ -143,7 +143,7 @@ try {
     await page.getByRole('tab', { name: '光影', exact: true }).click();
     assert.equal(
       await page
-        .getByRole('button', { name: '夜景', exact: true })
+        .getByRole('button', { name: '夜晚', exact: true })
         .getAttribute('aria-pressed'),
       'true',
     );
@@ -161,12 +161,12 @@ try {
       await page.getByRole('button', { name: '分享', exact: true }).click();
     }
     await page
-      .getByRole('dialog', { name: '分享校园', exact: true })
-      .getByRole('button', { name: '复制视角链接', exact: true })
+      .getByRole('dialog', { name: '分享', exact: true })
+      .getByRole('button', { name: '复制链接', exact: true })
       .click();
-    const share = page.getByRole('dialog', { name: '分享这个校园视角' });
+    const share = page.getByRole('dialog', { name: '复制链接', exact: true });
     await share.waitFor();
-    const input = share.getByRole('textbox', { name: '校园视角链接' });
+    const input = share.getByRole('textbox', { name: '视角链接' });
     const link = new URL(await input.inputValue());
     assert.equal(new URLSearchParams(link.hash.slice(1)).get('light'), 'night');
     assert.equal(

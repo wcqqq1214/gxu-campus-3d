@@ -137,9 +137,7 @@ try {
       .getByRole('group', { name: 'Views of this place', exact: true })
       .waitFor();
     await page.locator('.detail-actions button').click();
-    await page
-      .getByRole('heading', { name: 'Share campus', exact: true })
-      .waitFor();
+    await page.getByRole('heading', { name: 'Share', exact: true }).waitFor();
     assert.ok(
       !/\p{Script=Han}/u.test(await page.getByRole('dialog').innerText()),
     );
