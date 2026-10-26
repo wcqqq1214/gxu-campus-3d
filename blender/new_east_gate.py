@@ -7,6 +7,7 @@ faces are estimates, not a survey. Sources are recorded in data/sources.json.
 """
 import math
 import random
+from pathlib import Path
 import bpy
 import geometry
 from geometry import Mesh
@@ -18,6 +19,8 @@ DECK = .16  # campus_gate adds catalogue elevation + .24; matches the nearby roa
 def ensure_materials(C):
     for name, rgb, rough, metal in [
         ('newEastSilver',(.62,.66,.67),.48,.35),
+        ('newEastAgedSilver',(.32,.31,.27),.72,.20),
+        ('newEastBaseSilver',(.45,.47,.44),.76,.25),
         ('newEastRecess',(.15,.18,.19),.72,.18),
         ('newEastGold',(.68,.45,.13),.30,.52),
         ('newEastStone',(.63,.64,.61),.85,0),
@@ -31,11 +34,15 @@ def ensure_materials(C):
         ('newEastBrickDark',(.30,.27,.25),.95,0),
         ('newEastMortar',(.20,.21,.20),1,0),
         ('newEastYellow',(.78,.46,.055),.65,.12),
+        ('newEastBarrierWhite',(.76,.77,.73),.65,0),
+        ('newEastBarrierRed',(.48,.055,.035),.64,0),
+        ('newEastRubber',(.035,.04,.04),.94,0),
         ('newEastWall',(.49,.49,.44),.94,0),
         ('newEastWallCap',(.53,.54,.50),.88,0),
         ('newEastSoil',(.075,.06,.04),1,0),
         ('newEastLeaf',(.035,.09,.028),.98,0),
         ('newEastLeafLight',(.065,.145,.045),.98,0),
+        ('newEastLeafTips',(.10,.20,.055),.96,0),
     ]:
         if name not in C:
             existing=bpy.data.materials.get(name)
@@ -107,7 +114,7 @@ def beveled_sill(m,bottom,top,C):
     m.face([(*p,top) for p in upper],C['newEastSilver'])
 
 
-def vertical_fins(m,ring,bottom,top,C):
+def vertical_fins(m,ring,bottom,top,C,base_band=False):
     # Sample by distance so curved returns have the same rhythm as the frontage.
     segments=[(a,b,math.dist(a,b)) for a,b in zip(ring,ring[1:]+ring[:1])]
     perimeter=sum(length for _,_,length in segments)
@@ -118,8 +125,13 @@ def vertical_fins(m,ring,bottom,top,C):
         while distance>offset+segments[index][2]:
             offset+=segments[index][2];index+=1
         (x,y),(a,b),length=segments[index];t=(distance-offset)/length
+        finish='newEastSilver'
+        if base_band:
+            # The booth's low cladding is darker and uneven in the front photo.
+            # Keep this subtle variation below the sill, without random rebuilds.
+            finish='newEastAgedSilver' if j%13 in (2,8,11) else 'newEastBaseSilver'
         metal_fin(m,x+(a-x)*t,y+(b-y)*t,bottom,top,.075,.14,
-                  math.atan2(b-y,a-x),C['newEastSilver'])
+                  math.atan2(b-y,a-x),C[finish])
 
 
 def paving(m,C,detail):
@@ -165,7 +177,7 @@ def guardroom(m,C,detail):
         solid(p,post,DECK+6.9,DECK+8.05,C['newEastRecess'])
         vertical_fins(p,post,DECK+6.9,DECK+8.05,C)
     for lo,hi in [(DECK,DECK+.75),(DECK+2.35,DECK+6.9),(DECK+8.05,DECK+9.4)]:
-        vertical_fins(p,ring,lo,hi,C)
+        vertical_fins(p,ring,lo,hi,C,base_band=lo==DECK)
     # A continuous inset band closes the corner gaps between the flat panes.
     # Opaque dark glazing suggests reflections without inventing an interior.
     solid(p,rounded_ring(-6.05,.4,3.24,2.68,.60),DECK+.79,DECK+2.35,C['newEastGlass'])
@@ -177,6 +189,20 @@ def guardroom(m,C,detail):
     p.box(-6.05,-1.01,DECK+1.32,2.70,.07,.045,C['newEastWindowFrame'])
     p.box(-4.355,.4,DECK+1.32,.07,1.55,.045,C['newEastWindowFrame'])
     p.box(-6.05,1.76,DECK+1.55,2.6,.10,1.6,C['newEastRecess'])
+    # The 2025 inside view shows a narrow dark doorway on the lane side of
+    # the booth's rear. Show a closed glazed leaf; dimensions and hardware are
+    # estimates, and no unseen room interior is invented.
+    door=-5.4
+    p.box(door,1.875,DECK+1.12,.80,.025,2.10,C['newEastGlass'])
+    for x in [door-.425,door+.425]:
+        p.box(x,1.90,DECK+1.135,.05,.08,2.17,C['newEastFrame'])
+    for z in [.075,2.195]:
+        p.box(door,1.90,DECK+z,.80,.08,.05,C['newEastFrame'])
+    p.box(door,1.88,DECK+.025,.96,.25,.05,C['newEastBaseSilver'])
+    if detail:
+        p.cylinder(door+.28,1.965,DECK+1.15,.012,.22,C['newEastSilver'],10)
+        for z in [1.04,1.26]:
+            p.box(door+.28,1.925,DECK+z,.025,.08,.025,C['newEastSilver'])
     # Return closures keep the window band enclosed without blocking its glass.
     p.box(-7.69,.4,DECK+1.55,.12,2.6,1.6,C['newEastSilver'])
     # The photo shows a continuous curved sill and two low plinth bands.
@@ -200,8 +226,13 @@ def guardroom(m,C,detail):
 
 
 def english_wordmark(C):
-    """Upright Latin lettering from Blender's bundled font; no system dependency."""
+    """Photo-like serif capitals from a bundled, renamed Noto-derived subset.
+
+    This approximates the photographed lettering, not an identified sign font.
+    """
     curve=bpy.data.curves.new('new-east-latin','FONT')
+    curve.font=bpy.data.fonts.load(str(Path(__file__).parent/'fonts/GXUGateSerif.otf'),check_existing=True)
+    curve.font.pack()
     curve.body='GUANGXI UNIVERSITY';curve.space_character=1.15
     curve.extrude=.03;curve.resolution_u=3
     obj=bpy.data.objects.new('new-east-latin',curve);bpy.context.scene.collection.objects.link(obj)
@@ -217,6 +248,18 @@ def english_wordmark(C):
     return p
 
 
+def circular_rib(m,x,y,z,r,h,mat,n):
+    """Closed folded rim; its inner edge seats into the existing pier core."""
+    bevel=.007
+    profile=[(r-.085,-h/2),(r-bevel,-h/2),(r,-h/2+bevel),
+             (r,h/2-bevel),(r-bevel,h/2),(r-.085,h/2)]
+    rings=[[(x+radius*math.cos(i*math.tau/n),y+radius*math.sin(i*math.tau/n),z+height)
+            for i in range(n)] for radius,height in profile]
+    for a,b in zip(rings,rings[1:]+rings[:1]):
+        for i in range(n):
+            j=(i+1)%n;m.face([a[i],a[j],b[j],b[i]],mat)
+
+
 def lintel(m,C,detail):
     p=Mesh();silver=C['newEastSilver'];dark=C['newEastRecess']
     # Curved plan return towards the east end cap, visible in the frontal photo.
@@ -227,24 +270,59 @@ def lintel(m,C,detail):
     for (x,y),(a,b) in zip(samples,samples[1:]):
         solid(p,[(x,y+.05),(a,b+.05),(a,1.12),(x,1.12)],bottom,top,dark)
         angle=math.atan2(b-y,a-x)
-        metal_fin(p,(x+a)/2,(y+b)/2,bottom-.05,top+.05,.08,.30,angle,silver)
-        metal_fin(p,(x+a)/2,1.16,bottom-.05,top+.05,.08,.22,0,silver)
+        # Butt vertical blades to the soffit ribs: overlapping front faces
+        # at the fold otherwise render as a row of black rectangles.
+        metal_fin(p,(x+a)/2,(y+b)/2,bottom,top+.05,.08,.30,angle,silver)
+        metal_fin(p,(x+a)/2,1.16,bottom,top+.05,.08,.22,0,silver)
         # Wrap the front blades underneath the beam, a strong cue in the photo.
         # Keep these ribs in both LODs for views looking through the gate.
-        p.box((x+a)/2,(y+1.12)/2,bottom-.07,.08,1.42-y,.14,silver)
+        # Follow the facade normal through the curved return, instead of
+        # keeping every soffit blade parallel to the straight part of the beam.
+        midx,midy=(x+a)/2,(y+b)/2
+        tx,ty=math.cos(angle),math.sin(angle);nx,ny=-ty,tx
+        reach=(1.27-midy)/ny
+        front=(midx-.15*nx,midy-.15*ny)
+        rear=(midx+reach*nx,midy+reach*ny)
+        solid(p,[(front[0]-.04*tx,front[1]-.04*ty),
+                 (front[0]+.04*tx,front[1]+.04*ty),
+                 (rear[0]+.04*tx,rear[1]+.04*ty),
+                 (rear[0]-.04*tx,rear[1]-.04*ty)],bottom-.14,bottom,silver)
         p.face([(x,y,top+.01),(a,b,top+.01),(a,1.12,top+.01),(x,1.12,top+.01)],silver)
     # The right-hand termination is a broad front-facing stone panel, not just
     # a thin side cap. Its recessed face and edge frame remain visible in both LODs.
-    p.box(6.725,.39,(bottom+top)/2,1.85,1.58,top-bottom+.12,C['newEastStone'])
-    for x in [5.81,7.64]:p.box(x,-.435,(bottom+top)/2,.055,.10,top-bottom+.15,silver)
-    for z in [bottom-.045,top+.045]:p.box(6.725,-.435,z,1.86,.10,.055,silver)
-    if detail:
-        for z in [bottom+.62,bottom+1.24]:p.box(6.725,-.406,z,1.76,.012,.009,C['gateJoint'])
+    # One central horizontal joint is visible in the frontal photograph.
+    # Recess the backing and seat two face panels above it, without overlay lines.
+    middle=(bottom+top)/2
+    p.box(6.725,.40,middle,1.85,1.56,top-bottom+.12,C['newEastStone'])
+    for lo,hi in [(bottom-.06,middle-.006),(middle+.006,top+.06)]:
+        p.box(6.725,-.39,(lo+hi)/2,1.85,.02,hi-lo,C['newEastStone'])
+    p.box(6.725,-.383,middle,1.85,.012,.012,dark)
+    # The frontal photograph shows the ribbed underside continuing below the
+    # broad end panel. Keep its shallow dark joints in both LODs.
+    p.box(6.725,.39,bottom-.065,1.85,1.58,.01,dark)
+    for i in range(11):
+        p.box(5.875+i*.17,.39,bottom-.105,.075,1.58,.07,silver)
+    # Mitred frame strips meet edge-to-edge at all four corners.
+    outer=[(5.7825,bottom-.0725),(7.6675,bottom-.0725),
+           (7.6675,top+.0725),(5.7825,top+.0725)]
+    inner=[(5.8375,bottom-.0175),(7.6125,bottom-.0175),
+           (7.6125,top+.0175),(5.8375,top+.0175)]
+    for i in range(4):
+        j=(i+1)%4;outline=[outer[i],outer[j],inner[j],inner[i]]
+        front=[(x,-.485,z) for x,z in outline]
+        back=[(x,-.385,z) for x,z in outline]
+        p.face(front,silver);p.face(back[::-1],silver)
+        for k in range(4):
+            nxt=(k+1)%4;p.face([front[k],back[k],back[nxt],front[nxt]],silver)
     m.add_part('03_银灰格栅横梁与弧形收头_照片建模',p)
     p=Mesh()
     p.cylinder(4.5,.25,(DECK-.52)/2,.65,DECK+.52,C['gateTrim'],32)
     p.cylinder(4.5,.25,(DECK+bottom)/2,.56,bottom-DECK,dark,32)
-    for i in range(36):p.cylinder(4.5,.25,DECK+.07+i*.142,.63,.045,silver,40 if detail else 24)
+    for i in range(36):
+        # Darker, warmer lower rings are visible in the 2025 frontal photo;
+        # colour and weathering extent remain estimates, not material analysis.
+        finish=C['newEastAgedSilver'] if i in (1,2,4) else silver
+        circular_rib(p,4.5,.25,DECK+.07+i*.142,.63,.045,finish,40 if detail else 24)
     for z,r,h in [(DECK+.04,.68,.08),(DECK+.18,.65,.06),(bottom-.08,.68,.10)]:
         p.cylinder(4.5,.25,z,r,h,silver,40 if detail else 24)
     m.add_part('04_东侧横肋圆柱_照片建模',p)
@@ -260,18 +338,32 @@ def pedestrian_entry(m,C,detail):
         for y in [-1.45,1.45]:p.cylinder(x,y,DECK+1.35,.045,2.7,C['newEastSilver'],10)
     n=20 if detail else 12
     def roof(x):return DECK+2.75+.36*(1-((x-cx)/half)**2)
+    def arch(y,offset,width,height):
+        # Continuous rectangular framing follows the filmed canopy silhouette.
+        # Shared cross sections and closed ends avoid holes between short tubes.
+        rings=[]
+        for i in range(n+1):
+            x=cx-half+2*half*i/n;z=roof(x)+offset
+            rings.append([(x,y-width/2,z-height/2),(x,y+width/2,z-height/2),
+                          (x,y+width/2,z+height/2),(x,y-width/2,z+height/2)])
+        for a,b in zip(rings,rings[1:]):
+            for j in range(4):
+                k=(j+1)%4;p.face([a[j],a[k],b[k],b[j]],C['newEastSilver'])
+        p.face(rings[0][::-1],C['newEastSilver']);p.face(rings[-1],C['newEastSilver'])
     for i in range(n):
         a=cx-half+2*half*i/n;b=cx-half+2*half*(i+1)/n
         p.face([(a,-1.85,roof(a)),(b,-1.85,roof(b)),(b,1.85,roof(b)),(a,1.85,roof(a))],sheet)
         p.face([(a,1.85,roof(a)-.045),(b,1.85,roof(b)-.045),(b,-1.85,roof(b)-.045),(a,-1.85,roof(a)-.045)],sheet)
-        for y in [-1.45,-.5,.5,1.45]:
-            p.line((a,y,roof(a)-.072),(b,y,roof(b)-.072),.022,C['newEastSilver'],6)
-        for y in [-1.85,0,1.85]:p.line((a,y,roof(a)+.01),(b,y,roof(b)+.01),.035,C['newEastSilver'],6)
         # Close the curved front/rear sheet edges; no open, paper-thin silhouette.
         for y in [-1.85,1.85]:
             p.face([(a,y,roof(a)-.045),(b,y,roof(b)-.045),
                     (b,y,roof(b)),(a,y,roof(a))],sheet)
-    for x in [cx-half,cx,cx+half]:p.line((x,-1.85,roof(x)),(x,1.85,roof(x)),.035,C['newEastSilver'],6)
+    for y in [-1.45,-.5,.5,1.45]:arch(y,-.065,.045,.06)
+    for y in [-1.85,0,1.85]:arch(y,.01,.07,.07)
+    for x in [cx-half,cx,cx+half]:
+        # Let the closed ends project 10 mm past the arch face. Coincident
+        # end caps at their junction produce dark z-fighting in decoded GLBs.
+        p.box(x,0,roof(x),.07,3.79,.07,C['newEastSilver'])
     for x in [cx-half,cx+half]:
         p.face([(x,-1.85,roof(x)-.045),(x,1.85,roof(x)-.045),
                 (x,1.85,roof(x)),(x,-1.85,roof(x))],sheet)
@@ -281,11 +373,20 @@ def pedestrian_entry(m,C,detail):
     # The 00:12 view shows a framed notice panel on the planted side. Retain
     # its opaque backing and frame; the unreadable artwork is not recreated.
     p.box(7.925,0,DECK+1.68,.045,2.35,1.55,C['newEastBlue'])
+    # Four mitred strips share edges instead of overlapping front faces at
+    # the corners, which otherwise turn black after export/rendering.
+    outer=[(-1.225,.855),(1.225,.855),(1.225,2.505),(-1.225,2.505)]
+    inner=[(-1.175,.905),(1.175,.905),(1.175,2.455),(-1.175,2.455)]
+    for i in range(4):
+        j=(i+1)%4;outline=[outer[i],outer[j],inner[j],inner[i]]
+        a=[(7.885,y,DECK+z) for y,z in outline]
+        b=[(7.965,y,DECK+z) for y,z in outline]
+        p.face(a[::-1],C['newEastSilver']);p.face(b,C['newEastSilver'])
+        for k in range(4):
+            nxt=(k+1)%4;p.face([a[k],a[nxt],b[nxt],b[k]],C['newEastSilver'])
     for y in [-1.2,1.2]:
-        p.box(7.925,y,DECK+1.68,.08,.05,1.65,C['newEastSilver'])
         for z in [.88,2.48]:
             p.line((7.925,y,DECK+z),(7.9,math.copysign(1.45,y),DECK+z),.018,C['newEastSilver'],6)
-    for z in [.88,2.48]:p.box(7.925,0,DECK+z,.08,2.45,.05,C['newEastSilver'])
     m.add_part('06_东25栋旁蓝色弧形雨棚_视频建模',p)
     p=Mesh()
     for x in [5.65,6.55,7.45]:
@@ -297,16 +398,30 @@ def pedestrian_entry(m,C,detail):
         for y in [-.43,.43]:
             facing=-1 if y<0 else 1
             p.box(x,y,DECK+1.20,.045,.055,.20,C['newEastSilver'])
-            p.box(x,y,DECK+1.38,.14,.085,.25,C['newEastRecess'])
-            p.box(x,y+facing*.047,DECK+1.40,.105,.014,.16,C['newEastGlass'])
+            p.box(x,y,DECK+1.48,.18,.085,.42,C['newEastRecess'])
+            p.box(x,y+facing*.047,DECK+1.46,.13,.014,.26,C['newEastGlass'])
+            # A separate lens above the portrait screen, on both approaches.
+            p.line((x,y+facing*.043,DECK+1.65),
+                   (x,y+facing*.059,DECK+1.65),.021,C['newEastGlass'],12)
+            p.face([(x+.021*math.cos(i*math.tau/12),y+facing*.059,
+                     DECK+1.65-facing*.021*math.sin(i*math.tau/12)) for i in range(12)],C['newEastGlass'])
             if detail:
                 p.box(x,y+facing*.047,DECK+1.30,.055,.014,.015,C['newEastSilver'])
                 # Access panels lie on the housing, not across the clear lane.
                 for side in [-1,1]:
                     p.box(x+side*.117,y,DECK+.55,.008,.20,.72,C['newEastRecess'])
                     p.box(x+side*.123,y,DECK+.55,.008,.18,.70,C['newEastSilver'])
-        # Blue front panel is visible in the footage; tiny warning text omitted.
-        p.box(x,-.637,DECK+.53,.12,.025,.78,C['newEastBlue'])
+        # Blue end covers are visible from inside and outside the entrance.
+        for y in [-.637,.637]:p.box(x,y,DECK+.53,.12,.025,.78,C['newEastBlue'])
+    # The video shows blue swing leaves. Display an estimated open position,
+    # folded along the housings, rather than placing a solid panel in the lane.
+    for x,direction in [(5.80,1),(6.40,-1),(6.70,1),(7.30,-1)]:
+        y=direction*.23
+        p.box(x,y,DECK+.73,.018,.46,.32,C['newEastBlue'])
+        for z in [.56,.90]:p.box(x,y,DECK+z,.025,.48,.02,C['newEastSilver'])
+        p.cylinder(x,0,DECK+.73,.022,.37,C['newEastSilver'],10)
+        for z in [.64,.82]:
+            p.line((x-direction*.06,0,DECK+z),(x,0,DECK+z),.012,C['newEastSilver'],8)
     for x in [5.2,7.9]:
         for y in [-2.5,0,2.5]:
             foot=DECK-max(0,abs(y)-2.3)*.52/1.7
@@ -382,6 +497,7 @@ def garden_enclosure(m,C):
     # Continuous, uneven shrub masses rather than repeated clipped topiary.
     # Shared silhouettes in both LODs avoid foliage popping at distance changes.
     profile=[(-.5,0),(-.5,.45),(-.34,.85),(-.04,1),(.32,.85),(.5,.45),(.5,0)]
+    rng=random.Random('new-east-leaf-sprays-v1')
     ys=sorted(set([-1.85+i*9.85/26 for i in range(27)]+[2.3,4]))
     for row,(cx,width) in enumerate([(8.94,1.08),(9.96,1.18)]):
         rings=[]
@@ -396,6 +512,30 @@ def garden_enclosure(m,C):
             for j in range(len(profile)):
                 k=(j+1)%len(profile);p.face([a[j],a[k],b[k],b[j]],mat)
         p.face(rings[0][::-1],mat);p.face(rings[-1],mat)
+        # The route video shows leafy, irregular crowns. Small attached sprays
+        # soften the coarse masses without claiming a plant species or survey.
+        # Both LODs retain these silhouettes; all dimensions remain estimates.
+        for ring in rings[1:-1:2]:
+            for point in ring[2:5]:
+                x,y,z=point;z-=.008;phase=rng.uniform(0,math.tau)
+                sx,sy=.14*math.cos(phase),.14*math.sin(phase)
+                p.line((x,y,z),(x+sx*.82,y+sy*.82,z+.09*.82),.003,C['newEastLeaf'],5)
+                # Offset pairs along a short stem, avoiding repeated radial stars.
+                for node in [.22,.52,.82]:
+                    for side in [-1,1]:
+                        t=node-(.045 if side<0 else 0)
+                        root=(x+sx*t,y+sy*t,z+.09*t)
+                        angle=phase+side*rng.uniform(.65,1.0)
+                        length=rng.uniform(.075,.10);width=rng.uniform(.014,.024)
+                        dx,dy=math.cos(angle),math.sin(angle);rise=rng.uniform(.025,.045)
+                        tip=(root[0]+dx*length,root[1]+dy*length,root[2]+rise)
+                        mid=(root[0]+dx*length*.55,root[1]+dy*length*.55,root[2]+rise*.55)
+                        outline=[root,(mid[0]+dy*width,mid[1]-dx*width,mid[2]),
+                                 tip,(mid[0]-dy*width,mid[1]+dx*width,mid[2])]
+                        ridge=(mid[0],mid[1],mid[2]+.008)
+                        finish=C['newEastLeafTips' if rng.random()<.65 else 'newEastLeafLight']
+                        for a,b in zip(outline,outline[1:]+outline[:1]):p.face([a,b,ridge],finish)
+                        p.face(outline[::-1],C['newEastLeaf'])
     m.add_part('11_东侧低矮绿篱_视频依据布置估算',p)
 
 
@@ -415,9 +555,21 @@ def new_east_gate(C,detail):
     for x in [-.49,.49]:
         p.box(x,1.4,DECK+.05,.22,.42,.10,C['newEastRecess'])
         p.box(x,1.4,DECK+.60,.18,.35,1.10,C['newEastYellow'])
+        # The frontal photograph shows the two vehicle arms lowered. Their
+        # lengths/sections are estimated; the separate pedestrian lanes stay open.
+        p.box(x,1.20,DECK+1.08,.17,.10,.17,C['newEastRecess'])
+        p.box(x,1.135,DECK+1.08,.12,.05,.12,C['newEastSilver'])
+        direction=-1 if x<0 else 1
+        reach=2.56 if x<0 else 3.23
+        for i in range(math.ceil(reach/.32)):
+            a=i*.32;b=min(reach,(i+1)*.32)
+            finish='newEastBarrierWhite' if i%2==0 else 'newEastBarrierRed'
+            p.box(x+direction*(a+b)/2,1.085,DECK+1.08,b-a,.07,.09,C[finish])
+        p.box(x+direction*(reach+.015),1.085,DECK+1.08,.03,.075,.095,C['newEastRubber'])
     m.add_part('08_中央核验设施_照片建模',p)
     garden_enclosure(m,C)
     west_connector(m,C)
+    speed_cushions(m,C)
     # Half-metre repeat keeps the grain fine at this small end panel. Explicit
     # local UVs survive the later world-space translation and Draco export.
     for i,material in enumerate(m.m):
@@ -429,6 +581,28 @@ def new_east_gate(C,detail):
         drop=max(range(3),key=lambda k:abs(normal[k]));u,v=[k for k in range(3) if k!=drop]
         m.face_uvs[i]=[(p[u]*2,p[v]*2) for p in points]
     return m
+
+
+def speed_cushions(m,C):
+    """Black/yellow road strips in the frontal photo; dimensions are estimated.
+
+    The local plane is fitted to the existing road, not the lower terrain.
+    Independent ray probes against the saved road guard this calibration.
+    """
+    p=Mesh()
+    def road(x,y):return .1949-.02308*x+.0128*(y-2.8)
+    profile=[(-.18,-.012),(-.18,0),(-.13,.024),(-.07,.048),
+             (.07,.048),(.13,.024),(.18,0),(.18,-.012)]
+    for left,right in [(-3.05,-.70),(.70,3.55)]:
+        for i in range(math.ceil((right-left)/.45)):
+            a=left+i*.45+.008;b=min(right,left+(i+1)*.45)-.008
+            ends=[[(x,.35+y,road(x,.35+y)+h) for y,h in profile] for x in (a,b)]
+            mat=C['newEastYellow' if i%2 else 'newEastRubber']
+            for j in range(len(profile)):
+                k=(j+1)%len(profile)
+                p.face([ends[0][j],ends[1][j],ends[1][k],ends[0][k]],mat)
+            p.face(ends[0],mat);p.face(ends[1][::-1],mat)
+    m.add_part('13_车道黑黄减速带_照片形制尺寸估算',p)
 
 
 def west_connector(m,C):

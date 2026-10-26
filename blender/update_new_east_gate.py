@@ -12,26 +12,12 @@ import bpy
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
 from campus_gates import campus_gate
-from export_attributes import omit_unused_uvs
+from detail_export import export_detail
 from geometry import MATERIALS
 from incremental_glb import splice_nodes, validate_retained
 from incremental_update import copy_inputs, snapshot, publication_lock, publish, require_recovered, run_checked
 from initial_model_budget import check_initial_model_budget
 from preserve_glb_geometry import unpack, mesh_nodes_by_name
-
-
-def export(obj, target):
-    bpy.ops.object.select_all(action='DESELECT')
-    obj.select_set(True)
-    with omit_unused_uvs(deduplicate_vertices=True):
-        bpy.ops.export_scene.gltf(
-            filepath=str(target), export_format='GLB', use_selection=True,
-            export_extras=True, export_cameras=False, export_lights=False,
-            export_draco_mesh_compression_enable=True,
-            export_draco_mesh_compression_level=7,
-            export_draco_position_quantization=18,
-            export_draco_normal_quantization=10,
-            export_materials='EXPORT')
 
 
 def main():
@@ -72,7 +58,7 @@ def main():
     export_props=dict(mesh_nodes_by_name(unpack(original)[0])[key].get('extras',{}))
     for mesh,path in [(high,target/'public/models/new-east-gate.glb'),(low,target/'work/new-east-base.glb')]:
         obj=mesh.object(key,collection,export_props)
-        export(obj,path)
+        export_detail(obj,path)
         data=obj.data;bpy.data.objects.remove(obj,do_unlink=True);bpy.data.meshes.remove(data)
     updated=splice_nodes(original,(target/'work/new-east-base.glb').read_bytes(),{key})
     validate_retained(original,updated,{key})
