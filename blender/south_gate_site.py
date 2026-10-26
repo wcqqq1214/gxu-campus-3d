@@ -41,16 +41,6 @@ def surface(m,x,y,points,C,offset=0):
     for i in range(1,len(p)-1):m.face([p[0],p[i],p[i+1]],C)
 
 
-def paving_row(m,x,y,ya,yb,left_a,right_a,left_b,right_b,mat,offset):
-    # A narrow grid follows terrain without the heavy uniform subdivision of
-    # long, thin triangles. It also keeps slab tops above the joint backing.
-    count=math.ceil(max(right_a-left_a,right_b-left_b)/.8)
-    for k in range(count):
-        la=left_a+(right_a-left_a)*k/count;ra=left_a+(right_a-left_a)*(k+1)/count
-        lb=left_b+(right_b-left_b)*k/count;rb=left_b+(right_b-left_b)*(k+1)/count
-        surface(m,x,y,[(la,ya),(lb,yb),(rb,yb),(ra,ya)],mat,offset)
-
-
 def strip(m,x,y,a,b,width,mat,offset=.012):
     dx=b[0]-a[0];dy=b[1]-a[1];length=math.hypot(dx,dy)
     nx,ny=-dy/length*width/2,dx/length*width/2

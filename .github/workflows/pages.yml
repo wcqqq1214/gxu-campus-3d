@@ -29,23 +29,41 @@ jobs:
           cache-dependency-path: scripts/requirements.txt
       - uses: actions/configure-pages@v5
         id: pages
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
       - run: npm ci
       - run: python -m pip install -r scripts/requirements.txt -c scripts/constraints-geodata.txt
+      - name: 安装无损 JPEG 测试依赖
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends libjpeg-turbo-progs
+          command -v jpegtran
+      - name: 安装 Blender 几何测试运行时
+        run: |
+          set -euo pipefail
+          geometry_blender_archive="$RUNNER_TEMP/blender-5.2.2-linux-x64.tar.xz"
+          curl --fail --location --retry 3 \
+            https://download.blender.org/release/Blender5.2/blender-5.2.2-linux-x64.tar.xz \
+            --output "$geometry_blender_archive"
+          # 固定校验值来自同版本的官方 blender-5.2.2.sha256。
+          echo "84098912789dc450e95697c4184fb8a90acbe5111c2ba4aede3fecb57806a168  $geometry_blender_archive" | sha256sum --check
+          tar -xf "$geometry_blender_archive" -C "$RUNNER_TEMP"
+          "$RUNNER_TEMP/blender-5.2.2-linux-x64/blender" --version
+          echo "$RUNNER_TEMP/blender-5.2.2-linux-x64" >> "$GITHUB_PATH"
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
       - run: npm run test:data
+      - run: npm run test:geometry
       - run: npm run build:pages
         env:
-          PAGES_BASE_PATH: ${{ github.event_name == 'pull_request' && '/gxu-campus-3d' || steps.pages.outputs.base_path }}
+          PAGES_BASE_PATH: ${{ (github.event_name == 'pull_request' || github.ref != 'refs/heads/main') && '/gxu-campus-3d' || steps.pages.outputs.base_path }}
       - uses: actions/upload-pages-artifact@v4
-        if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         with:
           path: out
   deploy:
     needs: build
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       pages: write

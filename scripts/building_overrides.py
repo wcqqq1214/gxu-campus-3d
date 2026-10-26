@@ -304,17 +304,21 @@ def resolve_facades(b, form, rules, *, panel_minimum_bottom=3.2):
     indexed = {}
     part_ids = {p['id'] for p in form['parts']} or {'body'}
     for rule in rules:
-        if set(rule) - {'polygon','ring','edge','part','windows','balconies','spacing','skipWindowLevels','openCorridor','windowGrid','windowBands','horizontalLedges','panels','attachedGallery','wallFinish'}:
+        if set(rule) - {'polygon','ring','edge','part','segment','windows','balconies','spacing','skipWindowLevels','openCorridor','windowGrid','windowBands','horizontalLedges','panels','attachedGallery','wallFinish'}:
             raise ValueError('Unknown facade rule field')
         anchor(b, rule)
         if 'part' in rule and (not isinstance(rule['part'],str) or rule['part'] not in part_ids):
             raise ValueError('Facade rule references an unknown building part')
         edge_key = tuple(rule[k] for k in ('polygon','ring','edge'))
-        key = (*edge_key, rule.get('part'))
+        if 'segment' in rule and ('part' not in rule or type(rule['segment']) is not int or rule['segment'] < 0):
+            raise ValueError('Facade segment requires an explicit part and a nonnegative integer')
+        key = (*edge_key, rule.get('part'), rule.get('segment'))
         if key in indexed:
             raise ValueError('Duplicate facade rule')
         if any(k[:3] == edge_key and (k[3] is None or key[3] is None) for k in indexed):
             raise ValueError('Do not mix whole-edge and part-specific facade rules')
+        if any(k[:4] == key[:4] and (k[4] is None or key[4] is None) for k in indexed):
+            raise ValueError('Do not mix whole-part and segment-specific facade rules')
         for key_bool in ('windows','balconies'):
             if key_bool in rule and not isinstance(rule[key_bool], bool):
                 raise ValueError('Facade window/balcony switches must be boolean')
@@ -435,11 +439,14 @@ def resolve_facades(b, form, rules, *, panel_minimum_bottom=3.2):
                     # only the coincident intervals collected above.
                     if not any(s.length > .01 for s in segments) or (('floorHeights' in part or has_slatted_portico or incomplete_edge) and boundary_segments and abs(sum(s.length for s in segments)-sum(s.length for s in boundary_segments))>1e-5):
                         segments=boundary_segments
-                    for s in segments:
-                        if s.length < .01: continue
-                        rule_key = (pi,ri,ei,part['id'])
+                    segments = sorted((s for s in segments if s.length >= .01),
+                                      key=lambda s: min(line.project(Point(p)) for p in s.coords))
+                    for segment_index,s in enumerate(segments):
+                        rule_key = (pi,ri,ei,part['id'],segment_index)
                         if rule_key not in indexed:
-                            rule_key = (pi,ri,ei,None)
+                            rule_key = (pi,ri,ei,part['id'],None)
+                        if rule_key not in indexed:
+                            rule_key = (pi,ri,ei,None,None)
                         rule = indexed.get(rule_key,{})
                         if rule_key in matched:
                             matched[rule_key] += 1
@@ -678,7 +685,7 @@ def resolve_building(building, record=None, source_ids=None):
         entrances = []; ids = set()
         for e in record['entrances']:
             required = {'id','polygon','ring','edge','t','width','primary'}
-            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance','recessGlazing','recessDoor'} or not e['id'] or e['id'] in ids:
+            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance','recessGlazing','recessDoor','recessedStairEntry'} or not e['id'] or e['id'] in ids:
                 raise ValueError('Invalid or duplicate entrance')
             if 'recessGlazing' in e and ('recess' not in e or set(e)-required-{'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','recessGlazing'}):
                 raise ValueError('Recess glazing requires only a recessed portico entrance')
@@ -727,6 +734,11 @@ def resolve_building(building, record=None, source_ids=None):
             resolved = {**e,'center':[a[i]+(c[i]-a[i])*t for i in (0,1)],
                 'bearing':math.degrees(math.atan2(n[0],n[1]))%360,
                 'status':provenance['entrances']['status'],'basis':provenance['entrances']['note']}
+            if 'recessedStairEntry' in e:
+                if set(e)-required-{'recessedStairEntry'}:
+                    raise ValueError('Recessed stair entry cannot combine with another entrance system')
+                from recessed_stair_entry_data import resolve_recessed_stair_entry
+                resolved['recessedStairEntry']=resolve_recessed_stair_entry(b,resolved,e['recessedStairEntry'],form['parts'])
             if 'flushEntrance' in e:
                 from flush_entrance_data import validate_flush_entrance, validate_flush_canopy_footprint
                 if set(e)-required-{'flushEntrance'}:

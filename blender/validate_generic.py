@@ -24,6 +24,13 @@ def ordinary(b):
             and b['tags'].get('memorial') != 'column')
 
 
+def component_vertices(obj, group):
+    # Generator coordinates and roof probes are world-space. Incremental
+    # adjustments may retain a translated/rotated editable object.
+    return [obj.matrix_world @ v.co for v in obj.data.vertices
+            if any(g.group == group.index for g in v.groups)]
+
+
 def mesh_tree(obj):
     return BVHTree.FromPolygons([obj.matrix_world@v.co for v in obj.data.vertices],
                                 [tuple(p.vertices) for p in obj.data.polygons])
@@ -114,6 +121,11 @@ def samples(b):
         return points
     for e in form['entrances']:
         x,y=e['center'];a=math.radians(e['bearing']);nx,ny=math.sin(a),math.cos(a)
+        if 'recessedStairEntry' in e:
+            p=e['recessedStairEntry'];distance=(p['outerEnd']+p['innerStart'])/2
+            points.append({'kind':'recessed-entry-landing','x':x-nx*distance,'y':y-ny*distance,
+                           'top':z+p['platformHeight']+.2,'expected':z+p['platformHeight']})
+            continue
         if 'flushEntrance' in e:
             p=e['flushEntrance'];expected=z+p['floorHeight']+p['doorHeight']+p['frameWidth']/2
             points.append({'kind':'flush-door-header','x':x+nx*.13,'y':y+ny*.13,
@@ -169,7 +181,7 @@ def main():
     prefix=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'generic')
     if not re.fullmatch('[a-z0-9-]+',prefix):raise ValueError('Invalid report prefix')
     bs = [b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if ordinary(b)]
-    colors = ['pink','livingWarm','livingCool','stone','stoneWarm','stoneCool','white','paleRoof','blueRoof','red','dark','path','shadeGlass','glass']
+    colors = ['pink','livingWarm','livingCool','stone','stoneWarm','stoneCool','white','paleRoof','blueRoof','red','dark','path','shadeGlass','glass','grass','green']
     C = {k:i for i,k in enumerate(colors)}
     MATERIALS[:]=[bpy.data.materials.new('generic-check-'+name) for name in colors]
     generated = []
@@ -218,7 +230,7 @@ def main():
         for name,start,end in expected.parts[:3]:
             group=o.vertex_groups.get(name)
             assert group is not None,(b['id'],name,'missing editable component')
-            actual=[v.co for v in o.data.vertices if any(g.group==group.index for g in v.groups)]
+            actual=component_vertices(o,group)
             # Source vertices are welded for file size; compare geometry in
             # both directions, independent of duplicate count or mesh ordering.
             predicted=expected.v[start:end]

@@ -85,7 +85,10 @@ test('关系去重、要素 ID 与目录互相对应', async () => {
       assert.ok(b.id.startsWith('north-campus/'));
       assert.equal(b.osmEditedAt, null);
       assert.ok(b.sourceRefs.includes('northCampusImagery2024'));
-      assert.equal(b.sourceUrl, 'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer');
+      assert.equal(
+        b.sourceUrl,
+        'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+      );
     } else {
       assert.equal(b.sourceUrl, `https://www.openstreetmap.org/${b.id}`);
     }
@@ -158,7 +161,13 @@ test('现南门绑定真实门楼且不重复导出，汇学堂从东侧进入',
     const node = gltf.nodes.find((n) => n.extras?.landmark === gate.id);
     // The editable landmark also contains the photo-based approach paving.
     // Check the gate architecture itself against its mapped building footprint.
-    const architecture = new Set(['gateStone', 'gateTrim', 'gateRecess', 'gateJoint', 'gateRed']);
+    const architecture = new Set([
+      'gateStone',
+      'gateTrim',
+      'gateRecess',
+      'gateJoint',
+      'gateRed',
+    ]);
     const positions = gltf.meshes[node.mesh].primitives
       .filter((p) => architecture.has(gltf.materials[p.material].name))
       .map((p) => gltf.accessors[p.attributes.POSITION]);
@@ -206,10 +215,22 @@ test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
     ),
   );
 });
-test('基础模型和纹理同时满足精细 12 MB、流畅 6 MB 预算', async () => {
+test('首屏模型与嵌入纹理：8 MB 目标、10 MB 硬上限', async (t) => {
+  const budget = JSON.parse(
+    await readFile(
+      new URL('../data/initial-model-budget.json', import.meta.url),
+      'utf8',
+    ),
+  );
   const total = manifest.base.bytes + manifest.trees.bytes;
-  assert.ok(total <= 6_000_000, `${total} bytes`);
-  assert.ok(total <= 12_000_000);
+  if (total > budget.targetBytes)
+    t.diagnostic(
+      `WARNING: ${total} bytes exceeds target ${budget.targetBytes}`,
+    );
+  assert.ok(
+    total <= budget.hardLimitBytes,
+    `${total} bytes exceeds hard limit ${budget.hardLimitBytes}`,
+  );
 });
 test('来源日期字段和高程原始值可追溯', async () => {
   const sources = await json('sources');

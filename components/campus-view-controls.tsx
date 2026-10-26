@@ -91,7 +91,7 @@ export function CampusViewControls({
   return (
     <fieldset className="landmark-views" aria-label={t('地点观察视角')}>
       <div className="view-primary-row">
-        <fieldset className="view-segment" aria-label={t('视角')}>
+        <fieldset className="segmented" aria-label={t('视角')}>
           {(['oblique', 'top'] as const).map((value) => (
             <button
               key={value}
@@ -120,24 +120,21 @@ export function CampusViewControls({
         )}
       </div>
       {landmark && (
-        <div className="view-direction-row">
-          <span className="view-direction-label">{t('方位')}</span>
-          <fieldset
-            className="view-directions"
-            ref={directions}
-            aria-label={t('方位与近景')}
-          >
-            {landmarkViewOptions(landmark, t).map(([value, label]) => (
-              <button
-                key={value}
-                aria-pressed={!orbit && view === value}
-                onClick={() => onViewChange(value)}
-              >
-                {label}
-              </button>
-            ))}
-          </fieldset>
-        </div>
+        <fieldset
+          className="segmented view-directions"
+          ref={directions}
+          aria-label={t('方位与近景')}
+        >
+          {landmarkViewOptions(landmark, t).map(([value, label]) => (
+            <button
+              key={value}
+              aria-pressed={!orbit && view === value}
+              onClick={() => onViewChange(value)}
+            >
+              {label}
+            </button>
+          ))}
+        </fieldset>
       )}
     </fieldset>
   );

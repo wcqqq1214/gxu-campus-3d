@@ -107,7 +107,10 @@ def prepare_sites(root=ROOT):
     source_ids={s['id'] for s in read('sources.json')['sources']}
     sites=[];areas=[];gradings=[]
     for config in catalogue['sites']:
-        if config.get('type')=='canopy-connection':
+        if config.get('type')=='recessed-entry-ground':
+            from recessed_entry_site_data import derive_recessed_entry_site
+            site,area,grading=derive_recessed_entry_site(config,buildings,source_ids)
+        elif config.get('type')=='canopy-connection':
             from canopy_connection_data import derive_canopy_connection
             site,area,grading=derive_canopy_connection(config,buildings,roads,source_ids)
         elif config.get('type')=='courtyard-paving':

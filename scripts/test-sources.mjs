@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { sourceIndex } from '../lib/campus/sources.ts';
 const data = JSON.parse(
   await readFile(new URL('../public/data/sources.json', import.meta.url)),
 );
@@ -10,7 +9,9 @@ const landmarks = JSON.parse(
 );
 
 test('全部地标的主来源和附加来源均可解析，来源ID唯一且链接完整', () => {
-  const refs = sourceIndex(data.sources);
+  const refs = Object.fromEntries(
+    data.sources.map((source) => [source.id, source]),
+  );
   assert.equal(
     Object.keys(refs).length,
     data.sources.length,

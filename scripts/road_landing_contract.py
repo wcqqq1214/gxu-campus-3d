@@ -13,7 +13,7 @@ def revision(value):
     return hashlib.sha256(json.dumps(without_documentation(value), sort_keys=True, separators=(',', ':')).encode()).hexdigest()
 
 
-def load_landings(root, configuration='data/road-landing-overrides.json'):
+def load_landings(root, configuration='data/road-landing-overrides.json', *, building_elevation=None):
     read = lambda name: json.loads((root / name).read_text())
     buildings = read('public/data/buildings.json')
     surfaces = read('public/data/surfaces.json')
@@ -23,6 +23,9 @@ def load_landings(root, configuration='data/road-landing-overrides.json'):
     result = []
     for config in records:
         b = next(b for b in buildings if b['id'] == config['buildingId'])
+        # During a fresh model build the serialized elevation does not exist
+        # yet. Use that build's resolved datum while retaining anchor checks.
+        datum = building_elevation(b) if building_elevation is not None else b['elevation']
         e = next(e for e in b['form']['entrances'] if e['id'] == config['entranceId'])
         index, surface = next((i, s) for i, s in enumerate(surfaces) if s['id'] == config['surfaceId'])
         if surface.get('suppressed') or surface['id'] in overlays[0]['replaceSurfaceIds']:
@@ -31,7 +34,7 @@ def load_landings(root, configuration='data/road-landing-overrides.json'):
             surface = {**surface, **overlay['surfaceOverrides'].get(str(index), {})}
         if surface['kind'] != 'roads' or surface['tags'].get('highway') != 'service':
             raise ValueError('Road landing requires an existing service road')
-        if config['surfaceRevision'] != revision(surface) or config['anchorRevision'] != revision([b['elevation'], e]):
+        if config['surfaceRevision'] != revision(surface) or config['anchorRevision'] != revision([datum, e]):
             raise ValueError('Road landing anchors changed; inspect and revise its bounded configuration')
         numeric = [config['sideFeather'], config['meshStep'], config['minimumTerrainClearance'], *config['depthStations']]
         if any(type(v) not in (int, float) or not math.isfinite(v) or v <= 0 for v in numeric):
@@ -49,7 +52,7 @@ def load_landings(root, configuration='data/road-landing-overrides.json'):
         result.append({**config, 'origin': e['outerCenter'], 'normal': normal,
                        'tangent': [normal[1], -normal[0]],
                        'halfWidth': e.get('stepWidth', e['porticoWidth']) / 2,
-                       'targetElevation': b['elevation'] + e.get('stepBaseHeight', 0),
+                       'targetElevation': datum + e.get('stepBaseHeight', 0),
                        'surface': surface})
     if len({r['id'] for r in result}) != len(result):
         raise ValueError('Duplicate road landing')

@@ -33,6 +33,16 @@ class RoadLandingContractTests(unittest.TestCase):
         record=self.load()[0]
         self.assertEqual(record['targetElevation'],5)
         self.assertEqual(record['halfWidth'],2)
+    def test_fresh_build_uses_resolved_datum_and_still_checks_anchors(self):
+        self.load()
+        building=dict(id='building',form={'entrances':[self.entry]})
+        self.write('public/data/buildings.json',[building])
+        self.assertEqual(load_landings(self.root,building_elevation=lambda b:5)[0]['targetElevation'],5)
+        building['elevation']=999
+        self.write('public/data/buildings.json',[building])
+        self.assertEqual(load_landings(self.root,building_elevation=lambda b:5)[0]['targetElevation'],5)
+        with self.assertRaisesRegex(ValueError,'anchors changed'):
+            load_landings(self.root,building_elevation=lambda b:6)
     def test_changed_entry_rejected(self):
         self.config['anchorRevision']='stale'
         with self.assertRaisesRegex(ValueError,'anchors changed'):self.load()

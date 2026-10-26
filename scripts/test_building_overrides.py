@@ -13,6 +13,40 @@ from building_overrides import (ROOT, anchor, footprint_revision, load_catalogue
 
 
 class BuildingOverrideTests(unittest.TestCase):
+    def split_facade_fixture(self):
+        def rectangle(a, b):
+            return [[[a,0],[b,0],[b,20],[a,20],[a,0]]]
+        parts=[dict(id='wings',polygons=[rectangle(0,8),rectangle(22,30)],height=16.5,levels=5),
+               dict(id='middle',polygons=[rectangle(8,22)],height=6.6,levels=2)]
+        rule=dict(polygon=0,ring=0,edge=0,part='wings',segment=0,windows=False)
+        return parts,rule
+
+    def test_segment_rules_select_disconnected_wings_in_edge_order(self):
+        parts,rule=self.split_facade_fixture()
+        # Polygon storage order must not change which wing receives the rule.
+        for polygons in [parts[0]['polygons'],list(reversed(parts[0]['polygons']))]:
+            parts[0]['polygons']=polygons
+            result=self.resolve(self.building(),parts=parts,facadeRules=[rule])
+            facades=[f for f in result['form']['facades'] if f['edge']==0 and f['part']=='wings']
+            self.assertEqual([f['start'][0] for f in facades],[0,22])
+            self.assertEqual(facades[0]['rule'],rule)
+            self.assertEqual(facades[1]['rule'],{})
+        second={**rule,'segment':1,'windows':True}
+        result=self.resolve(self.building(),parts=parts,facadeRules=[rule,second])
+        self.assertEqual([f['rule']['windows'] for f in result['form']['facades']
+                          if f['edge']==0 and f['part']=='wings'],[False,True])
+
+    def test_segment_rules_reject_missing_ambiguous_and_invalid_targets(self):
+        parts,rule=self.split_facade_fixture()
+        for segment in [-1,True,1.5,'0',None,2]:
+            with self.subTest(segment=segment),self.assertRaises(ValueError):
+                self.resolve(self.building(),parts=parts,facadeRules=[{**rule,'segment':segment}])
+        whole={k:v for k,v in rule.items() if k!='segment'}
+        for rules in [[rule,whole],[whole,rule],[rule,rule],
+                      [{k:v for k,v in rule.items() if k!='part'}]]:
+            with self.subTest(rules=rules),self.assertRaises(ValueError):
+                self.resolve(self.building(),parts=parts,facadeRules=rules)
+
     def test_part_base_depth_keeps_heights_and_rejects_open_or_invalid_depths(self):
         b = self.building()
         part = dict(id='body', polygons=b['polygons'], height=16.5, levels=5, baseDepth=1.1)

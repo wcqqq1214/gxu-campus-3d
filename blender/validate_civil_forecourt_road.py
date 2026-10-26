@@ -1,4 +1,4 @@
-"""Check the repaired mapped service road against original terrain and joins."""
+"""Check mapped service-road continuity against its configured ground grade."""
 import bpy,json,math,sys,hashlib
 from pathlib import Path
 from mathutils import Vector
@@ -6,11 +6,13 @@ from mathutils.bvhtree import BVHTree
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from site_geometry import inside,ring_distance
 from validation_inputs import baseline_root
+from civil_forecourt_grade import load_grade, weight as grade_weight
 PREFIX=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--report-prefix=')),'s2-civil-front-connection-road-grade')
 TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)
 BASELINE=baseline_root(sys.argv)
 PAVING_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--paving-id=')),'civil-forecourt-service')
 r=next(p for p in json.load(open(ROOT/'public/data/pavings.json'))['pavings'] if p['id']==PAVING_ID)
+GRADE=load_grade(ROOT) if PAVING_ID=='civil-forecourt-service' else None
 def root(o):
  while o.parent:o=o.parent
  return o
@@ -40,7 +42,11 @@ def check(label):
    if any(inside((x,y),p['outer']) or ring_distance((x,y),p['outer'])<=r['joinFeather']+.1 for p in r.get('neighborOverlaps',[])):continue
    h,g,old=road(x,y),ground(x,y),oldground(x,y)
    assert h is not None and g is not None and old is not None,('road/terrain hole',x,y)
-   errors.append(abs(h-old-r['groundedService']['offset']));clearances.append(h-g)
+   # The configured nonlinear grade is tessellated before paving. Check its
+   # actual soil plane; the independent fixed profiles in validate_civil_grade
+   # also enforce absolute entrance elevations and shallow road gradients.
+   reference=g if GRADE is not None else old
+   errors.append(abs(h-reference-r['groundedService']['offset']));clearances.append(h-g)
    assert errors[-1]<tolerance,('grounded road height',x,y,h,old,errors[-1])
    assert h-g>.055,('terrain through road',x,y,h-g)
  # Independently fixed former failure location, a two-centimetre scan.
@@ -78,7 +84,9 @@ def check(label):
    x,y=[a[k]*(1-t)+b[k]*t for k in (0,1)]
    xx,yy=x-n[0]*.05,y-n[1]*.05
    expected,h=oldroad(xx,yy),road(xx,yy)
-   assert expected is not None and h is not None and abs(h-expected)<tolerance,('campus road join changed',j['edge'],t,h,expected)
+   assert expected is not None and h is not None,('missing campus road join',j['edge'],t)
+   if GRADE is None or grade_weight(xx,yy,GRADE)==0:
+    assert abs(h-expected)<tolerance,('campus road join changed',j['edge'],t,h,expected)
    hs=[];gaps=[]
    for d in [-.2+i*.02 for i in range(41)]:
     xx,yy=x+n[0]*d,y+n[1]*d;h=road(xx,yy)
@@ -114,7 +122,7 @@ def check(label):
      export_seams.append(error)
   assert export_seams,'No road samples at export partition boundary'
  return dict(passed=True,interiorSamples=len(errors),maximumGroundedHeightError=max(errors),minimumGroundClearance=min(clearances),formerFailureProfiles=profiles,joins=joins,neighborOverlapProfiles=overlap_profiles,tolerance=tolerance,exportSeamSamples=len(export_seams),maximumExportSeamError=max(export_seams,default=0))
-report=dict(passed=False,scope='Mapped service-road footprint repaired to original terrain plus its explicit estimated offset; original campus-road contacts retained through bounded blends. Interior, fixed profiles and exported seams checked.',pavingId=PAVING_ID,areaMeters2=r['areaMeters2'],groundOffsetM=r['groundedService']['offset'])
+report=dict(passed=False,scope='Mapped service-road footprint follows the configured photo-guided forecourt grade where enabled, otherwise the baseline terrain; campus-road contacts use the same bounded grade. Interior, fixed profiles and exported seams checked.',pavingId=PAVING_ID,areaMeters2=r['areaMeters2'],groundOffsetM=r['groundedService']['offset'])
 try:
  bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'));report['source']=check('source');source_road=sample([o for o in bpy.context.scene.objects if root(o).get('layer')=='roads'])
  bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(TARGET/'public/models/base.glb'));bpy.context.view_layer.update();report['base']=check('base')

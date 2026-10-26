@@ -19,11 +19,14 @@
     "models:build": "blender --background --python-exit-code 1 --python blender/build_campus.py",
     "test": "node --experimental-strip-types --test scripts/test-*.mjs",
     "test:data": "python3 -m unittest discover -s scripts -p 'test_*.py'",
+    "test:geometry": "node scripts/run-geometry-tests.mjs",
     "data:restore": "python3 scripts/restore_snapshot.py",
-    "preview": "node scripts/preview.mjs"
+    "preview": "node scripts/preview.mjs",
+    "test:incremental": "python3 scripts/test-incremental-updates.py"
   },
   "dependencies": {
     "@base-ui/react": "1.7.0",
+    "@radix-ui/colors": "3.0.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "1.31.0",

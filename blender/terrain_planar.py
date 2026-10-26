@@ -192,9 +192,11 @@ def simplify_mesh_arrays(source):
 
 
 @contextmanager
-def planar_terrain_candidate(obj, *, dump_directory=None):
+def planar_terrain_candidate(obj, *, dump_directory=None, shared_position_bounds=False):
+    # Multi-material roads use the same 18-bit position domain for every
+    # primitive. Without that exporter guarantee, retain terrain-only use.
     original = obj.data
-    if (obj.get('layer') != 'terrain' or obj.matrix_world != Matrix.Identity(4)
+    if (obj.get('layer') not in ({'terrain','roads'} if shared_position_bounds else {'terrain'}) or obj.matrix_world != Matrix.Identity(4)
             or original.shape_keys or obj.modifiers or obj.vertex_groups
             or original.has_custom_normals or any(p.use_smooth for p in original.polygons)
             or len(original.uv_layers) != 1 or original.color_attributes):
@@ -204,7 +206,7 @@ def planar_terrain_candidate(obj, *, dump_directory=None):
     if any(a.name not in supported and not a.name.startswith('.') for a in original.attributes):
         raise ValueError('Unsupported terrain attributes must be preserved explicitly')
     source = read_mesh(original)
-    if len(set(source['materials'])) != 1:
+    if len(set(source['materials'])) != 1 and not shared_position_bounds:
         raise ValueError('Terrain quantization domain requires one material')
     result, report = simplify_mesh_arrays(source)
     temporary = bpy.data.meshes.new('terrain-planar-candidate')

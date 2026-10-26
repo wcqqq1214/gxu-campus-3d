@@ -3,21 +3,37 @@ import hashlib,json,sys
 from pathlib import Path
 import bpy
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
+if not globals().get('_INCREMENTAL_CANDIDATE'):
+    from incremental_update import staged_update
+    staged_update(ROOT, __file__)
+    raise SystemExit(0)
+from incremental_glb import splice_nodes, validate_retained
+from initial_model_budget import check_initial_model_budget
 from geometry import MATERIALS
-from preserve_glb_geometry import preserve_geometry,compact_buffer_views,unpack,mesh_nodes_by_name
+from preserve_glb_geometry import unpack,mesh_nodes_by_name
 previous=(ROOT/'public/models/base.glb').read_bytes()
+old_manifest=json.loads((ROOT/'public/data/models.json').read_text())
+old_banks={e['url']:(ROOT/'public'/e['url']).read_bytes() for e in old_manifest.get('sports',[])}
 before={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'public/models').glob('*.glb')}
 script=ROOT/'blender/build_campus.py';namespace={'__file__':str(script),'__name__':'__main__'};sys.argv.append('--base-only')
 try:exec(compile(script.read_text(),str(script),'exec'),namespace)
 except SystemExit as result:
     if result.code not in (None,0):raise
-preserve_geometry(previous,ROOT/'public/models/base.glb',['landmark-time-gate'])
-compact_buffer_views(ROOT/'public/models/base.glb')
+path=ROOT/'public/models/base.glb'
+generated=path.read_bytes()
+names=set(mesh_nodes_by_name(unpack(previous)[0]))|set(mesh_nodes_by_name(unpack(generated)[0]))
+selected={'roads','terrain','green'}|{k for k in names if k.startswith(('site-','shore-','paving-','vegetation-low-','infra-approach-'))}
+selected|={'landmark-'+b['id'] for b in namespace['infrastructure']['bridges']}
+path.write_bytes(splice_nodes(previous,generated,selected))
+validate_retained(previous,path.read_bytes(),selected)
+# Base-only also exports basketball banks; they are outside a road update.
 high={}
 for b in namespace['infrastructure']['bridges']:
     key=b['id'];high[key]=namespace['bridge'](b,namespace['C'],True)
     namespace['export'](key+'.glb',{'landmark-'+key:high[key]})
 manifest=json.loads((ROOT/'public/data/models.json').read_text())
+for url,raw in old_banks.items():(ROOT/'public'/url).write_bytes(raw)
+if 'sports' in old_manifest:manifest['sports']=old_manifest['sports']
 for entry in manifest['landmarks']:
     if entry['id'] in high:
         raw=(ROOT/'public'/entry['url']).read_bytes();entry.update(bytes=len(raw),sha256=hashlib.sha256(raw).hexdigest())
@@ -79,12 +95,15 @@ def signature(doc,binary,node):
 changed=[];retained=[]
 old_nodes=mesh_nodes_by_name(a);new_nodes=mesh_nodes_by_name(c)
 for name,node in old_nodes.items():
-    other=new_nodes[name]
+    other=new_nodes.get(name)
+    if other is None:
+        assert name in selected,name
+        continue
     (retained if signature(a,ab,node)==signature(c,cb,other) else changed).append(name)
-assert set(changed)<= {'roads','terrain','green'}|{'infra-approach-'+k for k in high}|{k for k in namespace['base'] if k.startswith(('site-','shore-','paving-','vegetation-low-'))},changed
+assert set(changed)<=selected,changed
 assert all(hashlib.sha256((ROOT/'public/models'/n).read_bytes()).hexdigest()==h for n,h in before.items() if n not in {'base.glb'}|{k+'.glb' for k in high})
 report={'changedBaseNodes':changed,'retainedBaseNodes':len(retained),'retainedNearAndTreeGlbs':len(before)-1-len(high),'trees':len(trees),'initialBytes':len(blob)+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
 (ROOT/'docs/model-checks/bridge-joins-models.json').write_text(json.dumps(report,indent=2)+'\n')
-assert report['initialBytes']<6_000_000,report
+check_initial_model_budget(report['initialBytes'])
 assert report['blendBytes']<100*1024*1024,report
 print(report,flush=True)

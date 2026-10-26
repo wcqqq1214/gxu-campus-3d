@@ -36,6 +36,15 @@ test('every named map feature has an explicit bilingual entry and provenance', (
     for (const source of row.sources)
       assert.ok(evidence.sources[source], source);
 });
+test('displayed names never use a middle dot as a separator', () => {
+  for (const source of Object.keys(campusNames))
+    for (const locale of ['zh', 'en'])
+      assert.ok(!placeName(source, locale).includes('·'), source);
+  assert.equal(
+    placeName('北校园教学组团·东北翼', 'en'),
+    'North Campus Teaching Complex, Northeast Wing',
+  );
+});
 test('agreed names override presentation while unresolved Chinese names remain intact', () => {
   assert.equal(placeName('新东门', 'zh'), '新东园门');
   assert.equal(placeName('新东门', 'en'), 'Xindongyuan Gate');
@@ -77,15 +86,13 @@ test('English and Chinese search resolve the same stable landmark IDs', () => {
 });
 test('in-flight progress is translated from the same message after switching language', () => {
   assert.equal(translate('en', '{count} 处', { count: 1 }), '1 place');
+  assert.equal(translate('en', '{count} 个结果', { count: 1 }), '1 result');
   const message = {
-    text: '正在细化{name} · {percent}%',
+    text: '正在加载{name} {percent}%',
     values: { name: '新东门', percent: 42 },
   };
-  assert.equal(statusText('zh', message), '正在细化新东园门 · 42%');
-  assert.equal(
-    statusText('en', message),
-    'Loading details: Xindongyuan Gate · 42%',
-  );
+  assert.equal(statusText('zh', message), '正在加载新东园门 42%');
+  assert.equal(statusText('en', message), 'Loading Xindongyuan Gate 42%');
   assert.equal(
     translate('en', '返回 {name}', { name: 'Library' }),
     'Back to Library',

@@ -15,7 +15,7 @@ EXPORTS = ('buildings.json', 'geography.geojson', 'sites.json', 'foundations.jso
 def export_public_data(root=ROOT):
     out = root / 'public/data'
     read = lambda name: json.loads((out / name).read_text())
-    values = {name:read(name) for name in (*EXPORTS, 'low-planting.json')}
+    values = {name:read(name) for name in (*EXPORTS, 'low-planting.json', 'pavings.json', 'shores.json')}
     foundation = foundation_context(root)
     planting_config = json.loads((root / 'data/low-planting.json').read_text())
     planting_data = {name:read(name + '.json') for name in CONTEXT_FILES}
@@ -28,6 +28,22 @@ def export_public_data(root=ROOT):
     if (low['contextRevision'] not in (digest(planting), context_revision(planting))
             or low['configRevision'] != digest(planting_config) or not low['placementPassed']):
         raise ValueError('Low-planting context is stale; run vegetation preparation before export')
+    ground = {name:read(name+'.json') for name in
+              ('surfaces','infrastructure','surroundings','campus-roads')}
+    def ground_contexts(sites):
+        paving = [ground[name] for name in ('surfaces','infrastructure','surroundings','campus-roads')] + [sites]
+        shore = {'surfaces':ground['surfaces'],'roads':ground['campus-roads'],
+                 'surroundings':ground['surroundings'],'infrastructure':ground['infrastructure'],
+                 'sites':sites,'buildings':[[b['id'],b['polygons']] for b in values['buildings.json']]}
+        return {'pavings.json':paving,'shores.json':shore}
+    raw_contexts = ground_contexts(values['sites.json'])
+    exported_contexts = ground_contexts(without_documentation(values['sites.json']))
+    # Removing site evidence changes the serialized context. Validate the
+    # prepared input first; only then migrate its hash to the exported input.
+    for name, context in raw_contexts.items():
+        if values[name]['contextRevision'] not in (digest(context),digest(exported_contexts[name])):
+            raise ValueError(f'{name} context is stale; run data preparation before export')
+        values[name]['contextRevision'] = digest(exported_contexts[name])
     buildings = values['buildings.json']
     by_id = {building['id']:building for building in buildings}
     for building in buildings:
@@ -49,6 +65,9 @@ def export_public_data(root=ROOT):
     # Canopy fingerprints are part of the building input to the foundation guard.
     foundation['buildings'] = [{k:v for k,v in b.items() if k not in ('elevation', 'zone', 'chunk')}
                                for b in values['buildings.json']]
+    for name in ('sites','pavings','shores'):
+        foundation[name] = values[name+'.json']
+        planting[name] = values[name+'.json']
     values['foundations.json']['contextRevision'] = revision(foundation)
     low['contextRevision'] = context_revision(planting)
     sizes = {}

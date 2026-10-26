@@ -3,7 +3,13 @@ import sys,json,hashlib
 from pathlib import Path
 import bpy
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
-from geometry import MATERIALS,Mesh
+if not globals().get('_INCREMENTAL_CANDIDATE'):
+    from incremental_update import staged_update
+    staged_update(ROOT, __file__)
+    raise SystemExit(0)
+from incremental_glb import splice_nodes, validate_retained
+from initial_model_budget import check_initial_model_budget
+from geometry import MATERIALS
 from basketball import court_model,bank_paving
 previous_base=(ROOT/'public/models/base.glb').read_bytes()
 before={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'public/models').glob('*.glb')}
@@ -12,9 +18,13 @@ sys.argv.append('--base-only')
 try:exec(compile(script.read_text(),str(script),'exec'),ns)
 except SystemExit as e:
     if e.code not in (0,None):raise
-from preserve_glb_geometry import preserve_geometry,compact_buffer_views
-preserve_geometry(previous_base,ROOT/'public/models/base.glb',['landmark-time-gate'])
-compact_buffer_views(ROOT/'public/models/base.glb')
+from preserve_glb_geometry import unpack, mesh_nodes_by_name
+path=ROOT/'public/models/base.glb'
+generated=path.read_bytes()
+names=set(mesh_nodes_by_name(unpack(previous_base)[0]))|set(mesh_nodes_by_name(unpack(generated)[0]))
+selected={'terrain','roads','sports','green'}|{k for k in names if k.startswith(('basketball-bank-','site-','shore-','paving-','vegetation-low-'))}
+path.write_bytes(splice_nodes(previous_base,generated,selected))
+validate_retained(previous_base,path.read_bytes(),selected)
 manifest=json.loads((ROOT/'public/data/models.json').read_text());blob=(ROOT/'public/models/base.glb').read_bytes();manifest['base'].update(bytes=len(blob),sha256=hashlib.sha256(blob).hexdigest())
 (ROOT/'public/data/models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 records=[(m.name,tuple(m.diffuse_color),m.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value,m.node_tree.nodes['Principled BSDF'].inputs['Metallic'].default_value) for m in MATERIALS]
@@ -65,8 +75,7 @@ bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'),compre
 print('Basketball updated in editable source and base GLB',flush=True)
 
 assert (ROOT/'blender/gxu-campus.blend').stat().st_size<100*1024*1024
-assert manifest['base']['bytes']+manifest['trees']['bytes']<6_000_000
-from preserve_glb_geometry import unpack,mesh_nodes_by_name
+check_initial_model_budget(manifest['base']['bytes']+manifest['trees']['bytes'])
 a,ab=unpack(previous_base);c,cb=unpack((ROOT/'public/models/base.glb').read_bytes())
 def signature(doc,binary,node):
     result=[]
@@ -79,12 +88,12 @@ old_nodes=mesh_nodes_by_name(a);new_nodes=mesh_nodes_by_name(c)
 for name,node in old_nodes.items():
     other=new_nodes.get(name)
     if other is None:
-        assert name.startswith('basketball-bank-') and name not in {b['id'] for b in ns['basketball']['banks']}
+        assert name in selected,name
         removed.append(name);continue
     if signature(a,ab,node)!=signature(c,cb,other):changed.append(name)
     else:retained.append(name)
 bank_ids={b['id'] for b in ns['basketball']['banks']}
-assert set(changed)<=set(['terrain','roads','sports','green'])|bank_ids|{k for k in ns['base'] if k.startswith(('site-','shore-','paving-','vegetation-low-'))},changed
+assert set(changed)<=selected,changed
 assert all(hashlib.sha256((ROOT/'public/models'/n).read_bytes()).hexdigest()==h for n,h in before.items() if n!='base.glb' and n.removesuffix('.glb') not in bank_ids)
 report={'removedNodes':removed,'changedExistingNodes':changed,'preservedNodeCount':len(retained),'newNodes':sorted(set(new_nodes)-set(old_nodes)),'method':'Exact Draco primitive bytes; logical names ignore only Blender numeric suffixes, ambiguous names rejected; all unrelated GLBs retained','initialBytes':manifest['base']['bytes']+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
 (ROOT/'docs/model-checks/basketball-retained-nodes.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')

@@ -23,6 +23,8 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronsUp,
+  ChevronsDown,
   Download,
   Expand,
   Grid2X2,
@@ -55,13 +57,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import type {
   Building,
   Landmark,
@@ -93,28 +89,28 @@ import { CampusMinimap } from '@/components/campus-minimap';
 import { CampusViewControls } from '@/components/campus-view-controls';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const TOUR_STOP_MS = 8500;
-const LAYER_ITEMS: [LayerKey, string, string, typeof Building2][] = [
-  ['labels', '地点名称', '在地图上显示地点名称', RectangleEllipsis],
-  ['boundary', '校园边界', '白色细线标示大致范围', Scan],
-  ['buildings', '校园建筑', '教学楼、宿舍与地标', Building2],
-  ['vegetation', '树木', '乔木、棕榈与林荫景观', Trees],
-  ['roads', '道路与桥梁', '校道、桥梁与步行空间', Navigation],
-  ['water', '湖塘水面', '镜湖、碧云湖及其他水体', Waves],
-  ['sports', '运动场地', '球场、跑道与游泳池', Dumbbell],
-  ['context', '周边建筑', '仅保留贴近校界的周边建筑', Layers3],
+const LAYER_ITEMS: [LayerKey, string, typeof Building2][] = [
+  ['labels', '地点名称', RectangleEllipsis],
+  ['boundary', '校园边界', Scan],
+  ['buildings', '校园建筑', Building2],
+  ['vegetation', '树木', Trees],
+  ['roads', '道路与桥梁', Navigation],
+  ['water', '水面', Waves],
+  ['sports', '运动场地', Dumbbell],
+  ['context', '周边建筑', Layers3],
 ];
-const PRESETS: [Preset, string, string, typeof Sun][] = [
-  ['morning', '晨光', '树影初长', Sunrise],
-  ['day', '日间', '校园清朗', Sun],
-  ['evening', '黄昏', '余晖入窗', Sunset],
-  ['night', '夜景', '灯火渐明', Moon],
+const PRESETS: [Preset, string, typeof Sun][] = [
+  ['morning', '清晨', Sunrise],
+  ['day', '白天', Sun],
+  ['evening', '黄昏', Sunset],
+  ['night', '夜晚', Moon],
 ];
 const BUILDING_RESULT_LIMIT = 40;
-const QUALITY_NAMES: Record<Quality, string> = {
-  auto: '自动',
-  fine: '精细',
-  smooth: '流畅',
-};
+const QUALITY_OPTIONS: [Quality, string][] = [
+  ['auto', '自动'],
+  ['fine', '精细'],
+  ['smooth', '流畅'],
+];
 export default function Home() {
   return (
     <CampusLocaleProvider>
@@ -126,6 +122,7 @@ function CampusMap() {
   const { locale, setLocale, t, name } = useCampusLocale();
   const localeRef = useRef(locale);
   const dock = useRef<HTMLElement>(null);
+  const panelToggle = useRef<HTMLButtonElement>(null);
   const detailBack = useRef<HTMLButtonElement>(null);
   const tourEntry = useRef<HTMLButtonElement>(null);
   const tourProgress = useRef<HTMLSpanElement>(null);
@@ -138,7 +135,7 @@ function CampusMap() {
     [landmarks, setLandmarks] = useState<Landmark[]>([]),
     [overview, setOverview] = useState<Overview | null>(null);
   const [ready, setReady] = useState(false),
-    [status, setStatus] = useState<Message>('正在铺开校园…'),
+    [status, setStatus] = useState<Message>('正在加载校园…'),
     [loadProgress, setLoadProgress] = useState<number | undefined>(undefined),
     [error, setError] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
@@ -162,8 +159,10 @@ function CampusMap() {
   const presetEdited = useRef(false);
   useEffect(() => {
     // Portals (dialogs, menus, tooltips) render outside the app, so the theme sits on <html>.
-    document.documentElement.dataset.theme =
-      preset === 'night' ? 'night' : 'day';
+    const night = preset === 'night';
+    document.documentElement.dataset.theme = night ? 'night' : 'day';
+    // Radix UI Colors switch to their dark scales under .dark-theme.
+    document.documentElement.classList.toggle('dark-theme', night);
   }, [preset]);
   useEffect(() => {
     localeRef.current = locale;
@@ -171,8 +170,6 @@ function CampusMap() {
   }, [locale]);
   const [framingRequest, setFramingRequest] = useState(0);
   const framedRequest = useRef(0);
-  const [overviewRetry, setOverviewRetry] = useState(0);
-  const [overviewError, setOverviewError] = useState(false);
   const [panelExpanded, setPanelExpanded] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
@@ -221,16 +218,12 @@ function CampusMap() {
     const lifetime = new AbortController();
     void fetchJson<Overview>(`${BASE}/data/overview.json`, lifetime.signal)
       .then((data) => {
-        if (!lifetime.signal.aborted) {
-          setOverview(data);
-          setOverviewError(false);
-        }
+        if (!lifetime.signal.aborted) setOverview(data);
       })
-      .catch(() => {
-        if (!lifetime.signal.aborted) setOverviewError(true);
-      });
+      // The data date is supplementary; the map works without it.
+      .catch(() => {});
     return () => lifetime.abort();
-  }, [overviewRetry]);
+  }, []);
   useEffect(() => {
     let active = true;
     const lifetime = new AbortController();
@@ -333,14 +326,14 @@ function CampusMap() {
           cleanup = () => c.dispose();
         } catch {
           setStatus(
-            '此浏览器暂时无法启用三维画面。请开启硬件加速，或使用支持 WebGL 2 的浏览器。',
+            '无法显示三维画面，请开启硬件加速或使用支持 WebGL 2 的浏览器',
           );
           setError(true);
         }
       })
       .catch(() => {
         if (active) {
-          setStatus('校园资料加载失败，请检查网络后重试。');
+          setStatus('校园数据加载失败，请检查网络后重试');
           setError(true);
         }
       });
@@ -446,6 +439,12 @@ function CampusMap() {
       if (body) body.scrollTop = menuScroll.current;
     }
   }, [selected, panelMode, collapsed, panelExpanded]);
+  function togglePanel() {
+    setCollapsed((value) => !value);
+    requestAnimationFrame(() =>
+      panelToggle.current?.focus({ preventScroll: true }),
+    );
+  }
   function returnToMenu() {
     pauseMotion();
     returnPlace.current = selected;
@@ -574,7 +573,7 @@ function CampusMap() {
     url.hash = encodeShare(snapshot);
     try {
       await navigator.clipboard.writeText(url.href);
-      notify('视角链接已复制，可分享或稍后打开');
+      notify('链接已复制');
     } catch {
       setShareLink(url.href);
     }
@@ -598,20 +597,20 @@ function CampusMap() {
   }
   function toggleFullscreen() {
     if (!document.fullscreenEnabled) {
-      notify('当前浏览器不支持全屏，可使用横屏浏览。');
+      notify('当前浏览器不支持全屏');
       return;
     }
     const action = document.fullscreenElement
       ? document.exitFullscreen()
       : document.documentElement.requestFullscreen();
-    void action.catch(() => notify('当前浏览器不支持全屏，可使用横屏浏览。'));
+    void action.catch(() => notify('当前浏览器不支持全屏'));
   }
   async function exportView() {
     try {
       await controller.current?.exportImage();
-      notify('校园画面已导出');
+      notify('图片已下载');
     } catch {
-      notify('导出失败，请重试。');
+      notify('下载失败，请重试');
     }
   }
   return (
@@ -622,8 +621,8 @@ function CampusMap() {
           <button
             className="brand-mark"
             onClick={() => view('overview')}
-            title={t('返回全景')}
-            aria-label={t('返回校园全景')}
+            title={t('回到全景')}
+            aria-label={t('回到全景')}
           >
             <Image
               src={`${BASE}/favicon.svg`}
@@ -708,48 +707,39 @@ function CampusMap() {
         className={`panel-dock ${collapsed ? 'collapsed' : ''} ${panelExpanded ? 'expanded' : ''} ${panelMode === 'detail' ? 'detail-mode' : ''}`}
         aria-label={t('校园浏览面板')}
       >
-        <div className="dock-heading">
-          {panelMode === 'detail' && current && (
+        {(collapsed || panelMode === 'detail') && (
+          <div className="dock-heading">
+            {panelMode === 'detail' && current && (
+              <button
+                ref={detailBack}
+                className="dock-back"
+                title={t('返回地点列表')}
+                aria-label={t('返回地点列表')}
+                onClick={returnToMenu}
+              >
+                <ChevronLeft size={16} />
+                <span>{t('返回列表')}</span>
+              </button>
+            )}
             <button
-              ref={detailBack}
-              className="dock-back"
-              title={t('返回地点列表')}
-              aria-label={t('返回地点列表')}
-              onClick={returnToMenu}
+              ref={panelToggle}
+              className="dock-toggle"
+              aria-expanded={!collapsed}
+              aria-controls="campus-panel-body"
+              aria-label={collapsed ? t('展开面板') : t('收起面板')}
+              onClick={togglePanel}
             >
-              <ChevronLeft size={16} />
-              <span>{t('返回列表')}</span>
+              <span>
+                {panelMode === 'detail' && current
+                  ? collapsed
+                    ? name(current.name)
+                    : ''
+                  : t('校园浏览')}
+              </span>
+              <ChevronDown size={16} />
             </button>
-          )}
-          <button
-            className="dock-toggle"
-            aria-expanded={!collapsed}
-            aria-controls="campus-panel-body"
-            aria-label={collapsed ? t('展开面板') : t('收起面板')}
-            onClick={() => setCollapsed((v) => !v)}
-          >
-            <span>
-              {panelMode === 'detail' && current
-                ? collapsed
-                  ? name(current.name)
-                  : ''
-                : t('校园浏览')}
-            </span>
-            <small>{collapsed ? t('展开') : t('收起面板')}</small>
-            <ChevronDown size={16} />
-          </button>
-          {!collapsed && panelMode === 'menu' && (
-            <button
-              className="dock-expand"
-              aria-expanded={panelExpanded}
-              onClick={() => {
-                setPanelExpanded((value) => !value);
-              }}
-            >
-              {panelExpanded ? t('收回列表') : t('展开列表')}
-            </button>
-          )}
-        </div>
+          </div>
+        )}
         <div
           id="campus-panel-body"
           className="dock-body"
@@ -762,12 +752,10 @@ function CampusMap() {
           {panelMode === 'detail' && current ? (
             <section className="place-detail" aria-label={t('地点详情')}>
               <div className="detail-heading">
-                <div>
-                  <div className="eyebrow">
-                    {t(CATEGORY_NAMES[current.category])}
-                  </div>
-                  <h2>{name(current.name)}</h2>
+                <div className="eyebrow">
+                  {t(CATEGORY_NAMES[current.category])}
                 </div>
+                <h2>{name(current.name)}</h2>
               </div>
               {currentLandmark ? (
                 <p>{landmarkDescription(currentLandmark, locale)}</p>
@@ -778,16 +766,13 @@ function CampusMap() {
                   </p>
                   <p className="building-facts">
                     {currentBuilding!.levels >= 1
-                      ? t('约 {levels} 层 · 高约 {height} 米', {
+                      ? t('约 {levels} 层，高约 {height} 米', {
                           levels: Math.round(currentBuilding!.levels),
                           height: Math.round(currentBuilding!.height),
                         })
                       : t('高约 {height} 米', {
                           height: Math.round(currentBuilding!.height),
                         })}
-                  </p>
-                  <p className="building-note">
-                    {t('外观按 OpenStreetMap 轮廓与层数估算，未经实地测绘。')}
                   </p>
                 </>
               )}
@@ -822,20 +807,47 @@ function CampusMap() {
                 }}
                 className="main-tabs"
               >
-                <TabsList className="panel-tabs">
-                  <TabsTrigger value="explore">
-                    <MapPin size={17} />
-                    {t('地点')}
-                  </TabsTrigger>
-                  <TabsTrigger value="layers">
-                    <Layers3 size={17} />
-                    {t('图层')}
-                  </TabsTrigger>
-                  <TabsTrigger value="environment">
-                    <Sun size={17} />
-                    {t('光影')}
-                  </TabsTrigger>
-                </TabsList>
+                <div className="explorer-toolbar">
+                  <TabsList className="panel-tabs">
+                    <TabsTrigger value="explore">
+                      <MapPin size={17} />
+                      {t('地点')}
+                    </TabsTrigger>
+                    <TabsTrigger value="layers">
+                      <Layers3 size={17} />
+                      {t('图层')}
+                    </TabsTrigger>
+                    <TabsTrigger value="environment">
+                      <Sun size={17} />
+                      {t('光影')}
+                    </TabsTrigger>
+                  </TabsList>
+                  <button
+                    className="dock-expand"
+                    aria-expanded={panelExpanded}
+                    aria-controls="campus-panel-body"
+                    aria-label={panelExpanded ? t('收起列表') : t('展开列表')}
+                    title={panelExpanded ? t('收起列表') : t('展开列表')}
+                    onClick={() => setPanelExpanded((value) => !value)}
+                  >
+                    {panelExpanded ? (
+                      <ChevronsDown size={16} />
+                    ) : (
+                      <ChevronsUp size={16} />
+                    )}
+                  </button>
+                  <button
+                    ref={collapsed ? undefined : panelToggle}
+                    className="menu-collapse"
+                    aria-expanded={!collapsed}
+                    aria-controls="campus-panel-body"
+                    aria-label={t('收起面板')}
+                    title={t('收起面板')}
+                    onClick={togglePanel}
+                  >
+                    <ChevronDown size={16} />
+                  </button>
+                </div>
                 <TabsContent value="explore" className="explore-content">
                   <div className="search-wrap">
                     <Search size={16} />
@@ -871,16 +883,17 @@ function CampusMap() {
                     data-searching={Boolean(query.trim())}
                     aria-atomic="true"
                   >
-                    <span>{query.trim() ? t('搜索结果') : t('地点')}</span>
-                    <span>{t('{count} 处', { count: resultCount })}</span>
+                    {query.trim()
+                      ? t('{count} 个结果', { count: resultCount })
+                      : t('{count} 个地点', { count: resultCount })}
                   </output>
                   <div className="places">
                     {!landmarks.length ? (
                       error ? (
                         <div className="empty-state">
-                          <p>{t('地点资料暂时无法加载，请检查网络后重试。')}</p>
+                          <p>{t('地点数据加载失败')}</p>
                           <button className="search-reset" onClick={retry}>
-                            {t('重新加载地点')}
+                            {t('重新加载')}
                           </button>
                         </div>
                       ) : (
@@ -913,9 +926,7 @@ function CampusMap() {
                       </>
                     ) : (
                       <div className="empty-state">
-                        <p>
-                          {t('没有找到相关地点或建筑。试试“图书馆”或“宿舍”。')}
-                        </p>
+                        <p>{t('没有找到相关地点或建筑')}</p>
                         <button className="search-reset" onClick={resetSearch}>
                           {t('清空搜索')}
                         </button>
@@ -924,43 +935,26 @@ function CampusMap() {
                   </div>
                 </TabsContent>
                 <TabsContent value="layers" className="settings-content">
-                  <p className="section-hint">{t('选择地图中显示的内容')}</p>
-                  {LAYER_ITEMS.map(([key, label, desc, Icon]) => (
+                  {LAYER_ITEMS.map(([key, label, Icon]) => (
                     <label
                       className="layer-row"
                       key={key}
                       htmlFor={`layer-${key}`}
                     >
                       <Icon size={19} />
-                      <span>
-                        <strong id={`layer-title-${key}`}>{t(label)}</strong>
-                        <small id={`layer-description-${key}`}>{t(desc)}</small>
-                      </span>
+                      <span id={`layer-title-${key}`}>{t(label)}</span>
                       <Switch
                         id={`layer-${key}`}
                         checked={layers[key]}
                         onCheckedChange={(on) => toggleLayer(key, on)}
                         aria-labelledby={`layer-title-${key}`}
-                        aria-describedby={`layer-description-${key}`}
                       />
                     </label>
                   ))}
-                  <details className="menu-disclosure layer-note">
-                    <summary>
-                      {t('关于校园边界')}
-                      <ChevronDown size={15} />
-                    </summary>
-                    <p className="settings-note">
-                      {t(
-                        '白色细线表示校园大致范围；农院路为公共道路，不代表封闭校区。',
-                      )}
-                    </p>
-                  </details>
                 </TabsContent>
                 <TabsContent value="environment" className="settings-content">
-                  <p className="section-hint">{t('同一座校园，不同的光景')}</p>
                   <div className="preset-grid">
-                    {PRESETS.map(([p, label, caption, Icon]) => (
+                    {PRESETS.map(([p, label, Icon]) => (
                       <button
                         key={p}
                         className={preset === p ? 'active' : ''}
@@ -978,64 +972,38 @@ function CampusMap() {
                         />
                         <span className="preset-caption">
                           <Icon size={16} />
-                          <strong>{t(label)}</strong>
+                          {t(label)}
                           {preset === p && <Check size={14} />}
                         </span>
-                        <small>{t(caption)}</small>
                       </button>
                     ))}
                   </div>
-                  <details className="menu-disclosure quality-disclosure">
-                    <summary>
-                      <span>
-                        {t('画质')}
-                        <strong>{t(QUALITY_NAMES[quality])}</strong>
-                      </span>
-                      <ChevronDown size={15} />
-                    </summary>
-                    <RadioGroup
-                      value={quality}
-                      onValueChange={(v) => changeQuality(v as Quality)}
-                      className="quality-options"
-                      aria-label={t('画质')}
+                  <div className="setting-row">
+                    <span id="quality-title">{t('画质')}</span>
+                    <fieldset
+                      className="segmented"
+                      aria-labelledby="quality-title"
                     >
-                      {[
-                        ['auto', t('自动'), t('根据屏幕与运行表现调节')],
-                        ['fine', t('精细'), t('完整植被、阴影与近景细节')],
-                        ['smooth', t('流畅'), t('降低植被密度与渲染分辨率')],
-                      ].map(([q, name, desc]) => (
-                        <label key={q} htmlFor={`quality-${q}`}>
-                          <RadioGroupItem
-                            id={`quality-${q}`}
-                            value={q}
-                            aria-labelledby={`quality-title-${q}`}
-                          />
-                          <span>
-                            <strong id={`quality-title-${q}`}>{name}</strong>
-                            <small>{t(desc)}</small>
-                          </span>
-                        </label>
+                      {QUALITY_OPTIONS.map(([q, label]) => (
+                        <button
+                          key={q}
+                          aria-pressed={quality === q}
+                          onClick={() => changeQuality(q)}
+                        >
+                          {t(label)}
+                        </button>
                       ))}
-                    </RadioGroup>
-                  </details>
-                  <p className="settings-note">
-                    {t('预览取自图书馆同一视角，光照为氛围模拟。')}
-                  </p>
+                    </fieldset>
+                  </div>
                 </TabsContent>
               </Tabs>
-              <div className="panel-foot">
-                {overviewError ? (
-                  <button onClick={() => setOverviewRetry((n) => n + 1)}>
-                    {t('地图数据暂不可用 · 重试')}
-                  </button>
-                ) : overview ? (
-                  t('地图数据 · {date}', {
+              {overview && (
+                <div className="panel-foot">
+                  {t('地图数据更新于 {date}', {
                     date: overview.snapshotAt.slice(0, 10).replaceAll('-', '.'),
-                  })
-                ) : (
-                  t('地图数据加载中…')
-                )}
-              </div>
+                  })}
+                </div>
+              )}
               {current && (
                 <button
                   className="return-landmark"
@@ -1045,7 +1013,7 @@ function CampusMap() {
                     setPanelExpanded(false);
                   }}
                 >
-                  {t('返回 {name}', { name: name(current.name) })}{' '}
+                  {t('返回 {name}', { name: name(current.name) })}
                   <ArrowUpRight size={14} />
                 </button>
               )}
@@ -1064,8 +1032,10 @@ function CampusMap() {
             onClick={() => setTour((value) => !value)}
           >
             {tour ? <Pause size={15} /> : <Play size={15} />}
-            {tour ? t('暂停游览') : t('继续游览')} · {tourIndex + 1}/
-            {landmarks.length}
+            {tour ? t('暂停游览') : t('继续游览')}
+            <span>
+              {tourIndex + 1}/{landmarks.length}
+            </span>
           </button>
         )}
         <div
@@ -1079,11 +1049,15 @@ function CampusMap() {
           {tourStarted && (
             <div className="tour-heading">
               <div className="tour-copy">
-                <strong>{tour ? t('正在游览') : t('游览已暂停')}</strong>
                 <small>
-                  {String(tourIndex + 1).padStart(2, '0')} / {landmarks.length}{' '}
-                  ·{' '}
-                  {landmarks[tourIndex] ? name(landmarks[tourIndex].name) : ''}
+                  <span className="tour-position">
+                    {tourIndex + 1}/{landmarks.length}
+                  </span>
+                  <span>
+                    {landmarks[tourIndex]
+                      ? name(landmarks[tourIndex].name)
+                      : ''}
+                  </span>
                 </small>
               </div>
               <button
@@ -1129,11 +1103,6 @@ function CampusMap() {
                 {t('{count} 个地点', { count: landmarks.length })}
               </small>
             )}
-            {tourStarted && (
-              <small className="mobile-tour-progress">
-                {tourIndex + 1}/{landmarks.length}
-              </small>
-            )}
           </button>
           {tourStarted && (
             <>
@@ -1162,8 +1131,8 @@ function CampusMap() {
           <MapToolButton
             className="north-button"
             onClick={() => view('north')}
-            aria-label={t('正北朝向')}
-            tooltip={t('正北朝向')}
+            aria-label={t('朝向正北')}
+            tooltip={t('朝向正北')}
           >
             <Navigation
               size={20}
@@ -1177,14 +1146,16 @@ function CampusMap() {
             <MapToolButton
               onClick={() => view('zoomIn')}
               aria-label={t('放大')}
-              tooltip={t('放大 · +（聚焦画面）')}
+              tooltip={t('放大')}
+              shortcut="+"
             >
               <Plus size={19} />
             </MapToolButton>
             <MapToolButton
               onClick={() => view('zoomOut')}
               aria-label={t('缩小')}
-              tooltip={t('缩小 · −（聚焦画面）')}
+              tooltip={t('缩小')}
+              shortcut="−"
             >
               <Minus size={19} />
             </MapToolButton>
@@ -1192,22 +1163,23 @@ function CampusMap() {
           <div className="tool-stack secondary-tools">
             <MapToolButton
               onClick={() => view('top')}
-              aria-label={t('俯视校园')}
-              tooltip={t('俯视校园')}
+              aria-label={t('俯视')}
+              tooltip={t('俯视')}
             >
               <Grid2X2 size={18} />
             </MapToolButton>
             <MapToolButton
               onClick={() => view('tilt')}
-              aria-label={t('倾斜鸟瞰')}
-              tooltip={t('倾斜鸟瞰')}
+              aria-label={t('鸟瞰')}
+              tooltip={t('鸟瞰')}
             >
               <ScanEye size={18} />
             </MapToolButton>
             <MapToolButton
               onClick={() => view('overview')}
-              aria-label={t('全景复位')}
-              tooltip={t('全景复位 · Home（聚焦画面）')}
+              aria-label={t('回到全景')}
+              tooltip={t('回到全景')}
+              shortcut="Home"
             >
               <House size={18} />
             </MapToolButton>
@@ -1231,8 +1203,9 @@ function CampusMap() {
             <MapToolButton
               className="mobile-reset"
               onClick={() => view('overview')}
-              aria-label={t('全景复位')}
-              tooltip={t('全景复位 · Home（聚焦画面）')}
+              aria-label={t('回到全景')}
+              tooltip={t('回到全景')}
+              shortcut="Home"
             >
               <House size={18} />
             </MapToolButton>
@@ -1260,10 +1233,7 @@ function CampusMap() {
             setHelpOpen(true);
           }}
         >
-          <span className="pointer-help">
-            {t('操作说明 · 拖动旋转 · 滚轮缩放')}
-          </span>
-          <span className="touch-help">{t('操作说明')}</span>
+          {t('操作说明')}
         </button>
         {layers.boundary && (
           <span className="boundary-legend">
@@ -1276,7 +1246,7 @@ function CampusMap() {
           target="_blank"
           rel="noreferrer"
         >
-          © OpenStreetMap contributors · ODbL
+          © OpenStreetMap contributors
         </a>
       </footer>
       {status && ready && !error ? (
@@ -1324,10 +1294,7 @@ function CampusMap() {
       )}
       <Dialog open={toolsOpen} onOpenChange={setToolsOpen}>
         <DialogContent className="tools-dialog">
-          <DialogTitle>{t('校园工具')}</DialogTitle>
-          <DialogDescription>
-            {t('调整视角、分享画面，或查看操作说明。')}
-          </DialogDescription>
+          <DialogTitle>{t('更多工具')}</DialogTitle>
           <div className="tools-grid">
             <button
               onClick={() => {
@@ -1336,7 +1303,7 @@ function CampusMap() {
               }}
             >
               <House size={20} />
-              {t('全景复位')}
+              {t('回到全景')}
             </button>
             <button
               onClick={() => {
@@ -1345,7 +1312,7 @@ function CampusMap() {
               }}
             >
               <Navigation size={20} />
-              {t('正北朝向')}
+              {t('朝向正北')}
             </button>
             <button
               onClick={() => {
@@ -1354,7 +1321,7 @@ function CampusMap() {
               }}
             >
               <Grid2X2 size={20} />
-              {t('俯视校园')}
+              {t('俯视')}
             </button>
             <button
               onClick={() => {
@@ -1363,7 +1330,7 @@ function CampusMap() {
               }}
             >
               <ScanEye size={20} />
-              {t('倾斜鸟瞰')}
+              {t('鸟瞰')}
             </button>
             <button
               onClick={() => {
@@ -1372,7 +1339,7 @@ function CampusMap() {
               }}
             >
               <Expand size={20} />
-              {t('切换全屏')}
+              {t('全屏')}
             </button>
             <button
               disabled={!ready}
@@ -1399,38 +1366,28 @@ function CampusMap() {
       </Dialog>
       <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
         <DialogContent className="tools-dialog">
-          <DialogTitle>{t('怎样游览校园')}</DialogTitle>
-          <DialogDescription>
-            {t('选择一个地点，或点击“开始游览”依次浏览校园。')}
-          </DialogDescription>
+          <DialogTitle>{t('操作说明')}</DialogTitle>
           <dl className="gesture-instructions">
-            <dt>{t('手机触控')}</dt>
-            <dd>{t('单指拖动旋转；双指拖动平移；双指捏合缩放。')}</dd>
+            <dt>{t('触屏')}</dt>
+            <dd>{t('单指拖动旋转，双指拖动平移，双指捏合缩放')}</dd>
             <dt>{t('鼠标与触控板')}</dt>
-            <dd>{t('拖动旋转，右键拖动平移，滚轮缩放。')}</dd>
+            <dd>{t('拖动旋转，右键拖动平移，滚轮缩放')}</dd>
             <dt>{t('键盘')}</dt>
             <dd>
               {t(
-                'Tab 选择控件，Enter 确认。聚焦三维画面后，方向键平移，+ / − 缩放，Home 返回全景。',
+                'Tab 切换控件，Enter 确认；选中地图后，方向键平移，+ 和 − 缩放，Home 回到全景',
               )}
             </dd>
-            <dt>{t('查看地点')}</dt>
-            <dd>
-              {t(
-                '搜索“六教”等名称或别名，在详情视角栏选择全貌、俯视、环绕、正背面及近景；可横向滑动查看更多视角。',
-              )}
-            </dd>
-            <dt>{t('暂停游览')}</dt>
-            <dd>{t('拖动画面即可暂停，也可使用“暂停游览”按钮。')}</dd>
+            <dt>{t('搜索')}</dt>
+            <dd>{t('支持名称和简称，如“六教”')}</dd>
+            <dt>{t('游览')}</dt>
+            <dd>{t('拖动地图即可暂停')}</dd>
           </dl>
         </DialogContent>
       </Dialog>
       <Dialog open={shareOpen} onOpenChange={setShareOpen}>
         <DialogContent className="share-dialog">
-          <DialogTitle>{t('分享校园')}</DialogTitle>
-          <DialogDescription>
-            {t('保存当前视角链接，或下载带署名的校园画面。')}
-          </DialogDescription>
+          <DialogTitle>{t('分享')}</DialogTitle>
           <div className="tools-grid">
             <button
               disabled={!ready}
@@ -1440,7 +1397,7 @@ function CampusMap() {
               }}
             >
               <Share2 size={20} />
-              {t('复制视角链接')}
+              {t('复制链接')}
             </button>
             <button
               disabled={!ready}
@@ -1450,7 +1407,7 @@ function CampusMap() {
               }}
             >
               <Download size={20} />
-              {t('下载画面')}
+              {t('下载图片')}
             </button>
           </div>
         </DialogContent>
@@ -1462,17 +1419,13 @@ function CampusMap() {
         }}
       >
         <DialogContent className="share-dialog">
-          <DialogTitle>{t('分享这个校园视角')}</DialogTitle>
-          <DialogDescription>
-            {t('链接保留当前地点、镜头和光照，换一块屏幕也能继续浏览。')}
-          </DialogDescription>
+          <DialogTitle>{t('复制链接')}</DialogTitle>
           <Input
-            aria-label={t('校园视角链接')}
+            aria-label={t('视角链接')}
             value={shareLink}
             readOnly
             onFocus={(event) => event.currentTarget.select()}
           />
-          <p>{t('复制上方链接即可分享。')}</p>
         </DialogContent>
       </Dialog>
     </main>
@@ -1501,19 +1454,13 @@ function PlaceGroups({
   const { name } = useCampusLocale();
   return (
     <>
-      {' '}
       {groups.map((group) => (
         <section
           className="place-group"
           key={group.key}
           aria-label={group.name}
         >
-          {!searching && (
-            <h3>
-              {group.name}
-              <span>{group.places.length}</span>
-            </h3>
-          )}
+          {!searching && <h3>{group.name}</h3>}
           {group.places.map((p) => (
             <button
               key={p.id}
@@ -1539,7 +1486,7 @@ function PlaceGroups({
             </button>
           ))}
         </section>
-      ))}{' '}
+      ))}
     </>
   );
 }
@@ -1567,12 +1514,7 @@ function BuildingResults({
       className="place-group building-results"
       aria-label={t('其他建筑')}
     >
-      {titled && (
-        <h3>
-          {t('其他建筑')}
-          <span>{buildings.length}</span>
-        </h3>
-      )}
+      {titled && <h3>{t('其他建筑')}</h3>}
       {shown.map((b) => (
         <button
           key={b.id}
@@ -1585,9 +1527,8 @@ function BuildingResults({
           <span className="place-copy">
             <strong>{name(b.name)}</strong>
             <small>
-              {t(CATEGORY_NAMES[b.category])}
-              {' · '}
-              {buildingLocationLabel(b, landmarks, locale)}
+              <span>{t(CATEGORY_NAMES[b.category])}</span>
+              <span>{buildingLocationLabel(b, landmarks, locale)}</span>
             </small>
           </span>
           <ChevronRight size={16} aria-hidden="true" />
@@ -1606,8 +1547,9 @@ function BuildingResults({
 
 function MapToolButton({
   tooltip,
+  shortcut,
   ...props
-}: ComponentProps<'button'> & { tooltip: string }) {
+}: ComponentProps<'button'> & { tooltip: string; shortcut?: string }) {
   return (
     <Tooltip.Root disabled={props.disabled}>
       <Tooltip.Trigger render={<button {...props} />} />
@@ -1617,7 +1559,10 @@ function MapToolButton({
           side="left"
           sideOffset={10}
         >
-          <Tooltip.Popup className="map-tool-tooltip">{tooltip}</Tooltip.Popup>
+          <Tooltip.Popup className="map-tool-tooltip">
+            {tooltip}
+            {shortcut && <kbd>{shortcut}</kbd>}
+          </Tooltip.Popup>
         </Tooltip.Positioner>
       </Tooltip.Portal>
     </Tooltip.Root>

@@ -46,7 +46,10 @@ def read_decoded(path):
         data[key] = data[key][data['triangles']]
     data['materials'] = np.zeros(len(data['triangles']), dtype=int)
     data['polygons'] = [Polygon(p[:, :2]) for p in data['points']]
-    data['keys'] = [min(tuple(map(tuple, np.roll(p, k, axis=0))) for k in range(3)) for p in data['points']]
+    data['keys'] = []
+    for triangle, uv, normals, material in zip(data['points'], data['uvs'], data['normals'], data['materials']):
+        corners = [(tuple(p), tuple(u), tuple(n)) for p, u, n in zip(triangle, uv, normals)]
+        data['keys'].append((int(material), min(tuple(corners[k:]+corners[:k]) for k in range(3))))
     data['modelSHA256'], data['material'] = raw['modelSHA256'], raw['material']
     return data
 

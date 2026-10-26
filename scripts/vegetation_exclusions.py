@@ -62,7 +62,7 @@ def ground_masks(data):
                 add('attached-gallery', f"{building['id']}:{facade['polygon']}:{facade['ring']}:{facade['edge']}:{facade['part']}",
                     Polygon(facade['attachedGallery']['footprint']))
         for entrance in building.get('form', {}).get('entrances', []):
-            for kind in ('attachedPortico','stairFlight'):
+            for kind in ('attachedPortico','stairFlight','recessedStairEntry'):
                 if kind in entrance:
                     add('entrance-platform', f"{building['id']}:{entrance['id']}",
                         Polygon(entrance[kind]['footprint']))

@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
+import { createPrimitiveDecoder } from './draco-geometry.mjs';
 const read = (n) =>
   JSON.parse(fs.readFileSync(new URL('../public/data/' + n, import.meta.url)));
 const data = read('basketball.json');
@@ -33,7 +34,7 @@ test('篮球场使用独立运动场节点，保持精选目录稳定且来源�
   assert.equal(read('overview.json').trees, read('vegetation.json').length);
 });
 
-test('basketball LODs keep the same ground and full near hardware within the initial budget', () => {
+test('basketball LODs keep the same ground and full near hardware within the initial budget', async () => {
   const manifest = read('models.json');
   const parse = (url) => {
     const raw = fs.readFileSync(new URL('../public/' + url, import.meta.url));
@@ -42,12 +43,61 @@ test('basketball LODs keep the same ground and full near hardware within the ini
     return { raw, doc, bin: raw.subarray(end + 8) };
   };
   const base = parse(manifest.base.url);
+  const decodeBase = await createPrimitiveDecoder(base.doc, base.bin);
+  // Compression level and vertex deduplication may reorder the encoded stream.
+  // Compare every decoded corner attribute and triangle winding instead.
+  const triangles = (geometry) => {
+    try {
+      const attributes = Object.keys(geometry.attributes).sort();
+      const corners = Array.from(
+        { length: geometry.attributes.position.count },
+        (_, i) =>
+          JSON.stringify(
+            attributes.map((name) => {
+              const attribute = geometry.attributes[name];
+              return [
+                name,
+                Array.from(
+                  attribute.array.subarray(
+                    i * attribute.itemSize,
+                    (i + 1) * attribute.itemSize,
+                  ),
+                ),
+              ];
+            }),
+          ),
+      );
+      const result = [];
+      for (let i = 0; i < geometry.index.count; i += 3) {
+        const face = [0, 1, 2].map((j) => corners[geometry.index.array[i + j]]);
+        result.push(
+          [face, [face[1], face[2], face[0]], [face[2], face[0], face[1]]]
+            .map((rotation) => JSON.stringify(rotation))
+            .sort()[0],
+        );
+      }
+      return result.sort();
+    } finally {
+      geometry.dispose();
+    }
+  };
   assert.equal(manifest.sports.length, data.banks.length);
-  assert.ok(manifest.base.bytes + manifest.trees.bytes < 6_000_000);
+  const budget = JSON.parse(
+    fs.readFileSync(
+      new URL('../data/initial-model-budget.json', import.meta.url),
+    ),
+  );
+  assert.ok(
+    manifest.base.bytes + manifest.trees.bytes <= budget.hardLimitBytes,
+  );
   for (const asset of manifest.sports) {
     const near = parse(asset.url);
+    const decodeNear = await createPrimitiveDecoder(near.doc, near.bin);
     assert.equal(near.raw.length, asset.bytes);
-    assert.equal(createHash('sha256').update(near.raw).digest('hex'), asset.sha256);
+    assert.equal(
+      createHash('sha256').update(near.raw).digest('hex'),
+      asset.sha256,
+    );
     assert.deepEqual(
       asset.bounds,
       data.banks.find((b) => b.id === asset.id).bounds,
@@ -72,19 +122,9 @@ test('basketball LODs keep the same ground and full near hardware within the ini
     );
     for (const [material, p] of far) {
       if (material === 'courtOrange') continue;
-      const payload = (gltf, primitive) => {
-        const view =
-          gltf.doc.bufferViews[
-            primitive.extensions.KHR_draco_mesh_compression.bufferView
-          ];
-        return gltf.bin.subarray(
-          view.byteOffset ?? 0,
-          (view.byteOffset ?? 0) + view.byteLength,
-        );
-      };
       assert.deepEqual(
-        payload(base, p),
-        payload(near, full.get(material)),
+        triangles(decodeBase(p)),
+        triangles(decodeNear(full.get(material))),
         material,
       );
       assert.deepEqual(

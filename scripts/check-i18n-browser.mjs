@@ -17,6 +17,23 @@ const waitForSceneReady = (page) =>
     undefined,
     { timeout: 120000 },
   );
+const languageTrigger = (page) =>
+  page.getByRole('button', { name: '语言 / Language', exact: true });
+async function setLanguage(page, locale) {
+  await languageTrigger(page).click();
+  const option = page.getByRole('menuitemradio', {
+    name: locale === 'en' ? 'English' : '中文',
+    exact: true,
+  });
+  await option.click();
+  await page.waitForFunction(
+    (lang) => document.documentElement.lang === lang,
+    locale === 'en' ? 'en' : 'zh-CN',
+  );
+  await languageTrigger(page).click();
+  assert.equal(await option.getAttribute('aria-checked'), 'true');
+  await page.keyboard.press('Escape');
+}
 try {
   for (const width of [1280, 390, 320]) {
     const page = await browser.newPage({
@@ -40,7 +57,9 @@ try {
     });
     const checkHeader = () =>
       page.evaluate(() => {
-        const control = document.querySelector('.language-switch');
+        const control = document.querySelector(
+          'button[aria-label="语言 / Language"]',
+        );
         const rect = control.getBoundingClientRect();
         const header = document.querySelector('.masthead');
         return {
@@ -56,14 +75,8 @@ try {
       });
     const chineseHeader = await checkHeader();
     assert.ok(chineseHeader.fits && chineseHeader.buttonsFit);
-    // The whole capsule toggles, including the currently selected side.
-    await page.locator('.language-switch span[lang="zh-CN"]').click();
-    await page.waitForFunction(() => document.documentElement.lang === 'en');
+    await setLanguage(page, 'en');
     assert.deepEqual(await checkHeader(), chineseHeader);
-    assert.equal(
-      await page.locator('.language-switch').getAttribute('data-locale'),
-      'en',
-    );
     assert.equal(await page.title(), 'Guangxi University Campus Map');
     const search = page.getByRole('searchbox', {
       name: 'Search campus places',
@@ -78,13 +91,11 @@ try {
       .waitFor();
     await page.waitForTimeout(1600); // Let the existing focus animation finish before checking preservation.
     const before = await page.locator('.debug-metrics').textContent();
-    await page.locator('.language-switch span[lang="en"]').click();
+    await setLanguage(page, 'zh');
     await page
       .getByRole('heading', { name: '计算机与电子信息学院', exact: true })
       .waitFor();
-    await page
-      .getByRole('button', { name: 'Switch to English', exact: true })
-      .click();
+    await setLanguage(page, 'en');
     assert.ok(
       await page.evaluate(
         () =>
@@ -122,12 +133,14 @@ try {
       path: new URL(`en-detail-${width}.png`, output).pathname,
     });
     // Translation must include dialogs rendered through a portal.
-    if (width < 760)
-      await page.getByRole('button', { name: 'Details', exact: true }).click();
-    await page.locator('.detail-actions button').click();
     await page
-      .getByRole('heading', { name: 'Share campus', exact: true })
+      .getByRole('group', { name: 'Views of this place', exact: true })
       .waitFor();
+    await page.locator('.detail-actions button').click();
+    await page.getByRole('heading', { name: 'Share', exact: true }).waitFor();
+    assert.ok(
+      !/\p{Script=Han}/u.test(await page.getByRole('dialog').innerText()),
+    );
     if (width === 320) {
       const downloadReady = page.waitForEvent('download');
       await page
@@ -164,16 +177,6 @@ try {
       style: '.debug-metrics { visibility: hidden !important; }',
       path: new URL(`en-lighting-${width}.png`, output).pathname,
     });
-    await page
-      .getByRole('button', { name: 'About this map', exact: true })
-      .click();
-    await page
-      .getByRole('heading', { name: 'About Guangxi University Campus Map' })
-      .waitFor();
-    assert.ok(
-      !/\p{Script=Han}/u.test(await page.getByRole('dialog').innerText()),
-    );
-    await page.getByRole('button', { name: 'Close', exact: true }).click();
     await page.goto(base + '?debug'); // No lang parameter: restore the saved preference.
     await page.waitForFunction(() => document.documentElement.lang === 'en');
     await page
@@ -185,9 +188,7 @@ try {
     // Explicit share language overrides the stored preference, without changing the place hash.
     await page.goto(base + '?lang=zh#place=library');
     await page.waitForFunction(() => document.documentElement.lang === 'zh-CN');
-    await page
-      .getByRole('button', { name: 'Switch to English', exact: true })
-      .waitFor();
+    await languageTrigger(page).waitFor();
     await waitForSceneReady(page);
     results.push({ width, ...layout, passed: true });
     await page.close();
@@ -213,7 +214,7 @@ try {
   });
   await page.goto(base + '?lang=en');
   await page.getByRole('alert').filter({ hasText: 'WebGL 2' }).waitFor();
-  await page.getByRole('button', { name: '切换为中文', exact: true }).click();
+  await setLanguage(page, 'zh');
   await page.getByRole('alert').filter({ hasText: '此浏览器' }).waitFor();
   results.push({ storageUnavailable: true, webglFallbackTranslated: true });
   assert.deepEqual(errors, []);

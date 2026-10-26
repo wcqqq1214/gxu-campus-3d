@@ -29,6 +29,9 @@ def context_value(root, config, data):
     flights=[{'buildingId':b['id'],'entranceId':e['id'],'footprint':e['stairFlight']['footprint']}
              for b in data['buildings'] for e in b.get('form',{}).get('entrances',[]) if 'stairFlight' in e]
     if flights:value['stairFlights']=flights
+    recessed=[{'buildingId':b['id'],'entranceId':e['id'],'footprint':e['recessedStairEntry']['footprint']}
+              for b in data['buildings'] for e in b.get('form',{}).get('entrances',[]) if 'recessedStairEntry' in e]
+    if recessed:value['recessedStairEntries']=recessed
     value['config'] = config
     value['openZones'] = json.loads((root / 'data/vegetation-zones.json').read_text())
     value['campus'] = next(f['geometry'] for f in json.loads((root / 'public/data/geography.geojson').read_text())['features'] if f['id'] == 'campus')

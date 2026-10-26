@@ -38,6 +38,7 @@ check_prepared_mapped_canopies(buildings)
 from stair_tower_data import check_prepared_stair_towers
 check_prepared_stair_towers(buildings)
 from low_planting_contract import load_prepared
+from public_data_fields import without_documentation
 low_plantings=load_prepared(ROOT)
 # The pure hash is duplicated here to keep Blender independent of Shapely.
 paving_context=[surfaces,infrastructure,surroundings,campus_roads,sites]
@@ -60,7 +61,10 @@ for site in sites['sites']:
         index,target=next((i,s) for i,s in enumerate(surfaces) if s['id']==site['surfaceId'])
         target={**target,**infrastructure['surfaceOverrides'].get(str(index),{}),**surroundings['surfaceOverrides'].get(str(index),{}),**campus_roads['surfaceOverrides'].get(str(index),{})}
         paving=next(p for p in pavings['pavings'] if p['surfaceId']==site['surfaceId'])
-        if (any(site.get(k)!=v for k,v in config.items())
+        # Public exports omit evidence/notes; compare the geometry contract,
+        # otherwise a valid exported site falsely requires data preparation.
+        prepared=without_documentation(site)
+        if (any(prepared.get(k)!=v for k,v in without_documentation(config).items())
             or site['footprintRevision']!=hashlib.sha256(json.dumps(building['polygons'],separators=(',',':')).encode()).hexdigest()
             or site['surfaceRevision']!=hashlib.sha256(json.dumps(target,sort_keys=True,separators=(',',':')).encode()).hexdigest()
             or site['surfaceOffset']!=paving.get('groundedService',{}).get('offset')):
@@ -103,6 +107,11 @@ for site in sites['sites']:
         target={**target,**infrastructure['surfaceOverrides'].get(str(index),{}),**surroundings['surfaceOverrides'].get(str(index),{}),**campus_roads['surfaceOverrides'].get(str(index),{})}
         if hashlib.sha256(json.dumps(target,separators=(',',':'),sort_keys=True).encode()).hexdigest()!=site['surfaceRevision']:
             raise RuntimeError('Connection surface is stale; run site preparation')
+        continue
+    if site.get('type')=='recessed-entry-ground':
+        entry=next((e for e in building.get('form',{}).get('entrances',[]) if e['id']==site['entranceId']),None)
+        if site['entry']!=entry or site['buildingCenter']!=building['center'] or 'buildingElevation' in site or site['footprintRevision']!=hashlib.sha256(json.dumps(building['polygons'],separators=(',',':')).encode()).hexdigest():
+            raise RuntimeError('Recessed entry ground is stale; run site preparation')
         continue
     e=building['architecture']
     if (site['footprintRevision']!=hashlib.sha256(json.dumps(building['polygons'],separators=(',',':')).encode()).hexdigest()
@@ -150,9 +159,12 @@ def elevation(x,y):
     u=max(0,min(cols-1.001,(x-xmin)/(xmax-xmin)*(cols-1)));v=max(0,min(rows-1.001,(y-ymin)/(ymax-ymin)*(rows-1)));i=int(u);j=int(v);a=u-i;b=v-j
     return (hh[j*cols+i]*(1-a)+hh[j*cols+i+1]*a)*(1-b)+(hh[(j+1)*cols+i]*(1-a)+hh[(j+1)*cols+i+1]*a)*b
 
+from civil_forecourt_grade import load_grade, grade_forecourt, building_datum
+civil_grade = load_grade(ROOT)
+
 def building_elevation(b):
     if b.get('customModel')=='north-campus':return b['elevation']
-    return elevation(*b.get('form',{}).get('stairTower',{}).get('hostCenter',b['center']))
+    return building_datum(b,elevation(*b.get('form',{}).get('stairTower',{}).get('hostCenter',b['center'])),civil_grade)
 
 def generic(b,detail):
     if b.get('customModel')=='north-campus':
@@ -228,6 +240,7 @@ for si,original in enumerate(surfaces):
 from surroundings import surroundings_mesh
 base['roads'].extend(surroundings_mesh(surroundings,C,elevation,base['terrain']))
 base['roads'].extend(surroundings_mesh(campus_roads,C,elevation,base['terrain']))
+base['terrain'],base['roads']=grade_forecourt(base['terrain'],base['roads'],civil_grade)
 from paving_geometry import build_pavings
 # Grounded service roads must be repaired before their doorway/stair aprons
 # sample the road. Merge repaired surfaces and their contact strips into roads
@@ -258,7 +271,7 @@ for foundation in foundations['foundations']:
 (ROOT/'docs/model-checks/refinement/service-road-build.json').write_text(json.dumps(service_road_report,ensure_ascii=False,indent=2)+'\n')
 from road_landing_contract import load_landings
 from road_landing_geometry import build_landings
-base['roads'],road_landing_report=build_landings(load_landings(ROOT),base['roads'],base['terrain'],C['road'])
+base['roads'],road_landing_report=build_landings(load_landings(ROOT,building_elevation=lambda b:round(building_elevation(b),2)),base['roads'],base['terrain'],C['road'])
 (ROOT/'docs/model-checks/refinement/road-landing-build.json').write_text(json.dumps(road_landing_report,ensure_ascii=False,indent=2)+'\n')
 base['terrain'].ground_uv_bounds=[[v+(-1 if i<2 else 1) for i,v in enumerate(p['bounds'])] for p in pavings['pavings']]+[s['gradingBounds'] for s in sites['sites'] if s.get('type') in ('side-connection','front-connection','terraced-stair-connection','entry-apron','gallery-apron','canopy-connection')]
 base['terrain'].ground_uv_bounds.extend(r['bounds'] for r in foundations['foundations'])
@@ -427,8 +440,10 @@ def export(name,groups):
         o=mesh.object(key,EXPORT,props);o.select_set(True);objs.append(o)
     path=MODELS/name
     from export_attributes import omit_unused_uvs
-    with omit_unused_uvs() if name=='base.glb' or name.startswith('basketball-bank-') else nullcontext():
-        bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=6,export_draco_position_quantization=15 if name=='base.glb' or name.startswith('basketball-bank-') else 16,export_draco_normal_quantization=6 if name=='base.glb' or name.startswith('basketball-bank-') else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
+    # Keep the base budget reproducible through the normal build: share only
+    # byte-identical vertex attributes, without lowering geometry/UV precision.
+    with omit_unused_uvs(deduplicate_vertices=name=='base.glb') if name=='base.glb' or name.startswith('basketball-bank-') else nullcontext():
+        bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=7 if name=='base.glb' else 6,export_draco_position_quantization=15 if name=='base.glb' or name.startswith('basketball-bank-') else 16,export_draco_normal_quantization=6 if name=='base.glb' or name.startswith('basketball-bank-') else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
     if name=='base.glb':
         from terrain_export import replace_precise_terrain
         replace_precise_terrain(path,objs)
@@ -436,11 +451,18 @@ def export(name,groups):
         north_keys={b['chunk'] for b in buildings if b.get('customModel')=='north-campus'}
         north_keys.update(k for k in groups if k.startswith('north-campus-'))
         if north_keys:repack_north_base(path,objs,north_keys)
+        from gltf_bounds import compact_glb_float_bounds
+        compact_glb_float_bounds(path)
     if name.startswith('basketball-bank-'):
         from basketball_export import extract_bank
         extract_bank(path.read_bytes(),name.removesuffix('.glb'),path)
     for o in objs:mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
     print('Export',name,round(path.stat().st_size/1e6,2),'MB',flush=True);return path.stat().st_size
+def check_initial_budget():
+    total=sum((MODELS/name).stat().st_size for name in ('base.glb','trees.glb'))
+    from initial_model_budget import check_initial_model_budget
+    check_initial_model_budget(total)
+
 sizes={};sizes['base.glb']=export('base.glb',base)
 # Base-only rebuilds also refresh these paired assets, so changing court data
 # cannot leave an older full-detail bank over a newer distant representation.
@@ -448,6 +470,7 @@ for bank in basketball['banks']:
     sizes[bank['id']+'.glb']=export(bank['id']+'.glb',{bank['id']:bank_model(bank,basketball['courts'],C)})
 from basketball_export import manifest_entries
 if BASE_ONLY:
+    check_initial_budget()
     manifest=json.loads((DATA/'models.json').read_text())
     from vegetation_priorities import priority_positions
     manifest['treePriorityPositions']=priority_positions(json.loads((DATA/'vegetation-zones.json').read_text()),trees)
@@ -484,6 +507,7 @@ from vegetation_priorities import priority_positions
 manifest['treePriorityPositions']=priority_positions(json.loads((DATA/'vegetation-zones.json').read_text()),trees)
 for entry in [manifest['base'],manifest['trees'],manifest['treesNear']]+manifest['zones']+manifest['landmarks']+manifest['infrastructure']:
     entry['sha256']=hashlib.sha256((ROOT/'public'/entry['url']).read_bytes()).hexdigest()
+check_initial_budget()
 (DATA/'models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
 # Remove only obsolete generated near models after the new manifest is complete.
 for old in [MODELS/'west.glb',MODELS/'east.glb',MODELS/'north.glb']:

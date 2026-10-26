@@ -17,7 +17,7 @@ def protected_site_shape(site):
     A courtyard's AABB can overlap the surrounding building wings. Its prepared
     polygon is the actual protected ground; unknown site types retain the AABB.
     """
-    if site.get('type') != 'courtyard-paving':
+    if site.get('type') not in ('courtyard-paving','recessed-entry-ground'):
         return box(*site['gradingBounds'])
     rings = [site.get('pavingPolygon')]
     if 'stairConnection' in site:
