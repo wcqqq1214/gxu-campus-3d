@@ -67,6 +67,8 @@ export interface Landmark {
   elevation: number;
   bounds: number[];
   description: string;
+  /** Estimated site extent [west, south, east, north], relative to center. */
+  siteBoundsOffset?: [number, number, number, number];
   detail: string;
   sourceUrl: string;
   reference: string;

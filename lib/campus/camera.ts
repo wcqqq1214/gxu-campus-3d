@@ -19,6 +19,8 @@ export function landmarkDirection(
   if (view === 'top') return new Vector3(0, 1, 0.025).normalize();
   if (view === 'oblique')
     return new Vector3(...(place.cameraOffset ?? [-0.5, 0.66, 1])).normalize();
+  if (place.id === 'new-east-gate' && view === 'entrance')
+    return new Vector3(Math.sin(bearing), 0.12, -Math.cos(bearing)).normalize();
   const reverse = view === 'back' || view === 'rear-entrance' ? -1 : 1;
   return new Vector3(
     Math.sin(bearing) * reverse,
@@ -102,7 +104,15 @@ export function fitPoints(
 }
 
 export function landmarkBox(place: Landmark) {
-  const [x0, y0, x1, y1] = place.bounds;
+  const site = place.siteBoundsOffset?.map((v, i) => v + place.center[i % 2]);
+  const [x0, y0, x1, y1] = site
+    ? [
+        Math.min(site[0], place.bounds[0]),
+        Math.min(site[1], place.bounds[1]),
+        Math.max(site[2], place.bounds[2]),
+        Math.max(site[3], place.bounds[3]),
+      ]
+    : place.bounds;
   return new Box3(
     new Vector3(x0 - 3, place.elevation - 0.5, -y1 - 3),
     new Vector3(x1 + 3, place.elevation + place.height + 3, -y0 + 3),
@@ -160,6 +170,18 @@ export function entranceBox(
   rear: boolean,
   architecture?: Building['architecture'],
 ) {
+  if (place.id === 'new-east-gate' && !rear) {
+    // Keep both short enclosure edges, the tower and pedestrian canopy together.
+    // The generic entrance crop moves out into the road and fits too much sky.
+    return new Box3().setFromCenterAndSize(
+      new Vector3(
+        place.center[0] + 0.55,
+        place.elevation + 5.3,
+        -place.center[1] - 2.25,
+      ),
+      new Vector3(21.3, 11.4, 13),
+    );
+  }
   if (place.id === 'huicui' && architecture && !rear) {
     const { origin, angle } = architecture;
     const localY = 34;

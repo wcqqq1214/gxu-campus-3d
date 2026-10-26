@@ -158,6 +158,9 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 `--base-only` 只适用于区块键不变且不需要同步近景的基础导出。几何或数据改变后，应同时更新本地源对象、基础节点、相关近景及清单，并核对无关资产未变。现有增量入口包括：
 
 - `blender/update_south_gate.py`、`update_basketball.py`、`update_roads.py`：同步各自模型及相关场地。
+- `blender/update_new_east_gate.py -- --output-root=work/new-east-candidate`：按照片与视频重建新东园门的独立候选，保留其他源对象及 GLB 节点；自动检查两档解码几何、通道净空、铺装高度、资源哈希与预算。加 `--publish` 在检查通过后用仓库发布锁成套安装；候选目录必须不存在。`new_east_gate.py` 保留具名构件，材质由完整建模和增量入口共同创建。
+  门卫窗采用封闭的内缩深色窗带，转角不留透空缝；门禁屏分别朝向两侧来人方向。窗框、圆角机壳及收边尺寸为细部估算。银色格栅采用7毫米倒角截面，门卫窗补充横档和斜面窗台。右端面板的自制128×128细砂纹理嵌入源文件和两档GLB，采用半米重复的局部UV；检查实际导出的嵌入图像、UV尺度和窗档上下玻璃净空。几何检查覆盖窗带转角和双向刷卡屏，入口近景另用相机回归检查桌面、竖屏和横屏下高塔、雨棚与围合不被裁切。东25栋侧新增矮墙压顶、金属围栏、低矮绿篱三组构件，连同西侧银灰短墙共12组；矮墙顺接人行坡度，围栏不横跨门禁通道。源模型和两档解码几何均检查矮墙高程、回折立柱、通道净空及东侧建筑间距；另查雨棚侧板净空、棚底支撑和连续灌木覆盖。压顶端头与长边平接，避免重叠顶面；矮墙降低后栏杆底板同步落到压顶面。
+  新东园门西侧短墙按2021年外景与2025年内侧全景对照补入：估算长3.3米、高约3.1米，银灰竖向饰面、浅薄压顶与接地基座单独保留为第12组构件。仅占高塔与邻楼多边形之间的缺口，不外推临街长围墙。西侧碰撞检查由整个包围盒禁入改为实际OSM轮廓的点包含、面边穿越和至少5厘米净距检查；源文件及两档解码模型均检查短墙覆盖、压顶和接地。入口相机扩展至同时容纳左右围合。
 - `blender/update_tree_layout.py`：同步树位和朝向；`-- --ground` 从最终地形更新树根高程。
 - `blender/build_vegetation.py`：重导植物模板；模板几何改变时，仍须同步 `.blend` 源模型。
 - `blender/repair_foundation_candidate.py`、`export_repaired_ground.py`：在独立候选中修补基础，再做局部导出与校验。
@@ -168,10 +171,12 @@ blender --background --python-exit-code 1 --python blender/validate_road_display
 
 每次替换前先记录尝试的文件，即使重命名成功后立即收到 SIGINT，回滚也会核对该文件的实际哈希并恢复。回滚逐文件尝试，单个恢复失败不会阻断其他文件。恢复从备份的副本进行；已安装文件如又被外部修改，则保留该修改并报告冲突。清理备份前再次确认所有尝试替换的文件均恢复到原始哈希，新增文件已删除。回滚不完整时，原始备份和 `recovery.json` 留在报错指定的 `work/gxu-publish-*` 目录，后续复制与发布会拒绝继续。记录包含原始/候选哈希、备份路径及恢复失败项；更新记录失败时仍保留最初的记录和全部备份。应先停止其他写入者、按记录核对并恢复一致的资产集，再将整个恢复目录移出 `work/gxu-publish-*` 扫描范围保留归档，才能重试。进程异常退出遗留的记录也按此处理；不提供断电持久性保证。
 
-默认直接运行原更新命令即可完成上述流程；加 `-- --output-root=/path/to/new-candidate` 只生成并验证候选，不覆盖正式资产。回归测试从当前 `public/` 和本地 `blender/gxu-campus.blend` 分别运行两个入口，检查正式输入未变，并再次核对无关节点的完整资源引用：
+默认直接运行原更新命令即可完成上述流程；加 `-- --output-root=/path/to/new-candidate` 只生成并验证候选，不覆盖正式资产。回归测试从当前 `public/` 和本地 `blender/gxu-campus.blend` 分别运行道路、篮球及新东园门三个入口，检查正式输入未变，并再次核对无关节点的完整资源引用：
 
 ```sh
 npm run test:incremental -- --output-root=/path/to/new-regression-directory
+# 只验证新东园门（包含当前模型的重复生成）
+npm run test:incremental -- --output-root=/path/to/new-gate-regression --kinds new_east_gate
 ```
 
 测试需要 Blender 和 Node.js 在 PATH 中（也可设置 `BLENDER_BIN`、`NODE_BIN`），输出目录必须尚不存在。`test:data` 另包含已发布节点保留、目标节点增删、纹理损坏检测、构建/校验及预算失败不发布的快速回归。发布专项 `scripts/test_incremental_publication.py` 覆盖准备和替换期间的外部修改、候选变化、恢复/新增文件删除/恢复记录写入失败，以及真实子进程竞争发布、回滚持锁和等待者拒绝未完成恢复。

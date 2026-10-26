@@ -1,12 +1,13 @@
 """Three independent gate studies. All dimensions are estimates, not surveys.
 
 East: 2018 inauguration photo, later undated street view. West: undated low-res
-street view. New east: verified location/guardroom, provisional exterior study.
+street view. New east: November 2025 photo and September 2026 route footage.
 Local facade faces -Y; rotation is derived from the catalogue compass bearing.
 """
 import math
 from geometry import Mesh
 from south_gate import inscription
+from new_east_gate import new_east_gate
 
 
 def arch(m, x, half, spring, rise, depth, top, C, detail):
@@ -106,28 +107,6 @@ def barrier(m,x,y,C,detail,sign=1):
             t=j/5;m.line((x+sign*.7*t,y,1.15+2.85*t),(x+sign*.7*(t+.09),y,1.15+2.85*(t+.09)),.047,C['gateRed'],6)
 
 
-def new_east_gate(C,detail):
-    """Provisional guardroom and walk-in gate study: exterior photo still missing."""
-    m=Mesh();p=Mesh();booth(p,-5.9,1.4,2.7,3.2,C,detail);m.add_part('01_门卫室_外观推定',p)
-    p=Mesh()
-    # Low walls stop short of the mapped central access road.
-    for x in [-7.2,6.6]:
-        p.box(x,0,1.05,1.4,.60,2.1,C['stone']);p.box(x,0,2.18,1.6,.8,.18,C['white'])
-    m.add_part('02_入口边墙_尺寸推定',p)
-    p=Mesh()
-    for x in [4.0,6.0]:p.box(x,0,1.75,.10,.12,3.5,C['metal'])
-    p.box(5,0,3.55,2.4,2.5,.16,C['metal'])
-    if detail:
-        for yy in [-.8,0,.8]:p.box(5,yy,3.44,2.25,.055,.12,C['metal'])
-    for x in [4.1,5.1,6.1]:
-        p.box(x,0,.62,.20,1.05,1.24,C['metal'])
-        if detail:p.box(x,-.22,1.30,.12,.14,.12,C['dark'])
-    m.add_part('03_步行通道_设施推定',p)
-    p=Mesh();barrier(p,-3.6,0,C,detail,-1);railing(p,5.1,2.6,3.5,C,detail)
-    m.add_part('04_车行道闸与护栏_推定',p)
-    return m
-
-
 def west_gate(C,detail):
     m=Mesh();p=Mesh();booth(p,-5.1,2.8,2.1,2.7,C,detail);m.add_part('01_林荫入口值守岗亭',p)
     p=Mesh()
@@ -154,10 +133,10 @@ def campus_gate(l,z,C,detail=True):
     m={'east-gate':east_gate,'new-east-gate':new_east_gate,'west-gate':west_gate}[l['id']](C,detail)
     p=Mesh()
     pads={'east-gate':[(-12,0,5.5,6),(12,0,5.5,6)],
-          'new-east-gate':[(-5.9,.8,3.5,5.8),(5,0,4,6)],
+          'new-east-gate':[],  # Its grounded paving and ramps are part of the gate.
           'west-gate':[(-5.1,1,4.5,6.4),(8.1,1,4.9,6.4)]}
     for x,y,w,d in pads[l['id']]:p.box(x,y,.20,w,d,.20,C['path'])
-    m.add_part('07_人行铺装_范围估算',p)
+    if p.v:m.add_part('07_人行铺装_范围估算',p)
     if l['id']=='east-gate':
         # Width is constrained by the actual corridor between neighbouring OSM
         # footprints. Keep the mapped gate node rather than moving neighbours.

@@ -15,6 +15,8 @@ bridges = {b['id'] for b in json.loads((ROOT / 'public/data/infrastructure.json'
 
 def updated(obj):
     name = obj.name
+    if mode == 'new-east-gate':
+        return obj.get('landmark') == 'new-east-gate'
     if name in {'roads', 'terrain', 'green'} or name.startswith(('树木示意-', 'site-', 'shore-', 'paving-', 'vegetation-low-')):
         return True
     if obj.get('siteId') or obj.get('pavingId'):

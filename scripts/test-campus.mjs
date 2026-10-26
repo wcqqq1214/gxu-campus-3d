@@ -347,8 +347,9 @@ test('三座新增校门采用独立入口 POI，可导航且不伪造建筑轮�
   const newEast = gates.find((g) => g.id === 'new-east-gate');
   const east = gates.find((g) => g.id === 'east-gate');
   assert.ok(east.center[1] - newEast.center[1] > 650);
-  assert.equal(newEast.reference, 'newEast2026');
-  assert.ok(newEast.detail.includes('推定'));
+  assert.equal(newEast.reference, 'newEastPhoto2025');
+  assert.ok(newEast.additionalReferences.includes('newEastRoute2026'));
+  assert.ok(newEast.detail.includes('估算'));
   assert.ok(east.detail.includes('2018'));
   assert.deepEqual(
     searchLandmarks(landmarks, '新东门').map((p) => p.id),
