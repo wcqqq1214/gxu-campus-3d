@@ -13,12 +13,40 @@
       "template": 0,
       "junctionClearanceMeters": 7,
       "replacementHalfWidthMeters": 12,
-      "sourceRefs": ["osm", "gxuDonationProjects", "bocuiTreesSummer2024", "bocuiTreesAutumn2024"],
+      "sourceRefs": [
+        "osm",
+        "gxuDonationProjects",
+        "bocuiTreesSummer2024",
+        "bocuiTreesAutumn2024"
+      ],
       "evidence": {
         "location": "博萃路名称及线位来自OSM；取该线从西端起230–350米的一段作为展示试点，远离学生公寓5栋所在东段。不是养护照片拍摄机位定位。",
         "layout": "校方项目册PDF第33页列有博萃路两旁玉兰树；2024年暑假养护简报具名照片支持沿路成列及留出步行空间。资料未给出逐株坐标。",
         "dimensions": "12米间距、距道路中心6.2米、10米树高、7米路口退让及12米背景替换半宽为示意参数；最终占地、树冠保留区和三维碰撞检查继续优先。",
         "species": "校方文字称玉兰/白玉兰；暂用既有阔叶模板0表达行列关系，不声称复原叶形、花期或精确树冠。2024年11月记录提到5栋附近危树清除，本试点不重建该东段树位。"
+      }
+    },
+    {
+      "id": "west-gate-broadleaf-approach",
+      "roadId": "way/759150549",
+      "roadRevision": "8d4c3da5f24f83a90b677a9da661abbe0445dbfc311a9c69609c4893b8674c89",
+      "startMeters": 647,
+      "endMeters": 661,
+      "spacingMeters": 12,
+      "offsetMeters": 11,
+      "heightMeters": 11.5,
+      "template": 0,
+      "junctionClearanceMeters": 7,
+      "replacementHalfWidthMeters": 12,
+      "sourceRefs": [
+        "osm",
+        "westGateVideos20261027"
+      ],
+      "evidence": {
+        "location": "OSM西门内侧接鲁班路的道路轴 way/759150549，从东端起647–661m近入口区间。",
+        "layout": "2021视频约31秒西门内景支持入口道路两侧阔叶树冠高于门卫室；2025视频约31秒已核实画面补充内侧树冠遮挡关系。此前28–30秒时间段对应已撤回；不据此推定新旧遮棚位置。仅改善成列关系，不声称逐株测绘。",
+        "dimensions": "12m间距、11m轴侧距及11.5m模板缩放参数均为估算；保留原门体、道路、建筑净空过滤，碰撞检查优先。 三维检查已排除更内侧636m站位与1号楼相交的候选，区间收窄防止重生成时再次加入。",
+        "species": "羽状棕榈并非这些镜头中近入口主要树冠，采用既有阔叶模板0；不推定准确树种和株龄。"
       }
     }
   ]

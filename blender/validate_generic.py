@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT/'blender'))
 from generic_buildings import ordinary_building,compact_form_source
 from geometry import MATERIALS
 from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS, SHOP_BUILDINGS
+from student_water_tower import TOWER_ID
 
 
 def ordinary(b):
@@ -61,6 +62,11 @@ def root_name(obj):
 
 def samples(b):
     form = b['form']; z = b['elevation']; points = []
+    if b['id'] == TOWER_ID:
+        x,y=b['center'];h=b['height']
+        # Avoid the central antenna and the tank lip; probe both tank overhangs.
+        return [{'x':x+dx,'y':y,'top':z+h+.5,'expected':z+h,'kind':'water-tank-roof'}
+                for dx in (-2.3,2.3)]
     def area(tri):
         a,c,d = tri
         return abs((c[0]-a[0])*(d[1]-a[1])-(c[1]-a[1])*(d[0]-a[0]))/2
@@ -202,7 +208,7 @@ def main():
     if chunk:
         bs = [b for b in bs if b.get('chunk') == chunk]
         assert bs, ('Unknown or empty ordinary building chunk', chunk)
-    colors = ['pink','livingWarm','livingCool','stone','stoneWarm','stoneCool','white','paleRoof','blueRoof','red','dark','path','shadeGlass','glass','grass','green']
+    colors = ['pink','livingWarm','livingCool','stone','stoneWarm','stoneCool','white','paleRoof','blueRoof','red','dark','path','shadeGlass','glass','grass','green','metal']
     C = {k:i for i,k in enumerate(colors)}
     MATERIALS[:]=[bpy.data.materials.new('generic-check-'+name) for name in colors]
     generated = []
@@ -228,7 +234,7 @@ def main():
             residential = {**b, 'form': {**b['form'], 'archetype':'dormitory'}}
             assert len(high.v) < len(ordinary_building(residential,b.get('elevation',0),C,True).v)
         generated.append({'id':b['id'],'roof':b['form']['roof']['type'],
-                          'archetype':b['form']['archetype'],'sharedComponents':3})
+                          'archetype':b['form']['archetype'],'sharedComponents':min(3,len(high.parts))})
     report = {'generatedBuildings':len(bs),'generated':generated,
               'scope':'ordinary buildings only; dedicated landmarks and monuments use their existing verifiers',
               'tolerancesMeters': {'source':.011,'baseDraco':.05,'nearDraco':.02}}
@@ -248,6 +254,14 @@ def main():
     for b in bs:
         o=objects[b['id']]
         expected=ordinary_building(b,b['elevation'],C,b['insideCampus'])
+        if b['id']==TOWER_ID:
+            actual=[o.matrix_world@v.co for v in o.data.vertices]
+            for left,right in ((actual,expected.v),(expected.v,actual)):
+                assert left and right
+                kd=KDTree(len(right))
+                for i,point in enumerate(right):kd.insert(point,i)
+                kd.balance()
+                assert all(kd.find(point)[2]<.011 for point in left),'Stale editable water tower'
         for name,start,end in (expected.parts if b['id'] in NEW_EAST_NEIGHBOURS else expected.parts[:3]):
             group=o.vertex_groups.get(name)
             assert group is not None,(b['id'],name,'missing editable component')

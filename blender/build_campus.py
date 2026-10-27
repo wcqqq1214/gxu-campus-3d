@@ -136,6 +136,8 @@ for name,color,rough,metal in [('courtGreen','#347e69',.92,0),('courtKey','#bd64
     C[name]=material(name,rgb(color),rough,metal)
 for name,color,rough,metal in [('huicuiWall','#c7b49b',.86,0),('huicuiTrim','#e0d8c8',.78,0),('huicuiGlass','#54747d',.24,.3),('huicuiFrame','#555c5d',.50,.3)]:
     C[name]=material(name,rgb(color),rough,metal)
+from student_center import student_center_materials
+student_center_materials(C)
 # Original deterministic JPEG textures; packed into both .blend and exported GLBs.
 texture_dir=ROOT/'blender/textures';texture_dir.mkdir(exist_ok=True)
 for name in ['stone','grass','green','road','path','paleRoof','slate','sport','pitch','asphalt']:

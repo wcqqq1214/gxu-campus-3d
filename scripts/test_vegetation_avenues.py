@@ -28,6 +28,7 @@ class AvenueTests(unittest.TestCase):
         from prepare_geodata import inverse
         root=self.isolated();path=root/'data/vegetation-avenues.json'
         config=json.loads(path.read_text());a=config['avenues'][0]
+        config['avenues']=[a]  # Synthetic geography below contains only this test axis.
         coords=[list(inverse(0,0)),list(inverse(100,0))]
         a.update(startMeters=1,endMeters=97,junctionClearanceMeters=3,roadRevision=revision(coords))
         geo={'type':'FeatureCollection','features':[
@@ -53,9 +54,11 @@ class AvenueTests(unittest.TestCase):
     def test_current_pilot_is_bounded_and_deterministic(self):
         root=Path(__file__).resolve().parents[1]
         first=derive_avenues(root);second=derive_avenues(root)
-        self.assertEqual(first[0]['candidates'],second[0]['candidates'])
-        self.assertTrue(first[0]['candidates'])
-        self.assertTrue(all(first[0]['replacement'].covers(Point(r['tree'][:2])) for r in first[0]['candidates']))
+        self.assertEqual(len(first),len(second))
+        for a,b in zip(first,second):
+            self.assertEqual(a['candidates'],b['candidates'])
+            self.assertTrue(a['candidates'])
+            self.assertTrue(all(a['replacement'].covers(Point(r['tree'][:2])) for r in a['candidates']))
 
 
 if __name__=='__main__':unittest.main()

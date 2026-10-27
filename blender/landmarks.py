@@ -1,6 +1,9 @@
 """Distinct architectural studies, using the reference catalogue and OSM footprints."""
 import math
 from geometry import Mesh
+from student_center import student_center
+from laboratory import laboratory
+from huixue import huixue
 from south_gate import south_gate
 from library import library
 from international_residence import international_residence
@@ -9,6 +12,16 @@ from time_gate import time_gate
 from teaching_ten import teaching_ten
 from teaching_six import teaching_six
 from huicui import huicui
+
+DEDICATED_LANDMARKS = {
+    'huixue': huixue,
+    'laboratory': laboratory,
+    'student-center': student_center,
+    'library': library,
+    'international-residence': international_residence,
+    'teaching-six': teaching_six,
+    'teaching-ten': teaching_ten,
+}
 
 def facade(m,x,y,z,w,d,h,wall,glass,trim,floors=6,spacing=4,band=False):
     m.box(x,y,z+h/2,w,d,h,wall)
@@ -28,35 +41,16 @@ def facade(m,x,y,z,w,d,h,wall,glass,trim,floors=6,spacing=4,band=False):
 def steps(m,x,y,z,width,depth,height,mat,n=12):
     for i in range(n):m.box(x,y+depth*i/n/2,z+height*(i+.5)/n,width,depth*(1-i/n),height/n,mat)
 def landmark(l,b,z,C,detail=True):
-    m=Mesh();x,y=l['center'];xmin,ymin,xmax,ymax=l['bounds'];w=xmax-xmin;d=ymax-ymin;x=(xmin+xmax)/2;y=(ymin+ymax)/2;h=l['height']
-    stone,white,glass,dark,roof,wood=C['stone'],C['white'],C['glass'],C['dark'],C['slate'],C['wood']
     k=l['id']
+    if k in DEDICATED_LANDMARKS:
+        return DEDICATED_LANDMARKS[k](l,b,z,C,detail)
     if k=='huicui':return huicui(b,z,C,detail)
-    if k=='teaching-ten':return teaching_ten(l,b,z,C,detail)
     if l.get('placeKind')=='sculpture':return time_gate(l,z,C,detail)
     if l.get('placeKind')=='gate':return campus_gate(l,z,C,detail)
+    m=Mesh();x,y=l['center'];xmin,ymin,xmax,ymax=l['bounds'];w=xmax-xmin;d=ymax-ymin;x=(xmin+xmax)/2;y=(ymin+ymax)/2;h=l['height']
+    stone,white,glass,dark,roof,wood=C['stone'],C['white'],C['glass'],C['dark'],C['slate'],C['wood']
     if k=='south-gate':
         return south_gate(x,y,z,C,detail,footprint_width=w,footprint_depth=d)
-    elif k=='huixue':
-        # Keep the mapped E/W and N/S extents after rotating the south-facing study east.
-        w,d=d,w
-        m.box(x,y,z+10,w*.94,d*.88,20,stone)
-        m.box(x,y+d*.2,z+22,w*.9,d*.44,6,dark)
-        m.roof(x,y+d*.08,z+23,w*.88,d*.82,3.5,roof)
-        front=y-d*.45
-        m.box(x,front-.25,z+10,w*.36,.6,16,dark)
-        m.box(x,front-.7,z+7,w*.3,.4,10,wood)
-        m.roof(x,front+7,z+21,w*.47,23,4,roof)
-        m.box(x,front-4.6,z+21,w*.47,1.5,.65,C['red'])
-        for i in [-1,1]:
-            m.box(x+i*w*.245,front-.2,z+11,5,3,22,stone)
-            for j in range(5):m.box(x+i*(w*.30+j*w*.033),front-.6,z+11,1.35,1.2,19,white)
-        for sx in [-1,1]:
-            for j in range(13):
-                m.box(x+sx*w*.476,y-d*.4+j*d*.065,z+10,.8,1.0,19,white)
-                m.box(x+sx*w*.477,y-d*.37+j*d*.065,z+10,.15,1.1,14,glass)
-        steps(m,x,front-8,z,w*.4,12,2.1,stone)
-        m.rotate_z(x,y,math.pi/2)
     elif k=='auditorium':
         m.box(x,y,z+5.4,w*.9,d*.93,10.8,white)
         m.roof(x,y,z+10.8,w*.98,d,3,C['paleRoof'])
@@ -74,23 +68,6 @@ def landmark(l,b,z,C,detail=True):
                 for f in range(3):m.box(x+sx*w*.455,y-d*.39+j*d*.106,z+1.8+3*f,.15,1.7,2,glass)
                 m.box(x+sx*w*.465,y-d*.43+j*d*.12,z+5.5,.4,.5,10,stone)
         steps(m,x,front-6,z,w*.94,9,1.2,stone)
-    elif k=='library':
-        return library(l,b,z,C,detail)
-    elif k=='international-residence':
-        return international_residence(l,b,z,C,detail)
-    elif k=='student-center':
-        # Use the mapped curved exterior and courtyard instead of a substitute rectangle.
-        for f in range(5):
-            m.extrude(b['polygons'],b['roofTriangles'],z+f*h/5,h/5,glass,white)
-            for poly in b['polygons']:
-                for ring in poly:
-                    for a,bb in zip(ring,ring[1:]):
-                        dx=bb[0]-a[0];dy=bb[1]-a[1];ln=math.hypot(dx,dy)
-                        m.box((a[0]+bb[0])/2,(a[1]+bb[1])/2,z+(f+1)*h/5,ln+.2,.75,.8,white,math.atan2(dy,dx))
-                        if detail:
-                            for i in range(max(1,int(ln/2))):
-                                t=(i+.5)/max(1,int(ln/2));m.box(a[0]+dx*t,a[1]+dy*t,z+(f+.5)*h/5,.12,.12,h/5-.5,dark)
-        m.box(x,ymin-2,z+2.5,12,5,5,glass);m.box(x,ymin-3,z+5.2,16,8,.4,white)
     elif k=='stadium':
         # Official 2021 video, 00:07 and 00:12: broad shallow roof, vertical piers, horizontal louvers.
         # The mapped footprint has a narrow north wing. Using the full bounding
@@ -119,16 +96,6 @@ def landmark(l,b,z,C,detail=True):
                 sx=xx+(col-2.5)*mainw*.115;sy=y+(row-2)*maind*.14
                 m.box(sx,sy,z+hh+3.1,2.3,2.3,.7,white)
         steps(m,xx,ymin-3,z,mainw*.65,8,1.2,stone)
-    elif k=='laboratory':
-        # The central through-opening on the campus axis is left genuinely open.
-        ww=w*.35;gap=w*.22
-        for sx in [-1,1]:facade(m,x+sx*(gap/2+ww/2),y,z,ww,d*.8,h*.76,stone,glass,white,7,4)
-        facade(m,x,y,z+h*.48,w*.94,d*.70,h*.45,stone,glass,white,4,4)
-        m.box(x,y,z+h,w*.76,d*.84,1.1,white)
-        for i in [-3,-2,2,3]:m.box(x+i*w*.08,y-d*.45,z+h*.26,1.3,1.8,h*.52,stone)
-        m.box(x,y-d*.45,z+h*.52,w*.85,3,.8,white)
-    elif k=='teaching-six':
-        return teaching_six(l,b,z,C,detail)
     elif k=='teaching-two':
         facade(m,x,y,z,w,d,h,C['pink'],glass,white,7,3.8)
         m.box(x,ymin-1.6,z+h*.50,9,3,h,stone)

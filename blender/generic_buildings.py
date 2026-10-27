@@ -300,6 +300,9 @@ def facade_segments(b):
 def ordinary_building(b, z, C, detail):
     if b.get('form', {}).get('version') != 1:
         raise ValueError(f"{b['id']}: run data:prepare before rebuilding ordinary buildings")
+    from student_water_tower import TOWER_ID, water_tower
+    if b['id'] == TOWER_ID:
+        return water_tower(b, z, C, detail)
     m = shared_form(b, z, C)
     if b['id'] in NEW_EAST_NEIGHBOURS:
         facades = facade_segments(b)

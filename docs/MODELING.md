@@ -220,3 +220,9 @@ BASELINE_URL=http://127.0.0.1:4432/gxu-campus-3d/ REFINEMENT_URL=http://127.0.0.
 退役候选工具不用于当前资产，恢复时必须配套历史输入与独立输出：`preview_civil_platform_west.py`、`update_chongzuo_bridge.py` 见提交 `b6215ab`；旧土木门廊候选见 `3004b87` 及本地 `work/archive/2026-10-14-modeling-cleanup-3004b87/`；旧道路合批比较见 `e927d0f`。当前运行逻辑为 `lib/campus/road-batching.ts`，由 `scripts/test-static-road-batching.mjs` 回归；跨前端的球场比较仍由 `check-sports-batching-browser.mjs` 兼容旧标签。
 
 可清理退役脚本和缓存，但保留正式源模型、现用脚本、纹理及仍用于比较的基准。本地归档与移出版本跟踪不等于删除 Git 历史对象。
+
+## 四地标联合增量验收
+
+独立候选若来自同一基线，不能逐份覆盖整个 base.glb。按目标节点合并地标；独立水塔须同时更新所属 chunk-p0-p0 近景和基础节点。合并数据按稳定 ID 处理，随后重新生成地基依赖并核对实际几何，不能只刷新指纹。
+
+`blender/validate_landmark_refinements.py` 需要本地源文件，比较汇学堂、综合实验大楼、活动中心、西门生成器与可编辑网格及实际解码的两档 GLB。独立水塔另外运行 `blender/validate_generic.py -- --chunk=chunk-p0-p0`，保护分块内其他37栋。`npm run test:geometry` 自动发现各地标双 LOD 回归，不需要本地 blend。数据测试中的证据断言从 data/ 源配置读取，不能依赖公开导出时移除的 evidence 字段。
