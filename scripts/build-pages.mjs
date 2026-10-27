@@ -2,6 +2,7 @@ import { access, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { runtimeBuildings } from './runtime-data.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const repository =
   process.env.GITHUB_REPOSITORY?.split('/').at(-1) ?? 'gxu-campus-3d';
@@ -63,6 +64,15 @@ for (const a of [
   'draco/draco_wasm_wrapper.js',
 ])
   await access(path.join(out, a));
+// The page loads buildings.json before creating the scene. Publish only the
+// fields it reads; public/data keeps the full modelling record.
+const buildingsPath = path.join(out, 'data/buildings.json');
+await writeFile(
+  buildingsPath,
+  JSON.stringify(
+    runtimeBuildings(JSON.parse(await readFile(buildingsPath, 'utf8'))),
+  ),
+);
 await rm(path.join(out, '.vite'), { recursive: true, force: true });
 await writeFile(path.join(out, '.nojekyll'), '');
 console.log(`GitHub Pages 静态包：${out}；资源前缀：${basePath || '/'}`);

@@ -1,23 +1,36 @@
 'use client';
 import { useCampusLocale } from '@/components/campus-locale';
-import { memo, useEffect, useMemo, useState } from 'react';
+import {
+  memo,
+  useEffect,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { MapPin, ChevronDown } from 'lucide-react';
 import type { Building, Landmark } from '@/lib/campus/types';
-import { cameraBearing, type CameraSnapshot } from '@/lib/campus/share';
+import { cameraBearing } from '@/lib/campus/share';
+import type { CameraStore } from '@/lib/campus/camera-store';
 
 export const CampusMinimap = memo(function CampusMinimap({
   buildings,
   current,
-  camera,
+  camera: cameraStore,
   showBoundary,
 }: {
   buildings: Building[];
   current?: Pick<Landmark, 'name' | 'center'>;
-  camera: CameraSnapshot | null;
+  camera: CameraStore;
   showBoundary: boolean;
 }) {
   const { t } = useCampusLocale();
   const [open, setOpen] = useState(false);
+  // A closed minimap ignores camera samples instead of re-rendering for them.
+  const camera = useSyncExternalStore(
+    cameraStore.subscribe,
+    () => (open ? cameraStore.get() : null),
+    () => null,
+  );
   const [boundary, setBoundary] = useState<number[][][]>([]);
   useEffect(() => {
     if (!open || !showBoundary || boundary.length) return;
@@ -99,6 +112,19 @@ export const CampusMinimap = memo(function CampusMinimap({
         })),
     };
   }, [buildings, boundary]);
+  // Hundreds of footprints stay unchanged while the camera marker moves.
+  const footprints = useMemo(
+    () =>
+      map?.shapes.map((shape) => (
+        <path
+          key={shape.id}
+          d={shape.path}
+          className="minimap-building"
+          fillRule="evenodd"
+        />
+      )),
+    [map],
+  );
   if (!map) return null;
   const point = current ? map.point(...current.center) : null;
   const target = camera ? map.point(camera.target[0], -camera.target[2]) : null;
@@ -128,14 +154,7 @@ export const CampusMinimap = memo(function CampusMinimap({
             viewBox={`0 0 ${map.width} ${map.height}`}
             aria-label={t('北向朝上的校园建筑分布与镜头方向')}
           >
-            {map.shapes.map((shape) => (
-              <path
-                key={shape.id}
-                d={shape.path}
-                className="minimap-building"
-                fillRule="evenodd"
-              />
-            ))}
+            {footprints}
             {showBoundary &&
               boundary.map((ring, i) => (
                 <path

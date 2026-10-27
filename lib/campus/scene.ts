@@ -31,6 +31,12 @@ import {
 } from './streaming';
 import type { StreamAsset as Asset } from './streaming';
 import {
+  asset,
+  modelUrl,
+  type BasePrefetch,
+  type ModelManifest as Manifest,
+} from './boot';
+import {
   bridgeEntrancePose,
   entranceBox,
   fitBox,
@@ -60,18 +66,6 @@ import type {
   LandmarkView,
   ViewportFrame,
 } from './types';
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
-export const asset = (path: string) => `${BASE}/${path}`;
-interface Manifest {
-  treePriorityPositions?: number[][];
-  base: Asset;
-  trees: Asset;
-  treesNear?: Asset;
-  zones: Asset[];
-  landmarks: Asset[];
-  infrastructure?: Asset[];
-  sports?: Asset[];
-}
 interface Callbacks {
   onStatus: (message: Message, error?: boolean, progress?: number) => void;
   onReady: () => void;
@@ -81,7 +75,8 @@ interface Callbacks {
     origin?: import('./types').SelectionOrigin,
   ) => void;
   onInteract: () => void;
-  onMetrics: (m: Metrics) => void;
+  /** Optional: building the report is skipped when nobody reads it. */
+  onMetrics?: (m: Metrics) => void;
   onOrbit: (on: boolean) => void;
   onCamera: (snapshot: CameraSnapshot) => void;
 }
@@ -90,6 +85,8 @@ export function createScene(
   buildings: Building[],
   landmarks: Landmark[],
   callbacks: Callbacks,
+  /** Consumed by the first initialization only; retries fetch again. */
+  prefetch?: BasePrefetch,
 ): SceneController {
   let locale: Locale = 'zh';
   const t = (source: string, values?: Record<string, string | number>) =>
@@ -195,9 +192,22 @@ export function createScene(
   const loader = new GLTFLoader();
   const draco = new DRACOLoader();
   draco.setDecoderPath(asset('draco/'));
-  draco.setWorkerLimit(2);
+  // The base model carries hundreds of Draco primitives. Phone-sized layouts
+  // keep two decoder heaps; larger screens use spare cores, at most four.
+  draco.setWorkerLimit(
+    window.innerWidth < 760
+      ? 2
+      : Math.min(4, Math.max(2, (navigator.hardwareConcurrency || 2) - 1)),
+  );
+  // Fetch the decoder while the base model is still downloading. Model loads
+  // still await this request; observing it here only avoids an unhandled
+  // rejection when it fails before the first decode.
+  (
+    draco.preload() as DRACOLoader & { decoderPending?: Promise<unknown> }
+  ).decoderPending?.catch(() => {});
   loader.setDRACOLoader(draco);
   let manifest: Manifest | null = null;
+  let pendingPrefetch = prefetch;
   let baseRoot: THREE.Group | null = null;
   let treesRoot: THREE.Group | null = null;
   let highTreesReady = false;
@@ -974,7 +984,12 @@ export function createScene(
       callbacks.onStatus('部分细节加载失败，可重试', true);
     else if (initialReady) callbacks.onStatus('');
   }
-  async function loadGLB(a: Asset, key = 'base', signal = lifecycle.signal) {
+  async function loadGLB(
+    a: Asset,
+    key = 'base',
+    signal = lifecycle.signal,
+    prefetched?: BasePrefetch,
+  ) {
     const label =
       key === 'base'
         ? '正在加载校园'
@@ -983,23 +998,23 @@ export function createScene(
           : key.startsWith('landmark-')
             ? '正在加载{name}'
             : '正在加载周边细节';
+    const progress = (fraction: number) => {
+      progresses.set(key, {
+        label,
+        fraction,
+        name: key.startsWith('landmark-')
+          ? (landmarks.find((l) => 'landmark-' + l.id === key)?.name ?? '地标')
+          : undefined,
+      });
+      updateLoadStatus();
+    };
+    let unsubscribe: (() => void) | undefined;
     try {
-      const buffer = await fetchModel(
-        asset(a.url) + (a.sha256 ? `?v=${a.sha256}` : ''),
-        a.bytes,
-        signal,
-        (fraction) => {
-          progresses.set(key, {
-            label,
-            fraction,
-            name: key.startsWith('landmark-')
-              ? (landmarks.find((l) => 'landmark-' + l.id === key)?.name ??
-                '地标')
-              : undefined,
-          });
-          updateLoadStatus();
-        },
-      );
+      let buffer: ArrayBuffer;
+      if (prefetched) {
+        unsubscribe = prefetched.onProgress(progress);
+        buffer = await prefetched.base;
+      } else buffer = await fetchModel(modelUrl(a), a.bytes, signal, progress);
       signal.throwIfAborted();
       const gltf = await loader.parseAsync(buffer, asset('models/'));
       if (disposed || signal.aborted) {
@@ -1014,6 +1029,7 @@ export function createScene(
       if (key === 'base') pruneGroundTriangles(gltf.scene);
       return gltf;
     } finally {
+      unsubscribe?.();
       progresses.delete(key);
       updateLoadStatus();
     }
@@ -1359,13 +1375,14 @@ export function createScene(
     if (loading.has('base') || initialReady) return;
     loading.add('base');
     callbacks.onStatus('正在加载校园…');
+    // A failed prefetch is not reused: retries go through the normal fetches.
+    const boot = pendingPrefetch;
+    pendingPrefetch = undefined;
     try {
-      manifest = await fetchJson<Manifest>(
-        asset('data/models.json'),
-        lifecycle.signal,
-      );
+      manifest = await (boot?.manifest ??
+        fetchJson<Manifest>(asset('data/models.json'), lifecycle.signal));
       if (disposed) return;
-      const gltf = await loadGLB(manifest!.base);
+      const gltf = await loadGLB(manifest.base, 'base', lifecycle.signal, boot);
       baseRoot = gltf.scene;
       convexCulling = createConvexCulling(baseRoot);
       scene.add(baseRoot);
@@ -1802,7 +1819,7 @@ export function createScene(
     if (benchmarkRun ? benchmarkRun.sampleDue() : time - sampleStart > 1500) {
       if (activeFrames > 0 && activeFrameMs > 0)
         fps = (1000 * activeFrames) / activeFrameMs;
-      callbacks.onMetrics(metrics());
+      callbacks.onMetrics?.(metrics());
       if (quality === 'auto' && !compact() && !saveData() && !document.hidden) {
         if (
           adaptive.sample(

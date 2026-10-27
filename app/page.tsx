@@ -5,6 +5,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type ComponentProps,
 } from 'react';
 import {
@@ -78,13 +79,10 @@ import {
   searchableBuildings,
   searchLandmarks,
 } from '@/lib/campus/navigation';
-import {
-  decodeShare,
-  encodeShare,
-  cameraBearing,
-  type CameraSnapshot,
-} from '@/lib/campus/share';
+import { decodeShare, encodeShare, cameraBearing } from '@/lib/campus/share';
 import { fetchJson } from '@/lib/campus/streaming';
+import { prefetchBase } from '@/lib/campus/boot';
+import { createCameraStore, type CameraStore } from '@/lib/campus/camera-store';
 import { CampusMinimap } from '@/components/campus-minimap';
 import { CampusViewControls } from '@/components/campus-view-controls';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
@@ -177,7 +175,7 @@ function CampusMap() {
   const [debug, setDebug] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
-  const [cameraState, setCameraState] = useState<CameraSnapshot | null>(null);
+  const [cameraStore] = useState(createCameraStore);
   const [shareLink, setShareLink] = useState('');
   const [panelMode, setPanelMode] = useState<'menu' | 'detail'>('menu');
   const [landmarkView, setLandmarkView] = useState<LandmarkView | null>(
@@ -227,10 +225,14 @@ function CampusMap() {
   useEffect(() => {
     let active = true;
     const lifetime = new AbortController();
+    const debugMetrics = new URLSearchParams(location.search).has('debug');
     queueMicrotask(() => {
-      if (active) setDebug(new URLSearchParams(location.search).has('debug'));
+      if (active) setDebug(debugMetrics);
     });
     let cleanup: (() => void) | undefined;
+    // The base model is the longest download; start it beside the scene code
+    // and building data instead of after them.
+    const boot = prefetchBase(lifetime.signal);
     void Promise.all([
       fetchJson<Building[]>(`${BASE}/data/buildings.json`, lifetime.signal),
       fetchJson<Landmark[]>(`${BASE}/data/landmarks.json`, lifetime.signal),
@@ -246,61 +248,71 @@ function CampusMap() {
             new URLSearchParams(location.search).has('test-webgl-unavailable')
           )
             throw new Error('WebGL test');
-          const c = createScene(host.current, bs, ls, {
-            onStatus: (message, failed = false, progress) => {
-              if (active) {
-                setStatus(message);
-                setLoadProgress(progress);
-                setError(failed);
-              }
-            },
-            onReady: () => {
-              if (active) setReady(true);
-            },
-            onSelect: (id, origin = 'manual') => {
-              if (active) {
-                setSelected(id);
-                setFramingRequest((value) => value + 1);
-                setLandmarkView('oblique');
-                const stop = ls.findIndex((place) => place.id === id);
-                // Ordinary buildings are not tour stops; the tour keeps its place.
-                if (stop >= 0) setTourIndex(stop);
-                if (origin !== 'tour') {
-                  setPanelMode(id ? 'detail' : 'menu');
-                  setCollapsed(false);
-                  setPanelExpanded(false);
-                  dock.current
-                    ?.querySelector<HTMLInputElement>('input[type="search"]')
-                    ?.blur();
-                  if (origin === 'manual') {
-                    setTour(false);
-                    pendingFocus.current = id ? 'detail' : 'menu';
+          const c = createScene(
+            host.current,
+            bs,
+            ls,
+            {
+              onStatus: (message, failed = false, progress) => {
+                if (active) {
+                  setStatus(message);
+                  setLoadProgress(progress);
+                  setError(failed);
+                }
+              },
+              onReady: () => {
+                if (active) setReady(true);
+              },
+              onSelect: (id, origin = 'manual') => {
+                if (active) {
+                  setSelected(id);
+                  setFramingRequest((value) => value + 1);
+                  setLandmarkView('oblique');
+                  const stop = ls.findIndex((place) => place.id === id);
+                  // Ordinary buildings are not tour stops; the tour keeps its place.
+                  if (stop >= 0) setTourIndex(stop);
+                  if (origin !== 'tour') {
+                    setPanelMode(id ? 'detail' : 'menu');
+                    setCollapsed(false);
+                    setPanelExpanded(false);
+                    dock.current
+                      ?.querySelector<HTMLInputElement>('input[type="search"]')
+                      ?.blur();
+                    if (origin === 'manual') {
+                      setTour(false);
+                      pendingFocus.current = id ? 'detail' : 'menu';
+                    }
                   }
                 }
-              }
+              },
+              onHover: (id) => {
+                if (active) setHovered(id);
+              },
+              onInteract: () => {
+                if (active) {
+                  setTour(false);
+                  setLandmarkView(null);
+                }
+              },
+              onCamera: (snapshot) => {
+                if (active) cameraStore.set(snapshot);
+              },
+              onOrbit: (on) => {
+                if (active) {
+                  setOrbit(on);
+                  if (on) setLandmarkView('oblique');
+                }
+              },
+              // Metrics are only displayed in debug mode; elsewhere each
+              // report would re-render the whole page every 1.5 s.
+              onMetrics: debugMetrics
+                ? (m) => {
+                    if (active) setMetrics(m);
+                  }
+                : undefined,
             },
-            onHover: (id) => {
-              if (active) setHovered(id);
-            },
-            onInteract: () => {
-              if (active) {
-                setTour(false);
-                setLandmarkView(null);
-              }
-            },
-            onCamera: (snapshot) => {
-              if (active) setCameraState(snapshot);
-            },
-            onOrbit: (on) => {
-              if (active) {
-                setOrbit(on);
-                if (on) setLandmarkView('oblique');
-              }
-            },
-            onMetrics: (m) => {
-              if (active) setMetrics(m);
-            },
-          });
+            boot,
+          );
           c.setLocale(localeRef.current);
           controller.current = c;
           cleanup = () => c.dispose();
@@ -325,6 +337,8 @@ function CampusMap() {
           }
           cleanup = () => c.dispose();
         } catch {
+          // Without WebGL nothing will consume the prefetched model.
+          lifetime.abort();
           setStatus(
             '无法显示三维画面，请开启硬件加速或使用支持 WebGL 2 的浏览器',
           );
@@ -343,7 +357,8 @@ function CampusMap() {
       cleanup?.();
       controller.current = null;
     };
-  }, [retrySeed]);
+    // The store is created once; listing it only satisfies the hook rule.
+  }, [retrySeed, cameraStore]);
   useEffect(() => {
     const preference = matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setReducedMotion(preference.matches);
@@ -1022,7 +1037,7 @@ function CampusMap() {
           <CampusMinimap
             buildings={buildings}
             current={currentLandmark ?? currentBuilding}
-            camera={cameraState}
+            camera={cameraStore}
             showBoundary={layers.boundary}
           />
         </div>
@@ -1134,12 +1149,7 @@ function CampusMap() {
             aria-label={t('朝向正北')}
             tooltip={t('朝向正北')}
           >
-            <Navigation
-              size={20}
-              style={{
-                transform: `rotate(${cameraBearing(cameraState) - 45}deg)`,
-              }}
-            />
+            <NorthArrow camera={cameraStore} />
             <span>N</span>
           </MapToolButton>
           <div className="tool-stack zoom-tools">
@@ -1545,6 +1555,18 @@ function BuildingResults({
   );
 }
 
+/** Follows camera samples without re-rendering the surrounding map controls. */
+function NorthArrow({ camera }: { camera: CameraStore }) {
+  // A primitive selection skips renders for samples that only pan or zoom.
+  const bearing = useSyncExternalStore(
+    camera.subscribe,
+    () => cameraBearing(camera.get()),
+    () => cameraBearing(null),
+  );
+  return (
+    <Navigation size={20} style={{ transform: `rotate(${bearing - 45}deg)` }} />
+  );
+}
 function MapToolButton({
   tooltip,
   shortcut,

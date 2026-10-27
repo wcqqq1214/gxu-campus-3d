@@ -27,7 +27,7 @@ npm test
 npm run build:pages
 ```
 
-`build:pages` 生成 `out/`，`PAGES_BASE_PATH` 可指定仓库子路径；`npm run preview` 默认在 4300 端口预览该目录。清理或重建前确认是否仍有预览使用它。
+`build:pages` 生成 `out/`，`PAGES_BASE_PATH` 可指定仓库子路径；`npm run preview` 默认在 4300 端口预览该目录。清理或重建前确认是否仍有预览使用它。`out/data/buildings.json` 只保留网页读取的字段，轮廓取整到厘米（`scripts/runtime-data.mjs`）；建模、校验和指纹始终以 `public/data/buildings.json` 的完整记录为准。前端 `Building` 类型增减字段时同步该清单，`test-runtime-data.mjs` 会检查两者一致。
 
 `gh workflow run pages.yml --ref dev` 可运行 Linux 完整检查，包含 Blender 几何回归。非 `main` 分支使用 `/gxu-campus-3d` 前缀且跳过部署；只有 `main` 的非 PR 运行允许发布。依赖版本和检查顺序见 [pages.yml](../.github/workflows/pages.yml)；CI 安装 `libjpeg-turbo-progs`，确保需要 `jpegtran` 的回归不因缺少工具而跳过。
 
