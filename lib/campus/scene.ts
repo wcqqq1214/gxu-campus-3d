@@ -372,8 +372,17 @@ export function createScene(
       width: 0,
       height: 0,
       point: landmarkLabelAnchor(l),
+      bounds: [0, 0, 0, 0],
     };
   });
+  const labelOrder = [...labelNodes];
+  let orderedHover: string | null | undefined;
+  let orderedSelection: string | null | undefined;
+  const labelProjection = new THREE.Vector3();
+  const orbitOffset = new THREE.Vector3();
+  const orbitAxis = new THREE.Vector3(0, 1, 0);
+  const occupiedLabels: number[][] = [];
+  const labelViewport = { width: 0, height: 0 };
   function measureLabels() {
     const layerDisplay = labels.style.display;
     labels.style.display = '';
@@ -1648,6 +1657,9 @@ export function createScene(
     pendingRequest = performance.now();
   });
   function resize() {
+    const rect = host.getBoundingClientRect();
+    labelViewport.width = rect.width;
+    labelViewport.height = rect.height;
     measureLabels();
     const w = host.clientWidth,
       h = host.clientHeight;
@@ -1764,11 +1776,10 @@ export function createScene(
       else {
         const offset = benchmarkRun
           ? benchmarkRun.position(time)
-          : camera.position
-              .clone()
-              .sub(controls.target)
+          : orbitOffset
+              .subVectors(camera.position, controls.target)
               .applyAxisAngle(
-                new THREE.Vector3(0, 1, 0),
+                orbitAxis,
                 Math.min(0.05, (time - lastFrame) / 1000) * 0.13,
               );
         camera.position.copy(controls.target).add(offset);
@@ -1829,19 +1840,30 @@ export function createScene(
         activeFrames++;
       }
       lastRendered = time;
-      const rect = host.getBoundingClientRect();
-      const occupied: number[][] = [];
-      for (const { l, el, point, width, height } of [...labelNodes].sort(
-        (a, b) =>
-          Number(b.l.id === hovered) * 2 +
-          Number(b.l.id === selected) -
-          (Number(a.l.id === hovered) * 2 + Number(a.l.id === selected)),
-      )) {
-        const p = point.clone().project(camera);
+      if (orderedHover !== hovered || orderedSelection !== selected) {
+        orderedHover = hovered;
+        orderedSelection = selected;
+        // Reset tie order to the catalogue order, matching the previous sort.
+        for (let i = 0; i < labelNodes.length; i++)
+          labelOrder[i] = labelNodes[i];
+        labelOrder.sort(
+          (a, b) =>
+            Number(b.l.id === hovered) * 2 +
+            Number(b.l.id === selected) -
+            (Number(a.l.id === hovered) * 2 + Number(a.l.id === selected)),
+        );
+      }
+      const occupied = occupiedLabels;
+      occupied.length = 0;
+      for (const { l, el, point, width, height, bounds } of labelOrder) {
+        const p = labelProjection.copy(point).project(camera);
         const dist = camera.position.distanceTo(point);
-        const x = ((p.x + 1) * rect.width) / 2,
-          y = ((-p.y + 1) * rect.height) / 2;
-        const bounds = [x - width / 2, y - height, x + width / 2, y];
+        const x = ((p.x + 1) * labelViewport.width) / 2,
+          y = ((-p.y + 1) * labelViewport.height) / 2;
+        bounds[0] = x - width / 2;
+        bounds[1] = y - height;
+        bounds[2] = x + width / 2;
+        bounds[3] = y;
         const overlap = occupied.some(
           (r) =>
             bounds[0] < r[2] + 6 &&
