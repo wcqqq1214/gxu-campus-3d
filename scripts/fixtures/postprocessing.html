@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh">
+  <meta charset="utf-8" />
+  <title>后处理非有限值回归</title>
+  <p>
+    运行方式：从仓库根目录运行 node --experimental-strip-types
+    scripts/serve-webgl-fixtures.mts，打开
+    /scripts/fixtures/postprocessing.html。测试真实 WebGL 2
+    后处理，不修改校园资产。
+  </p>
+  <pre id="result">正在检查…</pre>
+  <script type="module">
+    import * as THREE from 'three';
+    import { createPostprocessing } from '../../lib/campus/postprocessing.ts';
+    const result = document.querySelector('#result');
+    const renderer = new THREE.WebGLRenderer({ preserveDrawingBuffer: true });
+    renderer.setSize(256, 256);
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    document.body.append(renderer.domElement);
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#334455');
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.z = 5;
+    const geometry = new THREE.PlaneGeometry(4, 4);
+    const material = new THREE.ShaderMaterial({
+      uniforms: { poison: { value: 0.2 } },
+      vertexShader: `varying vec2 vUv;
+      void main() {vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`,
+      fragmentShader: `uniform float poison; varying vec2 vUv;
+      void main() {
+        vec3 colour=vec3(.2,.3,.4);
+        if(abs(vUv.x-.5)<.02 && abs(vUv.y-.5)<.02) colour=vec3(poison);
+        gl_FragColor=vec4(colour,1.0);
+      }`,
+    });
+    scene.add(new THREE.Mesh(geometry, material));
+    const effects = createPostprocessing(renderer, scene, camera);
+    const gl = renderer.getContext();
+    const rows = [];
+    const daylightGlow = new Map();
+    try {
+      for (const ratio of [1, 1.75]) {
+        renderer.setPixelRatio(ratio);
+        effects.resize();
+        for (const night of [false, true, false, true]) {
+          effects.setNight(night);
+          for (const [name, value] of [
+            ['finite', 0.2],
+            ['bright HDR', 40],
+            ['NaN', NaN],
+            ['+Infinity', Infinity],
+            ['-Infinity', -Infinity],
+          ]) {
+            material.uniforms.poison.value = value;
+            effects.render();
+            const pixel = new Uint8Array(4);
+            gl.readPixels(60, 60, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, pixel);
+            const error = gl.getError();
+            let pass =
+              pixel[0] > 20 &&
+              pixel[1] > 20 &&
+              pixel[2] > 20 &&
+              pixel[3] === 255 &&
+              error === 0;
+            const glow = new Uint8Array(4);
+            gl.readPixels(
+              Math.floor(138 * ratio),
+              Math.floor(128 * ratio),
+              1,
+              1,
+              gl.RGBA,
+              gl.UNSIGNED_BYTE,
+              glow,
+            );
+            if (name === 'bright HDR') {
+              if (!night) daylightGlow.set(ratio, glow[0]);
+              else pass &&= glow[0] > daylightGlow.get(ratio);
+            }
+            rows.push({
+              ratio,
+              night,
+              input: name,
+              pixel: [...pixel],
+              glow: [...glow],
+              error,
+              pass,
+            });
+          }
+        }
+      }
+      const failed = rows.filter((row) => !row.pass);
+      result.textContent = JSON.stringify(
+        { passed: rows.length - failed.length, failed: failed.length, rows },
+        null,
+        2,
+      );
+      result.dataset.result = failed.length ? 'fail' : 'pass';
+    } catch (error) {
+      result.textContent = String(error);
+      result.dataset.result = 'fail';
+    } finally {
+      effects.dispose();
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
+    }
+  </script>
+</html>

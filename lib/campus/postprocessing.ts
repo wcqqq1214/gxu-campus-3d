@@ -36,6 +36,17 @@ export function createPostprocessing(
     saoBlurDepthCutoff: 0.00008,
   });
   const bloom = new UnrealBloomPass(new Vector2(1, 1), 0.14, 0.25, 1.35);
+  // Isolated non-finite HDR pixels must not spread across every bloom mip.
+  // Keep valid samples unchanged, including values above the display range.
+  bloom.materialHighPassFilter.fragmentShader =
+    bloom.materialHighPassFilter.fragmentShader.replace(
+      'vec4 texel = texture2D( tDiffuse, vUv );',
+      `vec4 texel = texture2D( tDiffuse, vUv );
+      if (any(isnan(texel)) || any(isinf(texel))) {
+        gl_FragColor = vec4(defaultColor, defaultOpacity);
+        return;
+      }`,
+    );
   bloom.enabled = false;
   const output = new OutputPass();
   composer.addPass(beauty);
