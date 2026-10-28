@@ -455,16 +455,22 @@ export function createScene(
     mesh.updateMatrixWorld();
     return mesh;
   }
-  for (const b of navigationFootprints(buildings, landmarks)) {
-    const mesh = footprintMesh(b);
-    mesh.userData = { id: b.landmark ?? b.id, layer: b.layer };
-    proxies.push(mesh);
+  let proxiesReady = false;
+  function ensurePickProxies() {
+    if (proxiesReady) return;
+    for (const b of navigationFootprints(buildings, landmarks)) {
+      const mesh = footprintMesh(b);
+      mesh.userData = { id: b.landmark ?? b.id, layer: b.layer };
+      proxies.push(mesh);
+    }
+    proxiesReady = true;
   }
   const namedBuildings = new Map(
     searchableBuildings(buildings, landmarks).map((b) => [b.id, b]),
   );
   // Only curated places participate in map hover and click selection.
   function pickTargets() {
+    ensurePickProxies();
     return proxies.filter((p) => layers[p.userData.layer as LayerKey]);
   }
   function pick(clientX: number, clientY: number) {
