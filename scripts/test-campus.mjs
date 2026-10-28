@@ -232,6 +232,35 @@ test('首屏模型与嵌入纹理：8 MB 目标、10 MB 硬上限', async (t) =>
     `${total} bytes exceeds hard limit ${budget.hardLimitBytes}`,
   );
 });
+test('基础模型逐节点压缩几何预算，阻止远景节点继续膨胀', async () => {
+  const doc = glbJson(
+    await readFile(new URL('../public/models/base.glb', import.meta.url)),
+  );
+  // These are containment limits for the existing assets, not completed LOD
+  // targets. Lower the exceptions together with reviewed Blender exports.
+  const exceptions = {
+    'chunk-p1-n2': 400_000,
+    'landmark-new-east-gate': 275_000,
+    'landmark-library': 275_000,
+  };
+  for (const node of doc.nodes) {
+    if (node.mesh === undefined) continue;
+    const views = new Set(
+      doc.meshes[node.mesh].primitives.map(
+        (p) => p.extensions.KHR_draco_mesh_compression.bufferView,
+      ),
+    );
+    const bytes = [...views].reduce(
+      (sum, i) => sum + doc.bufferViews[i].byteLength,
+      0,
+    );
+    const limit =
+      exceptions[node.name] ??
+      { roads: 1_300_000, terrain: 1_200_000 }[node.extras?.layer] ??
+      300_000;
+    assert.ok(bytes <= limit, `${node.name}: ${bytes} bytes exceeds ${limit}`);
+  }
+});
 test('来源日期字段和高程原始值可追溯', async () => {
   const sources = await json('sources');
   for (const s of sources.sources) {
