@@ -1,4 +1,12 @@
-import { access, cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import {
+  access,
+  cp,
+  mkdir,
+  readFile,
+  readdir,
+  rm,
+  writeFile,
+} from 'node:fs/promises';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -62,8 +70,13 @@ for (const a of [
   'data/sources.json',
   'draco/draco_decoder.wasm',
   'draco/draco_wasm_wrapper.js',
+  'draco/draco_decoder.js',
 ])
   await access(path.join(out, a));
+// Runtime decoder URLs must all point to the one public copy.
+const media = await readdir(path.join(out, '_next/static/media'));
+if (media.some((file) => file.startsWith('draco_')))
+  throw new Error('构建中存在重复的 Draco 解码器');
 // The page loads buildings.json before creating the scene. Publish only the
 // fields it reads; public/data keeps the full modelling record.
 const buildingsPath = path.join(out, 'data/buildings.json');
