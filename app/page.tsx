@@ -12,7 +12,8 @@ import {
   CampusLocaleProvider,
   useCampusLocale,
 } from '@/components/campus-locale';
-import { statusText, type Message } from '@/lib/campus/i18n';
+import { createLoadStatusStore } from '@/lib/campus/load-status-store';
+import { CampusLoadStatus } from '@/components/campus-load-status';
 import { landmarkDescription } from '@/lib/campus/i18n/descriptions';
 import { Menu } from '@base-ui/react/menu';
 import { Tooltip } from '@base-ui/react/tooltip';
@@ -38,7 +39,6 @@ import {
   Ellipsis,
   CircleHelp,
   Layers3,
-  LoaderCircle,
   MapPin,
   Minus,
   Moon,
@@ -132,10 +132,13 @@ function CampusMap() {
   const [buildings, setBuildings] = useState<Building[]>([]),
     [landmarks, setLandmarks] = useState<Landmark[]>([]),
     [overview, setOverview] = useState<Overview | null>(null);
+  const [loadStatusStore] = useState(createLoadStatusStore);
+  const error = useSyncExternalStore(
+    loadStatusStore.subscribe,
+    loadStatusStore.getError,
+    () => false,
+  );
   const [ready, setReady] = useState(false),
-    [status, setStatus] = useState<Message>('正在加载校园…'),
-    [loadProgress, setLoadProgress] = useState<number | undefined>(undefined),
-    [error, setError] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
     [query, setQuery] = useState(''),
     [tab, setTab] = useState('explore');
@@ -183,17 +186,6 @@ function CampusMap() {
   );
   const [orbit, setOrbit] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [backgroundStatusVisible, setBackgroundStatusVisible] = useState(false);
-  const backgroundStatus = Boolean(status) && ready && !error;
-  useEffect(() => {
-    if (!backgroundStatus) {
-      queueMicrotask(() => setBackgroundStatusVisible(false));
-      return;
-    }
-    // Most nearby details arrive quickly; only slower loads are worth mentioning.
-    const timer = setTimeout(() => setBackgroundStatusVisible(true), 600);
-    return () => clearTimeout(timer);
-  }, [backgroundStatus]);
   const notify = useCallback((message: string) => setToast(message), []);
   const pauseMotion = useCallback(() => {
     setTour(false);
@@ -255,9 +247,7 @@ function CampusMap() {
             {
               onStatus: (message, failed = false, progress) => {
                 if (active) {
-                  setStatus(message);
-                  setLoadProgress(progress);
-                  setError(failed);
+                  loadStatusStore.set(message, failed, progress);
                 }
               },
               onReady: () => {
@@ -339,16 +329,15 @@ function CampusMap() {
         } catch {
           // Without WebGL nothing will consume the prefetched model.
           lifetime.abort();
-          setStatus(
+          loadStatusStore.set(
             '无法显示三维画面，请开启硬件加速或使用支持 WebGL 2 的浏览器',
+            true,
           );
-          setError(true);
         }
       })
       .catch(() => {
         if (active) {
-          setStatus('校园数据加载失败，请检查网络后重试');
-          setError(true);
+          loadStatusStore.set('校园数据加载失败，请检查网络后重试', true);
         }
       });
     return () => {
@@ -358,7 +347,7 @@ function CampusMap() {
       controller.current = null;
     };
     // The store is created once; listing it only satisfies the hook rule.
-  }, [retrySeed, cameraStore]);
+  }, [retrySeed, cameraStore, loadStatusStore]);
   useEffect(() => {
     const preference = matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setReducedMotion(preference.matches);
@@ -596,8 +585,7 @@ function CampusMap() {
   function retry() {
     if (controller.current) controller.current.retry();
     else {
-      setError(false);
-      setStatus('正在重新加载…');
+      loadStatusStore.set('正在重新加载…');
       setRetrySeed((s) => s + 1);
     }
   }
@@ -1259,40 +1247,7 @@ function CampusMap() {
           © OpenStreetMap contributors
         </a>
       </footer>
-      {status && ready && !error ? (
-        // Streaming after the first paint is background work: a small, delayed pill.
-        <output className="load-pill-lane">
-          {backgroundStatusVisible && (
-            <div className="load-pill">
-              <LoaderCircle className="spin" size={14} aria-hidden="true" />
-              <span>{statusText(locale, status)}</span>
-              {Boolean(loadProgress) && (
-                <i
-                  aria-hidden="true"
-                  style={{ transform: `scaleX(${loadProgress})` }}
-                />
-              )}
-            </div>
-          )}
-        </output>
-      ) : null}
-      {status && !(ready && !error) && (
-        <div
-          className={`scene-status ${error ? 'error' : ''}`}
-          role={error ? 'alert' : 'status'}
-        >
-          {!error && <LoaderCircle className="spin" size={16} />}
-          <span>{statusText(locale, status)}</span>
-          {loadProgress !== undefined && (
-            <progress
-              aria-label={t('模型加载进度')}
-              max={1}
-              value={loadProgress}
-            />
-          )}
-          {error && <button onClick={retry}>{t('重试')}</button>}
-        </div>
-      )}
+      <CampusLoadStatus store={loadStatusStore} ready={ready} retry={retry} />
       {toast && (
         <output className="toast">
           <Check size={15} />
