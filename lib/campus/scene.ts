@@ -921,14 +921,23 @@ export function createScene(
             m.metalness = 0.28;
           }
           if (m.name === 'timeSilver') m.envMapIntensity = 1.5;
-          if (m.name === 'timeLight' || m.name === 'timeSilver') {
-            m.emissive.set('#83b6e2');
-            m.emissiveIntensity =
-              preset === 'night' ? (m.name === 'timeLight' ? 1.8 : 0.16) : 0;
-          }
         }
       }
+    });
+    applyModelLighting(root);
+  }
+  function applyModelLighting(root: THREE.Object3D) {
+    root.traverse((o) => {
+      if (!(o instanceof THREE.Mesh)) return;
       nightStyle.apply(o, preset === 'night');
+      for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+        if (!(m instanceof THREE.MeshStandardMaterial)) continue;
+        if (m.name === 'timeSilver' || m.name === 'timeLight') {
+          m.emissive.set('#83b6e2');
+          m.emissiveIntensity =
+            preset === 'night' ? (m.name === 'timeSilver' ? 0.16 : 1.8) : 0;
+        }
+      }
     });
   }
   function syncRoadLights() {
@@ -1052,6 +1061,7 @@ export function createScene(
       };
       try {
         if (key !== 'base') palette.buildings(gltf.scene, key);
+        const styledPreset = preset;
         styleMeshes(gltf.scene, key !== 'base');
         await yieldLoading();
         batchSportsSurfaces(gltf.scene);
@@ -1059,6 +1069,9 @@ export function createScene(
         batchStaticRoadSurfaces(gltf.scene);
         await yieldLoading();
         if (key === 'base') pruneGroundTriangles(gltf.scene);
+        // Preset changes during a yield cannot reach this unattached root.
+        // Synchronize after the last yield, before the caller publishes it.
+        if (preset !== styledPreset) applyModelLighting(gltf.scene);
         return gltf;
       } catch (error) {
         // A cancelled detail must not leak a decoded root while yielding.
@@ -1546,18 +1559,7 @@ export function createScene(
     effects?.setNight(p === 'night');
     syncRoadLights();
     labels.dataset.light = p;
-    scene.traverse((o) => {
-      if (!(o instanceof THREE.Mesh)) return;
-      nightStyle.apply(o, p === 'night');
-      for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
-        if (!(m instanceof THREE.MeshStandardMaterial)) continue;
-        if (m.name === 'timeSilver' || m.name === 'timeLight') {
-          m.emissive.set('#83b6e2');
-          m.emissiveIntensity =
-            p === 'night' ? (m.name === 'timeSilver' ? 0.16 : 1.8) : 0;
-        }
-      }
-    });
+    applyModelLighting(scene);
     if (p === 'night') {
       // Pane attributes are created lazily; include them in the existing LOD budget.
       for (const [key, root] of loaded)
