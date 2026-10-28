@@ -191,21 +191,28 @@ export function createScene(
   scene.environment = sky.texture;
   scene.environmentIntensity = 0.24;
   const loader = new GLTFLoader();
-  const draco = new DRACOLoader();
-  draco.setDecoderPath(asset('draco/'));
-  // The base model carries hundreds of Draco primitives. Phone-sized layouts
-  // keep two decoder heaps; larger screens use spare cores, at most four.
-  draco.setWorkerLimit(
-    window.innerWidth < 760
-      ? 2
-      : Math.min(4, Math.max(2, (navigator.hardwareConcurrency || 2) - 1)),
-  );
-  // Fetch the decoder while the base model is still downloading. Model loads
-  // still await this request; observing it here only avoids an unhandled
-  // rejection when it fails before the first decode.
-  (
-    draco.preload() as DRACOLoader & { decoderPending?: Promise<unknown> }
-  ).decoderPending?.catch(() => {});
+  let decoderFailed = false;
+  function createDecoder() {
+    const decoder = new DRACOLoader();
+    decoder.setDecoderPath(asset('draco/'));
+    // The base model carries hundreds of Draco primitives. Phone-sized layouts
+    // keep two decoder heaps; larger screens use spare cores, at most four.
+    decoder.setWorkerLimit(
+      window.innerWidth < 760
+        ? 2
+        : Math.min(4, Math.max(2, (navigator.hardwareConcurrency || 2) - 1)),
+    );
+    // Fetch the decoder while the base model is still downloading. Model loads
+    // still await this request; observing it here only avoids an unhandled
+    // rejection when it fails before the first decode.
+    (
+      decoder.preload() as DRACOLoader & { decoderPending?: Promise<unknown> }
+    ).decoderPending?.catch(() => {
+      if (draco === decoder) decoderFailed = true;
+    });
+    return decoder;
+  }
+  let draco = createDecoder();
   loader.setDRACOLoader(draco);
   let manifest: Manifest | null = null;
   let pendingPrefetch = prefetch;
@@ -1769,7 +1776,12 @@ export function createScene(
       ) {
         convexPreparation = setTimeout(() => {
           convexPreparation = undefined;
-          if (disposed || !baseRoot || !modeSmooth || renderer.shadowMap.enabled)
+          if (
+            disposed ||
+            !baseRoot ||
+            !modeSmooth ||
+            renderer.shadowMap.enabled
+          )
             return;
           convexCulling = createConvexCulling(baseRoot);
           dirty = true;
@@ -1941,6 +1953,14 @@ export function createScene(
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     },
     retry: () => {
+      // A rejected decoderPending is permanent for that loader instance.
+      // All subsequent parses must share a fresh decoder after a failed preload.
+      if (decoderFailed) {
+        draco.dispose();
+        decoderFailed = false;
+        draco = createDecoder();
+        loader.setDRACOLoader(draco);
+      }
       if (!initialReady) void initialize();
       else {
         void loadBoundary();
