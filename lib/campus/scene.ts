@@ -94,6 +94,7 @@ export function createScene(
   const benchmarkOrbit = benchmarkOrbitEnabled(location.search);
   const scene = new THREE.Scene();
   let convexCulling: ReturnType<typeof createConvexCulling> | null = null;
+  let convexPreparation: ReturnType<typeof setTimeout> | undefined;
   const contextStyle = createContextStyle();
   const palette = createPalette(buildings);
   const nightStyle = createNightStyle();
@@ -1384,7 +1385,6 @@ export function createScene(
       if (disposed) return;
       const gltf = await loadGLB(manifest.base, 'base', lifecycle.signal, boot);
       baseRoot = gltf.scene;
-      convexCulling = createConvexCulling(baseRoot);
       scene.add(baseRoot);
       updateLabelAnchors();
       const terrainMesh: THREE.Mesh[] = [];
@@ -1758,6 +1758,23 @@ export function createScene(
       applyTreeLOD();
       convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
       renderScene();
+      // Paint the complete geometry first. Only the shadow-free smooth tier
+      // needs this CPU-side optimisation; switching away cancels its need.
+      if (
+        baseRoot &&
+        modeSmooth &&
+        !renderer.shadowMap.enabled &&
+        !convexCulling &&
+        convexPreparation === undefined
+      ) {
+        convexPreparation = setTimeout(() => {
+          convexPreparation = undefined;
+          if (disposed || !baseRoot || !modeSmooth || renderer.shadowMap.enabled)
+            return;
+          convexCulling = createConvexCulling(baseRoot);
+          dirty = true;
+        }, 0);
+      }
       dirty = false;
       lastFrame = time;
       if (
@@ -1945,6 +1962,7 @@ export function createScene(
       lifecycle.abort();
       detailQueue.dispose();
       cancelAnimationFrame(loop);
+      clearTimeout(convexPreparation);
       observer.disconnect();
       wheelHost.removeEventListener('wheel', onOverlayWheel);
       controls.dispose();

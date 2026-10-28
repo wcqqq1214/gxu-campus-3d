@@ -105,7 +105,7 @@ export function closedConvexParts(
 }
 
 /** Skip hidden exit faces of proven closed solids only when shadows are off.
- * Prepare before first GPU upload. One index buffer and one draw per mesh stay.
+ * May prepare after first GPU upload. One index buffer and one draw per mesh stay.
  */
 export function createConvexCulling(root: THREE.Object3D) {
   const uses = new Map<THREE.BufferGeometry, number>();
@@ -158,7 +158,8 @@ export function createConvexCulling(root: THREE.Object3D) {
       return;
     const parts = closedConvexParts(geometry);
     if (!parts.length) return;
-    geometry.index.setUsage(THREE.DynamicDrawUsage);
+    // Keep the existing usage hint: preparation may happen after GPU upload.
+    // needsUpdate below supports subsequent writes with either usage hint.
     records.push({
       mesh: object,
       index: geometry.index,

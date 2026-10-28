@@ -32,7 +32,11 @@ const materials = doc.materials.map((source) => {
     if (!textures.has(i)) textures.set(i, new THREE.Texture());
     m.map = textures.get(i);
   }
-  assert(!source.alphaMode || source.alphaMode === 'OPAQUE');
+  assert(['OPAQUE', 'MASK', 'BLEND'].includes(source.alphaMode ?? 'OPAQUE'));
+  m.opacity = pbr.baseColorFactor?.[3] ?? 1;
+  m.transparent = source.alphaMode === 'BLEND';
+  if (m.transparent) m.depthWrite = false;
+  m.alphaTest = source.alphaMode === 'MASK' ? (source.alphaCutoff ?? 0.5) : 0;
   if (['sportWhite', 'roadWhite', 'roadYellow', 'tactile'].includes(m.name)) {
     m.polygonOffset = true;
     m.polygonOffsetFactor = -2;
