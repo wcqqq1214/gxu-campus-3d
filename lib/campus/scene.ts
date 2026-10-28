@@ -1036,12 +1036,26 @@ export function createScene(
         throw new DOMException('Request cancelled', 'AbortError');
       }
       loadedBytes += a.bytes;
-      if (key !== 'base') palette.buildings(gltf.scene, key);
-      styleMeshes(gltf.scene, key !== 'base');
-      batchSportsSurfaces(gltf.scene);
-      batchStaticRoadSurfaces(gltf.scene);
-      if (key === 'base') pruneGroundTriangles(gltf.scene);
-      return gltf;
+      const yieldLoading = async () => {
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        signal.throwIfAborted();
+        if (disposed) throw new DOMException('Scene disposed', 'AbortError');
+      };
+      try {
+        if (key !== 'base') palette.buildings(gltf.scene, key);
+        styleMeshes(gltf.scene, key !== 'base');
+        await yieldLoading();
+        batchSportsSurfaces(gltf.scene);
+        await yieldLoading();
+        batchStaticRoadSurfaces(gltf.scene);
+        await yieldLoading();
+        if (key === 'base') pruneGroundTriangles(gltf.scene);
+        return gltf;
+      } catch (error) {
+        // A cancelled detail must not leak a decoded root while yielding.
+        disposeObject(gltf.scene);
+        throw error;
+      }
     } finally {
       unsubscribe?.();
       progresses.delete(key);
@@ -1431,12 +1445,24 @@ export function createScene(
       // No additional model or texture transfer; deferred work keeps startup latency flat.
       requestAnimationFrame(() => {
         if (disposed) return;
-        const refine = () => {
+        const refine = async () => {
           if (disposed || !baseRoot) return;
           palette.buildings(baseRoot, 'base');
+          const meshes: THREE.Mesh[] = [];
           baseRoot.traverse((o) => {
-            if (o instanceof THREE.Mesh) palette.terrain(o);
+            if (o instanceof THREE.Mesh) meshes.push(o);
           });
+          // Keep the original summation order and publish the GPU normal buffer
+          // only once it is complete. Yield between bounded vertex batches.
+          for (const mesh of meshes) {
+            const steps = palette.terrainSteps(mesh);
+            while (!disposed) {
+              const step = steps.next();
+              if (step.done) break;
+              await new Promise<void>((resolve) => setTimeout(resolve, 0));
+            }
+            if (disposed) return;
+          }
           renderer.shadowMap.needsUpdate = true;
           dirty = true;
         };
