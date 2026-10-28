@@ -1,4 +1,6 @@
 'use client';
+import { asset } from '@/lib/campus/boot';
+import { loadCampusBoundary } from '@/lib/campus/boundary-data';
 import { useCampusLocale } from '@/components/campus-locale';
 import {
   memo,
@@ -35,14 +37,7 @@ export const CampusMinimap = memo(function CampusMinimap({
   useEffect(() => {
     if (!open || !showBoundary || boundary.length) return;
     const c = new AbortController();
-    void fetch(
-      `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/data/campus-boundary.json`,
-      { signal: c.signal },
-    )
-      .then((r) => {
-        if (!r.ok) throw new Error('boundary');
-        return r.json();
-      })
+    void loadCampusBoundary(c.signal)
       .then((d: { rings: number[][][] }) => setBoundary(d.rings))
       .catch(() => {});
     return () => c.abort();
@@ -51,10 +46,9 @@ export const CampusMinimap = memo(function CampusMinimap({
   useEffect(() => {
     if (!open || publicRoad.length) return;
     const controller = new AbortController();
-    void fetch(
-      `${process.env.NEXT_PUBLIC_BASE_PATH ?? ''}/data/infrastructure-map.json`,
-      { signal: controller.signal },
-    )
+    void fetch(asset('data/infrastructure-map.json'), {
+      signal: controller.signal,
+    })
       .then((r) => {
         if (!r.ok) throw new Error('map');
         return r.json();

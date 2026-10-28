@@ -1,3 +1,4 @@
+import { loadCampusBoundary } from './boundary-data';
 import { placeName, translate, type Locale, type Message } from './i18n';
 import { landmarkLabelAnchor } from './labels';
 import { createNightStyle, createRoadLights } from './night';
@@ -54,7 +55,6 @@ import { ShadowFrustum } from './shadow-frustum';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import { createContextStyle } from './context-style';
-import type { CampusBoundary } from './boundary';
 import type {
   Building,
   Landmark,
@@ -1389,10 +1389,7 @@ export function createScene(
     if (boundaryLoading || boundaryReady || disposed) return;
     boundaryLoading = true;
     try {
-      const data = await fetchJson<CampusBoundary>(
-        asset('data/campus-boundary.json'),
-        lifecycle.signal,
-      );
+      const data = await loadCampusBoundary(lifecycle.signal);
       if (disposed) return;
       boundaryRoot.add(createBoundary(data));
       contextStyle.setBoundary(data);

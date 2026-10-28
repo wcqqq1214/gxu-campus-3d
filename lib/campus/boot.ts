@@ -1,7 +1,12 @@
 import { fetchJson, fetchModel, type StreamAsset } from './streaming.ts';
 
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
-export const asset = (path: string) => `${BASE}/${path}`;
+const DATA_VERSION = process.env.NEXT_PUBLIC_DATA_VERSION;
+export const asset = (path: string) =>
+  `${BASE}/${path}` +
+  (DATA_VERSION && path.startsWith('data/') && path.endsWith('.json')
+    ? `?v=${DATA_VERSION}`
+    : '');
 /** Content-hashed model URL; prefetch and scene must request the same URL. */
 export const modelUrl = (a: StreamAsset) =>
   asset(a.url) + (a.sha256 ? `?v=${a.sha256}` : '');

@@ -81,7 +81,7 @@ import {
 } from '@/lib/campus/navigation';
 import { decodeShare, encodeShare, cameraBearing } from '@/lib/campus/share';
 import { fetchJson } from '@/lib/campus/streaming';
-import { prefetchBase } from '@/lib/campus/boot';
+import { asset, prefetchBase } from '@/lib/campus/boot';
 import { createCameraStore, type CameraStore } from '@/lib/campus/camera-store';
 import { CampusMinimap } from '@/components/campus-minimap';
 import { CampusViewControls } from '@/components/campus-view-controls';
@@ -206,7 +206,7 @@ function CampusMap() {
   }, [toast]);
   useEffect(() => {
     const lifetime = new AbortController();
-    void fetchJson<Overview>(`${BASE}/data/overview.json`, lifetime.signal)
+    void fetchJson<Overview>(asset('data/overview.json'), lifetime.signal)
       .then((data) => {
         if (!lifetime.signal.aborted) setOverview(data);
       })
@@ -226,8 +226,8 @@ function CampusMap() {
     // and building data instead of after them.
     const boot = prefetchBase(lifetime.signal);
     void Promise.all([
-      fetchJson<Building[]>(`${BASE}/data/buildings.json`, lifetime.signal),
-      fetchJson<Landmark[]>(`${BASE}/data/landmarks.json`, lifetime.signal),
+      fetchJson<Building[]>(asset('data/buildings.json'), lifetime.signal),
+      fetchJson<Landmark[]>(asset('data/landmarks.json'), lifetime.signal),
       import('@/lib/campus/scene'),
     ])
       .then(([bs, ls, { createScene }]) => {

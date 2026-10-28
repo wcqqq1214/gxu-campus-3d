@@ -1,3 +1,4 @@
+import { dataVersion } from './data-version.mjs';
 import {
   access,
   cp,
@@ -23,13 +24,21 @@ if (
   basePath.split('/').some((p) => p === '.' || p === '..')
 )
   throw new Error('无效的 Pages 子路径');
+const version = await dataVersion(
+  path.join(root, 'public/data'),
+  await readFile(path.join(root, 'scripts/runtime-data.mjs')),
+);
 const result = spawnSync(
   process.execPath,
   [path.join(root, 'node_modules/vinext/dist/cli.js'), 'build'],
   {
     cwd: root,
     stdio: 'inherit',
-    env: { ...process.env, NEXT_PUBLIC_BASE_PATH: basePath },
+    env: {
+      ...process.env,
+      NEXT_PUBLIC_BASE_PATH: basePath,
+      NEXT_PUBLIC_DATA_VERSION: version,
+    },
   },
 );
 if (result.error) throw result.error;
