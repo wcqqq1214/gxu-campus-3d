@@ -123,7 +123,7 @@ export async function fetchJson<T>(
       try {
         const response = await fetch(url, {
           signal: request.signal,
-          cache: 'no-cache',
+          cache: /[?&]v=[a-f0-9]{64}(?:&|$)/.test(url) ? 'default' : 'no-cache',
         });
         if (!response.ok) throw new HttpError(response.status);
         return (await response.json()) as T;

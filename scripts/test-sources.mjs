@@ -52,7 +52,11 @@ test('建模依据分类覆盖全部地点，并与可再生成的源目录一�
     landmarks.find((p) => p.id === 'teaching-two').modelingBasis,
     'type',
   );
-  for (const id of ['new-east-gate', 'bocui-bridge', 'huixian-bridge']) {
+  assert.equal(
+    landmarks.find((p) => p.id === 'new-east-gate').modelingBasis,
+    'photo',
+  );
+  for (const id of ['bocui-bridge', 'huixian-bridge']) {
     assert.equal(landmarks.find((p) => p.id === id).modelingBasis, 'inferred');
   }
 });

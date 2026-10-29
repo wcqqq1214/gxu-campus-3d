@@ -59,33 +59,46 @@ export function createPalette(buildings: Building[]) {
   }
   const styled = new WeakSet<MeshStandardMaterial>();
   const smoothed = new WeakSet();
+  function* terrainSteps(mesh: Mesh) {
+    if (
+      !(mesh.material instanceof MeshStandardMaterial) ||
+      mesh.material.name !== 'grass' ||
+      smoothed.has(mesh.geometry)
+    )
+      return;
+    smoothed.add(mesh.geometry);
+    const positions = mesh.geometry.getAttribute('position');
+    const normals = mesh.geometry.getAttribute('normal');
+    if (!normals) return;
+    const groups = new Map<string, Vector3>();
+    const keys: string[] = [];
+    const normal = new Vector3();
+    for (let i = 0; i < positions.count; i++) {
+      const key = `${positions.getX(i).toFixed(2)},${positions.getY(i).toFixed(2)},${positions.getZ(i).toFixed(2)}`;
+      keys.push(key);
+      if (!groups.has(key)) groups.set(key, new Vector3());
+      groups.get(key)!.add(normal.fromBufferAttribute(normals, i));
+      if ((i + 1) % 4096 === 0) yield;
+    }
+    let normalized = 0;
+    for (const value of groups.values()) {
+      value.normalize();
+      if (++normalized % 4096 === 0) yield;
+    }
+    for (let i = 0; i < positions.count; i++) {
+      const n = groups.get(keys[i])!;
+      normals.setXYZ(i, n.x, n.y, n.z);
+      if ((i + 1) % 4096 === 0) yield;
+    }
+    normals.needsUpdate = true;
+  }
   return {
+    terrainSteps,
     terrain(mesh: Mesh) {
-      if (
-        !(mesh.material instanceof MeshStandardMaterial) ||
-        mesh.material.name !== 'grass' ||
-        smoothed.has(mesh.geometry)
-      )
-        return;
-      smoothed.add(mesh.geometry);
-      const positions = mesh.geometry.getAttribute('position');
-      const normals = mesh.geometry.getAttribute('normal');
-      if (!normals) return;
-      const groups = new Map<string, Vector3>();
-      const keys: string[] = [];
-      const normal = new Vector3();
-      for (let i = 0; i < positions.count; i++) {
-        const key = `${positions.getX(i).toFixed(2)},${positions.getY(i).toFixed(2)},${positions.getZ(i).toFixed(2)}`;
-        keys.push(key);
-        if (!groups.has(key)) groups.set(key, new Vector3());
-        groups.get(key)!.add(normal.fromBufferAttribute(normals, i));
+      const steps = terrainSteps(mesh);
+      while (!steps.next().done) {
+        /* Synchronous path for small detail meshes. */
       }
-      for (const value of groups.values()) value.normalize();
-      for (let i = 0; i < positions.count; i++) {
-        const n = groups.get(keys[i])!;
-        normals.setXYZ(i, n.x, n.y, n.z);
-      }
-      normals.needsUpdate = true;
     },
     surface(material: MeshStandardMaterial) {
       if (styled.has(material)) return;

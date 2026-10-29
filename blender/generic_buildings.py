@@ -13,6 +13,7 @@ from recessed_stair_entry import add_recessed_stair_entry, recessed_entry_blocks
 from roof_eave import add_roof_eave, replaces_parapet
 from terraced_stairs import blocks_window as stairs_block_window
 from roof_crown import side_wall_blocks_window
+from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS, SHOP_BUILDINGS, wall_finish, facade_details, shopfront_details
 
 
 def compact_form_source(obj):
@@ -33,6 +34,8 @@ def compact_form_source(obj):
 
 
 def wall_material(b, C):
+    if b['id'] in NEW_EAST_NEIGHBOURS:
+        return wall_finish(b, C)
     # A shared small palette keeps the all-campus base batched. Per-building
     # warm/cool material slots added >15% draw calls in the measured pilot.
     wall = C['pink' if b['category'] == 'living' else 'stone' if b['category'] == 'academic' else 'white']
@@ -297,7 +300,16 @@ def facade_segments(b):
 def ordinary_building(b, z, C, detail):
     if b.get('form', {}).get('version') != 1:
         raise ValueError(f"{b['id']}: run data:prepare before rebuilding ordinary buildings")
+    from student_water_tower import TOWER_ID, water_tower
+    if b['id'] == TOWER_ID:
+        return water_tower(b, z, C, detail)
     m = shared_form(b, z, C)
+    if b['id'] in NEW_EAST_NEIGHBOURS:
+        facades = facade_segments(b)
+        m.add_part('04_立面窗格', facade_details(b, z, C, detail, facades))
+        if b['id'] in SHOP_BUILDINGS:
+            m.add_part('05_临街店面', shopfront_details(b, z, C, detail, facades))
+        return m
     if 'stairTower' in b['form']:return m
     windows = Mesh(); form = b['form']; h = form['height']; wall = wall_material(b, C)
     seed = int(hashlib.sha256(b['id'].encode()).hexdigest()[:8], 16)

@@ -80,6 +80,8 @@
   --current-text: var(--red-11);
   --focus: var(--jade-8);
   --scene-bg: var(--sage-3);
+  /* The chosen segment sits above its track: lighter in both themes. */
+  --segment-on: var(--panel);
 
   --font-body: Inter, 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-serif:
@@ -106,11 +108,13 @@
   color-scheme: light;
   font-family: var(--font-body);
   font-synthesis: none;
+  scrollbar-color: var(--sage-7) transparent;
 }
 :root.dark-theme {
   --shadow-float: 0 1px 2px var(--black-a4), 0 4px 12px var(--black-a4);
   --shadow-overlay: 0 4px 8px var(--black-a4), 0 12px 32px var(--black-a6);
   --scene-bg: var(--sage-2);
+  --segment-on: var(--sage-5);
   color-scheme: dark;
 }
 * {
@@ -140,6 +144,13 @@ button {
 button:disabled {
   cursor: wait;
   opacity: 0.55;
+}
+::selection {
+  background: var(--jade-5);
+  color: var(--text-1);
+}
+input {
+  caret-color: var(--accent-solid);
 }
 button:focus-visible,
 a:focus-visible,
@@ -606,23 +617,21 @@ kbd {
 }
 .place-copy strong {
   display: block;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  /* Long English names wrap so similar buildings stay distinguishable. */
+  overflow-wrap: anywhere;
   font-weight: 500;
   line-height: 1.5;
 }
+/* The distance at the end tells same-named buildings apart; wrap, never clip it. */
 .place-copy small {
-  display: flex;
-  gap: 8px;
-  overflow: hidden;
-  white-space: nowrap;
+  display: block;
   font-size: var(--size-meta);
+  line-height: 1.5;
   color: var(--text-2);
+  overflow-wrap: anywhere;
 }
-.place-copy small > span:last-child {
-  overflow: hidden;
-  text-overflow: ellipsis;
+.place-copy small > span:first-child {
+  margin-right: 8px;
 }
 .place-row.selected .place-copy strong {
   color: var(--accent-text);
@@ -798,7 +807,7 @@ kbd {
   }
 }
 .segmented button[aria-pressed='true'] {
-  background: var(--panel);
+  background: var(--segment-on);
   border-color: var(--control-line);
   color: var(--accent-text);
   font-weight: 600;
@@ -809,16 +818,24 @@ kbd {
 
 /* ---------- Place detail ---------- */
 .detail-heading {
-  margin-top: 4px;
-}
-.eyebrow {
-  font-size: var(--size-meta);
-  color: var(--text-2);
+  margin-top: 8px;
 }
 .detail-heading h2 {
-  margin: 4px 0 0;
+  margin: 0;
   font: 600 var(--size-title) / 1.4 var(--font-serif);
   overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+/* Name first, then what and where it is, as map cards read. */
+.detail-meta {
+  margin: 2px 0 0;
+  font-size: var(--size-body);
+  line-height: 1.6;
+  color: var(--text-2);
+}
+.detail-meta > span + span::before {
+  content: '·';
+  margin: 0 6px;
 }
 .place-detail > p {
   margin: 8px 0 0;
@@ -866,8 +883,11 @@ kbd {
   background: var(--accent-bg);
   color: var(--accent-text);
 }
+.orbit-toggle:disabled {
+  cursor: not-allowed;
+}
 @media (hover: hover) {
-  .orbit-toggle:not([aria-pressed='true']):hover {
+  .orbit-toggle:not([aria-pressed='true']):not(:disabled):hover {
     border-color: var(--control-line-hover);
   }
 }
@@ -883,6 +903,10 @@ kbd {
   :lang(en) .view-directions {
     grid-auto-flow: row;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Three options: the last one takes the full second row instead of half of it. */
+  :lang(en) .view-directions button:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 }
 .detail-actions {
@@ -1119,6 +1143,9 @@ kbd {
   color: white;
   font-weight: 600;
 }
+.tour-compact svg {
+  fill: currentColor;
+}
 .tour-compact span {
   font-weight: 400;
   font-variant-numeric: tabular-nums;
@@ -1133,11 +1160,49 @@ kbd {
   .tour-skip:hover {
     border-color: var(--control-line-hover);
   }
+  .tour-compact:hover {
+    background: var(--accent-solid-hover);
+  }
   .dock-back:hover,
   .dock-toggle:hover > svg,
   .tour-end:hover {
     color: var(--text-1);
   }
+  .tour-end:hover {
+    background: var(--hover);
+  }
+  .search-wrap > button:hover {
+    color: var(--text-1);
+  }
+  .search-reset:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-bg);
+  }
+  .detail-actions button:hover,
+  .return-landmark:hover,
+  .map-footer > a:hover,
+  .gesture-help:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .minimap-toggle:hover > svg,
+  .layer-row:hover > svg {
+    color: var(--text-1);
+  }
+}
+/* Touch has no hover, so a press gets its own feedback. */
+.place-row:not(:disabled):active,
+.header-action:active,
+.map-tools button:not(:disabled):active,
+.menu-collapse:active,
+.dock-expand:active,
+.tour-end:active,
+.tour-skip:not(:disabled):active,
+.tools-grid button:not(:disabled):active {
+  background: var(--sage-4);
+}
+.place-row.selected:active {
+  background: var(--accent-bg-hover);
 }
 
 /* ---------- Map tools ---------- */
@@ -1453,6 +1518,11 @@ kbd {
   font-size: var(--size-body);
   animation: fade-in var(--motion);
 }
+.toast.failed {
+  border: var(--hairline) solid var(--amber-6);
+  background: var(--amber-2);
+  color: var(--amber-11);
+}
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -1668,8 +1738,11 @@ kbd {
   .panel-foot {
     display: none;
   }
-  .detail-mode:not(.expanded) .detail-heading .eyebrow {
+  .detail-mode:not(.expanded) .detail-category {
     display: none;
+  }
+  .detail-mode:not(.expanded) .detail-category + span::before {
+    content: none;
   }
   .detail-heading {
     margin-top: 0;
@@ -1691,7 +1764,8 @@ kbd {
     display: none;
   }
   .view-directions button {
-    flex: 0 0 auto;
+    /* Grow to fill the row when the options fit; scroll when they do not. */
+    flex: 1 0 auto;
     min-width: 44px;
     padding: 0 12px;
   }

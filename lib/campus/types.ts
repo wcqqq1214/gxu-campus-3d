@@ -31,9 +31,9 @@ export type Category =
   | 'service'
   | 'infrastructure'
   | 'landmark';
+/** Fields published to the page; see scripts/runtime-data.mjs. */
 export interface Building {
   architecture?: { origin: [number, number]; angle: number };
-  constructionStatus?: string | null;
   id: string;
   name: string;
   category: Category;
@@ -45,9 +45,6 @@ export interface Building {
   landmark: string | null;
   polygons: number[][][][];
   bounds: number[];
-  osmEditedAt: string;
-  sourceUrl: string;
-  zone: string;
 }
 export interface Landmark {
   /** Optional east/north/up label position in metres. */
@@ -67,6 +64,8 @@ export interface Landmark {
   elevation: number;
   bounds: number[];
   description: string;
+  /** Estimated site extent [west, south, east, north], relative to center. */
+  siteBoundsOffset?: [number, number, number, number];
   detail: string;
   sourceUrl: string;
   reference: string;

@@ -136,6 +136,8 @@ for name,color,rough,metal in [('courtGreen','#347e69',.92,0),('courtKey','#bd64
     C[name]=material(name,rgb(color),rough,metal)
 for name,color,rough,metal in [('huicuiWall','#c7b49b',.86,0),('huicuiTrim','#e0d8c8',.78,0),('huicuiGlass','#54747d',.24,.3),('huicuiFrame','#555c5d',.50,.3)]:
     C[name]=material(name,rgb(color),rough,metal)
+from student_center import student_center_materials
+student_center_materials(C)
 # Original deterministic JPEG textures; packed into both .blend and exported GLBs.
 texture_dir=ROOT/'blender/textures';texture_dir.mkdir(exist_ok=True)
 for name in ['stone','grass','green','road','path','paleRoof','slate','sport','pitch','asphalt']:
@@ -439,12 +441,26 @@ def export(name,groups):
         if key.startswith('site-'):props['siteId']=key[5:]
         o=mesh.object(key,EXPORT,props);o.select_set(True);objs.append(o)
     path=MODELS/name
+    from detail_export import export_detail
     from export_attributes import omit_unused_uvs
     # Keep the base budget reproducible through the normal build: share only
     # byte-identical vertex attributes, without lowering geometry/UV precision.
-    with omit_unused_uvs(deduplicate_vertices=name=='base.glb') if name=='base.glb' or name.startswith('basketball-bank-') else nullcontext():
-        bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=7 if name=='base.glb' else 6,export_draco_position_quantization=15 if name=='base.glb' or name.startswith('basketball-bank-') else 16,export_draco_normal_quantization=6 if name=='base.glb' or name.startswith('basketball-bank-') else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
+    if name=='new-east-gate.glb':
+        gate,=objs
+        export_detail(gate,path)
+    else:
+        with omit_unused_uvs(deduplicate_vertices=name=='base.glb') if name=='base.glb' or name.startswith('basketball-bank-') else nullcontext():
+            bpy.ops.export_scene.gltf(filepath=str(path),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True,export_draco_mesh_compression_level=7 if name=='base.glb' else 6,export_draco_position_quantization=15 if name=='base.glb' or name.startswith('basketball-bank-') else 16,export_draco_normal_quantization=6 if name=='base.glb' or name.startswith('basketball-bank-') else 10,export_materials='EXPORT',export_cameras=False,export_lights=False)
     if name=='base.glb':
+        # Replace only this landmark: other nodes retain their existing budgets.
+        from tempfile import TemporaryDirectory
+        from incremental_glb import splice_nodes
+        for obj in objs:
+            if obj.get('landmark')=='new-east-gate':
+                with TemporaryDirectory(prefix='gxu-gate-export-') as directory:
+                    precise=Path(directory)/'gate.glb'
+                    export_detail(obj,precise)
+                    path.write_bytes(splice_nodes(path.read_bytes(),precise.read_bytes(),{obj.name}))
         from terrain_export import replace_precise_terrain
         replace_precise_terrain(path,objs)
         from north_campus_export import repack_north_base

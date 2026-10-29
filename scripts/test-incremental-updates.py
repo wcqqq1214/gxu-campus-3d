@@ -13,14 +13,16 @@ from incremental_glb import validate_retained
 from preserve_glb_geometry import unpack, mesh_nodes_by_name
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--output-root', type=Path, required=True, help='New directory for both validated candidates')
+parser.add_argument('--output-root', type=Path, required=True, help='New directory for validated candidates')
+parser.add_argument('--kinds', nargs='+', choices=('roads', 'basketball', 'new_east_gate'),
+                    default=('roads', 'basketball', 'new_east_gate'), help='Limit the integration check to selected workers')
 args = parser.parse_args()
 output = args.output_root.resolve()
 output.mkdir(parents=True, exist_ok=False)
 before = snapshot(ROOT)
 old = (ROOT / 'public/models/base.glb').read_bytes()
 results = {}
-for kind in ('roads', 'basketball'):
+for kind in args.kinds:
     candidate = output / kind
     with (output / (kind + '.log')).open('w') as log:
         result = subprocess.run([os.environ.get('BLENDER_BIN', 'blender'), '-b', '--factory-startup',
@@ -33,14 +35,18 @@ for kind in ('roads', 'basketball'):
     updated = (candidate / 'public/models/base.glb').read_bytes()
     names = set(mesh_nodes_by_name(unpack(old)[0])) | set(mesh_nodes_by_name(unpack(updated)[0]))
     selected = {'roads', 'terrain', 'green'} | {n for n in names if n.startswith(('site-', 'shore-', 'paving-', 'vegetation-low-'))}
-    if kind == 'roads':
+    if kind == 'new_east_gate':
+        selected = {'landmark-new-east-gate'}
+        # With current assets this also exercises a repeated build: unchanged
+        # model bytes must not be treated as a validation failure.
+    elif kind == 'roads':
         selected |= {n for n in names if n.startswith('infra-approach-')}
         selected |= {'landmark-' + b['id'] for b in json.loads((ROOT / 'public/data/infrastructure.json').read_text())['bridges']}
     else:
         selected |= {'sports'} | {n for n in names if n.startswith('basketball-bank-')}
     retained = validate_retained(old, updated, selected)
-    report = json.loads((candidate / 'work/incremental-result.json').read_text())
-    assert report['passed'] and report['published'] == []
-    results[kind] = {'retainedNodes':retained, 'initialBytes':report['initialBytes']}
+    report = json.loads((candidate / 'work' / ('new-east-update.json' if kind == 'new_east_gate' else 'incremental-result.json')).read_text())
+    assert report['passed'] and report.get('published', []) == []
+    results[kind] = {'retainedNodes':retained, 'initialBytes':report['initialModelBytes'] if kind == 'new_east_gate' else report['initialBytes']}
     (output / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
     print(kind, results[kind], flush=True)

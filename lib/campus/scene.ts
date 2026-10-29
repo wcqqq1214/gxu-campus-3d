@@ -1,3 +1,4 @@
+import { loadCampusBoundary } from './boundary-data';
 import { placeName, translate, type Locale, type Message } from './i18n';
 import { landmarkLabelAnchor } from './labels';
 import { createNightStyle, createRoadLights } from './night';
@@ -31,6 +32,12 @@ import {
 } from './streaming';
 import type { StreamAsset as Asset } from './streaming';
 import {
+  asset,
+  modelUrl,
+  type BasePrefetch,
+  type ModelManifest as Manifest,
+} from './boot';
+import {
   bridgeEntrancePose,
   entranceBox,
   fitBox,
@@ -48,7 +55,6 @@ import { ShadowFrustum } from './shadow-frustum';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import { createContextStyle } from './context-style';
-import type { CampusBoundary } from './boundary';
 import type {
   Building,
   Landmark,
@@ -60,18 +66,6 @@ import type {
   LandmarkView,
   ViewportFrame,
 } from './types';
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
-export const asset = (path: string) => `${BASE}/${path}`;
-interface Manifest {
-  treePriorityPositions?: number[][];
-  base: Asset;
-  trees: Asset;
-  treesNear?: Asset;
-  zones: Asset[];
-  landmarks: Asset[];
-  infrastructure?: Asset[];
-  sports?: Asset[];
-}
 interface Callbacks {
   onStatus: (message: Message, error?: boolean, progress?: number) => void;
   onReady: () => void;
@@ -81,7 +75,8 @@ interface Callbacks {
     origin?: import('./types').SelectionOrigin,
   ) => void;
   onInteract: () => void;
-  onMetrics: (m: Metrics) => void;
+  /** Optional: building the report is skipped when nobody reads it. */
+  onMetrics?: (m: Metrics) => void;
   onOrbit: (on: boolean) => void;
   onCamera: (snapshot: CameraSnapshot) => void;
 }
@@ -90,6 +85,8 @@ export function createScene(
   buildings: Building[],
   landmarks: Landmark[],
   callbacks: Callbacks,
+  /** Consumed by the first initialization only; retries fetch again. */
+  prefetch?: BasePrefetch,
 ): SceneController {
   let locale: Locale = 'zh';
   const t = (source: string, values?: Record<string, string | number>) =>
@@ -97,6 +94,7 @@ export function createScene(
   const benchmarkOrbit = benchmarkOrbitEnabled(location.search);
   const scene = new THREE.Scene();
   let convexCulling: ReturnType<typeof createConvexCulling> | null = null;
+  let convexPreparation: ReturnType<typeof setTimeout> | undefined;
   const contextStyle = createContextStyle();
   const palette = createPalette(buildings);
   const nightStyle = createNightStyle();
@@ -193,11 +191,31 @@ export function createScene(
   scene.environment = sky.texture;
   scene.environmentIntensity = 0.24;
   const loader = new GLTFLoader();
-  const draco = new DRACOLoader();
-  draco.setDecoderPath(asset('draco/'));
-  draco.setWorkerLimit(2);
+  let decoderFailed = false;
+  function createDecoder() {
+    const decoder = new DRACOLoader();
+    decoder.setDecoderPath(asset('draco/'));
+    // The base model carries hundreds of Draco primitives. Phone-sized layouts
+    // keep two decoder heaps; larger screens use spare cores, at most four.
+    decoder.setWorkerLimit(
+      window.innerWidth < 760
+        ? 2
+        : Math.min(4, Math.max(2, (navigator.hardwareConcurrency || 2) - 1)),
+    );
+    // Fetch the decoder while the base model is still downloading. Model loads
+    // still await this request; observing it here only avoids an unhandled
+    // rejection when it fails before the first decode.
+    (
+      decoder.preload() as DRACOLoader & { decoderPending?: Promise<unknown> }
+    ).decoderPending?.catch(() => {
+      if (draco === decoder) decoderFailed = true;
+    });
+    return decoder;
+  }
+  let draco = createDecoder();
   loader.setDRACOLoader(draco);
   let manifest: Manifest | null = null;
+  let pendingPrefetch = prefetch;
   let baseRoot: THREE.Group | null = null;
   let treesRoot: THREE.Group | null = null;
   let highTreesReady = false;
@@ -354,8 +372,17 @@ export function createScene(
       width: 0,
       height: 0,
       point: landmarkLabelAnchor(l),
+      bounds: [0, 0, 0, 0],
     };
   });
+  const labelOrder = [...labelNodes];
+  let orderedHover: string | null | undefined;
+  let orderedSelection: string | null | undefined;
+  const labelProjection = new THREE.Vector3();
+  const orbitOffset = new THREE.Vector3();
+  const orbitAxis = new THREE.Vector3(0, 1, 0);
+  const occupiedLabels: number[][] = [];
+  const labelViewport = { width: 0, height: 0 };
   function measureLabels() {
     const layerDisplay = labels.style.display;
     labels.style.display = '';
@@ -437,16 +464,22 @@ export function createScene(
     mesh.updateMatrixWorld();
     return mesh;
   }
-  for (const b of navigationFootprints(buildings, landmarks)) {
-    const mesh = footprintMesh(b);
-    mesh.userData = { id: b.landmark ?? b.id, layer: b.layer };
-    proxies.push(mesh);
+  let proxiesReady = false;
+  function ensurePickProxies() {
+    if (proxiesReady) return;
+    for (const b of navigationFootprints(buildings, landmarks)) {
+      const mesh = footprintMesh(b);
+      mesh.userData = { id: b.landmark ?? b.id, layer: b.layer };
+      proxies.push(mesh);
+    }
+    proxiesReady = true;
   }
   const namedBuildings = new Map(
     searchableBuildings(buildings, landmarks).map((b) => [b.id, b]),
   );
   // Only curated places participate in map hover and click selection.
   function pickTargets() {
+    ensurePickProxies();
     return proxies.filter((p) => layers[p.userData.layer as LayerKey]);
   }
   function pick(clientX: number, clientY: number) {
@@ -888,14 +921,23 @@ export function createScene(
             m.metalness = 0.28;
           }
           if (m.name === 'timeSilver') m.envMapIntensity = 1.5;
-          if (m.name === 'timeLight' || m.name === 'timeSilver') {
-            m.emissive.set('#83b6e2');
-            m.emissiveIntensity =
-              preset === 'night' ? (m.name === 'timeLight' ? 1.8 : 0.16) : 0;
-          }
         }
       }
+    });
+    applyModelLighting(root);
+  }
+  function applyModelLighting(root: THREE.Object3D) {
+    root.traverse((o) => {
+      if (!(o instanceof THREE.Mesh)) return;
       nightStyle.apply(o, preset === 'night');
+      for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
+        if (!(m instanceof THREE.MeshStandardMaterial)) continue;
+        if (m.name === 'timeSilver' || m.name === 'timeLight') {
+          m.emissive.set('#83b6e2');
+          m.emissiveIntensity =
+            preset === 'night' ? (m.name === 'timeSilver' ? 0.16 : 1.8) : 0;
+        }
+      }
     });
   }
   function syncRoadLights() {
@@ -974,7 +1016,12 @@ export function createScene(
       callbacks.onStatus('部分细节加载失败，可重试', true);
     else if (initialReady) callbacks.onStatus('');
   }
-  async function loadGLB(a: Asset, key = 'base', signal = lifecycle.signal) {
+  async function loadGLB(
+    a: Asset,
+    key = 'base',
+    signal = lifecycle.signal,
+    prefetched?: BasePrefetch,
+  ) {
     const label =
       key === 'base'
         ? '正在加载校园'
@@ -983,23 +1030,23 @@ export function createScene(
           : key.startsWith('landmark-')
             ? '正在加载{name}'
             : '正在加载周边细节';
+    const progress = (fraction: number) => {
+      progresses.set(key, {
+        label,
+        fraction,
+        name: key.startsWith('landmark-')
+          ? (landmarks.find((l) => 'landmark-' + l.id === key)?.name ?? '地标')
+          : undefined,
+      });
+      updateLoadStatus();
+    };
+    let unsubscribe: (() => void) | undefined;
     try {
-      const buffer = await fetchModel(
-        asset(a.url) + (a.sha256 ? `?v=${a.sha256}` : ''),
-        a.bytes,
-        signal,
-        (fraction) => {
-          progresses.set(key, {
-            label,
-            fraction,
-            name: key.startsWith('landmark-')
-              ? (landmarks.find((l) => 'landmark-' + l.id === key)?.name ??
-                '地标')
-              : undefined,
-          });
-          updateLoadStatus();
-        },
-      );
+      let buffer: ArrayBuffer;
+      if (prefetched) {
+        unsubscribe = prefetched.onProgress(progress);
+        buffer = await prefetched.base;
+      } else buffer = await fetchModel(modelUrl(a), a.bytes, signal, progress);
       signal.throwIfAborted();
       const gltf = await loader.parseAsync(buffer, asset('models/'));
       if (disposed || signal.aborted) {
@@ -1007,13 +1054,32 @@ export function createScene(
         throw new DOMException('Request cancelled', 'AbortError');
       }
       loadedBytes += a.bytes;
-      if (key !== 'base') palette.buildings(gltf.scene, key);
-      styleMeshes(gltf.scene, key !== 'base');
-      batchSportsSurfaces(gltf.scene);
-      batchStaticRoadSurfaces(gltf.scene);
-      if (key === 'base') pruneGroundTriangles(gltf.scene);
-      return gltf;
+      const yieldLoading = async () => {
+        await new Promise<void>((resolve) => setTimeout(resolve, 0));
+        signal.throwIfAborted();
+        if (disposed) throw new DOMException('Scene disposed', 'AbortError');
+      };
+      try {
+        if (key !== 'base') palette.buildings(gltf.scene, key);
+        const styledPreset = preset;
+        styleMeshes(gltf.scene, key !== 'base');
+        await yieldLoading();
+        batchSportsSurfaces(gltf.scene);
+        await yieldLoading();
+        batchStaticRoadSurfaces(gltf.scene);
+        await yieldLoading();
+        if (key === 'base') pruneGroundTriangles(gltf.scene);
+        // Preset changes during a yield cannot reach this unattached root.
+        // Synchronize after the last yield, before the caller publishes it.
+        if (preset !== styledPreset) applyModelLighting(gltf.scene);
+        return gltf;
+      } catch (error) {
+        // A cancelled detail must not leak a decoded root while yielding.
+        disposeObject(gltf.scene);
+        throw error;
+      }
     } finally {
+      unsubscribe?.();
       progresses.delete(key);
       updateLoadStatus();
     }
@@ -1336,10 +1402,7 @@ export function createScene(
     if (boundaryLoading || boundaryReady || disposed) return;
     boundaryLoading = true;
     try {
-      const data = await fetchJson<CampusBoundary>(
-        asset('data/campus-boundary.json'),
-        lifecycle.signal,
-      );
+      const data = await loadCampusBoundary(lifecycle.signal);
       if (disposed) return;
       boundaryRoot.add(createBoundary(data));
       contextStyle.setBoundary(data);
@@ -1359,15 +1422,15 @@ export function createScene(
     if (loading.has('base') || initialReady) return;
     loading.add('base');
     callbacks.onStatus('正在加载校园…');
+    // A failed prefetch is not reused: retries go through the normal fetches.
+    const boot = pendingPrefetch;
+    pendingPrefetch = undefined;
     try {
-      manifest = await fetchJson<Manifest>(
-        asset('data/models.json'),
-        lifecycle.signal,
-      );
+      manifest = await (boot?.manifest ??
+        fetchJson<Manifest>(asset('data/models.json'), lifecycle.signal));
       if (disposed) return;
-      const gltf = await loadGLB(manifest!.base);
+      const gltf = await loadGLB(manifest.base, 'base', lifecycle.signal, boot);
       baseRoot = gltf.scene;
-      convexCulling = createConvexCulling(baseRoot);
       scene.add(baseRoot);
       updateLabelAnchors();
       const terrainMesh: THREE.Mesh[] = [];
@@ -1401,12 +1464,24 @@ export function createScene(
       // No additional model or texture transfer; deferred work keeps startup latency flat.
       requestAnimationFrame(() => {
         if (disposed) return;
-        const refine = () => {
+        const refine = async () => {
           if (disposed || !baseRoot) return;
           palette.buildings(baseRoot, 'base');
+          const meshes: THREE.Mesh[] = [];
           baseRoot.traverse((o) => {
-            if (o instanceof THREE.Mesh) palette.terrain(o);
+            if (o instanceof THREE.Mesh) meshes.push(o);
           });
+          // Keep the original summation order and publish the GPU normal buffer
+          // only once it is complete. Yield between bounded vertex batches.
+          for (const mesh of meshes) {
+            const steps = palette.terrainSteps(mesh);
+            while (!disposed) {
+              const step = steps.next();
+              if (step.done) break;
+              await new Promise<void>((resolve) => setTimeout(resolve, 0));
+            }
+            if (disposed) return;
+          }
           renderer.shadowMap.needsUpdate = true;
           dirty = true;
         };
@@ -1484,18 +1559,7 @@ export function createScene(
     effects?.setNight(p === 'night');
     syncRoadLights();
     labels.dataset.light = p;
-    scene.traverse((o) => {
-      if (!(o instanceof THREE.Mesh)) return;
-      nightStyle.apply(o, p === 'night');
-      for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
-        if (!(m instanceof THREE.MeshStandardMaterial)) continue;
-        if (m.name === 'timeSilver' || m.name === 'timeLight') {
-          m.emissive.set('#83b6e2');
-          m.emissiveIntensity =
-            p === 'night' ? (m.name === 'timeSilver' ? 0.16 : 1.8) : 0;
-        }
-      }
-    });
+    applyModelLighting(scene);
     if (p === 'night') {
       // Pane attributes are created lazily; include them in the existing LOD budget.
       for (const [key, root] of loaded)
@@ -1592,6 +1656,9 @@ export function createScene(
     pendingRequest = performance.now();
   });
   function resize() {
+    const rect = host.getBoundingClientRect();
+    labelViewport.width = rect.width;
+    labelViewport.height = rect.height;
     measureLabels();
     const w = host.clientWidth,
       h = host.clientHeight;
@@ -1708,11 +1775,10 @@ export function createScene(
       else {
         const offset = benchmarkRun
           ? benchmarkRun.position(time)
-          : camera.position
-              .clone()
-              .sub(controls.target)
+          : orbitOffset
+              .subVectors(camera.position, controls.target)
               .applyAxisAngle(
-                new THREE.Vector3(0, 1, 0),
+                orbitAxis,
                 Math.min(0.05, (time - lastFrame) / 1000) * 0.13,
               );
         camera.position.copy(controls.target).add(offset);
@@ -1741,6 +1807,28 @@ export function createScene(
       applyTreeLOD();
       convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
       renderScene();
+      // Paint the complete geometry first. Only the shadow-free smooth tier
+      // needs this CPU-side optimisation; switching away cancels its need.
+      if (
+        baseRoot &&
+        modeSmooth &&
+        !renderer.shadowMap.enabled &&
+        !convexCulling &&
+        convexPreparation === undefined
+      ) {
+        convexPreparation = setTimeout(() => {
+          convexPreparation = undefined;
+          if (
+            disposed ||
+            !baseRoot ||
+            !modeSmooth ||
+            renderer.shadowMap.enabled
+          )
+            return;
+          convexCulling = createConvexCulling(baseRoot);
+          dirty = true;
+        }, 0);
+      }
       dirty = false;
       lastFrame = time;
       if (
@@ -1751,19 +1839,30 @@ export function createScene(
         activeFrames++;
       }
       lastRendered = time;
-      const rect = host.getBoundingClientRect();
-      const occupied: number[][] = [];
-      for (const { l, el, point, width, height } of [...labelNodes].sort(
-        (a, b) =>
-          Number(b.l.id === hovered) * 2 +
-          Number(b.l.id === selected) -
-          (Number(a.l.id === hovered) * 2 + Number(a.l.id === selected)),
-      )) {
-        const p = point.clone().project(camera);
+      if (orderedHover !== hovered || orderedSelection !== selected) {
+        orderedHover = hovered;
+        orderedSelection = selected;
+        // Reset tie order to the catalogue order, matching the previous sort.
+        for (let i = 0; i < labelNodes.length; i++)
+          labelOrder[i] = labelNodes[i];
+        labelOrder.sort(
+          (a, b) =>
+            Number(b.l.id === hovered) * 2 +
+            Number(b.l.id === selected) -
+            (Number(a.l.id === hovered) * 2 + Number(a.l.id === selected)),
+        );
+      }
+      const occupied = occupiedLabels;
+      occupied.length = 0;
+      for (const { l, el, point, width, height, bounds } of labelOrder) {
+        const p = labelProjection.copy(point).project(camera);
         const dist = camera.position.distanceTo(point);
-        const x = ((p.x + 1) * rect.width) / 2,
-          y = ((-p.y + 1) * rect.height) / 2;
-        const bounds = [x - width / 2, y - height, x + width / 2, y];
+        const x = ((p.x + 1) * labelViewport.width) / 2,
+          y = ((-p.y + 1) * labelViewport.height) / 2;
+        bounds[0] = x - width / 2;
+        bounds[1] = y - height;
+        bounds[2] = x + width / 2;
+        bounds[3] = y;
         const overlap = occupied.some(
           (r) =>
             bounds[0] < r[2] + 6 &&
@@ -1802,7 +1901,7 @@ export function createScene(
     if (benchmarkRun ? benchmarkRun.sampleDue() : time - sampleStart > 1500) {
       if (activeFrames > 0 && activeFrameMs > 0)
         fps = (1000 * activeFrames) / activeFrameMs;
-      callbacks.onMetrics(metrics());
+      callbacks.onMetrics?.(metrics());
       if (quality === 'auto' && !compact() && !saveData() && !document.hidden) {
         if (
           adaptive.sample(
@@ -1907,6 +2006,14 @@ export function createScene(
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     },
     retry: () => {
+      // A rejected decoderPending is permanent for that loader instance.
+      // All subsequent parses must share a fresh decoder after a failed preload.
+      if (decoderFailed) {
+        draco.dispose();
+        decoderFailed = false;
+        draco = createDecoder();
+        loader.setDRACOLoader(draco);
+      }
       if (!initialReady) void initialize();
       else {
         void loadBoundary();
@@ -1928,6 +2035,7 @@ export function createScene(
       lifecycle.abort();
       detailQueue.dispose();
       cancelAnimationFrame(loop);
+      clearTimeout(convexPreparation);
       observer.disconnect();
       wheelHost.removeEventListener('wheel', onOverlayWheel);
       controls.dispose();

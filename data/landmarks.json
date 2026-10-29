@@ -104,10 +104,15 @@
     "category": "culture",
     "height": 22,
     "description": "碧云湖畔的学生活动空间，流线形楼层与连续窗带映入湖中。",
-    "detail": "曲线转角、白色水平挑檐、深色玻璃窗带与屋顶栏杆。",
+    "detail": "校方2021视频与建筑学协会2022航拍核对五层曲面主楼、西侧一层水塔平台、内退玻璃与连续阳台。屋顶设备、上部西侧回转轮廓及尺寸按画面估算；背立面与完整入口尚待补证。",
     "reference": "campus2026",
     "distance": 195,
-    "modelingBasis": "photo"
+    "modelingBasis": "photo",
+    "additionalReferences": [
+      "studentOfficial2021",
+      "studentArchitecture2022",
+      "studentWalk2020"
+    ]
   },
   {
     "id": "teaching-six",
@@ -141,10 +146,14 @@
     "name": "综合实验大楼",
     "category": "academic",
     "description": "南部校园轴线上的大型实验建筑，与南大门共同构成校园入口景观。",
-    "detail": "中央高体量、两侧展开的楼翼、层间线脚与入口门厅。",
+    "detail": "正面逐级退台、平顶挑檐、圆柱廊和中央贯通开口；高度按照片比例估算，北立面待核实。",
     "reference": "campusGallery",
     "distance": 255,
-    "modelingBasis": "photo"
+    "modelingBasis": "photo",
+    "height": 44,
+    "additionalReferences": [
+      "laboratoryFpv2023"
+    ]
   },
   {
     "id": "computer",
@@ -188,27 +197,37 @@
       108.29342144137495,
       22.8412081023638
     ],
-    "height": 4.4,
+    "height": 10,
     "gateWidth": 16,
     "gateDepth": 8,
+    "siteBoundsOffset": [
+      -10,
+      -4,
+      11,
+      8.5
+    ],
     "frontBearing": 180,
-    "distance": 48,
-    "reference": "newEast2026",
-    "description": "秀灵西一里的新东园入口，靠近学生公寓东25栋。",
-    "detail": "位置由 2026 校方说明及 OSM 校道与校界交点核对。门卫室、步行通道与金属门禁采用推定细化，尚无可核验的近年门体照片；尺寸、配色和构件布置待照片校准。",
+    "distance": 56,
+    "reference": "newEastPhoto2025",
+    "description": "秀灵路西一里的新东园门，银灰格栅门楼配金色校名，东侧为通往东25栋的门禁通道。",
+    "detail": "按2025年11月发布的正面实拍重建门楼；2026年9月路线视频补充东25栋旁雨棚、门禁、砖铺地、浅色矮墙基座、金属竖栏与绿篱。西侧银灰短墙参考2021年外景，结合2025年内侧全景核对连接关系。位置沿用OSM校道与校界交点；尺度、围合延伸长度、种植布置、未见背面和局部高程为估算，旧墙现状未获近拍确认。",
     "positionRoad": "way/822812185",
     "sourceUrl": "https://www.openstreetmap.org/way/822812185",
     "positionBasis": "2026 校方新东园入口说明，OSM way/822812185 与校界 way/398115378 的交点；并非 OSM 已测绘门楼。",
     "additionalReferences": [
+      "newEast2026",
       "newEastIELTS2026",
-      "newEastGuardroom2021"
+      "newEastGuardroom2021",
+      "newEastRoute2026",
+      "newEastExterior2021",
+      "newEastTour2025"
     ],
     "cameraOffset": [
       -0.15,
       0.36,
       1
     ],
-    "modelingBasis": "inferred"
+    "modelingBasis": "photo"
   },
   {
     "id": "east-gate",
@@ -250,20 +269,22 @@
       108.2802516,
       22.8450504
     ],
-    "height": 4.5,
+    "height": 6.7,
     "gateWidth": 22,
     "gateDepth": 11,
     "frontBearing": 270,
     "distance": 48,
     "reference": "westGatePhoto",
     "description": "鲁班路上的校园入口，林荫校道连接门卫岗亭及通行设施。",
-    "detail": "依无日期入口街景表现开放式车行口、小型岗亭、门窗框、薄檐、道闸与步行护栏。照片分辨率有限，构件尺寸与背面推定；2026 校方重开通知用于位置及使用状态核对。",
+    "detail": "依据2021年西门内外景及2025年视频，重建斜边竖向校名墙、错层厚檐玻璃门卫室和入口分流护栏。无日期低清图片中的红白高杆无法对应，不再作为门体依据；尺寸、背面及遮棚现状仍需补证。",
     "osmId": "node/8850695397",
     "sourceUrl": "https://www.openstreetmap.org/node/8850695397",
     "positionBasis": "OSM 门节点；门体占地和高度按参考估算。",
     "additionalReferences": [
       "gateRoads2025",
-      "westGate2026"
+      "westGate2026",
+      "westGateStudy20261027",
+      "westGateVideos20261027"
     ],
     "cameraOffset": [
       -1,

@@ -14,7 +14,12 @@ import {
 
 test('fixed-pose benchmark requires both explicit debug and measurement mode', () => {
   assert.equal(benchmarkOrbitEnabled('?debug&benchmark=fixed-orbit'), true);
-  for (const search of ['', '?debug', '?benchmark=fixed-orbit', '?debug&benchmark=other']) {
+  for (const search of [
+    '',
+    '?debug',
+    '?benchmark=fixed-orbit',
+    '?debug&benchmark=other',
+  ]) {
     assert.equal(benchmarkOrbitEnabled(search), false);
   }
 });
@@ -222,4 +227,70 @@ test('六教南北门近景沿建筑轴线定位，四向入口与三个内院�
   );
   assert.equal(b.polygons[0].length - 1, 3);
   assert.ok(l.additionalReferences.includes('teachingSixEntrances2025'));
+});
+
+test('新东园门近景降低俯角，远近资源就绪前后构图一致且保留高塔和雨棚', async () => {
+  const place = landmarks.find((l) => l.id === 'new-east-gate');
+  const bytes = await readFile(
+    new URL('../public/models/new-east-gate.glb', import.meta.url),
+  );
+  const gltf = JSON.parse(
+    bytes.toString('utf8', 20, 20 + bytes.readUInt32LE(12)),
+  );
+  const points = gltf.meshes.flatMap((mesh) =>
+    mesh.primitives.flatMap((p) => {
+      const a = gltf.accessors[p.attributes.POSITION];
+      return [new Vector3(...a.min), new Vector3(...a.max)];
+    }),
+  );
+  const loaded = new Box3().setFromPoints(points);
+  const crop = entranceBox(place, loaded, false);
+  assert.ok(crop.equals(entranceBox(place, landmarkBox(place), false)));
+  assert.ok(
+    crop.containsBox(loaded),
+    '高塔、雨棚、围墙绿篱和地面应全部在近景构图内',
+  );
+  assert.ok(
+    landmarkBox(place).containsBox(loaded),
+    '近景资源未就绪时全貌也应包含围合',
+  );
+  assert.ok(place.siteBoundsOffset[2] > 8 && place.siteBoundsOffset[3] > 8);
+  const direction = landmarkDirection(place, 'entrance');
+  assert.ok(
+    direction.y < 0.15 && direction.z > 0.98,
+    '从南侧以较低俯角观察入口',
+  );
+  for (const [width, height, left, top, w, h] of [
+    [1280, 720, 368, 106, 816, 572],
+    [390, 844, 18, 94, 298, 310],
+    [844, 390, 328, 106, 446, 242],
+  ]) {
+    const fit = fitBox(
+      crop,
+      direction,
+      { left, top, width: w, height: h },
+      { width, height },
+    );
+    const camera = new PerspectiveCamera(41, width / height, 1, 30000);
+    camera.setViewOffset(
+      width,
+      height,
+      width / 2 - left - w / 2,
+      height / 2 - top - h / 2,
+      width,
+      height,
+    );
+    camera.position.copy(fit.position);
+    camera.lookAt(fit.target);
+    camera.updateMatrixWorld();
+    for (const point of points) {
+      const p = point.clone().project(camera);
+      const x = ((p.x + 1) * width) / 2,
+        y = ((1 - p.y) * height) / 2;
+      assert.ok(
+        x > left && x < left + w && y > top && y < top + h,
+        `${width}x${height}: ${x},${y}`,
+      );
+    }
+  }
 });

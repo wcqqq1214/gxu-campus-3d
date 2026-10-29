@@ -5,19 +5,20 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type ComponentProps,
 } from 'react';
 import {
   CampusLocaleProvider,
   useCampusLocale,
 } from '@/components/campus-locale';
-import { statusText, type Message } from '@/lib/campus/i18n';
+import { createLoadStatusStore } from '@/lib/campus/load-status-store';
+import { CampusLoadStatus } from '@/components/campus-load-status';
 import { landmarkDescription } from '@/lib/campus/i18n/descriptions';
 import { Menu } from '@base-ui/react/menu';
 import { Tooltip } from '@base-ui/react/tooltip';
 import Image from 'next/image';
 import {
-  ArrowUpRight,
   Building2,
   Check,
   ChevronDown,
@@ -25,6 +26,7 @@ import {
   ChevronRight,
   ChevronsUp,
   ChevronsDown,
+  CircleAlert,
   Download,
   Expand,
   Grid2X2,
@@ -37,7 +39,6 @@ import {
   Ellipsis,
   CircleHelp,
   Layers3,
-  LoaderCircle,
   MapPin,
   Minus,
   Moon,
@@ -78,13 +79,10 @@ import {
   searchableBuildings,
   searchLandmarks,
 } from '@/lib/campus/navigation';
-import {
-  decodeShare,
-  encodeShare,
-  cameraBearing,
-  type CameraSnapshot,
-} from '@/lib/campus/share';
+import { decodeShare, encodeShare, cameraBearing } from '@/lib/campus/share';
 import { fetchJson } from '@/lib/campus/streaming';
+import { asset, prefetchBase } from '@/lib/campus/boot';
+import { createCameraStore, type CameraStore } from '@/lib/campus/camera-store';
 import { CampusMinimap } from '@/components/campus-minimap';
 import { CampusViewControls } from '@/components/campus-view-controls';
 const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
@@ -134,10 +132,13 @@ function CampusMap() {
   const [buildings, setBuildings] = useState<Building[]>([]),
     [landmarks, setLandmarks] = useState<Landmark[]>([]),
     [overview, setOverview] = useState<Overview | null>(null);
+  const [loadStatusStore] = useState(createLoadStatusStore);
+  const error = useSyncExternalStore(
+    loadStatusStore.subscribe,
+    loadStatusStore.getError,
+    () => false,
+  );
   const [ready, setReady] = useState(false),
-    [status, setStatus] = useState<Message>('正在加载校园…'),
-    [loadProgress, setLoadProgress] = useState<number | undefined>(undefined),
-    [error, setError] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
     [query, setQuery] = useState(''),
     [tab, setTab] = useState('explore');
@@ -148,7 +149,9 @@ function CampusMap() {
     [tourStarted, setTourStarted] = useState(false),
     [tourIndex, setTourIndex] = useState(0),
     [collapsed, setCollapsed] = useState(false),
-    [toast, setToast] = useState(''),
+    [toast, setToast] = useState<{ message: string; failed: boolean } | null>(
+      null,
+    ),
     [retrySeed, setRetrySeed] = useState(0),
     [metrics, setMetrics] = useState<Metrics | null>(null);
   const settings = useRef({
@@ -177,7 +180,7 @@ function CampusMap() {
   const [debug, setDebug] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
-  const [cameraState, setCameraState] = useState<CameraSnapshot | null>(null);
+  const [cameraStore] = useState(createCameraStore);
   const [shareLink, setShareLink] = useState('');
   const [panelMode, setPanelMode] = useState<'menu' | 'detail'>('menu');
   const [landmarkView, setLandmarkView] = useState<LandmarkView | null>(
@@ -185,18 +188,11 @@ function CampusMap() {
   );
   const [orbit, setOrbit] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const [backgroundStatusVisible, setBackgroundStatusVisible] = useState(false);
-  const backgroundStatus = Boolean(status) && ready && !error;
-  useEffect(() => {
-    if (!backgroundStatus) {
-      queueMicrotask(() => setBackgroundStatusVisible(false));
-      return;
-    }
-    // Most nearby details arrive quickly; only slower loads are worth mentioning.
-    const timer = setTimeout(() => setBackgroundStatusVisible(true), 600);
-    return () => clearTimeout(timer);
-  }, [backgroundStatus]);
-  const notify = useCallback((message: string) => setToast(message), []);
+  // A fresh object restarts the timer when the same message repeats.
+  const notify = useCallback(
+    (message: string, failed = false) => setToast({ message, failed }),
+    [],
+  );
   const pauseMotion = useCallback(() => {
     setTour(false);
     controller.current?.setOrbit(false);
@@ -211,12 +207,12 @@ function CampusMap() {
   }, [pauseMotion]);
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(''), 3500);
+    const t = setTimeout(() => setToast(null), 3500);
     return () => clearTimeout(t);
   }, [toast]);
   useEffect(() => {
     const lifetime = new AbortController();
-    void fetchJson<Overview>(`${BASE}/data/overview.json`, lifetime.signal)
+    void fetchJson<Overview>(asset('data/overview.json'), lifetime.signal)
       .then((data) => {
         if (!lifetime.signal.aborted) setOverview(data);
       })
@@ -227,13 +223,17 @@ function CampusMap() {
   useEffect(() => {
     let active = true;
     const lifetime = new AbortController();
+    const debugMetrics = new URLSearchParams(location.search).has('debug');
     queueMicrotask(() => {
-      if (active) setDebug(new URLSearchParams(location.search).has('debug'));
+      if (active) setDebug(debugMetrics);
     });
     let cleanup: (() => void) | undefined;
+    // The base model is the longest download; start it beside the scene code
+    // and building data instead of after them.
+    const boot = prefetchBase(lifetime.signal);
     void Promise.all([
-      fetchJson<Building[]>(`${BASE}/data/buildings.json`, lifetime.signal),
-      fetchJson<Landmark[]>(`${BASE}/data/landmarks.json`, lifetime.signal),
+      fetchJson<Building[]>(asset('data/buildings.json'), lifetime.signal),
+      fetchJson<Landmark[]>(asset('data/landmarks.json'), lifetime.signal),
       import('@/lib/campus/scene'),
     ])
       .then(([bs, ls, { createScene }]) => {
@@ -246,61 +246,69 @@ function CampusMap() {
             new URLSearchParams(location.search).has('test-webgl-unavailable')
           )
             throw new Error('WebGL test');
-          const c = createScene(host.current, bs, ls, {
-            onStatus: (message, failed = false, progress) => {
-              if (active) {
-                setStatus(message);
-                setLoadProgress(progress);
-                setError(failed);
-              }
-            },
-            onReady: () => {
-              if (active) setReady(true);
-            },
-            onSelect: (id, origin = 'manual') => {
-              if (active) {
-                setSelected(id);
-                setFramingRequest((value) => value + 1);
-                setLandmarkView('oblique');
-                const stop = ls.findIndex((place) => place.id === id);
-                // Ordinary buildings are not tour stops; the tour keeps its place.
-                if (stop >= 0) setTourIndex(stop);
-                if (origin !== 'tour') {
-                  setPanelMode(id ? 'detail' : 'menu');
-                  setCollapsed(false);
-                  setPanelExpanded(false);
-                  dock.current
-                    ?.querySelector<HTMLInputElement>('input[type="search"]')
-                    ?.blur();
-                  if (origin === 'manual') {
-                    setTour(false);
-                    pendingFocus.current = id ? 'detail' : 'menu';
+          const c = createScene(
+            host.current,
+            bs,
+            ls,
+            {
+              onStatus: (message, failed = false, progress) => {
+                if (active) {
+                  loadStatusStore.set(message, failed, progress);
+                }
+              },
+              onReady: () => {
+                if (active) setReady(true);
+              },
+              onSelect: (id, origin = 'manual') => {
+                if (active) {
+                  setSelected(id);
+                  setFramingRequest((value) => value + 1);
+                  setLandmarkView('oblique');
+                  const stop = ls.findIndex((place) => place.id === id);
+                  // Ordinary buildings are not tour stops; the tour keeps its place.
+                  if (stop >= 0) setTourIndex(stop);
+                  if (origin !== 'tour') {
+                    setPanelMode(id ? 'detail' : 'menu');
+                    setCollapsed(false);
+                    setPanelExpanded(false);
+                    dock.current
+                      ?.querySelector<HTMLInputElement>('input[type="search"]')
+                      ?.blur();
+                    if (origin === 'manual') {
+                      setTour(false);
+                      pendingFocus.current = id ? 'detail' : 'menu';
+                    }
                   }
                 }
-              }
+              },
+              onHover: (id) => {
+                if (active) setHovered(id);
+              },
+              onInteract: () => {
+                if (active) {
+                  setTour(false);
+                  setLandmarkView(null);
+                }
+              },
+              onCamera: (snapshot) => {
+                if (active) cameraStore.set(snapshot);
+              },
+              onOrbit: (on) => {
+                if (active) {
+                  setOrbit(on);
+                  if (on) setLandmarkView('oblique');
+                }
+              },
+              // Metrics are only displayed in debug mode; elsewhere each
+              // report would re-render the whole page every 1.5 s.
+              onMetrics: debugMetrics
+                ? (m) => {
+                    if (active) setMetrics(m);
+                  }
+                : undefined,
             },
-            onHover: (id) => {
-              if (active) setHovered(id);
-            },
-            onInteract: () => {
-              if (active) {
-                setTour(false);
-                setLandmarkView(null);
-              }
-            },
-            onCamera: (snapshot) => {
-              if (active) setCameraState(snapshot);
-            },
-            onOrbit: (on) => {
-              if (active) {
-                setOrbit(on);
-                if (on) setLandmarkView('oblique');
-              }
-            },
-            onMetrics: (m) => {
-              if (active) setMetrics(m);
-            },
-          });
+            boot,
+          );
           c.setLocale(localeRef.current);
           controller.current = c;
           cleanup = () => c.dispose();
@@ -325,16 +333,17 @@ function CampusMap() {
           }
           cleanup = () => c.dispose();
         } catch {
-          setStatus(
+          // Without WebGL nothing will consume the prefetched model.
+          lifetime.abort();
+          loadStatusStore.set(
             '无法显示三维画面，请开启硬件加速或使用支持 WebGL 2 的浏览器',
+            true,
           );
-          setError(true);
         }
       })
       .catch(() => {
         if (active) {
-          setStatus('校园数据加载失败，请检查网络后重试');
-          setError(true);
+          loadStatusStore.set('校园数据加载失败，请检查网络后重试', true);
         }
       });
     return () => {
@@ -343,7 +352,8 @@ function CampusMap() {
       cleanup?.();
       controller.current = null;
     };
-  }, [retrySeed]);
+    // The store is created once; listing it only satisfies the hook rule.
+  }, [retrySeed, cameraStore, loadStatusStore]);
   useEffect(() => {
     const preference = matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setReducedMotion(preference.matches);
@@ -581,8 +591,7 @@ function CampusMap() {
   function retry() {
     if (controller.current) controller.current.retry();
     else {
-      setError(false);
-      setStatus('正在重新加载…');
+      loadStatusStore.set('正在重新加载…');
       setRetrySeed((s) => s + 1);
     }
   }
@@ -597,20 +606,20 @@ function CampusMap() {
   }
   function toggleFullscreen() {
     if (!document.fullscreenEnabled) {
-      notify('当前浏览器不支持全屏');
+      notify('当前浏览器不支持全屏', true);
       return;
     }
     const action = document.fullscreenElement
       ? document.exitFullscreen()
       : document.documentElement.requestFullscreen();
-    void action.catch(() => notify('当前浏览器不支持全屏'));
+    void action.catch(() => notify('当前浏览器不支持全屏', true));
   }
   async function exportView() {
     try {
       await controller.current?.exportImage();
       notify('图片已下载');
     } catch {
-      notify('下载失败，请重试');
+      notify('下载失败，请重试', true);
     }
   }
   return (
@@ -752,18 +761,26 @@ function CampusMap() {
           {panelMode === 'detail' && current ? (
             <section className="place-detail" aria-label={t('地点详情')}>
               <div className="detail-heading">
-                <div className="eyebrow">
-                  {t(CATEGORY_NAMES[current.category])}
-                </div>
                 <h2>{name(current.name)}</h2>
+                <p className="detail-meta">
+                  <span className="detail-category">
+                    {t(CATEGORY_NAMES[current.category])}
+                  </span>
+                  {!currentLandmark && (
+                    <span className="building-location">
+                      {buildingLocationLabel(
+                        currentBuilding!,
+                        landmarks,
+                        locale,
+                      )}
+                    </span>
+                  )}
+                </p>
               </div>
               {currentLandmark ? (
                 <p>{landmarkDescription(currentLandmark, locale)}</p>
               ) : (
                 <>
-                  <p className="building-location">
-                    {buildingLocationLabel(currentBuilding!, landmarks, locale)}
-                  </p>
                   <p className="building-facts">
                     {currentBuilding!.levels >= 1
                       ? t('约 {levels} 层，高约 {height} 米', {
@@ -1014,7 +1031,7 @@ function CampusMap() {
                   }}
                 >
                   {t('返回 {name}', { name: name(current.name) })}
-                  <ArrowUpRight size={14} />
+                  <ChevronRight size={16} aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -1022,7 +1039,7 @@ function CampusMap() {
           <CampusMinimap
             buildings={buildings}
             current={currentLandmark ?? currentBuilding}
-            camera={cameraState}
+            camera={cameraStore}
             showBoundary={layers.boundary}
           />
         </div>
@@ -1134,12 +1151,7 @@ function CampusMap() {
             aria-label={t('朝向正北')}
             tooltip={t('朝向正北')}
           >
-            <Navigation
-              size={20}
-              style={{
-                transform: `rotate(${cameraBearing(cameraState) - 45}deg)`,
-              }}
-            />
+            <NorthArrow camera={cameraStore} />
             <span>N</span>
           </MapToolButton>
           <div className="tool-stack zoom-tools">
@@ -1249,44 +1261,15 @@ function CampusMap() {
           © OpenStreetMap contributors
         </a>
       </footer>
-      {status && ready && !error ? (
-        // Streaming after the first paint is background work: a small, delayed pill.
-        <output className="load-pill-lane">
-          {backgroundStatusVisible && (
-            <div className="load-pill">
-              <LoaderCircle className="spin" size={14} aria-hidden="true" />
-              <span>{statusText(locale, status)}</span>
-              {Boolean(loadProgress) && (
-                <i
-                  aria-hidden="true"
-                  style={{ transform: `scaleX(${loadProgress})` }}
-                />
-              )}
-            </div>
-          )}
-        </output>
-      ) : null}
-      {status && !(ready && !error) && (
-        <div
-          className={`scene-status ${error ? 'error' : ''}`}
-          role={error ? 'alert' : 'status'}
-        >
-          {!error && <LoaderCircle className="spin" size={16} />}
-          <span>{statusText(locale, status)}</span>
-          {loadProgress !== undefined && (
-            <progress
-              aria-label={t('模型加载进度')}
-              max={1}
-              value={loadProgress}
-            />
-          )}
-          {error && <button onClick={retry}>{t('重试')}</button>}
-        </div>
-      )}
+      <CampusLoadStatus store={loadStatusStore} ready={ready} retry={retry} />
       {toast && (
-        <output className="toast">
-          <Check size={15} />
-          {t(toast)}
+        <output className={`toast ${toast.failed ? 'failed' : ''}`}>
+          {toast.failed ? (
+            <CircleAlert size={15} aria-hidden="true" />
+          ) : (
+            <Check size={15} aria-hidden="true" />
+          )}
+          {t(toast.message)}
         </output>
       )}
       {debug && metrics && (
@@ -1545,6 +1528,18 @@ function BuildingResults({
   );
 }
 
+/** Follows camera samples without re-rendering the surrounding map controls. */
+function NorthArrow({ camera }: { camera: CameraStore }) {
+  // A primitive selection skips renders for samples that only pan or zoom.
+  const bearing = useSyncExternalStore(
+    camera.subscribe,
+    () => cameraBearing(camera.get()),
+    () => cameraBearing(null),
+  );
+  return (
+    <Navigation size={20} style={{ transform: `rotate(${bearing - 45}deg)` }} />
+  );
+}
 function MapToolButton({
   tooltip,
   shortcut,

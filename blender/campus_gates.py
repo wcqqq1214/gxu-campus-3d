@@ -1,12 +1,14 @@
 """Three independent gate studies. All dimensions are estimates, not surveys.
 
-East: 2018 inauguration photo, later undated street view. West: undated low-res
-street view. New east: verified location/guardroom, provisional exterior study.
+East: 2018 inauguration photo, later undated street view. West: 2021 outside /
+inside gate video and 2025 entrance footage; the undated thumbnail is secondary.
+New east: November 2025 photo and September 2026 route footage.
 Local facade faces -Y; rotation is derived from the catalogue compass bearing.
 """
 import math
 from geometry import Mesh
 from south_gate import inscription
+from new_east_gate import new_east_gate
 
 
 def arch(m, x, half, spring, rise, depth, top, C, detail):
@@ -106,47 +108,48 @@ def barrier(m,x,y,C,detail,sign=1):
             t=j/5;m.line((x+sign*.7*t,y,1.15+2.85*t),(x+sign*.7*(t+.09),y,1.15+2.85*(t+.09)),.047,C['gateRed'],6)
 
 
-def new_east_gate(C,detail):
-    """Provisional guardroom and walk-in gate study: exterior photo still missing."""
-    m=Mesh();p=Mesh();booth(p,-5.9,1.4,2.7,3.2,C,detail);m.add_part('01_门卫室_外观推定',p)
-    p=Mesh()
-    # Low walls stop short of the mapped central access road.
-    for x in [-7.2,6.6]:
-        p.box(x,0,1.05,1.4,.60,2.1,C['stone']);p.box(x,0,2.18,1.6,.8,.18,C['white'])
-    m.add_part('02_入口边墙_尺寸推定',p)
-    p=Mesh()
-    for x in [4.0,6.0]:p.box(x,0,1.75,.10,.12,3.5,C['metal'])
-    p.box(5,0,3.55,2.4,2.5,.16,C['metal'])
-    if detail:
-        for yy in [-.8,0,.8]:p.box(5,yy,3.44,2.25,.055,.12,C['metal'])
-    for x in [4.1,5.1,6.1]:
-        p.box(x,0,.62,.20,1.05,1.24,C['metal'])
-        if detail:p.box(x,-.22,1.30,.12,.14,.12,C['dark'])
-    m.add_part('03_步行通道_设施推定',p)
-    p=Mesh();barrier(p,-3.6,0,C,detail,-1);railing(p,5.1,2.6,3.5,C,detail)
-    m.add_part('04_车行道闸与护栏_推定',p)
-    return m
-
-
 def west_gate(C,detail):
-    m=Mesh();p=Mesh();booth(p,-5.1,2.8,2.1,2.7,C,detail);m.add_part('01_林荫入口值守岗亭',p)
+    # 2021 video 7047681296730082572, 26-31s: outside and inside views.
+    # The undated thumbnail is not enough to locate its red poles on the gate.
+    # Preserve an open lane between the north guardhouse and south name wall.
+    from south_gate import prism
+    m=Mesh();p=Mesh()
+    # Recessed, full-height glazed guardhouse, with a broad concrete canopy.
+    p.box(-7.15,1.15,.14,5.6,3.7,.28,C['gateTrim'])
+    p.box(-7.15,1.15,1.85,5.25,3.35,3.42,C['glass'])
+    for sy in (-1,1):
+        yy=1.15+sy*1.70
+        for xx in [-9.7,-8.85,-8.0,-7.15,-6.30,-5.45,-4.60]:
+            p.box(xx,yy,1.85,.065,.08,3.42,C['white'])
+        for zz in (.22,2.65,3.52):
+            p.box(-7.15,yy,zz,5.25,.08,.065,C['white'])
+    for sx in (-1,1):
+        xx=-7.15+sx*2.66
+        for yy in (-.50,.60,1.70,2.80):p.box(xx,yy,1.85,.08,.065,3.42,C['white'])
+    p.box(-7.15,1.15,3.65,5.65,3.75,.25,C['paleRoof'])
+    # Flared edge pier and two shallow staggered slabs; sizes are estimates.
+    prism(p,[(-10.55,.10),(-9.55,.10),(-9.30,3.75),(-8.65,4.60),(-10.55,4.60)],.30,3.90,C['paleRoof'])
+    prism(p,[(-10.60,4.55),(-4.05,4.72),(-4.05,5.05),(-10.60,5.18)],.20,4.40,C['paleRoof'])
+    prism(p,[(-9.95,5.15),(-5.10,5.15),(-5.10,5.48),(-9.95,5.48)],.45,3.80,C['paleRoof'])
+    m.add_part('01_玻璃门卫室与错层厚檐_视频比例估算',p)
     p=Mesh()
-    for x in [-7.8,-6.5]:
-        p.box(x,-.2,2.08,.18,.24,4.16,C['white'])
-        if detail:p.box(x,-.35,3.1,.09,.03,1.4,C['gateRed'])
-    m.add_part('02_入口标杆',p)
-    p=Mesh();barrier(p,-3.5,1,C,detail,-1);barrier(p,3.5,1,C,detail)
-    m.add_part('03_车行道闸',p)
+    # Slanted pale name wall is visible at 26-27s; no invented rear text.
+    prism(p,[(7.65,.10),(10.65,.10),(10.65,6.40),(8.85,6.05)],-1.55,.70,C['white'])
+    prism(p,[(7.65,.10),(9.35,.10),(9.35,4.78),(8.58,4.93)],-1.94,.08,C['paleRoof'])
+    for char,z in zip('广西大学',(4.50,3.55,2.60,1.65)):
+        p.extend(inscription(char,8.65,-2.01,z,.70,.72,C['wood'],detail))
+    m.add_part('02_斜边竖向校名墙_背面未证实',p)
+    p=Mesh();barrier(p,-3.50,.80,C,detail,-1);barrier(p,3.50,.80,C,detail)
+    m.add_part('03_开放车行道闸',p)
     p=Mesh()
-    for x in [6.8,8.2,9.6]:
-        # Three rails separate pedestrian lanes without a fictitious triumphal arch.
+    # Photo shows long lane dividers; keep vehicle and pedestrian corridors open.
+    for x in (4.70,6.10,7.45):
         q=Mesh();railing(q,0,0,4.6,C,detail);q.rotate_z(0,0,math.pi/2)
-        q.v=[(a+x,b+.5,c) for a,b,c in q.v];p.extend(q)
-    m.add_part('04_步行通道不锈钢护栏',p)
-    p=Mesh()
-    for x in [-10.2,10.5]:
-        p.box(x,2, .35,1,5,.7,C['stone']);p.box(x,2,.76,1.12,5.1,.12,C['gateTrim'])
-    m.add_part('05_入口低矮围挡',p)
+        q.v=[(a+x,b+2.0,c) for a,b,c in q.v];p.extend(q)
+    for x in (-3.95,3.95):
+        q=Mesh();railing(q,0,0,5.8,C,detail);q.rotate_z(0,0,math.pi/2)
+        q.v=[(a+x,b+2.0,c) for a,b,c in q.v];p.extend(q)
+    m.add_part('04_入口分流护栏_间距估算',p)
     return m
 
 
@@ -154,10 +157,12 @@ def campus_gate(l,z,C,detail=True):
     m={'east-gate':east_gate,'new-east-gate':new_east_gate,'west-gate':west_gate}[l['id']](C,detail)
     p=Mesh()
     pads={'east-gate':[(-12,0,5.5,6),(12,0,5.5,6)],
-          'new-east-gate':[(-5.9,.8,3.5,5.8),(5,0,4,6)],
-          'west-gate':[(-5.1,1,4.5,6.4),(8.1,1,4.9,6.4)]}
-    for x,y,w,d in pads[l['id']]:p.box(x,y,.20,w,d,.20,C['path'])
-    m.add_part('07_人行铺装_范围估算',p)
+          'new-east-gate':[],  # Its grounded paving and ramps are part of the gate.
+          'west-gate':[(-7.15,.6,6.8,6.0),(7.65,.6,5.9,6.0)]}
+    for x,y,w,d in pads[l['id']]:
+        p.box(x,y,-.06 if l['id']=='west-gate' else .20,w,d,
+              .10 if l['id']=='west-gate' else .20,C['path'])
+    if p.v:m.add_part('07_人行铺装_范围估算',p)
     if l['id']=='east-gate':
         # Width is constrained by the actual corridor between neighbouring OSM
         # footprints. Keep the mapped gate node rather than moving neighbours.

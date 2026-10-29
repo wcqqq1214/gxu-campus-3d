@@ -23,7 +23,7 @@ export const englishDescriptions: Record<string, string> = {
   'international-residence':
     'A high-rise residence southeast of Biyun Lake, connected to the podium of the former International College building.',
   'new-east-gate':
-    'The Xindongyuan entrance on Xiuling Road West Lane 1, near Student Residence Hall East 25.',
+    'The Xindongyuan entrance on Xiuling Road West Lane 1, with silver fins, a gold university name and an east-side pedestrian entrance beside Student Residence Hall East 25.',
   'east-gate':
     'A stone gateway on Xiuling Road, with a broad central arch, two smaller side arches and a continuous horizontal cornice.',
   'west-gate':
