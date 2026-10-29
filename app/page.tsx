@@ -19,7 +19,6 @@ import { Menu } from '@base-ui/react/menu';
 import { Tooltip } from '@base-ui/react/tooltip';
 import Image from 'next/image';
 import {
-  ArrowUpRight,
   Building2,
   Check,
   ChevronDown,
@@ -27,6 +26,7 @@ import {
   ChevronRight,
   ChevronsUp,
   ChevronsDown,
+  CircleAlert,
   Download,
   Expand,
   Grid2X2,
@@ -149,7 +149,9 @@ function CampusMap() {
     [tourStarted, setTourStarted] = useState(false),
     [tourIndex, setTourIndex] = useState(0),
     [collapsed, setCollapsed] = useState(false),
-    [toast, setToast] = useState(''),
+    [toast, setToast] = useState<{ message: string; failed: boolean } | null>(
+      null,
+    ),
     [retrySeed, setRetrySeed] = useState(0),
     [metrics, setMetrics] = useState<Metrics | null>(null);
   const settings = useRef({
@@ -186,7 +188,11 @@ function CampusMap() {
   );
   const [orbit, setOrbit] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
-  const notify = useCallback((message: string) => setToast(message), []);
+  // A fresh object restarts the timer when the same message repeats.
+  const notify = useCallback(
+    (message: string, failed = false) => setToast({ message, failed }),
+    [],
+  );
   const pauseMotion = useCallback(() => {
     setTour(false);
     controller.current?.setOrbit(false);
@@ -201,7 +207,7 @@ function CampusMap() {
   }, [pauseMotion]);
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(''), 3500);
+    const t = setTimeout(() => setToast(null), 3500);
     return () => clearTimeout(t);
   }, [toast]);
   useEffect(() => {
@@ -600,20 +606,20 @@ function CampusMap() {
   }
   function toggleFullscreen() {
     if (!document.fullscreenEnabled) {
-      notify('当前浏览器不支持全屏');
+      notify('当前浏览器不支持全屏', true);
       return;
     }
     const action = document.fullscreenElement
       ? document.exitFullscreen()
       : document.documentElement.requestFullscreen();
-    void action.catch(() => notify('当前浏览器不支持全屏'));
+    void action.catch(() => notify('当前浏览器不支持全屏', true));
   }
   async function exportView() {
     try {
       await controller.current?.exportImage();
       notify('图片已下载');
     } catch {
-      notify('下载失败，请重试');
+      notify('下载失败，请重试', true);
     }
   }
   return (
@@ -755,18 +761,26 @@ function CampusMap() {
           {panelMode === 'detail' && current ? (
             <section className="place-detail" aria-label={t('地点详情')}>
               <div className="detail-heading">
-                <div className="eyebrow">
-                  {t(CATEGORY_NAMES[current.category])}
-                </div>
                 <h2>{name(current.name)}</h2>
+                <p className="detail-meta">
+                  <span className="detail-category">
+                    {t(CATEGORY_NAMES[current.category])}
+                  </span>
+                  {!currentLandmark && (
+                    <span className="building-location">
+                      {buildingLocationLabel(
+                        currentBuilding!,
+                        landmarks,
+                        locale,
+                      )}
+                    </span>
+                  )}
+                </p>
               </div>
               {currentLandmark ? (
                 <p>{landmarkDescription(currentLandmark, locale)}</p>
               ) : (
                 <>
-                  <p className="building-location">
-                    {buildingLocationLabel(currentBuilding!, landmarks, locale)}
-                  </p>
                   <p className="building-facts">
                     {currentBuilding!.levels >= 1
                       ? t('约 {levels} 层，高约 {height} 米', {
@@ -1017,7 +1031,7 @@ function CampusMap() {
                   }}
                 >
                   {t('返回 {name}', { name: name(current.name) })}
-                  <ArrowUpRight size={14} />
+                  <ChevronRight size={16} aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -1249,9 +1263,13 @@ function CampusMap() {
       </footer>
       <CampusLoadStatus store={loadStatusStore} ready={ready} retry={retry} />
       {toast && (
-        <output className="toast">
-          <Check size={15} />
-          {t(toast)}
+        <output className={`toast ${toast.failed ? 'failed' : ''}`}>
+          {toast.failed ? (
+            <CircleAlert size={15} aria-hidden="true" />
+          ) : (
+            <Check size={15} aria-hidden="true" />
+          )}
+          {t(toast.message)}
         </output>
       )}
       {debug && metrics && (
