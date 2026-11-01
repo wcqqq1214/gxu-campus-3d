@@ -10,6 +10,22 @@ ROOT = Path(__file__).resolve().parents[1]
 TARGETS = {'way/759090364', 'way/842784665'}
 
 
+def assert_close(case, actual, expected, path='value'):
+    """Compare nested data, tolerating cross-platform libm float noise."""
+    if isinstance(expected, dict):
+        case.assertEqual(actual.keys(), expected.keys(), path)
+        for key in expected:
+            assert_close(case, actual[key], expected[key], f'{path}.{key}')
+    elif isinstance(expected, list):
+        case.assertEqual(len(actual), len(expected), path)
+        for i, (a, e) in enumerate(zip(actual, expected)):
+            assert_close(case, a, e, f'{path}[{i}]')
+    elif isinstance(expected, float):
+        case.assertAlmostEqual(actual, expected, delta=1e-9, msg=path)
+    else:
+        case.assertEqual(actual, expected, path)
+
+
 class LaboratoryNorthTests(unittest.TestCase):
     def test_published_neighbours_use_attributed_three_storeys(self):
         buildings = json.loads((ROOT/'public/data/buildings.json').read_text())
@@ -23,7 +39,7 @@ class LaboratoryNorthTests(unittest.TestCase):
         for b in selected:
             with self.subTest(id=b['id']):
                 resolved = resolve_building(b, catalogue[b['id']], sources)
-                self.assertEqual(b, without_documentation(resolved))
+                assert_close(self, b, without_documentation(resolved))
                 self.assertEqual(b['levels'], 3)
                 self.assertAlmostEqual(b['height'], 9.9)
                 self.assertGreater(b['center'][1], laboratory['center'][1])
