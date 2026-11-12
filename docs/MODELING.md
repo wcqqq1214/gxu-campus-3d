@@ -16,20 +16,38 @@
 
 ## 网页开发和检查
 
-Node.js 最低版本见 [package.json](../package.json)（当前为 22.13）；CI 使用 Node.js 24。
+本地开发和 CI 统一使用 [.nvmrc](../.nvmrc) 指定的 Node.js 24；使用 nvm 时先运行 `nvm install`、`nvm use`。`package.json` 保留最低兼容声明 22.13，日常验证使用 24。
 
 ```sh
 npm ci
 npm run dev
-npm run typecheck
-npm run lint
-npm test
+npm run check
 npm run build:pages
 ```
 
 `build:pages` 生成 `out/`，`PAGES_BASE_PATH` 可指定仓库子路径；`npm run preview` 默认在 4300 端口预览该目录。清理或重建前确认是否仍有预览使用它。`out/data/buildings.json` 只保留网页读取的字段，轮廓取整到厘米（`scripts/runtime-data.mjs`）；建模、校验和指纹始终以 `public/data/buildings.json` 的完整记录为准。前端 `Building` 类型增减字段时同步该清单，`test-runtime-data.mjs` 会检查两者一致。
 
-`gh workflow run pages.yml --ref dev` 可运行 Linux 完整检查，包含 Blender 几何回归。非 `main` 分支使用 `/gxu-campus-3d` 前缀且跳过部署；只有 `main` 的非 PR 运行允许发布。依赖版本和检查顺序见 [pages.yml](../.github/workflows/pages.yml)；CI 安装 `libjpeg-turbo-progs`，确保需要 `jpegtran` 的回归不因缺少工具而跳过。
+`npm run check` 按顺序运行类型检查、lint 和 JavaScript/TypeScript 测试，任一失败立即退出；不需要 Python、Blender 或本地 `.blend`。完整检查另外运行 `npm run test:data`、`npm run test:geometry` 和 `npm run test:browser`（包含静态构建）。
+
+推送 `dev`、推送 `main` 或向 `main` 提交 PR 会自动运行 Linux 完整检查，包含 Python 数据测试、Blender 几何回归和浏览器回归；也可运行 `gh workflow run pages.yml --ref dev` 手动触发。非 `main` 分支使用 `/gxu-campus-3d` 前缀且跳过部署；只有 `main` 的非 PR 运行且全部检查通过后允许发布。依赖版本和检查顺序见 [pages.yml](../.github/workflows/pages.yml)；CI 安装 `libjpeg-turbo-progs`，确保需要 `jpegtran` 的回归不因缺少工具而跳过。
+
+### 浏览器回归
+
+Playwright 版本固定在开发依赖和锁文件中。首次运行或升级后安装对应 Chromium；Linux 同时安装系统依赖（见 [Playwright CI 文档](https://playwright.dev/docs/ci-intro)）：
+
+```sh
+npx playwright install chromium
+# Linux：npx playwright install --with-deps chromium
+npm run test:browser
+```
+
+入口先构建 Pages，再自动启动服务并依次运行菜单、相机和 i18n 检查。菜单与相机使用开发服务，相机探针只注入测试响应；i18n 使用 `out/` 的静态页面，覆盖默认 `/gxu-campus-3d/` 子路径。菜单与相机覆盖 1280px、390px，i18n 另含 320px，以及语言恢复、分享导出、存储受限与 WebGL 不可用场景。
+
+默认占用本机 4317、4318 端口；占用时直接报错，不复用其他服务，可用 `BROWSER_DEV_PORT`、`BROWSER_PREVIEW_PORT` 修改。入口支持 macOS/Linux，退出、失败或收到中断信号时清理它启动的服务与子进程。刚执行过构建时可用 `npm run test:browser -- --skip-build`，须保持同一 `PAGES_BASE_PATH`；支持空字符串（站点根路径）或 `/gxu-campus-3d`。
+
+每次运行单独保存到 `work/browser-checks/run-*`，包含服务和断言日志、各视口 trace，以及未完成页面的截图和控制台/网络日志。CI 失败时上传这些产物并保留 7 天；本地使用 `npx playwright show-trace <trace.zip>` 查看操作与网络记录，具体断言错误见对应检查日志。单项最多运行 10 分钟，CI 浏览器步骤最多 25 分钟。
+
+检查使用 [Chromium 新无头模式](https://playwright.dev/docs/browsers#chromium-new-headless-mode)（`channel: chromium`），本地默认使用可用的 GPU；CI 设置 `SWIFTSHADER=1` 使用软件渲染，本地可用同一环境变量复测。trace 保留 DOM 与网络记录，不连续录制 WebGL 画面，失败时另存截图。此入口验证功能，不用于 GPU 性能比较。原有 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`BROWSER_PATH` 和单脚本 URL 覆盖仍保留；`I18N_BROWSER=webkit` 可用于本机额外检查，需自行安装对应浏览器。
 
 ## 数据和完整模型构建
 

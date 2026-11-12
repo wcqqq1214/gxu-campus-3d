@@ -36,7 +36,7 @@
 
 ## 本地运行
 
-使用 Node.js 24，无需地图密钥或后端服务。
+使用 Node.js 24，版本由 `.nvmrc` 与 CI 共用；使用 nvm 时可运行 `nvm install`、`nvm use`。无需地图密钥或后端服务。
 
 ```sh
 git clone --branch dev https://github.com/wcqqq1214/gxu-campus-3d.git
@@ -46,6 +46,8 @@ npm run dev
 ```
 
 打开终端输出的 Local 地址。静态构建运行 `npm run build:pages`，产物位于 `out/`；运行 `npm run preview` 后访问 <http://127.0.0.1:4300/gxu-campus-3d/>。
+
+运行 `npm run check` 完成类型检查、lint 和 JavaScript/TypeScript 测试。浏览器回归先运行 `npx playwright install chromium`，再运行 `npm run test:browser`，覆盖菜单、相机与中英文界面。推送 `dev` 会自动运行上述检查、Python 数据测试、Blender 几何回归和静态构建，不部署站点；完整环境要求见[模型结构、测试与重建](docs/MODELING.md)。
 
 ## 数据与文档
 

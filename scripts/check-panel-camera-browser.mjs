@@ -2,12 +2,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import ts from 'typescript';
-const { chromium } = await import(
-  process.env.PLAYWRIGHT_MODULE || 'playwright'
-);
-const browser = await chromium.launch({
-  executablePath: process.env.CHROMIUM_PATH,
-});
+import { browserCheck } from './browser-check.mjs';
 const baselineText = process.env.PANEL_SCENE_REV
   ? execFileSync(
       'git',
@@ -28,6 +23,7 @@ const baselineSource = baselineText
   : null;
 const errors = [];
 const results = [];
+const browser = await browserCheck('camera');
 try {
   for (const viewport of [
     { width: 1280, height: 800 },
@@ -171,7 +167,10 @@ try {
       controls,
     );
     const beforeView = await snapshot();
-    await page.getByRole('button', { name: '俯视', exact: true }).click();
+    await page
+      .getByRole('group', { name: '地点观察视角', exact: true })
+      .getByRole('button', { name: '俯视', exact: true })
+      .click();
     await toggleCycle('俯视保持相机与投影');
     assert.notDeepEqual(
       beforeView.position,
@@ -221,7 +220,8 @@ try {
     );
     await toggleCycle('分享链接恢复后保持相机与投影');
     await page
-      .getByRole('button', { name: '返回校园全景', exact: true })
+      .locator('.masthead')
+      .getByRole('button', { name: '回到全景', exact: true })
       .click();
     await settle();
     const beforeResize = await snapshot();
@@ -243,7 +243,7 @@ try {
     );
     await toggleCycle('窗口缩放后仍保持构图');
     assert.equal(await page.locator('vite-error-overlay').count(), 0);
-    await page.close();
+    await browser.closePage(page);
   }
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ passed: results.length, errors }, null, 2));

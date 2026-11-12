@@ -1,11 +1,7 @@
 /* Dev-server UI regressions. Set PLAYWRIGHT_MODULE / CHROMIUM_PATH if needed. */
 import assert from 'node:assert/strict';
-const { chromium } = await import(
-  process.env.PLAYWRIGHT_MODULE || 'playwright'
-);
-const browser = await chromium.launch({
-  executablePath: process.env.CHROMIUM_PATH,
-});
+import { browserCheck } from './browser-check.mjs';
+const browser = await browserCheck('menu');
 const results = [];
 const errors = [];
 try {
@@ -186,7 +182,7 @@ try {
       'BUTTON',
     );
     passed('剪贴板受限时可复制分享链接并恢复焦点');
-    await page.close();
+    await browser.closePage(page);
   }
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ passed: results.length, errors }, null, 2));

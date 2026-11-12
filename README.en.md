@@ -36,7 +36,7 @@ Overview captured on 2026-10-27; other screenshots on 2026-10-12. All use local 
 
 ## Run locally
 
-Use Node.js 24. No map API key or backend service is required.
+Use Node.js 24, shared by `.nvmrc` and CI. With nvm, run `nvm install` and `nvm use`. No map API key or backend service is required.
 
 ```sh
 git clone --branch dev https://github.com/wcqqq1214/gxu-campus-3d.git
@@ -46,6 +46,8 @@ npm run dev
 ```
 
 Open the Local URL shown in the terminal. Run `npm run build:pages` to build into `out/`, then `npm run preview` to serve it at <http://127.0.0.1:4300/gxu-campus-3d/>.
+
+Run `npm run check` for type checking, lint, and JavaScript/TypeScript tests. For browser regressions, run `npx playwright install chromium`, then `npm run test:browser` to check menus, cameras, and the Chinese/English interface. Pushes to `dev` automatically run these checks, Python data tests, Blender geometry regressions, and the static build without deploying the site. See [model structure, tests, and rebuilding](docs/MODELING.md) for the full environment requirements.
 
 ## Data and documentation
 
