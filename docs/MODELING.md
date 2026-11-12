@@ -8,15 +8,15 @@
 | --- | --- |
 | 可编辑模型 | 本地 `blender/gxu-campus.blend`，不纳入 Git，目前未提供 Release 下载；增量建模和源模型校验需要它，网页开发和普通测试不需要。 |
 | 建模规则与参数 | `blender/`、`scripts/`、`data/`，随代码管理。 |
-| 网页资产 | `public/models/`、`public/data/`，模型与清单须成套更新。 |
-| 参考资料、候选、基准与归档 | `work/`，不纳入 Git。 |
+| 网页资产 | `public/models/`、`public/data/`，模型与清单须成套更新；只在一项模型改动验收完成、准备发布时提交，迭代中的候选留在 `work/`。 |
+| 参考资料、候选、基准、报告与归档 | `work/`，不纳入 Git；本地产物统一放在这里，不另建 `output/`、`outputs/` 等目录。 |
 | 文档与回归输入 | `docs/` 默认忽略，仅跟踪三份正式说明和 README 展示图；测试夹具在 `scripts/fixtures/`、`blender/fixtures/`。 |
 
 源文件保留具名对象、材质、打包纹理及 `featureId`、`landmark`、`sourceUrl` 属性。楼栋 ID 关联模型、目录与拾取，不随显示名称变更。开发、提交、推送均使用 `dev`，完整规则见 [AGENTS.md](../AGENTS.md)。
 
 ## 网页开发和检查
 
-本地开发和 CI 统一使用 [.nvmrc](../.nvmrc) 指定的 Node.js 24；使用 nvm 时先运行 `nvm install`、`nvm use`。`package.json` 保留最低兼容声明 22.13，日常验证使用 24。
+本地开发和 CI 统一使用 [.nvmrc](../.nvmrc) 指定的 Node.js 24，`package.json` 的 `engines` 与之一致；使用 nvm 时先运行 `nvm install`、`nvm use`。
 
 ```sh
 npm ci
