@@ -129,6 +129,7 @@ export function createDetailStreaming({
       });
   }
   function reconcile(focusing = false) {
+    if (disposed) return;
     const state = view();
     const { manifest, selected } = state;
     if (!manifest || disposed || !state.ready) return;

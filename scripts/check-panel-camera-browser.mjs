@@ -10,6 +10,12 @@ const baselineText = process.env.PANEL_SCENE_REV
       { encoding: 'utf8' },
     )
   : null;
+// The baseline swaps only createScene and keeps the current module imports, so
+// it supports revisions after createScene was split into lib/campus/scene-*.ts.
+if (baselineText && !baselineText.includes("from './scene-details'"))
+  throw new Error(
+    `PANEL_SCENE_REV=${process.env.PANEL_SCENE_REV} 早于场景模块拆分，不支持作为基准`,
+  );
 const baselineSource = baselineText
   ? ts.transpileModule(
       baselineText.slice(baselineText.indexOf('export function createScene')),

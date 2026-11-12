@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run build:pages",
     "start": "npm run dev",
     "lint": "oxlint",
     "lint:python": "python3 -m ruff check .",

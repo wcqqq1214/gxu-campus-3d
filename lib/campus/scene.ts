@@ -303,6 +303,13 @@ export function createScene(
     string,
     { label: string; name?: string; fraction: number }
   >();
+  let tween: {
+    from: THREE.Vector3;
+    to: THREE.Vector3;
+    fromTarget: THREE.Vector3;
+    toTarget: THREE.Vector3;
+    start: number;
+  } | null = null;
   const details = createDetailStreaming({
     scene,
     root: dynamic,
@@ -351,13 +358,6 @@ export function createScene(
     },
   });
   const reconcileDetails = (focusing = false) => details.reconcile(focusing);
-  let tween: {
-    from: THREE.Vector3;
-    to: THREE.Vector3;
-    fromTarget: THREE.Vector3;
-    toTarget: THREE.Vector3;
-    start: number;
-  } | null = null;
   const labels = createSceneLabels({
     host,
     landmarks,

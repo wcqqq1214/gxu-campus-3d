@@ -78,5 +78,20 @@ await writeFile(
     runtimeBuildings(JSON.parse(await readFile(buildingsPath, 'utf8'))),
   ),
 );
+// Pages serves this for any unknown path, so links carry the full prefix.
+await writeFile(
+  path.join(out, '404.html'),
+  `<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>页面不存在 · 广西大学 校园地图</title>
+<link rel="icon" href="${basePath}/favicon.svg">
+<style>body{margin:0;min-height:100vh;display:grid;place-content:center;gap:12px;text-align:center;font-family:Inter,'PingFang SC','Microsoft YaHei',sans-serif;color:#1d3b31;background:#f4f6f2}h1{margin:0;font-size:20px}a{color:#29a383;font-weight:600}@media (prefers-color-scheme:dark){body{color:#e8f0ec;background:#151a18}}</style>
+<h1>页面不存在<br><span lang="en">Page not found</span></h1>
+<a href="${basePath}/">返回校园地图 · <span lang="en">Back to the campus map</span></a>
+</html>
+`,
+);
 await writeFile(path.join(out, '.nojekyll'), '');
 console.log(`GitHub Pages 静态包：${out}；资源前缀：${basePath || '/'}`);
