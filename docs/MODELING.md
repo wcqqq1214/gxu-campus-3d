@@ -25,7 +25,7 @@ npm run check
 npm run build:pages
 ```
 
-`build:pages` 生成 `out/`，`PAGES_BASE_PATH` 可指定仓库子路径；`npm run preview` 默认在 4300 端口预览该目录。清理或重建前确认是否仍有预览使用它。`out/data/buildings.json` 只保留网页读取的字段，轮廓取整到厘米（`scripts/runtime-data.mjs`）；建模、校验和指纹始终以 `public/data/buildings.json` 的完整记录为准。前端 `Building` 类型增减字段时同步该清单，`test-runtime-data.mjs` 会检查两者一致。
+网页是 Vite + React 的客户端单页：入口 `index.html` → `app/main.tsx`，界面在 `app/` 与 `components/`，场景与数据逻辑在 `lib/campus/`。`build:pages` 生成 `out/`，`PAGES_BASE_PATH` 可指定仓库子路径；`npm run preview` 默认在 4300 端口预览该目录。清理或重建前确认是否仍有预览使用它。`out/data/buildings.json` 只保留网页读取的字段，轮廓取整到厘米（`scripts/runtime-data.mjs`）；建模、校验和指纹始终以 `public/data/buildings.json` 的完整记录为准。前端 `Building` 类型增减字段时同步该清单，`test-runtime-data.mjs` 会检查两者一致。
 
 `npm run check` 按顺序运行类型检查、lint 和 JavaScript/TypeScript 测试，任一失败立即退出；不需要 Python、Blender 或本地 `.blend`。完整检查另外运行 `npm run lint:python`、`npm run test:data`、`npm run test:geometry` 和 `npm run test:browser`（包含静态构建）。
 

@@ -1,7 +1,9 @@
 import { fetchJson, fetchModel, type StreamAsset } from './streaming.ts';
 
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
-const DATA_VERSION = process.env.NEXT_PUBLIC_DATA_VERSION;
+// Node tests import this module directly, where Vite's import.meta.env is absent.
+const env: Partial<ImportMetaEnv> = import.meta.env ?? {};
+const BASE = env.BASE_URL?.replace(/\/$/, '') ?? '';
+const DATA_VERSION = env.VITE_DATA_VERSION;
 export const asset = (path: string) =>
   `${BASE}/${path}` +
   (DATA_VERSION && path.startsWith('data/') && path.endsWith('.json')

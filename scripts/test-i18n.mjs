@@ -108,13 +108,15 @@ test('all displayed landmark descriptions and static UI messages have English tr
       zh,
     );
   }
-  for (const path of [
-    '../app/page.tsx',
-    '../components/campus-minimap.tsx',
-    '../components/campus-locale.tsx',
-    '../components/ui/dialog.tsx',
-    '../lib/campus/scene.ts',
-  ]) {
+  // Scan whole source trees so moving UI or scene code between files keeps coverage.
+  const sources = ['app', 'components', 'lib/campus'].flatMap((dir) =>
+    fs
+      .readdirSync(new URL(`../${dir}/`, import.meta.url), { recursive: true })
+      .filter((file) => /\.tsx?$/.test(file) && !file.startsWith('i18n'))
+      .map((file) => `../${dir}/${file}`),
+  );
+  assert.ok(sources.includes('../app/campus-map.tsx'));
+  for (const path of sources) {
     const source = fs.readFileSync(new URL(path, import.meta.url), 'utf8');
     const ast = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true);
     function walk(node) {

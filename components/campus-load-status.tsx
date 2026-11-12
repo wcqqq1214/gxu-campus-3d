@@ -1,4 +1,3 @@
-'use client';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { useCampusLocale } from '@/components/campus-locale';

@@ -3,7 +3,7 @@
 
 The serif face is only used for place names and dialog titles, so the subset
 covers the characters of every landmark and building name plus the interface
-copy in app/page.tsx. Rerun after adding names with new characters:
+copy in app/ and components/. Rerun after adding names with new characters:
 
     python3 scripts/build_serif_font.py /path/to/NotoSerifSC-SemiBold.otf
 
@@ -28,7 +28,11 @@ def characters() -> str:
     for file in ('buildings.json', 'landmarks.json'):
         data = json.loads((ROOT / 'public/data' / file).read_text('utf-8'))
         names += [item.get('name') or '' for item in data]
-    copy = (ROOT / 'app/page.tsx').read_text('utf-8')
+    copy = ''.join(
+        path.read_text('utf-8')
+        for folder in ('app', 'components')
+        for path in sorted((ROOT / folder).rglob('*.tsx'))
+    )
     text = ''.join(names) + ''.join(CJK.findall(copy)) + BASIC
     return ''.join(sorted(set(text)))
 

@@ -165,7 +165,7 @@ try {
       PAGES_BASE_PATH: basePath,
     }).done;
   const html = await readFile('out/index.html', 'utf8');
-  if (!html.includes(`"${basePath}/_next/static/`))
+  if (!html.includes(`"${basePath}/assets/`))
     throw new Error('out/ 的资源前缀与 PAGES_BASE_PATH 不匹配，请重新构建');
   const dev = start(
     'dev-server',
@@ -178,8 +178,7 @@ try {
       '--strictPort',
     ],
     {
-      NEXT_PUBLIC_BASE_PATH: '',
-      NEXT_PUBLIC_DATA_VERSION: '',
+      CAMPUS_BASE_PATH: '',
       NODE_ENV: 'development',
     },
   );

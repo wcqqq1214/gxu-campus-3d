@@ -1,4 +1,3 @@
-'use client';
 import { asset } from '@/lib/campus/boot';
 import { loadCampusBoundary } from '@/lib/campus/boundary-data';
 import { useCampusLocale } from '@/components/campus-locale';

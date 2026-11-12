@@ -1,4 +1,3 @@
-'use client';
 import {
   useCallback,
   useEffect,
@@ -17,7 +16,6 @@ import { CampusLoadStatus } from '@/components/campus-load-status';
 import { landmarkDescription } from '@/lib/campus/i18n/descriptions';
 import { Menu } from '@base-ui/react/menu';
 import { Tooltip } from '@base-ui/react/tooltip';
-import Image from 'next/image';
 import {
   Building2,
   Check,
@@ -85,7 +83,6 @@ import { asset, prefetchBase } from '@/lib/campus/boot';
 import { createCameraStore, type CameraStore } from '@/lib/campus/camera-store';
 import { CampusMinimap } from '@/components/campus-minimap';
 import { CampusViewControls } from '@/components/campus-view-controls';
-const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 const TOUR_STOP_MS = 8500;
 const LAYER_ITEMS: [LayerKey, string, typeof Building2][] = [
   ['labels', '地点名称', RectangleEllipsis],
@@ -109,7 +106,7 @@ const QUALITY_OPTIONS: [Quality, string][] = [
   ['fine', '精细'],
   ['smooth', '流畅'],
 ];
-export default function Home() {
+export default function CampusApp() {
   return (
     <CampusLocaleProvider>
       <CampusMap />
@@ -242,7 +239,7 @@ function CampusMap() {
         setLandmarks(ls);
         try {
           if (
-            process.env.NODE_ENV === 'development' &&
+            import.meta.env.DEV &&
             new URLSearchParams(location.search).has('test-webgl-unavailable')
           )
             throw new Error('WebGL test');
@@ -633,13 +630,7 @@ function CampusMap() {
             title={t('回到全景')}
             aria-label={t('回到全景')}
           >
-            <Image
-              src={`${BASE}/favicon.svg`}
-              alt=""
-              width={44}
-              height={44}
-              unoptimized
-            />
+            <img src={asset('favicon.svg')} alt="" width={44} height={44} />
           </button>
           <h1>
             {t('广西大学')}
@@ -979,13 +970,13 @@ function CampusMap() {
                         aria-pressed={preset === p}
                         aria-label={t(label)}
                       >
-                        <Image
-                          src={`${BASE}/images/presets/${p}.jpg`}
+                        <img
+                          src={asset(`images/presets/${p}.jpg`)}
                           alt=""
                           width={640}
                           height={360}
                           loading="lazy"
-                          unoptimized
+                          decoding="async"
                         />
                         <span className="preset-caption">
                           <Icon size={16} />
