@@ -5,17 +5,10 @@ import { createPalette } from './palette';
 import { createSky, fogRange } from './sky';
 import { LIGHTING } from './lighting';
 import { searchableBuildings } from './navigation';
-import {
-  treeAppearance,
-  treeRotation,
-  treeElevation,
-  prioritizeTreeRows,
-} from './vegetation';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { batchSportsSurfaces } from './sports-batching';
 import { batchStaticRoadSurfaces } from './road-batching';
 import { pruneGroundTriangles } from './ground-triangles';
@@ -48,6 +41,7 @@ import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import { createContextStyle } from './context-style';
 import { createDetailStreaming } from './scene-details';
+import { createSceneTrees } from './scene-trees';
 import { downloadCanvas } from './scene-export';
 import { createSceneLabels } from './scene-labels';
 import {
@@ -196,19 +190,6 @@ export function createScene(
   let manifest: Manifest | null = null;
   let pendingPrefetch = prefetch;
   let baseRoot: THREE.Group | null = null;
-  let treesRoot: THREE.Group | null = null;
-  let highTreesReady = false;
-  let highTreesFailed = false;
-  let treesFailed = false;
-  let treeData: {
-    data: number[][];
-    terrain: {
-      bounds: number[];
-      cols: number;
-      rows: number;
-      heights: number[];
-    };
-  } | null = null;
   let disposed = false;
   let quality: Quality = 'auto';
   let preset: Preset = 'day';
@@ -310,6 +291,20 @@ export function createScene(
     toTarget: THREE.Vector3;
     start: number;
   } | null = null;
+  const trees = createSceneTrees({
+    scene,
+    lifetime: lifecycle.signal,
+    nightStyle,
+    night: () => preset === 'night',
+    load: (a, key, signal) => loadGLB(a, key, signal),
+    onLoaded: () => {
+      setQuality(quality);
+      applyLayers();
+    },
+    onSettled: () => {
+      pendingRequest = performance.now();
+    },
+  });
   const details = createDetailStreaming({
     scene,
     root: dynamic,
@@ -327,14 +322,8 @@ export function createScene(
     }),
     load: (a, key, signal) => loadGLB(a, key, signal),
     nearTrees: (distance) =>
-      profile.nearTrees &&
-      treesRoot &&
-      manifest?.treesNear &&
-      !highTreesReady &&
-      !highTreesFailed &&
-      !loading.has('trees') &&
-      distance < 1000
-        ? (signal) => loadTrees(true, signal)
+      profile.nearTrees && distance < 1000
+        ? trees.nearLoader(manifest)
         : undefined,
     onNearTreesFailed: () =>
       callbacks.onStatus('近处树木加载失败，可重试', true),
@@ -756,7 +745,7 @@ export function createScene(
           !details.loaded.get(child.name)?.visible;
     syncRoadLights();
     boundaryRoot.visible = layers.boundary;
-    if (treesRoot) treesRoot.visible = layers.vegetation;
+    trees.setVisible(layers.vegetation);
     labels.setVisible(layers.labels);
     highlight.visible = layers[detailLayer('landmark-' + selected)];
     // Model attach/release, tree density, quality and layer changes all arrive here.
@@ -792,7 +781,7 @@ export function createScene(
       );
     } else if (boundaryFailed && layers.boundary)
       callbacks.onStatus('校园边界加载失败，可重试', true);
-    else if (treesFailed || (highTreesFailed && !modeSmooth))
+    else if (trees.failed(!modeSmooth))
       callbacks.onStatus('部分树木加载失败，可重试', true);
     else if (details.hasFailures())
       callbacks.onStatus('部分细节加载失败，可重试', true);
@@ -864,166 +853,6 @@ export function createScene(
       unsubscribe?.();
       progresses.delete(key);
       updateLoadStatus();
-    }
-  }
-  async function loadTrees(near = false, signal = lifecycle.signal) {
-    if (
-      !manifest ||
-      (near ? highTreesReady || !manifest.treesNear : treesRoot) ||
-      loading.has('trees')
-    )
-      return;
-    loading.add('trees');
-    try {
-      const [data, terrain] = treeData
-        ? [treeData.data, treeData.terrain]
-        : await Promise.all([
-            fetch(asset('data/vegetation.json'), {
-              signal: lifecycle.signal,
-            }).then((r) => {
-              if (!r.ok) throw new Error('vegetation');
-              return r.json();
-            }) as Promise<number[][]>,
-            fetch(asset('data/terrain.json'), {
-              signal: lifecycle.signal,
-            }).then((r) => {
-              if (!r.ok) throw new Error('terrain');
-              return r.json();
-            }) as Promise<{
-              bounds: number[];
-              cols: number;
-              rows: number;
-              heights: number[];
-            }>,
-          ]);
-      if (disposed) return;
-      treeData = { data, terrain };
-      const g = await loadGLB(
-        near ? manifest.treesNear! : manifest.trees,
-        near ? 'trees-near' : 'trees',
-        signal,
-      );
-      if (!treesRoot) {
-        treesRoot = new THREE.Group();
-        treesRoot.name = 'vegetation';
-        treesRoot.userData.layer = 'vegetation';
-        scene.add(treesRoot);
-      }
-      const parts: THREE.Mesh[] = [];
-      g.scene.traverse((o) => {
-        if (o instanceof THREE.Mesh) parts.push(o);
-      });
-      for (let typ = 0; typ < 3; typ++) {
-        const partsForType = parts.filter((o) => {
-          let p: THREE.Object3D | null = o;
-          while (p) {
-            if (
-              p.userData.template === typ ||
-              p.name === `Tree-template-${typ}`
-            )
-              return true;
-            p = p.parent;
-          }
-          return false;
-        });
-        if (!partsForType.length) continue;
-        const geometries = partsForType.map((part) => {
-          const geometry = part.geometry.index
-            ? part.geometry.toNonIndexed()
-            : part.geometry.clone();
-          const material = (
-            Array.isArray(part.material) ? part.material[0] : part.material
-          ) as THREE.MeshStandardMaterial;
-          const color = material.color;
-          const colors = new Float32Array(
-            geometry.getAttribute('position').count * 3,
-          );
-          for (let i = 0; i < colors.length; i += 3) {
-            colors[i] = color.r;
-            colors[i + 1] = color.g;
-            colors[i + 2] = color.b;
-          }
-          geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-          geometry.deleteAttribute('uv');
-          return geometry;
-        });
-        const geometry = mergeGeometries(geometries)!;
-        geometries.forEach((g) => g.dispose());
-        const material = new THREE.MeshStandardMaterial({
-          name: 'treeCanopy',
-          vertexColors: true,
-          roughness: 0.94,
-          side: THREE.DoubleSide,
-        });
-        const sectors = new Map<string, number[][]>();
-        for (const row of data) {
-          if (row[3] !== typ) continue;
-          const key = `${Math.floor(row[0] / 450)},${Math.floor(row[1] / 450)}`;
-          if (!sectors.has(key)) sectors.set(key, []);
-          sectors.get(key)!.push(row);
-        }
-        for (const sectorRows of sectors.values()) {
-          const rows = prioritizeTreeRows(
-            sectorRows,
-            manifest.treePriorityPositions || [],
-          );
-          const inst = new THREE.InstancedMesh(geometry, material, rows.length);
-          const transform = new THREE.Object3D();
-          rows.forEach((row, i) => {
-            const [x, y, h] = row;
-            transform.position.set(x, treeElevation(row, terrain), -y);
-            transform.rotation.set(0, treeRotation(x, y), 0);
-            const appearance = treeAppearance(x, y);
-            transform.scale.set(
-              (appearance.width * h) / 9,
-              (appearance.height * h) / 9,
-              (appearance.width * h) / 9,
-            );
-            transform.updateMatrix();
-            inst.setMatrixAt(i, transform.matrix);
-            inst.setColorAt(i, new THREE.Color(...appearance.tint));
-          });
-          nightStyle.apply(inst, preset === 'night');
-          inst.instanceMatrix.needsUpdate = true;
-          inst.computeBoundingSphere();
-          inst.castShadow = true;
-          inst.receiveShadow = true;
-          inst.userData.fullCount = rows.length;
-          inst.userData.lod = near ? 1 : 0;
-          inst.userData.center = new THREE.Vector3(
-            rows.reduce((sum, r) => sum + r[0], 0) / rows.length,
-            0,
-            -rows.reduce((sum, r) => sum + r[1], 0) / rows.length,
-          );
-          treesRoot.add(inst);
-        }
-      }
-      disposeObject(g.scene);
-      if (near) highTreesReady = true;
-      // Materials and geometry are shared with the instanced meshes and disposed once during teardown.
-      setQuality(quality);
-      applyLayers();
-    } catch (error) {
-      if (!disposed && !signal.aborted) {
-        if (near) highTreesFailed = true;
-        else treesFailed = true;
-      }
-      throw error;
-    } finally {
-      loading.delete('trees');
-      pendingRequest = performance.now();
-    }
-  }
-  function applyTreeLOD() {
-    if (!treesRoot) return;
-    for (const o of treesRoot.children) {
-      const near =
-        highTreesReady &&
-        profile.nearTrees &&
-        camera.position.distanceTo(o.userData.center) < 500;
-      const visible = o.userData.lod === 1 ? near : !near;
-      if (o.visible !== visible) renderer.shadowMap.needsUpdate = true;
-      o.visible = visible;
     }
   }
   async function loadBoundary() {
@@ -1119,7 +948,7 @@ export function createScene(
       });
       void loadBoundary();
       reconcileDetails();
-      void loadTrees().catch(() => {
+      void trees.load(manifest).catch(() => {
         if (!disposed) callbacks.onStatus('树木加载失败，可重试', true);
       });
     } catch {
@@ -1153,18 +982,8 @@ export function createScene(
     }
     if (!profile.nearTrees) {
       details.cancel('trees-near');
-      if (treesRoot && highTreesReady) {
-        const retired = new THREE.Group();
-        for (const child of treesRoot.children.slice())
-          if (child.userData.lod === 1) retired.add(child);
-        disposeObject(retired, [scene]);
-        highTreesReady = false;
-      }
     }
-    treesRoot?.traverse((o) => {
-      if (o instanceof THREE.InstancedMesh)
-        o.count = Math.ceil(o.userData.fullCount * profile.treeDensity);
-    });
+    trees.configure(profile.treeDensity, profile.nearTrees);
     dirty = true;
     applyLayers();
     reconcileDetails();
@@ -1386,7 +1205,8 @@ export function createScene(
         camera.updateProjectionMatrix();
       }
       shadowFrustum();
-      applyTreeLOD();
+      if (trees.updateLOD(camera.position, profile.nearTrees))
+        renderer.shadowMap.needsUpdate = true;
       convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
       renderScene();
       // Paint the complete geometry first. Only the shadow-free smooth tier
@@ -1499,13 +1319,12 @@ export function createScene(
       else {
         void loadBoundary();
         details.retry();
-        highTreesFailed = false;
-        treesFailed = false;
+        trees.resetFailures();
         reconcileDetails();
-        if (!treesRoot)
-          void loadTrees().catch(() =>
-            callbacks.onStatus('树木加载失败，请稍后重试', true),
-          );
+        if (!trees.loaded)
+          void trees
+            .load(manifest!)
+            .catch(() => callbacks.onStatus('树木加载失败，请稍后重试', true));
       }
     },
     setLocale,
