@@ -58,3 +58,52 @@ export function qualityProfile(
     detailBudgetMiB: Math.min(compact ? 32 : 64, [64, 48, 24][level]),
   };
 }
+
+const saveData = () =>
+  Boolean(
+    (navigator as Navigator & { connection?: { saveData?: boolean } })
+      .connection?.saveData,
+  );
+const compactViewport = () => window.innerWidth < 760;
+
+/**
+ * The selected quality and the automatic level beneath it. Phone-sized
+ * layouts and data saver keep automatic quality at the smooth tier.
+ */
+export class QualityControl {
+  quality: Quality = 'auto';
+  private adaptive = new AdaptiveQuality();
+
+  get automaticLevel() {
+    return this.adaptive.level;
+  }
+
+  /** Returns whether the choice changed; a new choice restarts automatic tuning. */
+  select(quality: Quality) {
+    const changed = quality !== this.quality;
+    if (changed) this.adaptive.reset();
+    this.quality = quality;
+    return changed;
+  }
+
+  profile() {
+    return qualityProfile(
+      this.quality,
+      compactViewport(),
+      saveData(),
+      this.adaptive.level,
+    );
+  }
+
+  /** Feeds a frame-rate sample; returns whether the automatic level changed. */
+  sample(fps: number, frames: number, continuous: boolean) {
+    if (
+      this.quality !== 'auto' ||
+      compactViewport() ||
+      saveData() ||
+      document.hidden
+    )
+      return false;
+    return this.adaptive.sample(fps, frames, continuous);
+  }
+}

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { AdaptiveQuality, qualityProfile } from '../lib/campus/quality.ts';
+import { AdaptiveQuality, qualityProfile, QualityControl } from '../lib/campus/quality.ts';
 
 test('持续低帧率分两级减少阴影、精细植被与资源预算，单次慢帧不降档', () => {
   const adaptive = new AdaptiveQuality();
@@ -82,4 +82,15 @@ test('流畅档减少约19%像素预算，自动降到流畅时使用相同预�
   assert.equal(qualityProfile('auto', false, false, 2).resolutionScale, 0.9);
   assert.equal(qualityProfile('auto', false, false, 1).resolutionScale, 1);
   assert.equal(qualityProfile('fine', false, false, 0).resolutionScale, 1);
+});
+
+test('更换画质选择会重新开始自动调节，重复选择不会', () => {
+  const control = new QualityControl();
+  const continuous = Array.from({ length: 2 }, () => control['adaptive'].sample(20, 30));
+  assert.ok(continuous.at(-1));
+  assert.equal(control.automaticLevel, 2);
+  assert.equal(control.select('auto'), false);
+  assert.equal(control.automaticLevel, 2);
+  assert.equal(control.select('fine'), true);
+  assert.equal(control.automaticLevel, 1);
 });

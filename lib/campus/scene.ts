@@ -31,7 +31,7 @@ import {
   type MapView,
 } from './camera';
 import { DEFAULT_LAYERS } from './types';
-import { AdaptiveQuality, qualityProfile } from './quality';
+import { QualityControl } from './quality';
 import { FramePacer, FrameStats } from './frame-pacing';
 import { BenchmarkOrbit } from './benchmark-orbit';
 import { ShadowFrustum } from './shadow-frustum';
@@ -40,6 +40,7 @@ import { createBoundary } from './boundary';
 import { createContextStyle } from './context-style';
 import { createModelLoader, matchGround, refineBase } from './scene-base';
 import { createDetailStreaming } from './scene-details';
+import { createSceneEffects } from './scene-effects';
 import { createSceneTrees } from './scene-trees';
 import { downloadCanvas } from './scene-export';
 import { createSceneLabels } from './scene-labels';
@@ -167,7 +168,6 @@ export function createScene(
   let pendingPrefetch = prefetch;
   let baseRoot: THREE.Group | null = null;
   let disposed = false;
-  let quality: Quality = 'auto';
   let preset: Preset = 'day';
   let selected: string | null = null;
   let hovered: string | null = null;
@@ -176,40 +176,18 @@ export function createScene(
   let loadedBytes = 0;
   let loop = 0;
   let modeSmooth = false;
-  const adaptive = new AdaptiveQuality();
-  let profile = qualityProfile('auto', false, false, adaptive.level);
-  let effects: ReturnType<
-    typeof import('./postprocessing').createPostprocessing
-  > | null = null;
-  let effectsLoading = false;
-  let effectsFailed = false;
-  function syncEffects() {
-    if (!profile.postprocessing) {
-      effects?.dispose();
-      effects = null;
-      return;
-    }
-    if (effects) {
-      effects.resize();
-      return;
-    }
-    if (effectsLoading || effectsFailed || !initialReady) return;
-    effectsLoading = true;
-    void import('./postprocessing')
-      .then(({ createPostprocessing }) => {
-        if (!disposed && profile.postprocessing) {
-          effects = createPostprocessing(renderer, scene, camera);
-          effects.setNight(preset === 'night');
-          dirty = true;
-        }
-      })
-      .catch(() => {
-        effectsFailed = true;
-      })
-      .finally(() => {
-        effectsLoading = false;
-      });
-  }
+  const qualityControl = new QualityControl();
+  let profile = qualityControl.profile();
+  const effects = createSceneEffects({
+    renderer,
+    scene,
+    camera,
+    night: () => preset === 'night',
+    onReady: () => {
+      dirty = true;
+    },
+  });
+  const syncEffects = () => effects.sync(profile.postprocessing, initialReady);
   function renderScene() {
     if (scene.fog instanceof THREE.Fog) {
       Object.assign(
@@ -221,14 +199,8 @@ export function createScene(
     renderer.info.reset();
     if (renderer.shadowMap.enabled && renderer.shadowMap.needsUpdate)
       shadowUpdates++;
-    if (effects && profile.postprocessing) effects.render();
-    else renderer.render(scene, camera);
+    if (!effects.render()) renderer.render(scene, camera);
   }
-  const saveData = () =>
-    Boolean(
-      (navigator as Navigator & { connection?: { saveData?: boolean } })
-        .connection?.saveData,
-    );
   let lastFrame = 0;
   let benchmarkRun: BenchmarkOrbit | null = null;
   const framePacer = new FramePacer();
@@ -252,7 +224,6 @@ export function createScene(
   let frameReady = false;
   let cameraChanged = true;
   let cameraSampleAt = 0;
-  const compact = () => window.innerWidth < 760;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const loading = new Set<string>();
   const lifecycle = new AbortController();
@@ -274,7 +245,7 @@ export function createScene(
     night: () => preset === 'night',
     load: (a, key, signal) => loadGLB(a, key, signal),
     onLoaded: () => {
-      setQuality(quality);
+      setQuality(qualityControl.quality);
       applyLayers();
     },
     onSettled: () => {
@@ -903,15 +874,11 @@ export function createScene(
     }
   }
   function setQuality(q: Quality) {
-    if (q !== quality) {
-      adaptive.reset();
-      effectsFailed = false;
-    }
-    quality = q;
+    if (qualityControl.select(q)) effects.resetFailure();
     applyQuality();
   }
   function applyQuality() {
-    profile = qualityProfile(quality, compact(), saveData(), adaptive.level);
+    profile = qualityControl.profile();
     modeSmooth = profile.level === 2;
     renderer.setPixelRatio(
       Math.min(window.devicePixelRatio, profile.pixelRatio) *
@@ -948,7 +915,7 @@ export function createScene(
     renderer.toneMappingExposure = light.exposure;
     // shadowFrustum owns the target-relative light position, including when
     // reapplying the same preset while its cached volume is unchanged.
-    effects?.setNight(p === 'night');
+    effects.setNight(p === 'night');
     syncRoadLights();
     labels.setLight(p);
     applyModelLighting(scene);
@@ -1038,7 +1005,7 @@ export function createScene(
       w,
       h,
     );
-    setQuality(quality);
+    setQuality(qualityControl.quality);
     dirty = true;
   }
   const observer = new ResizeObserver(resize);
@@ -1055,13 +1022,7 @@ export function createScene(
     ).memory;
     return {
       readyMs,
-      postprocessing: effects
-        ? 'ready'
-        : effectsFailed
-          ? 'failed'
-          : effectsLoading
-            ? 'loading'
-            : 'off',
+      postprocessing: effects.status,
       ...(benchmarkOrbit
         ? {
             benchmark: {
@@ -1083,7 +1044,7 @@ export function createScene(
       textures: renderer.info.memory.textures,
       pixelRatio: renderer.getPixelRatio(),
       quality: ['精细', '均衡', '流畅'][profile.level],
-      automaticQualityLevel: adaptive.level,
+      automaticQualityLevel: qualityControl.automaticLevel,
       shadows: profile.shadows,
       nearTrees: profile.nearTrees,
       detailBudgetMiB: profile.detailBudgetMiB,
@@ -1174,16 +1135,14 @@ export function createScene(
     if (benchmarkRun ? benchmarkRun.sampleDue() : stats.due(time)) {
       const activeFrames = stats.sample(time);
       callbacks.onMetrics?.(metrics());
-      if (quality === 'auto' && !compact() && !saveData() && !document.hidden) {
-        if (
-          adaptive.sample(
-            stats.fps,
-            activeFrames,
-            orbiting || Boolean(tween) || Boolean(moving),
-          )
+      if (
+        qualityControl.sample(
+          stats.fps,
+          activeFrames,
+          orbiting || Boolean(tween) || Boolean(moving),
         )
-          applyQuality();
-      }
+      )
+        applyQuality();
     }
     if (
       manifest &&
@@ -1271,7 +1230,7 @@ export function createScene(
       convexCulling = null;
       disposeObject(scene);
       contextStyle.dispose();
-      effects?.dispose();
+      effects.dispose();
       sky.dispose();
       renderer.dispose();
       canvas.remove();
