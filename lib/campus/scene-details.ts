@@ -211,11 +211,30 @@ export function createDetailStreaming({
   }
   return {
     loaded: loaded as ReadonlyMap<string, THREE.Group>,
-    geometryCosts: geometryCosts as ReadonlyMap<string, number>,
     get queued() {
       return queue.tasks.size;
     },
     reconcile,
+    /** Download size of the resident details, from the manifest. */
+    residentBytes(manifest: ModelManifest) {
+      return [...loaded.keys()].reduce(
+        (n, key) =>
+          n +
+          (manifest.landmarks.find((a) => 'landmark-' + a.id === key)?.bytes ??
+            manifest.zones.find((a) => a.id === key)?.bytes ??
+            manifest.infrastructure?.find((a) => a.id === key)?.bytes ??
+            manifest.sports?.find((a) => a.id === key)?.bytes ??
+            0),
+        0,
+      );
+    },
+    /** Decoded geometry of the resident details. */
+    geometryBytes() {
+      return [...loaded.keys()].reduce(
+        (n, key) => n + (geometryCosts.get(key) ?? 0),
+        0,
+      );
+    },
     /** A wanted detail failed and has not been retried. */
     hasFailures() {
       return [...failed.keys()].some((key) => wanted.has(key));

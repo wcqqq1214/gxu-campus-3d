@@ -7,8 +7,6 @@ import { LIGHTING } from './lighting';
 import { searchableBuildings } from './navigation';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { batchSportsSurfaces } from './sports-batching';
 import { batchStaticRoadSurfaces } from './road-batching';
 import { pruneGroundTriangles } from './ground-triangles';
@@ -40,6 +38,7 @@ import { ShadowFrustum } from './shadow-frustum';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import { createContextStyle } from './context-style';
+import { createModelLoader, matchGround, refineBase } from './scene-base';
 import { createDetailStreaming } from './scene-details';
 import { createSceneTrees } from './scene-trees';
 import { downloadCanvas } from './scene-export';
@@ -163,30 +162,7 @@ export function createScene(
   scene.add(ground);
   scene.environment = sky.texture;
   scene.environmentIntensity = 0.24;
-  const loader = new GLTFLoader();
-  let decoderFailed = false;
-  function createDecoder() {
-    const decoder = new DRACOLoader();
-    decoder.setDecoderPath(asset('draco/'));
-    // The base model carries hundreds of Draco primitives. Phone-sized layouts
-    // keep two decoder heaps; larger screens use spare cores, at most four.
-    decoder.setWorkerLimit(
-      window.innerWidth < 760
-        ? 2
-        : Math.min(4, Math.max(2, (navigator.hardwareConcurrency || 2) - 1)),
-    );
-    // Fetch the decoder while the base model is still downloading. Model loads
-    // still await this request; observing it here only avoids an unhandled
-    // rejection when it fails before the first decode.
-    (
-      decoder.preload() as DRACOLoader & { decoderPending?: Promise<unknown> }
-    ).decoderPending?.catch(() => {
-      if (draco === decoder) decoderFailed = true;
-    });
-    return decoder;
-  }
-  let draco = createDecoder();
-  loader.setDRACOLoader(draco);
+  const loader = createModelLoader();
   let manifest: Manifest | null = null;
   let pendingPrefetch = prefetch;
   let baseRoot: THREE.Group | null = null;
@@ -890,27 +866,11 @@ export function createScene(
       baseRoot = gltf.scene;
       scene.add(baseRoot);
       updateLabelAnchors();
-      const terrainMesh: THREE.Mesh[] = [];
-      baseRoot.traverse((o) => {
-        if (
-          o instanceof THREE.Mesh &&
-          o.material instanceof THREE.MeshStandardMaterial &&
-          o.material.name === 'grass'
-        )
-          terrainMesh.push(o);
+      matchGround(ground, baseRoot, {
+        nightStyle,
+        contextStyle,
+        night: preset === 'night',
       });
-      if (terrainMesh[0]) {
-        const mat = terrainMesh[0].material as THREE.MeshStandardMaterial;
-        ground.material.dispose();
-        ground.material = mat.clone();
-        nightStyle.copyDayColor(mat, ground.material);
-        nightStyle.apply(ground, preset === 'night');
-        contextStyle.apply(ground.material);
-        const uv = ground.geometry.getAttribute('uv');
-        for (let i = 0; i < uv.count; i++)
-          uv.setXY(i, uv.getX(i) * 7500, uv.getY(i) * 7500);
-        uv.needsUpdate = true;
-      }
       initialReady = true;
       syncEffects();
       readyMs = Math.round(performance.now());
@@ -923,22 +883,7 @@ export function createScene(
         if (disposed) return;
         const refine = async () => {
           if (disposed || !baseRoot) return;
-          palette.buildings(baseRoot, 'base');
-          const meshes: THREE.Mesh[] = [];
-          baseRoot.traverse((o) => {
-            if (o instanceof THREE.Mesh) meshes.push(o);
-          });
-          // Keep the original summation order and publish the GPU normal buffer
-          // only once it is complete. Yield between bounded vertex batches.
-          for (const mesh of meshes) {
-            const steps = palette.terrainSteps(mesh);
-            while (!disposed) {
-              const step = steps.next();
-              if (step.done) break;
-              await new Promise<void>((resolve) => setTimeout(resolve, 0));
-            }
-            if (disposed) return;
-          }
+          if (!(await refineBase(baseRoot, palette, () => disposed))) return;
           renderer.shadowMap.needsUpdate = true;
           dirty = true;
         };
@@ -1145,25 +1090,9 @@ export function createScene(
       loadedBytes,
       loadedDetails: [...details.loaded.keys()],
       queuedDetails: details.queued,
-      residentDetailBytes: [...details.loaded.keys()].reduce(
-        (n, key) =>
-          n +
-          (manifest?.landmarks.find((a) => 'landmark-' + a.id === key)?.bytes ??
-            manifest?.zones.find((a) => a.id === key)?.bytes ??
-            manifest?.infrastructure?.find((a) => a.id === key)?.bytes ??
-            manifest?.sports?.find((a) => a.id === key)?.bytes ??
-            0),
-        0,
-      ),
+      residentDetailBytes: manifest ? details.residentBytes(manifest) : 0,
       detailGeometryMiB:
-        Math.round(
-          ([...details.loaded.keys()].reduce(
-            (n, key) => n + (details.geometryCosts.get(key) ?? 0),
-            0,
-          ) /
-            1048576) *
-            10,
-        ) / 10,
+        Math.round((details.geometryBytes() / 1048576) * 10) / 10,
     };
   }
   function animate(time: number) {
@@ -1309,12 +1238,7 @@ export function createScene(
     retry: () => {
       // A rejected decoderPending is permanent for that loader instance.
       // All subsequent parses must share a fresh decoder after a failed preload.
-      if (decoderFailed) {
-        draco.dispose();
-        decoderFailed = false;
-        draco = createDecoder();
-        loader.setDRACOLoader(draco);
-      }
+      loader.recover();
       if (!initialReady) void initialize();
       else {
         void loadBoundary();
@@ -1339,7 +1263,7 @@ export function createScene(
       observer.disconnect();
       releaseWheel();
       controls.dispose();
-      draco.dispose();
+      loader.dispose();
       picking.dispose();
       canvas.removeEventListener('keydown', onKey);
       canvas.removeEventListener('webglcontextlost', onLost);
