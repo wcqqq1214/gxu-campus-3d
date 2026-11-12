@@ -5,7 +5,6 @@ cadastral boundary. Exact terrain cuts keep the campus underpasses open even
 though the historic DEM is much coarser than a bridge.
 """
 import gzip,json,math
-from pathlib import Path
 import numpy as np
 import mapbox_earcut as earcut
 from shapely.geometry import Point,LineString,Polygon,box,mapping,shape

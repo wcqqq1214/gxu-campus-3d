@@ -1,5 +1,5 @@
 """Probe the built southeast civil-school portal using fixed map coordinates."""
-import bpy,json,sys,math,re,hashlib
+import bpy,json,sys,re,hashlib
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree

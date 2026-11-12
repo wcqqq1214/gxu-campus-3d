@@ -1,7 +1,6 @@
 """A photo-supported entrance landing connected sideways to a mapped footway."""
 import copy,hashlib,json,math
-from shapely.geometry import Polygon,LineString,box
-from shapely.ops import unary_union
+from shapely.geometry import Polygon,LineString
 from building_overrides import footprint_revision
 from surroundings_data import surface_shape,triangulate
 

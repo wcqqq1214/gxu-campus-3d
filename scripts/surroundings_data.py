@@ -7,7 +7,7 @@ import json,math
 from pathlib import Path
 import numpy as np
 import mapbox_earcut as earcut
-from shapely.geometry import Polygon,LineString,shape,Point,box
+from shapely.geometry import Polygon,shape,box
 from shapely.ops import transform,unary_union
 from shapely import make_valid
 from context_data import select_context

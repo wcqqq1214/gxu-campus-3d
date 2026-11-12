@@ -1,7 +1,7 @@
 """Bounded repairs of mapped ordinary pavement; retain its exact footprint."""
 import copy,hashlib,json,math
 from pathlib import Path
-from shapely.geometry import Polygon,LineString,Point
+from shapely.geometry import Polygon,Point
 from shapely.ops import unary_union
 from shore_data import effective_surfaces,revision
 from surroundings_data import surface_shape

@@ -1,7 +1,6 @@
 import copy,json,math,shutil,tempfile,unittest
 from pathlib import Path
 from shapely.geometry import Point,Polygon,box
-from shapely.ops import unary_union
 from architecture_data import entrance_tree_masks,clear_entrance_trees
 from infrastructure_footprints import strip_shape
 from vegetation_data import prepare_vegetation

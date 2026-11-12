@@ -47,7 +47,7 @@ npm run dev
 
 Open the Local URL shown in the terminal. Run `npm run build:pages` to build into `out/`, then `npm run preview` to serve it at <http://127.0.0.1:4300/gxu-campus-3d/>.
 
-Run `npm run check` for type checking, lint, and JavaScript/TypeScript tests. Python is pinned to the 3.12 series in `.python-version`; after installing the development dependencies, run `npm run lint:python` for the first stage of Ruff checks. For browser regressions, run `npx playwright install chromium`, then `npm run test:browser` to check menus, cameras, and the Chinese/English interface. Pushes to `dev` automatically run these checks, Python data tests, Blender geometry regressions, and the static build without deploying the site. See [model structure, tests, and rebuilding](docs/MODELING.md) for the full environment requirements.
+Run `npm run check` for type checking, lint, and JavaScript/TypeScript tests. Python is pinned to the 3.12 series in `.python-version`; after installing the development dependencies, run `npm run lint:python` for the Ruff checks. For browser regressions, run `npx playwright install chromium`, then `npm run test:browser` to check menus, cameras, and the Chinese/English interface. Pushes to `dev` automatically run these checks, Python data tests, Blender geometry regressions, and the static build without deploying the site. See [model structure, tests, and rebuilding](docs/MODELING.md) for the full environment requirements.
 
 ## Data and documentation
 

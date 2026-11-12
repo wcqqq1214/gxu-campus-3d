@@ -4,5 +4,5 @@ required-version = "==0.17.4"
 extend-exclude = ["work", "out"]
 
 [tool.ruff.lint]
-# 第一阶段只拦截语法和高确定性错误；风格、导入排序与格式化后续分批接入。
-select = ["E9", "F63", "F7", "F82"]
+# 第二阶段：语法错误与全部 pyflakes 规则（未使用导入、未定义名称等）；导入排序与格式化后续分批接入。
+select = ["E9", "F"]

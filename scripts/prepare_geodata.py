@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """Normalize OSM geometry, preserve courtyards, and assemble attributable scene data."""
 import collections,datetime,json,math
-from pathlib import Path
 import numpy as np
-from PIL import Image,ImageFilter
+from PIL import Image
 from shapely.geometry import Polygon,MultiPolygon,LineString,Point,mapping,shape,box
 from shapely.ops import polygonize,unary_union,transform
 from shapely import make_valid

@@ -1,7 +1,7 @@
 """Sideways entrance connections must meet the selected mapped footway."""
 import copy,hashlib,json,unittest
 from pathlib import Path
-from shapely.geometry import Polygon,LineString
+from shapely.geometry import Polygon
 from side_connection_data import derive_side_connection
 from shore_data import effective_surfaces
 

@@ -1,5 +1,5 @@
 """Small deterministic mesh assembler. Blender coordinates: east X, north Y, up Z."""
-import bpy,math,json
+import bpy,math
 from mathutils import Vector
 MATERIALS=[]
 def material(name,color,roughness=.8,metallic=0):

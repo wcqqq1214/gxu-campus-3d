@@ -1,6 +1,6 @@
 import copy,json,unittest
 from pathlib import Path
-from shapely.geometry import LineString,Polygon
+from shapely.geometry import Polygon
 from building_overrides import load_catalogue,resolve_building,source_catalogue
 from flush_entrance_data import validate_flush_entrance,validate_flush_canopy_footprint
 from front_connection_data import derive_front_connection

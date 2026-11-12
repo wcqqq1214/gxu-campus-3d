@@ -3,7 +3,7 @@
 Callers select and label scene assets explicitly. This module does not import
 models, mutate assets, choose scene layers, or write acceptance reports.
 """
-import bpy, math
+import math
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from vegetation_layout import tree_rotation

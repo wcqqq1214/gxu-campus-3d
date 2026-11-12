@@ -5,8 +5,6 @@ roof rise is additional and explicitly estimated unless separately supplied.
 No footprint, height or entrance here constitutes a new real-world survey.
 """
 import math
-import json
-from pathlib import Path
 import numpy as np
 import mapbox_earcut as earcut
 from shapely.geometry import Polygon, MultiPoint, Point

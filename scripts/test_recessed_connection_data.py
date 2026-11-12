@@ -1,7 +1,7 @@
 """Resolved recessed stairs meet a mapped road using their actual outer face."""
 import copy,hashlib,json,math,unittest
 from pathlib import Path
-from shapely.geometry import Polygon,LineString
+from shapely.geometry import Polygon
 from front_connection_data import derive_front_connection
 from shore_data import effective_surfaces
 from building_overrides import footprint_revision

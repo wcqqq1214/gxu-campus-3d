@@ -1,6 +1,5 @@
 """Reject stale or conflicting short aprons and preserve mapped geometry."""
-import copy,json,math,unittest
-from pathlib import Path
+import copy,unittest
 from shapely.geometry import Polygon
 from entry_apron_data import derive_entry_apron
 from building_overrides import footprint_revision

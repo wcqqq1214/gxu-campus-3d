@@ -27,7 +27,7 @@ def prepare_form(record, parameters):
     def world(u,v,z=None):return cx+u*ux-v*uy,cy+u*uy+v*ux
     local_polygon=transform(local,polygon)
     u0,v0,u1,v1=local_polygon.bounds
-    w,d=u1-u0,v1-v0
+    w,_d=u1-u0,v1-v0
     form={**parameters,'frame':{'center':[cx,cy],'u':[ux,uy],'bounds':[u0,v0,u1,v1]},'solids':[]}
     def part(name,area,lo,hi):
         if area.is_empty:return

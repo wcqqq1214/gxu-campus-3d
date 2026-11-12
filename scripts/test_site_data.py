@@ -1,7 +1,7 @@
 """Entrance-to-road constraints, sources, and crown-aware local exclusions."""
 import copy,json,unittest
 from pathlib import Path
-from shapely.geometry import Polygon,box
+from shapely.geometry import Polygon
 from site_data import derive_site,road_columns
 from architecture_data import architectural_envelope
 

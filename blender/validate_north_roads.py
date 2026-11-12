@@ -1,5 +1,5 @@
 """Ray-test every static scene layer, not just road nodes, against original roads."""
-import gzip,json,sys,math,hashlib
+import gzip,json,math,hashlib
 from pathlib import Path
 import bpy
 from mathutils import Vector

@@ -20,7 +20,7 @@ class HuixueTests(unittest.TestCase):
         colors = {name: i for i, name in enumerate(
             ('stone', 'white', 'glass', 'dark', 'slate', 'wood', 'metal', 'red', 'path', 'green', 'huixueRoof'))}
         xmin, ymin, xmax, ymax = record['bounds']
-        cx, cy = (xmin+xmax)/2, (ymin+ymax)/2
+        _cx, cy = (xmin+xmax)/2, (ymin+ymax)/2
         ground = record['elevation']
         # Independent acceptance probes in world coordinates: the entrance
         # faces east, a wing bay stays open, and the middle stair landing is flat.

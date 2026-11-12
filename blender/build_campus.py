@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build editable campus source and spatially streamed Draco GLBs with Blender 5.2."""
-import bpy,sys,json,math,time,random,hashlib
+import bpy,sys,json,math,random,hashlib
 from contextlib import nullcontext
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))

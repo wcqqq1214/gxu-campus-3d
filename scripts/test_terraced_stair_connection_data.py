@@ -1,5 +1,5 @@
 """A stair apron joins the lower toe without creating an entrance identity."""
-import copy,json,hashlib,unittest,math
+import copy,json,hashlib,unittest
 from pathlib import Path
 from shapely.geometry import Polygon
 from front_connection_data import derive_front_connection

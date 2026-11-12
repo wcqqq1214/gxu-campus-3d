@@ -29,7 +29,7 @@ def context(b,host,c):
 
 
 def resolve_stair_tower_context(buildings):
-    from shapely.geometry import Polygon,box,LineString
+    from shapely.geometry import Polygon,box
     from shapely.geometry.polygon import orient
     from shapely.affinity import rotate,translate
     from shapely.ops import unary_union

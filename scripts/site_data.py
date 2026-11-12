@@ -1,7 +1,7 @@
 """Small sourced forecourts; keep mapped footprints and existing surface slots."""
 import copy,hashlib,json,math
 from pathlib import Path
-from shapely.geometry import Polygon,Point,LineString,box
+from shapely.geometry import Polygon,LineString,box
 from shapely.affinity import rotate,translate
 from shapely.ops import unary_union
 from building_overrides import read_json,footprint_revision

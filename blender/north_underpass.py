@@ -1,5 +1,4 @@
 """Open the mapped passage below retained roads; no pavement over the arterial."""
-import math
 import hashlib
 import json
 from geometry import Mesh

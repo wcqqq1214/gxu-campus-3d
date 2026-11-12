@@ -1,5 +1,5 @@
 """Check actual exterior profiles and source/export contacts, not only the plateau."""
-import bpy,json,sys,math
+import bpy,json,sys
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree

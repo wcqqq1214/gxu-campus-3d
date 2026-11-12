@@ -2,7 +2,6 @@
 Official exterior photo: gjxy.gxu.edu.cn current gallery, capture date unknown.
 Footprint and floors are mapped; tower setbacks / unseen elevations are estimates.
 """
-import math
 from geometry import Mesh
 from library import outline_edges
 from south_gate import inscription

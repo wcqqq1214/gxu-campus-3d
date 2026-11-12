@@ -1,5 +1,5 @@
 """Fixed map/height probes for the annex gable screen and arched aperture."""
-import bpy,json,sys,re,hashlib,math
+import bpy,json,sys,re,hashlib
 from pathlib import Path
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree

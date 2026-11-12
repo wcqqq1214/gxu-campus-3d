@@ -1,5 +1,4 @@
 """Distinct architectural studies, using the reference catalogue and OSM footprints."""
-import math
 from geometry import Mesh
 from student_center import student_center
 from laboratory import laboratory
@@ -48,7 +47,7 @@ def landmark(l,b,z,C,detail=True):
     if l.get('placeKind')=='sculpture':return time_gate(l,z,C,detail)
     if l.get('placeKind')=='gate':return campus_gate(l,z,C,detail)
     m=Mesh();x,y=l['center'];xmin,ymin,xmax,ymax=l['bounds'];w=xmax-xmin;d=ymax-ymin;x=(xmin+xmax)/2;y=(ymin+ymax)/2;h=l['height']
-    stone,white,glass,dark,roof,wood=C['stone'],C['white'],C['glass'],C['dark'],C['slate'],C['wood']
+    stone,white,glass,dark,_roof,wood=C['stone'],C['white'],C['glass'],C['dark'],C['slate'],C['wood']
     if k=='south-gate':
         return south_gate(x,y,z,C,detail,footprint_width=w,footprint_depth=d)
     elif k=='auditorium':

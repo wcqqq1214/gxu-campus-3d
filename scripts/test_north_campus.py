@@ -1,7 +1,6 @@
 """Delivered northern layout: provenance, topology, clear ground, and assets."""
 import hashlib
 import json
-import math
 import unittest
 from pathlib import Path
 from shapely.geometry import Point, Polygon, LineString

@@ -1,7 +1,6 @@
 import copy
 import json
 import math
-import tempfile
 import unittest
 from pathlib import Path
 from shapely.geometry import box

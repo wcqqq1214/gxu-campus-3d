@@ -35,7 +35,7 @@ jobs:
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
       - run: npm ci
       - run: python -m pip install -r scripts/requirements-dev.txt -c scripts/constraints-geodata.txt
-      - name: Python 静态检查（第一阶段）
+      - name: Python 静态检查
         run: npm run lint:python -- --output-format=github
       - name: 安装无损 JPEG 测试依赖
         run: |
