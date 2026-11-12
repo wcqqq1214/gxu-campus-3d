@@ -3,6 +3,7 @@
 The catalogue is input, never a second set of building footprints. Missing
 evidence leaves defaults visible; malformed or stale overrides fail preparation.
 """
+
 import copy
 import hashlib
 import json
@@ -20,20 +21,58 @@ from building_forms import infer_archetype, positive, resolve_form, roof_geometr
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LEVELS = {'living': 6, 'academic': 5, 'culture': 2, 'service': 3}
-ARCHETYPE_LEVELS = {'dormitory':6,'residential-block':6,'teaching-block':5,
-                    'courtyard-lab':5,'low-rise-service':2}
-ARCHETYPES = {'generic', 'dormitory', 'residential-block', 'canteen', 'teaching-block',
-              'courtyard-lab', 'low-rise-service', 'external-stair'}
-FIELDS = {'archetype', 'levels', 'floorHeight', 'floorHeights', 'height', 'roof', 'parts', 'entrances', 'facadeRules', 'exposedFacadeRules', 'stairTower', 'roofDome', 'roofEave', 'terracedStairs', 'roofCrown', 'gableScreen', 'roofVolumes', 'roofEdgeFrames'}
+ARCHETYPE_LEVELS = {
+    'dormitory': 6,
+    'residential-block': 6,
+    'teaching-block': 5,
+    'courtyard-lab': 5,
+    'low-rise-service': 2,
+}
+ARCHETYPES = {
+    'generic',
+    'dormitory',
+    'residential-block',
+    'canteen',
+    'teaching-block',
+    'courtyard-lab',
+    'low-rise-service',
+    'external-stair',
+}
+FIELDS = {
+    'archetype',
+    'levels',
+    'floorHeight',
+    'floorHeights',
+    'height',
+    'roof',
+    'parts',
+    'entrances',
+    'facadeRules',
+    'exposedFacadeRules',
+    'stairTower',
+    'roofDome',
+    'roofEave',
+    'terracedStairs',
+    'roofCrown',
+    'gableScreen',
+    'roofVolumes',
+    'roofEdgeFrames',
+}
 
 
 def ordinary(b):
-    return not (b.get('landmark') or b.get('customModel') or b['id'] == 'way/948683815'
-                or b.get('tags', {}).get('memorial') == 'column')
+    return not (
+        b.get('landmark')
+        or b.get('customModel')
+        or b['id'] == 'way/948683815'
+        or b.get('tags', {}).get('memorial') == 'column'
+    )
 
 
 def footprint_revision(b):
-    return hashlib.sha256(json.dumps(b['polygons'], separators=(',', ':')).encode()).hexdigest()
+    return hashlib.sha256(
+        json.dumps(b['polygons'], separators=(',', ':')).encode()
+    ).hexdigest()
 
 
 def unique_object(pairs):
@@ -50,8 +89,12 @@ def read_json(path):
 
 
 def load_catalogue(path=None):
-    data = read_json(path or ROOT/'data/building-overrides.json')
-    if set(data) != {'schemaVersion', 'buildings'} or type(data['schemaVersion']) is not int or data['schemaVersion'] != 1:
+    data = read_json(path or ROOT / 'data/building-overrides.json')
+    if (
+        set(data) != {'schemaVersion', 'buildings'}
+        or type(data['schemaVersion']) is not int
+        or data['schemaVersion'] != 1
+    ):
         raise ValueError('Building overrides require schemaVersion 1 and buildings')
     if not isinstance(data['buildings'], dict):
         raise ValueError('buildings must be keyed by stable OSM ID')
@@ -62,9 +105,13 @@ def source_catalogue(root=None):
     # Public data is output, not an input dependency of a clean preparation.
     root = Path(root or ROOT)
     sources = []
-    for name in ('sources.json', 'huicui-sources.json',
-                 'basketball-sources.json', 'building-sources.json'):
-        sources.extend(read_json(root/'data'/name))
+    for name in (
+        'sources.json',
+        'huicui-sources.json',
+        'basketball-sources.json',
+        'building-sources.json',
+    ):
+        sources.extend(read_json(root / 'data' / name))
     if len({s['id'] for s in sources}) != len(sources):
         raise ValueError('Duplicate source ID across source catalogues')
     return sources
@@ -74,17 +121,24 @@ def validate_ids(catalogue, buildings):
     available = {b['id'] for b in buildings if ordinary(b)}
     unknown = set(catalogue) - available
     if unknown:
-        raise ValueError(f'Unknown or dedicated building override IDs: {sorted(unknown)}')
+        raise ValueError(
+            f'Unknown or dedicated building override IDs: {sorted(unknown)}'
+        )
 
 
 def evidence(record, field, source_ids):
     item = record.get('evidence', {}).get(field)
-    if not isinstance(item, dict) or item.get('status') not in ('confirmed', 'estimated'):
+    if not isinstance(item, dict) or item.get('status') not in (
+        'confirmed',
+        'estimated',
+    ):
         raise ValueError(f'{field}: explicit confirmed/estimated evidence is required')
     if not isinstance(item.get('note'), str) or not item['note'].strip():
         raise ValueError(f'{field}: evidence rationale is required')
     refs = item.get('sourceRefs')
-    if not isinstance(refs, list) or any(not isinstance(ref,str) or ref not in source_ids for ref in refs):
+    if not isinstance(refs, list) or any(
+        not isinstance(ref, str) or ref not in source_ids for ref in refs
+    ):
         raise ValueError(f'{field}: unknown source reference')
     if item['status'] == 'confirmed' and not refs:
         raise ValueError(f'{field}: confirmed information needs a source')
@@ -103,33 +157,45 @@ def osm_number(tags, key):
 
 def anchor(b, value, exterior=False):
     for key in ('polygon', 'ring', 'edge'):
-        if isinstance(value.get(key), bool) or not isinstance(value.get(key), int) or value[key] < 0:
+        if (
+            isinstance(value.get(key), bool)
+            or not isinstance(value.get(key), int)
+            or value[key] < 0
+        ):
             raise ValueError(f'{b["id"]}: invalid {key} anchor')
     try:
         ring = b['polygons'][value['polygon']][value['ring']]
-        a, c = ring[value['edge']], ring[value['edge']+1]
+        a, c = ring[value['edge']], ring[value['edge'] + 1]
     except IndexError as error:
         raise ValueError(f'{b["id"]}: stale facade anchor') from error
     if exterior and value['ring'] != 0:
         raise ValueError('Ordinary entrances must anchor the exterior ring')
-    dx, dy = c[0]-a[0], c[1]-a[1]; length = math.hypot(dx, dy)
-    if length < .01:
+    dx, dy = c[0] - a[0], c[1] - a[1]
+    length = math.hypot(dx, dy)
+    if length < 0.01:
         raise ValueError('Degenerate facade anchor')
-    sign = 1 if sum(p[0]*q[1]-q[0]*p[1] for p,q in zip(ring,ring[1:])) > 0 else -1
+    sign = (
+        1 if sum(p[0] * q[1] - q[0] * p[1] for p, q in zip(ring, ring[1:])) > 0 else -1
+    )
     # Interior rings face the courtyard regardless of the source winding.
     if value['ring'] > 0:
         sign *= -1
-    return a, c, (dy/length*sign, -dx/length*sign), length
+    return a, c, (dy / length * sign, -dx / length * sign), length
 
 
 def pack_geometry(polys):
     coords, triangles = [], []
     for poly in polys:
-        rings = [[list(p) for p in poly.exterior.coords]] + [[list(p) for p in r.coords] for r in poly.interiors]
+        rings = [[list(p) for p in poly.exterior.coords]] + [
+            [list(p) for p in r.coords] for r in poly.interiors
+        ]
         coords.append(rings)
         xy = [p for r in rings for p in r[:-1]]
-        triangles.append(earcut.triangulate_float64(np.asarray(xy),
-            np.cumsum([len(r)-1 for r in rings], dtype=np.uint32)).tolist())
+        triangles.append(
+            earcut.triangulate_float64(
+                np.asarray(xy), np.cumsum([len(r) - 1 for r in rings], dtype=np.uint32)
+            ).tolist()
+        )
     return coords, triangles
 
 
@@ -140,72 +206,134 @@ def resolve_parts(b, raw, roof):
         raise ValueError('parts must be a nonempty explicit partition')
     for part in raw:
         required = {'id', 'polygons', 'height', 'levels'}
-        if not required <= set(part) or set(part) - required - {'openBelow','roof','wallFinish','baseDepth'} or not isinstance(part['id'],str) or not part['id'] or part['id'] in ids:
+        if (
+            not required <= set(part)
+            or set(part) - required - {'openBelow', 'roof', 'wallFinish', 'baseDepth'}
+            or not isinstance(part['id'], str)
+            or not part['id']
+            or part['id'] in ids
+        ):
             raise ValueError('Each part needs a unique ID, polygons, height and levels')
         ids.add(part['id'])
         polys = [Polygon(p[0], p[1:]) for p in part['polygons']]
-        if not polys or any(not p.is_valid or p.area < .01 for p in polys):
+        if not polys or any(not p.is_valid or p.area < 0.01 for p in polys):
             raise ValueError('Invalid part polygon')
         shape = unary_union(polys)
         if shape.difference(footprint).area > 1e-5:
-            raise ValueError('Part leaves the original footprint or fills its courtyard')
+            raise ValueError(
+                'Part leaves the original footprint or fills its courtyard'
+            )
         if any(shape.intersection(other).area > 1e-5 for other in covered):
             raise ValueError('Building parts overlap')
         covered.append(shape)
-        height = positive(part['height'], 'part height'); levels = positive(part['levels'], 'part levels')
+        height = positive(part['height'], 'part height')
+        levels = positive(part['levels'], 'part levels')
         coords, triangles = pack_geometry(polys)
         part_roof = copy.deepcopy(roof)
         if 'roof' in part:
             own = part['roof']
-            if not isinstance(own,dict) or not {'type','rise'} <= set(own) or set(own)-{'type','rise','mesh','finish','inset','rim'} or own['type'] not in ('flat','hipped','gabled','profiled'):
+            if (
+                not isinstance(own, dict)
+                or not {'type', 'rise'} <= set(own)
+                or set(own) - {'type', 'rise', 'mesh', 'finish', 'inset', 'rim'}
+                or own['type'] not in ('flat', 'hipped', 'gabled', 'profiled')
+            ):
                 raise ValueError('Part roof needs an explicit type and rise')
-            if own['type']=='profiled' and ('mesh' not in own or 'openBelow' in part):
-                raise ValueError('Profiled roof requires an explicit mesh on a solid part')
-            if 'finish' in own and (own['finish'] != 'blue-metal' or own['type'] != 'flat' or 'openBelow' in part):
+            if own['type'] == 'profiled' and ('mesh' not in own or 'openBelow' in part):
+                raise ValueError(
+                    'Profiled roof requires an explicit mesh on a solid part'
+                )
+            if 'finish' in own and (
+                own['finish'] != 'blue-metal'
+                or own['type'] != 'flat'
+                or 'openBelow' in part
+            ):
                 raise ValueError('Blue metal finish requires a solid flat part roof')
-            if type(own['rise']) not in (float,int) or not math.isfinite(own['rise']):
+            if type(own['rise']) not in (float, int) or not math.isfinite(own['rise']):
                 raise ValueError('Part roof rise must be finite and numeric')
-            if (own['type']=='flat' and own['rise']!=0) or (own['type']!='flat' and own['rise']<=0):
+            if (own['type'] == 'flat' and own['rise'] != 0) or (
+                own['type'] != 'flat' and own['rise'] <= 0
+            ):
                 raise ValueError('Part roof rise conflicts with its type')
-            part_roof={**own,'basis':'Explicit part roof; see attributed parts evidence','status':'estimated'}
-            if 'mesh' in own and own['type']=='flat':
+            part_roof = {
+                **own,
+                'basis': 'Explicit part roof; see attributed parts evidence',
+                'status': 'estimated',
+            }
+            if 'mesh' in own and own['type'] == 'flat':
                 raise ValueError('Explicit roof mesh requires a pitched roof')
             if 'inset' in own:
                 width = own['inset']
-                if (own.get('finish') != 'blue-metal' or type(width) not in (int,float)
-                        or not math.isfinite(width) or not .2 <= width <= 3):
-                    raise ValueError('Roof inset requires blue metal and a 0.2–3 m width')
+                if (
+                    own.get('finish') != 'blue-metal'
+                    or type(width) not in (int, float)
+                    or not math.isfinite(width)
+                    or not 0.2 <= width <= 3
+                ):
+                    raise ValueError(
+                        'Roof inset requires blue metal and a 0.2–3 m width'
+                    )
                 # Partition the top instead of overlaying coplanar colored faces.
                 # Preserve each component and courtyard; a narrow neck that
                 # disappears under this estimate needs an explicit roof model.
-                centers = [p.buffer(-width,join_style=2) for p in polys]
-                if any(p.is_empty or p.geom_type != 'Polygon' or p.area < 1
-                       or len(p.interiors) != len(original.interiors)
-                       for original,p in zip(polys,centers)):
+                centers = [p.buffer(-width, join_style=2) for p in polys]
+                if any(
+                    p.is_empty
+                    or p.geom_type != 'Polygon'
+                    or p.area < 1
+                    or len(p.interiors) != len(original.interiors)
+                    for original, p in zip(polys, centers)
+                ):
                     raise ValueError('Roof inset collapses or splits a roof component')
-                border = [p.difference(center) for p,center in zip(polys,centers)]
-                borders = [q for p in border for q in ([p] if p.geom_type=='Polygon' else p.geoms)]
-                for key, surfaces in [('centerGeometry',centers),('borderGeometry',borders)]:
+                border = [p.difference(center) for p, center in zip(polys, centers)]
+                borders = [
+                    q
+                    for p in border
+                    for q in ([p] if p.geom_type == 'Polygon' else p.geoms)
+                ]
+                for key, surfaces in [
+                    ('centerGeometry', centers),
+                    ('borderGeometry', borders),
+                ]:
                     # Exact shared wall anchors can be collinear. Earcut may
                     # retain a zero-area triangle that flips after float32
                     # export. Remove only sub-micrometre top-boundary noise;
                     # the body's facade anchors remain untouched.
-                    surfaces = [p.simplify(1e-7,preserve_topology=True) for p in surfaces]
+                    surfaces = [
+                        p.simplify(1e-7, preserve_topology=True) for p in surfaces
+                    ]
                     vertices, indices = pack_geometry(surfaces)
-                    part_roof[key] = {'polygons':vertices,'triangles':indices}
+                    part_roof[key] = {'polygons': vertices, 'triangles': indices}
         if part_roof['type'] != 'flat':
             if 'mesh' in part_roof:
                 from explicit_roof_data import resolve_roof_mesh
-                part_roof['geometry'] = resolve_roof_mesh(coords, part_roof.pop('mesh'), part_roof['rise'],
-                    raised_eaves=part_roof['type']=='profiled')
+
+                part_roof['geometry'] = resolve_roof_mesh(
+                    coords,
+                    part_roof.pop('mesh'),
+                    part_roof['rise'],
+                    raised_eaves=part_roof['type'] == 'profiled',
+                )
             else:
-                part_roof['geometry'] = roof_geometry(coords, part_roof['type'], part_roof['rise'])
-        resolved = {'id':part['id'], 'polygons':coords, 'triangles':triangles,
-                    'height':height, 'levels':levels, 'roof':part_roof}
+                part_roof['geometry'] = roof_geometry(
+                    coords, part_roof['type'], part_roof['rise']
+                )
+        resolved = {
+            'id': part['id'],
+            'polygons': coords,
+            'triangles': triangles,
+            'height': height,
+            'levels': levels,
+            'roof': part_roof,
+        }
         if 'baseDepth' in part:
             depth = part['baseDepth']
-            if (type(depth) not in (int, float) or not math.isfinite(depth)
-                    or not .5 <= depth <= 2 or 'openBelow' in part):
+            if (
+                type(depth) not in (int, float)
+                or not math.isfinite(depth)
+                or not 0.5 <= depth <= 2
+                or 'openBelow' in part
+            ):
                 raise ValueError('Base depth must be 0.5–2 metres on a closed part')
             # Model ground closure only; no change to the adopted floor datum.
             resolved['baseDepth'] = depth
@@ -215,72 +343,169 @@ def resolve_parts(b, raw, roof):
             resolved['wallFinish'] = part['wallFinish']
         if 'openBelow' in part:
             opening = part['openBelow']
-            if not isinstance(opening, dict) or not {'clearHeight','floorHeight','columns'} <= set(opening) or set(opening)-{'clearHeight','floorHeight','columns','slattedRoof'}:
-                raise ValueError('Open portico needs floor, soffit and explicit columns')
+            if (
+                not isinstance(opening, dict)
+                or not {'clearHeight', 'floorHeight', 'columns'} <= set(opening)
+                or set(opening)
+                - {'clearHeight', 'floorHeight', 'columns', 'slattedRoof'}
+            ):
+                raise ValueError(
+                    'Open portico needs floor, soffit and explicit columns'
+                )
             clear = positive(opening['clearHeight'], 'portico soffit height')
             floor = positive(opening['floorHeight'], 'portico floor height')
-            if part_roof['type'] != 'flat' or not .1 <= floor < clear-2 or clear > height-.15:
+            if (
+                part_roof['type'] != 'flat'
+                or not 0.1 <= floor < clear - 2
+                or clear > height - 0.15
+            ):
                 raise ValueError('Portico floor/soffit/roof heights are inconsistent')
-            columns = opening['columns']; supports = []
-            if not isinstance(columns,list) or not 2 <= len(columns) <= 12:
+            columns = opening['columns']
+            supports = []
+            if not isinstance(columns, list) or not 2 <= len(columns) <= 12:
                 raise ValueError('Portico requires 2–12 explicit columns')
             for column in columns:
-                if not isinstance(column,dict) or not {'center','width','depth','angle'} <= set(column) or set(column)-{'center','width','depth','angle','shape','base','finish','capital'}:
+                if (
+                    not isinstance(column, dict)
+                    or not {'center', 'width', 'depth', 'angle'} <= set(column)
+                    or set(column)
+                    - {
+                        'center',
+                        'width',
+                        'depth',
+                        'angle',
+                        'shape',
+                        'base',
+                        'finish',
+                        'capital',
+                    }
+                ):
                     raise ValueError('Unknown portico column fields')
-                if not isinstance(column['center'],list) or len(column['center']) != 2:
+                if not isinstance(column['center'], list) or len(column['center']) != 2:
                     raise ValueError('Invalid portico column center')
                 values = [*column['center'], column['angle']]
-                if len(column['center']) != 2 or any(isinstance(v,bool) or not isinstance(v,(int,float)) or not math.isfinite(v) for v in values):
+                if len(column['center']) != 2 or any(
+                    isinstance(v, bool)
+                    or not isinstance(v, (int, float))
+                    or not math.isfinite(v)
+                    for v in values
+                ):
                     raise ValueError('Invalid portico column coordinates')
-                w = positive(column['width'],'column width'); d = positive(column['depth'],'column depth')
-                if column.get('shape','box') not in ('box','cylinder') or (column.get('shape')=='cylinder' and abs(w-d)>1e-6):
+                w = positive(column['width'], 'column width')
+                d = positive(column['depth'], 'column depth')
+                if column.get('shape', 'box') not in ('box', 'cylinder') or (
+                    column.get('shape') == 'cylinder' and abs(w - d) > 1e-6
+                ):
                     raise ValueError('Round portico columns need equal width and depth')
-                if 'finish' in column and column['finish'] not in ('white','stone'):
+                if 'finish' in column and column['finish'] not in ('white', 'stone'):
                     raise ValueError('Column finish must use shared white or stone')
-                spread=0
+                spread = 0
                 if 'base' in column:
-                    base=column['base']
-                    if column.get('shape')!='cylinder' or not isinstance(base,dict) or set(base)!={'height','projection','capHeight'}:
-                        raise ValueError('Round column base requires height, projection and cap height')
-                    for key,lo,hi in [('height',.2,.8),('projection',.03,.15),('capHeight',.04,.12)]:
-                        v=base[key]
-                        if type(v) not in (int,float) or not math.isfinite(v) or not lo<=v<=hi:raise ValueError('Invalid column base '+key)
-                    if base['height']<=base['capHeight'] or base['height']>=clear-floor:raise ValueError('Column base must fit its shaft')
-                    spread=base['projection']+.03
+                    base = column['base']
+                    if (
+                        column.get('shape') != 'cylinder'
+                        or not isinstance(base, dict)
+                        or set(base) != {'height', 'projection', 'capHeight'}
+                    ):
+                        raise ValueError(
+                            'Round column base requires height, projection and cap height'
+                        )
+                    for key, lo, hi in [
+                        ('height', 0.2, 0.8),
+                        ('projection', 0.03, 0.15),
+                        ('capHeight', 0.04, 0.12),
+                    ]:
+                        v = base[key]
+                        if (
+                            type(v) not in (int, float)
+                            or not math.isfinite(v)
+                            or not lo <= v <= hi
+                        ):
+                            raise ValueError('Invalid column base ' + key)
+                    if (
+                        base['height'] <= base['capHeight']
+                        or base['height'] >= clear - floor
+                    ):
+                        raise ValueError('Column base must fit its shaft')
+                    spread = base['projection'] + 0.03
                 if 'capital' in column:
-                    capital=column['capital']
-                    if column.get('shape')!='cylinder' or not isinstance(capital,dict) or set(capital)!={'height','projection','taperHeight'}:
-                        raise ValueError('Round column capital requires height, projection and taper height')
-                    for key,lo,hi in [('height',.15,.6),('projection',.03,.15),('taperHeight',.04,.15)]:
-                        v=capital[key]
-                        if type(v) not in (int,float) or not math.isfinite(v) or not lo<=v<=hi:raise ValueError('Invalid column capital '+key)
-                    if capital['taperHeight']>=capital['height'] or capital['height']+column.get('base',{}).get('height',0)>=clear-floor:
+                    capital = column['capital']
+                    if (
+                        column.get('shape') != 'cylinder'
+                        or not isinstance(capital, dict)
+                        or set(capital) != {'height', 'projection', 'taperHeight'}
+                    ):
+                        raise ValueError(
+                            'Round column capital requires height, projection and taper height'
+                        )
+                    for key, lo, hi in [
+                        ('height', 0.15, 0.6),
+                        ('projection', 0.03, 0.15),
+                        ('taperHeight', 0.04, 0.15),
+                    ]:
+                        v = capital[key]
+                        if (
+                            type(v) not in (int, float)
+                            or not math.isfinite(v)
+                            or not lo <= v <= hi
+                        ):
+                            raise ValueError('Invalid column capital ' + key)
+                    if (
+                        capital['taperHeight'] >= capital['height']
+                        or capital['height'] + column.get('base', {}).get('height', 0)
+                        >= clear - floor
+                    ):
                         raise ValueError('Column capital must leave a clear shaft')
-                    spread=max(spread,capital['projection'])
-                support = translate(rotate(box(-w/2-spread,-d/2-spread,w/2+spread,d/2+spread),column['angle'],use_radians=True),*column['center'])
-                if support.difference(shape).area > 1e-5 or any(support.intersection(s).area > 1e-5 for s in supports):
+                    spread = max(spread, capital['projection'])
+                support = translate(
+                    rotate(
+                        box(
+                            -w / 2 - spread,
+                            -d / 2 - spread,
+                            w / 2 + spread,
+                            d / 2 + spread,
+                        ),
+                        column['angle'],
+                        use_radians=True,
+                    ),
+                    *column['center'],
+                )
+                if support.difference(shape).area > 1e-5 or any(
+                    support.intersection(s).area > 1e-5 for s in supports
+                ):
                     raise ValueError('Portico columns leave their footprint or overlap')
                 supports.append(support)
             resolved['openBelow'] = copy.deepcopy(opening)
             if 'slattedRoof' in opening:
                 from slatted_roof_data import resolve_slatted_roof
-                lattice = resolve_slatted_roof(part['polygons'], opening['slattedRoof'], columns)
+
+                lattice = resolve_slatted_roof(
+                    part['polygons'], opening['slattedRoof'], columns
+                )
                 polygons, indices = pack_geometry([lattice])
-                resolved['openBelow']['roofGeometry'] = {'polygons':polygons,'triangles':indices}
+                resolved['openBelow']['roofGeometry'] = {
+                    'polygons': polygons,
+                    'triangles': indices,
+                }
         if 'rim' in part_roof:
             from roof_rim_data import resolve_roof_rim
+
             part_roof['rimGeometry'] = resolve_roof_rim(resolved, part_roof['rim'])
         parts.append(resolved)
     if footprint.symmetric_difference(unary_union(covered)).area > 1e-5:
         raise ValueError('Building parts do not cover the complete mapped footprint')
-    if abs(max(p['height'] for p in parts)-b['height']) > 1e-5:
+    if abs(max(p['height'] for p in parts) - b['height']) > 1e-5:
         raise ValueError('Maximum part height must equal the building body height')
     # A recessed ground floor can split a single roof into two volume parts.
     # Do not turn the shared, equal-height seam into a rooftop parapet.
     for part in parts:
-        adjacent = [Polygon(poly[0],poly[1:]) for other in parts
-                    if other['id'] != part['id'] and abs(other['height']-part['height']) < 1e-6
-                    for poly in other['polygons']]
+        adjacent = [
+            Polygon(poly[0], poly[1:])
+            for other in parts
+            if other['id'] != part['id']
+            and abs(other['height'] - part['height']) < 1e-6
+            for poly in other['polygons']
+        ]
         if adjacent:
             # Polygon subtraction can leave the same rotated edge a few ULPs
             # apart. A 0.1 micrometre overlay tolerance removes that seam;
@@ -289,11 +514,18 @@ def resolve_parts(b, raw, roof):
             edges = []
             for poly in part['polygons']:
                 for ring in poly:
-                    for a,c in zip(ring,ring[1:]):
-                        line = LineString([a,c]).difference(covered)
-                        segments = [line] if line.geom_type == 'LineString' else list(getattr(line,'geoms',[]))
-                        edges.extend([list(s.coords[0]),list(s.coords[-1])] for s in segments
-                                     if s.geom_type == 'LineString' and s.length > .01)
+                    for a, c in zip(ring, ring[1:]):
+                        line = LineString([a, c]).difference(covered)
+                        segments = (
+                            [line]
+                            if line.geom_type == 'LineString'
+                            else list(getattr(line, 'geoms', []))
+                        )
+                        edges.extend(
+                            [list(s.coords[0]), list(s.coords[-1])]
+                            for s in segments
+                            if s.geom_type == 'LineString' and s.length > 0.01
+                        )
             part['parapetEdges'] = edges
     return parts
 
@@ -301,17 +533,43 @@ def resolve_parts(b, raw, roof):
 def resolve_facades(b, form, rules, *, panel_minimum_bottom=3.2):
     from facade_bands_data import validate_horizontal_ledges, validate_window_bands
     from facade_panels_data import validate_panels
+
     indexed = {}
     part_ids = {p['id'] for p in form['parts']} or {'body'}
     for rule in rules:
-        if set(rule) - {'polygon','ring','edge','part','segment','windows','balconies','spacing','skipWindowLevels','openCorridor','windowGrid','windowBands','horizontalLedges','panels','attachedGallery','wallFinish'}:
+        if set(rule) - {
+            'polygon',
+            'ring',
+            'edge',
+            'part',
+            'segment',
+            'windows',
+            'balconies',
+            'spacing',
+            'skipWindowLevels',
+            'openCorridor',
+            'windowGrid',
+            'windowBands',
+            'horizontalLedges',
+            'panels',
+            'attachedGallery',
+            'wallFinish',
+        }:
             raise ValueError('Unknown facade rule field')
         anchor(b, rule)
-        if 'part' in rule and (not isinstance(rule['part'],str) or rule['part'] not in part_ids):
+        if 'part' in rule and (
+            not isinstance(rule['part'], str) or rule['part'] not in part_ids
+        ):
             raise ValueError('Facade rule references an unknown building part')
-        edge_key = tuple(rule[k] for k in ('polygon','ring','edge'))
-        if 'segment' in rule and ('part' not in rule or type(rule['segment']) is not int or rule['segment'] < 0):
-            raise ValueError('Facade segment requires an explicit part and a nonnegative integer')
+        edge_key = tuple(rule[k] for k in ('polygon', 'ring', 'edge'))
+        if 'segment' in rule and (
+            'part' not in rule
+            or type(rule['segment']) is not int
+            or rule['segment'] < 0
+        ):
+            raise ValueError(
+                'Facade segment requires an explicit part and a nonnegative integer'
+            )
         key = (*edge_key, rule.get('part'), rule.get('segment'))
         if key in indexed:
             raise ValueError('Duplicate facade rule')
@@ -319,108 +577,265 @@ def resolve_facades(b, form, rules, *, panel_minimum_bottom=3.2):
             raise ValueError('Do not mix whole-edge and part-specific facade rules')
         if any(k[:4] == key[:4] and (k[4] is None or key[4] is None) for k in indexed):
             raise ValueError('Do not mix whole-part and segment-specific facade rules')
-        for key_bool in ('windows','balconies'):
+        for key_bool in ('windows', 'balconies'):
             if key_bool in rule and not isinstance(rule[key_bool], bool):
                 raise ValueError('Facade window/balcony switches must be boolean')
         if 'wallFinish' in rule:
-            if (rule['wallFinish'] not in ('white','pink','stone') or rule['ring'] != 0
-                    or rule.get('balconies') is not False or any(k in rule for k in ('openCorridor','attachedGallery'))):
-                raise ValueError('Wall finish needs a solid exterior facade and a shared wall colour')
+            if (
+                rule['wallFinish'] not in ('white', 'pink', 'stone')
+                or rule['ring'] != 0
+                or rule.get('balconies') is not False
+                or any(k in rule for k in ('openCorridor', 'attachedGallery'))
+            ):
+                raise ValueError(
+                    'Wall finish needs a solid exterior facade and a shared wall colour'
+                )
         if 'spacing' in rule:
             positive(rule['spacing'], 'window spacing')
         if 'skipWindowLevels' in rule:
-            skipped=rule['skipWindowLevels']
-            if (not isinstance(skipped,list) or not skipped or
-                    any(type(v) is not int or v<0 for v in skipped) or skipped!=sorted(set(skipped))):
-                raise ValueError('Skipped window levels must be ordered unique nonnegative floor indices')
-            if rule.get('windows') is False or any(k in rule for k in ('windowGrid','windowBands','openCorridor','attachedGallery')):
-                raise ValueError('Skipped window levels apply only to enabled generic window rows')
+            skipped = rule['skipWindowLevels']
+            if (
+                not isinstance(skipped, list)
+                or not skipped
+                or any(type(v) is not int or v < 0 for v in skipped)
+                or skipped != sorted(set(skipped))
+            ):
+                raise ValueError(
+                    'Skipped window levels must be ordered unique nonnegative floor indices'
+                )
+            if rule.get('windows') is False or any(
+                k in rule
+                for k in (
+                    'windowGrid',
+                    'windowBands',
+                    'openCorridor',
+                    'attachedGallery',
+                )
+            ):
+                raise ValueError(
+                    'Skipped window levels apply only to enabled generic window rows'
+                )
         if 'horizontalLedges' in rule:
-            if (rule['ring'] != 0 or rule.get('balconies') is not False
-                    or any(k in rule for k in ('openCorridor','windowGrid','windowBands','attachedGallery'))):
-                raise ValueError('Horizontal ledges require an exterior solid facade without conflicting rules')
+            if (
+                rule['ring'] != 0
+                or rule.get('balconies') is not False
+                or any(
+                    k in rule
+                    for k in (
+                        'openCorridor',
+                        'windowGrid',
+                        'windowBands',
+                        'attachedGallery',
+                    )
+                )
+            ):
+                raise ValueError(
+                    'Horizontal ledges require an exterior solid facade without conflicting rules'
+                )
         if 'attachedGallery' in rule:
-            if (rule['ring'] != 0 or rule.get('windows') is False or rule.get('balconies') is not False
-                    or any(k in rule for k in ('openCorridor', 'windowGrid', 'windowBands', 'panels', 'spacing'))):
-                raise ValueError('Attached gallery requires an exterior facade without conflicting window rules')
+            if (
+                rule['ring'] != 0
+                or rule.get('windows') is False
+                or rule.get('balconies') is not False
+                or any(
+                    k in rule
+                    for k in (
+                        'openCorridor',
+                        'windowGrid',
+                        'windowBands',
+                        'panels',
+                        'spacing',
+                    )
+                )
+            ):
+                raise ValueError(
+                    'Attached gallery requires an exterior facade without conflicting window rules'
+                )
         if 'panels' in rule:
             # Explicit panels still render when generic window rows are disabled.
-            if (rule['ring'] != 0 or rule.get('balconies') is not False
-                    or any(k in rule for k in ('windowGrid', 'spacing'))):
-                raise ValueError('Panels need an exterior solid facade with balconies explicitly disabled')
+            if (
+                rule['ring'] != 0
+                or rule.get('balconies') is not False
+                or any(k in rule for k in ('windowGrid', 'spacing'))
+            ):
+                raise ValueError(
+                    'Panels need an exterior solid facade with balconies explicitly disabled'
+                )
         if 'windowBands' in rule:
-            if (rule['ring'] != 0 or rule.get('windows') is False or rule.get('balconies') is True
-                    or any(k in rule for k in ('windowGrid', 'spacing'))):
-                raise ValueError('Window bands require an exterior solid facade without conflicting rules')
+            if (
+                rule['ring'] != 0
+                or rule.get('windows') is False
+                or rule.get('balconies') is True
+                or any(k in rule for k in ('windowGrid', 'spacing'))
+            ):
+                raise ValueError(
+                    'Window bands require an exterior solid facade without conflicting rules'
+                )
         if 'windowGrid' in rule:
-            grid=rule['windowGrid']
-            if not isinstance(grid,dict) or set(grid)!={'columns','firstLevel','edgeInset','widthRatio','heightRatio','pilasterWidth','pilasterDepth','paneRows'}:
-                raise ValueError('Window grid needs explicit bay, floor, pier and pane dimensions')
-            for parameter in ['edgeInset','widthRatio','heightRatio']:
-                positive(grid[parameter],'window grid '+parameter)
-            for parameter in ['pilasterWidth','pilasterDepth']:
-                value=grid[parameter]
-                if type(value) not in (int,float) or not math.isfinite(value) or value<0:
-                    raise ValueError('Window grid pilaster dimensions must be finite and nonnegative')
-            if (grid['pilasterWidth']==0)!=(grid['pilasterDepth']==0):
-                raise ValueError('Window grid pilaster dimensions must both be zero to omit pilasters')
-            for parameter,lower,upper in [('columns',1,32),('paneRows',1,8),('firstLevel',0,49)]:
-                if type(grid[parameter]) is not int or not lower<=grid[parameter]<=upper:
-                    raise ValueError('Invalid window grid '+parameter)
-            if grid['widthRatio']>=1 or grid['heightRatio']>.85:
+            grid = rule['windowGrid']
+            if not isinstance(grid, dict) or set(grid) != {
+                'columns',
+                'firstLevel',
+                'edgeInset',
+                'widthRatio',
+                'heightRatio',
+                'pilasterWidth',
+                'pilasterDepth',
+                'paneRows',
+            }:
+                raise ValueError(
+                    'Window grid needs explicit bay, floor, pier and pane dimensions'
+                )
+            for parameter in ['edgeInset', 'widthRatio', 'heightRatio']:
+                positive(grid[parameter], 'window grid ' + parameter)
+            for parameter in ['pilasterWidth', 'pilasterDepth']:
+                value = grid[parameter]
+                if (
+                    type(value) not in (int, float)
+                    or not math.isfinite(value)
+                    or value < 0
+                ):
+                    raise ValueError(
+                        'Window grid pilaster dimensions must be finite and nonnegative'
+                    )
+            if (grid['pilasterWidth'] == 0) != (grid['pilasterDepth'] == 0):
+                raise ValueError(
+                    'Window grid pilaster dimensions must both be zero to omit pilasters'
+                )
+            for parameter, lower, upper in [
+                ('columns', 1, 32),
+                ('paneRows', 1, 8),
+                ('firstLevel', 0, 49),
+            ]:
+                if (
+                    type(grid[parameter]) is not int
+                    or not lower <= grid[parameter] <= upper
+                ):
+                    raise ValueError('Invalid window grid ' + parameter)
+            if grid['widthRatio'] >= 1 or grid['heightRatio'] > 0.85:
                 raise ValueError('Window grid glazing must leave wall bands')
-            if rule['ring']!=0 or rule.get('windows') is False or rule.get('balconies') is True or 'openCorridor' in rule or 'spacing' in rule:
-                raise ValueError('Window grid requires an exterior windowed facade without conflicting rules')
+            if (
+                rule['ring'] != 0
+                or rule.get('windows') is False
+                or rule.get('balconies') is True
+                or 'openCorridor' in rule
+                or 'spacing' in rule
+            ):
+                raise ValueError(
+                    'Window grid requires an exterior windowed facade without conflicting rules'
+                )
         if 'openCorridor' in rule:
             corridor = rule['openCorridor']
-            required={'depth','firstLevel','railHeight','endInset'}
-            if not isinstance(corridor,dict) or not required <= set(corridor) or set(corridor)-required-{'piers','balusters','finish','openings','lastLevel','firstSlabThickness','frontProfile'}:
-                raise ValueError('Open corridor needs depth, firstLevel, railHeight and endInset')
-            for parameter in ['depth','railHeight','endInset']:
-                positive(corridor[parameter], 'corridor '+parameter)
+            required = {'depth', 'firstLevel', 'railHeight', 'endInset'}
+            if (
+                not isinstance(corridor, dict)
+                or not required <= set(corridor)
+                or set(corridor)
+                - required
+                - {
+                    'piers',
+                    'balusters',
+                    'finish',
+                    'openings',
+                    'lastLevel',
+                    'firstSlabThickness',
+                    'frontProfile',
+                }
+            ):
+                raise ValueError(
+                    'Open corridor needs depth, firstLevel, railHeight and endInset'
+                )
+            for parameter in ['depth', 'railHeight', 'endInset']:
+                positive(corridor[parameter], 'corridor ' + parameter)
             if type(corridor['firstLevel']) is not int or corridor['firstLevel'] < 0:
-                raise ValueError('Corridor firstLevel must be a nonnegative floor index')
-            if 'lastLevel' in corridor and (type(corridor['lastLevel']) is not int or corridor['lastLevel'] < corridor['firstLevel']):
-                raise ValueError('Corridor lastLevel must be an integer at or above firstLevel')
-            if corridor['firstLevel']==0 and 'piers' not in corridor:
+                raise ValueError(
+                    'Corridor firstLevel must be a nonnegative floor index'
+                )
+            if 'lastLevel' in corridor and (
+                type(corridor['lastLevel']) is not int
+                or corridor['lastLevel'] < corridor['firstLevel']
+            ):
+                raise ValueError(
+                    'Corridor lastLevel must be an integer at or above firstLevel'
+                )
+            if corridor['firstLevel'] == 0 and 'piers' not in corridor:
                 raise ValueError('Ground-level open corridor requires explicit piers')
             if 'piers' in corridor:
-                piers=corridor['piers']
-                if not isinstance(piers,dict) or not {'bays','width','depth'}<=set(piers) or set(piers)-{'bays','width','depth','firstLevel'} or type(piers['bays']) is not int or not 1<=piers['bays']<=24:
-                    raise ValueError('Corridor piers need bounded bays, width and depth')
-                for parameter in ('width','depth'):positive(piers[parameter],'corridor pier '+parameter)
+                piers = corridor['piers']
+                if (
+                    not isinstance(piers, dict)
+                    or not {'bays', 'width', 'depth'} <= set(piers)
+                    or set(piers) - {'bays', 'width', 'depth', 'firstLevel'}
+                    or type(piers['bays']) is not int
+                    or not 1 <= piers['bays'] <= 24
+                ):
+                    raise ValueError(
+                        'Corridor piers need bounded bays, width and depth'
+                    )
+                for parameter in ('width', 'depth'):
+                    positive(piers[parameter], 'corridor pier ' + parameter)
             if 'balusters' in corridor:
-                rail=corridor['balusters']
-                if not isinstance(rail,dict) or set(rail)!={'spacing','width'}:
+                rail = corridor['balusters']
+                if not isinstance(rail, dict) or set(rail) != {'spacing', 'width'}:
                     raise ValueError('Balusters need spacing and width')
-                for parameter in ('spacing','width'):positive(rail[parameter],'baluster '+parameter)
-                if not .08<=rail['width']<=.18 or not rail['width']+.12<=rail['spacing']<=.6 or corridor['railHeight']<.5:
-                    raise ValueError('Balusters need usable clear gaps and railing height')
+                for parameter in ('spacing', 'width'):
+                    positive(rail[parameter], 'baluster ' + parameter)
+                if (
+                    not 0.08 <= rail['width'] <= 0.18
+                    or not rail['width'] + 0.12 <= rail['spacing'] <= 0.6
+                    or corridor['railHeight'] < 0.5
+                ):
+                    raise ValueError(
+                        'Balusters need usable clear gaps and railing height'
+                    )
             if rule.get('balconies') is True:
-                raise ValueError('Open corridor requires a boundary facade without added balconies')
+                raise ValueError(
+                    'Open corridor requires a boundary facade without added balconies'
+                )
         indexed[key] = rule
-    parts = form['parts'] or [{'id':'body', 'polygons':b['polygons'],
-                              'height':form['height'], 'levels':form['levels'], 'roof':form['roof']}]
+    parts = form['parts'] or [
+        {
+            'id': 'body',
+            'polygons': b['polygons'],
+            'height': form['height'],
+            'levels': form['levels'],
+            'roof': form['roof'],
+        }
+    ]
     result = []
-    has_slatted_portico = any('slattedRoof' in p.get('openBelow',{}) for p in parts)
+    has_slatted_portico = any('slattedRoof' in p.get('openBelow', {}) for p in parts)
     corridor_strips = []
     matched = {key: 0 for key in indexed}
     for pi, poly in enumerate(b['polygons']):
         for ri, ring in enumerate(poly):
-            for ei in range(len(ring)-1):
-                a,c,normal,_ = anchor(b, {'polygon':pi,'ring':ri,'edge':ei})
-                line = LineString([a,c])
+            for ei in range(len(ring) - 1):
+                a, c, normal, _ = anchor(b, {'polygon': pi, 'ring': ri, 'edge': ei})
+                line = LineString([a, c])
                 # Recover partial clipping only when the complete mapped edge
                 # is actually missing coverage. An already complete partition
                 # may contain sub-micrometre return slivers; expanding every
                 # nearly coincident boundary would overlap its neighbour.
-                clipped_length = sum(line.intersection(unary_union([
-                    Polygon(p[0], p[1:]) for p in part['polygons']])).length for part in parts)
-                incomplete_edge = abs(clipped_length-line.length) > 1e-5
+                clipped_length = sum(
+                    line.intersection(
+                        unary_union([Polygon(p[0], p[1:]) for p in part['polygons']])
+                    ).length
+                    for part in parts
+                )
+                incomplete_edge = abs(clipped_length - line.length) > 1e-5
                 for part in parts:
-                    shape = unary_union([Polygon(p[0],p[1:]) for p in part['polygons']])
+                    shape = unary_union(
+                        [Polygon(p[0], p[1:]) for p in part['polygons']]
+                    )
                     segment = line.intersection(shape)
-                    segments = [segment] if segment.geom_type == 'LineString' else [s for s in getattr(segment,'geoms',[]) if s.geom_type == 'LineString']
+                    segments = (
+                        [segment]
+                        if segment.geom_type == 'LineString'
+                        else [
+                            s
+                            for s in getattr(segment, 'geoms', [])
+                            if s.geom_type == 'LineString'
+                        ]
+                    )
                     # Clipping a slightly oblique mapped edge can place a new
                     # endpoint a few ULPs outside the original line. Recover
                     # only coincident boundary intervals, not buffered shapes
@@ -428,142 +843,344 @@ def resolve_facades(b, form, rules, *, panel_minimum_bottom=3.2):
                     boundary_segments = []
                     for rings in part['polygons']:
                         for boundary in rings:
-                            for v,w in zip(boundary,boundary[1:]):
-                                if max(line.distance(Point(v)),line.distance(Point(w))) > 1e-7:
+                            for v, w in zip(boundary, boundary[1:]):
+                                if (
+                                    max(
+                                        line.distance(Point(v)), line.distance(Point(w))
+                                    )
+                                    > 1e-7
+                                ):
                                     continue
-                                lo,hi=sorted((line.project(Point(v)),line.project(Point(w))))
-                                if hi-lo>.01:
-                                    boundary_segments.append(LineString([line.interpolate(lo),line.interpolate(hi)]))
+                                lo, hi = sorted(
+                                    (line.project(Point(v)), line.project(Point(w)))
+                                )
+                                if hi - lo > 0.01:
+                                    boundary_segments.append(
+                                        LineString(
+                                            [line.interpolate(lo), line.interpolate(hi)]
+                                        )
+                                    )
                     # Any partition can lose a partial oblique edge to GEOS
                     # roundoff, including equal-storey solid wings. Recover
                     # only the coincident intervals collected above.
-                    if not any(s.length > .01 for s in segments) or (('floorHeights' in part or has_slatted_portico or incomplete_edge) and boundary_segments and abs(sum(s.length for s in segments)-sum(s.length for s in boundary_segments))>1e-5):
-                        segments=boundary_segments
-                    segments = sorted((s for s in segments if s.length >= .01),
-                                      key=lambda s: min(line.project(Point(p)) for p in s.coords))
-                    for segment_index,s in enumerate(segments):
-                        rule_key = (pi,ri,ei,part['id'],segment_index)
+                    if not any(s.length > 0.01 for s in segments) or (
+                        (
+                            'floorHeights' in part
+                            or has_slatted_portico
+                            or incomplete_edge
+                        )
+                        and boundary_segments
+                        and abs(
+                            sum(s.length for s in segments)
+                            - sum(s.length for s in boundary_segments)
+                        )
+                        > 1e-5
+                    ):
+                        segments = boundary_segments
+                    segments = sorted(
+                        (s for s in segments if s.length >= 0.01),
+                        key=lambda s: min(line.project(Point(p)) for p in s.coords),
+                    )
+                    for segment_index, s in enumerate(segments):
+                        rule_key = (pi, ri, ei, part['id'], segment_index)
                         if rule_key not in indexed:
-                            rule_key = (pi,ri,ei,part['id'],None)
+                            rule_key = (pi, ri, ei, part['id'], None)
                         if rule_key not in indexed:
-                            rule_key = (pi,ri,ei,None,None)
-                        rule = indexed.get(rule_key,{})
+                            rule_key = (pi, ri, ei, None, None)
+                        rule = indexed.get(rule_key, {})
                         if rule_key in matched:
                             matched[rule_key] += 1
-                        start,end = list(s.coords)[0],list(s.coords)[-1]
-                        if line.project(Point(start)) > line.project(Point(end)): start,end=end,start
-                        facade = {'polygon':pi,'ring':ri,'edge':ei,'part':part['id'],
-                            'start':list(start),'end':list(end),'normal':list(normal),'height':part['height'],
-                            'levels':part['levels'],'rule':rule}
+                        start, end = list(s.coords)[0], list(s.coords)[-1]
+                        if line.project(Point(start)) > line.project(Point(end)):
+                            start, end = end, start
+                        facade = {
+                            'polygon': pi,
+                            'ring': ri,
+                            'edge': ei,
+                            'part': part['id'],
+                            'start': list(start),
+                            'end': list(end),
+                            'normal': list(normal),
+                            'height': part['height'],
+                            'levels': part['levels'],
+                            'rule': rule,
+                        }
                         if 'floorHeights' in form:
-                            facade['floorHeights'] = list(part.get('floorHeights',form['floorHeights']))
+                            facade['floorHeights'] = list(
+                                part.get('floorHeights', form['floorHeights'])
+                            )
                         if 'wallFinish' in rule:
-                            matching=[(v,w) for rings in part['polygons'] for boundary in rings for v,w in zip(boundary,boundary[1:])
-                                      if ((math.dist(v,start)<1e-6 and math.dist(w,end)<1e-6) or
-                                          (math.dist(w,start)<1e-6 and math.dist(v,end)<1e-6))]
-                            if 'openBelow' in part or len(matching)!=1:
-                                raise ValueError('Wall finish requires one complete solid part wall')
+                            matching = [
+                                (v, w)
+                                for rings in part['polygons']
+                                for boundary in rings
+                                for v, w in zip(boundary, boundary[1:])
+                                if (
+                                    (
+                                        math.dist(v, start) < 1e-6
+                                        and math.dist(w, end) < 1e-6
+                                    )
+                                    or (
+                                        math.dist(w, start) < 1e-6
+                                        and math.dist(v, end) < 1e-6
+                                    )
+                                )
+                            ]
+                            if 'openBelow' in part or len(matching) != 1:
+                                raise ValueError(
+                                    'Wall finish requires one complete solid part wall'
+                                )
                         if 'skipWindowLevels' in rule:
-                            if 'openBelow' in part or part['levels']!=int(part['levels']) or max(rule['skipWindowLevels'])>=part['levels']:
-                                raise ValueError('Skipped window levels must exist on their solid facade part')
+                            if (
+                                'openBelow' in part
+                                or part['levels'] != int(part['levels'])
+                                or max(rule['skipWindowLevels']) >= part['levels']
+                            ):
+                                raise ValueError(
+                                    'Skipped window levels must exist on their solid facade part'
+                                )
                         if 'attachedGallery' in rule:
                             from attached_gallery_data import resolve_attached_gallery
-                            if abs(s.length-line.length)>1e-5:
-                                raise ValueError('Attached gallery needs an undivided mapped facade')
-                            facade['attachedGallery'] = resolve_attached_gallery(b, facade, part, rule['attachedGallery'])
+
+                            if abs(s.length - line.length) > 1e-5:
+                                raise ValueError(
+                                    'Attached gallery needs an undivided mapped facade'
+                                )
+                            facade['attachedGallery'] = resolve_attached_gallery(
+                                b, facade, part, rule['attachedGallery']
+                            )
                         if 'horizontalLedges' in rule:
-                            if 'openBelow' in part or ('part' not in rule and abs(s.length-line.length)>1e-5):
-                                raise ValueError('Horizontal ledges need one undivided solid facade edge')
-                            validate_horizontal_ledges(rule['horizontalLedges'], part['height'])
+                            if 'openBelow' in part or (
+                                'part' not in rule
+                                and abs(s.length - line.length) > 1e-5
+                            ):
+                                raise ValueError(
+                                    'Horizontal ledges need one undivided solid facade edge'
+                                )
+                            validate_horizontal_ledges(
+                                rule['horizontalLedges'], part['height']
+                            )
                         if 'windowBands' in facade['rule']:
-                            if 'openBelow' in part or ('part' not in rule and abs(s.length-line.length)>1e-5):
-                                raise ValueError('Window bands need one undivided solid facade edge')
-                            validate_window_bands(facade['rule']['windowBands'], s.length,
-                                                  part['height'], part['levels'])
+                            if 'openBelow' in part or (
+                                'part' not in rule
+                                and abs(s.length - line.length) > 1e-5
+                            ):
+                                raise ValueError(
+                                    'Window bands need one undivided solid facade edge'
+                                )
+                            validate_window_bands(
+                                facade['rule']['windowBands'],
+                                s.length,
+                                part['height'],
+                                part['levels'],
+                            )
                         if 'panels' in rule:
-                            if 'openBelow' in part or ('part' not in rule and abs(s.length-line.length)>1e-5):
-                                raise ValueError('Panels need one undivided solid facade edge')
-                            validate_panels(rule['panels'], s.length, part['height'], part['levels'], rule.get('windowBands'), rule.get('horizontalLedges'), minimum_bottom=panel_minimum_bottom)
+                            if 'openBelow' in part or (
+                                'part' not in rule
+                                and abs(s.length - line.length) > 1e-5
+                            ):
+                                raise ValueError(
+                                    'Panels need one undivided solid facade edge'
+                                )
+                            validate_panels(
+                                rule['panels'],
+                                s.length,
+                                part['height'],
+                                part['levels'],
+                                rule.get('windowBands'),
+                                rule.get('horizontalLedges'),
+                                minimum_bottom=panel_minimum_bottom,
+                            )
                             from facade_panels_data import resolve_round_window_walls
-                            round_walls = resolve_round_window_walls(rule['panels'], s.length)
+
+                            round_walls = resolve_round_window_walls(
+                                rule['panels'], s.length
+                            )
                             if round_walls:
                                 facade['roundWindowWalls'] = round_walls
                         if 'openBelow' in part:
                             if 'openCorridor' in facade['rule']:
-                                raise ValueError('Corridor requires a solid flat-roofed part with whole floors')
+                                raise ValueError(
+                                    'Corridor requires a solid flat-roofed part with whole floors'
+                                )
                             if part['levels'] == 1:
                                 if 'windowGrid' in facade['rule']:
-                                    raise ValueError('Window grid cannot occupy a one-level open portico')
-                                facade['rule'] = {'windows':False}
+                                    raise ValueError(
+                                        'Window grid cannot occupy a one-level open portico'
+                                    )
+                                facade['rule'] = {'windows': False}
                             else:
-                                facade['minimumHeight'] = part['openBelow']['clearHeight']
+                                facade['minimumHeight'] = part['openBelow'][
+                                    'clearHeight'
+                                ]
                         if 'windowGrid' in facade['rule']:
-                            grid=facade['rule']['windowGrid'];length=math.dist(start,end)
-                            if 'part' not in rule and abs(length-line.length)>1e-5:
-                                raise ValueError('Window grid needs one undivided original facade edge')
-                            if part['levels']!=int(part['levels']) or grid['firstLevel']>=part['levels']:
-                                raise ValueError('Window grid requires whole floors above firstLevel')
-                            bay=(length-2*grid['edgeInset'])/grid['columns'];fh=part['height']/part['levels']
-                            if grid['edgeInset']<grid['pilasterWidth']/2 or bay*(1-grid['widthRatio'])<=grid['pilasterWidth']+.12:
-                                raise ValueError('Window grid frames and piers do not fit within the facade')
-                            if grid['pilasterDepth']>bay/2 or fh*grid['heightRatio']<=grid['paneRows']*.06:
-                                raise ValueError('Window grid pier depth or pane spacing is not usable')
-                            if (grid['firstLevel']+.56-grid['heightRatio']/2)*fh<facade.get('minimumHeight',0):
-                                raise ValueError('Window grid glazing intrudes into the open portico')
+                            grid = facade['rule']['windowGrid']
+                            length = math.dist(start, end)
+                            if 'part' not in rule and abs(length - line.length) > 1e-5:
+                                raise ValueError(
+                                    'Window grid needs one undivided original facade edge'
+                                )
+                            if (
+                                part['levels'] != int(part['levels'])
+                                or grid['firstLevel'] >= part['levels']
+                            ):
+                                raise ValueError(
+                                    'Window grid requires whole floors above firstLevel'
+                                )
+                            bay = (length - 2 * grid['edgeInset']) / grid['columns']
+                            fh = part['height'] / part['levels']
+                            if (
+                                grid['edgeInset'] < grid['pilasterWidth'] / 2
+                                or bay * (1 - grid['widthRatio'])
+                                <= grid['pilasterWidth'] + 0.12
+                            ):
+                                raise ValueError(
+                                    'Window grid frames and piers do not fit within the facade'
+                                )
+                            if (
+                                grid['pilasterDepth'] > bay / 2
+                                or fh * grid['heightRatio'] <= grid['paneRows'] * 0.06
+                            ):
+                                raise ValueError(
+                                    'Window grid pier depth or pane spacing is not usable'
+                                )
+                            if (
+                                grid['firstLevel'] + 0.56 - grid['heightRatio'] / 2
+                            ) * fh < facade.get('minimumHeight', 0):
+                                raise ValueError(
+                                    'Window grid glazing intrudes into the open portico'
+                                )
                         if 'openCorridor' in facade['rule']:
-                            corridor=facade['rule']['openCorridor'];fh=part['height']/part['levels']
-                            if part['levels']!=int(part['levels']):
-                                raise ValueError('Corridor requires a solid part with whole floors')
-                            if corridor.get('lastLevel',corridor['firstLevel'])>=part['levels'] or corridor['railHeight']>=fh-.5:
-                                raise ValueError('Corridor floors or railing leave no upper opening')
-                            length=math.dist(start,end);inset=corridor['endInset']
+                            corridor = facade['rule']['openCorridor']
+                            fh = part['height'] / part['levels']
+                            if part['levels'] != int(part['levels']):
+                                raise ValueError(
+                                    'Corridor requires a solid part with whole floors'
+                                )
+                            if (
+                                corridor.get('lastLevel', corridor['firstLevel'])
+                                >= part['levels']
+                                or corridor['railHeight'] >= fh - 0.5
+                            ):
+                                raise ValueError(
+                                    'Corridor floors or railing leave no upper opening'
+                                )
+                            length = math.dist(start, end)
+                            inset = corridor['endInset']
                             from corridor_detail_data import (
                                 validate_corridor_details,
                                 validate_corridor_facade_layers,
                             )
-                            validate_corridor_details(facade['rule'],length,part['height'],part['levels'])
-                            validate_corridor_facade_layers(facade['rule'],part['height'],part['levels'])
-                            if length-2*inset<2:
-                                raise ValueError('Corridor end returns leave no usable facade')
+
+                            validate_corridor_details(
+                                facade['rule'], length, part['height'], part['levels']
+                            )
+                            validate_corridor_facade_layers(
+                                facade['rule'], part['height'], part['levels']
+                            )
+                            if length - 2 * inset < 2:
+                                raise ValueError(
+                                    'Corridor end returns leave no usable facade'
+                                )
                             if 'piers' in corridor:
-                                piers=corridor['piers'];bay=(length-2*inset)/piers['bays']
-                                if piers['width']>=bay-.8 or piers['width']/2>inset or not .15<=piers['depth']<=corridor['depth']:
-                                    raise ValueError('Corridor piers must fit inside the facade and leave usable bays')
-                            tangent=[(end[k]-start[k])/length for k in (0,1)]
-                            a0=[start[k]+tangent[k]*inset for k in (0,1)]
-                            c0=[end[k]-tangent[k]*inset for k in (0,1)]
-                            strip=Polygon([a0,c0,[c0[k]-normal[k]*corridor['depth'] for k in (0,1)],
-                                           [a0[k]-normal[k]*corridor['depth'] for k in (0,1)]])
-                            if strip.difference(shape).area>1e-5:
-                                raise ValueError('Corridor leaves its part or reaches a courtyard')
-                            if any(strip.intersection(other).area>1e-5 for other in corridor_strips):
-                                raise ValueError('Corridor recesses overlap at a corner')
+                                piers = corridor['piers']
+                                bay = (length - 2 * inset) / piers['bays']
+                                if (
+                                    piers['width'] >= bay - 0.8
+                                    or piers['width'] / 2 > inset
+                                    or not 0.15 <= piers['depth'] <= corridor['depth']
+                                ):
+                                    raise ValueError(
+                                        'Corridor piers must fit inside the facade and leave usable bays'
+                                    )
+                            tangent = [(end[k] - start[k]) / length for k in (0, 1)]
+                            a0 = [start[k] + tangent[k] * inset for k in (0, 1)]
+                            c0 = [end[k] - tangent[k] * inset for k in (0, 1)]
+                            strip = Polygon(
+                                [
+                                    a0,
+                                    c0,
+                                    [
+                                        c0[k] - normal[k] * corridor['depth']
+                                        for k in (0, 1)
+                                    ],
+                                    [
+                                        a0[k] - normal[k] * corridor['depth']
+                                        for k in (0, 1)
+                                    ],
+                                ]
+                            )
+                            if strip.difference(shape).area > 1e-5:
+                                raise ValueError(
+                                    'Corridor leaves its part or reaches a courtyard'
+                                )
+                            if any(
+                                strip.intersection(other).area > 1e-5
+                                for other in corridor_strips
+                            ):
+                                raise ValueError(
+                                    'Corridor recesses overlap at a corner'
+                                )
                             corridor_strips.append(strip)
                         result.append(facade)
-                covered=sum(math.dist(f['start'],f['end']) for f in result
-                            if (f['polygon'],f['ring'],f['edge'])==(pi,ri,ei))
-                if abs(covered-line.length)>1e-5:
-                    raise ValueError(f'{b["id"]}: missing/duplicate facade at {(pi,ri,ei)}')
-    for key,count in matched.items():
+                covered = sum(
+                    math.dist(f['start'], f['end'])
+                    for f in result
+                    if (f['polygon'], f['ring'], f['edge']) == (pi, ri, ei)
+                )
+                if abs(covered - line.length) > 1e-5:
+                    raise ValueError(
+                        f'{b["id"]}: missing/duplicate facade at {(pi, ri, ei)}'
+                    )
+    for key, count in matched.items():
         if key[3] is not None and count != 1:
-            raise ValueError('Part-specific facade must resolve to one continuous exterior segment')
+            raise ValueError(
+                'Part-specific facade must resolve to one continuous exterior segment'
+            )
     # A low portico exposes the main wall above its roof. This boundary is
     # inside the mapped outline, so the ordinary exterior-ring pass misses it.
     for porch in (p for p in parts if 'openBelow' in p):
-        porch_shape = unary_union([Polygon(p[0],p[1:]) for p in porch['polygons']])
+        porch_shape = unary_union([Polygon(p[0], p[1:]) for p in porch['polygons']])
         for part in parts:
-            if part['height'] <= porch['height']: continue
-            for pi,poly in enumerate(part['polygons']):
-                for ri,ring in enumerate(poly):
-                    for ei in range(len(ring)-1):
-                        a,c,n,_ = anchor({'id':b['id'],'polygons':part['polygons']},{'polygon':pi,'ring':ri,'edge':ei})
-                        segment = LineString([a,c]).intersection(porch_shape.boundary)
-                        segments = [segment] if segment.geom_type == 'LineString' else [s for s in getattr(segment,'geoms',[]) if s.geom_type == 'LineString']
+            if part['height'] <= porch['height']:
+                continue
+            for pi, poly in enumerate(part['polygons']):
+                for ri, ring in enumerate(poly):
+                    for ei in range(len(ring) - 1):
+                        a, c, n, _ = anchor(
+                            {'id': b['id'], 'polygons': part['polygons']},
+                            {'polygon': pi, 'ring': ri, 'edge': ei},
+                        )
+                        segment = LineString([a, c]).intersection(porch_shape.boundary)
+                        segments = (
+                            [segment]
+                            if segment.geom_type == 'LineString'
+                            else [
+                                s
+                                for s in getattr(segment, 'geoms', [])
+                                if s.geom_type == 'LineString'
+                            ]
+                        )
                         for line in segments:
-                            if line.length < .01: continue
-                            result.append({'polygon':None,'ring':None,'edge':None,'part':part['id'],
-                                'start':list(line.coords[0]),'end':list(line.coords[-1]),'normal':list(n),
-                                'height':part['height'],'levels':part['levels'],'minimumHeight':porch['openBelow']['floorHeight'] if 'slattedRoof' in porch['openBelow'] else porch['height'],'rule':{}})
+                            if line.length < 0.01:
+                                continue
+                            result.append(
+                                {
+                                    'polygon': None,
+                                    'ring': None,
+                                    'edge': None,
+                                    'part': part['id'],
+                                    'start': list(line.coords[0]),
+                                    'end': list(line.coords[-1]),
+                                    'normal': list(n),
+                                    'height': part['height'],
+                                    'levels': part['levels'],
+                                    'minimumHeight': porch['openBelow']['floorHeight']
+                                    if 'slattedRoof' in porch['openBelow']
+                                    else porch['height'],
+                                    'rule': {},
+                                }
+                            )
                             if 'floorHeights' in part:
                                 result[-1]['floorHeights'] = list(part['floorHeights'])
     return result
@@ -571,61 +1188,112 @@ def resolve_facades(b, form, rules, *, panel_minimum_bottom=3.2):
 
 def resolve_building(building, record=None, source_ids=None):
     if not ordinary(building):
-        if record is not None: raise ValueError('Dedicated models do not use ordinary overrides')
+        if record is not None:
+            raise ValueError('Dedicated models do not use ordinary overrides')
         return copy.deepcopy(building)
-    b = copy.deepcopy(building); record = record or {}; source_ids = set(source_ids or {'osm'})
-    if set(record) - FIELDS - {'footprintRevision','evidence','review','name'}:
+    b = copy.deepcopy(building)
+    record = record or {}
+    source_ids = set(source_ids or {'osm'})
+    if set(record) - FIELDS - {'footprintRevision', 'evidence', 'review', 'name'}:
         raise ValueError(f'{b["id"]}: unknown building override field')
     if record and record.get('footprintRevision') != footprint_revision(b):
-        raise ValueError(f'{b["id"]}: footprint revision changed; recheck anchors and parts')
-    expected_evidence=(FIELDS & set(record) - {'roof'}) | {'roof.'+key for key in record.get('roof',{})}
-    if set(record.get('evidence',{})) != expected_evidence:
-        raise ValueError(f'{b["id"]}: evidence fields must exactly match applied override fields')
-    provenance = {}; warnings = []
+        raise ValueError(
+            f'{b["id"]}: footprint revision changed; recheck anchors and parts'
+        )
+    expected_evidence = (FIELDS & set(record) - {'roof'}) | {
+        'roof.' + key for key in record.get('roof', {})
+    }
+    if set(record.get('evidence', {})) != expected_evidence:
+        raise ValueError(
+            f'{b["id"]}: evidence fields must exactly match applied override fields'
+        )
+    provenance = {}
+    warnings = []
     for field in FIELDS & set(record) - {'roof'}:
         provenance[field] = evidence(record, field, source_ids)
-    tags = b['tags']; levels, warning = osm_number(tags, 'building:levels')
-    if warning: warnings.append(warning)
+    tags = b['tags']
+    levels, warning = osm_number(tags, 'building:levels')
+    if warning:
+        warnings.append(warning)
     height, warning = osm_number(tags, 'height')
-    if warning: warnings.append(warning)
-    archetype=record.get('archetype',infer_archetype(b))
-    default_levels=ARCHETYPE_LEVELS.get(archetype,DEFAULT_LEVELS[b['category']])
+    if warning:
+        warnings.append(warning)
+    archetype = record.get('archetype', infer_archetype(b))
+    default_levels = ARCHETYPE_LEVELS.get(archetype, DEFAULT_LEVELS[b['category']])
     b['levels'] = positive(record.get('levels', levels or default_levels), 'levels')
     floor_height = positive(record.get('floorHeight', 3.3), 'floorHeight')
-    b['height'] = positive(record.get('height', height or b['levels']*floor_height), 'height')
+    b['height'] = positive(
+        record.get('height', height or b['levels'] * floor_height), 'height'
+    )
     if 'floorHeights' in record:
         floors = record['floorHeights']
-        if (not isinstance(floors, list) or len(floors) != b['levels'] or not floors
-                or any(type(value) not in (int, float) for value in floors)):
-            raise ValueError('floorHeights needs one numeric height per complete storey')
+        if (
+            not isinstance(floors, list)
+            or len(floors) != b['levels']
+            or not floors
+            or any(type(value) not in (int, float) for value in floors)
+        ):
+            raise ValueError(
+                'floorHeights needs one numeric height per complete storey'
+            )
         floors = [positive(value, 'floorHeights item') for value in floors]
         if 'floorHeight' in record:
             raise ValueError('Use either floorHeight or floorHeights')
         # Specialized layouts currently use equal-storey geometry. Reject
         # combinations until their geometry also consumes the explicit stack.
         if 'stairTower' in record or any(
-                set(rule) - {'polygon', 'ring', 'edge', 'part', 'windows', 'balconies', 'spacing'}
-                for rule in record.get('facadeRules', [])):
-            raise ValueError('floorHeights currently requires ordinary facades without specialized layouts')
+            set(rule)
+            - {'polygon', 'ring', 'edge', 'part', 'windows', 'balconies', 'spacing'}
+            for rule in record.get('facadeRules', [])
+        ):
+            raise ValueError(
+                'floorHeights currently requires ordinary facades without specialized layouts'
+            )
         total = math.fsum(floors)
-        if 'height' in record and not math.isclose(b['height'], total, abs_tol=1e-6, rel_tol=0):
+        if 'height' in record and not math.isclose(
+            b['height'], total, abs_tol=1e-6, rel_tol=0
+        ):
             raise ValueError('Explicit height conflicts with the floorHeights sum')
         if height and not math.isclose(height, total, abs_tol=1e-6, rel_tol=0):
-            warnings.append('OSM height differs from the adopted floorHeights sum; explicit storeys take precedence')
+            warnings.append(
+                'OSM height differs from the adopted floorHeights sum; explicit storeys take precedence'
+            )
         b['height'] = total
-        provenance.setdefault('height', {'status': 'estimated',
-            'sourceRefs': provenance['floorHeights']['sourceRefs'],
-            'note': '逐层层高之和推导主体高度；不含屋顶突出物，不等同竣工测量高度'})
-    if not 2.2 <= b['height']/b['levels'] <= 6:
-        warnings.append('body height / floor count is outside 2.2–6.0 m; review this conflict')
-    provenance.setdefault('levels', {'status':'osm' if levels else 'estimated',
-        'sourceRefs':['osm'] if levels else [], 'note':'OSM building:levels' if levels else '用途类型默认层数'})
-    provenance.setdefault('height', {'status':'osm' if height else 'estimated',
-        'sourceRefs':['osm'] if height else provenance['levels']['sourceRefs'],
-        'note':'OSM height' if height else f'采用层数 × {floor_height:g} 米估算层高，非测量高度'})
+        provenance.setdefault(
+            'height',
+            {
+                'status': 'estimated',
+                'sourceRefs': provenance['floorHeights']['sourceRefs'],
+                'note': '逐层层高之和推导主体高度；不含屋顶突出物，不等同竣工测量高度',
+            },
+        )
+    if not 2.2 <= b['height'] / b['levels'] <= 6:
+        warnings.append(
+            'body height / floor count is outside 2.2–6.0 m; review this conflict'
+        )
+    provenance.setdefault(
+        'levels',
+        {
+            'status': 'osm' if levels else 'estimated',
+            'sourceRefs': ['osm'] if levels else [],
+            'note': 'OSM building:levels' if levels else '用途类型默认层数',
+        },
+    )
+    provenance.setdefault(
+        'height',
+        {
+            'status': 'osm' if height else 'estimated',
+            'sourceRefs': ['osm'] if height else provenance['levels']['sourceRefs'],
+            'note': 'OSM height'
+            if height
+            else f'采用层数 × {floor_height:g} 米估算层高，非测量高度',
+        },
+    )
     # A multipart pitched roof is resolved on each part, never on a bounding
     # roof over the complete (possibly concave) building.
-    form_input = b if 'parts' not in record else {**b,'tags':{**tags,'roof:shape':'flat'}}
+    form_input = (
+        b if 'parts' not in record else {**b, 'tags': {**tags, 'roof:shape': 'flat'}}
+    )
     form = resolve_form(form_input)
     if 'floorHeights' in record:
         form['floorHeights'] = floors
@@ -633,320 +1301,771 @@ def resolve_building(building, record=None, source_ids=None):
     if form['archetype'] not in ARCHETYPES:
         raise ValueError('Unknown building archetype')
     roof = record.get('roof', {})
-    if set(roof) - {'type','rise'}:
-        raise ValueError('Unsupported roof parameter; ridge follows the mapped local axis')
+    if set(roof) - {'type', 'rise'}:
+        raise ValueError(
+            'Unsupported roof parameter; ridge follows the mapped local axis'
+        )
     for field in roof:
-        provenance['roof.'+field] = evidence(record, 'roof.'+field, source_ids)
+        provenance['roof.' + field] = evidence(record, 'roof.' + field, source_ids)
     if roof:
         kind = roof.get('type', form['roof']['type'])
-        if kind not in ('flat','hipped','gabled'): raise ValueError('Unknown roof type')
-        rise = 0 if kind == 'flat' else positive(roof.get('rise',form['roof']['rise'] or 2.3),'roof rise')
-        if kind == 'flat' and roof.get('rise',0) != 0: raise ValueError('A flat roof cannot have a pitched rise')
-        basis = provenance.get('roof.type', {'note':form['roof']['basis']})
-        form['roof'] = {'type':kind,'rise':rise,'basis':basis['note'],
-                        'status':basis.get('status',form['roof']['status'])}
+        if kind not in ('flat', 'hipped', 'gabled'):
+            raise ValueError('Unknown roof type')
+        rise = (
+            0
+            if kind == 'flat'
+            else positive(roof.get('rise', form['roof']['rise'] or 2.3), 'roof rise')
+        )
+        if kind == 'flat' and roof.get('rise', 0) != 0:
+            raise ValueError('A flat roof cannot have a pitched rise')
+        basis = provenance.get('roof.type', {'note': form['roof']['basis']})
+        form['roof'] = {
+            'type': kind,
+            'rise': rise,
+            'basis': basis['note'],
+            'status': basis.get('status', form['roof']['status']),
+        }
         if kind != 'flat' and 'parts' not in record:
-            form['roof']['geometry'] = roof_geometry(b['polygons'],kind,rise)
+            form['roof']['geometry'] = roof_geometry(b['polygons'], kind, rise)
     if 'stairTower' in record:
         from stair_tower_data import validate_stair_tower
+
         validate_stair_tower(record['stairTower'])
-        if archetype!='external-stair' or form['roof']['type']!='flat' or any(k in record for k in ['parts','facadeRules']):raise ValueError('Open stair tower conflicts with generic solid form')
-        form['stairTower']={'config':copy.deepcopy(record['stairTower'])}
-    elif archetype=='external-stair':raise ValueError('External stair requires explicit tower geometry')
+        if (
+            archetype != 'external-stair'
+            or form['roof']['type'] != 'flat'
+            or any(k in record for k in ['parts', 'facadeRules'])
+        ):
+            raise ValueError('Open stair tower conflicts with generic solid form')
+        form['stairTower'] = {'config': copy.deepcopy(record['stairTower'])}
+    elif archetype == 'external-stair':
+        raise ValueError('External stair requires explicit tower geometry')
     if 'parts' in record:
         form['parts'] = resolve_parts(b, record['parts'], form['roof'])
         if 'floorHeights' in form:
             for part in form['parts']:
-                count=part['levels']
-                if count!=int(count) or count>len(floors) or not math.isclose(part['height'],math.fsum(floors[:int(count)]),abs_tol=1e-6,rel_tol=0):
-                    raise ValueError('Part must match the documented storeys from the shared ground datum')
-                part['floorHeights']=floors[:int(count)]
+                count = part['levels']
+                if (
+                    count != int(count)
+                    or count > len(floors)
+                    or not math.isclose(
+                        part['height'],
+                        math.fsum(floors[: int(count)]),
+                        abs_tol=1e-6,
+                        rel_tol=0,
+                    )
+                ):
+                    raise ValueError(
+                        'Part must match the documented storeys from the shared ground datum'
+                    )
+                part['floorHeights'] = floors[: int(count)]
     if 'roofDome' in record:
         from roof_dome_data import resolve_roof_dome
+
         form['roofDome'] = resolve_roof_dome(b, form, record['roofDome'])
     if 'roofEave' in record:
         from roof_eave_data import resolve_roof_eave
+
         form['roofEave'] = resolve_roof_eave(b, form, record['roofEave'])
     if 'terracedStairs' in record:
         from terraced_stairs_data import resolve_terraced_stairs
-        form['terracedStairs'] = resolve_terraced_stairs(b, form, record['terracedStairs'])
+
+        form['terracedStairs'] = resolve_terraced_stairs(
+            b, form, record['terracedStairs']
+        )
     if 'roofCrown' in record:
         from roof_crown_data import resolve_roof_crown
+
         form['roofCrown'] = resolve_roof_crown(b, form, record['roofCrown'])
     if 'gableScreen' in record:
         from gable_screen_data import resolve_gable_screen
+
         form['gableScreen'] = resolve_gable_screen(b, form, record['gableScreen'])
     if 'roofVolumes' in record:
         from roof_volumes_data import resolve_roof_volumes
+
         form['roofVolumes'] = resolve_roof_volumes(b, form, record['roofVolumes'])
     if 'roofEdgeFrames' in record:
         from roof_edge_frames_data import resolve_roof_edge_frames
-        form['roofEdgeFrames'] = resolve_roof_edge_frames(b, form, record['roofEdgeFrames'])
+
+        form['roofEdgeFrames'] = resolve_roof_edge_frames(
+            b, form, record['roofEdgeFrames']
+        )
     if 'entrances' in record:
-        if not isinstance(record['entrances'],list):
+        if not isinstance(record['entrances'], list):
             raise ValueError('Entrances must be an explicit list')
-        entrances = []; ids = set()
+        entrances = []
+        ids = set()
         for e in record['entrances']:
-            required = {'id','polygon','ring','edge','t','width','primary'}
-            if not required <= set(e) or set(e) - required - {'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','attachedPortico','landingHeight','doorFrame','stairFlight','mappedCanopy','flushEntrance','recessGlazing','recessDoor','recessedStairEntry'} or not e['id'] or e['id'] in ids:
+            required = {'id', 'polygon', 'ring', 'edge', 't', 'width', 'primary'}
+            if (
+                not required <= set(e)
+                or set(e)
+                - required
+                - {
+                    'recess',
+                    'steps',
+                    'stepBaseHeight',
+                    'stepWidth',
+                    'stepFoundationDepth',
+                    'attachedPortico',
+                    'landingHeight',
+                    'doorFrame',
+                    'stairFlight',
+                    'mappedCanopy',
+                    'flushEntrance',
+                    'recessGlazing',
+                    'recessDoor',
+                    'recessedStairEntry',
+                }
+                or not e['id']
+                or e['id'] in ids
+            ):
                 raise ValueError('Invalid or duplicate entrance')
-            if 'recessGlazing' in e and ('recess' not in e or set(e)-required-{'recess','steps','stepBaseHeight','stepWidth','stepFoundationDepth','recessGlazing'}):
-                raise ValueError('Recess glazing requires only a recessed portico entrance')
-            if any(k in e for k in ('stepWidth','stepFoundationDepth')) and 'recess' not in e:
-                raise ValueError('Explicit step width and foundation require a recessed entrance')
+            if 'recessGlazing' in e and (
+                'recess' not in e
+                or set(e)
+                - required
+                - {
+                    'recess',
+                    'steps',
+                    'stepBaseHeight',
+                    'stepWidth',
+                    'stepFoundationDepth',
+                    'recessGlazing',
+                }
+            ):
+                raise ValueError(
+                    'Recess glazing requires only a recessed portico entrance'
+                )
+            if (
+                any(k in e for k in ('stepWidth', 'stepFoundationDepth'))
+                and 'recess' not in e
+            ):
+                raise ValueError(
+                    'Explicit step width and foundation require a recessed entrance'
+                )
             if 'recessDoor' in e:
-                p=e['recessDoor']
-                if 'recess' not in e or any(k in e for k in ('recessGlazing','doorFrame','flushEntrance','attachedPortico','mappedCanopy')) or not isinstance(p,dict) or set(p)!={'frameWidth','leafCount','lintelHeight'}:
-                    raise ValueError('Recess door needs an independent recessed entrance and explicit frame/leaves/lintel')
-                if type(p['leafCount']) is not int or not 2<=p['leafCount']<=4:raise ValueError('Recess door requires 2–4 leaves')
-                for key,lo,hi in [('frameWidth',.04,.12),('lintelHeight',.12,.4)]:
-                    v=p[key]
-                    if type(v) not in (int,float) or not math.isfinite(v) or not lo<=v<=hi:raise ValueError('Invalid recess door '+key)
+                p = e['recessDoor']
+                if (
+                    'recess' not in e
+                    or any(
+                        k in e
+                        for k in (
+                            'recessGlazing',
+                            'doorFrame',
+                            'flushEntrance',
+                            'attachedPortico',
+                            'mappedCanopy',
+                        )
+                    )
+                    or not isinstance(p, dict)
+                    or set(p) != {'frameWidth', 'leafCount', 'lintelHeight'}
+                ):
+                    raise ValueError(
+                        'Recess door needs an independent recessed entrance and explicit frame/leaves/lintel'
+                    )
+                if type(p['leafCount']) is not int or not 2 <= p['leafCount'] <= 4:
+                    raise ValueError('Recess door requires 2–4 leaves')
+                for key, lo, hi in [
+                    ('frameWidth', 0.04, 0.12),
+                    ('lintelHeight', 0.12, 0.4),
+                ]:
+                    v = p[key]
+                    if (
+                        type(v) not in (int, float)
+                        or not math.isfinite(v)
+                        or not lo <= v <= hi
+                    ):
+                        raise ValueError('Invalid recess door ' + key)
             if 'mappedCanopy' in e:
                 from mapped_canopy_data import validate_mapped_canopy
+
                 validate_mapped_canopy(e['mappedCanopy'])
-                if set(e)-required-{'mappedCanopy'}:raise ValueError('Mapped canopy cannot duplicate an entrance roof or platform')
+                if set(e) - required - {'mappedCanopy'}:
+                    raise ValueError(
+                        'Mapped canopy cannot duplicate an entrance roof or platform'
+                    )
             if 'landingHeight' in e:
-                if type(e['landingHeight']) not in (int,float):
+                if type(e['landingHeight']) not in (int, float):
                     raise ValueError('Entrance landing height must be numeric')
-                landing=positive(e['landingHeight'],'entrance landing height')
-                if not .2 <= landing <= 1.2 or any(k in e for k in ('recess','steps','stepBaseHeight','attachedPortico')):
-                    raise ValueError('Simple raised landing needs 0.2–1.2 m height and no other portico configuration')
-            if 'steps' in e and ('recess' not in e or type(e['steps']) is not int or not 1 <= e['steps'] <= 12):
-                raise ValueError('Explicit steps require a recessed entrance and an integer count from 1 to 12')
-            ids.add(e['id']);a,c,n,length=anchor(b,e,exterior=True)
-            t=e['t'];width=positive(e['width'],'entrance width')
-            if isinstance(t,bool) or not isinstance(t,(float,int)) or not math.isfinite(t) or not 0<=t<=1:
+                landing = positive(e['landingHeight'], 'entrance landing height')
+                if not 0.2 <= landing <= 1.2 or any(
+                    k in e
+                    for k in ('recess', 'steps', 'stepBaseHeight', 'attachedPortico')
+                ):
+                    raise ValueError(
+                        'Simple raised landing needs 0.2–1.2 m height and no other portico configuration'
+                    )
+            if 'steps' in e and (
+                'recess' not in e
+                or type(e['steps']) is not int
+                or not 1 <= e['steps'] <= 12
+            ):
+                raise ValueError(
+                    'Explicit steps require a recessed entrance and an integer count from 1 to 12'
+                )
+            ids.add(e['id'])
+            a, c, n, length = anchor(b, e, exterior=True)
+            t = e['t']
+            width = positive(e['width'], 'entrance width')
+            if (
+                isinstance(t, bool)
+                or not isinstance(t, (float, int))
+                or not math.isfinite(t)
+                or not 0 <= t <= 1
+            ):
                 raise ValueError('Entrance fraction must lie on its facade')
-            if width/2 > min(t,1-t)*length or not isinstance(e['primary'],bool):
-                raise ValueError('Entrance width exceeds its facade or primary is not boolean')
+            if width / 2 > min(t, 1 - t) * length or not isinstance(e['primary'], bool):
+                raise ValueError(
+                    'Entrance width exceeds its facade or primary is not boolean'
+                )
             if 'doorFrame' in e:
-                frame=e['doorFrame']
-                if ('landingHeight' not in e or not isinstance(frame,dict)
-                        or set(frame)!={'bays','pierWidth','pierDepth'}):
-                    raise ValueError('Door frame requires a raised landing and explicit bays and pier dimensions')
-                if type(frame['bays']) is not int or not 1<=frame['bays']<=6:
+                frame = e['doorFrame']
+                if (
+                    'landingHeight' not in e
+                    or not isinstance(frame, dict)
+                    or set(frame) != {'bays', 'pierWidth', 'pierDepth'}
+                ):
+                    raise ValueError(
+                        'Door frame requires a raised landing and explicit bays and pier dimensions'
+                    )
+                if type(frame['bays']) is not int or not 1 <= frame['bays'] <= 6:
                     raise ValueError('Door frame bays must be an integer from 1 to 6')
-                if any(type(frame[k]) not in (int,float) or not math.isfinite(frame[k]) for k in ('pierWidth','pierDepth')):
-                    raise ValueError('Door frame pier dimensions must be finite numbers')
-                pw,pd=frame['pierWidth'],frame['pierDepth']
-                if not .25<=pw<=1.2 or not .6<=pd<=1.4 or width/frame['bays']-pw<.9:
-                    raise ValueError('Door frame piers must fit beneath the canopy and leave usable openings')
-                if (width+pw)/2>min(t,1-t)*length:
-                    raise ValueError('Outer door frame piers extend beyond the attached facade')
-            resolved = {**e,'center':[a[i]+(c[i]-a[i])*t for i in (0,1)],
-                'bearing':math.degrees(math.atan2(n[0],n[1]))%360,
-                'status':provenance['entrances']['status'],'basis':provenance['entrances']['note']}
+                if any(
+                    type(frame[k]) not in (int, float) or not math.isfinite(frame[k])
+                    for k in ('pierWidth', 'pierDepth')
+                ):
+                    raise ValueError(
+                        'Door frame pier dimensions must be finite numbers'
+                    )
+                pw, pd = frame['pierWidth'], frame['pierDepth']
+                if (
+                    not 0.25 <= pw <= 1.2
+                    or not 0.6 <= pd <= 1.4
+                    or width / frame['bays'] - pw < 0.9
+                ):
+                    raise ValueError(
+                        'Door frame piers must fit beneath the canopy and leave usable openings'
+                    )
+                if (width + pw) / 2 > min(t, 1 - t) * length:
+                    raise ValueError(
+                        'Outer door frame piers extend beyond the attached facade'
+                    )
+            resolved = {
+                **e,
+                'center': [a[i] + (c[i] - a[i]) * t for i in (0, 1)],
+                'bearing': math.degrees(math.atan2(n[0], n[1])) % 360,
+                'status': provenance['entrances']['status'],
+                'basis': provenance['entrances']['note'],
+            }
             if 'recessedStairEntry' in e:
-                if set(e)-required-{'recessedStairEntry'}:
-                    raise ValueError('Recessed stair entry cannot combine with another entrance system')
+                if set(e) - required - {'recessedStairEntry'}:
+                    raise ValueError(
+                        'Recessed stair entry cannot combine with another entrance system'
+                    )
                 from recessed_stair_entry_data import resolve_recessed_stair_entry
-                resolved['recessedStairEntry']=resolve_recessed_stair_entry(b,resolved,e['recessedStairEntry'],form['parts'])
+
+                resolved['recessedStairEntry'] = resolve_recessed_stair_entry(
+                    b, resolved, e['recessedStairEntry'], form['parts']
+                )
             if 'flushEntrance' in e:
                 from flush_entrance_data import (
                     validate_flush_canopy_footprint,
                     validate_flush_entrance,
                 )
-                if set(e)-required-{'flushEntrance'}:
-                    raise ValueError('Flush entrance cannot add other stair, canopy or portico systems')
-                wall_height=form['height']
+
+                if set(e) - required - {'flushEntrance'}:
+                    raise ValueError(
+                        'Flush entrance cannot add other stair, canopy or portico systems'
+                    )
+                wall_height = form['height']
                 if form['parts']:
-                    door=LineString([[resolved['center'][i]+(c[i]-a[i])/length*offset for i in (0,1)] for offset in (-width/2,width/2)])
-                    matches=[p for p in form['parts'] if unary_union([Polygon(r[0],r[1:]) for r in p['polygons']]).boundary.buffer(1e-6).covers(door)]
-                    if len(matches)!=1 or 'openBelow' in matches[0]:
-                        raise ValueError('Flush entrance must fit one solid building part')
-                    wall_height=matches[0]['height']
-                validate_flush_entrance(e['flushEntrance'],width,wall_height)
-                validate_flush_canopy_footprint(b,resolved,length)
+                    door = LineString(
+                        [
+                            [
+                                resolved['center'][i] + (c[i] - a[i]) / length * offset
+                                for i in (0, 1)
+                            ]
+                            for offset in (-width / 2, width / 2)
+                        ]
+                    )
+                    matches = [
+                        p
+                        for p in form['parts']
+                        if unary_union([Polygon(r[0], r[1:]) for r in p['polygons']])
+                        .boundary.buffer(1e-6)
+                        .covers(door)
+                    ]
+                    if len(matches) != 1 or 'openBelow' in matches[0]:
+                        raise ValueError(
+                            'Flush entrance must fit one solid building part'
+                        )
+                    wall_height = matches[0]['height']
+                validate_flush_entrance(e['flushEntrance'], width, wall_height)
+                validate_flush_canopy_footprint(b, resolved, length)
                 if 'returnGlazing' in e['flushEntrance']:
                     from flush_return_data import resolve_flush_return
-                    resolved['flushEntrance']=copy.deepcopy(e['flushEntrance'])
-                    resolved['flushEntrance']['returnGlazing']=resolve_flush_return(b,form,resolved,e['flushEntrance']['returnGlazing'])
+
+                    resolved['flushEntrance'] = copy.deepcopy(e['flushEntrance'])
+                    resolved['flushEntrance']['returnGlazing'] = resolve_flush_return(
+                        b, form, resolved, e['flushEntrance']['returnGlazing']
+                    )
             if 'stairFlight' in e:
-                if 'landingHeight' not in e:raise ValueError('Stair flight requires a simple raised landing')
+                if 'landingHeight' not in e:
+                    raise ValueError('Stair flight requires a simple raised landing')
                 from entrance_stairs_data import resolve_stair_flight
-                resolved['stairFlight']=resolve_stair_flight(b,resolved,e['stairFlight'],length)
+
+                resolved['stairFlight'] = resolve_stair_flight(
+                    b, resolved, e['stairFlight'], length
+                )
             if 'attachedPortico' in e:
-                if any(key in e for key in ('recess','steps','stepBaseHeight')):
-                    raise ValueError('Attached portico cannot combine with recessed entrance configuration')
-                resolved['attachedPortico']=resolve_attached_portico(b,resolved,e['attachedPortico'],length,form['parts'])
+                if any(key in e for key in ('recess', 'steps', 'stepBaseHeight')):
+                    raise ValueError(
+                        'Attached portico cannot combine with recessed entrance configuration'
+                    )
+                resolved['attachedPortico'] = resolve_attached_portico(
+                    b, resolved, e['attachedPortico'], length, form['parts']
+                )
             if 'recess' in e:
-                recess = positive(e['recess'],'entrance recess')
-                front = resolved['center']; back = [front[i]-n[i]*recess for i in (0,1)]
-                route = LineString([front,back]); tangent = [(c[i]-a[i])/length for i in (0,1)]
-                door = LineString([[back[i]+tangent[i]*offset for i in (0,1)] for offset in (-width/2,width/2)])
-                porches = [p for p in form['parts'] if 'openBelow' in p and
-                    unary_union([Polygon(r[0],r[1:]) for r in p['polygons']]).buffer(1e-5).covers(route)]
-                body = unary_union([Polygon(r[0],r[1:]) for p in form['parts'] if 'openBelow' not in p for r in p['polygons']])
+                recess = positive(e['recess'], 'entrance recess')
+                front = resolved['center']
+                back = [front[i] - n[i] * recess for i in (0, 1)]
+                route = LineString([front, back])
+                tangent = [(c[i] - a[i]) / length for i in (0, 1)]
+                door = LineString(
+                    [
+                        [back[i] + tangent[i] * offset for i in (0, 1)]
+                        for offset in (-width / 2, width / 2)
+                    ]
+                )
+                porches = [
+                    p
+                    for p in form['parts']
+                    if 'openBelow' in p
+                    and unary_union([Polygon(r[0], r[1:]) for r in p['polygons']])
+                    .buffer(1e-5)
+                    .covers(route)
+                ]
+                body = unary_union(
+                    [
+                        Polygon(r[0], r[1:])
+                        for p in form['parts']
+                        if 'openBelow' not in p
+                        for r in p['polygons']
+                    ]
+                )
                 # Mapped front and rear canopy edges may differ by millimetres
                 # in direction; allow 1 cm, not a free-floating door position.
-                if len(porches)!=1 or not body.boundary.buffer(.01).covers(door):
-                    raise ValueError('Recessed entrance must cross a portico and meet a main-body wall')
-                porch=porches[0]
+                if len(porches) != 1 or not body.boundary.buffer(0.01).covers(door):
+                    raise ValueError(
+                        'Recessed entrance must cross a portico and meet a main-body wall'
+                    )
+                porch = porches[0]
                 # A porch may cover only the middle of an original mapped
                 # edge. Its steps must stop at that part's actual side walls.
-                porch_shape=unary_union([Polygon(r[0],r[1:]) for r in porch['polygons']])
-                front_line=LineString([a,c])
+                porch_shape = unary_union(
+                    [Polygon(r[0], r[1:]) for r in porch['polygons']]
+                )
+                front_line = LineString([a, c])
                 # Project coincident edges before clipping: oblique coordinates
                 # can otherwise lose half an interval to floating-point error.
-                intervals=[]
+                intervals = []
                 for rings in porch['polygons']:
                     for ring in rings:
-                        for v,w in zip(ring,ring[1:]):
-                            if max(front_line.distance(Point(v)),front_line.distance(Point(w)))<=1e-7:
-                                lo,hi=sorted(front_line.project(Point(p)) for p in (v,w))
-                                if hi-lo>1e-6:intervals.append(LineString([front_line.interpolate(lo),front_line.interpolate(hi)]))
-                clipped=unary_union(intervals) if intervals else front_line.intersection(porch_shape)
-                segments=[clipped] if clipped.geom_type=='LineString' else [s for s in getattr(clipped,'geoms',[]) if s.geom_type=='LineString']
-                segments=[s for s in segments if s.distance(Point(front))<1e-6]
-                if len(segments)!=1:raise ValueError('Portico front must occupy one continuous mapped edge interval')
-                lo,hi=sorted(front_line.project(Point(p)) for p in [segments[0].coords[0],segments[0].coords[-1]])
-                width_at_front=2*min(front_line.project(Point(front))-lo,hi-front_line.project(Point(front)))
-                if width_at_front<width:raise ValueError('Recessed doorway exceeds its portico frontage')
-                portico_width=length if abs(width_at_front-length)<1e-6 else width_at_front
+                        for v, w in zip(ring, ring[1:]):
+                            if (
+                                max(
+                                    front_line.distance(Point(v)),
+                                    front_line.distance(Point(w)),
+                                )
+                                <= 1e-7
+                            ):
+                                lo, hi = sorted(
+                                    front_line.project(Point(p)) for p in (v, w)
+                                )
+                                if hi - lo > 1e-6:
+                                    intervals.append(
+                                        LineString(
+                                            [
+                                                front_line.interpolate(lo),
+                                                front_line.interpolate(hi),
+                                            ]
+                                        )
+                                    )
+                clipped = (
+                    unary_union(intervals)
+                    if intervals
+                    else front_line.intersection(porch_shape)
+                )
+                segments = (
+                    [clipped]
+                    if clipped.geom_type == 'LineString'
+                    else [
+                        s
+                        for s in getattr(clipped, 'geoms', [])
+                        if s.geom_type == 'LineString'
+                    ]
+                )
+                segments = [s for s in segments if s.distance(Point(front)) < 1e-6]
+                if len(segments) != 1:
+                    raise ValueError(
+                        'Portico front must occupy one continuous mapped edge interval'
+                    )
+                lo, hi = sorted(
+                    front_line.project(Point(p))
+                    for p in [segments[0].coords[0], segments[0].coords[-1]]
+                )
+                width_at_front = 2 * min(
+                    front_line.project(Point(front)) - lo,
+                    hi - front_line.project(Point(front)),
+                )
+                if width_at_front < width:
+                    raise ValueError('Recessed doorway exceeds its portico frontage')
+                portico_width = (
+                    length if abs(width_at_front - length) < 1e-6 else width_at_front
+                )
                 if 'stepWidth' in e:
-                    step_width=e['stepWidth']
-                    if type(step_width) not in (int,float) or not math.isfinite(step_width) or not width <= step_width <= portico_width:
-                        raise ValueError('Step width must cover the doorway and fit the portico frontage')
+                    step_width = e['stepWidth']
+                    if (
+                        type(step_width) not in (int, float)
+                        or not math.isfinite(step_width)
+                        or not width <= step_width <= portico_width
+                    ):
+                        raise ValueError(
+                            'Step width must cover the doorway and fit the portico frontage'
+                        )
                 if 'stepFoundationDepth' in e:
-                    foundation=e['stepFoundationDepth']
-                    if type(foundation) not in (int,float) or not math.isfinite(foundation) or not 0 < foundation <= .3:
-                        raise ValueError('Step foundation depth must be finite and within 0–0.3 m')
+                    foundation = e['stepFoundationDepth']
+                    if (
+                        type(foundation) not in (int, float)
+                        or not math.isfinite(foundation)
+                        or not 0 < foundation <= 0.3
+                    ):
+                        raise ValueError(
+                            'Step foundation depth must be finite and within 0–0.3 m'
+                        )
                 if 'stepBaseHeight' in e:
                     base = e['stepBaseHeight']
-                    if type(base) not in (int,float) or not math.isfinite(base) or not 0 <= base < porch['openBelow']['floorHeight']:
-                        raise ValueError('Step base must be finite, nonnegative and below the platform')
+                    if (
+                        type(base) not in (int, float)
+                        or not math.isfinite(base)
+                        or not 0 <= base < porch['openBelow']['floorHeight']
+                    ):
+                        raise ValueError(
+                            'Step base must be finite, nonnegative and below the platform'
+                        )
                 for column in porch['openBelow']['columns']:
-                    spread=column['base']['projection']+.03 if 'base' in column else 0
-                    support=translate(rotate(box(-column['width']/2-spread,-column['depth']/2-spread,column['width']/2+spread,column['depth']/2+spread),column['angle'],use_radians=True),*column['center'])
-                    if support.intersects(route.buffer(.6)):
-                        raise ValueError('Portico column blocks the central entrance route')
-                resolved.update(center=back,outerCenter=front,porticoId=porch['id'],
-                    platformHeight=porch['openBelow']['floorHeight'],porticoWidth=portico_width)
-                if 'recessDoor' in e and ((width-e['recessDoor']['frameWidth'])/e['recessDoor']['leafCount']-e['recessDoor']['frameWidth']<.6 or porch['openBelow']['floorHeight']+2.8+e['recessDoor']['lintelHeight']>porch['openBelow']['clearHeight']):
-                    raise ValueError('Recess door leaves or lintel do not fit the portico')
+                    spread = (
+                        column['base']['projection'] + 0.03 if 'base' in column else 0
+                    )
+                    support = translate(
+                        rotate(
+                            box(
+                                -column['width'] / 2 - spread,
+                                -column['depth'] / 2 - spread,
+                                column['width'] / 2 + spread,
+                                column['depth'] / 2 + spread,
+                            ),
+                            column['angle'],
+                            use_radians=True,
+                        ),
+                        *column['center'],
+                    )
+                    if support.intersects(route.buffer(0.6)):
+                        raise ValueError(
+                            'Portico column blocks the central entrance route'
+                        )
+                resolved.update(
+                    center=back,
+                    outerCenter=front,
+                    porticoId=porch['id'],
+                    platformHeight=porch['openBelow']['floorHeight'],
+                    porticoWidth=portico_width,
+                )
+                if 'recessDoor' in e and (
+                    (width - e['recessDoor']['frameWidth'])
+                    / e['recessDoor']['leafCount']
+                    - e['recessDoor']['frameWidth']
+                    < 0.6
+                    or porch['openBelow']['floorHeight']
+                    + 2.8
+                    + e['recessDoor']['lintelHeight']
+                    > porch['openBelow']['clearHeight']
+                ):
+                    raise ValueError(
+                        'Recess door leaves or lintel do not fit the portico'
+                    )
                 if 'recessGlazing' in e:
                     from recess_glazing_data import validate_recess_glazing
-                    validate_recess_glazing(e['recessGlazing'],resolved,porch['openBelow'],body.boundary,porch_shape,tangent)
+
+                    validate_recess_glazing(
+                        e['recessGlazing'],
+                        resolved,
+                        porch['openBelow'],
+                        body.boundary,
+                        porch_shape,
+                        tangent,
+                    )
             elif 'stepBaseHeight' in e:
                 raise ValueError('Step base requires a recessed entrance')
             entrances.append(resolved)
         # A separately mapped, explicitly supported roof is a canopy, not a
         # room with its own door. Ordinary enclosed buildings still need one
         # primary entrance; an empty list must never silently hide that gap.
-        open_roof = (tags.get('building') == 'roof' and bool(form['parts'])
-                     and all('openBelow' in p for p in form['parts']))
-        if (not entrances and not open_roof) or (entrances and sum(e['primary'] for e in entrances)!=1):
+        open_roof = (
+            tags.get('building') == 'roof'
+            and bool(form['parts'])
+            and all('openBelow' in p for p in form['parts'])
+        )
+        if (not entrances and not open_roof) or (
+            entrances and sum(e['primary'] for e in entrances) != 1
+        ):
             raise ValueError('Exactly one primary entrance is required')
-        form['entrances']=entrances
+        form['entrances'] = entrances
     if 'parts' in record or 'facadeRules' in record or 'floorHeights' in record:
-        form['facades']=resolve_facades(b,form,record.get('facadeRules',[]))
+        form['facades'] = resolve_facades(b, form, record.get('facadeRules', []))
     if 'exposedFacadeRules' in record:
         from exposed_facades_data import resolve_exposed_facades
-        exposed=resolve_exposed_facades(b, form, record['exposedFacadeRules'])
+
+        exposed = resolve_exposed_facades(b, form, record['exposedFacadeRules'])
         for facade in exposed:
-            if facade.get('region') not in ('under-portico','above-portico','above-roof'): continue
+            if facade.get('region') not in (
+                'under-portico',
+                'above-portico',
+                'above-roof',
+            ):
+                continue
             # A mixed roof exposes its backing wall down to the porch floor.
             # Explicit glazing owns its region. Keep automatic windows above
             # the roof unless a second explicit rule also owns the upper wall.
-            line=LineString([facade['start'],facade['end']]).buffer(1e-7)
-            porch=next(p for p in form['parts'] if p['id']==facade['adjacentPart'])
-            bound=porch['height'] if facade['region']=='under-portico' else facade['height']
-            for automatic in form.get('facades',[]):
-                if (automatic['part']==facade['part'] and automatic['polygon'] is None
-                        and not automatic['rule'] and 'adjacentPart' not in automatic
-                        and line.covers(LineString([automatic['start'],automatic['end']]))):
-                    automatic['minimumHeight']=max(automatic.get('minimumHeight',0),bound)
+            line = LineString([facade['start'], facade['end']]).buffer(1e-7)
+            porch = next(p for p in form['parts'] if p['id'] == facade['adjacentPart'])
+            bound = (
+                porch['height']
+                if facade['region'] == 'under-portico'
+                else facade['height']
+            )
+            for automatic in form.get('facades', []):
+                if (
+                    automatic['part'] == facade['part']
+                    and automatic['polygon'] is None
+                    and not automatic['rule']
+                    and 'adjacentPart' not in automatic
+                    and line.covers(LineString([automatic['start'], automatic['end']]))
+                ):
+                    automatic['minimumHeight'] = max(
+                        automatic.get('minimumHeight', 0), bound
+                    )
         form.setdefault('facades', []).extend(exposed)
     for entry in form['entrances']:
-        if 'flushEntrance' not in entry:continue
+        if 'flushEntrance' not in entry:
+            continue
         from flush_return_data import validate_return_facades
-        validate_return_facades(form,entry)
-        for facade in form.get('facades',[]):
-            if any(facade[k]!=entry[k] for k in ('polygon','ring','edge')):continue
-            rule=facade['rule']
-            length=math.dist(facade['start'],facade['end'])
-            tangent=[(facade['end'][i]-facade['start'][i])/length for i in (0,1)]
-            center=sum((entry['center'][i]-facade['start'][i])*tangent[i] for i in (0,1))
-            half=max(entry['width'],entry['flushEntrance'].get('canopy',{}).get('width',0))/2
+
+        validate_return_facades(form, entry)
+        for facade in form.get('facades', []):
+            if any(facade[k] != entry[k] for k in ('polygon', 'ring', 'edge')):
+                continue
+            rule = facade['rule']
+            length = math.dist(facade['start'], facade['end'])
+            tangent = [(facade['end'][i] - facade['start'][i]) / length for i in (0, 1)]
+            center = sum(
+                (entry['center'][i] - facade['start'][i]) * tangent[i] for i in (0, 1)
+            )
+            half = (
+                max(
+                    entry['width'],
+                    entry['flushEntrance'].get('canopy', {}).get('width', 0),
+                )
+                / 2
+            )
             # A mapped edge can span several parts. Rules on a disjoint part
             # cannot intersect this doorway or its projecting canopy.
-            if center+half<=0 or center-half>=length:continue
-            if any(k in rule for k in ('openCorridor','windowGrid','attachedGallery')):
+            if center + half <= 0 or center - half >= length:
+                continue
+            if any(
+                k in rule for k in ('openCorridor', 'windowGrid', 'attachedGallery')
+            ):
                 raise ValueError('Flush entrance conflicts with another facade system')
-            band=rule.get('windowBands')
-            if band and center+half>band['from']*length-.06 and center-half<band['to']*length+.06:
+            band = rule.get('windowBands')
+            if (
+                band
+                and center + half > band['from'] * length - 0.06
+                and center - half < band['to'] * length + 0.06
+            ):
                 raise ValueError('Flush entrance conflicts with another facade system')
             # Upper panels are permitted; they must not cover the glazed portal.
-            head=entry['flushEntrance']['glazingHeight']+entry['flushEntrance'].get('canopy',{}).get('thickness',0)
-            if any(p['bottom']<head for p in rule.get('panels',[])):
+            head = entry['flushEntrance']['glazingHeight'] + entry['flushEntrance'].get(
+                'canopy', {}
+            ).get('thickness', 0)
+            if any(p['bottom'] < head for p in rule.get('panels', [])):
                 raise ValueError('Facade panels overlap the flush entrance glazing')
-    provenance.setdefault('archetype',{'status':'estimated','sourceRefs':['osm'],
-        'note':'按名称、OSM用途和现有形制规则推定'})
+    provenance.setdefault(
+        'archetype',
+        {
+            'status': 'estimated',
+            'sourceRefs': ['osm'],
+            'note': '按名称、OSM用途和现有形制规则推定',
+        },
+    )
     if 'floorHeights' not in record:
-        provenance.setdefault('floorHeight',{'status':'estimated','sourceRefs':[],
-            'note':'默认3.3米层高；独立OSM高度存在时不以此覆盖高度'})
-    provenance.setdefault('roof.type',{'status':'osm' if tags.get('roof:shape') in ('flat','hipped','gabled') else 'estimated',
-        'sourceRefs':['osm'] if tags.get('roof:shape') in ('flat','hipped','gabled') else [],
-        'note':form['roof']['basis']})
-    provenance.setdefault('roof.rise',{'status':'estimated','sourceRefs':[],
-        'note':'平屋面屋脊增量为0；有坡屋面但没有屋脊尺寸时采用2.3米展示估算'})
-    provenance.setdefault('entrances',{'status':'estimated','sourceRefs':[],
-        'note':'无定位依据，最长外边中点示意入口；不声称朝向正确'})
-    provenance.setdefault('facadeRules',{'status':'estimated','sourceRefs':[],
-        'note':'默认窗距和窗尺寸；资料未覆盖的立面继续按类型推定'})
-    b.update(form=form,archetype=form['archetype'],roofBasis=form['roof']['basis'])
+        provenance.setdefault(
+            'floorHeight',
+            {
+                'status': 'estimated',
+                'sourceRefs': [],
+                'note': '默认3.3米层高；独立OSM高度存在时不以此覆盖高度',
+            },
+        )
+    provenance.setdefault(
+        'roof.type',
+        {
+            'status': 'osm'
+            if tags.get('roof:shape') in ('flat', 'hipped', 'gabled')
+            else 'estimated',
+            'sourceRefs': ['osm']
+            if tags.get('roof:shape') in ('flat', 'hipped', 'gabled')
+            else [],
+            'note': form['roof']['basis'],
+        },
+    )
+    provenance.setdefault(
+        'roof.rise',
+        {
+            'status': 'estimated',
+            'sourceRefs': [],
+            'note': '平屋面屋脊增量为0；有坡屋面但没有屋脊尺寸时采用2.3米展示估算',
+        },
+    )
+    provenance.setdefault(
+        'entrances',
+        {
+            'status': 'estimated',
+            'sourceRefs': [],
+            'note': '无定位依据，最长外边中点示意入口；不声称朝向正确',
+        },
+    )
+    provenance.setdefault(
+        'facadeRules',
+        {
+            'status': 'estimated',
+            'sourceRefs': [],
+            'note': '默认窗距和窗尺寸；资料未覆盖的立面继续按类型推定',
+        },
+    )
+    b.update(form=form, archetype=form['archetype'], roofBasis=form['roof']['basis'])
     if record:
-        b['calibration']={'schemaVersion':1,'footprintRevision':footprint_revision(b),
-                          'evidence':provenance,'review':copy.deepcopy(record.get('review',{})), 'warnings':warnings}
-        b['sourceRefs']=sorted({'osm'} | {ref for p in provenance.values() for ref in p['sourceRefs']})
-        b['heightBasis']=provenance['height']['note']
-        b['facadeBasis']='逐字段资料校准；未确认入口、立面和尺寸仍为示意，见校准记录'
+        b['calibration'] = {
+            'schemaVersion': 1,
+            'footprintRevision': footprint_revision(b),
+            'evidence': provenance,
+            'review': copy.deepcopy(record.get('review', {})),
+            'warnings': warnings,
+        }
+        b['sourceRefs'] = sorted(
+            {'osm'} | {ref for p in provenance.values() for ref in p['sourceRefs']}
+        )
+        b['heightBasis'] = provenance['height']['note']
+        b['facadeBasis'] = '逐字段资料校准；未确认入口、立面和尺寸仍为示意，见校准记录'
     else:
-        b.pop('calibration',None)
-        b['heightBasis']='OSM高度或层数' if height or levels else '按类型估算'
+        b.pop('calibration', None)
+        b['heightBasis'] = 'OSM高度或层数' if height or levels else '按类型估算'
         if building.get('calibration'):
-            b['facadeBasis']='按建筑类型推定'
-            b['sourceRefs']=['osm']
+            b['facadeBasis'] = '按建筑类型推定'
+            b['sourceRefs'] = ['osm']
     return b
 
 
 def prepare_existing_overrides():
-    out=ROOT/'public/data'; buildings=read_json(out/'buildings.json'); catalogue=load_catalogue()
-    validate_ids(catalogue,buildings); sources=source_catalogue(); source_ids={s['id'] for s in sources}
-    resolved=[resolve_building(b,catalogue.get(b['id']),source_ids) for b in buildings]
+    out = ROOT / 'public/data'
+    buildings = read_json(out / 'buildings.json')
+    catalogue = load_catalogue()
+    validate_ids(catalogue, buildings)
+    sources = source_catalogue()
+    source_ids = {s['id'] for s in sources}
+    resolved = [
+        resolve_building(b, catalogue.get(b['id']), source_ids) for b in buildings
+    ]
     from attached_gallery_data import validate_gallery_context
+
     validate_gallery_context(resolved)
     from mapped_canopy_data import resolve_mapped_canopy_context
+
     resolve_mapped_canopy_context(resolved)
     from stair_tower_data import resolve_stair_tower_context
+
     resolve_stair_tower_context(resolved)
-    geo=read_json(out/'geography.geojson'); features={f['id']:f for f in geo['features']}
-    props=('height','levels','heightBasis','facadeBasis','archetype','roofBasis','sourceRefs','calibration')
+    geo = read_json(out / 'geography.geojson')
+    features = {f['id']: f for f in geo['features']}
+    props = (
+        'height',
+        'levels',
+        'heightBasis',
+        'facadeBasis',
+        'archetype',
+        'roofBasis',
+        'sourceRefs',
+        'calibration',
+    )
     for b in resolved:
         if ordinary(b):
-            target=features[b['id']]['properties']
+            target = features[b['id']]['properties']
             for key in props:
-                if key in b:target[key]=b[key]
-                else:target.pop(key,None)
-    overview=read_json(out/'overview.json')
-    overview['estimatedHeights']=sum(b['heightBasis']=='按类型估算' for b in resolved)
-    overview['buildingCalibrations']=calibration_stats(resolved,catalogue)
+                if key in b:
+                    target[key] = b[key]
+                else:
+                    target.pop(key, None)
+    overview = read_json(out / 'overview.json')
+    overview['estimatedHeights'] = sum(
+        b['heightBasis'] == '按类型估算' for b in resolved
+    )
+    overview['buildingCalibrations'] = calibration_stats(resolved, catalogue)
     # All validation finishes before replacing any public data.
-    for name,data in [('buildings.json',resolved),('geography.geojson',geo),('overview.json',overview),
-                      ('sources.json',{'version':1,'sources':sources})]:
-        (out/name).write_text(json.dumps(data,ensure_ascii=False,separators=(',',':')))
-    report={'buildings':[{'id':b['id'],'name':b['name'],'before':{k:resolve_building(old)[k] for k in ('height','levels')},
-                          'after':{'height':b['height'],'levels':b['levels']},'calibration':b['calibration']}
-                         for old,b in zip(buildings,resolved) if b['id'] in catalogue]}
-    (ROOT/'docs/model-checks/refinement/s2-calibrations.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-    print(f'Applied {len(catalogue)} attributed ordinary-building records; preserved site/terrain/tree files')
+    for name, data in [
+        ('buildings.json', resolved),
+        ('geography.geojson', geo),
+        ('overview.json', overview),
+        ('sources.json', {'version': 1, 'sources': sources}),
+    ]:
+        (out / name).write_text(
+            json.dumps(data, ensure_ascii=False, separators=(',', ':'))
+        )
+    report = {
+        'buildings': [
+            {
+                'id': b['id'],
+                'name': b['name'],
+                'before': {k: resolve_building(old)[k] for k in ('height', 'levels')},
+                'after': {'height': b['height'], 'levels': b['levels']},
+                'calibration': b['calibration'],
+            }
+            for old, b in zip(buildings, resolved)
+            if b['id'] in catalogue
+        ]
+    }
+    (ROOT / 'docs/model-checks/refinement/s2-calibrations.json').write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + '\n'
+    )
+    print(
+        f'Applied {len(catalogue)} attributed ordinary-building records; preserved site/terrain/tree files'
+    )
 
 
-def calibration_stats(buildings,catalogue):
-    return {'records':len(catalogue),
-        'documentedLevels':sum(b.get('calibration',{}).get('evidence',{}).get('levels',{}).get('status')=='confirmed' for b in buildings),
-        'documentedBodyHeights':sum(b.get('calibration',{}).get('evidence',{}).get('height',{}).get('status')=='confirmed' for b in buildings)}
+def calibration_stats(buildings, catalogue):
+    return {
+        'records': len(catalogue),
+        'documentedLevels': sum(
+            b.get('calibration', {}).get('evidence', {}).get('levels', {}).get('status')
+            == 'confirmed'
+            for b in buildings
+        ),
+        'documentedBodyHeights': sum(
+            b.get('calibration', {}).get('evidence', {}).get('height', {}).get('status')
+            == 'confirmed'
+            for b in buildings
+        ),
+    }
 
 
 if __name__ == '__main__':

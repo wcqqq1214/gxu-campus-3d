@@ -1,4 +1,5 @@
 """Run with Blender's Python: preserve authored UVs through nested batching."""
+
 import sys
 import unittest
 from pathlib import Path
@@ -11,7 +12,7 @@ from geometry import MATERIALS, Mesh, material
 
 class MeshUVTests(unittest.TestCase):
     def setUp(self):
-        self.mat = material('uv-regression', (.5, .5, .5))
+        self.mat = material('uv-regression', (0.5, 0.5, 0.5))
 
     def tearDown(self):
         for obj in list(bpy.data.objects):
@@ -23,7 +24,7 @@ class MeshUVTests(unittest.TestCase):
 
     def test_nested_batch_keeps_corner_associations_and_default_projection(self):
         face = [(4, 8, 0), (6, 8, 0), (6, 9, 0), (4, 9, 0)]
-        authored = [(.1, .2), (.6, .2), (.6, .45), (.1, .45)]
+        authored = [(0.1, 0.2), (0.6, 0.2), (0.6, 0.45), (0.1, 0.45)]
         detail = Mesh()
         detail.face(face, self.mat, authored)
         building = Mesh()
@@ -34,7 +35,9 @@ class MeshUVTests(unittest.TestCase):
         chunk.extend(building)
         obj = chunk.object('uv-regression-batch', bpy.context.scene.collection)
         uv = obj.data.uv_layers.active.data
-        for index, expected in enumerate(([tuple(v / 4 for v in p[:2]) for p in face],) * 2 + (authored,)):
+        for index, expected in enumerate(
+            ([tuple(v / 4 for v in p[:2]) for p in face],) * 2 + (authored,)
+        ):
             for loop, pair in zip(obj.data.polygons[index].loop_indices, expected):
                 for actual, wanted in zip(uv[loop].uv, pair):
                     self.assertAlmostEqual(actual, wanted, places=6)

@@ -3,6 +3,7 @@
 This validates the implemented estimates. Architectural source review, unknowns,
 browser views and performance are separate requirements of whole-building review.
 """
+
 import hashlib
 import json
 import runpy
@@ -15,11 +16,20 @@ from validation_inputs import baseline_root
 
 ROAD_BASELINE = baseline_root(sys.argv, flags=('--road-baseline-root',))
 CONNECTION_BASELINE = baseline_root(sys.argv, flags=('--connection-baseline-root',))
-PREFIX = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-whole')
+PREFIX = next(
+    (a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')),
+    's2-civil-whole',
+)
 OUT = ROOT / 'docs/model-checks/refinement'
-FILES = ['blender/gxu-campus.blend', 'public/models/base.glb',
-         'public/models/chunk-n2-n3.glb', 'public/data/buildings.json',
-         'public/data/sites.json', 'public/data/pavings.json', 'public/data/models.json']
+FILES = [
+    'blender/gxu-campus.blend',
+    'public/models/base.glb',
+    'public/models/chunk-n2-n3.glb',
+    'public/data/buildings.json',
+    'public/data/sites.json',
+    'public/data/pavings.json',
+    'public/data/models.json',
+]
 
 
 def fingerprints():
@@ -30,7 +40,15 @@ def fingerprints():
 # them. Both old retained geometry and its replacement are included in this suite.
 CASES = [
     ('entry', ['--portal-only']),
-    ('annex', ['--decorated-step', '--terrace-added', '--rear-massing-added', '--seventh-recess-added']),
+    (
+        'annex',
+        [
+            '--decorated-step',
+            '--terrace-added',
+            '--rear-massing-added',
+            '--seventh-recess-added',
+        ],
+    ),
     ('facade', ['--retained-only', '--seventh-recess-added']),
     ('recess', []),
     ('seventh', []),
@@ -51,17 +69,32 @@ CASES = [
     ('forecourt_road', [f'--baseline-root={ROAD_BASELINE}']),
     ('garden', []),
 ]
-checks = [(f'blender/validate_civil_{name}.py', name.replace('_', '-'), args)
-          for name, args in CASES]
-checks += [('blender/validate_side_connection.py', name,
-            [f'--site-id={site}', f'--baseline-root={CONNECTION_BASELINE}'])
-           for name, site in [('main-connection', 'civil-main-front-connection'),
-                              ('annex-connection', 'civil-annex-stair-connection')]]
+checks = [
+    (f'blender/validate_civil_{name}.py', name.replace('_', '-'), args)
+    for name, args in CASES
+]
 checks += [
-    ('blender/inspect_foundation_clearance.py', 'whole-ground',
-     ['--building-id=relation/12875606', '--fail-on-intrusion']),
-    ('blender/inspect_wall_ground_gaps.py', 'whole-wall-contact',
-     ['--building-id=relation/12875606', '--fail-on-gap']),
+    (
+        'blender/validate_side_connection.py',
+        name,
+        [f'--site-id={site}', f'--baseline-root={CONNECTION_BASELINE}'],
+    )
+    for name, site in [
+        ('main-connection', 'civil-main-front-connection'),
+        ('annex-connection', 'civil-annex-stair-connection'),
+    ]
+]
+checks += [
+    (
+        'blender/inspect_foundation_clearance.py',
+        'whole-ground',
+        ['--building-id=relation/12875606', '--fail-on-intrusion'],
+    ),
+    (
+        'blender/inspect_wall_ground_gaps.py',
+        'whole-wall-contact',
+        ['--building-id=relation/12875606', '--fail-on-gap'],
+    ),
 ]
 
 report_path = OUT / f'{PREFIX}-geometry-suite.json'
@@ -73,13 +106,23 @@ try:
         check_prefix = f'{PREFIX}-{name}'
         target = OUT / f'{check_prefix}-geometry.json'
         assert not target.exists(), f'Do not overwrite {target}'
-        output_flag = (f'--report-prefix={check_prefix}' if Path(script).name.startswith('validate_')
-                       else f'--report={target}')
+        output_flag = (
+            f'--report-prefix={check_prefix}'
+            if Path(script).name.startswith('validate_')
+            else f'--report={target}'
+        )
         sys.argv = ['blender', '--', output_flag, *flags]
         print(f'WHOLE CHECK START: {name}', flush=True)
         runpy.run_path(str(ROOT / script), run_name='__main__')
         result = json.loads(target.read_text())
-        report['checks'].append(dict(script=script, flags=flags, report=str(target.relative_to(ROOT)), passed=result['passed']))
+        report['checks'].append(
+            dict(
+                script=script,
+                flags=flags,
+                report=str(target.relative_to(ROOT)),
+                passed=result['passed'],
+            )
+        )
         assert result['passed'], name
         assert fingerprints() == before, 'Validation changed input assets'
         print(f'WHOLE CHECK PASS: {name}', flush=True)

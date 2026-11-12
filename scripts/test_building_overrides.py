@@ -1,4 +1,5 @@
 """Reject unsupported calibration, preserve courts, and exercise real precedence."""
+
 import copy
 import json
 import math
@@ -24,1068 +25,2263 @@ from building_overrides import (
 class BuildingOverrideTests(unittest.TestCase):
     def split_facade_fixture(self):
         def rectangle(a, b):
-            return [[[a,0],[b,0],[b,20],[a,20],[a,0]]]
-        parts=[dict(id='wings',polygons=[rectangle(0,8),rectangle(22,30)],height=16.5,levels=5),
-               dict(id='middle',polygons=[rectangle(8,22)],height=6.6,levels=2)]
-        rule=dict(polygon=0,ring=0,edge=0,part='wings',segment=0,windows=False)
-        return parts,rule
+            return [[[a, 0], [b, 0], [b, 20], [a, 20], [a, 0]]]
+
+        parts = [
+            dict(
+                id='wings',
+                polygons=[rectangle(0, 8), rectangle(22, 30)],
+                height=16.5,
+                levels=5,
+            ),
+            dict(id='middle', polygons=[rectangle(8, 22)], height=6.6, levels=2),
+        ]
+        rule = dict(polygon=0, ring=0, edge=0, part='wings', segment=0, windows=False)
+        return parts, rule
 
     def test_segment_rules_select_disconnected_wings_in_edge_order(self):
-        parts,rule=self.split_facade_fixture()
+        parts, rule = self.split_facade_fixture()
         # Polygon storage order must not change which wing receives the rule.
-        for polygons in [parts[0]['polygons'],list(reversed(parts[0]['polygons']))]:
-            parts[0]['polygons']=polygons
-            result=self.resolve(self.building(),parts=parts,facadeRules=[rule])
-            facades=[f for f in result['form']['facades'] if f['edge']==0 and f['part']=='wings']
-            self.assertEqual([f['start'][0] for f in facades],[0,22])
-            self.assertEqual(facades[0]['rule'],rule)
-            self.assertEqual(facades[1]['rule'],{})
-        second={**rule,'segment':1,'windows':True}
-        result=self.resolve(self.building(),parts=parts,facadeRules=[rule,second])
-        self.assertEqual([f['rule']['windows'] for f in result['form']['facades']
-                          if f['edge']==0 and f['part']=='wings'],[False,True])
+        for polygons in [parts[0]['polygons'], list(reversed(parts[0]['polygons']))]:
+            parts[0]['polygons'] = polygons
+            result = self.resolve(self.building(), parts=parts, facadeRules=[rule])
+            facades = [
+                f
+                for f in result['form']['facades']
+                if f['edge'] == 0 and f['part'] == 'wings'
+            ]
+            self.assertEqual([f['start'][0] for f in facades], [0, 22])
+            self.assertEqual(facades[0]['rule'], rule)
+            self.assertEqual(facades[1]['rule'], {})
+        second = {**rule, 'segment': 1, 'windows': True}
+        result = self.resolve(self.building(), parts=parts, facadeRules=[rule, second])
+        self.assertEqual(
+            [
+                f['rule']['windows']
+                for f in result['form']['facades']
+                if f['edge'] == 0 and f['part'] == 'wings'
+            ],
+            [False, True],
+        )
 
     def test_segment_rules_reject_missing_ambiguous_and_invalid_targets(self):
-        parts,rule=self.split_facade_fixture()
-        for segment in [-1,True,1.5,'0',None,2]:
-            with self.subTest(segment=segment),self.assertRaises(ValueError):
-                self.resolve(self.building(),parts=parts,facadeRules=[{**rule,'segment':segment}])
-        whole={k:v for k,v in rule.items() if k!='segment'}
-        for rules in [[rule,whole],[whole,rule],[rule,rule],
-                      [{k:v for k,v in rule.items() if k!='part'}]]:
-            with self.subTest(rules=rules),self.assertRaises(ValueError):
-                self.resolve(self.building(),parts=parts,facadeRules=rules)
+        parts, rule = self.split_facade_fixture()
+        for segment in [-1, True, 1.5, '0', None, 2]:
+            with self.subTest(segment=segment), self.assertRaises(ValueError):
+                self.resolve(
+                    self.building(),
+                    parts=parts,
+                    facadeRules=[{**rule, 'segment': segment}],
+                )
+        whole = {k: v for k, v in rule.items() if k != 'segment'}
+        for rules in [
+            [rule, whole],
+            [whole, rule],
+            [rule, rule],
+            [{k: v for k, v in rule.items() if k != 'part'}],
+        ]:
+            with self.subTest(rules=rules), self.assertRaises(ValueError):
+                self.resolve(self.building(), parts=parts, facadeRules=rules)
 
     def test_part_base_depth_keeps_heights_and_rejects_open_or_invalid_depths(self):
         b = self.building()
-        part = dict(id='body', polygons=b['polygons'], height=16.5, levels=5, baseDepth=1.1)
+        part = dict(
+            id='body', polygons=b['polygons'], height=16.5, levels=5, baseDepth=1.1
+        )
         result = self.resolve(b, parts=[part])
         resolved = result['form']['parts'][0]
         self.assertEqual(resolved['baseDepth'], 1.1)
         self.assertEqual(resolved['height'], 16.5)
         self.assertEqual(result['polygons'], b['polygons'])
         without_depth = {k: v for k, v in part.items() if k != 'baseDepth'}
-        self.assertNotIn('baseDepth', self.resolve(result, parts=[without_depth])['form']['parts'][0])
-        self.assertEqual(self.resolve(b, parts=[{**part, 'baseDepth': .5}])['form']['parts'][0]['baseDepth'], .5)
-        for invalid in [True, 0, .49, 2.01, float('nan'), float('inf'), '1.1']:
+        self.assertNotIn(
+            'baseDepth', self.resolve(result, parts=[without_depth])['form']['parts'][0]
+        )
+        self.assertEqual(
+            self.resolve(b, parts=[{**part, 'baseDepth': 0.5}])['form']['parts'][0][
+                'baseDepth'
+            ],
+            0.5,
+        )
+        for invalid in [True, 0, 0.49, 2.01, float('nan'), float('inf'), '1.1']:
             with self.subTest(invalid=invalid), self.assertRaises(ValueError):
                 self.resolve(b, parts=[{**part, 'baseDepth': invalid}])
         with self.assertRaises(ValueError):
             self.resolve(b, parts=[{**part, 'openBelow': {}}])
 
     def eave_fixture(self):
-        return dict(part='body', polygon=0, edge=0, backDepth=.6,
-                    projection=1.6, sideOverhang=.8, rise=1.6, capThickness=.2)
+        return dict(
+            part='body',
+            polygon=0,
+            edge=0,
+            backDepth=0.6,
+            projection=1.6,
+            sideOverhang=0.8,
+            rise=1.6,
+            capThickness=0.2,
+        )
 
     def test_roof_eave_support_winding_height_and_reset(self):
-        b=self.building();r=self.resolve(b,roofEave=self.eave_fixture())
-        self.assertEqual(r['form']['roofEave']['normal'],[0,-1])
-        self.assertEqual(r['form']['roofEave']['baseHeight'],16.5)
-        self.assertEqual(r['polygons'],b['polygons'])
-        self.assertNotIn('roofEave',resolve_building(r)['form'])
+        b = self.building()
+        r = self.resolve(b, roofEave=self.eave_fixture())
+        self.assertEqual(r['form']['roofEave']['normal'], [0, -1])
+        self.assertEqual(r['form']['roofEave']['baseHeight'], 16.5)
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertNotIn('roofEave', resolve_building(r)['form'])
         b['polygons'][0][0].reverse()
-        r=self.resolve(b,roofEave=self.eave_fixture(),height=20)
-        self.assertEqual(r['form']['roofEave']['normal'],[-1,0])
-        self.assertEqual(r['form']['roofEave']['baseHeight'],20)
+        r = self.resolve(b, roofEave=self.eave_fixture(), height=20)
+        self.assertEqual(r['form']['roofEave']['normal'], [-1, 0])
+        self.assertEqual(r['form']['roofEave']['baseHeight'], 20)
 
     def test_roof_eave_rejects_bad_anchor_and_dimensions(self):
-        for key,value in [('part','missing'),('polygon',1),('edge',4),('edge',True),
-                          ('edge',-1),('backDepth',0),('projection',4),('rise',float('nan')),
-                          ('capThickness',True),('sideOverhang',-1),('extra',1)]:
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
-                self.resolve(self.building(),roofEave={**self.eave_fixture(),key:value})
+        for key, value in [
+            ('part', 'missing'),
+            ('polygon', 1),
+            ('edge', 4),
+            ('edge', True),
+            ('edge', -1),
+            ('backDepth', 0),
+            ('projection', 4),
+            ('rise', float('nan')),
+            ('capThickness', True),
+            ('sideOverhang', -1),
+            ('extra', 1),
+        ]:
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(
+                    self.building(), roofEave={**self.eave_fixture(), key: value}
+                )
         with self.assertRaises(ValueError):
-            self.resolve(self.building(),roofEave=self.eave_fixture(),roof={'type':'gabled','rise':2})
+            self.resolve(
+                self.building(),
+                roofEave=self.eave_fixture(),
+                roof={'type': 'gabled', 'rise': 2},
+            )
 
     def test_roof_eave_rejects_courtyard_and_high_adjacent_part(self):
-        b=self.building();b['polygons'][0].append([[5,.3],[5,5],[10,5],[10,.3],[5,.3]])
-        with self.assertRaisesRegex(ValueError,'support crosses'):
-            self.resolve(b,roofEave=self.eave_fixture())
-        b=self.building();parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'height':16.5,'levels':5},
-                                {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'height':16.5,'levels':5}]
-        config={**self.eave_fixture(),'part':'west','edge':1}
-        with self.assertRaisesRegex(ValueError,'equal or taller'):
-            self.resolve(b,parts=parts,roofEave=config)
-        parts[1].update(height=9.9,levels=3)
-        r=self.resolve(b,parts=parts,roofEave=config)
-        self.assertEqual(r['form']['roofEave']['baseHeight'],16.5)
+        b = self.building()
+        b['polygons'][0].append([[5, 0.3], [5, 5], [10, 5], [10, 0.3], [5, 0.3]])
+        with self.assertRaisesRegex(ValueError, 'support crosses'):
+            self.resolve(b, roofEave=self.eave_fixture())
+        b = self.building()
+        parts = [
+            {
+                'id': 'west',
+                'polygons': [[[[0, 0], [15, 0], [15, 20], [0, 20], [0, 0]]]],
+                'height': 16.5,
+                'levels': 5,
+            },
+            {
+                'id': 'east',
+                'polygons': [[[[15, 0], [30, 0], [30, 20], [15, 20], [15, 0]]]],
+                'height': 16.5,
+                'levels': 5,
+            },
+        ]
+        config = {**self.eave_fixture(), 'part': 'west', 'edge': 1}
+        with self.assertRaisesRegex(ValueError, 'equal or taller'):
+            self.resolve(b, parts=parts, roofEave=config)
+        parts[1].update(height=9.9, levels=3)
+        r = self.resolve(b, parts=parts, roofEave=config)
+        self.assertEqual(r['form']['roofEave']['baseHeight'], 16.5)
 
     def test_skipped_window_levels_preserve_other_rows_and_explicit_panels(self):
-        rule=self.panel_fixture();rule['skipWindowLevels']=[4]
-        r=self.resolve(self.building(),facadeRules=[rule])
-        self.assertEqual(r['form']['facades'][0]['rule'],rule)
+        rule = self.panel_fixture()
+        rule['skipWindowLevels'] = [4]
+        r = self.resolve(self.building(), facadeRules=[rule])
+        self.assertEqual(r['form']['facades'][0]['rule'], rule)
         self.assertTrue(all(not f['rule'] for f in r['form']['facades'][1:]))
-        reset=resolve_building(r)
-        self.assertTrue(all('skipWindowLevels' not in f['rule'] for f in reset['form'].get('facades',[])))
+        reset = resolve_building(r)
+        self.assertTrue(
+            all(
+                'skipWindowLevels' not in f['rule']
+                for f in reset['form'].get('facades', [])
+            )
+        )
 
     def test_skipped_window_levels_reject_invalid_or_ignored_selection(self):
-        for values in [[],[True],[-1],[1,1],[2,1],[5],[float('nan')],['4'],{},None]:
-            rule={'polygon':0,'ring':0,'edge':0,'skipWindowLevels':values}
-            with self.subTest(values=values),self.assertRaises(ValueError):
-                self.resolve(self.building(),facadeRules=[rule])
-        for key,value in [('windows',False),('windowGrid',{}),('windowBands',{}),('openCorridor',{}),('attachedGallery',{})]:
-            rule={'polygon':0,'ring':0,'edge':0,'skipWindowLevels':[4],key:value}
-            with self.subTest(key=key),self.assertRaises(ValueError):
-                self.resolve(self.building(),facadeRules=[rule])
-        b,values=self.portico_fixture()
-        with self.assertRaises(ValueError):self.resolve(b,**values,facadeRules=[{'polygon':0,'ring':0,'edge':2,'skipWindowLevels':[0]}])
+        for values in [
+            [],
+            [True],
+            [-1],
+            [1, 1],
+            [2, 1],
+            [5],
+            [float('nan')],
+            ['4'],
+            {},
+            None,
+        ]:
+            rule = {'polygon': 0, 'ring': 0, 'edge': 0, 'skipWindowLevels': values}
+            with self.subTest(values=values), self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[rule])
+        for key, value in [
+            ('windows', False),
+            ('windowGrid', {}),
+            ('windowBands', {}),
+            ('openCorridor', {}),
+            ('attachedGallery', {}),
+        ]:
+            rule = {
+                'polygon': 0,
+                'ring': 0,
+                'edge': 0,
+                'skipWindowLevels': [4],
+                key: value,
+            }
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[rule])
+        b, values = self.portico_fixture()
+        with self.assertRaises(ValueError):
+            self.resolve(
+                b,
+                **values,
+                facadeRules=[
+                    {'polygon': 0, 'ring': 0, 'edge': 2, 'skipWindowLevels': [0]}
+                ],
+            )
 
     def test_panels_and_ledges_require_clear_vertical_and_horizontal_separation(self):
-        rule=self.panel_fixture();panel=rule['panels'][0]
-        rule['horizontalLedges']={'from':0,'to':1,'tops':[16.5],'depth':.65,'thickness':.16}
-        self.resolve(self.building(),facadeRules=[rule])
-        rule['horizontalLedges']['tops']=[panel['top']]
-        with self.assertRaisesRegex(ValueError,'overlaps a horizontal ledge'):
-            self.resolve(self.building(),facadeRules=[rule])
-        rule['horizontalLedges']['to']=panel['from']
-        self.resolve(self.building(),facadeRules=[rule])
+        rule = self.panel_fixture()
+        panel = rule['panels'][0]
+        rule['horizontalLedges'] = {
+            'from': 0,
+            'to': 1,
+            'tops': [16.5],
+            'depth': 0.65,
+            'thickness': 0.16,
+        }
+        self.resolve(self.building(), facadeRules=[rule])
+        rule['horizontalLedges']['tops'] = [panel['top']]
+        with self.assertRaisesRegex(ValueError, 'overlaps a horizontal ledge'):
+            self.resolve(self.building(), facadeRules=[rule])
+        rule['horizontalLedges']['to'] = panel['from']
+        self.resolve(self.building(), facadeRules=[rule])
 
     def ledges_fixture(self):
-        return {'polygon':0,'ring':0,'edge':0,'balconies':False,'horizontalLedges':{
-            'from':.1,'to':.9,'tops':[3.3,6.6,9.9,13.2,16.5],'depth':.65,'thickness':.16}}
+        return {
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            'balconies': False,
+            'horizontalLedges': {
+                'from': 0.1,
+                'to': 0.9,
+                'tops': [3.3, 6.6, 9.9, 13.2, 16.5],
+                'depth': 0.65,
+                'thickness': 0.16,
+            },
+        }
 
     def test_horizontal_ledges_preserve_windows_and_remove_cleanly(self):
-        b=self.building();rule=self.ledges_fixture()
-        r=self.resolve(b,facadeRules=[rule])
-        self.assertEqual(r['form']['facades'][0]['rule'],rule)
-        self.assertNotIn('windows',r['form']['facades'][0]['rule'])
+        b = self.building()
+        rule = self.ledges_fixture()
+        r = self.resolve(b, facadeRules=[rule])
+        self.assertEqual(r['form']['facades'][0]['rule'], rule)
+        self.assertNotIn('windows', r['form']['facades'][0]['rule'])
         self.assertTrue(all(not f['rule'] for f in r['form']['facades'][1:]))
-        self.assertEqual(r['polygons'],b['polygons'])
-        reset=resolve_building(r)
-        self.assertTrue(all(not f['rule'] for f in reset['form'].get('facades',[])))
+        self.assertEqual(r['polygons'], b['polygons'])
+        reset = resolve_building(r)
+        self.assertTrue(all(not f['rule'] for f in reset['form'].get('facades', [])))
 
     def test_horizontal_ledges_reject_invalid_spans_heights_and_conflicts(self):
-        for key,value in [('from',-.1),('to',.1),('depth',True),('depth',float('nan')),
-                          ('thickness',0),('tops',[]),('tops',[True]),('tops',[float('inf')]),
-                          ('tops',[3.3,3.4]),('tops',[6.6,3.3]),('tops',[16.6]),('unknown',1)]:
-            rule=self.ledges_fixture();rule['horizontalLedges'][key]=value
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
-                self.resolve(self.building(),facadeRules=[rule])
-        for key in ['openCorridor','windowGrid','windowBands','attachedGallery','balconies']:
-            rule=self.ledges_fixture();rule[key]=True if key=='balconies' else {}
-            with self.subTest(key=key),self.assertRaises(ValueError):
-                self.resolve(self.building(),facadeRules=[rule])
+        for key, value in [
+            ('from', -0.1),
+            ('to', 0.1),
+            ('depth', True),
+            ('depth', float('nan')),
+            ('thickness', 0),
+            ('tops', []),
+            ('tops', [True]),
+            ('tops', [float('inf')]),
+            ('tops', [3.3, 3.4]),
+            ('tops', [6.6, 3.3]),
+            ('tops', [16.6]),
+            ('unknown', 1),
+        ]:
+            rule = self.ledges_fixture()
+            rule['horizontalLedges'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[rule])
+        for key in [
+            'openCorridor',
+            'windowGrid',
+            'windowBands',
+            'attachedGallery',
+            'balconies',
+        ]:
+            rule = self.ledges_fixture()
+            rule[key] = True if key == 'balconies' else {}
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[rule])
 
     def test_horizontal_ledges_reject_open_portico_and_split_edge(self):
-        b,values=self.portico_fixture();rule=self.ledges_fixture();rule['edge']=2
-        with self.assertRaises(ValueError):self.resolve(b,**values,facadeRules=[rule])
-        b=self.building();rule=self.ledges_fixture()
-        parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'levels':5,'height':16.5},
-               {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'levels':3,'height':9.9}]
-        with self.assertRaises(ValueError):self.resolve(b,parts=parts,facadeRules=[rule])
-        rule['part']='east'
-        with self.assertRaises(ValueError):self.resolve(b,parts=parts,facadeRules=[rule])
-        rule['part']='west'
-        self.resolve(b,parts=parts,facadeRules=[rule])
+        b, values = self.portico_fixture()
+        rule = self.ledges_fixture()
+        rule['edge'] = 2
+        with self.assertRaises(ValueError):
+            self.resolve(b, **values, facadeRules=[rule])
+        b = self.building()
+        rule = self.ledges_fixture()
+        parts = [
+            {
+                'id': 'west',
+                'polygons': [[[[0, 0], [15, 0], [15, 20], [0, 20], [0, 0]]]],
+                'levels': 5,
+                'height': 16.5,
+            },
+            {
+                'id': 'east',
+                'polygons': [[[[15, 0], [30, 0], [30, 20], [15, 20], [15, 0]]]],
+                'levels': 3,
+                'height': 9.9,
+            },
+        ]
+        with self.assertRaises(ValueError):
+            self.resolve(b, parts=parts, facadeRules=[rule])
+        rule['part'] = 'east'
+        with self.assertRaises(ValueError):
+            self.resolve(b, parts=parts, facadeRules=[rule])
+        rule['part'] = 'west'
+        self.resolve(b, parts=parts, facadeRules=[rule])
 
     def test_bounded_corridor_accepts_one_middle_storey_and_keeps_defaults(self):
-        b=self.building()
-        corridor={'depth':1.4,'firstLevel':2,'lastLevel':2,'railHeight':.9,'endInset':.3}
-        rule={'polygon':0,'ring':0,'edge':0,'balconies':False,'openCorridor':corridor}
-        r=self.resolve(b,facadeRules=[rule])
-        self.assertEqual(r['form']['facades'][0]['rule']['openCorridor'],corridor)
-        self.assertEqual(r['polygons'],b['polygons'])
-        legacy=copy.deepcopy(rule);del legacy['openCorridor']['lastLevel']
-        self.assertNotIn('lastLevel',self.resolve(b,facadeRules=[legacy])['form']['facades'][0]['rule']['openCorridor'])
+        b = self.building()
+        corridor = {
+            'depth': 1.4,
+            'firstLevel': 2,
+            'lastLevel': 2,
+            'railHeight': 0.9,
+            'endInset': 0.3,
+        }
+        rule = {
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            'balconies': False,
+            'openCorridor': corridor,
+        }
+        r = self.resolve(b, facadeRules=[rule])
+        self.assertEqual(r['form']['facades'][0]['rule']['openCorridor'], corridor)
+        self.assertEqual(r['polygons'], b['polygons'])
+        legacy = copy.deepcopy(rule)
+        del legacy['openCorridor']['lastLevel']
+        self.assertNotIn(
+            'lastLevel',
+            self.resolve(b, facadeRules=[legacy])['form']['facades'][0]['rule'][
+                'openCorridor'
+            ],
+        )
 
     def test_bounded_corridor_rejects_reversed_fractional_or_missing_storeys(self):
-        b=self.building()
-        for first,last in [(2,1),(2,2.5),(2,True),(2,5),(2,float('nan')),(5,5),(-1,2)]:
-            rule={'polygon':0,'ring':0,'edge':0,'openCorridor':{
-                'depth':1.4,'firstLevel':first,'lastLevel':last,'railHeight':.9,'endInset':.3}}
-            with self.subTest(first=first,last=last),self.assertRaises(ValueError):
-                self.resolve(b,facadeRules=[rule])
+        b = self.building()
+        for first, last in [
+            (2, 1),
+            (2, 2.5),
+            (2, True),
+            (2, 5),
+            (2, float('nan')),
+            (5, 5),
+            (-1, 2),
+        ]:
+            rule = {
+                'polygon': 0,
+                'ring': 0,
+                'edge': 0,
+                'openCorridor': {
+                    'depth': 1.4,
+                    'firstLevel': first,
+                    'lastLevel': last,
+                    'railHeight': 0.9,
+                    'endInset': 0.3,
+                },
+            }
+            with self.subTest(first=first, last=last), self.assertRaises(ValueError):
+                self.resolve(b, facadeRules=[rule])
 
     def test_roof_dome_tracks_support_height_and_removes_cleanly(self):
-        b=self.building();dome={'center':[15,10],'radius':4,'drumHeight':.8,'rise':4}
-        r=self.resolve(b,roofDome=dome)
-        self.assertEqual(r['form']['roofDome'],{**dome,'part':'body','baseHeight':16.5})
-        self.assertEqual(r['polygons'],b['polygons'])
-        self.assertEqual(self.resolve(b,height=20,roofDome=dome)['form']['roofDome']['baseHeight'],20)
-        self.assertNotIn('roofDome',resolve_building(r)['form'])
+        b = self.building()
+        dome = {'center': [15, 10], 'radius': 4, 'drumHeight': 0.8, 'rise': 4}
+        r = self.resolve(b, roofDome=dome)
+        self.assertEqual(
+            r['form']['roofDome'], {**dome, 'part': 'body', 'baseHeight': 16.5}
+        )
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertEqual(
+            self.resolve(b, height=20, roofDome=dome)['form']['roofDome']['baseHeight'],
+            20,
+        )
+        self.assertNotIn('roofDome', resolve_building(r)['form'])
 
     def test_roof_dome_rejects_courts_edges_open_or_pitched_support(self):
-        b=self.building();dome={'center':[15,10],'radius':4,'drumHeight':.8,'rise':4}
-        for center in ([2,10],[31,10]):
-            with self.subTest(center=center),self.assertRaises(ValueError):
-                self.resolve(b,roofDome={**dome,'center':center})
-        court=copy.deepcopy(b);court['polygons'][0].append([[14,9],[14,11],[16,11],[16,9],[14,9]])
-        with self.assertRaises(ValueError):self.resolve(court,roofDome=dome)
-        with self.assertRaises(ValueError):self.resolve(b,roofDome=dome,roof={'type':'hipped','rise':2})
-        part={'id':'porch','polygons':b['polygons'],'height':16.5,'levels':1,
-              'openBelow':{'clearHeight':16,'floorHeight':.5,'columns':[
-                  {'center':[2,2],'width':1,'depth':1,'angle':0},
-                  {'center':[28,18],'width':1,'depth':1,'angle':0}]}}
-        self.resolve(b,parts=[part])
-        with self.assertRaisesRegex(ValueError,'one solid flat support'):
-            self.resolve(b,roofDome=dome,parts=[part])
+        b = self.building()
+        dome = {'center': [15, 10], 'radius': 4, 'drumHeight': 0.8, 'rise': 4}
+        for center in ([2, 10], [31, 10]):
+            with self.subTest(center=center), self.assertRaises(ValueError):
+                self.resolve(b, roofDome={**dome, 'center': center})
+        court = copy.deepcopy(b)
+        court['polygons'][0].append([[14, 9], [14, 11], [16, 11], [16, 9], [14, 9]])
+        with self.assertRaises(ValueError):
+            self.resolve(court, roofDome=dome)
+        with self.assertRaises(ValueError):
+            self.resolve(b, roofDome=dome, roof={'type': 'hipped', 'rise': 2})
+        part = {
+            'id': 'porch',
+            'polygons': b['polygons'],
+            'height': 16.5,
+            'levels': 1,
+            'openBelow': {
+                'clearHeight': 16,
+                'floorHeight': 0.5,
+                'columns': [
+                    {'center': [2, 2], 'width': 1, 'depth': 1, 'angle': 0},
+                    {'center': [28, 18], 'width': 1, 'depth': 1, 'angle': 0},
+                ],
+            },
+        }
+        self.resolve(b, parts=[part])
+        with self.assertRaisesRegex(ValueError, 'one solid flat support'):
+            self.resolve(b, roofDome=dome, parts=[part])
 
     def test_roof_dome_rejects_invalid_dimensions_and_unknown_parameters(self):
-        dome={'center':[15,10],'radius':4,'drumHeight':.8,'rise':4}
-        for patch in ({'radius':True},{'radius':float('nan')},{'drumHeight':0},
-                      {'rise':20},{'center':[15]},{'center':['15',10]},
-                      {'center':[float('inf'),10]},{'segments':100000},{'radius':None}):
-            with self.subTest(patch=patch),self.assertRaises(ValueError):
-                self.resolve(self.building(),roofDome={**dome,**patch})
+        dome = {'center': [15, 10], 'radius': 4, 'drumHeight': 0.8, 'rise': 4}
+        for patch in (
+            {'radius': True},
+            {'radius': float('nan')},
+            {'drumHeight': 0},
+            {'rise': 20},
+            {'center': [15]},
+            {'center': ['15', 10]},
+            {'center': [float('inf'), 10]},
+            {'segments': 100000},
+            {'radius': None},
+        ):
+            with self.subTest(patch=patch), self.assertRaises(ValueError):
+                self.resolve(self.building(), roofDome={**dome, **patch})
 
     def test_roof_dome_uses_one_part_not_overall_building_height(self):
-        b=self.building();dome={'center':[22,10],'radius':4,'drumHeight':.8,'rise':4}
-        parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'levels':5,'height':16.5},
-               {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'levels':3,'height':9.9}]
-        r=self.resolve(b,parts=parts,roofDome=dome)
-        self.assertEqual(r['form']['roofDome']['baseHeight'],9.9)
-        self.assertEqual(r['form']['roofDome']['part'],'east')
-        with self.assertRaises(ValueError):self.resolve(b,parts=parts,roofDome={**dome,'center':[15,10]})
+        b = self.building()
+        dome = {'center': [22, 10], 'radius': 4, 'drumHeight': 0.8, 'rise': 4}
+        parts = [
+            {
+                'id': 'west',
+                'polygons': [[[[0, 0], [15, 0], [15, 20], [0, 20], [0, 0]]]],
+                'levels': 5,
+                'height': 16.5,
+            },
+            {
+                'id': 'east',
+                'polygons': [[[[15, 0], [30, 0], [30, 20], [15, 20], [15, 0]]]],
+                'levels': 3,
+                'height': 9.9,
+            },
+        ]
+        r = self.resolve(b, parts=parts, roofDome=dome)
+        self.assertEqual(r['form']['roofDome']['baseHeight'], 9.9)
+        self.assertEqual(r['form']['roofDome']['part'], 'east')
+        with self.assertRaises(ValueError):
+            self.resolve(b, parts=parts, roofDome={**dome, 'center': [15, 10]})
 
     def test_documented_storeys_override_osm_height_and_reach_all_facades(self):
-        b=self.building();b['tags']['height']='16.5'
-        floors=[4.8,3.9,3.9,3.9,3.9]
-        r=self.resolve(b,levels=5,floorHeights=floors)
-        self.assertAlmostEqual(r['height'],20.4)
-        self.assertEqual(r['polygons'],b['polygons'])
-        self.assertTrue(all(f['floorHeights']==floors for f in r['form']['facades']))
-        self.assertNotIn('floorHeight',r['calibration']['evidence'])
-        self.assertEqual(r['calibration']['evidence']['height']['status'],'estimated')
-        self.assertTrue(any('OSM height differs' in w for w in r['calibration']['warnings']))
+        b = self.building()
+        b['tags']['height'] = '16.5'
+        floors = [4.8, 3.9, 3.9, 3.9, 3.9]
+        r = self.resolve(b, levels=5, floorHeights=floors)
+        self.assertAlmostEqual(r['height'], 20.4)
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertTrue(all(f['floorHeights'] == floors for f in r['form']['facades']))
+        self.assertNotIn('floorHeight', r['calibration']['evidence'])
+        self.assertEqual(r['calibration']['evidence']['height']['status'], 'estimated')
+        self.assertTrue(
+            any('OSM height differs' in w for w in r['calibration']['warnings'])
+        )
         # Removing the override must remove the old stack, not retain derived input.
-        reset=resolve_building(r)
-        self.assertAlmostEqual(reset['height'],16.5)
-        self.assertNotIn('floorHeights',reset['form'])
+        reset = resolve_building(r)
+        self.assertAlmostEqual(reset['height'], 16.5)
+        self.assertNotIn('floorHeights', reset['form'])
 
     def test_storey_stack_rejects_inconsistent_or_invalid_values(self):
-        b=self.building();floors=[4.8,3.9,3.9,3.9,3.9]
-        for bad in ([],[4.8]*4,'4.8,3.9',None,[True]*5,[float('nan')]*5,
-                    [float('inf')]*5,[-1]*5,[0]*5,['3.9']*5):
-            with self.subTest(value=bad),self.assertRaises(ValueError):
-                self.resolve(b,levels=5,floorHeights=bad)
-        for values in ({'levels':4.5},{'height':16.5},{'floorHeight':3.3},{'parts':[]}):
-            with self.subTest(values=values),self.assertRaises(ValueError):
-                self.resolve(b,floorHeights=floors,**values)
-        self.assertAlmostEqual(self.resolve(b,height=20.4,floorHeights=floors)['height'],20.4)
+        b = self.building()
+        floors = [4.8, 3.9, 3.9, 3.9, 3.9]
+        for bad in (
+            [],
+            [4.8] * 4,
+            '4.8,3.9',
+            None,
+            [True] * 5,
+            [float('nan')] * 5,
+            [float('inf')] * 5,
+            [-1] * 5,
+            [0] * 5,
+            ['3.9'] * 5,
+        ):
+            with self.subTest(value=bad), self.assertRaises(ValueError):
+                self.resolve(b, levels=5, floorHeights=bad)
+        for values in (
+            {'levels': 4.5},
+            {'height': 16.5},
+            {'floorHeight': 3.3},
+            {'parts': []},
+        ):
+            with self.subTest(values=values), self.assertRaises(ValueError):
+                self.resolve(b, floorHeights=floors, **values)
+        self.assertAlmostEqual(
+            self.resolve(b, height=20.4, floorHeights=floors)['height'], 20.4
+        )
 
     def test_storey_stack_never_silently_uses_equal_floor_specialized_layout(self):
-        b=self.building();floors=[4.8,3.9,3.9,3.9,3.9]
-        ordinary={'polygon':0,'ring':0,'edge':0,'spacing':3,'balconies':False}
-        self.assertEqual(self.resolve(b,floorHeights=floors,facadeRules=[ordinary])['form']['facades'][0]['rule'],ordinary)
-        for key in ('openCorridor','windowBands','windowGrid','attachedGallery','panels'):
-            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'without specialized layouts'):
-                self.resolve(b,floorHeights=floors,facadeRules=[{**ordinary,key:{}}])
+        b = self.building()
+        floors = [4.8, 3.9, 3.9, 3.9, 3.9]
+        ordinary = {
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            'spacing': 3,
+            'balconies': False,
+        }
+        self.assertEqual(
+            self.resolve(b, floorHeights=floors, facadeRules=[ordinary])['form'][
+                'facades'
+            ][0]['rule'],
+            ordinary,
+        )
+        for key in (
+            'openCorridor',
+            'windowBands',
+            'windowGrid',
+            'attachedGallery',
+            'panels',
+        ):
+            with (
+                self.subTest(key=key),
+                self.assertRaisesRegex(ValueError, 'without specialized layouts'),
+            ):
+                self.resolve(
+                    b, floorHeights=floors, facadeRules=[{**ordinary, key: {}}]
+                )
 
     def test_only_explicit_open_roof_can_omit_entrance(self):
-        buildings={b['id']:b for b in json.loads((ROOT/'public/data/buildings.json').read_text())}
-        b=buildings['way/880089961'];record=load_catalogue()[b['id']]
-        sources={s['id'] for s in source_catalogue()}
-        resolved=resolve_building(b,record,sources)
-        self.assertEqual(resolved['form']['entrances'],[])
-        malformed=copy.deepcopy(record);malformed['entrances']={}
-        with self.assertRaises(ValueError):resolve_building(b,malformed,sources)
-        for kind in ('university','yes'):
-            enclosed=copy.deepcopy(b);enclosed['tags']['building']=kind
-            with self.subTest(kind=kind),self.assertRaises(ValueError):
-                resolve_building(enclosed,record,sources)
-        no_supports=copy.deepcopy(record)
+        buildings = {
+            b['id']: b
+            for b in json.loads((ROOT / 'public/data/buildings.json').read_text())
+        }
+        b = buildings['way/880089961']
+        record = load_catalogue()[b['id']]
+        sources = {s['id'] for s in source_catalogue()}
+        resolved = resolve_building(b, record, sources)
+        self.assertEqual(resolved['form']['entrances'], [])
+        malformed = copy.deepcopy(record)
+        malformed['entrances'] = {}
+        with self.assertRaises(ValueError):
+            resolve_building(b, malformed, sources)
+        for kind in ('university', 'yes'):
+            enclosed = copy.deepcopy(b)
+            enclosed['tags']['building'] = kind
+            with self.subTest(kind=kind), self.assertRaises(ValueError):
+                resolve_building(enclosed, record, sources)
+        no_supports = copy.deepcopy(record)
         del no_supports['parts'][0]['openBelow']
-        with self.assertRaises(ValueError):resolve_building(b,no_supports,sources)
-        no_parts=copy.deepcopy(record)
-        del no_parts['parts'];del no_parts['evidence']['parts']
-        with self.assertRaises(ValueError):resolve_building(b,no_parts,sources)
+        with self.assertRaises(ValueError):
+            resolve_building(b, no_supports, sources)
+        no_parts = copy.deepcopy(record)
+        del no_parts['parts']
+        del no_parts['evidence']['parts']
+        with self.assertRaises(ValueError):
+            resolve_building(b, no_parts, sources)
 
     def test_mixed_part_roofs_preserve_partition_and_reject_conflicts(self):
-        b=self.building()
-        parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'levels':5,'height':16.5,'roof':{'type':'hipped','rise':1.5}},
-               {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'levels':3,'height':9.9,'roof':{'type':'flat','rise':0}}]
-        r=self.resolve(b,parts=parts,roof={'type':'hipped','rise':2})
-        self.assertEqual(r['polygons'],b['polygons'])
-        self.assertEqual([p['roof']['type'] for p in r['form']['parts']],['hipped','flat'])
-        self.assertNotIn('geometry',r['form']['parts'][1]['roof'])
-        for bad in [{'type':'flat','rise':1},{'type':'hipped','rise':0},{'type':'hipped','rise':True},{'type':'hipped','rise':float('nan')},{'type':'unknown','rise':1},{'type':'flat'}]:
-            changed=copy.deepcopy(parts);changed[0]['roof']=bad
-            with self.subTest(roof=bad),self.assertRaises(ValueError):self.resolve(b,parts=changed)
+        b = self.building()
+        parts = [
+            {
+                'id': 'west',
+                'polygons': [[[[0, 0], [15, 0], [15, 20], [0, 20], [0, 0]]]],
+                'levels': 5,
+                'height': 16.5,
+                'roof': {'type': 'hipped', 'rise': 1.5},
+            },
+            {
+                'id': 'east',
+                'polygons': [[[[15, 0], [30, 0], [30, 20], [15, 20], [15, 0]]]],
+                'levels': 3,
+                'height': 9.9,
+                'roof': {'type': 'flat', 'rise': 0},
+            },
+        ]
+        r = self.resolve(b, parts=parts, roof={'type': 'hipped', 'rise': 2})
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertEqual(
+            [p['roof']['type'] for p in r['form']['parts']], ['hipped', 'flat']
+        )
+        self.assertNotIn('geometry', r['form']['parts'][1]['roof'])
+        for bad in [
+            {'type': 'flat', 'rise': 1},
+            {'type': 'hipped', 'rise': 0},
+            {'type': 'hipped', 'rise': True},
+            {'type': 'hipped', 'rise': float('nan')},
+            {'type': 'unknown', 'rise': 1},
+            {'type': 'flat'},
+        ]:
+            changed = copy.deepcopy(parts)
+            changed[0]['roof'] = bad
+            with self.subTest(roof=bad), self.assertRaises(ValueError):
+                self.resolve(b, parts=changed)
 
     def test_part_blue_roof_is_local_and_rejects_unsupported_finish(self):
-        b=self.building()
-        parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'levels':5,'height':16.5,'roof':{'type':'flat','rise':0,'finish':'blue-metal'}},
-               {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'levels':3,'height':9.9}]
-        r=self.resolve(b,parts=parts)
-        self.assertEqual(r['form']['parts'][0]['roof']['finish'],'blue-metal')
-        self.assertNotIn('finish',r['form']['parts'][1]['roof'])
-        self.assertNotIn('finish',r['form']['roof'])
-        self.assertEqual(resolve_building(r)['form']['parts'],[])
-        for roof in [{'type':'flat','rise':0,'finish':'red'},
-                     {'type':'flat','rise':0,'finish':None},
-                     {'type':'hipped','rise':1,'finish':'blue-metal'}]:
-            bad=copy.deepcopy(parts);bad[0]['roof']=roof
-            with self.subTest(roof=roof),self.assertRaisesRegex(ValueError,'finish'):
-                self.resolve(b,parts=bad)
+        b = self.building()
+        parts = [
+            {
+                'id': 'west',
+                'polygons': [[[[0, 0], [15, 0], [15, 20], [0, 20], [0, 0]]]],
+                'levels': 5,
+                'height': 16.5,
+                'roof': {'type': 'flat', 'rise': 0, 'finish': 'blue-metal'},
+            },
+            {
+                'id': 'east',
+                'polygons': [[[[15, 0], [30, 0], [30, 20], [15, 20], [15, 0]]]],
+                'levels': 3,
+                'height': 9.9,
+            },
+        ]
+        r = self.resolve(b, parts=parts)
+        self.assertEqual(r['form']['parts'][0]['roof']['finish'], 'blue-metal')
+        self.assertNotIn('finish', r['form']['parts'][1]['roof'])
+        self.assertNotIn('finish', r['form']['roof'])
+        self.assertEqual(resolve_building(r)['form']['parts'], [])
+        for roof in [
+            {'type': 'flat', 'rise': 0, 'finish': 'red'},
+            {'type': 'flat', 'rise': 0, 'finish': None},
+            {'type': 'hipped', 'rise': 1, 'finish': 'blue-metal'},
+        ]:
+            bad = copy.deepcopy(parts)
+            bad[0]['roof'] = roof
+            with self.subTest(roof=roof), self.assertRaisesRegex(ValueError, 'finish'):
+                self.resolve(b, parts=bad)
 
     def test_blue_roof_inset_partitions_top_without_filling_courtyard(self):
         from shapely.geometry import Polygon
         from shapely.ops import unary_union
-        b=self.building()
-        b['polygons'][0].append([[10,5],[10,15],[20,15],[20,5],[10,5]])
-        part={'id':'hall','polygons':b['polygons'],'height':16.5,'levels':5,
-              'roof':{'type':'flat','rise':0,'finish':'blue-metal','inset':1.2}}
-        r=self.resolve(b,parts=[part]);roof=r['form']['parts'][0]['roof']
-        shape=lambda key:unary_union([Polygon(p[0],p[1:]) for p in roof[key]['polygons']])
-        center=shape('centerGeometry');border=shape('borderGeometry')
-        original=Polygon(b['polygons'][0][0],b['polygons'][0][1:])
-        self.assertAlmostEqual(center.intersection(border).area,0)
-        self.assertLess(center.union(border).symmetric_difference(original).area,1e-8)
-        self.assertAlmostEqual(center.boundary.distance(original.boundary),1.2)
-        self.assertEqual(len(center.interiors),1)
-        self.assertEqual(resolve_building(r)['form']['parts'],[])
-        for key in ('centerGeometry','borderGeometry'):
-            geometry=roof[key];area=0
-            for poly,indices in zip(geometry['polygons'],geometry['triangles']):
-                points=[p for ring in poly for p in ring[:-1]]
-                for i in range(0,len(indices),3):
-                    a,c,d=[points[k] for k in indices[i:i+3]]
-                    signed=((c[0]-a[0])*(d[1]-a[1])-(c[1]-a[1])*(d[0]-a[0]))/2
-                    self.assertGreater(signed,0)
-                    area+=signed
-            self.assertAlmostEqual(area,shape(key).area)
+
+        b = self.building()
+        b['polygons'][0].append([[10, 5], [10, 15], [20, 15], [20, 5], [10, 5]])
+        part = {
+            'id': 'hall',
+            'polygons': b['polygons'],
+            'height': 16.5,
+            'levels': 5,
+            'roof': {'type': 'flat', 'rise': 0, 'finish': 'blue-metal', 'inset': 1.2},
+        }
+        r = self.resolve(b, parts=[part])
+        roof = r['form']['parts'][0]['roof']
+        shape = lambda key: unary_union(
+            [Polygon(p[0], p[1:]) for p in roof[key]['polygons']]
+        )
+        center = shape('centerGeometry')
+        border = shape('borderGeometry')
+        original = Polygon(b['polygons'][0][0], b['polygons'][0][1:])
+        self.assertAlmostEqual(center.intersection(border).area, 0)
+        self.assertLess(center.union(border).symmetric_difference(original).area, 1e-8)
+        self.assertAlmostEqual(center.boundary.distance(original.boundary), 1.2)
+        self.assertEqual(len(center.interiors), 1)
+        self.assertEqual(resolve_building(r)['form']['parts'], [])
+        for key in ('centerGeometry', 'borderGeometry'):
+            geometry = roof[key]
+            area = 0
+            for poly, indices in zip(geometry['polygons'], geometry['triangles']):
+                points = [p for ring in poly for p in ring[:-1]]
+                for i in range(0, len(indices), 3):
+                    a, c, d = [points[k] for k in indices[i : i + 3]]
+                    signed = (
+                        (c[0] - a[0]) * (d[1] - a[1]) - (c[1] - a[1]) * (d[0] - a[0])
+                    ) / 2
+                    self.assertGreater(signed, 0)
+                    area += signed
+            self.assertAlmostEqual(area, shape(key).area)
 
     def test_blue_roof_inset_rejects_invalid_and_collapsed_geometry(self):
-        b=self.building()
-        part={'id':'hall','polygons':b['polygons'],'height':16.5,'levels':5,
-              'roof':{'type':'flat','rise':0,'finish':'blue-metal','inset':1.2}}
-        for value in (None,True,0,.1,3.1,float('nan'),float('inf')):
-            bad=copy.deepcopy(part);bad['roof']['inset']=value
-            with self.subTest(value=value),self.assertRaisesRegex(ValueError,'inset'):
-                self.resolve(b,parts=[bad])
-        bad=copy.deepcopy(part);del bad['roof']['finish']
-        with self.assertRaisesRegex(ValueError,'inset'):self.resolve(b,parts=[bad])
+        b = self.building()
+        part = {
+            'id': 'hall',
+            'polygons': b['polygons'],
+            'height': 16.5,
+            'levels': 5,
+            'roof': {'type': 'flat', 'rise': 0, 'finish': 'blue-metal', 'inset': 1.2},
+        }
+        for value in (None, True, 0, 0.1, 3.1, float('nan'), float('inf')):
+            bad = copy.deepcopy(part)
+            bad['roof']['inset'] = value
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'inset'):
+                self.resolve(b, parts=[bad])
+        bad = copy.deepcopy(part)
+        del bad['roof']['finish']
+        with self.assertRaisesRegex(ValueError, 'inset'):
+            self.resolve(b, parts=[bad])
         # An accepted in-range width can still erase a narrow footprint.
-        narrow=copy.deepcopy(b);narrow['polygons']=[[[[0,0],[2,0],[2,20],[0,20],[0,0]]]]
-        bad=copy.deepcopy(part);bad['polygons']=narrow['polygons']
-        with self.assertRaisesRegex(ValueError,'collapses'):self.resolve(narrow,parts=[bad])
+        narrow = copy.deepcopy(b)
+        narrow['polygons'] = [[[[0, 0], [2, 0], [2, 20], [0, 20], [0, 0]]]]
+        bad = copy.deepcopy(part)
+        bad['polygons'] = narrow['polygons']
+        with self.assertRaisesRegex(ValueError, 'collapses'):
+            self.resolve(narrow, parts=[bad])
 
     def test_ground_corridor_with_pitched_roof_requires_fitting_piers(self):
-        corridor={'depth':1.8,'firstLevel':0,'railHeight':.9,'endInset':.3,
-                  'piers':{'bays':8,'width':.42,'depth':.5},'balusters':{'spacing':.32,'width':.11}}
-        rule={'polygon':0,'ring':0,'edge':0,'balconies':False,'openCorridor':corridor}
-        r=self.resolve(self.building(),facadeRules=[rule],roof={'type':'hipped','rise':1.5})
-        self.assertEqual(r['form']['facades'][0]['rule'],rule)
-        for key,value in [('bays',True),('bays',0),('bays',25),('width',1),('depth',2)]:
-            bad=copy.deepcopy(rule);bad['openCorridor']['piers'][key]=value
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):self.resolve(self.building(),facadeRules=[bad])
-        bad=copy.deepcopy(rule);bad['openCorridor']['balusters']['spacing']=.12
-        with self.assertRaises(ValueError):self.resolve(self.building(),facadeRules=[bad])
+        corridor = {
+            'depth': 1.8,
+            'firstLevel': 0,
+            'railHeight': 0.9,
+            'endInset': 0.3,
+            'piers': {'bays': 8, 'width': 0.42, 'depth': 0.5},
+            'balusters': {'spacing': 0.32, 'width': 0.11},
+        }
+        rule = {
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            'balconies': False,
+            'openCorridor': corridor,
+        }
+        r = self.resolve(
+            self.building(), facadeRules=[rule], roof={'type': 'hipped', 'rise': 1.5}
+        )
+        self.assertEqual(r['form']['facades'][0]['rule'], rule)
+        for key, value in [
+            ('bays', True),
+            ('bays', 0),
+            ('bays', 25),
+            ('width', 1),
+            ('depth', 2),
+        ]:
+            bad = copy.deepcopy(rule)
+            bad['openCorridor']['piers'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[bad])
+        bad = copy.deepcopy(rule)
+        bad['openCorridor']['balusters']['spacing'] = 0.12
+        with self.assertRaises(ValueError):
+            self.resolve(self.building(), facadeRules=[bad])
 
     def panel_fixture(self):
-        return {'polygon':0,'ring':0,'edge':0,'balconies':False,'panels':[
-            {'id':'screen','type':'lattice','from':.4,'to':.6,'bottom':4.1,'top':6.2,
-             'columns':3,'rows':4,'frameWidth':.065,'depth':.12}]}
+        return {
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            'balconies': False,
+            'panels': [
+                {
+                    'id': 'screen',
+                    'type': 'lattice',
+                    'from': 0.4,
+                    'to': 0.6,
+                    'bottom': 4.1,
+                    'top': 6.2,
+                    'columns': 3,
+                    'rows': 4,
+                    'frameWidth': 0.065,
+                    'depth': 0.12,
+                }
+            ],
+        }
 
     def test_upper_panels_preserve_footprint_and_rotate_with_facade(self):
-        b=self.building();rule=self.panel_fixture()
-        result=self.resolve(b,facadeRules=[rule])
-        self.assertEqual(result['polygons'],b['polygons'])
-        self.assertEqual(result['form']['facades'][0]['rule'],rule)
-        b['polygons']=[[[[-y,x] for x,y in b['polygons'][0][0]]]]
-        facade=self.resolve(b,facadeRules=[rule])['form']['facades'][0]
-        self.assertEqual(facade['normal'],[1.,0.]);self.assertEqual(facade['rule'],rule)
+        b = self.building()
+        rule = self.panel_fixture()
+        result = self.resolve(b, facadeRules=[rule])
+        self.assertEqual(result['polygons'], b['polygons'])
+        self.assertEqual(result['form']['facades'][0]['rule'], rule)
+        b['polygons'] = [[[[-y, x] for x, y in b['polygons'][0][0]]]]
+        facade = self.resolve(b, facadeRules=[rule])['form']['facades'][0]
+        self.assertEqual(facade['normal'], [1.0, 0.0])
+        self.assertEqual(facade['rule'], rule)
 
     def test_panels_reject_invalid_bounds_counts_and_conflicting_facades(self):
-        for key,value in [('from',-.1),('to',1.1),('bottom',0),('top',20),('depth',True),
-                          ('depth',float('nan')),('frameWidth',.3),('columns',True),('rows',16),
-                          ('type','unknown'),('id','')]:
-            rule=self.panel_fixture();rule['panels'][0][key]=value
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
-                self.resolve(self.building(),facadeRules=[rule])
-        for patch in [{'balconies':True},{'spacing':4},
-                      {'openCorridor':{'depth':1,'firstLevel':1,'railHeight':.9,'endInset':.3}}]:
-            with self.subTest(patch=patch),self.assertRaises(ValueError):
-                self.resolve(self.building(),facadeRules=[{**self.panel_fixture(),**patch}])
-        rule=self.panel_fixture();rule['windowBands']=self.bands_fixture()['windowBands']
-        with self.assertRaisesRegex(ValueError,'overlaps'):
-            self.resolve(self.building(),facadeRules=[rule])
-        for same_id in (False,True):
-            rule=self.panel_fixture();second=copy.deepcopy(rule['panels'][0])
-            if not same_id:second['id']='another'
+        for key, value in [
+            ('from', -0.1),
+            ('to', 1.1),
+            ('bottom', 0),
+            ('top', 20),
+            ('depth', True),
+            ('depth', float('nan')),
+            ('frameWidth', 0.3),
+            ('columns', True),
+            ('rows', 16),
+            ('type', 'unknown'),
+            ('id', ''),
+        ]:
+            rule = self.panel_fixture()
+            rule['panels'][0][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[rule])
+        for patch in [
+            {'balconies': True},
+            {'spacing': 4},
+            {
+                'openCorridor': {
+                    'depth': 1,
+                    'firstLevel': 1,
+                    'railHeight': 0.9,
+                    'endInset': 0.3,
+                }
+            },
+        ]:
+            with self.subTest(patch=patch), self.assertRaises(ValueError):
+                self.resolve(
+                    self.building(), facadeRules=[{**self.panel_fixture(), **patch}]
+                )
+        rule = self.panel_fixture()
+        rule['windowBands'] = self.bands_fixture()['windowBands']
+        with self.assertRaisesRegex(ValueError, 'overlaps'):
+            self.resolve(self.building(), facadeRules=[rule])
+        for same_id in (False, True):
+            rule = self.panel_fixture()
+            second = copy.deepcopy(rule['panels'][0])
+            if not same_id:
+                second['id'] = 'another'
             rule['panels'].append(second)
-            with self.assertRaises(ValueError):self.resolve(self.building(),facadeRules=[rule])
+            with self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[rule])
 
     def test_explicit_panels_can_disable_unobserved_generic_window_rows(self):
-        rule={**self.panel_fixture(),'windows':False}
-        facade=self.resolve(self.building(),facadeRules=[rule])['form']['facades'][0]
+        rule = {**self.panel_fixture(), 'windows': False}
+        facade = self.resolve(self.building(), facadeRules=[rule])['form']['facades'][0]
         self.assertFalse(facade['rule']['windows'])
-        self.assertEqual(facade['rule']['panels'],rule['panels'])
+        self.assertEqual(facade['rule']['panels'], rule['panels'])
 
     def test_explicit_stair_flight_preserves_rotated_footprints_and_three_risers(self):
-        b=self.building();original=copy.deepcopy(b['polygons'])
-        entry={'id':'south','polygon':0,'ring':0,'edge':0,'t':.5,'width':7.2,'primary':True,
-               'landingHeight':.45,'stairFlight':{'width':8.4,'landingDepth':1.2,'riserCount':3,'tread':.32,'baseHeight':0}}
-        e=self.resolve(b,entrances=[entry])['form']['entrances'][0]
-        self.assertEqual(b['polygons'],original);p=e['stairFlight']
-        self.assertAlmostEqual(p['front'],1.84);self.assertAlmostEqual(Polygon(p['footprint']).area,8.4*1.84)
-        self.assertLess(Polygon(p['footprint']).intersection(Polygon(original[0][0])).area,1e-8)
-        b['polygons']=[[[[-y,x] for x,y in original[0][0]]]]
-        rotated=self.resolve(b,entrances=[entry])['form']['entrances'][0]['stairFlight']
-        self.assertAlmostEqual(Polygon(rotated['footprint']).area,Polygon(p['footprint']).area)
+        b = self.building()
+        original = copy.deepcopy(b['polygons'])
+        entry = {
+            'id': 'south',
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            't': 0.5,
+            'width': 7.2,
+            'primary': True,
+            'landingHeight': 0.45,
+            'stairFlight': {
+                'width': 8.4,
+                'landingDepth': 1.2,
+                'riserCount': 3,
+                'tread': 0.32,
+                'baseHeight': 0,
+            },
+        }
+        e = self.resolve(b, entrances=[entry])['form']['entrances'][0]
+        self.assertEqual(b['polygons'], original)
+        p = e['stairFlight']
+        self.assertAlmostEqual(p['front'], 1.84)
+        self.assertAlmostEqual(Polygon(p['footprint']).area, 8.4 * 1.84)
+        self.assertLess(
+            Polygon(p['footprint']).intersection(Polygon(original[0][0])).area, 1e-8
+        )
+        b['polygons'] = [[[[-y, x] for x, y in original[0][0]]]]
+        rotated = self.resolve(b, entrances=[entry])['form']['entrances'][0][
+            'stairFlight'
+        ]
+        self.assertAlmostEqual(
+            Polygon(rotated['footprint']).area, Polygon(p['footprint']).area
+        )
 
     def test_stair_flight_rejects_unsupported_risers_and_overhang(self):
-        entry={'id':'south','polygon':0,'ring':0,'edge':0,'t':.5,'width':7.2,'primary':True,
-               'landingHeight':.45,'stairFlight':{'width':8.4,'landingDepth':1.2,'riserCount':3,'tread':.32,'baseHeight':0}}
-        for key,value in [('riserCount',True),('riserCount',1),('riserCount',8),('width',7),('width',100),('landingDepth',.5),('tread',.1),('baseHeight',.4),('baseHeight',float('nan'))]:
-            bad=copy.deepcopy(entry);bad['stairFlight'][key]=value
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):self.resolve(self.building(),entrances=[bad])
-        bad=copy.deepcopy(entry);bad.pop('landingHeight')
-        with self.assertRaises(ValueError):self.resolve(self.building(),entrances=[bad])
+        entry = {
+            'id': 'south',
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            't': 0.5,
+            'width': 7.2,
+            'primary': True,
+            'landingHeight': 0.45,
+            'stairFlight': {
+                'width': 8.4,
+                'landingDepth': 1.2,
+                'riserCount': 3,
+                'tread': 0.32,
+                'baseHeight': 0,
+            },
+        }
+        for key, value in [
+            ('riserCount', True),
+            ('riserCount', 1),
+            ('riserCount', 8),
+            ('width', 7),
+            ('width', 100),
+            ('landingDepth', 0.5),
+            ('tread', 0.1),
+            ('baseHeight', 0.4),
+            ('baseHeight', float('nan')),
+        ]:
+            bad = copy.deepcopy(entry)
+            bad['stairFlight'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(self.building(), entrances=[bad])
+        bad = copy.deepcopy(entry)
+        bad.pop('landingHeight')
+        with self.assertRaises(ValueError):
+            self.resolve(self.building(), entrances=[bad])
 
     def test_multibay_door_frame_retains_entrance_anchor_and_shared_landing(self):
-        b=self.building()
-        entry={'id':'south','polygon':0,'ring':0,'edge':0,'t':.5,'width':7.2,'primary':True,
-               'landingHeight':.36,'doorFrame':{'bays':3,'pierWidth':.55,'pierDepth':1.2}}
-        r=self.resolve(b,entrances=[entry]);e=r['form']['entrances'][0]
-        self.assertEqual(r['polygons'],b['polygons'])
-        self.assertEqual((e['center'],e['bearing'],e['landingHeight']),([15.,0.],180.,.36))
-        self.assertEqual(e['doorFrame'],entry['doorFrame'])
-        b['polygons']=[[[[-y,x] for x,y in b['polygons'][0][0]]]]
-        e=self.resolve(b,entrances=[entry])['form']['entrances'][0]
-        self.assertEqual((e['center'],e['bearing']),([0.,15.],90.))
+        b = self.building()
+        entry = {
+            'id': 'south',
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            't': 0.5,
+            'width': 7.2,
+            'primary': True,
+            'landingHeight': 0.36,
+            'doorFrame': {'bays': 3, 'pierWidth': 0.55, 'pierDepth': 1.2},
+        }
+        r = self.resolve(b, entrances=[entry])
+        e = r['form']['entrances'][0]
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertEqual(
+            (e['center'], e['bearing'], e['landingHeight']), ([15.0, 0.0], 180.0, 0.36)
+        )
+        self.assertEqual(e['doorFrame'], entry['doorFrame'])
+        b['polygons'] = [[[[-y, x] for x, y in b['polygons'][0][0]]]]
+        e = self.resolve(b, entrances=[entry])['form']['entrances'][0]
+        self.assertEqual((e['center'], e['bearing']), ([0.0, 15.0], 90.0))
 
     def test_multibay_door_frame_rejects_blocked_bays_and_unsupported_geometry(self):
-        entry={'id':'south','polygon':0,'ring':0,'edge':0,'t':.5,'width':7.2,'primary':True,
-               'landingHeight':.36,'doorFrame':{'bays':3,'pierWidth':.55,'pierDepth':1.2}}
-        for key,value in [('bays',True),('bays',0),('bays',3.5),('bays',6),
-                          ('pierWidth',True),('pierWidth',float('nan')),('pierWidth',.1),
-                          ('pierDepth','1.2'),('pierDepth',.3),('pierDepth',2)]:
-            bad=copy.deepcopy(entry);bad['doorFrame'][key]=value
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
-                self.resolve(self.building(),entrances=[bad])
-        bad=copy.deepcopy(entry);bad.pop('landingHeight')
-        with self.assertRaises(ValueError):self.resolve(self.building(),entrances=[bad])
+        entry = {
+            'id': 'south',
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            't': 0.5,
+            'width': 7.2,
+            'primary': True,
+            'landingHeight': 0.36,
+            'doorFrame': {'bays': 3, 'pierWidth': 0.55, 'pierDepth': 1.2},
+        }
+        for key, value in [
+            ('bays', True),
+            ('bays', 0),
+            ('bays', 3.5),
+            ('bays', 6),
+            ('pierWidth', True),
+            ('pierWidth', float('nan')),
+            ('pierWidth', 0.1),
+            ('pierDepth', '1.2'),
+            ('pierDepth', 0.3),
+            ('pierDepth', 2),
+        ]:
+            bad = copy.deepcopy(entry)
+            bad['doorFrame'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(self.building(), entrances=[bad])
+        bad = copy.deepcopy(entry)
+        bad.pop('landingHeight')
+        with self.assertRaises(ValueError):
+            self.resolve(self.building(), entrances=[bad])
         # The clear width fits exactly, but its outer piers leave the facade.
-        bad=copy.deepcopy(entry);bad['t']=7.2/2/30
-        with self.assertRaises(ValueError):self.resolve(self.building(),entrances=[bad])
+        bad = copy.deepcopy(entry)
+        bad['t'] = 7.2 / 2 / 30
+        with self.assertRaises(ValueError):
+            self.resolve(self.building(), entrances=[bad])
 
     def test_raised_landing_rejects_unusable_heights_and_conflicting_porticos(self):
-        entry={'id':'south','polygon':0,'ring':0,'edge':0,'t':.5,'width':7.2,'primary':True,'landingHeight':.36}
-        self.assertEqual(self.resolve(self.building(),entrances=[entry])['form']['entrances'][0]['landingHeight'],.36)
-        for height in [True,'0.36',float('nan'),0,.19,1.21]:
-            with self.subTest(height=height),self.assertRaises(ValueError):
-                self.resolve(self.building(),entrances=[{**entry,'landingHeight':height}])
+        entry = {
+            'id': 'south',
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            't': 0.5,
+            'width': 7.2,
+            'primary': True,
+            'landingHeight': 0.36,
+        }
+        self.assertEqual(
+            self.resolve(self.building(), entrances=[entry])['form']['entrances'][0][
+                'landingHeight'
+            ],
+            0.36,
+        )
+        for height in [True, '0.36', float('nan'), 0, 0.19, 1.21]:
+            with self.subTest(height=height), self.assertRaises(ValueError):
+                self.resolve(
+                    self.building(), entrances=[{**entry, 'landingHeight': height}]
+                )
         with self.assertRaises(ValueError):
-            self.resolve(self.building(),entrances=[{**self.attached_fixture(),'landingHeight':.36}])
+            self.resolve(
+                self.building(),
+                entrances=[{**self.attached_fixture(), 'landingHeight': 0.36}],
+            )
 
     def test_oblique_partition_recovers_collinear_facade_without_overlapping_seam(self):
-        b=self.building()
-        ring=[[-272.93077627413,-868.0510959998603],[-206.8857344524391,-868.1290199999798],
-              [-196.8630556923097,-877.7915959997881],[-269.3505153860546,-877.7025399999338],
-              [-272.93077627413,-868.0510959998603]]
-        b['polygons']=[[ring]];shape=Polygon(ring);parts=[]
-        for name,extent,h,levels in [('west',box(-1000,-2000,-265,0),16.5,5),
-                                     ('east',box(-265,-2000,0,0),13.2,4)]:
-            p=shape.intersection(extent)
-            parts.append({'id':name,'polygons':[[list(map(list,p.exterior.coords))]],'height':h,'levels':levels})
+        b = self.building()
+        ring = [
+            [-272.93077627413, -868.0510959998603],
+            [-206.8857344524391, -868.1290199999798],
+            [-196.8630556923097, -877.7915959997881],
+            [-269.3505153860546, -877.7025399999338],
+            [-272.93077627413, -868.0510959998603],
+        ]
+        b['polygons'] = [[ring]]
+        shape = Polygon(ring)
+        parts = []
+        for name, extent, h, levels in [
+            ('west', box(-1000, -2000, -265, 0), 16.5, 5),
+            ('east', box(-265, -2000, 0, 0), 13.2, 4),
+        ]:
+            p = shape.intersection(extent)
+            parts.append(
+                {
+                    'id': name,
+                    'polygons': [[list(map(list, p.exterior.coords))]],
+                    'height': h,
+                    'levels': levels,
+                }
+            )
         # The exact overlay loses both intervals on this real-world oblique edge.
-        line=LineString(ring[2:4])
-        self.assertTrue(all(line.intersection(Polygon(p['polygons'][0][0])).length<.01 for p in parts))
-        result=self.resolve(b,parts=parts)['form']['facades']
-        segments=[LineString([f['start'],f['end']]) for f in result if f['edge']==2]
-        self.assertEqual(len(segments),2)
-        self.assertAlmostEqual(sum(s.length for s in segments),line.length,places=8)
-        self.assertLess(segments[0].intersection(segments[1]).length,1e-8)
+        line = LineString(ring[2:4])
+        self.assertTrue(
+            all(
+                line.intersection(Polygon(p['polygons'][0][0])).length < 0.01
+                for p in parts
+            )
+        )
+        result = self.resolve(b, parts=parts)['form']['facades']
+        segments = [
+            LineString([f['start'], f['end']]) for f in result if f['edge'] == 2
+        ]
+        self.assertEqual(len(segments), 2)
+        self.assertAlmostEqual(sum(s.length for s in segments), line.length, places=8)
+        self.assertLess(segments[0].intersection(segments[1]).length, 1e-8)
 
     def test_partial_oblique_edge_recovers_missing_interval_in_solid_parts(self):
-        b=self.building()
-        a=[-656.418777727391,-760.5382399999202]
-        c=[-656.4495536085785,-788.1344680000896]
-        d=[-717.8064028063193,-788.05654399997]
-        q=[-717.7694787226078,-760.4499458086736]
-        corner=[-717.7653682970973,-757.3767519997551]
-        p=[-695.093802217242,-760.4825800000607]
-        b['polygons']=[[[a,c,d,corner,p,a]]]
-        length=math.dist(p,a);u=[(a[k]-p[k])/length for k in (0,1)];n=[-u[1],u[0]]
-        cut=LineString([[p[k]-n[k]*6+sign*u[k]*200 for k in (0,1)] for sign in [-1,1]])
-        shapes=sorted(split(Polygon([a,c,d,q,p,a]),cut).geoms,key=lambda p:p.centroid.y)
-        parts=[dict(id=str(i),polygons=[[list(map(list,p.exterior.coords))]],
-                    height=16.5 if i==0 else 6.6,levels=5 if i==0 else 2) for i,p in enumerate(shapes)]
-        parts.append(dict(id='return',polygons=[[[q,corner,p,q]]],height=6.6,levels=2))
-        line=LineString([d,corner])
-        clipped=[line.intersection(Polygon(p['polygons'][0][0])).length for p in parts]
-        self.assertGreater(clipped[1],1)  # Nonempty yet incomplete: the old empty-only recovery misses it.
-        self.assertLess(sum(clipped),line.length-10)
-        r=self.resolve(b,parts=parts)
-        segments=[LineString([f['start'],f['end']]) for f in r['form']['facades'] if f['edge']==2]
-        self.assertAlmostEqual(sum(p.length for p in segments),line.length,places=8)
-        self.assertAlmostEqual(unary_union(segments).length,line.length,places=8)
-        self.assertEqual(r['polygons'],b['polygons'])
+        b = self.building()
+        a = [-656.418777727391, -760.5382399999202]
+        c = [-656.4495536085785, -788.1344680000896]
+        d = [-717.8064028063193, -788.05654399997]
+        q = [-717.7694787226078, -760.4499458086736]
+        corner = [-717.7653682970973, -757.3767519997551]
+        p = [-695.093802217242, -760.4825800000607]
+        b['polygons'] = [[[a, c, d, corner, p, a]]]
+        length = math.dist(p, a)
+        u = [(a[k] - p[k]) / length for k in (0, 1)]
+        n = [-u[1], u[0]]
+        cut = LineString(
+            [[p[k] - n[k] * 6 + sign * u[k] * 200 for k in (0, 1)] for sign in [-1, 1]]
+        )
+        shapes = sorted(
+            split(Polygon([a, c, d, q, p, a]), cut).geoms, key=lambda p: p.centroid.y
+        )
+        parts = [
+            dict(
+                id=str(i),
+                polygons=[[list(map(list, p.exterior.coords))]],
+                height=16.5 if i == 0 else 6.6,
+                levels=5 if i == 0 else 2,
+            )
+            for i, p in enumerate(shapes)
+        ]
+        parts.append(
+            dict(id='return', polygons=[[[q, corner, p, q]]], height=6.6, levels=2)
+        )
+        line = LineString([d, corner])
+        clipped = [
+            line.intersection(Polygon(p['polygons'][0][0])).length for p in parts
+        ]
+        self.assertGreater(
+            clipped[1], 1
+        )  # Nonempty yet incomplete: the old empty-only recovery misses it.
+        self.assertLess(sum(clipped), line.length - 10)
+        r = self.resolve(b, parts=parts)
+        segments = [
+            LineString([f['start'], f['end']])
+            for f in r['form']['facades']
+            if f['edge'] == 2
+        ]
+        self.assertAlmostEqual(sum(p.length for p in segments), line.length, places=8)
+        self.assertAlmostEqual(unary_union(segments).length, line.length, places=8)
+        self.assertEqual(r['polygons'], b['polygons'])
 
     def test_part_white_finish_preserves_geometry_and_rejects_unknown_palette(self):
-        b=self.building()
-        part=dict(id='body',polygons=b['polygons'],height=16.5,levels=5)
-        plain=self.resolve(b,parts=[part])
-        painted=self.resolve(b,parts=[{**part,'wallFinish':'white'}])
-        resolved=painted['form']['parts'][0]
-        self.assertEqual(resolved['wallFinish'],'white')
-        self.assertEqual(resolved['polygons'],plain['form']['parts'][0]['polygons'])
-        self.assertEqual(resolved['triangles'],plain['form']['parts'][0]['triangles'])
-        self.assertNotIn('wallFinish',plain['form']['parts'][0])
-        for value in ['glass',True,None,{}]:
-            with self.subTest(value=value),self.assertRaises(ValueError):
-                self.resolve(b,parts=[{**part,'wallFinish':value}])
+        b = self.building()
+        part = dict(id='body', polygons=b['polygons'], height=16.5, levels=5)
+        plain = self.resolve(b, parts=[part])
+        painted = self.resolve(b, parts=[{**part, 'wallFinish': 'white'}])
+        resolved = painted['form']['parts'][0]
+        self.assertEqual(resolved['wallFinish'], 'white')
+        self.assertEqual(resolved['polygons'], plain['form']['parts'][0]['polygons'])
+        self.assertEqual(resolved['triangles'], plain['form']['parts'][0]['triangles'])
+        self.assertNotIn('wallFinish', plain['form']['parts'][0])
+        for value in ['glass', True, None, {}]:
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.resolve(b, parts=[{**part, 'wallFinish': value}])
 
     def test_part_specific_glazing_uses_local_segment_and_height(self):
-        b=self.building()
-        parts=[{'id':'west','polygons':[[[[0,0],[12,0],[12,20],[0,20],[0,0]]]],'height':16.5,'levels':5},
-               {'id':'east','polygons':[[[[12,0],[30,0],[30,20],[12,20],[12,0]]]],'height':13.2,'levels':4}]
-        rule=self.bands_fixture();rule['part']='east'
-        r=self.resolve(b,parts=parts,facadeRules=[rule])
-        facades=[f for f in r['form']['facades'] if f['edge']==0]
-        self.assertEqual([(f['part'],f['start'],f['end'],f['levels']) for f in facades],
-                         [('west',[0.,0.],[12.,0.],5.),('east',[12.,0.],[30.,0.],4.)])
-        self.assertEqual(facades[0]['rule'],{})
-        self.assertEqual(facades[1]['rule'],rule)
-        self.assertEqual(r['polygons'],b['polygons'])
+        b = self.building()
+        parts = [
+            {
+                'id': 'west',
+                'polygons': [[[[0, 0], [12, 0], [12, 20], [0, 20], [0, 0]]]],
+                'height': 16.5,
+                'levels': 5,
+            },
+            {
+                'id': 'east',
+                'polygons': [[[[12, 0], [30, 0], [30, 20], [12, 20], [12, 0]]]],
+                'height': 13.2,
+                'levels': 4,
+            },
+        ]
+        rule = self.bands_fixture()
+        rule['part'] = 'east'
+        r = self.resolve(b, parts=parts, facadeRules=[rule])
+        facades = [f for f in r['form']['facades'] if f['edge'] == 0]
+        self.assertEqual(
+            [(f['part'], f['start'], f['end'], f['levels']) for f in facades],
+            [
+                ('west', [0.0, 0.0], [12.0, 0.0], 5.0),
+                ('east', [12.0, 0.0], [30.0, 0.0], 4.0),
+            ],
+        )
+        self.assertEqual(facades[0]['rule'], {})
+        self.assertEqual(facades[1]['rule'], rule)
+        self.assertEqual(r['polygons'], b['polygons'])
         # Rotate the actual partition too: the selected 18 m segment stays selected.
-        b['polygons']=[[[[-y,x] for x,y in b['polygons'][0][0]]]]
+        b['polygons'] = [[[[-y, x] for x, y in b['polygons'][0][0]]]]
         for part in parts:
-            part['polygons']=[[[[-y,x] for x,y in part['polygons'][0][0]]]]
-        f=next(f for f in self.resolve(b,parts=parts,facadeRules=[rule])['form']['facades']
-               if f['part']=='east' and f['edge']==0)
-        self.assertEqual((f['start'],f['end'],f['normal']),([0.,12.],[0.,30.],[1.,0.]))
+            part['polygons'] = [[[[-y, x] for x, y in part['polygons'][0][0]]]]
+        f = next(
+            f
+            for f in self.resolve(b, parts=parts, facadeRules=[rule])['form']['facades']
+            if f['part'] == 'east' and f['edge'] == 0
+        )
+        self.assertEqual(
+            (f['start'], f['end'], f['normal']), ([0.0, 12.0], [0.0, 30.0], [1.0, 0.0])
+        )
 
-    def test_part_specific_facade_rejects_stale_disconnected_and_ambiguous_anchors(self):
-        b=self.building()
-        parts=[{'id':'west','polygons':[[[[0,0],[12,0],[12,20],[0,20],[0,0]]]],'height':16.5,'levels':5},
-               {'id':'east','polygons':[[[[12,0],[30,0],[30,20],[12,20],[12,0]]]],'height':13.2,'levels':4}]
-        rule=self.bands_fixture();rule['part']='east'
-        for part,edge in [('missing',0),('east',3)]:
-            bad={**rule,'part':part,'edge':edge}
-            with self.subTest(part=part,edge=edge),self.assertRaises(ValueError):
-                self.resolve(b,parts=parts,facadeRules=[bad])
+    def test_part_specific_facade_rejects_stale_disconnected_and_ambiguous_anchors(
+        self,
+    ):
+        b = self.building()
+        parts = [
+            {
+                'id': 'west',
+                'polygons': [[[[0, 0], [12, 0], [12, 20], [0, 20], [0, 0]]]],
+                'height': 16.5,
+                'levels': 5,
+            },
+            {
+                'id': 'east',
+                'polygons': [[[[12, 0], [30, 0], [30, 20], [12, 20], [12, 0]]]],
+                'height': 13.2,
+                'levels': 4,
+            },
+        ]
+        rule = self.bands_fixture()
+        rule['part'] = 'east'
+        for part, edge in [('missing', 0), ('east', 3)]:
+            bad = {**rule, 'part': part, 'edge': edge}
+            with self.subTest(part=part, edge=edge), self.assertRaises(ValueError):
+                self.resolve(b, parts=parts, facadeRules=[bad])
         with self.assertRaises(ValueError):
-            self.resolve(b,parts=parts,facadeRules=[rule,self.bands_fixture()])
+            self.resolve(b, parts=parts, facadeRules=[rule, self.bands_fixture()])
         # One part touching the same original edge in two disjoint intervals
         # has no unambiguous normalized from/to coordinate.
-        parts[0]['polygons']=[[[[10,0],[20,0],[20,20],[10,20],[10,0]]]]
-        parts[1]['polygons']=[[[[0,0],[10,0],[10,20],[0,20],[0,0]]],
-                              [[[20,0],[30,0],[30,20],[20,20],[20,0]]]]
-        with self.assertRaises(ValueError):self.resolve(b,parts=parts,facadeRules=[rule])
+        parts[0]['polygons'] = [[[[10, 0], [20, 0], [20, 20], [10, 20], [10, 0]]]]
+        parts[1]['polygons'] = [
+            [[[0, 0], [10, 0], [10, 20], [0, 20], [0, 0]]],
+            [[[20, 0], [30, 0], [30, 20], [20, 20], [20, 0]]],
+        ]
+        with self.assertRaises(ValueError):
+            self.resolve(b, parts=parts, facadeRules=[rule])
 
     def bands_fixture(self):
-        return {'polygon':0,'ring':0,'edge':0,'windowBands':{
-            'from':.15,'to':.85,'firstLevel':1,'heightRatio':.55,'depth':.38,'thickness':.18,
-            'windows':[{'from':.17,'to':.45,'panes':4},{'from':.5,'to':.58,'panes':1},
-                       {'from':.63,'to':.83,'panes':3}]}}
+        return {
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            'windowBands': {
+                'from': 0.15,
+                'to': 0.85,
+                'firstLevel': 1,
+                'heightRatio': 0.55,
+                'depth': 0.38,
+                'thickness': 0.18,
+                'windows': [
+                    {'from': 0.17, 'to': 0.45, 'panes': 4},
+                    {'from': 0.5, 'to': 0.58, 'panes': 1},
+                    {'from': 0.63, 'to': 0.83, 'panes': 3},
+                ],
+            },
+        }
 
     def test_window_bands_preserve_backing_wall_and_unreviewed_facades(self):
-        b=self.building();rule=self.bands_fixture()
-        r=self.resolve(b,facadeRules=[rule]);self.assertEqual(r['polygons'],b['polygons'])
-        self.assertEqual(r['form']['parts'],[])
-        facades=r['form']['facades'];self.assertEqual(len(facades),4)
-        self.assertEqual(facades[0]['rule'],rule)
+        b = self.building()
+        rule = self.bands_fixture()
+        r = self.resolve(b, facadeRules=[rule])
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertEqual(r['form']['parts'], [])
+        facades = r['form']['facades']
+        self.assertEqual(len(facades), 4)
+        self.assertEqual(facades[0]['rule'], rule)
         self.assertTrue(all(not f['rule'] for f in facades[1:]))
         # Rotation changes world directions, not the calibrated window strip.
-        b['polygons']=[[[[-y,x] for x,y in b['polygons'][0][0]]]]
-        rotated=self.resolve(b,facadeRules=[rule])['form']['facades'][0]
-        self.assertEqual(rotated['normal'],[1.,0.])
-        self.assertEqual(rotated['rule'],rule)
+        b['polygons'] = [[[[-y, x] for x, y in b['polygons'][0][0]]]]
+        rotated = self.resolve(b, facadeRules=[rule])['form']['facades'][0]
+        self.assertEqual(rotated['normal'], [1.0, 0.0])
+        self.assertEqual(rotated['rule'], rule)
 
     def test_window_bands_reject_overlap_invalid_floors_and_incompatible_forms(self):
-        for key,value in [('from',-.1),('to',1.1),('depth',float('nan')),
-                          ('thickness',True),('heightRatio',.99),('firstLevel',0),('firstLevel',5)]:
-            rule=self.bands_fixture();rule['windowBands'][key]=value
-            with self.subTest(key=key),self.assertRaises(ValueError):
-                self.resolve(self.building(),facadeRules=[rule])
-        for change in ['overlap','frame','panes','outside','unordered','corridor','balconies']:
-            rule=self.bands_fixture();windows=rule['windowBands']['windows']
-            if change=='overlap':windows[1]['from']=.4
-            if change=='frame':windows[1]['from']=.451
-            if change=='panes':windows[1]['panes']=12
-            if change=='outside':windows[-1]['to']=.9
-            if change=='unordered':windows.reverse()
-            if change=='corridor':rule['openCorridor']={}
-            if change=='balconies':rule['balconies']=True
-            with self.subTest(change=change),self.assertRaises(ValueError):
-                self.resolve(self.building(),facadeRules=[rule])
-        b,values=self.portico_fixture()
-        rule=self.bands_fixture();rule['edge']=2;values['facadeRules']=[rule]
-        with self.assertRaises(ValueError):self.resolve(b,**values)
+        for key, value in [
+            ('from', -0.1),
+            ('to', 1.1),
+            ('depth', float('nan')),
+            ('thickness', True),
+            ('heightRatio', 0.99),
+            ('firstLevel', 0),
+            ('firstLevel', 5),
+        ]:
+            rule = self.bands_fixture()
+            rule['windowBands'][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[rule])
+        for change in [
+            'overlap',
+            'frame',
+            'panes',
+            'outside',
+            'unordered',
+            'corridor',
+            'balconies',
+        ]:
+            rule = self.bands_fixture()
+            windows = rule['windowBands']['windows']
+            if change == 'overlap':
+                windows[1]['from'] = 0.4
+            if change == 'frame':
+                windows[1]['from'] = 0.451
+            if change == 'panes':
+                windows[1]['panes'] = 12
+            if change == 'outside':
+                windows[-1]['to'] = 0.9
+            if change == 'unordered':
+                windows.reverse()
+            if change == 'corridor':
+                rule['openCorridor'] = {}
+            if change == 'balconies':
+                rule['balconies'] = True
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[rule])
+        b, values = self.portico_fixture()
+        rule = self.bands_fixture()
+        rule['edge'] = 2
+        values['facadeRules'] = [rule]
+        with self.assertRaises(ValueError):
+            self.resolve(b, **values)
 
     def test_bounded_window_bands_leave_upper_floors_for_separate_panels(self):
-        rule=self.bands_fixture();rule['balconies']=False
-        rule['windowBands']['lastLevel']=2
-        panel=self.panel_fixture()['panels'][0]
-        panel.update(bottom=11,top=12.8)
-        rule['panels']=[panel]
-        result=self.resolve(self.building(),facadeRules=[rule])
-        self.assertEqual(result['form']['facades'][0]['rule'],rule)
+        rule = self.bands_fixture()
+        rule['balconies'] = False
+        rule['windowBands']['lastLevel'] = 2
+        panel = self.panel_fixture()['panels'][0]
+        panel.update(bottom=11, top=12.8)
+        rule['panels'] = [panel]
+        result = self.resolve(self.building(), facadeRules=[rule])
+        self.assertEqual(result['form']['facades'][0]['rule'], rule)
         # Omitting the bound restores the legacy all-upper-floors layout,
         # which must reject this overlapping panel.
         del rule['windowBands']['lastLevel']
-        with self.assertRaisesRegex(ValueError,'overlaps'):
-            self.resolve(self.building(),facadeRules=[rule])
+        with self.assertRaisesRegex(ValueError, 'overlaps'):
+            self.resolve(self.building(), facadeRules=[rule])
 
     def test_bounded_window_bands_reject_invalid_end_floor(self):
-        for end in [0,5,True,2.5,'2',None,float('nan')]:
-            rule=self.bands_fixture();rule['windowBands']['lastLevel']=end
-            with self.subTest(end=end),self.assertRaisesRegex(ValueError,'lastLevel'):
-                self.resolve(self.building(),facadeRules=[rule])
+        for end in [0, 5, True, 2.5, '2', None, float('nan')]:
+            rule = self.bands_fixture()
+            rule['windowBands']['lastLevel'] = end
+            with self.subTest(end=end), self.assertRaisesRegex(ValueError, 'lastLevel'):
+                self.resolve(self.building(), facadeRules=[rule])
 
     def mixed_corridor_fixture(self):
-        rule=self.bands_fixture();rule['balconies']=False
-        rule['windowBands']['lastLevel']=2
-        panel=self.panel_fixture()['panels'][0];panel.update(bottom=11,top=12.8)
-        rule['panels']=[panel]
-        rule['openCorridor']={'depth':1.1,'firstLevel':4,'lastLevel':4,
-            'railHeight':.9,'endInset':.5,'piers':{'bays':6,'width':.4,'depth':1.1},
-            'openings':[{'kind':'window','t':.5,'width':2,'height':1.9,'sill':.9,'levels':[4]}]}
+        rule = self.bands_fixture()
+        rule['balconies'] = False
+        rule['windowBands']['lastLevel'] = 2
+        panel = self.panel_fixture()['panels'][0]
+        panel.update(bottom=11, top=12.8)
+        rule['panels'] = [panel]
+        rule['openCorridor'] = {
+            'depth': 1.1,
+            'firstLevel': 4,
+            'lastLevel': 4,
+            'railHeight': 0.9,
+            'endInset': 0.5,
+            'piers': {'bays': 6, 'width': 0.4, 'depth': 1.1},
+            'openings': [
+                {
+                    'kind': 'window',
+                    't': 0.5,
+                    'width': 2,
+                    'height': 1.9,
+                    'sill': 0.9,
+                    'levels': [4],
+                }
+            ],
+        }
         return rule
 
     def test_mixed_corridor_keeps_solid_lower_bands_and_panels(self):
-        rule=self.mixed_corridor_fixture();b=self.building()
-        r=self.resolve(b,facadeRules=[rule])
-        self.assertEqual(r['form']['facades'][0]['rule'],rule)
-        self.assertEqual(r['polygons'],b['polygons'])
+        rule = self.mixed_corridor_fixture()
+        b = self.building()
+        r = self.resolve(b, facadeRules=[rule])
+        self.assertEqual(r['form']['facades'][0]['rule'], rule)
+        self.assertEqual(r['polygons'], b['polygons'])
         self.assertTrue(all(not f['rule'] for f in r['form']['facades'][1:]))
 
-    def test_mixed_corridor_rejects_overlapping_bands_panels_and_misplaced_openings(self):
-        for kind in ['band','slab','panel','opening']:
-            rule=self.mixed_corridor_fixture()
-            if kind=='band':
-                rule['windowBands']['lastLevel']=4
+    def test_mixed_corridor_rejects_overlapping_bands_panels_and_misplaced_openings(
+        self,
+    ):
+        for kind in ['band', 'slab', 'panel', 'opening']:
+            rule = self.mixed_corridor_fixture()
+            if kind == 'band':
+                rule['windowBands']['lastLevel'] = 4
                 del rule['panels']
-            if kind=='slab':rule['panels'][0].update(bottom=11.5,top=13.1)
-            if kind=='panel':rule['panels'][0].update(bottom=14,top=15.8)
-            if kind=='opening':rule['openCorridor']['openings'][0]['levels']=[3,4]
-            reason='Mixed explicit openings' if kind=='opening' else 'overlaps the recessed corridor or slab'
-            with self.subTest(kind=kind),self.assertRaisesRegex(ValueError,reason):
-                self.resolve(self.building(),facadeRules=[rule])
+            if kind == 'slab':
+                rule['panels'][0].update(bottom=11.5, top=13.1)
+            if kind == 'panel':
+                rule['panels'][0].update(bottom=14, top=15.8)
+            if kind == 'opening':
+                rule['openCorridor']['openings'][0]['levels'] = [3, 4]
+            reason = (
+                'Mixed explicit openings'
+                if kind == 'opening'
+                else 'overlaps the recessed corridor or slab'
+            )
+            with self.subTest(kind=kind), self.assertRaisesRegex(ValueError, reason):
+                self.resolve(self.building(), facadeRules=[rule])
 
     def attached_fixture(self):
-        return {'id':'south','polygon':0,'ring':0,'edge':0,'t':.5,'width':4.2,'primary':True,
-                'attachedPortico':{'width':9,'depth':3.2,'platformHeight':.36,
-                    'clearHeight':3.4,'slabThickness':.2,'parapetHeight':1,
-                    'columnWidth':.55,'columnInset':.45,'steps':3,'tread':.3,'stepBaseHeight':0}}
+        return {
+            'id': 'south',
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            't': 0.5,
+            'width': 4.2,
+            'primary': True,
+            'attachedPortico': {
+                'width': 9,
+                'depth': 3.2,
+                'platformHeight': 0.36,
+                'clearHeight': 3.4,
+                'slabThickness': 0.2,
+                'parapetHeight': 1,
+                'columnWidth': 0.55,
+                'columnInset': 0.45,
+                'steps': 3,
+                'tread': 0.3,
+                'stepBaseHeight': 0,
+            },
+        }
 
     def test_attached_portico_is_external_and_does_not_replace_the_footprint(self):
-        b=self.building();entry=self.attached_fixture();r=self.resolve(b,entrances=[entry])
-        p=r['form']['entrances'][0]['attachedPortico']
-        self.assertEqual(r['polygons'],b['polygons'])
-        self.assertEqual(r['form']['parts'],[])
-        self.assertEqual(len(p['columns']),4)
-        shape=Polygon(p['footprint']);body=Polygon(b['polygons'][0][0])
-        self.assertAlmostEqual(shape.area,9*4.1)
-        self.assertLess(shape.intersection(body).area,1e-8)
-        self.assertAlmostEqual(shape.boundary.intersection(body.boundary.buffer(1e-8)).length,9,places=6)
+        b = self.building()
+        entry = self.attached_fixture()
+        r = self.resolve(b, entrances=[entry])
+        p = r['form']['entrances'][0]['attachedPortico']
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertEqual(r['form']['parts'], [])
+        self.assertEqual(len(p['columns']), 4)
+        shape = Polygon(p['footprint'])
+        body = Polygon(b['polygons'][0][0])
+        self.assertAlmostEqual(shape.area, 9 * 4.1)
+        self.assertLess(shape.intersection(body).area, 1e-8)
+        self.assertAlmostEqual(
+            shape.boundary.intersection(body.boundary.buffer(1e-8)).length, 9, places=6
+        )
         # A reversed ring must still put the portico outside, facing south.
-        b['polygons'][0][0]=list(reversed(b['polygons'][0][0]));entry['edge']=3
-        e=self.resolve(b,entrances=[entry])['form']['entrances'][0]
-        self.assertEqual(e['bearing'],180)
-        self.assertLess(Polygon(e['attachedPortico']['footprint']).intersection(body).area,1e-8)
+        b['polygons'][0][0] = list(reversed(b['polygons'][0][0]))
+        entry['edge'] = 3
+        e = self.resolve(b, entrances=[entry])['form']['entrances'][0]
+        self.assertEqual(e['bearing'], 180)
+        self.assertLess(
+            Polygon(e['attachedPortico']['footprint']).intersection(body).area, 1e-8
+        )
 
     def test_attached_portico_rejects_blocked_openings_and_invalid_dimensions(self):
-        for key,value in [('width',31),('columnWidth',4),('columnInset',.1),
-                          ('clearHeight',3),('platformHeight',True),('depth',float('nan')),
-                          ('parapetHeight',.1),('steps',0),('steps',True),('steps',2.5),
-                          ('stepBaseHeight',-.1),('stepBaseHeight',True),('stepBaseHeight',.36)]:
-            entry=self.attached_fixture();entry['attachedPortico'][key]=value
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
-                self.resolve(self.building(),entrances=[entry])
-        entry=self.attached_fixture();entry['recess']=2
-        with self.assertRaises(ValueError):self.resolve(self.building(),entrances=[entry])
+        for key, value in [
+            ('width', 31),
+            ('columnWidth', 4),
+            ('columnInset', 0.1),
+            ('clearHeight', 3),
+            ('platformHeight', True),
+            ('depth', float('nan')),
+            ('parapetHeight', 0.1),
+            ('steps', 0),
+            ('steps', True),
+            ('steps', 2.5),
+            ('stepBaseHeight', -0.1),
+            ('stepBaseHeight', True),
+            ('stepBaseHeight', 0.36),
+        ]:
+            entry = self.attached_fixture()
+            entry['attachedPortico'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(self.building(), entrances=[entry])
+        entry = self.attached_fixture()
+        entry['recess'] = 2
+        with self.assertRaises(ValueError):
+            self.resolve(self.building(), entrances=[entry])
         # A neighbouring mapped component in front cannot be swallowed by the porch.
-        b=self.building();b['polygons'].append([[[14,-4],[16,-4],[16,-2],[14,-2],[14,-4]]])
-        with self.assertRaises(ValueError):self.resolve(b,entrances=[self.attached_fixture()])
+        b = self.building()
+        b['polygons'].append([[[14, -4], [16, -4], [16, -2], [14, -2], [14, -4]]])
+        with self.assertRaises(ValueError):
+            self.resolve(b, entrances=[self.attached_fixture()])
 
     def test_flat_canopy_crosses_solid_height_parts_and_rotates_with_facade(self):
-        b=self.building();entry=self.attached_fixture()
-        entry['attachedPortico'].update(parapetHeight=0,slabThickness=.6)
-        parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'height':16.5,'levels':5},
-               {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'height':13.2,'levels':4}]
-        r=self.resolve(b,parts=parts,entrances=[entry]);e=r['form']['entrances'][0]
-        self.assertEqual(r['polygons'],b['polygons'])
-        self.assertEqual(len(e['attachedPortico']['columns']),4)
-        self.assertEqual(e['attachedPortico']['parapetHeight'],0)
-        footprint=Polygon(e['attachedPortico']['footprint'])
-        self.assertLess(footprint.intersection(Polygon(b['polygons'][0][0])).area,1e-8)
-        b['polygons']=[[[[-y,x] for x,y in b['polygons'][0][0]]]]
-        for part in parts:part['polygons']=[[[[-y,x] for x,y in part['polygons'][0][0]]]]
-        e=self.resolve(b,parts=parts,entrances=[entry])['form']['entrances'][0]
-        self.assertEqual(e['bearing'],90)
-        self.assertGreater(Polygon(e['attachedPortico']['footprint']).centroid.x,0)
+        b = self.building()
+        entry = self.attached_fixture()
+        entry['attachedPortico'].update(parapetHeight=0, slabThickness=0.6)
+        parts = [
+            {
+                'id': 'west',
+                'polygons': [[[[0, 0], [15, 0], [15, 20], [0, 20], [0, 0]]]],
+                'height': 16.5,
+                'levels': 5,
+            },
+            {
+                'id': 'east',
+                'polygons': [[[[15, 0], [30, 0], [30, 20], [15, 20], [15, 0]]]],
+                'height': 13.2,
+                'levels': 4,
+            },
+        ]
+        r = self.resolve(b, parts=parts, entrances=[entry])
+        e = r['form']['entrances'][0]
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertEqual(len(e['attachedPortico']['columns']), 4)
+        self.assertEqual(e['attachedPortico']['parapetHeight'], 0)
+        footprint = Polygon(e['attachedPortico']['footprint'])
+        self.assertLess(footprint.intersection(Polygon(b['polygons'][0][0])).area, 1e-8)
+        b['polygons'] = [[[[-y, x] for x, y in b['polygons'][0][0]]]]
+        for part in parts:
+            part['polygons'] = [[[[-y, x] for x, y in part['polygons'][0][0]]]]
+        e = self.resolve(b, parts=parts, entrances=[entry])['form']['entrances'][0]
+        self.assertEqual(e['bearing'], 90)
+        self.assertGreater(Polygon(e['attachedPortico']['footprint']).centroid.x, 0)
 
     def test_attached_canopy_respects_lower_part_and_open_storey(self):
-        entry=self.attached_fixture();entry['attachedPortico'].update(parapetHeight=0,slabThickness=.6)
-        parts=[{'id':'west','polygons':[[[[0,0],[15,0],[15,20],[0,20],[0,0]]]],'height':16.5,'levels':5},
-               {'id':'east','polygons':[[[[15,0],[30,0],[30,20],[15,20],[15,0]]]],'height':3.8,'levels':1}]
-        with self.assertRaisesRegex(ValueError,'every touched part'):
-            self.resolve(self.building(),parts=parts,entrances=[entry])
-        b,values=self.portico_fixture();entry['edge']=2
-        with self.assertRaisesRegex(ValueError,'every touched part'):
-            self.resolve(b,parts=values['parts'],entrances=[entry])
+        entry = self.attached_fixture()
+        entry['attachedPortico'].update(parapetHeight=0, slabThickness=0.6)
+        parts = [
+            {
+                'id': 'west',
+                'polygons': [[[[0, 0], [15, 0], [15, 20], [0, 20], [0, 0]]]],
+                'height': 16.5,
+                'levels': 5,
+            },
+            {
+                'id': 'east',
+                'polygons': [[[[15, 0], [30, 0], [30, 20], [15, 20], [15, 0]]]],
+                'height': 3.8,
+                'levels': 1,
+            },
+        ]
+        with self.assertRaisesRegex(ValueError, 'every touched part'):
+            self.resolve(self.building(), parts=parts, entrances=[entry])
+        b, values = self.portico_fixture()
+        entry['edge'] = 2
+        with self.assertRaisesRegex(ValueError, 'every touched part'):
+            self.resolve(b, parts=values['parts'], entrances=[entry])
 
     def test_attached_canopy_rejects_invalid_optional_parapet(self):
-        for value in [True,'0',-.1,float('nan'),float('inf'),.3]:
-            entry=self.attached_fixture();entry['attachedPortico']['parapetHeight']=value
-            with self.subTest(value=value),self.assertRaises(ValueError):
-                self.resolve(self.building(),entrances=[entry])
+        for value in [True, '0', -0.1, float('nan'), float('inf'), 0.3]:
+            entry = self.attached_fixture()
+            entry['attachedPortico']['parapetHeight'] = value
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                self.resolve(self.building(), entrances=[entry])
 
     def portico_fixture(self):
-        b=self.building()
-        b['polygons']=[[[[0,0],[8,0],[8,-4],[22,-4],[22,0],[30,0],[30,20],[0,20],[0,0]]]]
-        parts=[{'id':'main','polygons':[[[[0,0],[30,0],[30,20],[0,20],[0,0]]]],'height':16.5,'levels':5},
-               {'id':'porch','polygons':[[[[8,-4],[22,-4],[22,0],[8,0],[8,-4]]]],'height':4,'levels':1,
-                'openBelow':{'clearHeight':3.4,'floorHeight':.45,'columns':[
-                    {'center':[x,-3.3],'width':.8,'depth':.8,'angle':0} for x in [8.7,11.5,18.5,21.3]]}}]
-        entrances=[{'id':'south','polygon':0,'ring':0,'edge':2,'t':.5,'width':6.8,'primary':True,'recess':4}]
-        return b,{'parts':parts,'entrances':entrances,'roof':{'type':'flat'}}
+        b = self.building()
+        b['polygons'] = [
+            [
+                [
+                    [0, 0],
+                    [8, 0],
+                    [8, -4],
+                    [22, -4],
+                    [22, 0],
+                    [30, 0],
+                    [30, 20],
+                    [0, 20],
+                    [0, 0],
+                ]
+            ]
+        ]
+        parts = [
+            {
+                'id': 'main',
+                'polygons': [[[[0, 0], [30, 0], [30, 20], [0, 20], [0, 0]]]],
+                'height': 16.5,
+                'levels': 5,
+            },
+            {
+                'id': 'porch',
+                'polygons': [[[[8, -4], [22, -4], [22, 0], [8, 0], [8, -4]]]],
+                'height': 4,
+                'levels': 1,
+                'openBelow': {
+                    'clearHeight': 3.4,
+                    'floorHeight': 0.45,
+                    'columns': [
+                        {'center': [x, -3.3], 'width': 0.8, 'depth': 0.8, 'angle': 0}
+                        for x in [8.7, 11.5, 18.5, 21.3]
+                    ],
+                },
+            },
+        ]
+        entrances = [
+            {
+                'id': 'south',
+                'polygon': 0,
+                'ring': 0,
+                'edge': 2,
+                't': 0.5,
+                'width': 6.8,
+                'primary': True,
+                'recess': 4,
+            }
+        ]
+        return b, {'parts': parts, 'entrances': entrances, 'roof': {'type': 'flat'}}
 
     def test_portico_preserves_outline_and_exposes_main_wall_above_canopy(self):
-        b,values=self.portico_fixture();r=self.resolve(b,**values)
-        self.assertEqual(r['polygons'],b['polygons'])
-        entrance=r['form']['entrances'][0]
-        self.assertEqual(entrance['center'],[15,0])
-        self.assertEqual(entrance['outerCenter'],[15,-4])
-        self.assertEqual(entrance['bearing'],180)
-        self.assertEqual(entrance['platformHeight'],.45)
-        facades=r['form']['facades']
-        self.assertTrue(all(f['rule']['windows'] is False for f in facades if f['part']=='porch'))
-        exposed=[f for f in facades if 'minimumHeight' in f]
-        self.assertEqual(len(exposed),1)
-        self.assertEqual(exposed[0]['minimumHeight'],4)
-        self.assertEqual(exposed[0]['height'],16.5)
-        self.assertAlmostEqual(LineString([exposed[0]['start'],exposed[0]['end']]).length,14)
+        b, values = self.portico_fixture()
+        r = self.resolve(b, **values)
+        self.assertEqual(r['polygons'], b['polygons'])
+        entrance = r['form']['entrances'][0]
+        self.assertEqual(entrance['center'], [15, 0])
+        self.assertEqual(entrance['outerCenter'], [15, -4])
+        self.assertEqual(entrance['bearing'], 180)
+        self.assertEqual(entrance['platformHeight'], 0.45)
+        facades = r['form']['facades']
+        self.assertTrue(
+            all(f['rule']['windows'] is False for f in facades if f['part'] == 'porch')
+        )
+        exposed = [f for f in facades if 'minimumHeight' in f]
+        self.assertEqual(len(exposed), 1)
+        self.assertEqual(exposed[0]['minimumHeight'], 4)
+        self.assertEqual(exposed[0]['height'], 16.5)
+        self.assertAlmostEqual(
+            LineString([exposed[0]['start'], exposed[0]['end']]).length, 14
+        )
 
     def test_portico_parts_share_documented_storeys(self):
-        b,v=self.portico_fixture();floors=[4.8,3.9,3.9,3.9,3.9]
-        v['parts'][0]['height']=20.4
-        v['parts'][1].update(height=8.7,levels=2)
-        r=self.resolve(b,floorHeights=floors,**v)
-        self.assertEqual([p['floorHeights'] for p in r['form']['parts']],[floors,floors[:2]])
+        b, v = self.portico_fixture()
+        floors = [4.8, 3.9, 3.9, 3.9, 3.9]
+        v['parts'][0]['height'] = 20.4
+        v['parts'][1].update(height=8.7, levels=2)
+        r = self.resolve(b, floorHeights=floors, **v)
+        self.assertEqual(
+            [p['floorHeights'] for p in r['form']['parts']], [floors, floors[:2]]
+        )
         for f in r['form']['facades']:
-            self.assertEqual(f['floorHeights'],floors if f['part']=='main' else floors[:2])
-        self.assertTrue(any(f.get('minimumHeight')==8.7 for f in r['form']['facades']))
-        for patch in [{'height':8.8},{'levels':2.5},{'levels':6}]:
-            bad=copy.deepcopy(v);bad['parts'][1].update(patch)
-            with self.subTest(patch=patch),self.assertRaisesRegex(ValueError,'shared ground datum'):
-                self.resolve(b,floorHeights=floors,**bad)
+            self.assertEqual(
+                f['floorHeights'], floors if f['part'] == 'main' else floors[:2]
+            )
+        self.assertTrue(
+            any(f.get('minimumHeight') == 8.7 for f in r['form']['facades'])
+        )
+        for patch in [{'height': 8.8}, {'levels': 2.5}, {'levels': 6}]:
+            bad = copy.deepcopy(v)
+            bad['parts'][1].update(patch)
+            with (
+                self.subTest(patch=patch),
+                self.assertRaisesRegex(ValueError, 'shared ground datum'),
+            ):
+                self.resolve(b, floorHeights=floors, **bad)
 
     def test_recessed_steps_can_be_narrower_than_the_portico(self):
-        b,v=self.portico_fixture()
-        v['entrances'][0].update(stepWidth=8,stepFoundationDepth=.15)
-        e=self.resolve(b,**v)['form']['entrances'][0]
-        self.assertEqual(e['stepWidth'],8)
-        self.assertEqual(e['porticoWidth'],14)
-        self.assertEqual(e['stepFoundationDepth'],.15)
+        b, v = self.portico_fixture()
+        v['entrances'][0].update(stepWidth=8, stepFoundationDepth=0.15)
+        e = self.resolve(b, **v)['form']['entrances'][0]
+        self.assertEqual(e['stepWidth'], 8)
+        self.assertEqual(e['porticoWidth'], 14)
+        self.assertEqual(e['stepFoundationDepth'], 0.15)
         # Moving the door toward the end reduces the usable symmetric span.
-        v['entrances'][0].update(t=.25,width=2,stepWidth=8)
-        with self.assertRaisesRegex(ValueError,'fit the portico frontage'):
-            self.resolve(b,**v)
+        v['entrances'][0].update(t=0.25, width=2, stepWidth=8)
+        with self.assertRaisesRegex(ValueError, 'fit the portico frontage'):
+            self.resolve(b, **v)
 
     def test_recessed_step_dimensions_reject_invalid_or_unbounded_values(self):
-        b,v=self.portico_fixture()
-        for key,values in [('stepWidth',[True,float('nan'),float('inf'),6,15]),
-                           ('stepFoundationDepth',[True,float('nan'),0,-.1,.31])]:
+        b, v = self.portico_fixture()
+        for key, values in [
+            ('stepWidth', [True, float('nan'), float('inf'), 6, 15]),
+            ('stepFoundationDepth', [True, float('nan'), 0, -0.1, 0.31]),
+        ]:
             for value in values:
-                bad=copy.deepcopy(v);bad['entrances'][0][key]=value
-                with self.subTest(key=key,value=value),self.assertRaises(ValueError):self.resolve(b,**bad)
-        for key in ['stepWidth','stepFoundationDepth']:
-            bad=copy.deepcopy(v);del bad['entrances'][0]['recess'];bad['entrances'][0][key]=.15
-            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'require a recessed entrance'):
-                self.resolve(b,**bad)
+                bad = copy.deepcopy(v)
+                bad['entrances'][0][key] = value
+                with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                    self.resolve(b, **bad)
+        for key in ['stepWidth', 'stepFoundationDepth']:
+            bad = copy.deepcopy(v)
+            del bad['entrances'][0]['recess']
+            bad['entrances'][0][key] = 0.15
+            with (
+                self.subTest(key=key),
+                self.assertRaisesRegex(ValueError, 'require a recessed entrance'),
+            ):
+                self.resolve(b, **bad)
 
     def test_round_portico_columns_validate_shape_and_diameter(self):
-        b,v=self.portico_fixture()
-        for c in v['parts'][1]['openBelow']['columns']:c['shape']='cylinder'
-        r=self.resolve(b,**v)
-        self.assertTrue(all(c['shape']=='cylinder' for c in r['form']['parts'][1]['openBelow']['columns']))
-        for patch in [{'shape':'cone'},{'depth':.7}]:
-            bad=copy.deepcopy(v);bad['parts'][1]['openBelow']['columns'][0].update(patch)
-            with self.subTest(patch=patch),self.assertRaisesRegex(ValueError,'Round portico'):
-                self.resolve(b,**bad)
+        b, v = self.portico_fixture()
+        for c in v['parts'][1]['openBelow']['columns']:
+            c['shape'] = 'cylinder'
+        r = self.resolve(b, **v)
+        self.assertTrue(
+            all(
+                c['shape'] == 'cylinder'
+                for c in r['form']['parts'][1]['openBelow']['columns']
+            )
+        )
+        for patch in [{'shape': 'cone'}, {'depth': 0.7}]:
+            bad = copy.deepcopy(v)
+            bad['parts'][1]['openBelow']['columns'][0].update(patch)
+            with (
+                self.subTest(patch=patch),
+                self.assertRaisesRegex(ValueError, 'Round portico'),
+            ):
+                self.resolve(b, **bad)
 
     def test_oblique_partial_portico_clips_steps_to_its_frontage(self):
         # This mapped edge previously lost half its interval to floating-point
         # clipping. The steps must also stop short of the five-storey ends.
-        b=next(b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if b['id']=='way/759132930')
-        record=load_catalogue()[b['id']];sources={s['id'] for s in source_catalogue()}
-        r=resolve_building(b,record,sources);e=r['form']['entrances'][0]
-        self.assertAlmostEqual(e['porticoWidth'],24.754915964340896)
-        front=next(f for f in r['form']['facades'] if f['edge']==5 and f['part']=='west-low-portico')
-        self.assertAlmostEqual(LineString([front['start'],front['end']]).length,e['porticoWidth'])
-        self.assertEqual(r['polygons'],b['polygons'])
-        bad=copy.deepcopy(record);bad['entrances'][0].update(t=.9,width=1)
-        with self.assertRaises(ValueError):resolve_building(b,bad,sources)
+        b = next(
+            b
+            for b in json.loads((ROOT / 'public/data/buildings.json').read_text())
+            if b['id'] == 'way/759132930'
+        )
+        record = load_catalogue()[b['id']]
+        sources = {s['id'] for s in source_catalogue()}
+        r = resolve_building(b, record, sources)
+        e = r['form']['entrances'][0]
+        self.assertAlmostEqual(e['porticoWidth'], 24.754915964340896)
+        front = next(
+            f
+            for f in r['form']['facades']
+            if f['edge'] == 5 and f['part'] == 'west-low-portico'
+        )
+        self.assertAlmostEqual(
+            LineString([front['start'], front['end']]).length, e['porticoWidth']
+        )
+        self.assertEqual(r['polygons'], b['polygons'])
+        bad = copy.deepcopy(record)
+        bad['entrances'][0].update(t=0.9, width=1)
+        with self.assertRaises(ValueError):
+            resolve_building(b, bad, sources)
 
     def test_portico_rejects_floating_door_blocked_route_and_invalid_supports(self):
-        b,values=self.portico_fixture()
-        bad=[]
-        for depth in [2,5,True,float('nan')]:
-            v=copy.deepcopy(values);v['entrances'][0]['recess']=depth;bad.append(v)
-        for center in [[0,0],[15,-3.3],[float('nan'),-3.3]]:
-            v=copy.deepcopy(values);v['parts'][1]['openBelow']['columns'][0]['center']=center;bad.append(v)
-        v=copy.deepcopy(values);v['parts'][1]['openBelow']['columns'][1]=copy.deepcopy(v['parts'][1]['openBelow']['columns'][0]);bad.append(v)
-        for key,height in [('clearHeight',4),('floorHeight',2),('clearHeight',True)]:
-            v=copy.deepcopy(values);v['parts'][1]['openBelow'][key]=height;bad.append(v)
-        v=copy.deepcopy(values);v['roof']={'type':'hipped'};bad.append(v)
+        b, values = self.portico_fixture()
+        bad = []
+        for depth in [2, 5, True, float('nan')]:
+            v = copy.deepcopy(values)
+            v['entrances'][0]['recess'] = depth
+            bad.append(v)
+        for center in [[0, 0], [15, -3.3], [float('nan'), -3.3]]:
+            v = copy.deepcopy(values)
+            v['parts'][1]['openBelow']['columns'][0]['center'] = center
+            bad.append(v)
+        v = copy.deepcopy(values)
+        v['parts'][1]['openBelow']['columns'][1] = copy.deepcopy(
+            v['parts'][1]['openBelow']['columns'][0]
+        )
+        bad.append(v)
+        for key, height in [
+            ('clearHeight', 4),
+            ('floorHeight', 2),
+            ('clearHeight', True),
+        ]:
+            v = copy.deepcopy(values)
+            v['parts'][1]['openBelow'][key] = height
+            bad.append(v)
+        v = copy.deepcopy(values)
+        v['roof'] = {'type': 'hipped'}
+        bad.append(v)
         for v in bad:
-            with self.subTest(v=v),self.assertRaises(ValueError):self.resolve(b,**v)
+            with self.subTest(v=v), self.assertRaises(ValueError):
+                self.resolve(b, **v)
 
     def recess_glazing_fixture(self):
-        b,v=self.portico_fixture()
-        v['entrances'][0]['recessGlazing']={'width':13.2,'glazingHeight':2.7,'transomHeight':2.4,
-            'sideColumns':3,'doorWidth':3.2,'doorHeight':2.2,'frameWidth':.075,'bayGap':.3}
-        return b,v
+        b, v = self.portico_fixture()
+        v['entrances'][0]['recessGlazing'] = {
+            'width': 13.2,
+            'glazingHeight': 2.7,
+            'transomHeight': 2.4,
+            'sideColumns': 3,
+            'doorWidth': 3.2,
+            'doorHeight': 2.2,
+            'frameWidth': 0.075,
+            'bayGap': 0.3,
+        }
+        return b, v
 
     def test_recess_glazing_preserves_portico_when_rotated(self):
         import math
-        b,v=self.recess_glazing_fixture();r=self.resolve(b,**v)
-        self.assertEqual(r['form']['entrances'][0]['recessGlazing'],v['entrances'][0]['recessGlazing'])
-        self.assertEqual(r['polygons'],b['polygons'])
-        b['polygons']=[[[[-y,x] for x,y in ring] for ring in poly] for poly in b['polygons']]
+
+        b, v = self.recess_glazing_fixture()
+        r = self.resolve(b, **v)
+        self.assertEqual(
+            r['form']['entrances'][0]['recessGlazing'],
+            v['entrances'][0]['recessGlazing'],
+        )
+        self.assertEqual(r['polygons'], b['polygons'])
+        b['polygons'] = [
+            [[[-y, x] for x, y in ring] for ring in poly] for poly in b['polygons']
+        ]
         for p in v['parts']:
-            p['polygons']=[[[[-y,x] for x,y in ring] for ring in poly] for poly in p['polygons']]
-            for c in p.get('openBelow',{}).get('columns',[]):
-                x,y=c['center'];c['center']=[-y,x];c['angle']+=math.pi/2
-        e=self.resolve(b,**v)['form']['entrances'][0]
-        self.assertEqual(e['center'],[0,15]);self.assertEqual(e['bearing'],90)
+            p['polygons'] = [
+                [[[-y, x] for x, y in ring] for ring in poly] for poly in p['polygons']
+            ]
+            for c in p.get('openBelow', {}).get('columns', []):
+                x, y = c['center']
+                c['center'] = [-y, x]
+                c['angle'] += math.pi / 2
+        e = self.resolve(b, **v)['form']['entrances'][0]
+        self.assertEqual(e['center'], [0, 15])
+        self.assertEqual(e['bearing'], 90)
 
     def test_recess_glazing_rejects_invalid_dimensions_and_unusable_banks(self):
-        b,v=self.recess_glazing_fixture()
-        for key,value in [('width',14),('width',8),('width',True),('width',float('nan')),
-                          ('glazingHeight',3.1),('glazingHeight',float('inf')),
-                          ('transomHeight',2.2),('transomHeight',2.6),('sideColumns',True),
-                          ('sideColumns',7),('doorWidth',7),('doorHeight',3.1),
-                          ('frameWidth',0),('bayGap',-.1)]:
-            bad=copy.deepcopy(v);bad['entrances'][0]['recessGlazing'][key]=value
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):self.resolve(b,**bad)
-        for key in ['width','sideColumns']:
-            bad=copy.deepcopy(v);del bad['entrances'][0]['recessGlazing'][key]
-            with self.subTest(missing=key),self.assertRaises(ValueError):self.resolve(b,**bad)
+        b, v = self.recess_glazing_fixture()
+        for key, value in [
+            ('width', 14),
+            ('width', 8),
+            ('width', True),
+            ('width', float('nan')),
+            ('glazingHeight', 3.1),
+            ('glazingHeight', float('inf')),
+            ('transomHeight', 2.2),
+            ('transomHeight', 2.6),
+            ('sideColumns', True),
+            ('sideColumns', 7),
+            ('doorWidth', 7),
+            ('doorHeight', 3.1),
+            ('frameWidth', 0),
+            ('bayGap', -0.1),
+        ]:
+            bad = copy.deepcopy(v)
+            bad['entrances'][0]['recessGlazing'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(b, **bad)
+        for key in ['width', 'sideColumns']:
+            bad = copy.deepcopy(v)
+            del bad['entrances'][0]['recessGlazing'][key]
+            with self.subTest(missing=key), self.assertRaises(ValueError):
+                self.resolve(b, **bad)
 
     def test_recess_glazing_requires_portico_and_excludes_other_entry_systems(self):
-        b,v=self.recess_glazing_fixture()
-        bad=copy.deepcopy(v);del bad['entrances'][0]['recess']
-        with self.assertRaisesRegex(ValueError,'only a recessed portico'):self.resolve(b,**bad)
-        for key in ['flushEntrance','attachedPortico','doorFrame','mappedCanopy']:
-            bad=copy.deepcopy(v);bad['entrances'][0][key]={}
-            with self.subTest(key=key),self.assertRaisesRegex(ValueError,'only a recessed portico'):
-                self.resolve(b,**bad)
+        b, v = self.recess_glazing_fixture()
+        bad = copy.deepcopy(v)
+        del bad['entrances'][0]['recess']
+        with self.assertRaisesRegex(ValueError, 'only a recessed portico'):
+            self.resolve(b, **bad)
+        for key in ['flushEntrance', 'attachedPortico', 'doorFrame', 'mappedCanopy']:
+            bad = copy.deepcopy(v)
+            bad['entrances'][0][key] = {}
+            with (
+                self.subTest(key=key),
+                self.assertRaisesRegex(ValueError, 'only a recessed portico'),
+            ):
+                self.resolve(b, **bad)
 
     def test_recess_glazing_cannot_extend_beyond_a_tapered_portico_rear(self):
-        b,v=self.recess_glazing_fixture()
-        b['polygons']=[[[[0,0],[12,0],[8,-4],[22,-4],[18,0],[30,0],[30,20],[0,20],[0,0]]]]
-        v['parts'][1]['polygons']=[[[[8,-4],[22,-4],[18,0],[12,0],[8,-4]]]]
-        for c,x in zip(v['parts'][1]['openBelow']['columns'],[9.5,12,18,20.5]):c['center'][0]=x
-        v['entrances'][0]['width']=4
-        with self.assertRaisesRegex(ValueError,'main-body rear wall'):self.resolve(b,**v)
+        b, v = self.recess_glazing_fixture()
+        b['polygons'] = [
+            [
+                [
+                    [0, 0],
+                    [12, 0],
+                    [8, -4],
+                    [22, -4],
+                    [18, 0],
+                    [30, 0],
+                    [30, 20],
+                    [0, 20],
+                    [0, 0],
+                ]
+            ]
+        ]
+        v['parts'][1]['polygons'] = [[[[8, -4], [22, -4], [18, 0], [12, 0], [8, -4]]]]
+        for c, x in zip(v['parts'][1]['openBelow']['columns'], [9.5, 12, 18, 20.5]):
+            c['center'][0] = x
+        v['entrances'][0]['width'] = 4
+        with self.assertRaisesRegex(ValueError, 'main-body rear wall'):
+            self.resolve(b, **v)
 
     def test_multistorey_portico_keeps_upper_windows_and_continuous_roof(self):
-        b,values=self.portico_fixture()
-        values['parts'][1].update(height=16.5,levels=5)
-        values['entrances'][0]['steps']=2
-        r=self.resolve(b,**values)
-        front=[f for f in r['form']['facades'] if f['part']=='porch']
+        b, values = self.portico_fixture()
+        values['parts'][1].update(height=16.5, levels=5)
+        values['entrances'][0]['steps'] = 2
+        r = self.resolve(b, **values)
+        front = [f for f in r['form']['facades'] if f['part'] == 'porch']
         self.assertTrue(front)
-        self.assertTrue(all(f['minimumHeight']==3.4 and f['rule'].get('windows',True) for f in front))
-        self.assertEqual(r['form']['entrances'][0]['steps'],2)
-        seam=LineString([[8,0],[22,0]])
+        self.assertTrue(
+            all(
+                f['minimumHeight'] == 3.4 and f['rule'].get('windows', True)
+                for f in front
+            )
+        )
+        self.assertEqual(r['form']['entrances'][0]['steps'], 2)
+        seam = LineString([[8, 0], [22, 0]])
         for part in r['form']['parts']:
-            self.assertIn('parapetEdges',part)
-            self.assertTrue(all(LineString(edge).intersection(seam).length < 1e-6 for edge in part['parapetEdges']))
+            self.assertIn('parapetEdges', part)
+            self.assertTrue(
+                all(
+                    LineString(edge).intersection(seam).length < 1e-6
+                    for edge in part['parapetEdges']
+                )
+            )
         # An explicit facade rule still wins on an upper storey.
-        values['facadeRules']=[{'polygon':0,'ring':0,'edge':2,'windows':False}]
-        r=self.resolve(b,**values)
-        self.assertFalse(next(f for f in r['form']['facades'] if f['edge']==2)['rule']['windows'])
-        for base in [-.1,.45,True,float('nan')]:
-            values['entrances'][0]['stepBaseHeight']=base
-            with self.subTest(base=base),self.assertRaises(ValueError):self.resolve(b,**values)
-        values['entrances'][0]['stepBaseHeight']=.15
-        self.assertEqual(self.resolve(b,**values)['form']['entrances'][0]['stepBaseHeight'],.15)
-        for steps in [0,13,True,2.5,'2']:
-            values['entrances'][0]['steps']=steps
-            with self.subTest(steps=steps),self.assertRaises(ValueError):self.resolve(b,**values)
+        values['facadeRules'] = [{'polygon': 0, 'ring': 0, 'edge': 2, 'windows': False}]
+        r = self.resolve(b, **values)
+        self.assertFalse(
+            next(f for f in r['form']['facades'] if f['edge'] == 2)['rule']['windows']
+        )
+        for base in [-0.1, 0.45, True, float('nan')]:
+            values['entrances'][0]['stepBaseHeight'] = base
+            with self.subTest(base=base), self.assertRaises(ValueError):
+                self.resolve(b, **values)
+        values['entrances'][0]['stepBaseHeight'] = 0.15
+        self.assertEqual(
+            self.resolve(b, **values)['form']['entrances'][0]['stepBaseHeight'], 0.15
+        )
+        for steps in [0, 13, True, 2.5, '2']:
+            values['entrances'][0]['steps'] = steps
+            with self.subTest(steps=steps), self.assertRaises(ValueError):
+                self.resolve(b, **values)
 
     def test_rotated_equal_height_seam_is_not_a_parapet(self):
         # Real animal-college seam that survived an exact Shapely difference.
-        parts = [{"id": "entrance-core", "polygons": [[[[306.129169723045, -248.0206644421203], [306.1276938455245, -248.0209599998649], [292.505712838706, -250.7480045342522], [290.2044925008056, -239.2530768394513], [303.82736244240726, -236.52280488364025], [306.129169723045, -248.0206644421203]]]], "height": 23.1, "levels": 7}, {"id": "entrance-front", "polygons": [[[[306.1276938455245, -248.0209599998649], [307.0407116662392, -252.57394800007617], [293.4172547634234, -255.3012879999136], [292.50423694416656, -250.74830000009783], [306.1276938455245, -248.0209599998649]]]], "height": 23.1, "levels": 7}]
-        shape=unary_union([Polygon(p['polygons'][0][0]) for p in parts])
-        b=self.building();polys=[shape] if shape.geom_type=='Polygon' else list(shape.geoms)
-        b['polygons']=[[[list(x) for x in p.exterior.coords]] for p in polys]
-        b['height']=23.1
-        resolved=resolve_parts(b,parts,{'type':'flat'})
-        for part,other in [(resolved[0],resolved[1]),(resolved[1],resolved[0])]:
-            neighbor=Polygon(other['polygons'][0][0]).boundary
+        parts = [
+            {
+                'id': 'entrance-core',
+                'polygons': [
+                    [
+                        [
+                            [306.129169723045, -248.0206644421203],
+                            [306.1276938455245, -248.0209599998649],
+                            [292.505712838706, -250.7480045342522],
+                            [290.2044925008056, -239.2530768394513],
+                            [303.82736244240726, -236.52280488364025],
+                            [306.129169723045, -248.0206644421203],
+                        ]
+                    ]
+                ],
+                'height': 23.1,
+                'levels': 7,
+            },
+            {
+                'id': 'entrance-front',
+                'polygons': [
+                    [
+                        [
+                            [306.1276938455245, -248.0209599998649],
+                            [307.0407116662392, -252.57394800007617],
+                            [293.4172547634234, -255.3012879999136],
+                            [292.50423694416656, -250.74830000009783],
+                            [306.1276938455245, -248.0209599998649],
+                        ]
+                    ]
+                ],
+                'height': 23.1,
+                'levels': 7,
+            },
+        ]
+        shape = unary_union([Polygon(p['polygons'][0][0]) for p in parts])
+        b = self.building()
+        polys = [shape] if shape.geom_type == 'Polygon' else list(shape.geoms)
+        b['polygons'] = [[[list(x) for x in p.exterior.coords]] for p in polys]
+        b['height'] = 23.1
+        resolved = resolve_parts(b, parts, {'type': 'flat'})
+        for part, other in [(resolved[0], resolved[1]), (resolved[1], resolved[0])]:
+            neighbor = Polygon(other['polygons'][0][0]).boundary
             for edge in part['parapetEdges']:
-                self.assertLess(LineString(edge).intersection(neighbor.buffer(1e-8)).length,1e-6)
+                self.assertLess(
+                    LineString(edge).intersection(neighbor.buffer(1e-8)).length, 1e-6
+                )
 
     def building(self):
-        return {'id':'way/test','name':'测试教学楼','category':'academic','height':16.5,
-                'levels':5,'landmark':None,'tags':{'building':'university'},
-                'polygons':[[[[0,0],[30,0],[30,20],[0,20],[0,0]]]]}
+        return {
+            'id': 'way/test',
+            'name': '测试教学楼',
+            'category': 'academic',
+            'height': 16.5,
+            'levels': 5,
+            'landmark': None,
+            'tags': {'building': 'university'},
+            'polygons': [[[[0, 0], [30, 0], [30, 20], [0, 20], [0, 0]]]],
+        }
 
     def test_open_corridor_is_anchored_inside_the_existing_part(self):
-        b=self.building()
-        rule={'polygon':0,'ring':0,'edge':0,'openCorridor':{'depth':1.4,'firstLevel':1,'railHeight':.9,'endInset':.3}}
-        r=self.resolve(b,facadeRules=[rule],roof={'type':'flat'})
-        self.assertEqual(r['polygons'],b['polygons'])
-        self.assertEqual(sum('openCorridor' in f['rule'] for f in r['form']['facades']),1)
-        for key,value in [('depth',21),('depth',True),('firstLevel',0),('firstLevel',5),('firstLevel',1.5),('railHeight',3),('endInset',15)]:
-            bad=copy.deepcopy(rule);bad['openCorridor'][key]=value
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
-                self.resolve(b,facadeRules=[bad],roof={'type':'flat'})
+        b = self.building()
+        rule = {
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            'openCorridor': {
+                'depth': 1.4,
+                'firstLevel': 1,
+                'railHeight': 0.9,
+                'endInset': 0.3,
+            },
+        }
+        r = self.resolve(b, facadeRules=[rule], roof={'type': 'flat'})
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertEqual(
+            sum('openCorridor' in f['rule'] for f in r['form']['facades']), 1
+        )
+        for key, value in [
+            ('depth', 21),
+            ('depth', True),
+            ('firstLevel', 0),
+            ('firstLevel', 5),
+            ('firstLevel', 1.5),
+            ('railHeight', 3),
+            ('endInset', 15),
+        ]:
+            bad = copy.deepcopy(rule)
+            bad['openCorridor'][key] = value
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(b, facadeRules=[bad], roof={'type': 'flat'})
         # A recess must not punch through the wall into an existing courtyard.
-        b['polygons'][0].append([[10,1],[10,10],[20,10],[20,1],[10,1]])
-        with self.assertRaises(ValueError):self.resolve(b,facadeRules=[rule],roof={'type':'flat'})
+        b['polygons'][0].append([[10, 1], [10, 10], [20, 10], [20, 1], [10, 1]])
+        with self.assertRaises(ValueError):
+            self.resolve(b, facadeRules=[rule], roof={'type': 'flat'})
 
     def test_open_corridors_reject_intersecting_corner_recesses(self):
-        rule={'polygon':0,'ring':0,'edge':0,'openCorridor':{'depth':1.4,'firstLevel':1,'railHeight':.9,'endInset':.3}}
-        other=copy.deepcopy(rule);other['edge']=1
-        with self.assertRaises(ValueError):self.resolve(self.building(),facadeRules=[rule,other],roof={'type':'flat'})
+        rule = {
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            'openCorridor': {
+                'depth': 1.4,
+                'firstLevel': 1,
+                'railHeight': 0.9,
+                'endInset': 0.3,
+            },
+        }
+        other = copy.deepcopy(rule)
+        other['edge'] = 1
+        with self.assertRaises(ValueError):
+            self.resolve(
+                self.building(), facadeRules=[rule, other], roof={'type': 'flat'}
+            )
 
     def test_open_corridor_on_portico_is_rejected_instead_of_silently_dropped(self):
-        for levels,height in [(1,4),(5,16.5)]:
-            b,values=self.portico_fixture()
-            values['parts'][1].update(levels=levels,height=height)
-            values['facadeRules']=[{'polygon':0,'ring':0,'edge':2,
-                'openCorridor':{'depth':1.4,'firstLevel':1,'railHeight':.9,'endInset':.3}}]
-            with self.subTest(levels=levels),self.assertRaisesRegex(ValueError,'solid'):
-                self.resolve(b,**values)
+        for levels, height in [(1, 4), (5, 16.5)]:
+            b, values = self.portico_fixture()
+            values['parts'][1].update(levels=levels, height=height)
+            values['facadeRules'] = [
+                {
+                    'polygon': 0,
+                    'ring': 0,
+                    'edge': 2,
+                    'openCorridor': {
+                        'depth': 1.4,
+                        'firstLevel': 1,
+                        'railHeight': 0.9,
+                        'endInset': 0.3,
+                    },
+                }
+            ]
+            with (
+                self.subTest(levels=levels),
+                self.assertRaisesRegex(ValueError, 'solid'),
+            ):
+                self.resolve(b, **values)
 
     def window_grid_rule(self, edge=0):
-        return {'polygon':0,'ring':0,'edge':edge,'windowGrid':{
-            'columns':8,'firstLevel':1,'edgeInset':.22,'widthRatio':.78,
-            'heightRatio':.55,'pilasterWidth':.18,'pilasterDepth':.28,'paneRows':4}}
+        return {
+            'polygon': 0,
+            'ring': 0,
+            'edge': edge,
+            'windowGrid': {
+                'columns': 8,
+                'firstLevel': 1,
+                'edgeInset': 0.22,
+                'widthRatio': 0.78,
+                'heightRatio': 0.55,
+                'pilasterWidth': 0.18,
+                'pilasterDepth': 0.28,
+                'paneRows': 4,
+            },
+        }
 
     def test_window_grid_preserves_multistorey_entrance_and_mapped_outline(self):
-        b,values=self.portico_fixture()
-        values['parts'][1].update(levels=5,height=16.5)
-        values['facadeRules']=[self.window_grid_rule(2)]
-        r=self.resolve(b,**values)
-        f=next(f for f in r['form']['facades'] if f['edge']==2)
-        self.assertEqual(f['rule']['windowGrid']['columns'],8)
-        self.assertEqual(f['minimumHeight'],3.4)
-        self.assertEqual(r['polygons'],b['polygons'])
-        self.assertEqual(r['form']['entrances'][0]['recess'],4)
+        b, values = self.portico_fixture()
+        values['parts'][1].update(levels=5, height=16.5)
+        values['facadeRules'] = [self.window_grid_rule(2)]
+        r = self.resolve(b, **values)
+        f = next(f for f in r['form']['facades'] if f['edge'] == 2)
+        self.assertEqual(f['rule']['windowGrid']['columns'], 8)
+        self.assertEqual(f['minimumHeight'], 3.4)
+        self.assertEqual(r['polygons'], b['polygons'])
+        self.assertEqual(r['form']['entrances'][0]['recess'], 4)
 
     def test_window_grid_rejects_unusable_dimensions_and_portico_conflicts(self):
-        bad=[('columns',True),('columns',0),('columns',100),('firstLevel',5),
-             ('firstLevel',-1),('edgeInset',16),('widthRatio',1),('heightRatio',1),
-             ('pilasterWidth',2),('pilasterDepth',float('nan')),('pilasterDepth',4),
-             ('heightRatio',.001),('paneRows',0)]
-        for key,value in bad:
-            rule=self.window_grid_rule();rule['windowGrid'][key]=value
-            with self.subTest(key=key),self.assertRaises(ValueError):
-                self.resolve(self.building(),facadeRules=[rule])
-        b,values=self.portico_fixture();values['facadeRules']=[self.window_grid_rule(2)]
-        with self.assertRaises(ValueError):self.resolve(b,**values)
-        rule=self.window_grid_rule();rule['windows']=False
-        with self.assertRaises(ValueError):self.resolve(self.building(),facadeRules=[rule])
+        bad = [
+            ('columns', True),
+            ('columns', 0),
+            ('columns', 100),
+            ('firstLevel', 5),
+            ('firstLevel', -1),
+            ('edgeInset', 16),
+            ('widthRatio', 1),
+            ('heightRatio', 1),
+            ('pilasterWidth', 2),
+            ('pilasterDepth', float('nan')),
+            ('pilasterDepth', 4),
+            ('heightRatio', 0.001),
+            ('paneRows', 0),
+        ]
+        for key, value in bad:
+            rule = self.window_grid_rule()
+            rule['windowGrid'][key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError):
+                self.resolve(self.building(), facadeRules=[rule])
+        b, values = self.portico_fixture()
+        values['facadeRules'] = [self.window_grid_rule(2)]
+        with self.assertRaises(ValueError):
+            self.resolve(b, **values)
+        rule = self.window_grid_rule()
+        rule['windows'] = False
+        with self.assertRaises(ValueError):
+            self.resolve(self.building(), facadeRules=[rule])
 
     def test_window_grid_count_cannot_repeat_across_split_facade(self):
-        b=self.building()
-        parts=[{'id':str(i),'polygons':[[[[x,0],[x+15,0],[x+15,20],[x,20],[x,0]]]],
-                'height':16.5,'levels':5} for i,x in enumerate([0,15])]
-        with self.assertRaisesRegex(ValueError,'undivided'):
-            self.resolve(b,parts=parts,facadeRules=[self.window_grid_rule()])
+        b = self.building()
+        parts = [
+            {
+                'id': str(i),
+                'polygons': [[[[x, 0], [x + 15, 0], [x + 15, 20], [x, 20], [x, 0]]]],
+                'height': 16.5,
+                'levels': 5,
+            }
+            for i, x in enumerate([0, 15])
+        ]
+        with self.assertRaisesRegex(ValueError, 'undivided'):
+            self.resolve(b, parts=parts, facadeRules=[self.window_grid_rule()])
 
     def record(self, b, **values):
-        fields={('roof.'+k) for k in values.get('roof',{})} | (set(values)-{'roof'})
-        return {'footprintRevision':footprint_revision(b),**values,
-                'evidence':{key:{'status':'confirmed','sourceRefs':['test-source'],'note':'Fixture source'} for key in fields}}
+        fields = {('roof.' + k) for k in values.get('roof', {})} | (
+            set(values) - {'roof'}
+        )
+        return {
+            'footprintRevision': footprint_revision(b),
+            **values,
+            'evidence': {
+                key: {
+                    'status': 'confirmed',
+                    'sourceRefs': ['test-source'],
+                    'note': 'Fixture source',
+                }
+                for key in fields
+            },
+        }
 
     def resolve(self, b, **values):
-        return resolve_building(b,self.record(b,**values),{'test-source','osm'})
+        return resolve_building(b, self.record(b, **values), {'test-source', 'osm'})
 
     def test_invalid_osm_value_does_not_discard_the_other_valid_dimension(self):
-        b=self.building();b['tags'].update({'height':'NaN','building:levels':'7'})
-        r=resolve_building(b);self.assertEqual(r['levels'],7);self.assertAlmostEqual(r['height'],23.1)
-        b['tags'].update({'height':'30 m','building:levels':'bad'})
-        r=resolve_building(b);self.assertEqual(r['height'],30);self.assertEqual(r['levels'],5)
-        for bad in [0,-1,float('inf'),True]:
-            b['tags']={'height':bad,'building:levels':'4'}
-            self.assertAlmostEqual(resolve_building(b)['height'],13.2)
+        b = self.building()
+        b['tags'].update({'height': 'NaN', 'building:levels': '7'})
+        r = resolve_building(b)
+        self.assertEqual(r['levels'], 7)
+        self.assertAlmostEqual(r['height'], 23.1)
+        b['tags'].update({'height': '30 m', 'building:levels': 'bad'})
+        r = resolve_building(b)
+        self.assertEqual(r['height'], 30)
+        self.assertEqual(r['levels'], 5)
+        for bad in [0, -1, float('inf'), True]:
+            b['tags'] = {'height': bad, 'building:levels': '4'}
+            self.assertAlmostEqual(resolve_building(b)['height'], 13.2)
 
     def test_independent_field_precedence_and_explicit_conflict(self):
-        b=self.building();b['tags'].update({'height':'30','building:levels':'6'})
-        r=self.resolve(b,levels=7)
-        self.assertEqual((r['height'],r['levels']),(30,7))
-        r=self.resolve(b,levels=7,height=28)
-        self.assertEqual((r['height'],r['levels']),(28,7))
-        r=self.resolve(b,levels=2)
+        b = self.building()
+        b['tags'].update({'height': '30', 'building:levels': '6'})
+        r = self.resolve(b, levels=7)
+        self.assertEqual((r['height'], r['levels']), (30, 7))
+        r = self.resolve(b, levels=7, height=28)
+        self.assertEqual((r['height'], r['levels']), (28, 7))
+        r = self.resolve(b, levels=2)
         self.assertTrue(r['calibration']['warnings'])
-        self.assertEqual(b['height'],16.5) # Caller data is never mutated.
+        self.assertEqual(b['height'], 16.5)  # Caller data is never mutated.
 
     def test_schema_sources_duplicates_and_stale_ids_fail(self):
-        b=self.building();record=self.record(b,levels=6)
-        for mutate in [lambda r:r.update(typo=1),lambda r:r.update(footprintRevision='old'),
-                       lambda r:r['evidence'].clear(),
-                       lambda r:r['evidence']['levels'].update(sourceRefs=['unknown'])]:
+        b = self.building()
+        record = self.record(b, levels=6)
+        for mutate in [
+            lambda r: r.update(typo=1),
+            lambda r: r.update(footprintRevision='old'),
+            lambda r: r['evidence'].clear(),
+            lambda r: r['evidence']['levels'].update(sourceRefs=['unknown']),
+        ]:
             with self.subTest(mutate=mutate):
-                r=copy.deepcopy(record);mutate(r)
-                with self.assertRaises(ValueError):resolve_building(b,r,{'test-source'})
-        with self.assertRaises(ValueError):json.loads('{"x":1,"x":2}',object_pairs_hook=unique_object)
-        with self.assertRaises(ValueError):validate_ids({'way/missing':{}},[b])
-        with self.assertRaises(ValueError):validate_ids({b['id']:{}},[{**b,'landmark':'library'}])
+                r = copy.deepcopy(record)
+                mutate(r)
+                with self.assertRaises(ValueError):
+                    resolve_building(b, r, {'test-source'})
+        with self.assertRaises(ValueError):
+            json.loads('{"x":1,"x":2}', object_pairs_hook=unique_object)
+        with self.assertRaises(ValueError):
+            validate_ids({'way/missing': {}}, [b])
+        with self.assertRaises(ValueError):
+            validate_ids({b['id']: {}}, [{**b, 'landmark': 'library'}])
         with tempfile.TemporaryDirectory() as directory:
-            path=Path(directory)/'overrides.json';path.write_text('{"schemaVersion":2,"buildings":{}}')
-            with self.assertRaises(ValueError):load_catalogue(path)
+            path = Path(directory) / 'overrides.json'
+            path.write_text('{"schemaVersion":2,"buildings":{}}')
+            with self.assertRaises(ValueError):
+                load_catalogue(path)
 
     def test_invalid_manual_numbers_never_become_geometry(self):
-        for key in ['levels','height','floorHeight']:
-            for value in [0,-1,float('nan'),float('inf'),True,None,'nonsense']:
-                with self.subTest(key=key,value=value),self.assertRaises(ValueError):
-                    self.resolve(self.building(),**{key:value})
+        for key in ['levels', 'height', 'floorHeight']:
+            for value in [0, -1, float('nan'), float('inf'), True, None, 'nonsense']:
+                with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                    self.resolve(self.building(), **{key: value})
 
     def test_entrance_is_anchored_on_original_exterior_and_points_out(self):
-        b=self.building();e={'id':'main','polygon':0,'ring':0,'edge':0,'t':.25,'width':4,'primary':True}
-        r=self.resolve(b,entrances=[e]);door=r['form']['entrances'][0]
-        self.assertEqual(door['center'],[7.5,0]);self.assertEqual(door['bearing'],180)
-        for change in [{'edge':99},{'edge':-1},{'t':1.1},{'width':20},{'primary':False}]:
-            with self.subTest(change=change),self.assertRaises(ValueError):self.resolve(b,entrances=[{**e,**change}])
+        b = self.building()
+        e = {
+            'id': 'main',
+            'polygon': 0,
+            'ring': 0,
+            'edge': 0,
+            't': 0.25,
+            'width': 4,
+            'primary': True,
+        }
+        r = self.resolve(b, entrances=[e])
+        door = r['form']['entrances'][0]
+        self.assertEqual(door['center'], [7.5, 0])
+        self.assertEqual(door['bearing'], 180)
+        for change in [
+            {'edge': 99},
+            {'edge': -1},
+            {'t': 1.1},
+            {'width': 20},
+            {'primary': False},
+        ]:
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                self.resolve(b, entrances=[{**e, **change}])
 
     def test_parts_preserve_court_and_each_exterior_segment_occurs_once(self):
-        b=self.building();b['polygons'][0].append([[10,5],[10,15],[20,15],[20,5],[10,5]])
+        b = self.building()
+        b['polygons'][0].append([[10, 5], [10, 15], [20, 15], [20, 5], [10, 5]])
         # Whole court ring remains with the lower part; taller west strip ends at x=8.
-        parts=[{'id':'core','polygons':[[[[0,0],[8,0],[8,20],[0,20],[0,0]]]],'height':23.1,'levels':7},
-               {'id':'wing','polygons':[[[[8,0],[30,0],[30,20],[8,20],[8,0]],b['polygons'][0][1]]],'height':16.5,'levels':5}]
-        r=self.resolve(b,levels=7,parts=parts);form=r['form']
-        shapes=[Polygon(p[0],p[1:]) for part in form['parts'] for p in part['polygons']]
-        target=Polygon(b['polygons'][0][0],b['polygons'][0][1:])
-        self.assertLess(unary_union(shapes).symmetric_difference(target).area,1e-6)
-        self.assertFalse(unary_union(shapes).contains(Point(15,10)))
-        self.assertAlmostEqual(sum(__import__('math').dist(f['start'],f['end']) for f in form['facades']),target.length)
-        self.assertEqual({f['levels'] for f in form['facades']},{5,7})
+        parts = [
+            {
+                'id': 'core',
+                'polygons': [[[[0, 0], [8, 0], [8, 20], [0, 20], [0, 0]]]],
+                'height': 23.1,
+                'levels': 7,
+            },
+            {
+                'id': 'wing',
+                'polygons': [
+                    [[[8, 0], [30, 0], [30, 20], [8, 20], [8, 0]], b['polygons'][0][1]]
+                ],
+                'height': 16.5,
+                'levels': 5,
+            },
+        ]
+        r = self.resolve(b, levels=7, parts=parts)
+        form = r['form']
+        shapes = [
+            Polygon(p[0], p[1:]) for part in form['parts'] for p in part['polygons']
+        ]
+        target = Polygon(b['polygons'][0][0], b['polygons'][0][1:])
+        self.assertLess(unary_union(shapes).symmetric_difference(target).area, 1e-6)
+        self.assertFalse(unary_union(shapes).contains(Point(15, 10)))
+        self.assertAlmostEqual(
+            sum(__import__('math').dist(f['start'], f['end']) for f in form['facades']),
+            target.length,
+        )
+        self.assertEqual({f['levels'] for f in form['facades']}, {5, 7})
         # All inner-ring window normals point into open courtyard space.
         for f in form['facades']:
             if f['ring']:
-                point=Point(*[(f['start'][i]+f['end'][i])/2+f['normal'][i]*.1 for i in (0,1)])
+                point = Point(
+                    *[
+                        (f['start'][i] + f['end'][i]) / 2 + f['normal'][i] * 0.1
+                        for i in (0, 1)
+                    ]
+                )
                 self.assertFalse(target.covers(point))
-        for bad in [parts[:1],parts+[parts[0]],
-                    [{**parts[0],'polygons':[[[[-1,0],[8,0],[8,20],[-1,20],[-1,0]]]]},parts[1]]]:
-            with self.assertRaises(ValueError):self.resolve(b,levels=7,parts=bad)
+        for bad in [
+            parts[:1],
+            parts + [parts[0]],
+            [
+                {
+                    **parts[0],
+                    'polygons': [[[[-1, 0], [8, 0], [8, 20], [-1, 20], [-1, 0]]]],
+                },
+                parts[1],
+            ],
+        ]:
+            with self.assertRaises(ValueError):
+                self.resolve(b, levels=7, parts=bad)
 
     def test_pitched_roofs_resolve_on_parts_of_concave_footprint(self):
-        b=self.building();b['polygons']=[[[[0,0],[30,0],[30,10],[10,10],[10,20],[0,20],[0,0]]]]
-        parts=[{'id':'bar','polygons':[[[[0,0],[30,0],[30,10],[0,10],[0,0]]]],'height':16.5,'levels':5},
-               {'id':'annex','polygons':[[[[0,10],[10,10],[10,20],[0,20],[0,10]]]],'height':9.9,'levels':3}]
-        r=self.resolve(b,parts=parts,roof={'type':'gabled','rise':2})
-        self.assertTrue(all(p['roof']['geometry']['triangles'] for p in r['form']['parts']))
+        b = self.building()
+        b['polygons'] = [
+            [[[0, 0], [30, 0], [30, 10], [10, 10], [10, 20], [0, 20], [0, 0]]]
+        ]
+        parts = [
+            {
+                'id': 'bar',
+                'polygons': [[[[0, 0], [30, 0], [30, 10], [0, 10], [0, 0]]]],
+                'height': 16.5,
+                'levels': 5,
+            },
+            {
+                'id': 'annex',
+                'polygons': [[[[0, 10], [10, 10], [10, 20], [0, 20], [0, 10]]]],
+                'height': 9.9,
+                'levels': 3,
+            },
+        ]
+        r = self.resolve(b, parts=parts, roof={'type': 'gabled', 'rise': 2})
+        self.assertTrue(
+            all(p['roof']['geometry']['triangles'] for p in r['form']['parts'])
+        )
 
     def test_blank_wall_rules_and_rollback_do_not_leave_stale_calibration(self):
-        b=self.building();rules=[{'polygon':0,'ring':0,'edge':1,'windows':False,'balconies':False}]
-        r=self.resolve(b,levels=6,facadeRules=rules)
-        edge=next(f for f in r['form']['facades'] if f['edge']==1)
+        b = self.building()
+        rules = [
+            {'polygon': 0, 'ring': 0, 'edge': 1, 'windows': False, 'balconies': False}
+        ]
+        r = self.resolve(b, levels=6, facadeRules=rules)
+        edge = next(f for f in r['form']['facades'] if f['edge'] == 1)
         self.assertFalse(edge['rule']['windows'])
-        restored=resolve_building(r)
-        self.assertEqual(restored['levels'],5);self.assertNotIn('calibration',restored)
-        self.assertNotIn('facades',restored['form']);self.assertEqual(restored['facadeBasis'],'按建筑类型推定')
+        restored = resolve_building(r)
+        self.assertEqual(restored['levels'], 5)
+        self.assertNotIn('calibration', restored)
+        self.assertNotIn('facades', restored['form'])
+        self.assertEqual(restored['facadeBasis'], '按建筑类型推定')
 
     def test_real_pilot_resolves_without_changing_original_footprints(self):
-        buildings=json.loads((ROOT/'public/data/buildings.json').read_text());catalogue=load_catalogue()
-        validate_ids(catalogue,buildings);sources={s['id'] for s in source_catalogue()}
+        buildings = json.loads((ROOT / 'public/data/buildings.json').read_text())
+        catalogue = load_catalogue()
+        validate_ids(catalogue, buildings)
+        sources = {s['id'] for s in source_catalogue()}
         for b in buildings:
             if b['id'] in catalogue:
-                r=resolve_building(b,catalogue[b['id']],sources)
-                self.assertEqual(r['polygons'],b['polygons']);self.assertEqual(r['tags'],b['tags'])
-                self.assertEqual(r['calibration']['evidence']['height']['status'],'estimated')
-                self.assertEqual(resolve_building(r,catalogue[b['id']],sources),r)
-                persisted=json.loads(json.dumps(r))
-                self.assertEqual(resolve_building(persisted,catalogue[b['id']],sources),persisted)
+                r = resolve_building(b, catalogue[b['id']], sources)
+                self.assertEqual(r['polygons'], b['polygons'])
+                self.assertEqual(r['tags'], b['tags'])
+                self.assertEqual(
+                    r['calibration']['evidence']['height']['status'], 'estimated'
+                )
+                self.assertEqual(resolve_building(r, catalogue[b['id']], sources), r)
+                persisted = json.loads(json.dumps(r))
+                self.assertEqual(
+                    resolve_building(persisted, catalogue[b['id']], sources), persisted
+                )
 
 
-if __name__=='__main__':unittest.main()
+if __name__ == '__main__':
+    unittest.main()

@@ -22,8 +22,9 @@ class BaselineInputTests(unittest.TestCase):
     def test_accepts_blender_arguments_and_existing_option_alias(self):
         for args in [[f'--baseline={self.root}'], ['--baseline-root', str(self.root)]]:
             with self.subTest(args=args):
-                result = baseline_root(['blender', '--background', '--',
-                                        '--report-prefix=check', *args])
+                result = baseline_root(
+                    ['blender', '--background', '--', '--report-prefix=check', *args]
+                )
                 self.assertEqual(result, self.root.resolve())
 
     def test_requires_explicit_baseline(self):
@@ -34,18 +35,28 @@ class BaselineInputTests(unittest.TestCase):
     def test_rejects_incomplete_baseline_before_opening_models(self):
         stderr = io.StringIO()
         with redirect_stderr(stderr), self.assertRaises(SystemExit):
-            baseline_root(['blender', '--', f'--baseline-root={self.root}'],
-                          files=('blender/gxu-campus.blend', 'public/models/base.glb'))
+            baseline_root(
+                ['blender', '--', f'--baseline-root={self.root}'],
+                files=('blender/gxu-campus.blend', 'public/models/base.glb'),
+            )
         self.assertIn('public/models/base.glb', stderr.getvalue())
 
     def test_suite_can_choose_distinct_road_and_connection_inputs(self):
         other = self.root / 'connection'
         (other / 'blender').mkdir(parents=True)
         (other / 'blender/gxu-campus.blend').write_bytes(b'connection baseline')
-        args = ['blender', '--', f'--road-baseline-root={self.root}',
-                f'--connection-baseline-root={other}']
-        self.assertEqual(baseline_root(args, flags=('--road-baseline-root',)), self.root.resolve())
-        self.assertEqual(baseline_root(args, flags=('--connection-baseline-root',)), other.resolve())
+        args = [
+            'blender',
+            '--',
+            f'--road-baseline-root={self.root}',
+            f'--connection-baseline-root={other}',
+        ]
+        self.assertEqual(
+            baseline_root(args, flags=('--road-baseline-root',)), self.root.resolve()
+        )
+        self.assertEqual(
+            baseline_root(args, flags=('--connection-baseline-root',)), other.resolve()
+        )
 
 
 if __name__ == '__main__':

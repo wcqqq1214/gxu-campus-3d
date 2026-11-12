@@ -11,6 +11,7 @@
     "start": "npm run dev",
     "lint": "oxlint",
     "lint:python": "python3 -m ruff check .",
+    "format:python": "python3 -m ruff format .",
     "format": "oxfmt",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && npm test",

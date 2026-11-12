@@ -10,99 +10,214 @@ from roof_volumes_data import resolve_roof_volumes
 
 class RoofVolumeTests(unittest.TestCase):
     def fixture(self):
-        b=dict(id='way/roof-volume', name='fixture', category='academic', landmark=None,
-               tags={'building':'university'}, polygons=[[[[0,0],[40,0],[40,20],[0,20],[0,0]]]])
-        c=dict(id='raised-strip',part='body',polygon=0,edge=0,
-               **{'from':.1,'to':.8},inset=4,depth=.5,rise=1.2)
-        return b,c
+        b = dict(
+            id='way/roof-volume',
+            name='fixture',
+            category='academic',
+            landmark=None,
+            tags={'building': 'university'},
+            polygons=[[[[0, 0], [40, 0], [40, 20], [0, 20], [0, 0]]]],
+        )
+        c = dict(
+            id='raised-strip',
+            part='body',
+            polygon=0,
+            edge=0,
+            **{'from': 0.1, 'to': 0.8},
+            inset=4,
+            depth=0.5,
+            rise=1.2,
+        )
+        return b, c
 
-    def resolve(self,b,config):
-        return resolve_building(b,dict(roofVolumes=config,footprintRevision=footprint_revision(b),
-            evidence={'roofVolumes':dict(status='estimated',sourceRefs=[],note='fixture')}))
+    def resolve(self, b, config):
+        return resolve_building(
+            b,
+            dict(
+                roofVolumes=config,
+                footprintRevision=footprint_revision(b),
+                evidence={
+                    'roofVolumes': dict(
+                        status='estimated', sourceRefs=[], note='fixture'
+                    )
+                },
+            ),
+        )
 
     def test_rotation_reversed_winding_idempotence_and_removal(self):
-        b,c=self.fixture();r=self.resolve(b,[c]);v=r['form']['roofVolumes'][0]
-        self.assertEqual(r,self.resolve(r,[c]))
-        self.assertEqual(b['polygons'],r['polygons'])
-        self.assertNotIn('roofVolumes',resolve_building(r)['form'])
-        area=Polygon(v['footprint']).area
-        self.assertAlmostEqual(area,14)
-        b['polygons'][0][0].reverse();reverse={**c,'edge':3,'from':.2,'to':.9}
-        self.assertLess(Polygon(self.resolve(b,[reverse])['form']['roofVolumes'][0]['footprint']).symmetric_difference(Polygon(v['footprint'])).area,1e-8)
-        b,c=self.fixture();angle=.73
-        b['polygons'][0][0]=[[x*math.cos(angle)-y*math.sin(angle),x*math.sin(angle)+y*math.cos(angle)] for x,y in b['polygons'][0][0]]
-        volume=self.resolve(b,[c])['form']['roofVolumes'][0]
-        self.assertAlmostEqual(Polygon(volume['footprint']).area,area)
-        self.assertTrue(Polygon(b['polygons'][0][0]).contains(Polygon(volume['footprint'])))
+        b, c = self.fixture()
+        r = self.resolve(b, [c])
+        v = r['form']['roofVolumes'][0]
+        self.assertEqual(r, self.resolve(r, [c]))
+        self.assertEqual(b['polygons'], r['polygons'])
+        self.assertNotIn('roofVolumes', resolve_building(r)['form'])
+        area = Polygon(v['footprint']).area
+        self.assertAlmostEqual(area, 14)
+        b['polygons'][0][0].reverse()
+        reverse = {**c, 'edge': 3, 'from': 0.2, 'to': 0.9}
+        self.assertLess(
+            Polygon(self.resolve(b, [reverse])['form']['roofVolumes'][0]['footprint'])
+            .symmetric_difference(Polygon(v['footprint']))
+            .area,
+            1e-8,
+        )
+        b, c = self.fixture()
+        angle = 0.73
+        b['polygons'][0][0] = [
+            [
+                x * math.cos(angle) - y * math.sin(angle),
+                x * math.sin(angle) + y * math.cos(angle),
+            ]
+            for x, y in b['polygons'][0][0]
+        ]
+        volume = self.resolve(b, [c])['form']['roofVolumes'][0]
+        self.assertAlmostEqual(Polygon(volume['footprint']).area, area)
+        self.assertTrue(
+            Polygon(b['polygons'][0][0]).contains(Polygon(volume['footprint']))
+        )
 
     def test_reject_invalid_identity_anchor_and_dimensions(self):
-        b,c=self.fixture()
-        for key,value in [('id',''),('part',False),('part','absent'),('polygon',1),('edge',4),
-                          ('edge',True),('polygon',-1),('from',.9),('to',1.2),('inset',.2),
-                          ('depth',0),('rise',7),('rise',True),('rise',float('inf')),('inset',float('nan')),
-                          ('to',.1001),('extra',1)]:
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):self.resolve(b,[{**c,key:value}])
-        for config in ([],{},[c]*13,[c,copy.deepcopy(c)]):
-            with self.subTest(config=config),self.assertRaises(ValueError):self.resolve(b,config)
+        b, c = self.fixture()
+        for key, value in [
+            ('id', ''),
+            ('part', False),
+            ('part', 'absent'),
+            ('polygon', 1),
+            ('edge', 4),
+            ('edge', True),
+            ('polygon', -1),
+            ('from', 0.9),
+            ('to', 1.2),
+            ('inset', 0.2),
+            ('depth', 0),
+            ('rise', 7),
+            ('rise', True),
+            ('rise', float('inf')),
+            ('inset', float('nan')),
+            ('to', 0.1001),
+            ('extra', 1),
+        ]:
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(b, [{**c, key: value}])
+        for config in ([], {}, [c] * 13, [c, copy.deepcopy(c)]):
+            with self.subTest(config=config), self.assertRaises(ValueError):
+                self.resolve(b, config)
 
     def test_courtyard_and_roof_edge_clearance(self):
-        b,c=self.fixture()
-        with self.assertRaisesRegex(ValueError,'clearance'):self.resolve(b,[{**c,'from':.005}])
-        with self.assertRaisesRegex(ValueError,'clearance'):self.resolve(b,[{**c,'inset':19.1}])
-        b['polygons'][0].append([[9,3],[11,3],[11,5],[9,5],[9,3]])
-        with self.assertRaisesRegex(ValueError,'courtyards'):self.resolve(b,[c])
+        b, c = self.fixture()
+        with self.assertRaisesRegex(ValueError, 'clearance'):
+            self.resolve(b, [{**c, 'from': 0.005}])
+        with self.assertRaisesRegex(ValueError, 'clearance'):
+            self.resolve(b, [{**c, 'inset': 19.1}])
+        b['polygons'][0].append([[9, 3], [11, 3], [11, 5], [9, 5], [9, 3]])
+        with self.assertRaisesRegex(ValueError, 'courtyards'):
+            self.resolve(b, [c])
 
     def test_intersecting_volumes_rejected_touching_volumes_allowed(self):
-        b,c=self.fixture();second={**c,'id':'second','inset':4.2}
-        with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[c,second])
-        r=self.resolve(b,[c,{**second,'inset':4.5}])
-        shapes=[Polygon(v['footprint']) for v in r['form']['roofVolumes']]
-        self.assertAlmostEqual(shapes[0].intersection(shapes[1]).area,0)
+        b, c = self.fixture()
+        second = {**c, 'id': 'second', 'inset': 4.2}
+        with self.assertRaisesRegex(ValueError, 'overlap'):
+            self.resolve(b, [c, second])
+        r = self.resolve(b, [c, {**second, 'inset': 4.5}])
+        shapes = [Polygon(v['footprint']) for v in r['form']['roofVolumes']]
+        self.assertAlmostEqual(shapes[0].intersection(shapes[1]).area, 0)
 
     def test_support_and_conflicting_roof_features(self):
-        b,c=self.fixture();form=self.resolve(b,[c])['form']
-        for feature in ('stairTower','roofDome','roofEave','roofCrown','gableScreen'):
-            with self.subTest(feature=feature),self.assertRaisesRegex(ValueError,'another roof'):
-                resolve_roof_volumes(b,{**form,feature:{}},[c])
-        part=dict(id='body',polygons=[[[[0,0],[40,0],[40,3],[0,3],[0,0]]]],height=10,roof={'type':'flat'})
-        with self.assertRaisesRegex(ValueError,'clearance'):resolve_roof_volumes(b,{**form,'parts':[part]},[c])
-        for patch in ({'roof':{'type':'hipped'}},{'openBelow':{}},{'roof':{'type':'flat','inset':1}}):
-            with self.subTest(patch=patch),self.assertRaises(ValueError):
-                resolve_roof_volumes(b,{**form,'parts':[{**part,**patch}]},[c])
+        b, c = self.fixture()
+        form = self.resolve(b, [c])['form']
+        for feature in (
+            'stairTower',
+            'roofDome',
+            'roofEave',
+            'roofCrown',
+            'gableScreen',
+        ):
+            with (
+                self.subTest(feature=feature),
+                self.assertRaisesRegex(ValueError, 'another roof'),
+            ):
+                resolve_roof_volumes(b, {**form, feature: {}}, [c])
+        part = dict(
+            id='body',
+            polygons=[[[[0, 0], [40, 0], [40, 3], [0, 3], [0, 0]]]],
+            height=10,
+            roof={'type': 'flat'},
+        )
+        with self.assertRaisesRegex(ValueError, 'clearance'):
+            resolve_roof_volumes(b, {**form, 'parts': [part]}, [c])
+        for patch in (
+            {'roof': {'type': 'hipped'}},
+            {'openBelow': {}},
+            {'roof': {'type': 'flat', 'inset': 1}},
+        ):
+            with self.subTest(patch=patch), self.assertRaises(ValueError):
+                resolve_roof_volumes(b, {**form, 'parts': [{**part, **patch}]}, [c])
 
     def test_cap_clearance_and_collisions_include_overhang(self):
-        b,c=self.fixture();c={**c,'cap':{'overhang':.3,'height':.5}}
-        self.assertEqual(self.resolve(b,[c]),self.resolve(self.resolve(b,[c]),[c]))
-        for cap in ({'overhang':True,'height':.5},{'overhang':.3,'height':float('nan')},
-                    {'overhang':1.1,'height':.5},{'overhang':.3,'height':0},{'height':.5}):
-            with self.subTest(cap=cap),self.assertRaises(ValueError):self.resolve(b,[{**c,'cap':cap}])
-        with self.assertRaisesRegex(ValueError,'cap needs'):
-            self.resolve(b,[{**c,'inset':.6}])
+        b, c = self.fixture()
+        c = {**c, 'cap': {'overhang': 0.3, 'height': 0.5}}
+        self.assertEqual(self.resolve(b, [c]), self.resolve(self.resolve(b, [c]), [c]))
+        for cap in (
+            {'overhang': True, 'height': 0.5},
+            {'overhang': 0.3, 'height': float('nan')},
+            {'overhang': 1.1, 'height': 0.5},
+            {'overhang': 0.3, 'height': 0},
+            {'height': 0.5},
+        ):
+            with self.subTest(cap=cap), self.assertRaises(ValueError):
+                self.resolve(b, [{**c, 'cap': cap}])
+        with self.assertRaisesRegex(ValueError, 'cap needs'):
+            self.resolve(b, [{**c, 'inset': 0.6}])
         # Body footprints do not intersect, but the taller neighbor hits the cap.
-        neighbor={**c,'id':'neighbor','inset':4.6,'rise':2};neighbor.pop('cap')
-        with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[c,neighbor])
-        with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[neighbor,c])
-        self.resolve(b,[c,{**neighbor,'rise':1}])
+        neighbor = {**c, 'id': 'neighbor', 'inset': 4.6, 'rise': 2}
+        neighbor.pop('cap')
+        with self.assertRaisesRegex(ValueError, 'overlap'):
+            self.resolve(b, [c, neighbor])
+        with self.assertRaisesRegex(ValueError, 'overlap'):
+            self.resolve(b, [neighbor, c])
+        self.resolve(b, [c, {**neighbor, 'rise': 1}])
 
     def test_glazing_bounds_faces_winding_and_projecting_frames(self):
-        b,c=self.fixture(); c.update(depth=4,rise=6)
-        g=dict(faces={'outer':8,'start':3},sill=3.6,height=2,margin=.35,frameWidth=.1,projection=.12)
-        c['glazing']=g
-        r=self.resolve(b,[c]);self.assertEqual(r,self.resolve(r,[c]))
-        self.assertEqual(r['form']['roofVolumes'][0]['outwardNormal'],[0,-1])
+        b, c = self.fixture()
+        c.update(depth=4, rise=6)
+        g = dict(
+            faces={'outer': 8, 'start': 3},
+            sill=3.6,
+            height=2,
+            margin=0.35,
+            frameWidth=0.1,
+            projection=0.12,
+        )
+        c['glazing'] = g
+        r = self.resolve(b, [c])
+        self.assertEqual(r, self.resolve(r, [c]))
+        self.assertEqual(r['form']['roofVolumes'][0]['outwardNormal'], [0, -1])
         b['polygons'][0][0].reverse()
-        rev=self.resolve(b,[{**c,'edge':3,'from':.2,'to':.9}])
-        self.assertEqual(rev['form']['roofVolumes'][0]['outwardNormal'],[0,-1])
-        b,c0=self.fixture();c={**c0,**c}
-        for key,value in [('faces',{}),('faces',{'unknown':2}),('faces',{'outer':True}),
-                          ('faces',{'start':24}),('sill',float('nan')),('sill',4.2),
-                          ('height',0),('projection',True),('margin',2),('frameWidth',.5)]:
-            with self.subTest(key=key,value=value),self.assertRaises(ValueError):
-                self.resolve(b,[{**c,'glazing':{**g,key:value}}])
+        rev = self.resolve(b, [{**c, 'edge': 3, 'from': 0.2, 'to': 0.9}])
+        self.assertEqual(rev['form']['roofVolumes'][0]['outwardNormal'], [0, -1])
+        b, c0 = self.fixture()
+        c = {**c0, **c}
+        for key, value in [
+            ('faces', {}),
+            ('faces', {'unknown': 2}),
+            ('faces', {'outer': True}),
+            ('faces', {'start': 24}),
+            ('sill', float('nan')),
+            ('sill', 4.2),
+            ('height', 0),
+            ('projection', True),
+            ('margin', 2),
+            ('frameWidth', 0.5),
+        ]:
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.resolve(b, [{**c, 'glazing': {**g, key: value}}])
         # Solid masses miss one another, but the projecting frame intersects.
-        neighbor={**c0,'id':'neighbor','inset':8.05,'rise':6}
-        with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[c,neighbor])
-        with self.assertRaisesRegex(ValueError,'overlap'):self.resolve(b,[neighbor,c])
+        neighbor = {**c0, 'id': 'neighbor', 'inset': 8.05, 'rise': 6}
+        with self.assertRaisesRegex(ValueError, 'overlap'):
+            self.resolve(b, [c, neighbor])
+        with self.assertRaisesRegex(ValueError, 'overlap'):
+            self.resolve(b, [neighbor, c])
 
 
-if __name__=='__main__':unittest.main()
+if __name__ == '__main__':
+    unittest.main()

@@ -4,6 +4,7 @@ Usage: blender -b --python-exit-code 1 --python blender/update_road_display.py
        -- --output-dir=work/road-junction-cleanup/candidate
 Inspect/validate the candidate before copying its blend, base GLB and manifest.
 """
+
 import argparse
 import hashlib
 import json
@@ -15,10 +16,10 @@ from pathlib import Path
 import bpy
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT/'blender'))
+sys.path.insert(0, str(ROOT / 'blender'))
 from initial_model_budget import check_initial_model_budget
 
-sys.path.insert(0, str(ROOT/'scripts'))
+sys.path.insert(0, str(ROOT / 'scripts'))
 import geometry
 from export_attributes import omit_unused_uvs
 from geometry import Mesh
@@ -38,89 +39,160 @@ def signatures(raw):
     for name, node in mesh_nodes_by_name(doc).items():
         result[name] = []
         for p in doc['meshes'][node['mesh']]['primitives']:
-            view = doc['bufferViews'][p['extensions']['KHR_draco_mesh_compression']['bufferView']]
+            view = doc['bufferViews'][
+                p['extensions']['KHR_draco_mesh_compression']['bufferView']
+            ]
             start = view.get('byteOffset', 0)
-            result[name].append((doc['materials'][p['material']]['name'],
-                                 hashlib.sha256(binary[start:start+view['byteLength']]).hexdigest()))
+            result[name].append(
+                (
+                    doc['materials'][p['material']]['name'],
+                    hashlib.sha256(
+                        binary[start : start + view['byteLength']]
+                    ).hexdigest(),
+                )
+            )
     return result
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir', type=Path, required=True)
-    parser.add_argument('--input-root', type=Path, default=ROOT, help='Original repository or a preceding candidate')
+    parser.add_argument(
+        '--input-root',
+        type=Path,
+        default=ROOT,
+        help='Original repository or a preceding candidate',
+    )
     parser.add_argument('--layer', choices=['roads', 'sports'], default='roads')
-    parser.add_argument('--cut-id', action='append', help='Apply only these new cuts; repeat for multiple IDs')
-    parser.add_argument('--repair-clearance', action='store_true', help='Repair configured terrain poke-throughs')
-    parser.add_argument('--clearance-only', action='store_true', help='Skip previously applied road cuts')
-    parser.add_argument('--repair-id', action='append', help='Apply only these clearance repairs; repeat for multiple IDs')
-    args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
+    parser.add_argument(
+        '--cut-id',
+        action='append',
+        help='Apply only these new cuts; repeat for multiple IDs',
+    )
+    parser.add_argument(
+        '--repair-clearance',
+        action='store_true',
+        help='Repair configured terrain poke-throughs',
+    )
+    parser.add_argument(
+        '--clearance-only',
+        action='store_true',
+        help='Skip previously applied road cuts',
+    )
+    parser.add_argument(
+        '--repair-id',
+        action='append',
+        help='Apply only these clearance repairs; repeat for multiple IDs',
+    )
+    args = parser.parse_args(sys.argv[sys.argv.index('--') + 1 :])
     if (args.clearance_only or args.repair_id) and not args.repair_clearance:
         parser.error('--clearance-only and --repair-id require --repair-clearance')
     if args.clearance_only and args.cut_id:
         parser.error('--clearance-only cannot be combined with --cut-id')
     output = args.output_dir.resolve()
-    if output == ROOT or ROOT/'public' in output.parents or ROOT/'blender' in output.parents:
+    if (
+        output == ROOT
+        or ROOT / 'public' in output.parents
+        or ROOT / 'blender' in output.parents
+    ):
         raise ValueError('Use an isolated candidate output directory')
     output.mkdir(parents=True, exist_ok=True)
     input_root = args.input_root.resolve()
     layer = args.layer
     source_name = 'roads' if layer == 'roads' else '其他运动场地'
-    cuts = load_cuts(ids=[] if args.clearance_only else args.cut_id, filename='road-display-cleanup.json' if layer == 'roads' else 'surface-display-cleanup.json')
+    cuts = load_cuts(
+        ids=[] if args.clearance_only else args.cut_id,
+        filename='road-display-cleanup.json'
+        if layer == 'roads'
+        else 'surface-display-cleanup.json',
+    )
     if layer != 'roads' and args.repair_clearance:
         raise ValueError('Terrain clearance repair applies only to roads')
     repairs = load_repairs(ids=args.repair_id) if args.repair_clearance else []
+
     def repair(mesh, road):
         if not repairs:
             return mesh, {}
-        ground = next(o for o in bpy.context.scene.objects
-                      if o.type == 'MESH' and o.name.split('.')[0] == 'terrain')
+        ground = next(
+            o
+            for o in bpy.context.scene.objects
+            if o.type == 'MESH' and o.name.split('.')[0] == 'terrain'
+        )
         terrain = Mesh()
         terrain.v = [tuple(ground.matrix_world @ v.co) for v in ground.data.vertices]
         terrain.f = [tuple(p.vertices) for p in ground.data.polygons]
-        result, report = repair_clearance(mesh, terrain,
-                                         {m.name: i for i, m in enumerate(road.data.materials)}, repairs)
+        result, report = repair_clearance(
+            mesh,
+            terrain,
+            {m.name: i for i, m in enumerate(road.data.materials)},
+            repairs,
+        )
         assert report['changedFaces'] > 0, report
         return result, report
-    original = (input_root/'public/models/base.glb').read_bytes()
+
+    original = (input_root / 'public/models/base.glb').read_bytes()
     document, _ = unpack(original)
     metadata = mesh_nodes_by_name(document)['roads'].get('extras', {})
-    if layer == 'roads' and (metadata.get('positionQuantizationBits') != 18 or not metadata.get('sharedPositionQuantizationBounds')):
-        raise ValueError('Road display update requires the existing shared 18-bit position grid')
-    bpy.ops.wm.open_mainfile(filepath=str(input_root/'blender/gxu-campus.blend'))
+    if layer == 'roads' and (
+        metadata.get('positionQuantizationBits') != 18
+        or not metadata.get('sharedPositionQuantizationBounds')
+    ):
+        raise ValueError(
+            'Road display update requires the existing shared 18-bit position grid'
+        )
+    bpy.ops.wm.open_mainfile(filepath=str(input_root / 'blender/gxu-campus.blend'))
     source = bpy.data.objects[source_name]
-    untouched = {o.name: (o.as_pointer(), o.data.as_pointer() if o.data else None)
-                 for o in bpy.data.objects if o != source}
+    untouched = {
+        o.name: (o.as_pointer(), o.data.as_pointer() if o.data else None)
+        for o in bpy.data.objects
+        if o != source
+    }
     mesh = Mesh()
     mesh.v = [tuple(v.co) for v in source.data.vertices]
     mesh.f = [tuple(p.vertices) for p in source.data.polygons]
     mesh.m = [p.material_index for p in source.data.polygons]
     from mathutils import Matrix
+
     if source.matrix_world != Matrix.Identity(4) or source.modifiers:
-        raise ValueError('Expected ordinary source roads without transforms or modifiers')
-    mesh.source_uvs = [[tuple(source.data.uv_layers.active.data[i].uv)
-                       for i in p.loop_indices] for p in source.data.polygons]
+        raise ValueError(
+            'Expected ordinary source roads without transforms or modifiers'
+        )
+    mesh.source_uvs = [
+        [tuple(source.data.uv_layers.active.data[i].uv) for i in p.loop_indices]
+        for p in source.data.polygons
+    ]
     fixed, report = trim_mesh(mesh, cuts)
     assert all(r['removedArea'] > 0 for r in report.values()), report
     fixed, clearance_report = repair(fixed, source)
     geometry.MATERIALS = list(source.data.materials)
     changed = {source.data.materials[i].name for i in fixed.changed_materials}
-    obj = fixed.object('road-display-candidate', source.users_collection[0], dict(source.items()))
-    for p, uvs, old_index in zip(obj.data.polygons, fixed.source_uvs, fixed.source_face_indices):
+    obj = fixed.object(
+        'road-display-candidate', source.users_collection[0], dict(source.items())
+    )
+    for p, uvs, old_index in zip(
+        obj.data.polygons, fixed.source_uvs, fixed.source_face_indices
+    ):
         p.use_smooth = source.data.polygons[old_index].use_smooth
         for i, uv in zip(p.loop_indices, uvs):
             obj.data.uv_layers.active.data[i].uv = uv
+
     # Assert exact preservation outside every cut, including source UVs.
     def records(value):
-        return Counter((tuple(value.v[i] for i in f), mat, tuple(tuple(u) for u in uv))
-                       for f, mat, uv in zip(value.f, value.m, value.source_uvs))
+        return Counter(
+            (tuple(value.v[i] for i in f), mat, tuple(tuple(u) for u in uv))
+            for f, mat, uv in zip(value.f, value.m, value.source_uvs)
+        )
+
     removed = records(mesh) - records(fixed)
     outside_changed = 0
     for points, _, _ in removed:
-        if not any(max(p[0] for p in points) > c['bounds'][0]
-                   and min(p[0] for p in points) < c['bounds'][2]
-                   and max(p[1] for p in points) > c['bounds'][1]
-                   and min(p[1] for p in points) < c['bounds'][3] for c in cuts+repairs):
+        if not any(
+            max(p[0] for p in points) > c['bounds'][0]
+            and min(p[0] for p in points) < c['bounds'][2]
+            and max(p[1] for p in points) > c['bounds'][1]
+            and min(p[1] for p in points) < c['bounds'][3]
+            for c in cuts + repairs
+        ):
             outside_changed += 1
     assert not outside_changed
     source_data = source.data
@@ -128,76 +200,132 @@ def main():
     if source_data.users == 0:
         bpy.data.meshes.remove(source_data)
     obj.name = source_name
-    assert all((bpy.data.objects[k].as_pointer(), bpy.data.objects[k].data.as_pointer()
-                if bpy.data.objects[k].data else None) == value for k, value in untouched.items())
-    (output/'blender').mkdir(exist_ok=True)
-    bpy.ops.wm.save_as_mainfile(filepath=str(output/'blender/gxu-campus.blend'), compress=True)
+    assert all(
+        (
+            bpy.data.objects[k].as_pointer(),
+            bpy.data.objects[k].data.as_pointer() if bpy.data.objects[k].data else None,
+        )
+        == value
+        for k, value in untouched.items()
+    )
+    (output / 'blender').mkdir(exist_ok=True)
+    bpy.ops.wm.save_as_mainfile(
+        filepath=str(output / 'blender/gxu-campus.blend'), compress=True
+    )
     # The shipping road contains past export-only seam/UV fixes. Trim its actual
     # decoded triangles rather than recreating those unrelated corrections.
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.ops.import_scene.gltf(filepath=str(input_root/'public/models/base.glb'))
+    bpy.ops.import_scene.gltf(filepath=str(input_root / 'public/models/base.glb'))
     bpy.context.view_layer.update()
-    delivered = next(o for o in bpy.context.scene.objects
-                     if o.type == 'MESH' and o.name.split('.')[0] == layer)
+    delivered = next(
+        o
+        for o in bpy.context.scene.objects
+        if o.type == 'MESH' and o.name.split('.')[0] == layer
+    )
     mesh = Mesh()
     mesh.v = [tuple(delivered.matrix_world @ v.co) for v in delivered.data.vertices]
     mesh.f = [tuple(p.vertices) for p in delivered.data.polygons]
     mesh.m = [p.material_index for p in delivered.data.polygons]
-    mesh.source_uvs = [[tuple(delivered.data.uv_layers.active.data[i].uv)
-                       for i in p.loop_indices] for p in delivered.data.polygons]
+    mesh.source_uvs = [
+        [tuple(delivered.data.uv_layers.active.data[i].uv) for i in p.loop_indices]
+        for p in delivered.data.polygons
+    ]
     # Earlier trims may already have removed every original extremal vertex.
     # Read Draco's encoded lattice instead of inferring it from decoded bounds.
-    domain = json.loads(subprocess.check_output(
-        ['node', str(ROOT/'scripts/road-position-domain.mjs'),
-         str(input_root/'public/models/base.glb'), *([] if layer == 'roads' else ['sports', 'sport'])], cwd=ROOT, text=True))
+    domain = json.loads(
+        subprocess.check_output(
+            [
+                'node',
+                str(ROOT / 'scripts/road-position-domain.mjs'),
+                str(input_root / 'public/models/base.glb'),
+                *([] if layer == 'roads' else ['sports', 'sport']),
+            ],
+            cwd=ROOT,
+            text=True,
+        )
+    )
     fixed, decoded_report = trim_mesh(mesh, cuts)
     fixed, decoded_clearance_report = repair(fixed, delivered)
     geometry.MATERIALS = list(delivered.data.materials)
-    assert changed == {delivered.data.materials[i].name for i in fixed.changed_materials}
+    assert changed == {
+        delivered.data.materials[i].name for i in fixed.changed_materials
+    }
     if layer == 'sports':
         assert changed == {'sport'}, changed
         # Other sports materials have independent compression domains and are
         # copied verbatim from the published GLB instead of being re-exported.
-        keep = [i for i, mat in enumerate(fixed.m) if delivered.data.materials[mat].name in changed]
+        keep = [
+            i
+            for i, mat in enumerate(fixed.m)
+            if delivered.data.materials[mat].name in changed
+        ]
         fixed.f = [fixed.f[i] for i in keep]
         fixed.m = [fixed.m[i] for i in keep]
         fixed.source_uvs = [fixed.source_uvs[i] for i in keep]
         fixed.source_face_indices = [fixed.source_face_indices[i] for i in keep]
     exported = fixed.object(layer, bpy.context.scene.collection, {'layer': layer})
-    for p, uvs, old_index in zip(exported.data.polygons, fixed.source_uvs, fixed.source_face_indices):
+    for p, uvs, old_index in zip(
+        exported.data.polygons, fixed.source_uvs, fixed.source_face_indices
+    ):
         p.use_smooth = delivered.data.polygons[old_index].use_smooth
         for i, uv in zip(p.loop_indices, uvs):
             exported.data.uv_layers.active.data[i].uv = uv
     bpy.ops.object.select_all(action='DESELECT')
     exported.select_set(True)
-    with omit_unused_uvs(deduplicate_vertices=True, share_position_bounds=True, position_domain=domain):
+    with omit_unused_uvs(
+        deduplicate_vertices=True, share_position_bounds=True, position_domain=domain
+    ):
         bpy.ops.export_scene.gltf(
-            filepath=str(output/'roads.glb'), export_format='GLB', use_selection=True,
-            export_extras=True, export_draco_mesh_compression_enable=True,
-            export_draco_mesh_compression_level=6, export_draco_position_quantization=domain['bits'],
-            export_draco_texcoord_quantization=12, export_draco_normal_quantization=6,
-            export_materials='EXPORT', export_cameras=False, export_lights=False)
-    candidate = output/'public/models/base.glb'
+            filepath=str(output / 'roads.glb'),
+            export_format='GLB',
+            use_selection=True,
+            export_extras=True,
+            export_draco_mesh_compression_enable=True,
+            export_draco_mesh_compression_level=6,
+            export_draco_position_quantization=domain['bits'],
+            export_draco_texcoord_quantization=12,
+            export_draco_normal_quantization=6,
+            export_materials='EXPORT',
+            export_cameras=False,
+            export_lights=False,
+        )
+    candidate = output / 'public/models/base.glb'
     candidate.parent.mkdir(parents=True, exist_ok=True)
     candidate.write_bytes(original)
-    preserve_geometry((output/'roads.glb').read_bytes(), candidate, [layer], materials=changed)
+    preserve_geometry(
+        (output / 'roads.glb').read_bytes(), candidate, [layer], materials=changed
+    )
     compact_buffer_views(candidate)
     before, after = signatures(original), signatures(candidate.read_bytes())
     assert before.keys() == after.keys()
     assert all(v == after[k] for k, v in before.items() if k != layer)
-    assert all(p == q for p, q in zip(before[layer], after[layer]) if p[0] not in changed)
-    manifest = json.loads((input_root/'public/data/models.json').read_text())
+    assert all(
+        p == q for p, q in zip(before[layer], after[layer]) if p[0] not in changed
+    )
+    manifest = json.loads((input_root / 'public/data/models.json').read_text())
     raw = candidate.read_bytes()
     manifest['base'].update(bytes=len(raw), sha256=hashlib.sha256(raw).hexdigest())
     check_initial_model_budget(len(raw) + manifest['trees']['bytes'])
-    (output/'public/data').mkdir(exist_ok=True)
-    (output/'public/data/models.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2)+'\n')
-    summary = dict(cuts=report, decodedCuts=decoded_report,
-                   clearance=clearance_report, decodedClearance=decoded_clearance_report,
-                   changedBaseNodes=[layer], changedMaterials=sorted(changed),
-                   retainedBaseNodes=len(before)-1, retainedSourceObjects=len(untouched),
-                   outsideChangedFaces=outside_changed, positionDomain=domain, baseBytes=len(raw))
-    (output/'report.json').write_text(json.dumps(summary, ensure_ascii=False, indent=2)+'\n')
+    (output / 'public/data').mkdir(exist_ok=True)
+    (output / 'public/data/models.json').write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + '\n'
+    )
+    summary = dict(
+        cuts=report,
+        decodedCuts=decoded_report,
+        clearance=clearance_report,
+        decodedClearance=decoded_clearance_report,
+        changedBaseNodes=[layer],
+        changedMaterials=sorted(changed),
+        retainedBaseNodes=len(before) - 1,
+        retainedSourceObjects=len(untouched),
+        outsideChangedFaces=outside_changed,
+        positionDomain=domain,
+        baseBytes=len(raw),
+    )
+    (output / 'report.json').write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2) + '\n'
+    )
     print(json.dumps(summary, ensure_ascii=False), flush=True)
 
 

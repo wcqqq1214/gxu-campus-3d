@@ -1,4 +1,5 @@
 """Opt-in integration regression using the current published assets and editable source."""
+
 import argparse
 import json
 import os
@@ -13,9 +14,19 @@ from incremental_update import snapshot
 from preserve_glb_geometry import mesh_nodes_by_name, unpack
 
 parser = argparse.ArgumentParser(description=__doc__)
-parser.add_argument('--output-root', type=Path, required=True, help='New directory for validated candidates')
-parser.add_argument('--kinds', nargs='+', choices=('roads', 'basketball', 'new_east_gate'),
-                    default=('roads', 'basketball', 'new_east_gate'), help='Limit the integration check to selected workers')
+parser.add_argument(
+    '--output-root',
+    type=Path,
+    required=True,
+    help='New directory for validated candidates',
+)
+parser.add_argument(
+    '--kinds',
+    nargs='+',
+    choices=('roads', 'basketball', 'new_east_gate'),
+    default=('roads', 'basketball', 'new_east_gate'),
+    help='Limit the integration check to selected workers',
+)
 args = parser.parse_args()
 output = args.output_root.resolve()
 output.mkdir(parents=True, exist_ok=False)
@@ -25,28 +36,68 @@ results = {}
 for kind in args.kinds:
     candidate = output / kind
     with (output / (kind + '.log')).open('w') as log:
-        result = subprocess.run([os.environ.get('BLENDER_BIN', 'blender'), '-b', '--factory-startup',
-            '--disable-autoexec', '--python-exit-code', '1', '--python', str(ROOT / f'blender/update_{kind}.py'),
-            '--', f'--output-root={candidate}'], cwd=ROOT, stdout=log, stderr=subprocess.STDOUT)
+        result = subprocess.run(
+            [
+                os.environ.get('BLENDER_BIN', 'blender'),
+                '-b',
+                '--factory-startup',
+                '--disable-autoexec',
+                '--python-exit-code',
+                '1',
+                '--python',
+                str(ROOT / f'blender/update_{kind}.py'),
+                '--',
+                f'--output-root={candidate}',
+            ],
+            cwd=ROOT,
+            stdout=log,
+            stderr=subprocess.STDOUT,
+        )
     if snapshot(ROOT) != before:
         raise RuntimeError('Integration test modified published assets')
     if result.returncode:
         raise RuntimeError(f'{kind} failed: {output / (kind + ".log")}')
     updated = (candidate / 'public/models/base.glb').read_bytes()
-    names = set(mesh_nodes_by_name(unpack(old)[0])) | set(mesh_nodes_by_name(unpack(updated)[0]))
-    selected = {'roads', 'terrain', 'green'} | {n for n in names if n.startswith(('site-', 'shore-', 'paving-', 'vegetation-low-'))}
+    names = set(mesh_nodes_by_name(unpack(old)[0])) | set(
+        mesh_nodes_by_name(unpack(updated)[0])
+    )
+    selected = {'roads', 'terrain', 'green'} | {
+        n
+        for n in names
+        if n.startswith(('site-', 'shore-', 'paving-', 'vegetation-low-'))
+    }
     if kind == 'new_east_gate':
         selected = {'landmark-new-east-gate'}
         # With current assets this also exercises a repeated build: unchanged
         # model bytes must not be treated as a validation failure.
     elif kind == 'roads':
         selected |= {n for n in names if n.startswith('infra-approach-')}
-        selected |= {'landmark-' + b['id'] for b in json.loads((ROOT / 'public/data/infrastructure.json').read_text())['bridges']}
+        selected |= {
+            'landmark-' + b['id']
+            for b in json.loads((ROOT / 'public/data/infrastructure.json').read_text())[
+                'bridges'
+            ]
+        }
     else:
         selected |= {'sports'} | {n for n in names if n.startswith('basketball-bank-')}
     retained = validate_retained(old, updated, selected)
-    report = json.loads((candidate / 'work' / ('new-east-update.json' if kind == 'new_east_gate' else 'incremental-result.json')).read_text())
+    report = json.loads(
+        (
+            candidate
+            / 'work'
+            / (
+                'new-east-update.json'
+                if kind == 'new_east_gate'
+                else 'incremental-result.json'
+            )
+        ).read_text()
+    )
     assert report['passed'] and report.get('published', []) == []
-    results[kind] = {'retainedNodes':retained, 'initialBytes':report['initialModelBytes'] if kind == 'new_east_gate' else report['initialBytes']}
+    results[kind] = {
+        'retainedNodes': retained,
+        'initialBytes': report['initialModelBytes']
+        if kind == 'new_east_gate'
+        else report['initialBytes'],
+    }
     (output / 'results.json').write_text(json.dumps(results, indent=2) + '\n')
     print(kind, results[kind], flush=True)

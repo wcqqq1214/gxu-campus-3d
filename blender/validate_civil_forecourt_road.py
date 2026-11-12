@@ -1,4 +1,5 @@
 """Check mapped service-road continuity against its configured ground grade."""
+
 import hashlib
 import json
 import math
@@ -9,132 +10,299 @@ import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
-ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'blender'))
 from civil_forecourt_grade import load_grade
 from civil_forecourt_grade import weight as grade_weight
 from site_geometry import inside, ring_distance
 from validation_inputs import baseline_root
 
-PREFIX=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--report-prefix=')),'s2-civil-front-connection-road-grade')
-TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)
-BASELINE=baseline_root(sys.argv)
-PAVING_ID=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--paving-id=')),'civil-forecourt-service')
-r=next(p for p in json.load(open(ROOT/'public/data/pavings.json'))['pavings'] if p['id']==PAVING_ID)
-GRADE=load_grade(ROOT) if PAVING_ID=='civil-forecourt-service' else None
+PREFIX = next(
+    (s.split('=', 1)[1] for s in sys.argv if s.startswith('--report-prefix=')),
+    's2-civil-front-connection-road-grade',
+)
+TARGET = next(
+    (
+        Path(s.split('=', 1)[1]).resolve()
+        for s in sys.argv
+        if s.startswith('--check-root=')
+    ),
+    ROOT,
+)
+BASELINE = baseline_root(sys.argv)
+PAVING_ID = next(
+    (s.split('=', 1)[1] for s in sys.argv if s.startswith('--paving-id=')),
+    'civil-forecourt-service',
+)
+r = next(
+    p
+    for p in json.load(open(ROOT / 'public/data/pavings.json'))['pavings']
+    if p['id'] == PAVING_ID
+)
+GRADE = load_grade(ROOT) if PAVING_ID == 'civil-forecourt-service' else None
+
+
 def root(o):
- while o.parent:o=o.parent
- return o
+    while o.parent:
+        o = o.parent
+    return o
+
+
 def sample(objects):
- trees=[]
- for o in objects:
-  if o.type!='MESH':continue
-  o.data.calc_loop_triangles();trees.append(BVHTree.FromPolygons([o.matrix_world@v.co for v in o.data.vertices],[tuple(t.vertices) for t in o.data.loop_triangles],all_triangles=True))
- def height(x,y):
-  hits=[t.ray_cast(Vector((x,y,100)),Vector((0,0,-1)),200)[0] for t in trees]
-  return max((p.z for p in hits if p is not None),default=None)
- return height
-bpy.ops.wm.open_mainfile(filepath=str(BASELINE/'blender/gxu-campus.blend'))
-oldground=sample([o for o in bpy.context.scene.objects if root(o).get('layer')=='terrain'])
-oldroad=sample([o for o in bpy.context.scene.objects if root(o).get('layer')=='roads'])
+    trees = []
+    for o in objects:
+        if o.type != 'MESH':
+            continue
+        o.data.calc_loop_triangles()
+        trees.append(
+            BVHTree.FromPolygons(
+                [o.matrix_world @ v.co for v in o.data.vertices],
+                [tuple(t.vertices) for t in o.data.loop_triangles],
+                all_triangles=True,
+            )
+        )
+
+    def height(x, y):
+        hits = [
+            t.ray_cast(Vector((x, y, 100)), Vector((0, 0, -1)), 200)[0] for t in trees
+        ]
+        return max((p.z for p in hits if p is not None), default=None)
+
+    return height
+
+
+bpy.ops.wm.open_mainfile(filepath=str(BASELINE / 'blender/gxu-campus.blend'))
+oldground = sample(
+    [o for o in bpy.context.scene.objects if root(o).get('layer') == 'terrain']
+)
+oldroad = sample(
+    [o for o in bpy.context.scene.objects if root(o).get('layer') == 'roads']
+)
+
+
 def check(label):
- road=sample([o for o in bpy.context.scene.objects if root(o).get('layer')=='roads'])
- ground=sample([o for o in bpy.context.scene.objects if root(o).get('layer')=='terrain'])
- tolerance=.008 if label=='source' else .045
- ring=r['vertices'];errors=[];clearances=[]
- x0,y0,x1,y1=r['bounds']
- for ix in range(math.floor(x0*2),math.ceil(x1*2)):
-  for iy in range(math.floor(y0*2),math.ceil(y1*2)):
-   x,y=ix/2+.17,iy/2+.13
-   if not inside((x,y),ring) or ring_distance((x,y),ring)<.2:continue
-   if min(ring_distance((x,y),[j['a'],j['b'],j['a']]) for j in r['joins'])<=3.1:continue
-   if any(inside((x,y),p['outer']) or ring_distance((x,y),p['outer'])<=r['joinFeather']+.1 for p in r.get('neighborOverlaps',[])):continue
-   h,g,old=road(x,y),ground(x,y),oldground(x,y)
-   assert h is not None and g is not None and old is not None,('road/terrain hole',x,y)
-   # The configured nonlinear grade is tessellated before paving. Check its
-   # actual soil plane; the independent fixed profiles in validate_civil_grade
-   # also enforce absolute entrance elevations and shallow road gradients.
-   reference=g if GRADE is not None else old
-   errors.append(abs(h-reference-r['groundedService']['offset']));clearances.append(h-g)
-   assert errors[-1]<tolerance,('grounded road height',x,y,h,old,errors[-1])
-   assert h-g>.055,('terrain through road',x,y,h-g)
- # Independently fixed former failure location, a two-centimetre scan.
- platform=PAVING_ID=='civil-platform-service'
- angle=math.radians(-89.63664066170013 if platform else -180.07647434826438);cs,sn=math.cos(angle),math.sin(angle)
- ox,oy=(-698.8083103913996,-742.4381853946857) if platform else (-485.10996235425523,-838.0392239999364)
- def world(x,y):return ox+x*cs-y*sn,oy+x*sn+y*cs
- profiles=[]
- for x in ((-4,0,4) if platform else (-1.125,0,1.125)):
-  # Fixed east-platform road edge from the pre-change plan diagnostic.
-  start=7.50757275568+.238008272559*x if platform else 3.3
-  heights=[road(*world(x,start+i*.02)) for i in range(61)]
-  assert all(h is not None for h in heights),('internal road hole',x)
-  delta=max(abs(b-a) for a,b in zip(heights,heights[1:]))
-  assert delta<.03,('internal road jump',x,delta)
-  profiles.append(dict(x=x,maximumStepPer2cm=delta))
- joins=[]
- overlap_profiles=[]
- if PAVING_ID=='civil-platform-service':
-  # Independent fixed coordinates on both sides of the north L-shaped
-  # overlap with way/759096572. Preserve the neighbor and cross its edge.
-  for x,y,nx,ny,count in [(-693.1,-712.920,0,-1,181),(-691.965,-711.7,1,0,101)]:
-   heights=[]
-   for i in range(count):
-    d=-.5+i*.02;xx,yy=x+nx*d,y+ny*d
-    h=road(xx,yy);assert h is not None,('north overlap hole',xx,yy)
-    heights.append(h)
-    if d<-.05:assert abs(h-oldroad(xx,yy))<tolerance,('retained overlapping neighbor changed',xx,yy)
-   jump=max(abs(b-a) for a,b in zip(heights,heights[1:]))
-   assert jump<.03,('north overlap discontinuity',x,y,jump)
-   overlap_profiles.append(dict(x=x,y=y,samples=len(heights),maximumStepPer2cm=jump))
- for j in r['joins']:
-  a,b,n=j['a'],j['b'],j['inward']
-  for t in (.2,.5,.8):
-   x,y=[a[k]*(1-t)+b[k]*t for k in (0,1)]
-   xx,yy=x-n[0]*.05,y-n[1]*.05
-   expected,h=oldroad(xx,yy),road(xx,yy)
-   assert expected is not None and h is not None,('missing campus road join',j['edge'],t)
-   if GRADE is None or grade_weight(xx,yy,GRADE)==0:
-    assert abs(h-expected)<tolerance,('campus road join changed',j['edge'],t,h,expected)
-   hs=[];gaps=[]
-   for d in [-.2+i*.02 for i in range(41)]:
-    xx,yy=x+n[0]*d,y+n[1]*d;h=road(xx,yy)
-    if h is None:
-     # Bound a float32/material boundary miss on both sides, using the same
-     # precision limits as the existing connection validator.
-     spacing=.00005 if label=='source' else .0005;found=[]
-     for sign in (-1,1):
-      for k in range(1,7):
-       nearby=road(xx+n[0]*sign*k*spacing,yy+n[1]*sign*k*spacing)
-       if nearby is not None:found.append((k*spacing,nearby));break
-     assert len(found)==2,('join gap exceeds precision bound',j['edge'],t,d)
-     gaps.append(sum(v[0] for v in found));h=max(v[1] for v in found)
-    hs.append(h)
-   jump=max(abs(b-a) for a,b in zip(hs,hs[1:]))
-   assert jump<.06,('join step',j['edge'],t,jump)
-   joins.append(dict(edge=j['edge'],t=t,maximumStepPer2cm=jump,measuredGapUpperBounds=gaps))
- export_seams=[]
- if label=='base':
-  # The local export cut must also remain covered where it meets the
-  # campus-wide compressed road node, not only at the repaired road ends.
-  x0,y0,x1,y1=r['bounds'];box=[(x0-5,y0-5),(x1+5,y0-5),(x1+5,y1+5),(x0-5,y1+5)]
-  for a,b in zip(box,box[1:]+box[:1]):
-   length=math.dist(a,b);nx,ny=-(b[1]-a[1])/length,(b[0]-a[0])/length
-   for i in range(1,math.ceil(length*2)):
-    t=i/math.ceil(length*2);x,y=a[0]*(1-t)+b[0]*t,a[1]*(1-t)+b[1]*t
-    for d in (-.1,-.04,0,.04,.1):
-     xx,yy=x+nx*d,y+ny*d;expected=source_road(xx,yy)
-     if expected is None:continue
-     h=road(xx,yy)
-     assert h is not None,('export partition hole',xx,yy)
-     error=abs(h-expected);assert error<.07,('export partition step',xx,yy,error)
-     export_seams.append(error)
-  assert export_seams,'No road samples at export partition boundary'
- return dict(passed=True,interiorSamples=len(errors),maximumGroundedHeightError=max(errors),minimumGroundClearance=min(clearances),formerFailureProfiles=profiles,joins=joins,neighborOverlapProfiles=overlap_profiles,tolerance=tolerance,exportSeamSamples=len(export_seams),maximumExportSeamError=max(export_seams,default=0))
-report=dict(passed=False,scope='Mapped service-road footprint follows the configured photo-guided forecourt grade where enabled, otherwise the baseline terrain; campus-road contacts use the same bounded grade. Interior, fixed profiles and exported seams checked.',pavingId=PAVING_ID,areaMeters2=r['areaMeters2'],groundOffsetM=r['groundedService']['offset'])
+    road = sample(
+        [o for o in bpy.context.scene.objects if root(o).get('layer') == 'roads']
+    )
+    ground = sample(
+        [o for o in bpy.context.scene.objects if root(o).get('layer') == 'terrain']
+    )
+    tolerance = 0.008 if label == 'source' else 0.045
+    ring = r['vertices']
+    errors = []
+    clearances = []
+    x0, y0, x1, y1 = r['bounds']
+    for ix in range(math.floor(x0 * 2), math.ceil(x1 * 2)):
+        for iy in range(math.floor(y0 * 2), math.ceil(y1 * 2)):
+            x, y = ix / 2 + 0.17, iy / 2 + 0.13
+            if not inside((x, y), ring) or ring_distance((x, y), ring) < 0.2:
+                continue
+            if (
+                min(ring_distance((x, y), [j['a'], j['b'], j['a']]) for j in r['joins'])
+                <= 3.1
+            ):
+                continue
+            if any(
+                inside((x, y), p['outer'])
+                or ring_distance((x, y), p['outer']) <= r['joinFeather'] + 0.1
+                for p in r.get('neighborOverlaps', [])
+            ):
+                continue
+            h, g, old = road(x, y), ground(x, y), oldground(x, y)
+            assert h is not None and g is not None and old is not None, (
+                'road/terrain hole',
+                x,
+                y,
+            )
+            # The configured nonlinear grade is tessellated before paving. Check its
+            # actual soil plane; the independent fixed profiles in validate_civil_grade
+            # also enforce absolute entrance elevations and shallow road gradients.
+            reference = g if GRADE is not None else old
+            errors.append(abs(h - reference - r['groundedService']['offset']))
+            clearances.append(h - g)
+            assert errors[-1] < tolerance, (
+                'grounded road height',
+                x,
+                y,
+                h,
+                old,
+                errors[-1],
+            )
+            assert h - g > 0.055, ('terrain through road', x, y, h - g)
+    # Independently fixed former failure location, a two-centimetre scan.
+    platform = PAVING_ID == 'civil-platform-service'
+    angle = math.radians(-89.63664066170013 if platform else -180.07647434826438)
+    cs, sn = math.cos(angle), math.sin(angle)
+    ox, oy = (
+        (-698.8083103913996, -742.4381853946857)
+        if platform
+        else (-485.10996235425523, -838.0392239999364)
+    )
+
+    def world(x, y):
+        return ox + x * cs - y * sn, oy + x * sn + y * cs
+
+    profiles = []
+    for x in (-4, 0, 4) if platform else (-1.125, 0, 1.125):
+        # Fixed east-platform road edge from the pre-change plan diagnostic.
+        start = 7.50757275568 + 0.238008272559 * x if platform else 3.3
+        heights = [road(*world(x, start + i * 0.02)) for i in range(61)]
+        assert all(h is not None for h in heights), ('internal road hole', x)
+        delta = max(abs(b - a) for a, b in zip(heights, heights[1:]))
+        assert delta < 0.03, ('internal road jump', x, delta)
+        profiles.append(dict(x=x, maximumStepPer2cm=delta))
+    joins = []
+    overlap_profiles = []
+    if PAVING_ID == 'civil-platform-service':
+        # Independent fixed coordinates on both sides of the north L-shaped
+        # overlap with way/759096572. Preserve the neighbor and cross its edge.
+        for x, y, nx, ny, count in [
+            (-693.1, -712.920, 0, -1, 181),
+            (-691.965, -711.7, 1, 0, 101),
+        ]:
+            heights = []
+            for i in range(count):
+                d = -0.5 + i * 0.02
+                xx, yy = x + nx * d, y + ny * d
+                h = road(xx, yy)
+                assert h is not None, ('north overlap hole', xx, yy)
+                heights.append(h)
+                if d < -0.05:
+                    assert abs(h - oldroad(xx, yy)) < tolerance, (
+                        'retained overlapping neighbor changed',
+                        xx,
+                        yy,
+                    )
+            jump = max(abs(b - a) for a, b in zip(heights, heights[1:]))
+            assert jump < 0.03, ('north overlap discontinuity', x, y, jump)
+            overlap_profiles.append(
+                dict(x=x, y=y, samples=len(heights), maximumStepPer2cm=jump)
+            )
+    for j in r['joins']:
+        a, b, n = j['a'], j['b'], j['inward']
+        for t in (0.2, 0.5, 0.8):
+            x, y = [a[k] * (1 - t) + b[k] * t for k in (0, 1)]
+            xx, yy = x - n[0] * 0.05, y - n[1] * 0.05
+            expected, h = oldroad(xx, yy), road(xx, yy)
+            assert expected is not None and h is not None, (
+                'missing campus road join',
+                j['edge'],
+                t,
+            )
+            if GRADE is None or grade_weight(xx, yy, GRADE) == 0:
+                assert abs(h - expected) < tolerance, (
+                    'campus road join changed',
+                    j['edge'],
+                    t,
+                    h,
+                    expected,
+                )
+            hs = []
+            gaps = []
+            for d in [-0.2 + i * 0.02 for i in range(41)]:
+                xx, yy = x + n[0] * d, y + n[1] * d
+                h = road(xx, yy)
+                if h is None:
+                    # Bound a float32/material boundary miss on both sides, using the same
+                    # precision limits as the existing connection validator.
+                    spacing = 0.00005 if label == 'source' else 0.0005
+                    found = []
+                    for sign in (-1, 1):
+                        for k in range(1, 7):
+                            nearby = road(
+                                xx + n[0] * sign * k * spacing,
+                                yy + n[1] * sign * k * spacing,
+                            )
+                            if nearby is not None:
+                                found.append((k * spacing, nearby))
+                                break
+                    assert len(found) == 2, (
+                        'join gap exceeds precision bound',
+                        j['edge'],
+                        t,
+                        d,
+                    )
+                    gaps.append(sum(v[0] for v in found))
+                    h = max(v[1] for v in found)
+                hs.append(h)
+            jump = max(abs(b - a) for a, b in zip(hs, hs[1:]))
+            assert jump < 0.06, ('join step', j['edge'], t, jump)
+            joins.append(
+                dict(
+                    edge=j['edge'],
+                    t=t,
+                    maximumStepPer2cm=jump,
+                    measuredGapUpperBounds=gaps,
+                )
+            )
+    export_seams = []
+    if label == 'base':
+        # The local export cut must also remain covered where it meets the
+        # campus-wide compressed road node, not only at the repaired road ends.
+        x0, y0, x1, y1 = r['bounds']
+        box = [(x0 - 5, y0 - 5), (x1 + 5, y0 - 5), (x1 + 5, y1 + 5), (x0 - 5, y1 + 5)]
+        for a, b in zip(box, box[1:] + box[:1]):
+            length = math.dist(a, b)
+            nx, ny = -(b[1] - a[1]) / length, (b[0] - a[0]) / length
+            for i in range(1, math.ceil(length * 2)):
+                t = i / math.ceil(length * 2)
+                x, y = a[0] * (1 - t) + b[0] * t, a[1] * (1 - t) + b[1] * t
+                for d in (-0.1, -0.04, 0, 0.04, 0.1):
+                    xx, yy = x + nx * d, y + ny * d
+                    expected = source_road(xx, yy)
+                    if expected is None:
+                        continue
+                    h = road(xx, yy)
+                    assert h is not None, ('export partition hole', xx, yy)
+                    error = abs(h - expected)
+                    assert error < 0.07, ('export partition step', xx, yy, error)
+                    export_seams.append(error)
+        assert export_seams, 'No road samples at export partition boundary'
+    return dict(
+        passed=True,
+        interiorSamples=len(errors),
+        maximumGroundedHeightError=max(errors),
+        minimumGroundClearance=min(clearances),
+        formerFailureProfiles=profiles,
+        joins=joins,
+        neighborOverlapProfiles=overlap_profiles,
+        tolerance=tolerance,
+        exportSeamSamples=len(export_seams),
+        maximumExportSeamError=max(export_seams, default=0),
+    )
+
+
+report = dict(
+    passed=False,
+    scope='Mapped service-road footprint follows the configured photo-guided forecourt grade where enabled, otherwise the baseline terrain; campus-road contacts use the same bounded grade. Interior, fixed profiles and exported seams checked.',
+    pavingId=PAVING_ID,
+    areaMeters2=r['areaMeters2'],
+    groundOffsetM=r['groundedService']['offset'],
+)
 try:
- bpy.ops.wm.open_mainfile(filepath=str(TARGET/'blender/gxu-campus.blend'));report['source']=check('source');source_road=sample([o for o in bpy.context.scene.objects if root(o).get('layer')=='roads'])
- bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(TARGET/'public/models/base.glb'));bpy.context.view_layer.update();report['base']=check('base')
- report['fingerprints']={p:hashlib.sha256((TARGET/p).read_bytes()).hexdigest() for p in ['blender/gxu-campus.blend','public/models/base.glb','public/data/pavings.json']};report['passed']=True
-except Exception as e:report['failure']=str(e);raise
+    bpy.ops.wm.open_mainfile(filepath=str(TARGET / 'blender/gxu-campus.blend'))
+    report['source'] = check('source')
+    source_road = sample(
+        [o for o in bpy.context.scene.objects if root(o).get('layer') == 'roads']
+    )
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    bpy.ops.import_scene.gltf(filepath=str(TARGET / 'public/models/base.glb'))
+    bpy.context.view_layer.update()
+    report['base'] = check('base')
+    report['fingerprints'] = {
+        p: hashlib.sha256((TARGET / p).read_bytes()).hexdigest()
+        for p in [
+            'blender/gxu-campus.blend',
+            'public/models/base.glb',
+            'public/data/pavings.json',
+        ]
+    }
+    report['passed'] = True
+except Exception as e:
+    report['failure'] = str(e)
+    raise
 finally:
- (ROOT/f'docs/model-checks/refinement/{PREFIX}-geometry.json').write_text(json.dumps(report,indent=2)+'\n');print('Civil forecourt road:',report['passed'],flush=True)
+    (ROOT / f'docs/model-checks/refinement/{PREFIX}-geometry.json').write_text(
+        json.dumps(report, indent=2) + '\n'
+    )
+    print('Civil forecourt road:', report['passed'], flush=True)

@@ -1,4 +1,5 @@
 """Check skewed junction cuts against independent GIS differences and real scope."""
+
 import json
 import unittest
 from pathlib import Path
@@ -15,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 class RoadDisplayCleanupTests(unittest.TestCase):
     def test_sloping_surface_and_uvs_match_independent_difference(self):
         xy = [(-4, -3), (8, -3), (8, 9), (-4, 9)]
-        surface = [(x, y, 2*x + 3*y + 7, x/4, y/4) for x, y in xy]
+        surface = [(x, y, 2 * x + 3 * y + 7, x / 4, y / 4) for x, y in xy]
         mask = [(-2, 1), (5, -1), (9, 6), (1, 8)]
         fragments = subtract(surface, mask)
         expected = Polygon(xy).difference(Polygon(mask))
@@ -24,72 +25,99 @@ class RoadDisplayCleanupTests(unittest.TestCase):
         for poly in fragments:
             self.assertGreater(Polygon([p[:2] for p in poly]).area, 1e-8)
             for x, y, z, u, v in poly:
-                self.assertAlmostEqual(z, 2*x + 3*y + 7)
-                self.assertAlmostEqual(u, x/4)
-                self.assertAlmostEqual(v, y/4)
+                self.assertAlmostEqual(z, 2 * x + 3 * y + 7)
+                self.assertAlmostEqual(u, x / 4)
+                self.assertAlmostEqual(v, y / 4)
             self.assertEqual(subtract(poly, mask), [poly])
 
     def test_touching_and_disjoint_faces_remain_exact(self):
         poly = [(0, 0, 3), (2, 0, 4), (0, 2, 5)]
-        for mask in [[(2, 0), (4, 0), (4, 4), (2, 4)],
-                     [(4, 4), (6, 4), (6, 6), (4, 6)]]:
+        for mask in [
+            [(2, 0), (4, 0), (4, 4), (2, 4)],
+            [(4, 4), (6, 4), (6, 6), (4, 6)],
+        ]:
             self.assertEqual(subtract(poly, mask), [poly])
 
     def test_vertical_curb_is_clipped_with_its_road_and_uvs(self):
-        curb = [(-2, 0, 0, 0, 0), (2, 0, 0, 1, 0),
-                (2, 0, 1, 1, 1), (-2, 0, 1, 0, 1)]
+        curb = [(-2, 0, 0, 0, 0), (2, 0, 0, 1, 0), (2, 0, 1, 1, 1), (-2, 0, 1, 0, 1)]
         mask = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
         fragments = subtract(curb, mask)
         self.assertEqual(len(fragments), 2)
         self.assertAlmostEqual(sum(surface_area(p) for p in fragments), 2)
         for poly in fragments:
-            self.assertTrue(all(p[0] <= -1 for p in poly) or all(p[0] >= 1 for p in poly))
+            self.assertTrue(
+                all(p[0] <= -1 for p in poly) or all(p[0] >= 1 for p in poly)
+            )
             for x, y, z, u, v in poly:
-                self.assertAlmostEqual(u, (x+2)/4)
+                self.assertAlmostEqual(u, (x + 2) / 4)
                 self.assertAlmostEqual(v, z)
             self.assertEqual(subtract(poly, mask), [poly])
-        self.assertEqual(subtract(curb, [(-3,-1),(3,-1),(3,1),(-3,1)]), [])
+        self.assertEqual(subtract(curb, [(-3, -1), (3, -1), (3, 1), (-3, 1)]), [])
         # A side lying on the cut boundary belongs to the retained road.
-        self.assertEqual(subtract(curb, [(-3,0),(3,0),(3,1),(-3,1)]), [curb])
+        self.assertEqual(subtract(curb, [(-3, 0), (3, 0), (3, 1), (-3, 1)]), [curb])
 
     def test_real_masks_leave_campus_gates_and_junction_centres(self):
-        geo = json.loads((ROOT/'public/data/geography.geojson').read_text())
-        campus = unary_union([transform(project, shape(f['geometry']))
-                              for f in geo['features']
-                              if f['id'] == 'campus' or f['properties'].get('kind') == 'campus-supplement'])
+        geo = json.loads((ROOT / 'public/data/geography.geojson').read_text())
+        campus = unary_union(
+            [
+                transform(project, shape(f['geometry']))
+                for f in geo['features']
+                if f['id'] == 'campus'
+                or f['properties'].get('kind') == 'campus-supplement'
+            ]
+        )
         cuts = load_cuts()
         mask = unary_union([Polygon(c['polygon']) for c in cuts])
-        buildings = {b['id']: b for b in json.loads((ROOT/'public/data/buildings.json').read_text())}
+        buildings = {
+            b['id']: b
+            for b in json.loads((ROOT / 'public/data/buildings.json').read_text())
+        }
         for cut in cuts:
             if cut.get('buildingId'):
                 building = buildings[cut['buildingId']]
-                parts = building['form']['parts'] or [{'polygons': building['polygons']}]
-                closed = unary_union([Polygon(p[0], p[1:]) for part in parts
-                                      if not part.get('openBelow') for p in part['polygons']])
+                parts = building['form']['parts'] or [
+                    {'polygons': building['polygons']}
+                ]
+                closed = unary_union(
+                    [
+                        Polygon(p[0], p[1:])
+                        for part in parts
+                        if not part.get('openBelow')
+                        for p in part['polygons']
+                    ]
+                )
                 # Internal cuts must lie inside an actual closed building,
                 # never consume a courtyard, open portico or exterior road.
                 self.assertLess(Polygon(cut['polygon']).difference(closed).area, 1e-8)
                 continue
             # The user-marked pond road overlaps the mapped campus boundary
             # by about 2 m²; the rest of the display cuts stay wholly outside.
-            self.assertLess(Polygon(cut['polygon']).intersection(campus).area,
-                            cut.get('campusOverlapLimit', 0) + 1e-8)
+            self.assertLess(
+                Polygon(cut['polygon']).intersection(campus).area,
+                cut.get('campusOverlapLimit', 0) + 1e-8,
+            )
         # Junction centres and every mapped campus destination remain clear.
-        anchors = json.loads((ROOT/'data/road-display-cleanup.json').read_text())['retainedProbes']
+        anchors = json.loads((ROOT / 'data/road-display-cleanup.json').read_text())[
+            'retainedProbes'
+        ]
         for point in anchors:
             self.assertGreater(mask.distance(Point(point)), 1)
-        landmarks = json.loads((ROOT/'public/data/landmarks.json').read_text())
+        landmarks = json.loads((ROOT / 'public/data/landmarks.json').read_text())
         for landmark in landmarks:
             self.assertGreater(mask.distance(Point(landmark['center'])), 10)
         # Explicit former tail witnesses must fall inside their intended masks.
         for cut in cuts:
             for point in cut.get('removedProbes', [cut.get('removedProbe')]):
-                self.assertTrue(Polygon(cut['polygon']).contains(Point(point)), cut['id'])
+                self.assertTrue(
+                    Polygon(cut['polygon']).contains(Point(point)), cut['id']
+                )
 
     def test_incremental_cut_selection_is_explicit(self):
         cuts = load_cuts(ids=['xiuxiang-west', 'daxue-east', 'xiuling-west-first-east'])
-        self.assertEqual([c['id'] for c in cuts],
-                         ['xiuxiang-west', 'daxue-east', 'xiuling-west-first-east'])
+        self.assertEqual(
+            [c['id'] for c in cuts],
+            ['xiuxiang-west', 'daxue-east', 'xiuling-west-first-east'],
+        )
         with self.assertRaises(ValueError):
             load_cuts(ids=['misspelled-cut'])
 

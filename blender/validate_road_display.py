@@ -1,4 +1,5 @@
 """Compare road-tail cleanup with an actual pre-change source and GLB baseline."""
+
 import argparse
 import json
 import sys
@@ -9,17 +10,24 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT/'scripts'))
+sys.path.insert(0, str(ROOT / 'scripts'))
 from road_display_cleanup import load_cuts
 from road_surface_clearance import load_repairs
 
 
 def surface_bvh(name, material=None):
-    obj, = [o for o in bpy.context.scene.objects if o.type == 'MESH' and o.name.split('.')[0] == name]
+    (obj,) = [
+        o
+        for o in bpy.context.scene.objects
+        if o.type == 'MESH' and o.name.split('.')[0] == name
+    ]
     obj.data.calc_loop_triangles()
     vertices = [tuple(obj.matrix_world @ v.co) for v in obj.data.vertices]
-    faces = [tuple(t.vertices) for t in obj.data.loop_triangles
-             if material is None or obj.data.materials[t.material_index].name == material]
+    faces = [
+        tuple(t.vertices)
+        for t in obj.data.loop_triangles
+        if material is None or obj.data.materials[t.material_index].name == material
+    ]
     return BVHTree.FromPolygons(vertices, faces, all_triangles=True)
 
 
@@ -31,8 +39,11 @@ def load(path, source, layer='roads'):
         bpy.ops.import_scene.gltf(filepath=str(path))
         bpy.context.view_layer.update()
     name = '其他运动场地' if source and layer == 'sports' else layer
-    obj, = [o for o in bpy.context.scene.objects
-            if o.type == 'MESH' and o.name.split('.')[0] == name]
+    (obj,) = [
+        o
+        for o in bpy.context.scene.objects
+        if o.type == 'MESH' and o.name.split('.')[0] == name
+    ]
     obj.data.calc_loop_triangles()
     vertices = [tuple(obj.matrix_world @ v.co) for v in obj.data.vertices]
     faces = [tuple(t.vertices) for t in obj.data.loop_triangles]
@@ -46,9 +57,12 @@ def ray(bvh, x, y):
 def in_cut(point, cuts, margin=0):
     for cut in cuts:
         polygon = cut['polygon']
-        if all(((b[0]-a[0])*(point[1]-a[1])-(b[1]-a[1])*(point[0]-a[0]))
-               / ((b[0]-a[0])**2+(b[1]-a[1])**2)**.5 > -margin
-               for a,b in zip(polygon,polygon[1:]+polygon[:1])):
+        if all(
+            ((b[0] - a[0]) * (point[1] - a[1]) - (b[1] - a[1]) * (point[0] - a[0]))
+            / ((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2) ** 0.5
+            > -margin
+            for a, b in zip(polygon, polygon[1:] + polygon[:1])
+        ):
             return True
     return False
 
@@ -58,46 +72,76 @@ def main():
     parser.add_argument('--baseline-root', type=Path, required=True)
     parser.add_argument('--candidate-root', type=Path, required=True)
     parser.add_argument('--report', type=Path, required=True)
-    parser.add_argument('--cut-id', action='append', help='Validate only cuts newly applied to this baseline')
+    parser.add_argument(
+        '--cut-id',
+        action='append',
+        help='Validate only cuts newly applied to this baseline',
+    )
     parser.add_argument('--repair-clearance', action='store_true')
     parser.add_argument('--layer', choices=['roads', 'sports'], default='roads')
-    parser.add_argument('--clearance-only', action='store_true', help='Skip previously applied road cuts')
-    parser.add_argument('--repair-id', action='append', help='Apply only these clearance repairs; repeat for multiple IDs')
-    args = parser.parse_args(sys.argv[sys.argv.index('--')+1:])
+    parser.add_argument(
+        '--clearance-only',
+        action='store_true',
+        help='Skip previously applied road cuts',
+    )
+    parser.add_argument(
+        '--repair-id',
+        action='append',
+        help='Apply only these clearance repairs; repeat for multiple IDs',
+    )
+    args = parser.parse_args(sys.argv[sys.argv.index('--') + 1 :])
     if (args.clearance_only or args.repair_id) and not args.repair_clearance:
         parser.error('--clearance-only and --repair-id require --repair-clearance')
     if args.clearance_only and args.cut_id:
         parser.error('--clearance-only cannot be combined with --cut-id')
-    filename = 'road-display-cleanup.json' if args.layer == 'roads' else 'surface-display-cleanup.json'
+    filename = (
+        'road-display-cleanup.json'
+        if args.layer == 'roads'
+        else 'surface-display-cleanup.json'
+    )
     cuts = load_cuts(ids=[] if args.clearance_only else args.cut_id, filename=filename)
-    config = json.loads((ROOT/'data'/filename).read_text())
+    config = json.loads((ROOT / 'data' / filename).read_text())
     if args.layer != 'roads' and args.repair_clearance:
         raise ValueError('Terrain clearance repair applies only to roads')
     repairs = load_repairs(ids=args.repair_id) if args.repair_clearance else []
+
     def repair_point(point):
-        return any(r['bounds'][0]-.08 <= point[0] <= r['bounds'][2]+.08
-                   and r['bounds'][1]-.08 <= point[1] <= r['bounds'][3]+.08 for r in repairs)
+        return any(
+            r['bounds'][0] - 0.08 <= point[0] <= r['bounds'][2] + 0.08
+            and r['bounds'][1] - 0.08 <= point[1] <= r['bounds'][3] + 0.08
+            for r in repairs
+        )
+
     report = {}
-    for kind, relative, source in [('source', 'blender/gxu-campus.blend', True),
-                                   ('decoded', 'public/models/base.glb', False)]:
-        vertices, faces, before = load(args.baseline_root.resolve()/relative, source, args.layer)
-        old_surfaces = {r.get('material', 'asphalt'): surface_bvh('roads', r.get('material', 'asphalt')) for r in repairs}
-        _, _, after = load(args.candidate_root.resolve()/relative, source, args.layer)
+    for kind, relative, source in [
+        ('source', 'blender/gxu-campus.blend', True),
+        ('decoded', 'public/models/base.glb', False),
+    ]:
+        vertices, faces, before = load(
+            args.baseline_root.resolve() / relative, source, args.layer
+        )
+        old_surfaces = {
+            r.get('material', 'asphalt'): surface_bvh(
+                'roads', r.get('material', 'asphalt')
+            )
+            for r in repairs
+        }
+        _, _, after = load(args.candidate_root.resolve() / relative, source, args.layer)
         new_surfaces = {m: surface_bvh('roads', m) for m in old_surfaces}
         terrain = surface_bvh('terrain') if repairs else None
         kept = removed = boundary = 0
         maximum = boundary_maximum = repair_maximum = 0
         problems = []
         for face in faces:
-            point = tuple(sum(vertices[i][k] for i in face)/3 for k in range(3))
+            point = tuple(sum(vertices[i][k] for i in face) / 3 for k in range(3))
             old, new = ray(before, *point[:2]), ray(after, *point[:2])
             if old is None:
                 continue
-            if in_cut(point, cuts, -.08):
+            if in_cut(point, cuts, -0.08):
                 removed += 1
                 if new is not None:
                     problems.append(('tail remains', point))
-            elif not in_cut(point, cuts, .08):
+            elif not in_cut(point, cuts, 0.08):
                 if new is None:
                     problems.append(('retained road missing', point))
                     continue
@@ -106,11 +150,14 @@ def main():
                 # the existing ~1 cm Draco grid. Its surviving fragment may
                 # move slightly; uncut triangles must retain their old plane.
                 points = [vertices[i] for i in face]
-                touched = any(max(p[0] for p in points) > c['bounds'][0]
-                              and min(p[0] for p in points) < c['bounds'][2]
-                              and max(p[1] for p in points) > c['bounds'][1]
-                              and min(p[1] for p in points) < c['bounds'][3] for c in cuts+repairs)
-                delta = abs(old.z-new.z)
+                touched = any(
+                    max(p[0] for p in points) > c['bounds'][0]
+                    and min(p[0] for p in points) < c['bounds'][2]
+                    and max(p[1] for p in points) > c['bounds'][1]
+                    and min(p[1] for p in points) < c['bounds'][3]
+                    for c in cuts + repairs
+                )
+                delta = abs(old.z - new.z)
                 if repair_point(point):
                     repair_maximum = max(repair_maximum, delta)
                 elif touched:
@@ -118,65 +165,126 @@ def main():
                     boundary_maximum = max(boundary_maximum, delta)
                 else:
                     maximum = max(maximum, delta)
-                if delta > (.02 if touched and not source else .002) and not repair_point(point):
+                if delta > (
+                    0.02 if touched and not source else 0.002
+                ) and not repair_point(point):
                     problems.append(('height changed', point, old.z, new.z))
         assert not problems, (kind, len(problems), problems[:10])
-        assert kept > (50_000 if args.layer == 'roads' else 500) and (not cuts or removed > 0), (kind, kept, removed)
+        assert kept > (50_000 if args.layer == 'roads' else 500) and (
+            not cuts or removed > 0
+        ), (kind, kept, removed)
         # Former road-tail witnesses detect a no-op build independently of the
         # clipping implementation. Junction centres detect accidental severing.
-        for point in [p for c in cuts for p in c.get('removedProbes', [c.get('removedProbe')])]:
-            assert ray(before, *point) is not None, ('baseline tail missing', kind, point)
+        for point in [
+            p for c in cuts for p in c.get('removedProbes', [c.get('removedProbe')])
+        ]:
+            assert ray(before, *point) is not None, (
+                'baseline tail missing',
+                kind,
+                point,
+            )
             assert ray(after, *point) is None, ('tail remains', kind, point)
         for point in config.get('retainedProbes', []):
-            assert ray(before, *point) is not None, ('baseline junction missing', kind, point)
+            assert ray(before, *point) is not None, (
+                'baseline junction missing',
+                kind,
+                point,
+            )
             assert ray(after, *point) is not None, ('junction missing', kind, point)
-        report[kind] = dict(retainedSamples=kept, removedSamples=removed,
-                            boundarySamples=boundary, maxUncutHeightDelta=maximum,
-                            maxBoundaryHeightDelta=boundary_maximum, maxRepairHeightDelta=repair_maximum)
+        report[kind] = dict(
+            retainedSamples=kept,
+            removedSamples=removed,
+            boundarySamples=boundary,
+            maxUncutHeightDelta=maximum,
+            maxBoundaryHeightDelta=boundary_maximum,
+            maxRepairHeightDelta=repair_maximum,
+        )
         repaired_samples = old_pokes = 0
         minimum_clearance = float('inf')
         boundary_samples = 0
         boundary_delta = 0
         for repair in repairs:
-            x0,y0,x1,y1 = repair['bounds']
+            x0, y0, x1, y1 = repair['bounds']
             material = repair.get('material', 'asphalt')
             old_asphalt, new_asphalt = old_surfaces[material], new_surfaces[material]
             # The bounded correction must meet unchanged road levels, rather
             # than introduce a new step along its rectangular boundary.
-            perimeter = [(x0+(i+.5)/4, y) for i in range(int((x1-x0)*4)) for y in (y0,y1)]
-            perimeter += [(x, y0+(i+.5)/4) for i in range(int((y1-y0)*4)) for x in (x0,x1)]
+            perimeter = [
+                (x0 + (i + 0.5) / 4, y)
+                for i in range(int((x1 - x0) * 4))
+                for y in (y0, y1)
+            ]
+            perimeter += [
+                (x, y0 + (i + 0.5) / 4)
+                for i in range(int((y1 - y0) * 4))
+                for x in (x0, x1)
+            ]
             for x, y in perimeter:
-                old, new = ray(old_asphalt,x,y), ray(new_asphalt,x,y)
+                old, new = ray(old_asphalt, x, y), ray(new_asphalt, x, y)
                 if old is None:
                     continue
-                assert new is not None, ('boundary road missing',kind,repair['id'],x,y)
-                delta = abs(old.z-new.z)
-                assert delta < (.002 if source else .02), ('repair boundary step',kind,repair['id'],x,y,delta)
+                assert new is not None, (
+                    'boundary road missing',
+                    kind,
+                    repair['id'],
+                    x,
+                    y,
+                )
+                delta = abs(old.z - new.z)
+                assert delta < (0.002 if source else 0.02), (
+                    'repair boundary step',
+                    kind,
+                    repair['id'],
+                    x,
+                    y,
+                    delta,
+                )
                 boundary_delta = max(boundary_delta, delta)
                 boundary_samples += 1
-            for ix in range(int((x1-x0)*2)):
-                for iy in range(int((y1-y0)*2)):
-                    x,y = x0+(ix+.5)/2,y0+(iy+.5)/2
-                    old,new,ground = ray(old_asphalt,x,y),ray(new_asphalt,x,y),ray(terrain,x,y)
+            for ix in range(int((x1 - x0) * 2)):
+                for iy in range(int((y1 - y0) * 2)):
+                    x, y = x0 + (ix + 0.5) / 2, y0 + (iy + 0.5) / 2
+                    old, new, ground = (
+                        ray(old_asphalt, x, y),
+                        ray(new_asphalt, x, y),
+                        ray(terrain, x, y),
+                    )
                     if old is None or ground is None:
                         continue
-                    assert new is not None, ('repair left hole',kind,x,y)
-                    delta = new.z-ground.z
-                    assert delta > .03, ('terrain pokes through',kind,x,y,delta)
-                    minimum_clearance = min(minimum_clearance,delta)
+                    assert new is not None, ('repair left hole', kind, x, y)
+                    delta = new.z - ground.z
+                    assert delta > 0.03, ('terrain pokes through', kind, x, y, delta)
+                    minimum_clearance = min(minimum_clearance, delta)
                     repaired_samples += 1
                     old_pokes += old.z <= ground.z
             for point in repair['probes']:
-                old,new,ground = ray(old_asphalt,*point),ray(new_asphalt,*point),ray(terrain,*point)
-                assert old is not None and ground is not None and old.z < ground.z, ('baseline spot missing',kind,point)
-                assert new is not None and new.z-ground.z > .03, ('spot remains',kind,point)
+                old, new, ground = (
+                    ray(old_asphalt, *point),
+                    ray(new_asphalt, *point),
+                    ray(terrain, *point),
+                )
+                assert old is not None and ground is not None and old.z < ground.z, (
+                    'baseline spot missing',
+                    kind,
+                    point,
+                )
+                assert new is not None and new.z - ground.z > 0.03, (
+                    'spot remains',
+                    kind,
+                    point,
+                )
         if repairs:
             assert old_pokes > 100 and repaired_samples > 1000
-            report[kind]['clearance'] = dict(samples=repaired_samples,oldPokes=old_pokes,minClearance=minimum_clearance,
-                                             boundarySamples=boundary_samples,maxBoundaryDelta=boundary_delta)
+            report[kind]['clearance'] = dict(
+                samples=repaired_samples,
+                oldPokes=old_pokes,
+                minClearance=minimum_clearance,
+                boundarySamples=boundary_samples,
+                maxBoundaryDelta=boundary_delta,
+            )
         print(kind, report[kind], flush=True)
     args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(json.dumps({'passed': True, **report}, indent=2)+'\n')
+    args.report.write_text(json.dumps({'passed': True, **report}, indent=2) + '\n')
 
 
 if __name__ == '__main__':

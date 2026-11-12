@@ -6,65 +6,119 @@ from corridor_detail_data import validate_corridor_details
 
 class CorridorDetailTests(unittest.TestCase):
     def rule(self):
-        return {'windows': False, 'openCorridor': {'endInset': .35, 'firstLevel': 1,
-            'finish': {'wall': 'white', 'rail': 'pink'},
-            'openings': [{'kind': 'door', 't': .2, 'width': 1., 'height': 2.15,
-                          'sill': 0., 'levels': [0, 1, 2, 3]}]}}
+        return {
+            'windows': False,
+            'openCorridor': {
+                'endInset': 0.35,
+                'firstLevel': 1,
+                'finish': {'wall': 'white', 'rail': 'pink'},
+                'openings': [
+                    {
+                        'kind': 'door',
+                        't': 0.2,
+                        'width': 1.0,
+                        'height': 2.15,
+                        'sill': 0.0,
+                        'levels': [0, 1, 2, 3],
+                    }
+                ],
+            },
+        }
 
     def check(self, rule):
         validate_corridor_details(rule, 15, 13.2, 4)
 
     def test_openings_accept_four_floors_and_do_not_mutate_input(self):
-        rule = self.rule(); before = copy.deepcopy(rule)
+        rule = self.rule()
+        before = copy.deepcopy(rule)
         self.check(rule)
         self.assertEqual(rule, before)
 
     def test_rejects_window_duplicates_and_unsupported_material(self):
         for patch in ('windows', 'finish', 'overlap'):
             rule = self.rule()
-            if patch == 'windows': rule['windows'] = True
-            if patch == 'finish': rule['openCorridor']['finish']['wall'] = 'custom'
-            if patch == 'overlap': rule['openCorridor']['openings'] *= 2
-            with self.subTest(patch=patch), self.assertRaises(ValueError): self.check(rule)
+            if patch == 'windows':
+                rule['windows'] = True
+            if patch == 'finish':
+                rule['openCorridor']['finish']['wall'] = 'custom'
+            if patch == 'overlap':
+                rule['openCorridor']['openings'] *= 2
+            with self.subTest(patch=patch), self.assertRaises(ValueError):
+                self.check(rule)
 
     def test_rejects_crossing_slab_returns_and_invalid_levels(self):
-        for key, value in [('height', 3.0), ('t', .99), ('width', True),
-                           ('sill', .1), ('levels', [4]), ('levels', [True]),
-                           ('levels', [1, 1]), ('t', float('nan'))]:
-            rule = self.rule(); rule['openCorridor']['openings'][0][key] = value
+        for key, value in [
+            ('height', 3.0),
+            ('t', 0.99),
+            ('width', True),
+            ('sill', 0.1),
+            ('levels', [4]),
+            ('levels', [True]),
+            ('levels', [1, 1]),
+            ('t', float('nan')),
+        ]:
+            rule = self.rule()
+            rule['openCorridor']['openings'][0][key] = value
             if key == 'height':
-                rule['openCorridor']['openings'][0].update(kind='window', sill=.2)
-            with self.subTest(key=key, value=value), self.assertRaises(ValueError): self.check(rule)
+                rule['openCorridor']['openings'][0].update(kind='window', sill=0.2)
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                self.check(rule)
 
     def test_separate_floor_openings_can_share_a_position(self):
-        rule = self.rule(); first = rule['openCorridor']['openings'][0]
-        first['levels'] = [0]; second = copy.deepcopy(first); second['levels'] = [1, 2, 3]
+        rule = self.rule()
+        first = rule['openCorridor']['openings'][0]
+        first['levels'] = [0]
+        second = copy.deepcopy(first)
+        second['levels'] = [1, 2, 3]
         rule['openCorridor']['openings'].append(second)
         self.check(rule)
 
     def test_explicit_recess_rows_can_coexist_with_default_solid_rows(self):
-        rule=self.rule();rule['windows']=True
-        rule['openCorridor']['openings'][0]['levels']=[1,3]
-        before=copy.deepcopy(rule)
+        rule = self.rule()
+        rule['windows'] = True
+        rule['openCorridor']['openings'][0]['levels'] = [1, 3]
+        before = copy.deepcopy(rule)
         self.check(rule)
-        self.assertEqual(rule,before)
-        rule['openCorridor']['lastLevel']=2
-        with self.assertRaisesRegex(ValueError,'within recessed floors'):
+        self.assertEqual(rule, before)
+        rule['openCorridor']['lastLevel'] = 2
+        with self.assertRaisesRegex(ValueError, 'within recessed floors'):
             self.check(rule)
 
     def test_piers_may_start_above_the_first_recessed_floor(self):
-        rule=self.rule();rule['openCorridor']['piers']={'bays':4,'width':.3,'depth':1,'firstLevel':2}
-        before=copy.deepcopy(rule);self.check(rule);self.assertEqual(rule,before)
-        for first in (0,4,True,1.5):
-            rule['openCorridor']['piers']['firstLevel']=first
-            with self.subTest(first=first),self.assertRaisesRegex(ValueError,'pier firstLevel'):self.check(rule)
+        rule = self.rule()
+        rule['openCorridor']['piers'] = {
+            'bays': 4,
+            'width': 0.3,
+            'depth': 1,
+            'firstLevel': 2,
+        }
+        before = copy.deepcopy(rule)
+        self.check(rule)
+        self.assertEqual(rule, before)
+        for first in (0, 4, True, 1.5):
+            rule['openCorridor']['piers']['firstLevel'] = first
+            with (
+                self.subTest(first=first),
+                self.assertRaisesRegex(ValueError, 'pier firstLevel'),
+            ):
+                self.check(rule)
 
     def test_piers_cannot_float_above_an_open_ground_storey(self):
-        rule=self.rule();rule['openCorridor'].update(firstLevel=0,piers={'bays':4,'width':.3,'depth':1,'firstLevel':1})
-        with self.assertRaisesRegex(ValueError,'retain ground piers'):self.check(rule)
+        rule = self.rule()
+        rule['openCorridor'].update(
+            firstLevel=0, piers={'bays': 4, 'width': 0.3, 'depth': 1, 'firstLevel': 1}
+        )
+        with self.assertRaisesRegex(ValueError, 'retain ground piers'):
+            self.check(rule)
 
     def test_first_slab_thickness_remains_bounded(self):
-        rule=self.rule();rule['openCorridor']['firstSlabThickness']=.09;self.check(rule)
-        for thickness in (True,0,.079,.301,float('nan')):
-            rule['openCorridor']['firstSlabThickness']=thickness
-            with self.subTest(thickness=thickness),self.assertRaisesRegex(ValueError,'first slab thickness'):self.check(rule)
+        rule = self.rule()
+        rule['openCorridor']['firstSlabThickness'] = 0.09
+        self.check(rule)
+        for thickness in (True, 0, 0.079, 0.301, float('nan')):
+            rule['openCorridor']['firstSlabThickness'] = thickness
+            with (
+                self.subTest(thickness=thickness),
+                self.assertRaisesRegex(ValueError, 'first slab thickness'),
+            ):
+                self.check(rule)

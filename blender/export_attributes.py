@@ -1,4 +1,5 @@
 """Omit unused UV streams before Draco compression; retain editable source UVs."""
+
 import sys
 from contextlib import contextmanager
 
@@ -12,46 +13,72 @@ def needs_texcoords(material):
     if material is None:
         return True
     empty_exporter_extensions = {
-        'KHR_materials_clearcoat', 'KHR_materials_transmission',
-        'KHR_materials_emissive_strength', 'KHR_materials_specular',
-        'KHR_materials_anisotropy', 'KHR_materials_ior',
+        'KHR_materials_clearcoat',
+        'KHR_materials_transmission',
+        'KHR_materials_emissive_strength',
+        'KHR_materials_specular',
+        'KHR_materials_anisotropy',
+        'KHR_materials_ior',
     }
     for name, extension in (material.extensions or {}).items():
         # Blender gathers empty placeholders before removing unused extensions.
         # Only those known-empty values are safe; retain UVs for active factors
         # too (anisotropy, for example, can use the tangent frame without a map).
-        if name not in empty_exporter_extensions or getattr(extension, 'extension', extension) != {}:
+        if (
+            name not in empty_exporter_extensions
+            or getattr(extension, 'extension', extension) != {}
+        ):
             return True
-    if any(getattr(material, name, None) is not None for name in (
-            'normal_texture', 'occlusion_texture', 'emissive_texture')):
+    if any(
+        getattr(material, name, None) is not None
+        for name in ('normal_texture', 'occlusion_texture', 'emissive_texture')
+    ):
         return True
     pbr = material.pbr_metallic_roughness
-    return pbr is not None and any(getattr(pbr, name, None) is not None for name in (
-        'base_color_texture', 'metallic_roughness_texture'))
+    return pbr is not None and any(
+        getattr(pbr, name, None) is not None
+        for name in ('base_color_texture', 'metallic_roughness_texture')
+    )
 
 
 class glTF2ExportUserExtension:
     is_critical = True
 
-    def gather_mesh_hook(self, mesh, blender_data, blender_object,
-                         vertex_groups, modifiers, materials, export_settings):
+    def gather_mesh_hook(
+        self,
+        mesh,
+        blender_data,
+        blender_object,
+        vertex_groups,
+        modifiers,
+        materials,
+        export_settings,
+    ):
         for primitive in mesh.primitives:
             if not needs_texcoords(primitive.material):
                 # Accessor caches may be shared; leave the original mapping untouched.
-                primitive.attributes = {name: value for name, value in primitive.attributes.items()
-                                        if not name.startswith('TEXCOORD_')}
+                primitive.attributes = {
+                    name: value
+                    for name, value in primitive.attributes.items()
+                    if not name.startswith('TEXCOORD_')
+                }
             if _deduplicate_vertices:
                 from vertex_dedup import deduplicate_primitive_vertices
+
                 deduplicate_primitive_vertices(primitive)
         if _share_position_bounds:
             from vertex_dedup import share_position_quantization_bounds
+
             share_position_quantization_bounds(mesh.primitives, _position_domain)
 
 
 @contextmanager
-def omit_unused_uvs(*, deduplicate_vertices=False, share_position_bounds=False, position_domain=None):
+def omit_unused_uvs(
+    *, deduplicate_vertices=False, share_position_bounds=False, position_domain=None
+):
     """Register the supported exporter hook only for this process and scope."""
     import bpy
+
     global _deduplicate_vertices, _share_position_bounds, _position_domain
     previous_deduplication = _deduplicate_vertices
     previous_shared_bounds = _share_position_bounds
@@ -82,6 +109,7 @@ def quantized_terrain_collapses(mesh, excluded, bits):
     remaining decoded position. Non-triangular polygons are left untouched.
     """
     import numpy as np
+
     if type(bits) is not int or not 1 <= bits <= 30:
         raise ValueError('Expected 1–30 Draco position quantization bits')
     active = [p for p in mesh.polygons if p.index not in excluded]
@@ -96,8 +124,12 @@ def quantized_terrain_collapses(mesh, excluded, bits):
     if not np.isfinite(xyz[used]).all() or extent <= 0:
         return set()
     max_value = (1 << bits) - 1
-    values = np.floor((xyz - minimum) * np.float32(max_value / float(extent)) + np.float32(.5))
-    decoded = (values * np.float32(float(extent) / max_value) + minimum).astype(np.float64)
+    values = np.floor(
+        (xyz - minimum) * np.float32(max_value / float(extent)) + np.float32(0.5)
+    )
+    decoded = (values * np.float32(float(extent) / max_value) + minimum).astype(
+        np.float64
+    )
     triangles = [p for p in active if len(p.vertices) == 3]
     if not triangles:
         return set()
@@ -106,8 +138,10 @@ def quantized_terrain_collapses(mesh, excluded, bits):
     zero = np.all(np.cross(b - a, c - a) == 0, axis=1)
     collapsed = {p.index for p, flag in zip(triangles, zero) if flag}
     kept = sorted({i for p in active if p.index not in collapsed for i in p.vertices})
-    if not kept or not (np.array_equal(xyz[kept].min(axis=0), minimum)
-                        and np.array_equal(xyz[kept].max(axis=0), maximum)):
+    if not kept or not (
+        np.array_equal(xyz[kept].min(axis=0), minimum)
+        and np.array_equal(xyz[kept].max(axis=0), maximum)
+    ):
         return set()
     return collapsed
 
@@ -121,31 +155,54 @@ def omit_zero_area_terrain_faces(obj, *, position_quantization_bits=None):
     """
     import bmesh
     import bpy
-    original=obj.data
-    collapsed=[]
-    if obj.get('layer')=='terrain' and not original.shape_keys and not obj.modifiers:
+
+    original = obj.data
+    collapsed = []
+    if obj.get('layer') == 'terrain' and not original.shape_keys and not obj.modifiers:
         for face in original.polygons:
-            if len(face.vertices)!=3:
+            if len(face.vertices) != 3:
                 continue
-            a,b,c=[tuple(original.vertices[i].co) for i in face.vertices]
-            u=[b[i]-a[i] for i in range(3)];v=[c[i]-a[i] for i in range(3)]
-            cross=(u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0])
-            if cross==(0,0,0):
+            a, b, c = [tuple(original.vertices[i].co) for i in face.vertices]
+            u = [b[i] - a[i] for i in range(3)]
+            v = [c[i] - a[i] for i in range(3)]
+            cross = (
+                u[1] * v[2] - u[2] * v[1],
+                u[2] * v[0] - u[0] * v[2],
+                u[0] * v[1] - u[1] * v[0],
+            )
+            if cross == (0, 0, 0):
                 collapsed.append(face.index)
         if position_quantization_bits is not None:
             from mathutils import Matrix
-            if obj.matrix_world != Matrix.Identity(4) or any(p.use_smooth for p in original.polygons):
-                raise ValueError('Quantized terrain cleanup requires untransformed, flat-shaded geometry')
-            collapsed = sorted(set(collapsed) | quantized_terrain_collapses(
-                original, set(collapsed), position_quantization_bits))
+
+            if obj.matrix_world != Matrix.Identity(4) or any(
+                p.use_smooth for p in original.polygons
+            ):
+                raise ValueError(
+                    'Quantized terrain cleanup requires untransformed, flat-shaded geometry'
+                )
+            collapsed = sorted(
+                set(collapsed)
+                | quantized_terrain_collapses(
+                    original, set(collapsed), position_quantization_bits
+                )
+            )
     if not collapsed:
         yield 0
         return
-    temporary=original.copy();bm=bmesh.new()
+    temporary = original.copy()
+    bm = bmesh.new()
     try:
-        bm.from_mesh(temporary);bm.faces.ensure_lookup_table()
-        bmesh.ops.delete(bm,geom=[bm.faces[i] for i in collapsed],context='FACES_ONLY')
-        bm.to_mesh(temporary);temporary.update();obj.data=temporary
+        bm.from_mesh(temporary)
+        bm.faces.ensure_lookup_table()
+        bmesh.ops.delete(
+            bm, geom=[bm.faces[i] for i in collapsed], context='FACES_ONLY'
+        )
+        bm.to_mesh(temporary)
+        temporary.update()
+        obj.data = temporary
         yield len(collapsed)
     finally:
-        obj.data=original;bm.free();bpy.data.meshes.remove(temporary)
+        obj.data = original
+        bm.free()
+        bpy.data.meshes.remove(temporary)

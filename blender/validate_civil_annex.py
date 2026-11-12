@@ -3,6 +3,7 @@
 This checks the adopted estimated massing, not the real building's measured
 height. It must reject the old uniform eight-storey extrusion.
 """
+
 import hashlib
 import json
 import re
@@ -14,14 +15,26 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET = next((Path(a.split('=', 1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')), ROOT)
-PREFIX = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')), 's2-civil-annex')
+TARGET = next(
+    (
+        Path(a.split('=', 1)[1]).resolve()
+        for a in sys.argv
+        if a.startswith('--check-root=')
+    ),
+    ROOT,
+)
+PREFIX = next(
+    (a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')),
+    's2-civil-annex',
+)
 DECORATED_STEP = '--decorated-step' in sys.argv
 TERRACE_ADDED = '--terrace-added' in sys.argv
 REAR_MASSING_ADDED = '--rear-massing-added' in sys.argv
 ID, CHUNK, Z = 'relation/12875606', 'chunk-n2-n3', 4.06
 LOW = [(-545, y, 10.8) for y in (-839, -843, -848, -856, -860)]
-LOW += [(x, y, 10.8) for x in (-541, -535, -529, -523, -516) for y in (-851, -856, -861)]
+LOW += [
+    (x, y, 10.8) for x in (-541, -535, -529, -523, -516) for y in (-851, -856, -861)
+]
 if TERRACE_ADDED:
     # The old -516 samples now touch the new upper roof edge/parapet.
     # Probe the retained roof farther inside; the terrace has its own validator.
@@ -49,72 +62,146 @@ def check(objects, tolerance):
         if obj.type != 'MESH':
             continue
         obj.data.calc_loop_triangles()
-        trees.append(BVHTree.FromPolygons(
-            [obj.matrix_world @ v.co for v in obj.data.vertices],
-            [tuple(t.vertices) for t in obj.data.loop_triangles], all_triangles=True))
+        trees.append(
+            BVHTree.FromPolygons(
+                [obj.matrix_world @ v.co for v in obj.data.vertices],
+                [tuple(t.vertices) for t in obj.data.loop_triangles],
+                all_triangles=True,
+            )
+        )
 
     def ray(origin, direction, distance):
-        hits = [tree.ray_cast(Vector(origin), Vector(direction), distance) for tree in trees]
-        return min((h for h in hits if h[0] is not None), key=lambda h: h[3], default=None)
+        hits = [
+            tree.ray_cast(Vector(origin), Vector(direction), distance) for tree in trees
+        ]
+        return min(
+            (h for h in hits if h[0] is not None), key=lambda h: h[3], default=None
+        )
 
     samples = []
     for x, y, expected in LOW + HIGH + SEAM:
         hit = ray((x, y, Z + 35), (0, 0, -1), 35)
         assert hit, ('missing roof', x, y)
         actual = hit[0].z - Z
-        assert abs(actual - expected) < tolerance, ('wrong roof height', x, y, actual, expected)
-        assert hit[1].z > .98, ('reversed roof normal', x, y, list(hit[1]))
+        assert abs(actual - expected) < tolerance, (
+            'wrong roof height',
+            x,
+            y,
+            actual,
+            expected,
+        )
+        assert hit[1].z > 0.98, ('reversed roof normal', x, y, list(hit[1]))
         samples.append(dict(x=x, y=y, expectedHeight=expected, actualHeight=actual))
     for x, y in VOIDS:
-        assert ray((x, y, Z + 35), (0, 0, -1), 34.8) is None, ('filled original void', x, y)
+        assert ray((x, y, Z + 35), (0, 0, -1), 34.8) is None, (
+            'filled original void',
+            x,
+            y,
+        )
     walls = []
     for x in (-546, -542):
         # After explicit windows/recesses are added, probe retained solid
         # wall bands. The dedicated step-facade validator checks the details.
-        for height in ((12, 16.5, 22.8) if DECORATED_STEP else (12, 19, 24)):
+        for height in (12, 16.5, 22.8) if DECORATED_STEP else (12, 19, 24):
             hit = ray((x, -838, Z + height), (0, 1, 0), 5)
-            expected_y=-834.82+(.95 if height==22.8 and '--seventh-recess-added' in sys.argv else 0)
-            assert hit and abs(hit[0].y-expected_y) < .04 + tolerance, ('missing exposed main wall', x, height, hit)
-            assert hit[1].y < -.98, ('reversed seam wall', x, height, list(hit[1]))
-            walls.append(dict(x=x, height=height, expectedY=expected_y, actualY=hit[0].y))
+            expected_y = -834.82 + (
+                0.95 if height == 22.8 and '--seventh-recess-added' in sys.argv else 0
+            )
+            assert hit and abs(hit[0].y - expected_y) < 0.04 + tolerance, (
+                'missing exposed main wall',
+                x,
+                height,
+                hit,
+            )
+            assert hit[1].y < -0.98, ('reversed seam wall', x, height, list(hit[1]))
+            walls.append(
+                dict(x=x, height=height, expectedY=expected_y, actualY=hit[0].y)
+            )
     # Probe the solid storey joint, outside generic window quads/frames, so
     # the base and near representations measure the same structural wall.
     normals = []
-    probes = [((-475, -815), (-1, 0), 3), ((-482, -786), (0, -1), 3),
-              ((-535, -816), (1, 0), 5), ((-512, -836), (0, 1), 3)]
-    probes += [((-500, -815), direction, 16) for direction in [(1, 0), (-1, 0), (0, 1), (0, -1)]]
+    probes = [
+        ((-475, -815), (-1, 0), 3),
+        ((-482, -786), (0, -1), 3),
+        ((-535, -816), (1, 0), 5),
+        ((-512, -836), (0, 1), 3),
+    ]
+    probes += [
+        ((-500, -815), direction, 16)
+        for direction in [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    ]
     for (x, y), (dx, dy), distance in probes:
         height = 7.2 if REAR_MASSING_ADDED else 16.5
         hit = ray((x, y, Z + height), (dx, dy, 0), distance)
-        assert hit and hit[1].x * dx + hit[1].y * dy < -.98, ('wrong outer/courtyard normal', x, y, dx, dy, hit)
-        normals.append(dict(origin=[x, y, Z + height], direction=[dx, dy, 0], normal=list(hit[1])))
-    return dict(passed=True, roofSamples=samples, openVoidSamples=VOIDS, exposedWallSamples=walls,
-                normalSamples=normals, rayCount=len(samples) + len(VOIDS) + len(walls) + len(normals), toleranceMeters=tolerance)
+        assert hit and hit[1].x * dx + hit[1].y * dy < -0.98, (
+            'wrong outer/courtyard normal',
+            x,
+            y,
+            dx,
+            dy,
+            hit,
+        )
+        normals.append(
+            dict(origin=[x, y, Z + height], direction=[dx, dy, 0], normal=list(hit[1]))
+        )
+    return dict(
+        passed=True,
+        roofSamples=samples,
+        openVoidSamples=VOIDS,
+        exposedWallSamples=walls,
+        normalSamples=normals,
+        rayCount=len(samples) + len(VOIDS) + len(walls) + len(normals),
+        toleranceMeters=tolerance,
+    )
 
 
-report = dict(passed=False, scope='Estimated 10.8 m southwest C wing, retained 26.4 m main/rear roof, shared boundary, original courtyard and forecourt voids; detailed roof tiers remain pending.')
-report['exposedWallProbeMode'] = 'retained solid bands beside explicit details' if DECORATED_STEP else 'original undecorated wall'
+report = dict(
+    passed=False,
+    scope='Estimated 10.8 m southwest C wing, retained 26.4 m main/rear roof, shared boundary, original courtyard and forecourt voids; detailed roof tiers remain pending.',
+)
+report['exposedWallProbeMode'] = (
+    'retained solid bands beside explicit details'
+    if DECORATED_STEP
+    else 'original undecorated wall'
+)
 if TERRACE_ADDED:
-    report['scope'] = 'Retained 10.8 m inner annex roof, 26.4 m main/rear roof, shared boundary and original voids; east terrace and its new upper roof edge checked separately.'
+    report['scope'] = (
+        'Retained 10.8 m inner annex roof, 26.4 m main/rear roof, shared boundary and original voids; east terrace and its new upper roof edge checked separately.'
+    )
 if REAR_MASSING_ADDED:
-    report['scope'] = 'Retained annex and southern main roof, shared annex boundary, original voids and outer/courtyard wall normals at 7.2 m. Northern roof and low connectors require validate_civil_rear.py.'
+    report['scope'] = (
+        'Retained annex and southern main roof, shared annex boundary, original voids and outer/courtyard wall normals at 7.2 m. Northern roof and low connectors require validate_civil_rear.py.'
+    )
 try:
     bpy.ops.wm.open_mainfile(filepath=str(TARGET / 'blender/gxu-campus.blend'))
-    report['source'] = check([o for o in bpy.context.scene.objects if o.get('featureId') == ID], .006)
+    report['source'] = check(
+        [o for o in bpy.context.scene.objects if o.get('featureId') == ID], 0.006
+    )
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.gltf(filepath=str(TARGET / 'public/models/base.glb'))
     bpy.context.view_layer.update()
-    report['base'] = check([o for o in bpy.context.scene.objects if root_name(o) == CHUNK], .05)
+    report['base'] = check(
+        [o for o in bpy.context.scene.objects if root_name(o) == CHUNK], 0.05
+    )
     bpy.ops.wm.read_factory_settings(use_empty=True)
     bpy.ops.import_scene.gltf(filepath=str(TARGET / 'public/models' / f'{CHUNK}.glb'))
     bpy.context.view_layer.update()
-    report['near'] = check(list(bpy.context.scene.objects), .02)
-    report['fingerprints'] = {p: hashlib.sha256((TARGET / p).read_bytes()).hexdigest() for p in
-                              ['blender/gxu-campus.blend', 'public/models/base.glb', f'public/models/{CHUNK}.glb', 'public/data/buildings.json']}
+    report['near'] = check(list(bpy.context.scene.objects), 0.02)
+    report['fingerprints'] = {
+        p: hashlib.sha256((TARGET / p).read_bytes()).hexdigest()
+        for p in [
+            'blender/gxu-campus.blend',
+            'public/models/base.glb',
+            f'public/models/{CHUNK}.glb',
+            'public/data/buildings.json',
+        ]
+    }
     report['passed'] = True
 except Exception as error:
     report['failure'] = str(error)
     raise
 finally:
-    (ROOT / 'docs/model-checks/refinement' / f'{PREFIX}-geometry.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+    (ROOT / 'docs/model-checks/refinement' / f'{PREFIX}-geometry.json').write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + '\n'
+    )
     print('Civil annex:', report['passed'], flush=True)

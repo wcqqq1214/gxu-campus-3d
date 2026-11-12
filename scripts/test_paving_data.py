@@ -9,52 +9,140 @@ from shore_data import revision
 
 class PavingDataTests(unittest.TestCase):
     def fixture(self):
-        s={'id':'way/1','kind':'roads','insideCampus':True,'tags':{'highway':'pedestrian'},'vertices':[[0,0],[10,0],[10,6],[0,6]],'triangles':[0,1,2,0,2,3]}
-        c={'id':'example','surfaceId':s['id'],'surfaceRevision':revision(s['vertices']),'joinEdges':[3],'joinFeather':3,'meshStep':2,'contactDepth':1,'contactSideMargin':.5,'joinOverlap':.15,'burial':.06,'sourceRefs':['osm'],'evidence':dict.fromkeys(['location','surface','dimensions','excludedDetails'],'documented')}
-        return c,s,box(-2,-1,0,7)
+        s = {
+            'id': 'way/1',
+            'kind': 'roads',
+            'insideCampus': True,
+            'tags': {'highway': 'pedestrian'},
+            'vertices': [[0, 0], [10, 0], [10, 6], [0, 6]],
+            'triangles': [0, 1, 2, 0, 2, 3],
+        }
+        c = {
+            'id': 'example',
+            'surfaceId': s['id'],
+            'surfaceRevision': revision(s['vertices']),
+            'joinEdges': [3],
+            'joinFeather': 3,
+            'meshStep': 2,
+            'contactDepth': 1,
+            'contactSideMargin': 0.5,
+            'joinOverlap': 0.15,
+            'burial': 0.06,
+            'sourceRefs': ['osm'],
+            'evidence': dict.fromkeys(
+                ['location', 'surface', 'dimensions', 'excludedDetails'], 'documented'
+            ),
+        }
+        return c, s, box(-2, -1, 0, 7)
+
     def test_footprint_retained_and_real_road_opening_has_no_side_wall(self):
-        c,s,n=self.fixture();before=copy.deepcopy(s);r=derive_paving(c,s,n,{'osm'})
-        self.assertEqual(s,before);self.assertEqual(r['vertices'],s['vertices']);self.assertEqual(r['areaMeters2'],60)
-        self.assertTrue(all(LineString(line).distance(Point(0,3))>1 for line in r['freeEdges']))
-        self.assertEqual(r['joins'][0]['inward'],[1.,0.])
+        c, s, n = self.fixture()
+        before = copy.deepcopy(s)
+        r = derive_paving(c, s, n, {'osm'})
+        self.assertEqual(s, before)
+        self.assertEqual(r['vertices'], s['vertices'])
+        self.assertEqual(r['areaMeters2'], 60)
+        self.assertTrue(
+            all(LineString(line).distance(Point(0, 3)) > 1 for line in r['freeEdges'])
+        )
+        self.assertEqual(r['joins'][0]['inward'], [1.0, 0.0])
+
     def test_reversed_ring_retains_same_inward_contact(self):
-        c,s,n=self.fixture();s['vertices'].reverse();c['surfaceRevision']=revision(s['vertices']);r=derive_paving(c,s,n,{'osm'})
-        self.assertEqual(r['joins'][0]['inward'],[1.,-0.])
+        c, s, n = self.fixture()
+        s['vertices'].reverse()
+        c['surfaceRevision'] = revision(s['vertices'])
+        r = derive_paving(c, s, n, {'osm'})
+        self.assertEqual(r['joins'][0]['inward'], [1.0, -0.0])
+
     def test_stale_invalid_unconnected_or_unknown_inputs_rejected(self):
-        c,s,n=self.fixture()
-        for key,value in [('surfaceRevision','stale'),('meshStep',float('nan')),('joinFeather',True),('joinEdges',[0]),('sourceRefs',['unknown'])]:
-            bad=copy.deepcopy(c);bad[key]=value
-            with self.assertRaises(ValueError):derive_paving(bad,s,n,{'osm'})
-        bad=copy.deepcopy(s);bad['tags']['bridge']='yes'
-        with self.assertRaises(ValueError):derive_paving(c,bad,n,{'osm'})
+        c, s, n = self.fixture()
+        for key, value in [
+            ('surfaceRevision', 'stale'),
+            ('meshStep', float('nan')),
+            ('joinFeather', True),
+            ('joinEdges', [0]),
+            ('sourceRefs', ['unknown']),
+        ]:
+            bad = copy.deepcopy(c)
+            bad[key] = value
+            with self.assertRaises(ValueError):
+                derive_paving(bad, s, n, {'osm'})
+        bad = copy.deepcopy(s)
+        bad['tags']['bridge'] = 'yes'
+        with self.assertRaises(ValueError):
+            derive_paving(c, bad, n, {'osm'})
+
     def test_context_changes_with_final_road_overlay(self):
-        self.assertNotEqual(context_revision([],{}, {},{'layers':[]},{}),context_revision([],{}, {},{'layers':[1]},{}))
+        self.assertNotEqual(
+            context_revision([], {}, {}, {'layers': []}, {}),
+            context_revision([], {}, {}, {'layers': [1]}, {}),
+        )
+
     def test_grounded_service_is_explicit_bounded_and_at_grade(self):
-        c,s,n=self.fixture()
-        with self.assertRaises(ValueError):derive_paving({**c,'groundedService':None},s,n,{'osm'})
-        s['tags']['highway']='service'
-        with self.assertRaises(ValueError):derive_paving(c,s,n,{'osm'})
-        c['groundedService']={'offset':.12}
-        self.assertEqual(derive_paving(c,s,n,{'osm'})['groundedService'],{'offset':.12})
-        for bad in [None,{}, {'offset':True},{'offset':float('nan')},{'offset':.4}]:
-            with self.subTest(bad=bad),self.assertRaises(ValueError):derive_paving({**c,'groundedService':bad},s,n,{'osm'})
-        s['tags']['bridge']='yes'
-        with self.assertRaises(ValueError):derive_paving(c,s,n,{'osm'})
+        c, s, n = self.fixture()
+        with self.assertRaises(ValueError):
+            derive_paving({**c, 'groundedService': None}, s, n, {'osm'})
+        s['tags']['highway'] = 'service'
+        with self.assertRaises(ValueError):
+            derive_paving(c, s, n, {'osm'})
+        c['groundedService'] = {'offset': 0.12}
+        self.assertEqual(
+            derive_paving(c, s, n, {'osm'})['groundedService'], {'offset': 0.12}
+        )
+        for bad in [
+            None,
+            {},
+            {'offset': True},
+            {'offset': float('nan')},
+            {'offset': 0.4},
+        ]:
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                derive_paving({**c, 'groundedService': bad}, s, n, {'osm'})
+        s['tags']['bridge'] = 'yes'
+        with self.assertRaises(ValueError):
+            derive_paving(c, s, n, {'osm'})
+
     def test_neighbor_overlap_retains_footprint_and_is_opt_in(self):
-        c,s,n=self.fixture();s['tags']['highway']='service'
-        c['groundedService']={'offset':.08,'preserveNeighborOverlap':True};c['groundClearance']=.06
-        n=box(-2,-1,1,7);r=derive_paving(c,s,n,{'osm'})
+        c, s, n = self.fixture()
+        s['tags']['highway'] = 'service'
+        c['groundedService'] = {'offset': 0.08, 'preserveNeighborOverlap': True}
+        c['groundClearance'] = 0.06
+        n = box(-2, -1, 1, 7)
+        r = derive_paving(c, s, n, {'osm'})
         from shapely.geometry import Polygon
-        self.assertAlmostEqual(sum(Polygon(p['outer'],p['holes']).area for p in r['neighborOverlaps']),6)
-        self.assertEqual(r['vertices'],s['vertices'])
-        c['groundedService']={'offset':.08}
-        self.assertNotIn('neighborOverlaps',derive_paving(c,s,n,{'osm'}))
+
+        self.assertAlmostEqual(
+            sum(Polygon(p['outer'], p['holes']).area for p in r['neighborOverlaps']), 6
+        )
+        self.assertEqual(r['vertices'], s['vertices'])
+        c['groundedService'] = {'offset': 0.08}
+        self.assertNotIn('neighborOverlaps', derive_paving(c, s, n, {'osm'}))
+
     def test_invalid_clearance_or_missing_overlap_rejected(self):
-        c,s,n=self.fixture();s['tags']['highway']='service';c['groundedService']={'offset':.08,'preserveNeighborOverlap':True}
-        with self.assertRaises(ValueError):derive_paving(c,s,n,{'osm'})
-        n=box(-2,-1,1,7)
-        for clearance in [True,float('nan'),.01,.3]:
-            with self.subTest(clearance=clearance),self.assertRaises(ValueError):derive_paving({**c,'groundClearance':clearance},s,n,{'osm'})
-        for flag in [False,1,'yes']:
-            with self.subTest(flag=flag),self.assertRaises(ValueError):derive_paving({**c,'groundedService':{'offset':.08,'preserveNeighborOverlap':flag}},s,n,{'osm'})
-if __name__=='__main__':unittest.main()
+        c, s, n = self.fixture()
+        s['tags']['highway'] = 'service'
+        c['groundedService'] = {'offset': 0.08, 'preserveNeighborOverlap': True}
+        with self.assertRaises(ValueError):
+            derive_paving(c, s, n, {'osm'})
+        n = box(-2, -1, 1, 7)
+        for clearance in [True, float('nan'), 0.01, 0.3]:
+            with self.subTest(clearance=clearance), self.assertRaises(ValueError):
+                derive_paving({**c, 'groundClearance': clearance}, s, n, {'osm'})
+        for flag in [False, 1, 'yes']:
+            with self.subTest(flag=flag), self.assertRaises(ValueError):
+                derive_paving(
+                    {
+                        **c,
+                        'groundedService': {
+                            'offset': 0.08,
+                            'preserveNeighborOverlap': flag,
+                        },
+                    },
+                    s,
+                    n,
+                    {'osm'},
+                )
+
+
+if __name__ == '__main__':
+    unittest.main()

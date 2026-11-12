@@ -1,4 +1,5 @@
 """Ordinary buildings: one architectural form, two levels of facade detail."""
+
 import hashlib
 import math
 
@@ -31,10 +32,13 @@ from terraced_stairs import blocks_window as stairs_block_window
 def compact_form_source(obj):
     """Weld source vertices without dropping groups at shared wall/roof edges."""
     from huicui import compact_source
+
     membership = {}
     key = lambda point: tuple(round(v, 5) for v in point)
     for vertex in obj.data.vertices:
-        membership.setdefault(key(vertex.co), set()).update(g.group for g in vertex.groups)
+        membership.setdefault(key(vertex.co), set()).update(
+            g.group for g in vertex.groups
+        )
     compact_source(obj)
     grouped = {group.index: [] for group in obj.vertex_groups}
     for vertex in obj.data.vertices:
@@ -50,7 +54,13 @@ def wall_material(b, C):
         return wall_finish(b, C)
     # A shared small palette keeps the all-campus base batched. Per-building
     # warm/cool material slots added >15% draw calls in the measured pilot.
-    wall = C['pink' if b['category'] == 'living' else 'stone' if b['category'] == 'academic' else 'white']
+    wall = C[
+        'pink'
+        if b['category'] == 'living'
+        else 'stone'
+        if b['category'] == 'academic'
+        else 'white'
+    ]
     if b['tags'].get('building:colour', '').lower() == '#f0a0a0':
         wall = C['pink']
     return wall
@@ -60,231 +70,587 @@ def shared_form(b, z, C):
     """All silhouette-defining components; never receives a detail flag."""
     if 'stairTower' in b['form']:
         from stair_tower import stair_tower_model
-        return stair_tower_model(b,z,C)
-    form = b['form']; h = form['height']; roof = form['roof']; wall = wall_material(b, C)
-    result = Mesh(); body = Mesh(); top = Mesh(); entrance = Mesh(); panels = Mesh()
-    parts = form['parts'] or [{'polygons': b['polygons'], 'triangles': b['roofTriangles'], 'height': h, 'roof':roof}]
+
+        return stair_tower_model(b, z, C)
+    form = b['form']
+    h = form['height']
+    roof = form['roof']
+    wall = wall_material(b, C)
+    result = Mesh()
+    body = Mesh()
+    top = Mesh()
+    entrance = Mesh()
+    panels = Mesh()
+    parts = form['parts'] or [
+        {
+            'polygons': b['polygons'],
+            'triangles': b['roofTriangles'],
+            'height': h,
+            'roof': roof,
+        }
+    ]
     for part in parts:
         part_body = Mesh()
         part_wall = C[part['wallFinish']] if 'wallFinish' in part else wall
-        roof = part['roof']; h = part['height']
-        triangles = part['triangles'] if roof['type'] == 'flat' else [[] for _ in part['polygons']]
+        roof = part['roof']
+        h = part['height']
+        triangles = (
+            part['triangles']
+            if roof['type'] == 'flat'
+            else [[] for _ in part['polygons']]
+        )
         if 'openBelow' in part:
-            opening=part['openBelow'];soffit=opening['clearHeight'];floor=opening['floorHeight']
-            roof_geometry=opening.get('roofGeometry',{'polygons':part['polygons'],'triangles':triangles})
-            roof_wall=C['white'] if 'slattedRoof' in opening else part_wall
-            edge_finish=opening.get('slattedRoof',{}).get('edgeFinish')
-            part_body.extrude(roof_geometry['polygons'],roof_geometry['triangles'],z+soffit,h-soffit,roof_wall,C['white'] if 'slattedRoof' in opening else C['paleRoof'],exterior_wall=C[edge_finish] if edge_finish else None)
+            opening = part['openBelow']
+            soffit = opening['clearHeight']
+            floor = opening['floorHeight']
+            roof_geometry = opening.get(
+                'roofGeometry', {'polygons': part['polygons'], 'triangles': triangles}
+            )
+            roof_wall = C['white'] if 'slattedRoof' in opening else part_wall
+            edge_finish = opening.get('slattedRoof', {}).get('edgeFinish')
+            part_body.extrude(
+                roof_geometry['polygons'],
+                roof_geometry['triangles'],
+                z + soffit,
+                h - soffit,
+                roof_wall,
+                C['white'] if 'slattedRoof' in opening else C['paleRoof'],
+                exterior_wall=C[edge_finish] if edge_finish else None,
+            )
             # Explicit underside and floor; the original footprint remains the canopy outline.
-            for poly,indices in zip(roof_geometry['polygons'],roof_geometry['triangles']):
-                vertices=[p for ring in poly for p in ring[:-1]]
-                for i in range(0,len(indices),3):
-                    part_body.face([(vertices[k][0],vertices[k][1],z+soffit) for k in reversed(indices[i:i+3])],roof_wall)
-            entry_floor=next((e['recessedStairEntry']['frameFloor'] for e in form['entrances']
-                              if e.get('recessedStairEntry',{}).get('framePart')==part.get('id')),None)
-            floor_geometry=entry_floor or {'polygons':part['polygons'],'triangles':triangles}
-            part_body.extrude(floor_geometry['polygons'],floor_geometry['triangles'],z-.15,floor+.15,C['stone'],C['stone'])
+            for poly, indices in zip(
+                roof_geometry['polygons'], roof_geometry['triangles']
+            ):
+                vertices = [p for ring in poly for p in ring[:-1]]
+                for i in range(0, len(indices), 3):
+                    part_body.face(
+                        [
+                            (vertices[k][0], vertices[k][1], z + soffit)
+                            for k in reversed(indices[i : i + 3])
+                        ],
+                        roof_wall,
+                    )
+            entry_floor = next(
+                (
+                    e['recessedStairEntry']['frameFloor']
+                    for e in form['entrances']
+                    if e.get('recessedStairEntry', {}).get('framePart')
+                    == part.get('id')
+                ),
+                None,
+            )
+            floor_geometry = entry_floor or {
+                'polygons': part['polygons'],
+                'triangles': triangles,
+            }
+            part_body.extrude(
+                floor_geometry['polygons'],
+                floor_geometry['triangles'],
+                z - 0.15,
+                floor + 0.15,
+                C['stone'],
+                C['stone'],
+            )
             for column in opening['columns']:
-                column_material=C[column['finish']] if 'finish' in column else part_wall
-                if column.get('shape')=='cylinder':
-                    base=column.get('base');bottom=floor+(base['height'] if base else 0)
-                    capital=column.get('capital');shaft_top=soffit-(capital['height'] if capital else 0)
-                    part_body.cylinder(*column['center'],z+(bottom+shaft_top)/2,column['width']/2,shaft_top-bottom,column_material,n=16)
+                column_material = (
+                    C[column['finish']] if 'finish' in column else part_wall
+                )
+                if column.get('shape') == 'cylinder':
+                    base = column.get('base')
+                    bottom = floor + (base['height'] if base else 0)
+                    capital = column.get('capital')
+                    shaft_top = soffit - (capital['height'] if capital else 0)
+                    part_body.cylinder(
+                        *column['center'],
+                        z + (bottom + shaft_top) / 2,
+                        column['width'] / 2,
+                        shaft_top - bottom,
+                        column_material,
+                        n=16,
+                    )
                     if capital:
-                        taper=capital['taperHeight'];radius=column['width']/2+capital['projection']
-                        part_body.cylinder(*column['center'],z+shaft_top+taper/2,column['width']/2,taper,column_material,n=16,topr=radius)
-                        part_body.cylinder(*column['center'],z+(shaft_top+taper+soffit)/2,radius,capital['height']-taper,column_material,n=16)
+                        taper = capital['taperHeight']
+                        radius = column['width'] / 2 + capital['projection']
+                        part_body.cylinder(
+                            *column['center'],
+                            z + shaft_top + taper / 2,
+                            column['width'] / 2,
+                            taper,
+                            column_material,
+                            n=16,
+                            topr=radius,
+                        )
+                        part_body.cylinder(
+                            *column['center'],
+                            z + (shaft_top + taper + soffit) / 2,
+                            radius,
+                            capital['height'] - taper,
+                            column_material,
+                            n=16,
+                        )
                     if base:
-                        base_height=base['height'];cap=base['capHeight'];radius=column['width']/2+base['projection']
-                        part_body.cylinder(*column['center'],z+floor+(base_height-cap)/2,radius,base_height-cap,column_material,n=16)
-                        part_body.cylinder(*column['center'],z+floor+base_height-cap/2,radius+.03,cap,column_material,n=16)
+                        base_height = base['height']
+                        cap = base['capHeight']
+                        radius = column['width'] / 2 + base['projection']
+                        part_body.cylinder(
+                            *column['center'],
+                            z + floor + (base_height - cap) / 2,
+                            radius,
+                            base_height - cap,
+                            column_material,
+                            n=16,
+                        )
+                        part_body.cylinder(
+                            *column['center'],
+                            z + floor + base_height - cap / 2,
+                            radius + 0.03,
+                            cap,
+                            column_material,
+                            n=16,
+                        )
                 else:
-                    part_body.box(*column['center'],z+(floor+soffit)/2,column['width'],column['depth'],soffit-floor,column_material,column['angle'])
+                    part_body.box(
+                        *column['center'],
+                        z + (floor + soffit) / 2,
+                        column['width'],
+                        column['depth'],
+                        soffit - floor,
+                        column_material,
+                        column['angle'],
+                    )
         else:
-            roof_material = C['blueRoof'] if roof.get('finish') == 'blue-metal' else C['paleRoof']
-            top_indices = [[] for _ in part['polygons']] if 'inset' in roof else triangles
-            depth = part.get('baseDepth', .5)
-            hall_entry=next((e['recessedStairEntry'] for e in form['entrances']
-                             if 'hall' in e.get('recessedStairEntry',{}) and e['recessedStairEntry']['hall']['part']==part.get('id')),None)
+            roof_material = (
+                C['blueRoof'] if roof.get('finish') == 'blue-metal' else C['paleRoof']
+            )
+            top_indices = (
+                [[] for _ in part['polygons']] if 'inset' in roof else triangles
+            )
+            depth = part.get('baseDepth', 0.5)
+            hall_entry = next(
+                (
+                    e['recessedStairEntry']
+                    for e in form['entrances']
+                    if 'hall' in e.get('recessedStairEntry', {})
+                    and e['recessedStairEntry']['hall']['part'] == part.get('id')
+                ),
+                None,
+            )
             if hall_entry:
-                hall=hall_entry['hall'];floor=hall_entry['doorLandingHeight'];ceiling=floor+hall['clearHeight']
-                empty=[[] for _ in part['polygons']]
+                hall = hall_entry['hall']
+                floor = hall_entry['doorLandingHeight']
+                ceiling = floor + hall['clearHeight']
+                empty = [[] for _ in part['polygons']]
                 # The opening is a real omission of wall geometry. Keep the
                 # mapped footprint and roof above it exactly where they were.
-                part_body.extrude(part['polygons'],empty,z-depth,floor+depth,part_wall,part_wall)
-                cut=hall['wallGeometry']
-                part_body.extrude(cut['polygons'],[[] for _ in cut['polygons']],z+floor,hall['clearHeight'],part_wall,part_wall)
-                part_body.extrude(part['polygons'],top_indices,z+ceiling,h-ceiling,part_wall,roof_material)
+                part_body.extrude(
+                    part['polygons'],
+                    empty,
+                    z - depth,
+                    floor + depth,
+                    part_wall,
+                    part_wall,
+                )
+                cut = hall['wallGeometry']
+                part_body.extrude(
+                    cut['polygons'],
+                    [[] for _ in cut['polygons']],
+                    z + floor,
+                    hall['clearHeight'],
+                    part_wall,
+                    part_wall,
+                )
+                part_body.extrude(
+                    part['polygons'],
+                    top_indices,
+                    z + ceiling,
+                    h - ceiling,
+                    part_wall,
+                    roof_material,
+                )
             else:
-                part_body.extrude(part['polygons'], top_indices, z-depth, h+depth, part_wall, roof_material)
+                part_body.extrude(
+                    part['polygons'],
+                    top_indices,
+                    z - depth,
+                    h + depth,
+                    part_wall,
+                    roof_material,
+                )
             if 'inset' in roof:
-                for key, material in [('borderGeometry',C['dark']),('centerGeometry',roof_material)]:
+                for key, material in [
+                    ('borderGeometry', C['dark']),
+                    ('centerGeometry', roof_material),
+                ]:
                     geometry = roof[key]
-                    for poly, indices in zip(geometry['polygons'],geometry['triangles']):
+                    for poly, indices in zip(
+                        geometry['polygons'], geometry['triangles']
+                    ):
                         points = [p for ring in poly for p in ring[:-1]]
-                        for i in range(0,len(indices),3):
-                            part_body.face([(points[k][0],points[k][1],z+h)
-                                            for k in indices[i:i+3]],material)
-        for facade in form.get('facades',[]):
-            if facade['part']==part.get('id','body') and 'wallFinish' in facade['rule']:
+                        for i in range(0, len(indices), 3):
+                            part_body.face(
+                                [
+                                    (points[k][0], points[k][1], z + h)
+                                    for k in indices[i : i + 3]
+                                ],
+                                material,
+                            )
+        for facade in form.get('facades', []):
+            if (
+                facade['part'] == part.get('id', 'body')
+                and 'wallFinish' in facade['rule']
+            ):
                 from facade_finish import apply_wall_finish
-                apply_wall_finish(part_body,facade,z,C[facade['rule']['wallFinish']])
-            if facade['part']==part.get('id','body') and 'openCorridor' in facade['rule']:
-                finish=facade['rule']['openCorridor'].get('finish',{})
-                add_corridor(part_body,facade,z,C[finish['wall']] if 'wall' in finish else wall,C['white'],C[finish.get('rail','white')],pitched_roof=roof['type']!='flat')
-                add_corridor_openings(part_body,facade,z,C)
+
+                apply_wall_finish(part_body, facade, z, C[facade['rule']['wallFinish']])
+            if (
+                facade['part'] == part.get('id', 'body')
+                and 'openCorridor' in facade['rule']
+            ):
+                finish = facade['rule']['openCorridor'].get('finish', {})
+                add_corridor(
+                    part_body,
+                    facade,
+                    z,
+                    C[finish['wall']] if 'wall' in finish else wall,
+                    C['white'],
+                    C[finish.get('rail', 'white')],
+                    pitched_roof=roof['type'] != 'flat',
+                )
+                add_corridor_openings(part_body, facade, z, C)
         body.extend(part_body)
         if roof['type'] != 'flat':
             geometry = roof['geometry']
             for face in geometry.get('boundaryWalls', []):
-                top.face([(x,y,z+h+up) for x,y,up in face], part_wall)
-            roof_material = C['paleRoof'] if roof['type']=='profiled' else C['red']
+                top.face([(x, y, z + h + up) for x, y, up in face], part_wall)
+            roof_material = C['paleRoof'] if roof['type'] == 'profiled' else C['red']
             for i in range(0, len(geometry['triangles']), 3):
-                top.face([(geometry['vertices'][k][0], geometry['vertices'][k][1], z+h+geometry['vertices'][k][2])
-                          for k in geometry['triangles'][i:i+3]], roof_material)
-        elif 'slattedRoof' not in part.get('openBelow',{}) and 'rim' not in roof:
+                top.face(
+                    [
+                        (
+                            geometry['vertices'][k][0],
+                            geometry['vertices'][k][1],
+                            z + h + geometry['vertices'][k][2],
+                        )
+                        for k in geometry['triangles'][i : i + 3]
+                    ],
+                    roof_material,
+                )
+        elif 'slattedRoof' not in part.get('openBelow', {}) and 'rim' not in roof:
             # Parapets follow each actual terrace elevation in both LODs.
-            edges = part.get('parapetEdges', [(a,c) for poly in part['polygons']
-                                             for ring in poly for a,c in zip(ring,ring[1:])])
+            edges = part.get(
+                'parapetEdges',
+                [
+                    (a, c)
+                    for poly in part['polygons']
+                    for ring in poly
+                    for a, c in zip(ring, ring[1:])
+                ],
+            )
             crown = form.get('roofCrown')
-            if crown and crown['part'] == part.get('id','body'):
+            if crown and crown['part'] == part.get('id', 'body'):
                 edges = crown['retainedParapetEdges']
-            screen=form.get('gableScreen')
-            if screen and screen['part']==part.get('id','body'):
-                edges=screen['retainedParapetEdges']
-            for a,c in edges:
+            screen = form.get('gableScreen')
+            if screen and screen['part'] == part.get('id', 'body'):
+                edges = screen['retainedParapetEdges']
+            for a, c in edges:
                 if replaces_parapet(form.get('roofEave'), part.get('id', 'body'), a, c):
                     continue
                 length = math.dist(a, c)
-                if length < 2: continue
-                top.box((a[0]+c[0])/2, (a[1]+c[1])/2, z+h+.4, length, .25, .8,
-                        C['white'], math.atan2(c[1]-a[1], c[0]-a[0]))
+                if length < 2:
+                    continue
+                top.box(
+                    (a[0] + c[0]) / 2,
+                    (a[1] + c[1]) / 2,
+                    z + h + 0.4,
+                    length,
+                    0.25,
+                    0.8,
+                    C['white'],
+                    math.atan2(c[1] - a[1], c[0] - a[0]),
+                )
         if 'rimGeometry' in roof:
             for face in roof['rimGeometry']['tops'] + roof['rimGeometry']['walls']:
-                top.face([(x,y,z+h+up) for x,y,up in face], C['white'])
+                top.face([(x, y, z + h + up) for x, y, up in face], C['white'])
     if 'roofDome' in form:
         from roof_dome import add_roof_dome
+
         add_roof_dome(top, form['roofDome'], z, C['white'])
     for volume in form.get('roofVolumes', []):
-        top.box(*volume['center'], z+volume['baseHeight']+volume['rise']/2,
-                volume['width'], volume['depth'], volume['rise'], C['white'], volume['angle'])
+        top.box(
+            *volume['center'],
+            z + volume['baseHeight'] + volume['rise'] / 2,
+            volume['width'],
+            volume['depth'],
+            volume['rise'],
+            C['white'],
+            volume['angle'],
+        )
         if 'cap' in volume:
             cap = volume['cap']
-            top.box(*volume['center'], z+volume['baseHeight']+volume['rise']+cap['height']/2,
-                    volume['width']+2*cap['overhang'], volume['depth']+2*cap['overhang'],
-                    cap['height'], C['paleRoof'], volume['angle'])
+            top.box(
+                *volume['center'],
+                z + volume['baseHeight'] + volume['rise'] + cap['height'] / 2,
+                volume['width'] + 2 * cap['overhang'],
+                volume['depth'] + 2 * cap['overhang'],
+                cap['height'],
+                C['paleRoof'],
+                volume['angle'],
+            )
         if 'glazing' in volume:
             from roof_volume_glazing import add_roof_volume_glazing
+
             add_roof_volume_glazing(top, volume, z, C)
     if 'roofEdgeFrames' in form:
         from roof_edge_frames import add_roof_edge_frames
+
         add_roof_edge_frames(top, form['roofEdgeFrames'], z, C['white'])
     if 'roofEave' in form:
         add_roof_eave(top, form['roofEave'], z, C['white'])
     if 'roofCrown' in form:
         from roof_crown import add_roof_crown
+
         add_roof_crown(top, form['roofCrown'], z, C)
     if 'gableScreen' in form:
         from gable_screen import add_gable_screen
-        add_gable_screen(top,form['gableScreen'],z,C)
-    for facade in form.get('facades',[]):
+
+        add_gable_screen(top, form['gableScreen'], z, C)
+    for facade in form.get('facades', []):
         if 'attachedGallery' in facade:
-            add_attached_gallery(body,facade,z,wall,C)
+            add_attached_gallery(body, facade, z, wall, C)
         if 'panels' in facade['rule']:
-            add_panels(panels,facade,z,C)
+            add_panels(panels, facade, z, C)
         if 'windowGrid' in facade['rule']:
-            add_grid_pilasters(body,facade,z,C)
+            add_grid_pilasters(body, facade, z, C)
         if 'windowBands' in facade['rule']:
-            add_band_ledges(body,facade,z,C)
+            add_band_ledges(body, facade, z, C)
         if 'horizontalLedges' in facade['rule']:
-            add_horizontal_ledges(body,facade,z,C)
-    for door in form.get('stairAccessDoors',[]):
+            add_horizontal_ledges(body, facade, z, C)
+    for door in form.get('stairAccessDoors', []):
         from stair_tower import stair_access_door
-        stair_access_door(entrance,door,z,C)
+
+        stair_access_door(entrance, door, z, C)
     for e in form['entrances']:
         if 'recessedStairEntry' in e:
-            add_recessed_stair_entry(entrance,e,z,C)
+            add_recessed_stair_entry(entrance, e, z, C)
             continue
         if 'flushEntrance' in e:
-            add_flush_entrance(entrance,e,z,C)
+            add_flush_entrance(entrance, e, z, C)
             continue
         if 'mappedCanopy' in e:
             from mapped_canopy_entry import add_mapped_canopy_entry
-            add_mapped_canopy_entry(entrance,e,z,C)
+
+            add_mapped_canopy_entry(entrance, e, z, C)
             continue
         if 'attachedPortico' in e:
-            add_attached_portico(entrance,e,z,C)
+            add_attached_portico(entrance, e, z, C)
             continue
-        x, y = e['center']; bearing = math.radians(e['bearing'])
+        x, y = e['center']
+        bearing = math.radians(e['bearing'])
         nx, ny = math.sin(bearing), math.cos(bearing)
         theta = -bearing
         width = e['width']
         if e.get('porticoId'):
-            floor=e['platformHeight'];front=e['outerCenter'];pw=e.get('stepWidth',e['porticoWidth'])
+            floor = e['platformHeight']
+            front = e['outerCenter']
+            pw = e.get('stepWidth', e['porticoWidth'])
             if 'recessGlazing' in e:
                 from recess_glazing import add_recess_glazing
-                add_recess_glazing(entrance,e,z,C)
+
+                add_recess_glazing(entrance, e, z, C)
             else:
-                entrance.box(x+nx*.04,y+ny*.04,z+floor+1.4,width,.10,2.8,C['glass'],theta)
-                door=e.get('recessDoor')
+                entrance.box(
+                    x + nx * 0.04,
+                    y + ny * 0.04,
+                    z + floor + 1.4,
+                    width,
+                    0.10,
+                    2.8,
+                    C['glass'],
+                    theta,
+                )
+                door = e.get('recessDoor')
                 if door:
-                    fw=door['frameWidth'];tx,ty=ny,-nx
-                    for i in range(door['leafCount']+1):
-                        offset=-width/2+fw/2+(width-fw)*i/door['leafCount']
-                        entrance.box(x+tx*offset+nx*.14,y+ty*offset+ny*.14,z+floor+1.4,fw,.10,2.8,C['dark'],theta)
-                    for up in (fw/2,2.8-fw/2):
-                        entrance.box(x+nx*.14,y+ny*.14,z+floor+up,width,.10,fw,C['dark'],theta)
-                    lh=door['lintelHeight']
-                    entrance.box(x+nx*.06,y+ny*.06,z+floor+2.8+lh/2,width+.2,.14,lh,C['stone'],theta)
-                else:entrance.box(x+nx*.06,y+ny*.06,z+floor+2.83,width+.2,.14,.12,C['white'],theta)
+                    fw = door['frameWidth']
+                    tx, ty = ny, -nx
+                    for i in range(door['leafCount'] + 1):
+                        offset = (
+                            -width / 2 + fw / 2 + (width - fw) * i / door['leafCount']
+                        )
+                        entrance.box(
+                            x + tx * offset + nx * 0.14,
+                            y + ty * offset + ny * 0.14,
+                            z + floor + 1.4,
+                            fw,
+                            0.10,
+                            2.8,
+                            C['dark'],
+                            theta,
+                        )
+                    for up in (fw / 2, 2.8 - fw / 2):
+                        entrance.box(
+                            x + nx * 0.14,
+                            y + ny * 0.14,
+                            z + floor + up,
+                            width,
+                            0.10,
+                            fw,
+                            C['dark'],
+                            theta,
+                        )
+                    lh = door['lintelHeight']
+                    entrance.box(
+                        x + nx * 0.06,
+                        y + ny * 0.06,
+                        z + floor + 2.8 + lh / 2,
+                        width + 0.2,
+                        0.14,
+                        lh,
+                        C['stone'],
+                        theta,
+                    )
+                else:
+                    entrance.box(
+                        x + nx * 0.06,
+                        y + ny * 0.06,
+                        z + floor + 2.83,
+                        width + 0.2,
+                        0.14,
+                        0.12,
+                        C['white'],
+                        theta,
+                    )
             # Counts can be sourced separately from estimated dimensions.
-            steps=e.get('steps',3)
-            step_base=e.get('stepBaseHeight',0)
-            foundation=e.get('stepFoundationDepth',0)
+            steps = e.get('steps', 3)
+            step_base = e.get('stepBaseHeight', 0)
+            foundation = e.get('stepFoundationDepth', 0)
             for i in range(steps):
-                height=(floor-step_base)*(steps-i)/steps
-                entrance.box(front[0]+nx*(i+.5)*.3,front[1]+ny*(i+.5)*.3,z+step_base+(height-foundation)/2,pw,.32,height+foundation,C['stone'],theta)
+                height = (floor - step_base) * (steps - i) / steps
+                entrance.box(
+                    front[0] + nx * (i + 0.5) * 0.3,
+                    front[1] + ny * (i + 0.5) * 0.3,
+                    z + step_base + (height - foundation) / 2,
+                    pw,
+                    0.32,
+                    height + foundation,
+                    C['stone'],
+                    theta,
+                )
             continue
         # Reuse facade glass and stone to avoid two extra draw calls per chunk.
-        landing=e.get('landingHeight',0)
-        frame=e.get('doorFrame')
+        landing = e.get('landingHeight', 0)
+        frame = e.get('doorFrame')
         if frame:
-            bay=width/frame['bays'];pw=frame['pierWidth'];pd=frame['pierDepth']
-            tx,ty=ny,-nx
+            bay = width / frame['bays']
+            pw = frame['pierWidth']
+            pd = frame['pierDepth']
+            tx, ty = ny, -nx
             for i in range(frame['bays']):
-                offset=-width/2+(i+.5)*bay
-                entrance.box(x+tx*offset,y+ty*offset,z+landing+1.3,bay-pw,.35,2.6,C['glass'],theta)
-            for i in range(frame['bays']+1):
-                offset=-width/2+i*bay
-                entrance.box(x+tx*offset+nx*(pd/2-.2),y+ty*offset+ny*(pd/2-.2),
-                             z+landing+2.775/2,pw,pd,2.775,C['stone'],theta)
+                offset = -width / 2 + (i + 0.5) * bay
+                entrance.box(
+                    x + tx * offset,
+                    y + ty * offset,
+                    z + landing + 1.3,
+                    bay - pw,
+                    0.35,
+                    2.6,
+                    C['glass'],
+                    theta,
+                )
+            for i in range(frame['bays'] + 1):
+                offset = -width / 2 + i * bay
+                entrance.box(
+                    x + tx * offset + nx * (pd / 2 - 0.2),
+                    y + ty * offset + ny * (pd / 2 - 0.2),
+                    z + landing + 2.775 / 2,
+                    pw,
+                    pd,
+                    2.775,
+                    C['stone'],
+                    theta,
+                )
             # The continuous header meets the existing canopy soffit. There
             # is no glass hidden behind the intermediate solid piers.
-            entrance.box(x+nx*(pd/2-.2),y+ny*(pd/2-.2),z+landing+(2.6+2.775)/2,
-                         width+pw,pd,.175,C['stone'],theta)
+            entrance.box(
+                x + nx * (pd / 2 - 0.2),
+                y + ny * (pd / 2 - 0.2),
+                z + landing + (2.6 + 2.775) / 2,
+                width + pw,
+                pd,
+                0.175,
+                C['stone'],
+                theta,
+            )
         else:
-            entrance.box(x, y, z+landing+1.3, width, .35, 2.6, C['glass'], theta)
-        entrance.box(x, y, z+landing+2.9, width+1.3, 2.5, .25, C['white'], theta)
+            entrance.box(x, y, z + landing + 1.3, width, 0.35, 2.6, C['glass'], theta)
+        entrance.box(x, y, z + landing + 2.9, width + 1.3, 2.5, 0.25, C['white'], theta)
         if 'stairFlight' in e:
-            p=e['stairFlight'];bottom=p['baseHeight']-.15
-            entrance.box(x+nx*(p['landingDepth']-.15)/2,y+ny*(p['landingDepth']-.15)/2,
-                         z+(landing+bottom)/2,p['width'],p['landingDepth']+.15,landing-bottom,C['stone'],theta)
-            for i in range(1,p['riserCount']):
-                stair_top=landing-(landing-p['baseHeight'])*i/p['riserCount']
-                distance=p['landingDepth']+(i-.5)*p['tread']
-                entrance.box(x+nx*distance,y+ny*distance,z+(stair_top+bottom)/2,
-                             p['width'],p['tread']+.01,stair_top-bottom,C['stone'],theta)
+            p = e['stairFlight']
+            bottom = p['baseHeight'] - 0.15
+            entrance.box(
+                x + nx * (p['landingDepth'] - 0.15) / 2,
+                y + ny * (p['landingDepth'] - 0.15) / 2,
+                z + (landing + bottom) / 2,
+                p['width'],
+                p['landingDepth'] + 0.15,
+                landing - bottom,
+                C['stone'],
+                theta,
+            )
+            for i in range(1, p['riserCount']):
+                stair_top = landing - (landing - p['baseHeight']) * i / p['riserCount']
+                distance = p['landingDepth'] + (i - 0.5) * p['tread']
+                entrance.box(
+                    x + nx * distance,
+                    y + ny * distance,
+                    z + (stair_top + bottom) / 2,
+                    p['width'],
+                    p['tread'] + 0.01,
+                    stair_top - bottom,
+                    C['stone'],
+                    theta,
+                )
         elif landing:
             # Explicitly calibrated two-level landing: both solids reach
             # below the building datum, rather than floating thin slabs.
-            for distance,w,depth,landing_top in [(.65,width+1.2,1.6,landing),(.9,width+1.6,2,landing/2)]:
-                entrance.box(x+nx*distance,y+ny*distance,z+(landing_top-.15)/2,w,depth,landing_top+.15,C['stone'],theta)
+            for distance, w, depth, landing_top in [
+                (0.65, width + 1.2, 1.6, landing),
+                (0.9, width + 1.6, 2, landing / 2),
+            ]:
+                entrance.box(
+                    x + nx * distance,
+                    y + ny * distance,
+                    z + (landing_top - 0.15) / 2,
+                    w,
+                    depth,
+                    landing_top + 0.15,
+                    C['stone'],
+                    theta,
+                )
         else:
-            entrance.box(x+nx*.65, y+ny*.65, z+.12, width+1.2, 1.6, .20, C['stone'], theta)
-            entrance.box(x+nx*.9, y+ny*.9, z+.035, width+1.6, 2, .08, C['stone'], theta)
+            entrance.box(
+                x + nx * 0.65,
+                y + ny * 0.65,
+                z + 0.12,
+                width + 1.2,
+                1.6,
+                0.20,
+                C['stone'],
+                theta,
+            )
+            entrance.box(
+                x + nx * 0.9,
+                y + ny * 0.9,
+                z + 0.035,
+                width + 1.6,
+                2,
+                0.08,
+                C['stone'],
+                theta,
+            )
     if 'terracedStairs' in form:
         from terraced_stairs import add_terraced_stairs
-        add_terraced_stairs(entrance,form['terracedStairs'],z,C['stone'])
+
+        add_terraced_stairs(entrance, form['terracedStairs'], z, C['stone'])
     result.add_part('01_主体轮廓', body)
     result.add_part('02_屋顶轮廓', top)
     result.add_part('03_入口与平台', entrance)
@@ -296,23 +662,38 @@ def shared_form(b, z, C):
 def facade_segments(b):
     if 'facades' in b['form']:
         return b['form']['facades']
-    result=[]
+    result = []
     for poly in b['polygons']:
-        for ri,ring in enumerate(poly):
-            area=sum(a[0]*c[1]-c[0]*a[1] for a,c in zip(ring,ring[1:]))
-            sign=(1 if area>0 else -1)*(-1 if ri else 1)
-            for a,c in zip(ring,ring[1:]):
-                length=math.dist(a,c)
-                if length<.01:continue
-                result.append({'start':a,'end':c,'normal':[(c[1]-a[1])/length*sign,-(c[0]-a[0])/length*sign],
-                    'height':b['form']['height'],'levels':b['form']['levels'],'rule':{}})
+        for ri, ring in enumerate(poly):
+            area = sum(a[0] * c[1] - c[0] * a[1] for a, c in zip(ring, ring[1:]))
+            sign = (1 if area > 0 else -1) * (-1 if ri else 1)
+            for a, c in zip(ring, ring[1:]):
+                length = math.dist(a, c)
+                if length < 0.01:
+                    continue
+                result.append(
+                    {
+                        'start': a,
+                        'end': c,
+                        'normal': [
+                            (c[1] - a[1]) / length * sign,
+                            -(c[0] - a[0]) / length * sign,
+                        ],
+                        'height': b['form']['height'],
+                        'levels': b['form']['levels'],
+                        'rule': {},
+                    }
+                )
     return result
 
 
 def ordinary_building(b, z, C, detail):
     if b.get('form', {}).get('version') != 1:
-        raise ValueError(f"{b['id']}: run data:prepare before rebuilding ordinary buildings")
+        raise ValueError(
+            f'{b["id"]}: run data:prepare before rebuilding ordinary buildings'
+        )
     from student_water_tower import TOWER_ID, water_tower
+
     if b['id'] == TOWER_ID:
         return water_tower(b, z, C, detail)
     m = shared_form(b, z, C)
@@ -322,87 +703,228 @@ def ordinary_building(b, z, C, detail):
         if b['id'] in SHOP_BUILDINGS:
             m.add_part('05_临街店面', shopfront_details(b, z, C, detail, facades))
         return m
-    if 'stairTower' in b['form']:return m
-    windows = Mesh(); form = b['form']; h = form['height']; wall = wall_material(b, C)
+    if 'stairTower' in b['form']:
+        return m
+    windows = Mesh()
+    form = b['form']
+    h = form['height']
+    wall = wall_material(b, C)
     seed = int(hashlib.sha256(b['id'].encode()).hexdigest()[:8], 16)
     levels = max(1, round(form['levels']))
     balconies = form['archetype'] in ('dormitory', 'residential-block')
     for facade in facade_segments(b):
-        a,c=facade['start'],facade['end'];rule=facade['rule']
-        if rule.get('windows') is False:continue
+        a, c = facade['start'], facade['end']
+        rule = facade['rule']
+        if rule.get('windows') is False:
+            continue
         if 'windowGrid' in rule:
-            add_grid_windows(windows,facade,z,C,detail)
+            add_grid_windows(windows, facade, z, C, detail)
             continue
         if 'windowBands' in rule:
-            add_band_windows(windows,facade,z,C,detail)
-        h=facade['height'];levels=max(1,round(facade['levels']))
-        dx, dy = c[0]-a[0], c[1]-a[1]; length = math.hypot(dx, dy)
-        if length < 2: continue
+            add_band_windows(windows, facade, z, C, detail)
+        h = facade['height']
+        levels = max(1, round(facade['levels']))
+        dx, dy = c[0] - a[0], c[1] - a[1]
+        length = math.hypot(dx, dy)
+        if length < 2:
+            continue
         nx, ny = facade['normal']
-        theta = math.atan2(dy, dx); num = max(1, int(length/rule.get('spacing',4)))
+        theta = math.atan2(dy, dx)
+        num = max(1, int(length / rule.get('spacing', 4)))
         floor_heights = facade.get('floorHeights')
         for level in range(levels):
-            if level in rule.get('skipWindowLevels',[]):continue
-            floor_bottom = math.fsum(floor_heights[:level]) if floor_heights else level*h/levels
-            floor_height = floor_heights[level] if floor_heights else h/levels
-            gallery=facade.get('attachedGallery')
-            if gallery and level>0:continue
-            corridor=rule.get('openCorridor')
-            if corridor and any(level in opening['levels'] for opening in corridor.get('openings', [])):
+            if level in rule.get('skipWindowLevels', []):
+                continue
+            floor_bottom = (
+                math.fsum(floor_heights[:level])
+                if floor_heights
+                else level * h / levels
+            )
+            floor_height = floor_heights[level] if floor_heights else h / levels
+            gallery = facade.get('attachedGallery')
+            if gallery and level > 0:
+                continue
+            corridor = rule.get('openCorridor')
+            if corridor and any(
+                level in opening['levels'] for opening in corridor.get('openings', [])
+            ):
                 # Explicit rear-wall openings replace this complete row only;
                 # ordinary rows and bounded bands on other floors stay intact.
                 continue
-            recessed=corridor is not None and corridor['firstLevel']<=level<=corridor.get('lastLevel',levels-1)
+            recessed = corridor is not None and corridor[
+                'firstLevel'
+            ] <= level <= corridor.get('lastLevel', levels - 1)
             for i in range(num):
-                f = (i+.5)/num; x, y = a[0]+dx*f+nx*.07, a[1]+dy*f+ny*.07
+                f = (i + 0.5) / num
+                x, y = a[0] + dx * f + nx * 0.07, a[1] + dy * f + ny * 0.07
                 if gallery:
-                    x+=nx*gallery['depth'];y+=ny*gallery['depth']
+                    x += nx * gallery['depth']
+                    y += ny * gallery['depth']
                 if recessed:
-                    if not corridor['endInset']+.2 < f*length < length-corridor['endInset']-.2:
+                    if (
+                        not corridor['endInset'] + 0.2
+                        < f * length
+                        < length - corridor['endInset'] - 0.2
+                    ):
                         continue
-                    x-=nx*corridor['depth'];y-=ny*corridor['depth']
+                    x -= nx * corridor['depth']
+                    y -= ny * corridor['depth']
                 # Preserve the original arithmetic for uncalibrated facades,
                 # keeping unrelated compressed assets reproducible.
-                zz = z+floor_bottom+.56*floor_height if floor_heights else z+(level+.56)*h/levels
-                ww = min(2.1, length/num*.60); wh = min(1.9, floor_height*.55)
-                if band_replaces_window(facade,level,f,ww):continue
-                if panel_replaces_window(facade,f,ww,zz-z,wh):continue
-                if zz-wh/2 < z+facade.get('minimumHeight',0): continue
-                if 'terracedStairs' in form and stairs_block_window(form['terracedStairs'],x,y,nx,ny,ww+.3,zz-z-(wh+.3)/2,zz-z+(wh+.3)/2):
+                zz = (
+                    z + floor_bottom + 0.56 * floor_height
+                    if floor_heights
+                    else z + (level + 0.56) * h / levels
+                )
+                ww = min(2.1, length / num * 0.60)
+                wh = min(1.9, floor_height * 0.55)
+                if band_replaces_window(facade, level, f, ww):
                     continue
-                if 'roofCrown' in form and side_wall_blocks_window(form['roofCrown'],x,y,nx,ny,ww+.3,zz-z-(wh+.3)/2,zz-z+(wh+.3)/2):
+                if panel_replaces_window(facade, f, ww, zz - z, wh):
                     continue
-                blocked_by_door=False
+                if zz - wh / 2 < z + facade.get('minimumHeight', 0):
+                    continue
+                if 'terracedStairs' in form and stairs_block_window(
+                    form['terracedStairs'],
+                    x,
+                    y,
+                    nx,
+                    ny,
+                    ww + 0.3,
+                    zz - z - (wh + 0.3) / 2,
+                    zz - z + (wh + 0.3) / 2,
+                ):
+                    continue
+                if 'roofCrown' in form and side_wall_blocks_window(
+                    form['roofCrown'],
+                    x,
+                    y,
+                    nx,
+                    ny,
+                    ww + 0.3,
+                    zz - z - (wh + 0.3) / 2,
+                    zz - z + (wh + 0.3) / 2,
+                ):
+                    continue
+                blocked_by_door = False
                 for entry in form['entrances']:
-                    if recessed_entry_blocks_window(entry,x,y,nx,ny,zz-z-wh/2,zz-z+wh/2,ww):
-                        blocked_by_door=True;break
-                    if flush_entrance_blocks_window(entry,x,y,nx,ny,zz-z-wh/2,zz-z+wh/2,ww):
-                        blocked_by_door=True;break
-                    if 'attachedPortico' not in entry and 'doorFrame' not in entry and 'shelter' not in entry and not floor_heights:continue
-                    bearing=math.radians(entry['bearing']);enx,eny=math.sin(bearing),math.cos(bearing)
-                    ex,ey=entry['center'];floor=z+(entry['shelter']['floorHeight'] if 'shelter' in entry else entry['attachedPortico']['platformHeight'] if 'attachedPortico' in entry else entry.get('landingHeight',0))
-                    door_top=entry['shelter']['doorHeight']+entry['shelter']['transomHeight']+.12 if 'shelter' in entry else 2.8
-                    doorway_width=entry['width']+entry.get('shelter',entry.get('doorFrame',{})).get('pierWidth',0)
-                    if (nx*enx+ny*eny>.999 and abs((x-ex)*enx+(y-ey)*eny)<.3
-                            and abs((x-ex)*eny-(y-ey)*enx)<(doorway_width+ww+.3)/2
-                            and zz-wh/2<floor+door_top and zz+wh/2>floor):
-                        blocked_by_door=True;break
-                for door in form.get('stairAccessDoors',[]):
-                    door_angle=math.radians(door['bearing']);dnx,dny=math.sin(door_angle),math.cos(door_angle);ex,ey=door['center']
-                    if nx*dnx+ny*dny>.999 and abs((x-ex)*dnx+(y-ey)*dny)<.3 and abs((x-ex)*dny-(y-ey)*dnx)<(door['width']+ww+.3)/2 and zz-wh/2<z+door['floor']+door['height'] and zz+wh/2>z+door['floor']:
-                        blocked_by_door=True
-                if blocked_by_door:continue
+                    if recessed_entry_blocks_window(
+                        entry, x, y, nx, ny, zz - z - wh / 2, zz - z + wh / 2, ww
+                    ):
+                        blocked_by_door = True
+                        break
+                    if flush_entrance_blocks_window(
+                        entry, x, y, nx, ny, zz - z - wh / 2, zz - z + wh / 2, ww
+                    ):
+                        blocked_by_door = True
+                        break
+                    if (
+                        'attachedPortico' not in entry
+                        and 'doorFrame' not in entry
+                        and 'shelter' not in entry
+                        and not floor_heights
+                    ):
+                        continue
+                    bearing = math.radians(entry['bearing'])
+                    enx, eny = math.sin(bearing), math.cos(bearing)
+                    ex, ey = entry['center']
+                    floor = z + (
+                        entry['shelter']['floorHeight']
+                        if 'shelter' in entry
+                        else entry['attachedPortico']['platformHeight']
+                        if 'attachedPortico' in entry
+                        else entry.get('landingHeight', 0)
+                    )
+                    door_top = (
+                        entry['shelter']['doorHeight']
+                        + entry['shelter']['transomHeight']
+                        + 0.12
+                        if 'shelter' in entry
+                        else 2.8
+                    )
+                    doorway_width = entry['width'] + entry.get(
+                        'shelter', entry.get('doorFrame', {})
+                    ).get('pierWidth', 0)
+                    if (
+                        nx * enx + ny * eny > 0.999
+                        and abs((x - ex) * enx + (y - ey) * eny) < 0.3
+                        and abs((x - ex) * eny - (y - ey) * enx)
+                        < (doorway_width + ww + 0.3) / 2
+                        and zz - wh / 2 < floor + door_top
+                        and zz + wh / 2 > floor
+                    ):
+                        blocked_by_door = True
+                        break
+                for door in form.get('stairAccessDoors', []):
+                    door_angle = math.radians(door['bearing'])
+                    dnx, dny = math.sin(door_angle), math.cos(door_angle)
+                    ex, ey = door['center']
+                    if (
+                        nx * dnx + ny * dny > 0.999
+                        and abs((x - ex) * dnx + (y - ey) * dny) < 0.3
+                        and abs((x - ex) * dny - (y - ey) * dnx)
+                        < (door['width'] + ww + 0.3) / 2
+                        and zz - wh / 2 < z + door['floor'] + door['height']
+                        and zz + wh / 2 > z + door['floor']
+                    ):
+                        blocked_by_door = True
+                if blocked_by_door:
+                    continue
                 if detail:
-                    windows.box(x, y, zz, ww+.30, .22, wh+.30, C['white'], theta)
-                    windows.box(x+nx*.13, y+ny*.13, zz, ww, .10, wh,
-                                C['shadeGlass'] if (seed+i*7+level*13)%7 < 2 else C['glass'], theta)
-                    windows.box(x+nx*.2, y+ny*.2, zz, .055, .10, wh, C['white'], theta)
-                    if not recessed and rule.get('balconies',balconies) and i%2 == 0:
-                        windows.box(x+nx*.65, y+ny*.65, zz-wh*.52, ww+.5, 1.3, .14, C['white'], theta)
-                        windows.box(x+nx*1.15, y+ny*1.15, zz-wh*.25, ww+.5, .1, .65, wall, theta)
+                    windows.box(x, y, zz, ww + 0.30, 0.22, wh + 0.30, C['white'], theta)
+                    windows.box(
+                        x + nx * 0.13,
+                        y + ny * 0.13,
+                        zz,
+                        ww,
+                        0.10,
+                        wh,
+                        C['shadeGlass']
+                        if (seed + i * 7 + level * 13) % 7 < 2
+                        else C['glass'],
+                        theta,
+                    )
+                    windows.box(
+                        x + nx * 0.2,
+                        y + ny * 0.2,
+                        zz,
+                        0.055,
+                        0.10,
+                        wh,
+                        C['white'],
+                        theta,
+                    )
+                    if not recessed and rule.get('balconies', balconies) and i % 2 == 0:
+                        windows.box(
+                            x + nx * 0.65,
+                            y + ny * 0.65,
+                            zz - wh * 0.52,
+                            ww + 0.5,
+                            1.3,
+                            0.14,
+                            C['white'],
+                            theta,
+                        )
+                        windows.box(
+                            x + nx * 1.15,
+                            y + ny * 1.15,
+                            zz - wh * 0.25,
+                            ww + 0.5,
+                            0.1,
+                            0.65,
+                            wall,
+                            theta,
+                        )
                 else:
-                    ux, uy = dx/length*ww/2, dy/length*ww/2
-                    windows.face([(x-ux,y-uy,zz-wh/2),(x+ux,y+uy,zz-wh/2),
-                                  (x+ux,y+uy,zz+wh/2),(x-ux,y-uy,zz+wh/2)], C['glass'])
+                    ux, uy = dx / length * ww / 2, dy / length * ww / 2
+                    windows.face(
+                        [
+                            (x - ux, y - uy, zz - wh / 2),
+                            (x + ux, y + uy, zz - wh / 2),
+                            (x + ux, y + uy, zz + wh / 2),
+                            (x - ux, y - uy, zz + wh / 2),
+                        ],
+                        C['glass'],
+                    )
     m.add_part('04_立面窗格', windows)
     return m

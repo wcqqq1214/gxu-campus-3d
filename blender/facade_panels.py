@@ -3,6 +3,7 @@
 Screen holes reveal a dark backing plane. This is an exterior approximation,
 not a cut-out building interior or a surveyed reproduction of floral tracery.
 """
+
 import math
 
 from facade_bands import frame
@@ -14,96 +15,160 @@ def add_panels(mesh, facade, z, C):
         if p['type'] == 'round-window-wall':
             add_round_window_wall(mesh, facade, p, z, C)
             continue
-        w = (p['to']-p['from'])*length; h = p['top']-p['bottom']; fw = p['frameWidth']
-        frame_material=C[p.get('frameFinish','white')]
-        x, y = point((p['from']+p['to'])/2, .025)
-        if p['type']=='solid':
-            mesh.box(x,y,z+(p['bottom']+p['top'])/2,w,p['depth'],h,C[p.get('finish','white')],theta)
+        w = (p['to'] - p['from']) * length
+        h = p['top'] - p['bottom']
+        fw = p['frameWidth']
+        frame_material = C[p.get('frameFinish', 'white')]
+        x, y = point((p['from'] + p['to']) / 2, 0.025)
+        if p['type'] == 'solid':
+            mesh.box(
+                x,
+                y,
+                z + (p['bottom'] + p['top']) / 2,
+                w,
+                p['depth'],
+                h,
+                C[p.get('finish', 'white')],
+                theta,
+            )
             continue
-        mesh.box(x, y, z+(p['bottom']+p['top'])/2, w, .03, h,
-                 C['glass'] if p['type']=='glazing' else C['dark'], theta)
+        mesh.box(
+            x,
+            y,
+            z + (p['bottom'] + p['top']) / 2,
+            w,
+            0.03,
+            h,
+            C['glass'] if p['type'] == 'glazing' else C['dark'],
+            theta,
+        )
 
         def bar(a, b, width):
-            ds, dh = b[0]-a[0], b[1]-a[1]; size = math.hypot(ds, dh)
-            vs, vh = -dh/size*width/2, ds/size*width/2
-            corners = [(a[0]-vs, a[1]-vh), (b[0]-vs, b[1]-vh),
-                       (b[0]+vs, b[1]+vh), (a[0]+vs, a[1]+vh)]
-            if u[1]*n[0]-u[0]*n[1] < 0:
+            ds, dh = b[0] - a[0], b[1] - a[1]
+            size = math.hypot(ds, dh)
+            vs, vh = -dh / size * width / 2, ds / size * width / 2
+            corners = [
+                (a[0] - vs, a[1] - vh),
+                (b[0] - vs, b[1] - vh),
+                (b[0] + vs, b[1] + vh),
+                (a[0] + vs, a[1] + vh),
+            ]
+            if u[1] * n[0] - u[0] * n[1] < 0:
                 corners.reverse()
+
             def at(s, up, depth):
-                px, py = point(p['from']+s/length, depth)
-                return (px, py, z+p['bottom']+up)
-            front = [at(s, up, .05+p['depth']) for s, up in corners]
-            back = [at(s, up, .05) for s, up in corners]
-            mesh.face(front, frame_material); mesh.face(back[::-1], frame_material)
+                px, py = point(p['from'] + s / length, depth)
+                return (px, py, z + p['bottom'] + up)
+
+            front = [at(s, up, 0.05 + p['depth']) for s, up in corners]
+            back = [at(s, up, 0.05) for s, up in corners]
+            mesh.face(front, frame_material)
+            mesh.face(back[::-1], frame_material)
             for i in range(4):
-                j = (i+1)%4
+                j = (i + 1) % 4
                 mesh.face([front[j], front[i], back[i], back[j]], frame_material)
 
         # Frames are entirely contained by the configured outer rectangle.
-        bar((fw/2, 0), (fw/2, h), fw)
-        bar((w-fw/2, 0), (w-fw/2, h), fw)
-        bar((fw, fw/2), (w-fw, fw/2), fw)
-        bar((fw, h-fw/2), (w-fw, h-fw/2), fw)
-        cw = (w-2*fw)/p['columns']; ch = (h-2*fw)/p['rows']
-        if p['type']=='glazing':
+        bar((fw / 2, 0), (fw / 2, h), fw)
+        bar((w - fw / 2, 0), (w - fw / 2, h), fw)
+        bar((fw, fw / 2), (w - fw, fw / 2), fw)
+        bar((fw, h - fw / 2), (w - fw, h - fw / 2), fw)
+        cw = (w - 2 * fw) / p['columns']
+        ch = (h - 2 * fw) / p['rows']
+        if p['type'] == 'glazing':
             for col in range(1, p['columns']):
-                s = fw+col*cw; bar((s, fw), (s, h-fw), fw*.65)
+                s = fw + col * cw
+                bar((s, fw), (s, h - fw), fw * 0.65)
             for row in range(1, p['rows']):
-                up = fw+(p['rowFractions'][row-1]*(h-2*fw) if 'rowFractions' in p else row*ch)
-                bar((fw, up), (w-fw, up), fw*.65)
+                up = fw + (
+                    p['rowFractions'][row - 1] * (h - 2 * fw)
+                    if 'rowFractions' in p
+                    else row * ch
+                )
+                bar((fw, up), (w - fw, up), fw * 0.65)
             continue
         # Adjacent octagons share straight edges. Deduplicate these bars;
         # the small corner diamonds remain open like the reference screen.
         edges = set()
         for row in range(p['rows']):
             for col in range(p['columns']):
-                s = fw+col*cw; up = fw+row*ch
-                octagon = [(s+cw*dx, up+ch*dy) for dx, dy in
-                           [(0,.3),(.3,0),(.7,0),(1,.3),(1,.7),(.7,1),(.3,1),(0,.7)]]
-                for a, b in zip(octagon, octagon[1:]+octagon[:1]):
+                s = fw + col * cw
+                up = fw + row * ch
+                octagon = [
+                    (s + cw * dx, up + ch * dy)
+                    for dx, dy in [
+                        (0, 0.3),
+                        (0.3, 0),
+                        (0.7, 0),
+                        (1, 0.3),
+                        (1, 0.7),
+                        (0.7, 1),
+                        (0.3, 1),
+                        (0, 0.7),
+                    ]
+                ]
+                for a, b in zip(octagon, octagon[1:] + octagon[:1]):
                     key = tuple(sorted(tuple(round(v, 8) for v in q) for q in (a, b)))
                     if key not in edges:
-                        edges.add(key); bar(a, b, fw*.55)
+                        edges.add(key)
+                        bar(a, b, fw * 0.55)
 
 
 def add_round_window_wall(mesh, facade, panel, z, C):
     length, u, n, theta, point = frame(facade)
     geometry = facade['roundWindowWalls'][panel['id']]
-    rings = geometry['rings']; xy = [v for ring in rings for v in ring]
-    reverse = u[1]*n[0]-u[0]*n[1] < 0
+    rings = geometry['rings']
+    xy = [v for ring in rings for v in ring]
+    reverse = u[1] * n[0] - u[0] * n[1] < 0
 
     def at(v, depth):
-        x,y = point(panel['from']+v[0]/length, depth)
-        return (x,y,z+panel['bottom']+v[1])
+        x, y = point(panel['from'] + v[0] / length, depth)
+        return (x, y, z + panel['bottom'] + v[1])
 
     def oriented(vertices):
         return vertices[::-1] if reverse else vertices
 
-    front_depth = .05+panel['depth']; back_depth = .025
+    front_depth = 0.05 + panel['depth']
+    back_depth = 0.025
     indices = geometry['triangles']
-    for i in range(0,len(indices),3):
-        triangle = oriented([xy[j] for j in indices[i:i+3]])
-        mesh.face([at(v,front_depth) for v in triangle],C['white'])
-        mesh.face([at(v,back_depth) for v in triangle[::-1]],C['white'])
+    for i in range(0, len(indices), 3):
+        triangle = oriented([xy[j] for j in indices[i : i + 3]])
+        mesh.face([at(v, front_depth) for v in triangle], C['white'])
+        mesh.face([at(v, back_depth) for v in triangle[::-1]], C['white'])
     for ring in rings:
         boundary = oriented(ring)
-        for a,b in zip(boundary,boundary[1:]+boundary[:1]):
-            mesh.face([at(b,front_depth),at(a,front_depth),at(a,back_depth),at(b,back_depth)],C['white'])
+        for a, b in zip(boundary, boundary[1:] + boundary[:1]):
+            mesh.face(
+                [
+                    at(b, front_depth),
+                    at(a, front_depth),
+                    at(a, back_depth),
+                    at(b, back_depth),
+                ],
+                C['white'],
+            )
     for ring in rings[1:]:
         # Hole boundaries are clockwise; glazing fronts face the exterior.
         boundary = oriented(ring[::-1])
-        mesh.face([at(v,.04) for v in boundary],C['glass'])
-        mesh.face([at(v,.01) for v in boundary[::-1]],C['glass'])
-        for a,b in zip(boundary,boundary[1:]+boundary[:1]):
-            mesh.face([at(b,.04),at(a,.04),at(a,.01),at(b,.01)],C['glass'])
+        mesh.face([at(v, 0.04) for v in boundary], C['glass'])
+        mesh.face([at(v, 0.01) for v in boundary[::-1]], C['glass'])
+        for a, b in zip(boundary, boundary[1:] + boundary[:1]):
+            mesh.face([at(b, 0.04), at(a, 0.04), at(a, 0.01), at(b, 0.01)], C['glass'])
 
 
 def panel_replaces_window(facade, fraction, width, center_height, height):
     """Remove intersecting default windows, including the larger near frame."""
     length = math.dist(facade['start'], facade['end'])
-    rectangle = (fraction*length-(width+.30)/2, fraction*length+(width+.30)/2,
-                 center_height-(height+.30)/2, center_height+(height+.30)/2)
-    return any(rectangle[0] < p['to']*length and rectangle[1] > p['from']*length
-               and rectangle[2] < p['top'] and rectangle[3] > p['bottom']
-               for p in facade['rule'].get('panels', []))
+    rectangle = (
+        fraction * length - (width + 0.30) / 2,
+        fraction * length + (width + 0.30) / 2,
+        center_height - (height + 0.30) / 2,
+        center_height + (height + 0.30) / 2,
+    )
+    return any(
+        rectangle[0] < p['to'] * length
+        and rectangle[1] > p['from'] * length
+        and rectangle[2] < p['top']
+        and rectangle[3] > p['bottom']
+        for p in facade['rule'].get('panels', [])
+    )

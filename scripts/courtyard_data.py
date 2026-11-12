@@ -1,4 +1,5 @@
 """A bounded courtyard layout anchored to existing building vertices."""
+
 import copy
 import math
 
@@ -10,10 +11,25 @@ from surroundings_data import triangulate
 
 
 def derive_courtyard(config, buildings, source_ids):
-    keys = {'id', 'type', 'buildingId', 'footprintRevision', 'boundaryVertices',
-            'frameVertices', 'contextRevisions', 'buildingClearance', 'surfaceOffset',
-            'openAreaLocal', 'trees', 'sourceRefs', 'evidence'}
-    if set(config)-{'stairConnection'} != keys or config['type'] != 'courtyard-paving':
+    keys = {
+        'id',
+        'type',
+        'buildingId',
+        'footprintRevision',
+        'boundaryVertices',
+        'frameVertices',
+        'contextRevisions',
+        'buildingClearance',
+        'surfaceOffset',
+        'openAreaLocal',
+        'trees',
+        'sourceRefs',
+        'evidence',
+    }
+    if (
+        set(config) - {'stairConnection'} != keys
+        or config['type'] != 'courtyard-paving'
+    ):
         raise ValueError('Invalid courtyard fields')
     by_id = {b['id']: b for b in buildings}
     b = by_id.get(config['buildingId'])
@@ -21,26 +37,53 @@ def derive_courtyard(config, buildings, source_ids):
         raise ValueError('Stale courtyard building')
     if not config['sourceRefs'] or not set(config['sourceRefs']) <= source_ids:
         raise ValueError('Unknown courtyard source')
-    if not isinstance(config['evidence'], dict) or set(config['evidence']) != {'location', 'layout', 'dimensions', 'ground'} or not all(isinstance(s, str) and s.strip() for s in config['evidence'].values()):
+    if (
+        not isinstance(config['evidence'], dict)
+        or set(config['evidence']) != {'location', 'layout', 'dimensions', 'ground'}
+        or not all(
+            isinstance(s, str) and s.strip() for s in config['evidence'].values()
+        )
+    ):
         raise ValueError('Missing courtyard evidence')
-    for key, limits in [('buildingClearance', (.05, .5)), ('surfaceOffset', (.03, .08))]:
+    for key, limits in [
+        ('buildingClearance', (0.05, 0.5)),
+        ('surfaceOffset', (0.03, 0.08)),
+    ]:
         value = config[key]
-        if type(value) not in (int, float) or not math.isfinite(value) or not limits[0] <= value <= limits[1]:
+        if (
+            type(value) not in (int, float)
+            or not math.isfinite(value)
+            or not limits[0] <= value <= limits[1]
+        ):
             raise ValueError('Invalid courtyard ' + key)
     ring = b['polygons'][0][0]
+
     def vertices(indices, count):
-        if not isinstance(indices, list) or len(indices) != count or len(set(indices)) != count or any(type(i) is not int or not 0 <= i < len(ring)-1 for i in indices):
+        if (
+            not isinstance(indices, list)
+            or len(indices) != count
+            or len(set(indices)) != count
+            or any(type(i) is not int or not 0 <= i < len(ring) - 1 for i in indices)
+        ):
             raise ValueError('Invalid courtyard vertex anchors')
         return [ring[i] for i in indices]
+
     boundary = Polygon(vertices(config['boundaryVertices'], 4))
     if not boundary.is_valid or not 50 <= boundary.area <= 2000:
         raise ValueError('Invalid courtyard boundary')
     a, z = vertices(config['frameVertices'], 2)
-    angle = math.atan2(z[1]-a[1], z[0]-a[0]); cs, sn = math.cos(angle), math.sin(angle)
+    angle = math.atan2(z[1] - a[1], z[0] - a[0])
+    cs, sn = math.cos(angle), math.sin(angle)
+
     def world(p):
-        if not isinstance(p, list) or len(p) != 2 or any(type(v) not in (int, float) or not math.isfinite(v) for v in p):
+        if (
+            not isinstance(p, list)
+            or len(p) != 2
+            or any(type(v) not in (int, float) or not math.isfinite(v) for v in p)
+        ):
             raise ValueError('Invalid courtyard local point')
-        return [a[0]+p[0]*cs-p[1]*sn, a[1]+p[0]*sn+p[1]*cs]
+        return [a[0] + p[0] * cs - p[1] * sn, a[1] + p[0] * sn + p[1] * cs]
+
     obstacles = []
     neighbours = set()
     for other in buildings:
@@ -48,7 +91,9 @@ def derive_courtyard(config, buildings, source_ids):
         if shape.intersects(boundary.buffer(config['buildingClearance'])):
             if other['id'] != b['id']:
                 neighbours.add(other['id'])
-                if config['contextRevisions'].get(other['id']) != footprint_revision(other):
+                if config['contextRevisions'].get(other['id']) != footprint_revision(
+                    other
+                ):
                     raise ValueError('Stale or unrecorded courtyard neighbour')
             obstacles.append(shape.buffer(config['buildingClearance'], join_style=2))
     if neighbours != set(config['contextRevisions']):
@@ -61,34 +106,54 @@ def derive_courtyard(config, buildings, source_ids):
     if not isinstance(config['trees'], list) or not 1 <= len(config['trees']) <= 8:
         raise ValueError('Courtyard requires a small explicit tree layout')
     for item in config['trees']:
-        if set(item) != {'id', 'local', 'height', 'template', 'pitRadius'} or not isinstance(item['id'], str) or not item['id'] or item['id'] in ids:
+        if (
+            set(item) != {'id', 'local', 'height', 'template', 'pitRadius'}
+            or not isinstance(item['id'], str)
+            or not item['id']
+            or item['id'] in ids
+        ):
             raise ValueError('Invalid or duplicate courtyard tree')
         ids.add(item['id'])
-        for key, limits in [('height', (4, 20)), ('pitRadius', (.8, 2))]:
-            if type(item[key]) not in (int, float) or not math.isfinite(item[key]) or not limits[0] <= item[key] <= limits[1]:
+        for key, limits in [('height', (4, 20)), ('pitRadius', (0.8, 2))]:
+            if (
+                type(item[key]) not in (int, float)
+                or not math.isfinite(item[key])
+                or not limits[0] <= item[key] <= limits[1]
+            ):
                 raise ValueError('Invalid courtyard tree ' + key)
         if type(item['template']) is not int or item['template'] not in (0, 1, 2):
             raise ValueError('Invalid courtyard tree template')
         xy = [round(v, 1) for v in world(item['local'])]
-        point = Point(xy); pit = point.buffer(item['pitRadius'], quad_segs=6)
+        point = Point(xy)
+        pit = point.buffer(item['pitRadius'], quad_segs=6)
         if not available.covers(pit) or any(pit.intersects(p) for p in pits):
             raise ValueError('Courtyard tree pit leaves available ground or overlaps')
-        if open_area.distance(point) <= 4*item['height']/9+1:
+        if open_area.distance(point) <= 4 * item['height'] / 9 + 1:
             raise ValueError('Tree crown intrudes into courtyard activity area')
-        pits.append(pit); trees.append([*xy, item['height'], item['template']])
+        pits.append(pit)
+        trees.append([*xy, item['height'], item['template']])
     paving = available.difference(unary_union(pits))
     if paving.geom_type != 'Polygon' or not paving.is_valid:
         raise ValueError('Courtyard paving must remain connected')
-    result = {**copy.deepcopy(config), 'origin': a, 'angle': angle,
-              'pavingPolygon': list(paving.exterior.coords),
-              'pavingHoles': [list(r.coords) for r in paving.interiors],
-              'replacementPolygon': list(boundary.exterior.coords),
-              'openAreaPolygon': list(open_area.exterior.coords),
-              'treeCandidates': trees, 'pavingMesh': triangulate(paving),
-              'gradingBounds': list(boundary.bounds), 'layer': 'roads', 'material': 'path'}
+    result = {
+        **copy.deepcopy(config),
+        'origin': a,
+        'angle': angle,
+        'pavingPolygon': list(paving.exterior.coords),
+        'pavingHoles': [list(r.coords) for r in paving.interiors],
+        'replacementPolygon': list(boundary.exterior.coords),
+        'openAreaPolygon': list(open_area.exterior.coords),
+        'treeCandidates': trees,
+        'pavingMesh': triangulate(paving),
+        'gradingBounds': list(boundary.bounds),
+        'layer': 'roads',
+        'material': 'path',
+    }
     area = paving
     if 'stairConnection' in config:
-        connection, patch = derive_stair_connection(config['stairConnection'], paving, buildings)
+        connection, patch = derive_stair_connection(
+            config['stairConnection'], paving, buildings
+        )
         result['stairConnection'] = connection
         area = unary_union([paving, patch])
     return result, area, area
@@ -96,10 +161,19 @@ def derive_courtyard(config, buildings, source_ids):
 
 def derive_stair_connection(config, paving, buildings):
     """Close a short gap to an existing stair base, without extending a road."""
-    if not isinstance(config, dict) or set(config) != {'buildingId', 'footprintRevision', 'width', 'evidence'}:
+    if not isinstance(config, dict) or set(config) != {
+        'buildingId',
+        'footprintRevision',
+        'width',
+        'evidence',
+    }:
         raise ValueError('Invalid courtyard stair connection fields')
     width = config['width']
-    if type(width) not in (int, float) or not math.isfinite(width) or not 1.2 <= width <= 3:
+    if (
+        type(width) not in (int, float)
+        or not math.isfinite(width)
+        or not 1.2 <= width <= 3
+    ):
         raise ValueError('Invalid courtyard stair connection width')
     if not isinstance(config['evidence'], str) or not config['evidence'].strip():
         raise ValueError('Missing courtyard stair connection evidence')
@@ -109,44 +183,78 @@ def derive_stair_connection(config, paving, buildings):
         raise ValueError('Missing or stale courtyard stair target')
     cs, sn = math.cos(stair['angle']), math.sin(stair['angle'])
     ox, oy = stair['origin']
-    def world(p): return (ox+p[0]*cs-p[1]*sn, oy+p[0]*sn+p[1]*cs)
-    ground = unary_union([Polygon([world(p) for p in poly[0]], [[world(p) for p in ring] for ring in poly[1:]]) for poly in stair['ground']['polygons']])
+
+    def world(p):
+        return (ox + p[0] * cs - p[1] * sn, oy + p[0] * sn + p[1] * cs)
+
+    ground = unary_union(
+        [
+            Polygon(
+                [world(p) for p in poly[0]],
+                [[world(p) for p in ring] for ring in poly[1:]],
+            )
+            for poly in stair['ground']['polygons']
+        ]
+    )
     p, q = nearest_points(paving, ground)
     gap = p.distance(q)
-    if not .1 <= gap <= 3:
+    if not 0.1 <= gap <= 3:
         raise ValueError('Courtyard stair connection must span a short separated gap')
-    start = list(p.coords[0]); normal = [(q.x-p.x)/gap, (q.y-p.y)/gap]
+    start = list(p.coords[0])
+    normal = [(q.x - p.x) / gap, (q.y - p.y) / gap]
     tangent = [-normal[1], normal[0]]
-    def point(s, d): return [start[i]+tangent[i]*s+normal[i]*d for i in (0, 1)]
-    contact = LineString([point(-width/2, 0), point(width/2, 0)])
-    if paving.boundary.buffer(1e-7).intersection(contact).length < width-1e-6:
-        raise ValueError('Courtyard connection requires a straight full-width paving edge')
-    stations = {-width/2, width/2}
+
+    def point(s, d):
+        return [start[i] + tangent[i] * s + normal[i] * d for i in (0, 1)]
+
+    contact = LineString([point(-width / 2, 0), point(width / 2, 0)])
+    if paving.boundary.buffer(1e-7).intersection(contact).length < width - 1e-6:
+        raise ValueError(
+            'Courtyard connection requires a straight full-width paving edge'
+        )
+    stations = {-width / 2, width / 2}
     for x, y in ground.exterior.coords:
-        s = (x-start[0])*tangent[0]+(y-start[1])*tangent[1]
-        if -width/2 < s < width/2: stations.add(s)
+        s = (x - start[0]) * tangent[0] + (y - start[1]) * tangent[1]
+        if -width / 2 < s < width / 2:
+            stations.add(s)
     sections = []
     for s in sorted(stations):
         a = point(s, 0)
-        hit = LineString([a, point(s, gap+width+3)]).intersection(ground)
+        hit = LineString([a, point(s, gap + width + 3)]).intersection(ground)
         if hit.geom_type != 'LineString' or hit.is_empty:
-            raise ValueError('Courtyard connection does not meet a continuous stair base')
+            raise ValueError(
+                'Courtyard connection does not meet a continuous stair base'
+            )
         end = min(hit.coords, key=lambda v: math.dist(a, v))
-        if not .1 <= math.dist(a, end) <= 3:
+        if not 0.1 <= math.dist(a, end) <= 3:
             raise ValueError('Courtyard connection edge exceeds short-gap bounds')
         sections.append({'station': s, 'start': a, 'end': list(end)})
-    patch = Polygon([sections[0]['start'], sections[-1]['start'], *[s['end'] for s in reversed(sections)]])
+    patch = Polygon(
+        [
+            sections[0]['start'],
+            sections[-1]['start'],
+            *[s['end'] for s in reversed(sections)],
+        ]
+    )
     if not patch.is_valid or patch.area <= 0 or patch.intersection(paving).area > 1e-6:
         raise ValueError('Invalid courtyard connection footprint')
     for b in buildings:
         shape = unary_union([Polygon(poly[0], poly[1:]) for poly in b['polygons']])
         if patch.intersection(shape).area > 1e-6:
             raise ValueError('Courtyard connection crosses a mapped building')
-    result = {**copy.deepcopy(config), 'origin': start, 'normal': normal, 'tangent': tangent,
-              'sections': sections, 'polygon': list(patch.exterior.coords),
-              'gapMeters': gap, 'areaMeters2': patch.area,
-              'stairGeometryRevision': stair['geometryRevision'],
-              'hostCenter': stair['hostCenter'], 'platformOffset': stair['config']['baseHeight']}
+    result = {
+        **copy.deepcopy(config),
+        'origin': start,
+        'normal': normal,
+        'tangent': tangent,
+        'sections': sections,
+        'polygon': list(patch.exterior.coords),
+        'gapMeters': gap,
+        'areaMeters2': patch.area,
+        'stairGeometryRevision': stair['geometryRevision'],
+        'hostCenter': stair['hostCenter'],
+        'platformOffset': stair['config']['baseHeight'],
+    }
     return result, patch
 
 
@@ -154,7 +262,7 @@ def apply_courtyards(trees, sites):
     """Replace only the named courtyard background; final exclusion passes follow."""
     courts = [s for s in sites if s.get('type') == 'courtyard-paving']
     masks = [Polygon(s['replacementPolygon']) for s in courts]
-    if any(a.intersects(b) for i, a in enumerate(masks) for b in masks[i+1:]):
+    if any(a.intersects(b) for i, a in enumerate(masks) for b in masks[i + 1 :]):
         raise ValueError('Overlapping courtyard layouts')
     kept = [t for t in trees if not any(m.covers(Point(t[:2])) for m in masks)]
     existing = {tuple(t[:4]): t for t in trees}
@@ -162,9 +270,15 @@ def apply_courtyards(trees, sites):
     for site, mask in zip(courts, masks):
         candidates = [existing.get(tuple(t), t) for t in site['treeCandidates']]
         kept.extend(candidates)
-        records.append({'id': site['id'], 'candidates': candidates,
-                        'replacedPriorRows': sum(mask.covers(Point(t[:2])) for t in trees),
-                        'openAreaPolygon': site['openAreaPolygon'], 'sourceRefs': site['sourceRefs']})
+        records.append(
+            {
+                'id': site['id'],
+                'candidates': candidates,
+                'replacedPriorRows': sum(mask.covers(Point(t[:2])) for t in trees),
+                'openAreaPolygon': site['openAreaPolygon'],
+                'sourceRefs': site['sourceRefs'],
+            }
+        )
     if len({tuple(t[:2]) for t in kept}) != len(kept):
         raise ValueError('Courtyard creates duplicate tree positions')
     return kept, records

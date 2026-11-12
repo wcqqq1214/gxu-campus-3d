@@ -9,78 +9,141 @@ from explicit_roof_data import resolve_roof_mesh
 class ExplicitRoofTests(unittest.TestCase):
     def fixture(self):
         poly = [[[[0, 0], [12, 0], [12, 8], [0, 8], [0, 0]]]]
-        mesh = {'vertices': [[0,0,0],[12,0,0],[12,8,0],[0,8,0],[4,4,2],[8,4,2]],
-                'triangles': [0,1,5,0,5,4,1,2,5,2,3,4,2,4,5,3,0,4]}
+        mesh = {
+            'vertices': [
+                [0, 0, 0],
+                [12, 0, 0],
+                [12, 8, 0],
+                [0, 8, 0],
+                [4, 4, 2],
+                [8, 4, 2],
+            ],
+            'triangles': [0, 1, 5, 0, 5, 4, 1, 2, 5, 2, 3, 4, 2, 4, 5, 3, 0, 4],
+        }
         return poly, mesh
 
     def test_continuous_roof_rotation_winding_and_input_preservation(self):
         poly, mesh = self.fixture()
         before = copy.deepcopy(mesh)
-        for angle in (0, .67):
-            transform = lambda p: [p[0]*math.cos(angle)-p[1]*math.sin(angle), p[0]*math.sin(angle)+p[1]*math.cos(angle)]
-            rotated = {'vertices':[transform(v)+v[2:] for v in mesh['vertices']],
-                       'triangles':list(reversed(mesh['triangles']))}
-            result = resolve_roof_mesh([[list(map(transform,poly[0][0]))]], rotated, 2)
-            self.assertEqual(len(result['triangles']),18)
-        self.assertEqual(mesh,before)
+        for angle in (0, 0.67):
+            transform = lambda p: [
+                p[0] * math.cos(angle) - p[1] * math.sin(angle),
+                p[0] * math.sin(angle) + p[1] * math.cos(angle),
+            ]
+            rotated = {
+                'vertices': [transform(v) + v[2:] for v in mesh['vertices']],
+                'triangles': list(reversed(mesh['triangles'])),
+            }
+            result = resolve_roof_mesh([[list(map(transform, poly[0][0]))]], rotated, 2)
+            self.assertEqual(len(result['triangles']), 18)
+        self.assertEqual(mesh, before)
 
     def test_rejects_gap_overlap_bad_index_and_elevated_eave(self):
         poly, mesh = self.fixture()
-        variants=[]
-        gap=copy.deepcopy(mesh);gap['triangles']=gap['triangles'][:-3];variants.append(gap)
-        overlap=copy.deepcopy(mesh);overlap['triangles']+=overlap['triangles'][:3];variants.append(overlap)
-        invalid=copy.deepcopy(mesh);invalid['triangles'][0]=True;variants.append(invalid)
-        high=copy.deepcopy(mesh);high['vertices'][0][2]=.2;variants.append(high)
+        variants = []
+        gap = copy.deepcopy(mesh)
+        gap['triangles'] = gap['triangles'][:-3]
+        variants.append(gap)
+        overlap = copy.deepcopy(mesh)
+        overlap['triangles'] += overlap['triangles'][:3]
+        variants.append(overlap)
+        invalid = copy.deepcopy(mesh)
+        invalid['triangles'][0] = True
+        variants.append(invalid)
+        high = copy.deepcopy(mesh)
+        high['vertices'][0][2] = 0.2
+        variants.append(high)
         for candidate in variants:
-            with self.subTest(candidate=candidate),self.assertRaises(ValueError):
-                resolve_roof_mesh(poly,candidate,2)
+            with self.subTest(candidate=candidate), self.assertRaises(ValueError):
+                resolve_roof_mesh(poly, candidate, 2)
 
     def test_rejects_courtyard_fill_and_discontinuous_duplicate_vertex(self):
         poly, mesh = self.fixture()
-        poly[0].append([[5,3],[7,3],[7,5],[5,5],[5,3]])
-        with self.assertRaisesRegex(ValueError,'tile'):resolve_roof_mesh(poly,mesh,2)
-        poly,mesh=self.fixture();mesh['vertices'].append([4,4,1]);mesh['triangles'][5]=6
-        with self.assertRaisesRegex(ValueError,'duplicate'):resolve_roof_mesh(poly,mesh,2)
+        poly[0].append([[5, 3], [7, 3], [7, 5], [5, 5], [5, 3]])
+        with self.assertRaisesRegex(ValueError, 'tile'):
+            resolve_roof_mesh(poly, mesh, 2)
+        poly, mesh = self.fixture()
+        mesh['vertices'].append([4, 4, 1])
+        mesh['triangles'][5] = 6
+        with self.assertRaisesRegex(ValueError, 'duplicate'):
+            resolve_roof_mesh(poly, mesh, 2)
 
     def test_part_resolution_uses_mesh_and_rejects_flat_mesh(self):
         poly, mesh = self.fixture()
-        part=dict(id='roof',polygons=poly,height=10,levels=3,roof=dict(type='hipped',rise=2,mesh=mesh))
-        b={'polygons':poly,'height':10}
-        result=resolve_parts(b,[part],dict(type='flat',rise=0))
-        self.assertEqual(result[0]['roof']['geometry'],mesh)
-        self.assertNotIn('mesh',result[0]['roof'])
-        part['roof'].update(type='flat',rise=0)
-        with self.assertRaisesRegex(ValueError,'pitched'):resolve_parts(b,[part],dict(type='flat',rise=0))
+        part = dict(
+            id='roof',
+            polygons=poly,
+            height=10,
+            levels=3,
+            roof=dict(type='hipped', rise=2, mesh=mesh),
+        )
+        b = {'polygons': poly, 'height': 10}
+        result = resolve_parts(b, [part], dict(type='flat', rise=0))
+        self.assertEqual(result[0]['roof']['geometry'], mesh)
+        self.assertNotIn('mesh', result[0]['roof'])
+        part['roof'].update(type='flat', rise=0)
+        with self.assertRaisesRegex(ValueError, 'pitched'):
+            resolve_parts(b, [part], dict(type='flat', rise=0))
 
     def test_profiled_roof_closes_raised_rim_and_keeps_legacy_eaves_strict(self):
         poly, _ = self.fixture()
-        mesh={'vertices':[[0,0,0],[12,0,0],[12,8,2],[0,8,2]],'triangles':[0,1,2,0,2,3]}
-        with self.assertRaisesRegex(ValueError,'zero rise'):resolve_roof_mesh(poly,mesh,2)
-        result=resolve_roof_mesh(poly,mesh,2,raised_eaves=True)
-        self.assertEqual(len(result['boundaryWalls']),3)
+        mesh = {
+            'vertices': [[0, 0, 0], [12, 0, 0], [12, 8, 2], [0, 8, 2]],
+            'triangles': [0, 1, 2, 0, 2, 3],
+        }
+        with self.assertRaisesRegex(ValueError, 'zero rise'):
+            resolve_roof_mesh(poly, mesh, 2)
+        result = resolve_roof_mesh(poly, mesh, 2, raised_eaves=True)
+        self.assertEqual(len(result['boundaryWalls']), 3)
         for face in result['boundaryWalls']:
-            a,b,c=face[:3];u=[b[k]-a[k] for k in range(3)];v=[c[k]-a[k] for k in range(3)]
-            normal=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2]]
-            center=[sum(p[k] for p in face)/len(face) for k in range(2)]
-            self.assertGreater(normal[0]*(center[0]-6)+normal[1]*(center[1]-4),0)
-        part=dict(id='roof',polygons=poly,height=10,levels=3,roof=dict(type='profiled',rise=2,mesh=mesh))
-        resolved=resolve_parts({'polygons':poly,'height':10},[part],dict(type='flat',rise=0))
-        self.assertEqual(resolved[0]['roof']['geometry'],result)
-        self.assertEqual(resolved[0]['polygons'],poly)
+            a, b, c = face[:3]
+            u = [b[k] - a[k] for k in range(3)]
+            v = [c[k] - a[k] for k in range(3)]
+            normal = [u[1] * v[2] - u[2] * v[1], u[2] * v[0] - u[0] * v[2]]
+            center = [sum(p[k] for p in face) / len(face) for k in range(2)]
+            self.assertGreater(
+                normal[0] * (center[0] - 6) + normal[1] * (center[1] - 4), 0
+            )
+        part = dict(
+            id='roof',
+            polygons=poly,
+            height=10,
+            levels=3,
+            roof=dict(type='profiled', rise=2, mesh=mesh),
+        )
+        resolved = resolve_parts(
+            {'polygons': poly, 'height': 10}, [part], dict(type='flat', rise=0)
+        )
+        self.assertEqual(resolved[0]['roof']['geometry'], result)
+        self.assertEqual(resolved[0]['polygons'], poly)
 
     def test_profiled_roof_requires_explicit_surface_and_body_contact(self):
-        poly,_=self.fixture()
-        part=dict(id='roof',polygons=poly,height=10,levels=3,roof=dict(type='profiled',rise=2))
-        with self.assertRaisesRegex(ValueError,'explicit mesh'):
-            resolve_parts({'polygons':poly,'height':10},[part],dict(type='flat',rise=0))
-        mesh={'vertices':[[0,0,.5],[12,0,.5],[12,8,2],[0,8,2]],'triangles':[0,1,2,0,2,3]}
-        with self.assertRaisesRegex(ValueError,'lowest eave'):resolve_roof_mesh(poly,mesh,2,raised_eaves=True)
-        mesh['vertices'][0][2]=0;mesh['triangles'].pop()
-        with self.assertRaises(ValueError):resolve_roof_mesh(poly,mesh,2,raised_eaves=True)
+        poly, _ = self.fixture()
+        part = dict(
+            id='roof',
+            polygons=poly,
+            height=10,
+            levels=3,
+            roof=dict(type='profiled', rise=2),
+        )
+        with self.assertRaisesRegex(ValueError, 'explicit mesh'):
+            resolve_parts(
+                {'polygons': poly, 'height': 10}, [part], dict(type='flat', rise=0)
+            )
+        mesh = {
+            'vertices': [[0, 0, 0.5], [12, 0, 0.5], [12, 8, 2], [0, 8, 2]],
+            'triangles': [0, 1, 2, 0, 2, 3],
+        }
+        with self.assertRaisesRegex(ValueError, 'lowest eave'):
+            resolve_roof_mesh(poly, mesh, 2, raised_eaves=True)
+        mesh['vertices'][0][2] = 0
+        mesh['triangles'].pop()
+        with self.assertRaises(ValueError):
+            resolve_roof_mesh(poly, mesh, 2, raised_eaves=True)
 
     def test_rejects_unjoined_ridge_edge_despite_complete_projection(self):
-        poly,mesh=self.fixture()
-        mesh['vertices'].append([6,4,2])
-        mesh['triangles'][3:6]=[0,5,6,0,6,4]
-        with self.assertRaisesRegex(ValueError,'unjoined interior edge'):
-            resolve_roof_mesh(poly,mesh,2)
+        poly, mesh = self.fixture()
+        mesh['vertices'].append([6, 4, 2])
+        mesh['triangles'][3:6] = [0, 5, 6, 0, 6, 4]
+        with self.assertRaisesRegex(ValueError, 'unjoined interior edge'):
+            resolve_roof_mesh(poly, mesh, 2)

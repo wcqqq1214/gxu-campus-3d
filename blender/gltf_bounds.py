@@ -1,4 +1,5 @@
 """Serialize typed FLOAT bounds compactly without changing a single Float32 bit."""
+
 import json
 import math
 import struct
@@ -32,14 +33,19 @@ def compact_float_bounds(doc):
 
 def compact_glb_float_bounds(path):
     from preserve_glb_geometry import unpack
+
     original = path.read_bytes()
     doc, binary = unpack(original)
     compact_float_bounds(doc)
     header = json.dumps(doc, separators=(',', ':')).encode()
     header += b' ' * (-len(header) % 4)
-    packed = (struct.pack('<4sII', b'glTF', 2, 28+len(header)+len(binary))
-              + struct.pack('<I4s', len(header), b'JSON') + header
-              + struct.pack('<I4s', len(binary), b'BIN\0') + binary)
+    packed = (
+        struct.pack('<4sII', b'glTF', 2, 28 + len(header) + len(binary))
+        + struct.pack('<I4s', len(header), b'JSON')
+        + header
+        + struct.pack('<I4s', len(binary), b'BIN\0')
+        + binary
+    )
     if len(packed) < len(original):
         path.write_bytes(packed)
     return len(original) - min(len(original), len(packed))

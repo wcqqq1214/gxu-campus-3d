@@ -1,4 +1,5 @@
 """Update only basketball, general sports, terrain and draped roads; retain near assets."""
+
 import hashlib
 import json
 import sys
@@ -6,9 +7,11 @@ from pathlib import Path
 
 import bpy
 
-ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'blender'))
 if not globals().get('_INCREMENTAL_CANDIDATE'):
     from incremental_update import staged_update
+
     staged_update(ROOT, __file__)
     raise SystemExit(0)
 from basketball import bank_paving, court_model
@@ -16,47 +19,101 @@ from geometry import MATERIALS
 from incremental_glb import splice_nodes, validate_retained
 from initial_model_budget import check_initial_model_budget
 
-previous_base=(ROOT/'public/models/base.glb').read_bytes()
-before={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'public/models').glob('*.glb')}
-script=ROOT/'blender/build_campus.py';ns={'__file__':str(script),'__name__':'__main__'}
+previous_base = (ROOT / 'public/models/base.glb').read_bytes()
+before = {
+    p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+    for p in (ROOT / 'public/models').glob('*.glb')
+}
+script = ROOT / 'blender/build_campus.py'
+ns = {'__file__': str(script), '__name__': '__main__'}
 sys.argv.append('--base-only')
-try:exec(compile(script.read_text(),str(script),'exec'),ns)
+try:
+    exec(compile(script.read_text(), str(script), 'exec'), ns)
 except SystemExit as e:
-    if e.code not in (0,None):raise
+    if e.code not in (0, None):
+        raise
 from preserve_glb_geometry import mesh_nodes_by_name, unpack
 
-path=ROOT/'public/models/base.glb'
-generated=path.read_bytes()
-names=set(mesh_nodes_by_name(unpack(previous_base)[0]))|set(mesh_nodes_by_name(unpack(generated)[0]))
-selected={'terrain','roads','sports','green'}|{k for k in names if k.startswith(('basketball-bank-','site-','shore-','paving-','vegetation-low-'))}
-path.write_bytes(splice_nodes(previous_base,generated,selected))
-validate_retained(previous_base,path.read_bytes(),selected)
-manifest=json.loads((ROOT/'public/data/models.json').read_text());blob=(ROOT/'public/models/base.glb').read_bytes();manifest['base'].update(bytes=len(blob),sha256=hashlib.sha256(blob).hexdigest())
-(ROOT/'public/data/models.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2))
-records=[(m.name,tuple(m.diffuse_color),m.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value,m.node_tree.nodes['Principled BSDF'].inputs['Metallic'].default_value) for m in MATERIALS]
-bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'))
-materials=[]
-for name,color,rough,metal in records:
-    mat=bpy.data.materials.get(name)
+path = ROOT / 'public/models/base.glb'
+generated = path.read_bytes()
+names = set(mesh_nodes_by_name(unpack(previous_base)[0])) | set(
+    mesh_nodes_by_name(unpack(generated)[0])
+)
+selected = {'terrain', 'roads', 'sports', 'green'} | {
+    k
+    for k in names
+    if k.startswith(
+        ('basketball-bank-', 'site-', 'shore-', 'paving-', 'vegetation-low-')
+    )
+}
+path.write_bytes(splice_nodes(previous_base, generated, selected))
+validate_retained(previous_base, path.read_bytes(), selected)
+manifest = json.loads((ROOT / 'public/data/models.json').read_text())
+blob = (ROOT / 'public/models/base.glb').read_bytes()
+manifest['base'].update(bytes=len(blob), sha256=hashlib.sha256(blob).hexdigest())
+(ROOT / 'public/data/models.json').write_text(
+    json.dumps(manifest, ensure_ascii=False, indent=2)
+)
+records = [
+    (
+        m.name,
+        tuple(m.diffuse_color),
+        m.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value,
+        m.node_tree.nodes['Principled BSDF'].inputs['Metallic'].default_value,
+    )
+    for m in MATERIALS
+]
+bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'blender/gxu-campus.blend'))
+materials = []
+for name, color, rough, metal in records:
+    mat = bpy.data.materials.get(name)
     if mat is None:
-        mat=bpy.data.materials.new(name);mat.use_nodes=True;mat.diffuse_color=color
-        bs=mat.node_tree.nodes.get('Principled BSDF');bs.inputs['Base Color'].default_value=color;bs.inputs['Roughness'].default_value=rough;bs.inputs['Metallic'].default_value=metal
+        mat = bpy.data.materials.new(name)
+        mat.use_nodes = True
+        mat.diffuse_color = color
+        bs = mat.node_tree.nodes.get('Principled BSDF')
+        bs.inputs['Base Color'].default_value = color
+        bs.inputs['Roughness'].default_value = rough
+        bs.inputs['Metallic'].default_value = metal
     materials.append(mat)
-MATERIALS[:]=materials
-collection=bpy.data.objects['terrain'].users_collection[0]
-for key,oldname,layer in [('terrain','terrain','terrain'),('roads','roads','roads'),('sports','其他运动场地','sports')]:
-    old=bpy.data.objects[oldname];mesh=old.data;bpy.data.objects.remove(old,do_unlink=True);bpy.data.meshes.remove(mesh)
-    ns['base'][key].object(oldname,collection,{'layer':layer})
+MATERIALS[:] = materials
+collection = bpy.data.objects['terrain'].users_collection[0]
+for key, oldname, layer in [
+    ('terrain', 'terrain', 'terrain'),
+    ('roads', 'roads', 'roads'),
+    ('sports', '其他运动场地', 'sports'),
+]:
+    old = bpy.data.objects[oldname]
+    mesh = old.data
+    bpy.data.objects.remove(old, do_unlink=True)
+    bpy.data.meshes.remove(mesh)
+    ns['base'][key].object(oldname, collection, {'layer': layer})
 for old in list(bpy.data.objects):
     if old.get('basketballCourt') or old.get('basketballBank'):
-        mesh=old.data;bpy.data.objects.remove(old,do_unlink=True)
-        if mesh.users==0:bpy.data.meshes.remove(mesh)
+        mesh = old.data
+        bpy.data.objects.remove(old, do_unlink=True)
+        if mesh.users == 0:
+            bpy.data.meshes.remove(mesh)
 for bank in ns['basketball']['banks']:
-    bank_paving(bank,ns['C']).object(bank['id']+'-paving',collection,{'layer':'sports','basketballBank':bank['id']})
+    bank_paving(bank, ns['C']).object(
+        bank['id'] + '-paving',
+        collection,
+        {'layer': 'sports', 'basketballBank': bank['id']},
+    )
 for court in ns['basketball']['courts']:
-    obj=court_model(court,ns['C']).object(court['id'],collection,{'layer':'sports','featureId':court['osmId'] or court['id'],'precision':court['precision'],'basketballCourt':court['id']})
+    obj = court_model(court, ns['C']).object(
+        court['id'],
+        collection,
+        {
+            'layer': 'sports',
+            'featureId': court['osmId'] or court['id'],
+            'precision': court['precision'],
+            'basketballCourt': court['id'],
+        },
+    )
     # Retain UVs and named groups, without storing four copies of every corner.
     from huicui import compact_source
+
     compact_source(obj)
 from paving_geometry import sync_source_pavings
 
@@ -72,40 +129,84 @@ from low_planting import sync_source_low_planting
 sync_source_low_planting(ns['base'])
 from mathutils.kdtree import KDTree
 
-kd=KDTree(len(ns['trees']))
-for i,t in enumerate(ns['trees']):kd.insert((t[0],t[1],0),i)
-kd.balance();survivors=[]
+kd = KDTree(len(ns['trees']))
+for i, t in enumerate(ns['trees']):
+    kd.insert((t[0], t[1], 0), i)
+kd.balance()
+survivors = []
 for o in list(bpy.data.objects):
-    if not o.name.startswith('树木示意-'):continue
-    co,index,distance=kd.find((o.location.x,o.location.y,0))
-    if distance>.02:bpy.data.objects.remove(o,do_unlink=True)
-    else:o.name='court-tree-temp-'+str(index);survivors.append((o,index))
-for o,i in survivors:o.name=f'树木示意-{i:04}';o.rotation_euler.z=ns['tree_rotation'](*ns['trees'][i][:2]);o.location.z=ns['trees'][i][4]
-assert len(survivors)==len(ns['trees'])
-bpy.ops.wm.save_as_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'),compress=True)
-print('Basketball updated in editable source and base GLB',flush=True)
+    if not o.name.startswith('树木示意-'):
+        continue
+    co, index, distance = kd.find((o.location.x, o.location.y, 0))
+    if distance > 0.02:
+        bpy.data.objects.remove(o, do_unlink=True)
+    else:
+        o.name = 'court-tree-temp-' + str(index)
+        survivors.append((o, index))
+for o, i in survivors:
+    o.name = f'树木示意-{i:04}'
+    o.rotation_euler.z = ns['tree_rotation'](*ns['trees'][i][:2])
+    o.location.z = ns['trees'][i][4]
+assert len(survivors) == len(ns['trees'])
+bpy.ops.wm.save_as_mainfile(
+    filepath=str(ROOT / 'blender/gxu-campus.blend'), compress=True
+)
+print('Basketball updated in editable source and base GLB', flush=True)
 
-assert (ROOT/'blender/gxu-campus.blend').stat().st_size<100*1024*1024
-check_initial_model_budget(manifest['base']['bytes']+manifest['trees']['bytes'])
-a,ab=unpack(previous_base);c,cb=unpack((ROOT/'public/models/base.glb').read_bytes())
-def signature(doc,binary,node):
-    result=[]
+assert (ROOT / 'blender/gxu-campus.blend').stat().st_size < 100 * 1024 * 1024
+check_initial_model_budget(manifest['base']['bytes'] + manifest['trees']['bytes'])
+a, ab = unpack(previous_base)
+c, cb = unpack((ROOT / 'public/models/base.glb').read_bytes())
+
+
+def signature(doc, binary, node):
+    result = []
     for p in doc['meshes'][node['mesh']]['primitives']:
-        v=doc['bufferViews'][p['extensions']['KHR_draco_mesh_compression']['bufferView']];start=v.get('byteOffset',0)
-        result.append((doc['materials'][p['material']]['name'],hashlib.sha256(binary[start:start+v['byteLength']]).hexdigest()))
+        v = doc['bufferViews'][
+            p['extensions']['KHR_draco_mesh_compression']['bufferView']
+        ]
+        start = v.get('byteOffset', 0)
+        result.append(
+            (
+                doc['materials'][p['material']]['name'],
+                hashlib.sha256(binary[start : start + v['byteLength']]).hexdigest(),
+            )
+        )
     return result
-changed=[];retained=[];removed=[]
-old_nodes=mesh_nodes_by_name(a);new_nodes=mesh_nodes_by_name(c)
-for name,node in old_nodes.items():
-    other=new_nodes.get(name)
+
+
+changed = []
+retained = []
+removed = []
+old_nodes = mesh_nodes_by_name(a)
+new_nodes = mesh_nodes_by_name(c)
+for name, node in old_nodes.items():
+    other = new_nodes.get(name)
     if other is None:
-        assert name in selected,name
-        removed.append(name);continue
-    if signature(a,ab,node)!=signature(c,cb,other):changed.append(name)
-    else:retained.append(name)
-bank_ids={b['id'] for b in ns['basketball']['banks']}
-assert set(changed)<=selected,changed
-assert all(hashlib.sha256((ROOT/'public/models'/n).read_bytes()).hexdigest()==h for n,h in before.items() if n!='base.glb' and n.removesuffix('.glb') not in bank_ids)
-report={'removedNodes':removed,'changedExistingNodes':changed,'preservedNodeCount':len(retained),'newNodes':sorted(set(new_nodes)-set(old_nodes)),'method':'Exact Draco primitive bytes; logical names ignore only Blender numeric suffixes, ambiguous names rejected; all unrelated GLBs retained','initialBytes':manifest['base']['bytes']+manifest['trees']['bytes'],'blendBytes':(ROOT/'blender/gxu-campus.blend').stat().st_size}
-(ROOT/'docs/model-checks/basketball-retained-nodes.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-print(report,flush=True)
+        assert name in selected, name
+        removed.append(name)
+        continue
+    if signature(a, ab, node) != signature(c, cb, other):
+        changed.append(name)
+    else:
+        retained.append(name)
+bank_ids = {b['id'] for b in ns['basketball']['banks']}
+assert set(changed) <= selected, changed
+assert all(
+    hashlib.sha256((ROOT / 'public/models' / n).read_bytes()).hexdigest() == h
+    for n, h in before.items()
+    if n != 'base.glb' and n.removesuffix('.glb') not in bank_ids
+)
+report = {
+    'removedNodes': removed,
+    'changedExistingNodes': changed,
+    'preservedNodeCount': len(retained),
+    'newNodes': sorted(set(new_nodes) - set(old_nodes)),
+    'method': 'Exact Draco primitive bytes; logical names ignore only Blender numeric suffixes, ambiguous names rejected; all unrelated GLBs retained',
+    'initialBytes': manifest['base']['bytes'] + manifest['trees']['bytes'],
+    'blendBytes': (ROOT / 'blender/gxu-campus.blend').stat().st_size,
+}
+(ROOT / 'docs/model-checks/basketball-retained-nodes.json').write_text(
+    json.dumps(report, ensure_ascii=False, indent=2) + '\n'
+)
+print(report, flush=True)

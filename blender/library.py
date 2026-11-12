@@ -1,159 +1,338 @@
 """Library architectural study: mapped courtyard and axis, 2026 front reference.
 North door dimensions follow the 2026 procurement; other dimensions are estimates.
 """
+
 import math
 
 from geometry import Mesh
 from south_gate import inscription
 
 
-def edge_frame(a,b):
-    dx=b[0]-a[0];dy=b[1]-a[1];length=math.hypot(dx,dy)
-    return length,math.atan2(dy,dx),dx/length,dy/length
+def edge_frame(a, b):
+    dx = b[0] - a[0]
+    dy = b[1] - a[1]
+    length = math.hypot(dx, dy)
+    return length, math.atan2(dy, dx), dx / length, dy / length
 
 
 def outline_edges(part):
     for poly in part['polygons']:
-        area=sum(a[0]*b[1]-b[0]*a[1] for a,b in zip(poly[0],poly[0][1:]))
-        sign=1 if area>0 else -1
+        area = sum(a[0] * b[1] - b[0] * a[1] for a, b in zip(poly[0], poly[0][1:]))
+        sign = 1 if area > 0 else -1
         for ring in poly:
-            for a,b in zip(ring,ring[1:]):
-                ln,angle,dx,dy=edge_frame(a,b)
-                if ln>.6:yield a,b,ln,angle,sign*dy,-sign*dx
+            for a, b in zip(ring, ring[1:]):
+                ln, angle, dx, dy = edge_frame(a, b)
+                if ln > 0.6:
+                    yield a, b, ln, angle, sign * dy, -sign * dx
 
 
-def library(l,b,z,C,detail):
-    m=Mesh();envelope=b['architecture'];stone=C['libraryStone'];trim=C['libraryTrim'];glass=C['libraryGlass'];metal=C['libraryMullion']
-    body=Mesh();windows=Mesh();bands=Mesh();frames=Mesh();pergolas=Mesh();entrance=Mesh();stairs=Mesh()
+def library(l, b, z, C, detail):
+    m = Mesh()
+    envelope = b['architecture']
+    stone = C['libraryStone']
+    trim = C['libraryTrim']
+    glass = C['libraryGlass']
+    metal = C['libraryMullion']
+    body = Mesh()
+    windows = Mesh()
+    bands = Mesh()
+    frames = Mesh()
+    pergolas = Mesh()
+    entrance = Mesh()
+    stairs = Mesh()
     for part in envelope['parts']:
-        h=part['height'];body.extrude(part['polygons'],part['triangles'],z,h,stone,C['paleRoof'])
-        floors=part['levels']
-        for a,bb,ln,angle,nx,ny in outline_edges(part):
-            dx=(bb[0]-a[0])/ln;dy=(bb[1]-a[1])/ln
-            def box_at(t,out,zz,w,depth,hh,mat,target=windows):
-                target.box(a[0]+dx*t+nx*out,a[1]+dy*t+ny*out,z+zz,w,depth,hh,mat,angle)
+        h = part['height']
+        body.extrude(part['polygons'], part['triangles'], z, h, stone, C['paleRoof'])
+        floors = part['levels']
+        for a, bb, ln, angle, nx, ny in outline_edges(part):
+            dx = (bb[0] - a[0]) / ln
+            dy = (bb[1] - a[1]) / ln
+
+            def box_at(t, out, zz, w, depth, hh, mat, target=windows):
+                target.box(
+                    a[0] + dx * t + nx * out,
+                    a[1] + dy * t + ny * out,
+                    z + zz,
+                    w,
+                    depth,
+                    hh,
+                    mat,
+                    angle,
+                )
+
             # Geometric sill lines and a parapet follow every mapped recess / inner ring.
-            box_at(ln/2,.03,h+.42,ln,.34,.84,stone,bands)
-            box_at(ln/2,.04,h+.88,ln+.22,.55,.12,trim,bands)
+            box_at(ln / 2, 0.03, h + 0.42, ln, 0.34, 0.84, stone, bands)
+            box_at(ln / 2, 0.04, h + 0.88, ln + 0.22, 0.55, 0.12, trim, bands)
             # This central north wall has a continuous glazed panel, not the
             # generic horizontal ribbons. Its panel is built below the loop.
-            if part['name']=='北楼中央阅览区' and ny>.9 and min(a[1],bb[1])>26:
+            if part['name'] == '北楼中央阅览区' and ny > 0.9 and min(a[1], bb[1]) > 26:
                 continue
             for f in range(floors):
-                zz=.6+(f+.5)*(h-.9)/floors;fh=(h-.9)/floors
-                box_at(ln/2,.10,zz,ln-.45,.12,fh*.62,glass)
-                box_at(ln/2,.20,zz+fh*.36,ln,.32,.20,trim,bands)
-                count=max(1,round(ln/(1.35 if detail else 4.2)))
-                for j in range(count+1):
-                    box_at(.25+(ln-.5)*j/count,.20,zz,.065 if detail else .10,.12,fh*.65,metal)
+                zz = 0.6 + (f + 0.5) * (h - 0.9) / floors
+                fh = (h - 0.9) / floors
+                box_at(ln / 2, 0.10, zz, ln - 0.45, 0.12, fh * 0.62, glass)
+                box_at(ln / 2, 0.20, zz + fh * 0.36, ln, 0.32, 0.20, trim, bands)
+                count = max(1, round(ln / (1.35 if detail else 4.2)))
+                for j in range(count + 1):
+                    box_at(
+                        0.25 + (ln - 0.5) * j / count,
+                        0.20,
+                        zz,
+                        0.065 if detail else 0.10,
+                        0.12,
+                        fh * 0.65,
+                        metal,
+                    )
                 if detail:
-                    box_at(ln/2,.22,zz+.12,ln-.5,.13,.055,metal)
+                    box_at(ln / 2, 0.22, zz + 0.12, ln - 0.5, 0.13, 0.055, metal)
                     # Top-floor grouped square openings interrupt the continuous glazing.
-                    if f==floors-1:
-                        for j in range(max(1,int(ln/4.2))):box_at((j+.5)*ln/max(1,int(ln/4.2)),.30,zz,.5,.30,fh*.73,stone)
+                    if f == floors - 1:
+                        for j in range(max(1, int(ln / 4.2))):
+                            box_at(
+                                (j + 0.5) * ln / max(1, int(ln / 4.2)),
+                                0.30,
+                                zz,
+                                0.5,
+                                0.30,
+                                fh * 0.73,
+                                stone,
+                            )
                     # Abstract meander frieze, real geometry above the alternating window bands.
-                    if f%2==0 and ln>4:
-                        for j in range(int(ln/2.4)):
-                            t=(j+.5)*ln/int(ln/2.4);zz2=zz+fh*.5
-                            for dz in [-.22,.22]:box_at(t,.24,zz2+dz,2.1,.07,.06,trim,bands)
-                            for dt in [-1.02,1.02]:box_at(t+dt,.24,zz2,.06,.07,.44,trim,bands)
-                            box_at(t,.24,zz2,1.25,.07,.06,trim,bands)
+                    if f % 2 == 0 and ln > 4:
+                        for j in range(int(ln / 2.4)):
+                            t = (j + 0.5) * ln / int(ln / 2.4)
+                            zz2 = zz + fh * 0.5
+                            for dz in [-0.22, 0.22]:
+                                box_at(t, 0.24, zz2 + dz, 2.1, 0.07, 0.06, trim, bands)
+                            for dt in [-1.02, 1.02]:
+                                box_at(t + dt, 0.24, zz2, 0.06, 0.07, 0.44, trim, bands)
+                            box_at(t, 0.24, zz2, 1.25, 0.07, 0.06, trim, bands)
     # The paired pale motifs face the sculpture on the NORTH side. Dimensions
     # follow the mapped 25.7 m recess, not the much wider south building front.
-    front=-35.25
-    north_face=26.89;panel_x=-.55
-    windows.box(panel_x,north_face+.13,z+17.0,24.8,.18,13.0,glass)
-    for j in range(21):windows.box(panel_x-12.4+j*1.24,north_face+.25,z+17.0,.065,.14,13.0,metal)
-    for zz in range(11,24):windows.box(panel_x,north_face+.25,z+zz,24.8,.14,.055,metal)
-    for xx in [panel_x-6.25,panel_x+6.25]:
-        for sx in [-1,1]:frames.box(xx+sx*4.9,north_face+.39,z+17.5,.55,.35,6.0,trim)
-        for zz in [14.5,17.5,20.5]:frames.box(xx,north_face+.39,z+zz,10.3,.35,.38,trim)
+    front = -35.25
+    north_face = 26.89
+    panel_x = -0.55
+    windows.box(panel_x, north_face + 0.13, z + 17.0, 24.8, 0.18, 13.0, glass)
+    for j in range(21):
+        windows.box(
+            panel_x - 12.4 + j * 1.24,
+            north_face + 0.25,
+            z + 17.0,
+            0.065,
+            0.14,
+            13.0,
+            metal,
+        )
+    for zz in range(11, 24):
+        windows.box(panel_x, north_face + 0.25, z + zz, 24.8, 0.14, 0.055, metal)
+    for xx in [panel_x - 6.25, panel_x + 6.25]:
+        for sx in [-1, 1]:
+            frames.box(
+                xx + sx * 4.9, north_face + 0.39, z + 17.5, 0.55, 0.35, 6.0, trim
+            )
+        for zz in [14.5, 17.5, 20.5]:
+            frames.box(xx, north_face + 0.39, z + zz, 10.3, 0.35, 0.38, trim)
+
     # Open roof frames have genuine air beneath beams, including sloping cantilever edges.
-    def pergola(cx,cy,width,depth,roof_z):
-        for sx in [-1,1]:
-            for sy in [-1,1]:
-                pergolas.box(cx+sx*(width/2-2),cy+sy*(depth/2-1.8),z+roof_z+1.9,.65,.65,3.8,trim)
-                if detail:pergolas.box(cx+sx*(width/2-1.3),cy+sy*(depth/2-1.8),z+roof_z+1.9,.22,.55,3.8,trim)
-        for sy in [-1,1]:
-            pergolas.box(cx,cy+sy*depth/2,z+roof_z+4.1,width+3,1.4,.50,trim)
-            pergolas.box(cx,cy+sy*(depth/2+.45),z+roof_z+4.43,width+4,.55,.14,trim)
-        for sx in [-1,1]:pergolas.box(cx+sx*width/2,cy,z+roof_z+4.1,1.4,depth,.50,trim)
-        for xx in range(max(2,round(width/7))):
-            px=cx-width/2+1+xx*(width-2)/(max(2,round(width/7))-1)
-            pergolas.box(px,cy,z+roof_z+3.95,.35,depth,.4,trim)
-    pergola(1.8,-24.5,61,11,36)
-    for xx in [-44,44.5]:pergola(xx,-17.5,18,16,36)
-    for xx in [-25.5,24.6]:pergola(xx,27,22,12,23.5)
-    pergola(panel_x,20.5,25,12,27)
+    def pergola(cx, cy, width, depth, roof_z):
+        for sx in [-1, 1]:
+            for sy in [-1, 1]:
+                pergolas.box(
+                    cx + sx * (width / 2 - 2),
+                    cy + sy * (depth / 2 - 1.8),
+                    z + roof_z + 1.9,
+                    0.65,
+                    0.65,
+                    3.8,
+                    trim,
+                )
+                if detail:
+                    pergolas.box(
+                        cx + sx * (width / 2 - 1.3),
+                        cy + sy * (depth / 2 - 1.8),
+                        z + roof_z + 1.9,
+                        0.22,
+                        0.55,
+                        3.8,
+                        trim,
+                    )
+        for sy in [-1, 1]:
+            pergolas.box(
+                cx, cy + sy * depth / 2, z + roof_z + 4.1, width + 3, 1.4, 0.50, trim
+            )
+            pergolas.box(
+                cx,
+                cy + sy * (depth / 2 + 0.45),
+                z + roof_z + 4.43,
+                width + 4,
+                0.55,
+                0.14,
+                trim,
+            )
+        for sx in [-1, 1]:
+            pergolas.box(
+                cx + sx * width / 2, cy, z + roof_z + 4.1, 1.4, depth, 0.50, trim
+            )
+        for xx in range(max(2, round(width / 7))):
+            px = cx - width / 2 + 1 + xx * (width - 2) / (max(2, round(width / 7)) - 1)
+            pergolas.box(px, cy, z + roof_z + 3.95, 0.35, depth, 0.4, trim)
+
+    pergola(1.8, -24.5, 61, 11, 36)
+    for xx in [-44, 44.5]:
+        pergola(xx, -17.5, 18, 16, 36)
+    for xx in [-25.5, 24.6]:
+        pergola(xx, 27, 22, 12, 23.5)
+    pergola(panel_x, 20.5, 25, 12, 27)
     # Six columns stand proud of the entrance; no wall closes the colonnade.
-    entrance.box(1.8,front-2.9,z+10.7,43,6.6,.85,stone)
-    entrance.box(1.8,front-3.2,z+11.22,45,7.4,.25,trim)
-    entrance.box(1.8,front-4.7,z+12.5,29,1.25,2.55,stone)
-    entrance.box(1.8,front-4.85,z+13.9,32,2.4,.25,trim)
+    entrance.box(1.8, front - 2.9, z + 10.7, 43, 6.6, 0.85, stone)
+    entrance.box(1.8, front - 3.2, z + 11.22, 45, 7.4, 0.25, trim)
+    entrance.box(1.8, front - 4.7, z + 12.5, 29, 1.25, 2.55, stone)
+    entrance.box(1.8, front - 4.85, z + 13.9, 32, 2.4, 0.25, trim)
     for j in range(6):
-        xx=1.8+(j-2.5)*7.5
-        entrance.cylinder(xx,front-4.7,z+5.9,.57,8.8,trim,24 if detail else 12,topr=.49)
-        for hh,rr in [(1.5,.78),(10.2,.7)]:entrance.cylinder(xx,front-4.7,z+hh,rr,.27,stone,20 if detail else 10)
+        xx = 1.8 + (j - 2.5) * 7.5
+        entrance.cylinder(
+            xx, front - 4.7, z + 5.9, 0.57, 8.8, trim, 24 if detail else 12, topr=0.49
+        )
+        for hh, rr in [(1.5, 0.78), (10.2, 0.7)]:
+            entrance.cylinder(
+                xx, front - 4.7, z + hh, rr, 0.27, stone, 20 if detail else 10
+            )
     for j in range(5):
-        xx=1.8+(j-2)*2.8;windows.box(xx,front-.31,z+3.2,2.6,.18,4.0,glass)
-        if detail:frames.box(xx,front-.48,z+3.2,.07,.1,4.0,metal)
-    for j in range(12):stairs.box(1.8,front-7.2+j*.22,z+.06*(j+1),44,5.7-j*.44,.12*(j+1),stone)
+        xx = 1.8 + (j - 2) * 2.8
+        windows.box(xx, front - 0.31, z + 3.2, 2.6, 0.18, 4.0, glass)
+        if detail:
+            frames.box(xx, front - 0.48, z + 3.2, 0.07, 0.1, 4.0, metal)
+    for j in range(12):
+        stairs.box(
+            1.8,
+            front - 7.2 + j * 0.22,
+            z + 0.06 * (j + 1),
+            44,
+            5.7 - j * 0.44,
+            0.12 * (j + 1),
+            stone,
+        )
     if detail:
-        for xx in [-19,1.8,22.6]:
-            a=(xx,front-9.5,z+1.05);bb=(xx,front-4.5,z+2.3)
-            stairs.line(a,bb,.045,metal,8)
-            for t in [0,.25,.5,.75,1]:
-                yy=a[1]+(bb[1]-a[1])*t;hh=1.05+1.25*t;stairs.line((xx,yy,z+hh-.85),(xx,yy,z+hh),.035,metal,6)
-    for name,part in [('01_真实轮廓与内院',body),('02_分格玻璃幕墙',windows),('03_层间腰线与回纹',bands),('04_幕墙框架',frames),('05_镂空檐架',pergolas),('06_南侧六柱入口',entrance),('07_台阶与扶手',stairs)]:m.add_part(name,part)
-    m.add_part('08_立体馆名',inscription('图 书 馆',1.8,front-5.39,z+12.55,16,1.75,C['libraryInk'],False))
+        for xx in [-19, 1.8, 22.6]:
+            a = (xx, front - 9.5, z + 1.05)
+            bb = (xx, front - 4.5, z + 2.3)
+            stairs.line(a, bb, 0.045, metal, 8)
+            for t in [0, 0.25, 0.5, 0.75, 1]:
+                yy = a[1] + (bb[1] - a[1]) * t
+                hh = 1.05 + 1.25 * t
+                stairs.line((xx, yy, z + hh - 0.85), (xx, yy, z + hh), 0.035, metal, 6)
+    for name, part in [
+        ('01_真实轮廓与内院', body),
+        ('02_分格玻璃幕墙', windows),
+        ('03_层间腰线与回纹', bands),
+        ('04_幕墙框架', frames),
+        ('05_镂空檐架', pergolas),
+        ('06_南侧六柱入口', entrance),
+        ('07_台阶与扶手', stairs),
+    ]:
+        m.add_part(name, part)
+    m.add_part(
+        '08_立体馆名',
+        inscription(
+            '图 书 馆', 1.8, front - 5.39, z + 12.55, 16, 1.75, C['libraryInk'], False
+        ),
+    )
     # North entrance occupies the mapped 25.7 m central recess, facing local +Y.
     # Official 2026-05-26 specification: opening 6.60 x 2.55 m, six 1 x 2.25 m panes.
-    spec=envelope['northEntry']
-    north=Mesh();doors=Mesh();north_steps=Mesh();cx=spec['centerX'];wall=27.25;landing=spec['landingHeight']
+    spec = envelope['northEntry']
+    north = Mesh()
+    doors = Mesh()
+    north_steps = Mesh()
+    cx = spec['centerX']
+    wall = 27.25
+    landing = spec['landingHeight']
     # Stone ground-floor infill hides the generic ribbon windows behind the portal.
-    north.box(cx,27.08,z+3.5,25.5,.28,7.0,stone)
-    north.box(cx,31.35,z+9.65,24.8,9.1,.7,stone)
-    north.box(cx,31.55,z+10.08,25.4,9.4,.16,trim)
-    north.box(cx,35.55,z+10.8,23.6,.8,2.3,stone)
+    north.box(cx, 27.08, z + 3.5, 25.5, 0.28, 7.0, stone)
+    north.box(cx, 31.35, z + 9.65, 24.8, 9.1, 0.7, stone)
+    north.box(cx, 31.55, z + 10.08, 25.4, 9.4, 0.16, trim)
+    north.box(cx, 35.55, z + 10.8, 23.6, 0.8, 2.3, stone)
     # Recessed sign panel and projecting coping visible in the library's header photo.
-    for xx in [cx-11.0,cx+11.0]:north.box(xx,36.03,z+10.9,.24,.18,1.9,trim)
-    for zz in [9.98,11.84]:north.box(cx,36.03,z+zz,22.2,.18,.14,trim)
-    north.box(cx,35.65,z+12.12,25.6,1.6,.25,trim)
+    for xx in [cx - 11.0, cx + 11.0]:
+        north.box(xx, 36.03, z + 10.9, 0.24, 0.18, 1.9, trim)
+    for zz in [9.98, 11.84]:
+        north.box(cx, 36.03, z + zz, 22.2, 0.18, 0.14, trim)
+    north.box(cx, 35.65, z + 12.12, 25.6, 1.6, 0.25, trim)
     # The 2026-04-26 north-forecourt event photo shows six columns, with a
     # wider central bay. Column count is documented; spacing remains estimated.
-    for xx in [cx-10.5,cx-7.3,cx-4.1,cx+4.1,cx+7.3,cx+10.5]:
-        north.cylinder(xx,35.15,z+5.3,.48,7.8,trim,24 if detail else 12,topr=.43)
-        for hh,rr in [(1.45,.65),(9.2,.63)]:north.cylinder(xx,35.15,z+hh,rr,.28,stone,20 if detail else 12)
+    for xx in [cx - 10.5, cx - 7.3, cx - 4.1, cx + 4.1, cx + 7.3, cx + 10.5]:
+        north.cylinder(
+            xx, 35.15, z + 5.3, 0.48, 7.8, trim, 24 if detail else 12, topr=0.43
+        )
+        for hh, rr in [(1.45, 0.65), (9.2, 0.63)]:
+            north.cylinder(xx, 35.15, z + hh, rr, 0.28, stone, 20 if detail else 12)
     # The 6.6 m opening is the inner dimension of the marble surround.
-    for xx in [cx-3.48,cx+3.48]:doors.box(xx,wall+.14,z+landing+1.275,.36,.40,2.55,trim)
-    doors.box(cx,wall+.14,z+landing+2.73,7.32,.40,.36,trim)
-    doors.box(cx,wall+.37,z+landing+2.40,6.60,.20,.30,C['metal'])
-    doors.box(cx,wall+.03,z+landing+1.125,6.6,.10,2.25,metal)
+    for xx in [cx - 3.48, cx + 3.48]:
+        doors.box(xx, wall + 0.14, z + landing + 1.275, 0.36, 0.40, 2.55, trim)
+    doors.box(cx, wall + 0.14, z + landing + 2.73, 7.32, 0.40, 0.36, trim)
+    doors.box(cx, wall + 0.37, z + landing + 2.40, 6.60, 0.20, 0.30, C['metal'])
+    doors.box(cx, wall + 0.03, z + landing + 1.125, 6.6, 0.10, 2.25, metal)
     for j in range(6):
-        xx=cx+(j-2.5)*1.10
-        doors.box(xx,wall+.12,z+landing+1.125,1.0,.024,2.25,glass)
+        xx = cx + (j - 2.5) * 1.10
+        doors.box(xx, wall + 0.12, z + landing + 1.125, 1.0, 0.024, 2.25, glass)
         if detail:
-            for dz in [.08,2.17]:doors.box(xx,wall+.15,z+landing+dz,1.0,.045,.07,C['metal'])
+            for dz in [0.08, 2.17]:
+                doors.box(
+                    xx, wall + 0.15, z + landing + dz, 1.0, 0.045, 0.07, C['metal']
+                )
             # A narrow safety stripe and handles on the outside leaves.
-            doors.box(xx,wall+.15,z+landing+1.05,1.0,.035,.065,trim)
-            if j in (0,5):doors.line((xx,wall+.23,z+landing+.85),(xx,wall+.23,z+landing+1.45),.025,C['metal'],8)
-    if detail:doors.box(cx,wall+.50,z+landing+2.46,.22,.13,.095,C['dark'])
-    north_steps.box(cx,spec['platformFrontY']-spec['platformDepth']/2,z+landing/2,spec['width'],spec['platformDepth'],landing,stone)
-    for j in range(spec['stepCount']):
-        depth=(spec['stepCount']-j)*spec['stepRun'];height=(j+1)*spec['stepRise']
-        north_steps.box(cx,spec['platformFrontY']+depth/2,z+height/2,spec['width'],depth,height,stone)
+            doors.box(xx, wall + 0.15, z + landing + 1.05, 1.0, 0.035, 0.065, trim)
+            if j in (0, 5):
+                doors.line(
+                    (xx, wall + 0.23, z + landing + 0.85),
+                    (xx, wall + 0.23, z + landing + 1.45),
+                    0.025,
+                    C['metal'],
+                    8,
+                )
     if detail:
-        for xx in [cx-12.3,cx+12.3]:
-            north_steps.line((xx,39.15,z+.95),(xx,36.35,z+2.0),.04,metal,8)
-            for t in [0,.5,1]:
-                yy=39.15-2.8*t;hh=.95+1.05*t
-                north_steps.line((xx,yy,z+hh-.85),(xx,yy,z+hh),.035,metal,6)
-    m.add_part('09_北入口六柱门廊',north)
-    m.add_part('10_北门感应玻璃门',doors)
-    m.add_part('11_北入口平台台阶',north_steps)
-    north_sign=inscription('图 书 馆',cx,36.09,z+10.9,11.8,1.45,C['libraryInk'],False)
-    north_sign.rotate_z(cx,36.09,math.pi)
-    m.add_part('12_北向立体馆名',north_sign)
+        doors.box(cx, wall + 0.50, z + landing + 2.46, 0.22, 0.13, 0.095, C['dark'])
+    north_steps.box(
+        cx,
+        spec['platformFrontY'] - spec['platformDepth'] / 2,
+        z + landing / 2,
+        spec['width'],
+        spec['platformDepth'],
+        landing,
+        stone,
+    )
+    for j in range(spec['stepCount']):
+        depth = (spec['stepCount'] - j) * spec['stepRun']
+        height = (j + 1) * spec['stepRise']
+        north_steps.box(
+            cx,
+            spec['platformFrontY'] + depth / 2,
+            z + height / 2,
+            spec['width'],
+            depth,
+            height,
+            stone,
+        )
+    if detail:
+        for xx in [cx - 12.3, cx + 12.3]:
+            north_steps.line(
+                (xx, 39.15, z + 0.95), (xx, 36.35, z + 2.0), 0.04, metal, 8
+            )
+            for t in [0, 0.5, 1]:
+                yy = 39.15 - 2.8 * t
+                hh = 0.95 + 1.05 * t
+                north_steps.line(
+                    (xx, yy, z + hh - 0.85), (xx, yy, z + hh), 0.035, metal, 6
+                )
+    m.add_part('09_北入口六柱门廊', north)
+    m.add_part('10_北门感应玻璃门', doors)
+    m.add_part('11_北入口平台台阶', north_steps)
+    north_sign = inscription(
+        '图 书 馆', cx, 36.09, z + 10.9, 11.8, 1.45, C['libraryInk'], False
+    )
+    north_sign.rotate_z(cx, 36.09, math.pi)
+    m.add_part('12_北向立体馆名', north_sign)
     # Local axes are derived from the OSM edge, never a north-aligned bounding box.
-    m.rotate_z(0,0,envelope['angle']);ox,oy=envelope['origin'];m.v=[(x+ox,y+oy,zz) for x,y,zz in m.v]
+    m.rotate_z(0, 0, envelope['angle'])
+    ox, oy = envelope['origin']
+    m.v = [(x + ox, y + oy, zz) for x, y, zz in m.v]
     return m

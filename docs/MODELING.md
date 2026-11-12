@@ -77,7 +77,7 @@ npm run test:data
 
 [pyproject.toml](../pyproject.toml) 将 Ruff 目标设为 `py312`，并要求与开发依赖相同的 Ruff 版本。检查扫描仓库 Python 源码（含 `scripts/`、`blender/`），排除生成目录和本地工作目录，启用 `E9`、全部 `F`（pyflakes）和 `I`（导入排序）规则，拦截语法错误、未定义名称、未使用的导入与变量和明显的控制流错误，并要求导入按标准库、第三方、项目模块分组排序；`scripts/` 与 `blender/` 中按模块名互相导入的文件视为项目模块。被其他模块转手导入的名称用带说明的 `# noqa: F401` 标出。检查不执行 Blender 脚本，也不需要安装 `bpy`。
 
-CI 在安装 Python 依赖后立即运行相同入口；失败会阻断后续步骤，并显示 GitHub 文件行号标注。目前不运行格式化或风格检查，也没有通过逐文件忽略隐藏历史问题。以后按规则或模块分批扩展并单独评审，避免全仓脚本一次性变更；规则含义见 [Ruff 官方文档](https://docs.astral.sh/ruff/rules/)。
+Python 代码由 `ruff format` 统一格式（保留单引号，行宽 88）；修改后运行 `npm run format:python`。CI 在安装 Python 依赖后立即运行相同的检查入口，并用 `ruff format --check` 确认格式；失败会阻断后续步骤，检查会显示 GitHub 文件行号标注，格式问题会给出差异。没有通过逐文件忽略隐藏历史问题。导入排序与格式化的整理提交记录在 [.git-blame-ignore-revs](../.git-blame-ignore-revs) 中，`git blame` 可据此跳过；以后扩展风格类规则时仍按规则分批单独评审；规则含义见 [Ruff 官方文档](https://docs.astral.sh/ruff/rules/)。
 
 ### 完整构建说明
 

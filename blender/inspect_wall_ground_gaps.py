@@ -4,6 +4,7 @@ This detects sampled open gaps under walls; it does not establish real site
 levels. Ground-level gallery contact checks its actual floor and rear wall.
 Open porticos and facades explicitly beginning above ground are excluded.
 """
+
 import argparse
 import hashlib
 import json
@@ -46,10 +47,10 @@ def probes(building, ground, roads):
         normal = facade['normal']
         count = max(1, math.ceil(math.dist(a, b) / 2))
         for i in range(count):
-            t = (i + .5) / count
+            t = (i + 0.5) / count
             x, y = (a[k] + (b[k] - a[k]) * t for k in (0, 1))
             # Immediately outside the wall, not a distant DEM lattice node.
-            origin = Vector((x + normal[0] * .02, y + normal[1] * .02, datum + 50))
+            origin = Vector((x + normal[0] * 0.02, y + normal[1] * 0.02, datum + 50))
             g = ground.ray_cast(origin, down, 100)[0]
             if g is None:
                 raise ValueError('Missing facade ground')
@@ -57,22 +58,37 @@ def probes(building, ground, roads):
             surface = max(g.z, r.z if r is not None else -math.inf)
             # Retain the below-datum band, but also test contact when grading
             # reaches the floor. An empty below-floor band is not a closure test.
-            low, high = surface + .05, datum - .05
+            low, high = surface + 0.05, datum - 0.05
             if low > high:
                 heights = [low]
             else:
-                intervals = max(1, math.ceil((high - low) / .1))
-                heights = [low + (high - low) * j / intervals for j in range(intervals + 1)]
+                intervals = max(1, math.ceil((high - low) / 0.1))
+                heights = [
+                    low + (high - low) * j / intervals for j in range(intervals + 1)
+                ]
             corridor = facade.get('rule', {}).get('openCorridor')
             contact = None
-            if (low > high and corridor and corridor['firstLevel'] == 0
-                    and corridor['endInset'] < t * math.dist(a, b)
-                    < math.dist(a, b) - corridor['endInset']):
+            if (
+                low > high
+                and corridor
+                and corridor['firstLevel'] == 0
+                and corridor['endInset']
+                < t * math.dist(a, b)
+                < math.dist(a, b) - corridor['endInset']
+            ):
                 contact = dict(depth=corridor['depth'], datum=datum)
-            rows.append(dict(facade=index, part=facade.get('part', 'body'),
-                             contactOnly=low > high, xy=[x, y], normal=normal,
-                             surfaceHeight=surface, heights=heights,
-                             openCorridorContact=contact))
+            rows.append(
+                dict(
+                    facade=index,
+                    part=facade.get('part', 'body'),
+                    contactOnly=low > high,
+                    xy=[x, y],
+                    normal=normal,
+                    surfaceHeight=surface,
+                    heights=heights,
+                    openCorridorContact=contact,
+                )
+            )
     if not rows:
         raise ValueError('No eligible closed ground-floor facades')
     return rows
@@ -82,7 +98,8 @@ def check(tree, rows):
     failures = []
     rays = 0
     for row in rows:
-        x, y = row['xy']; nx, ny = row['normal']
+        x, y = row['xy']
+        nx, ny = row['normal']
         missing = []
         contact = row.get('openCorridorContact')
         if contact:
@@ -90,38 +107,71 @@ def check(tree, rows):
             # wall, not a solid front wall. Below-floor plinth probes keep the
             # ordinary path. Actual geometry must prove both contact surfaces.
             depth, datum = contact['depth'], contact['datum']
-            inset = min(.25, depth / 2)
-            floor = tree.ray_cast(Vector((x-nx*inset, y-ny*inset, datum+.15)),
-                                  Vector((0, 0, -1)), .3)[0]
-            rear = tree.ray_cast(Vector((x-nx*(depth-.3), y-ny*(depth-.3), datum+.05)),
-                                 Vector((-nx, -ny, 0)), .6)[0]
+            inset = min(0.25, depth / 2)
+            floor = tree.ray_cast(
+                Vector((x - nx * inset, y - ny * inset, datum + 0.15)),
+                Vector((0, 0, -1)),
+                0.3,
+            )[0]
+            rear = tree.ray_cast(
+                Vector((x - nx * (depth - 0.3), y - ny * (depth - 0.3), datum + 0.05)),
+                Vector((-nx, -ny, 0)),
+                0.6,
+            )[0]
             rays += 2
             reasons = []
-            if floor is None or abs(floor.z-datum) > .05:
+            if floor is None or abs(floor.z - datum) > 0.05:
                 reasons.append('missing or displaced gallery floor')
-            if rear is None or abs((rear.x-x)*nx+(rear.y-y)*ny+depth) > .05:
+            if (
+                rear is None
+                or abs((rear.x - x) * nx + (rear.y - y) * ny + depth) > 0.05
+            ):
                 reasons.append('missing or displaced gallery rear wall')
-            if row['surfaceHeight'] > datum+.05:
+            if row['surfaceHeight'] > datum + 0.05:
                 reasons.append('ground or road buries gallery floor')
             if reasons:
-                failures.append(dict(facade=row['facade'], part=row['part'], xy=row['xy'],
-                                     ground=row['surfaceHeight'], reasons=reasons))
+                failures.append(
+                    dict(
+                        facade=row['facade'],
+                        part=row['part'],
+                        xy=row['xy'],
+                        ground=row['surfaceHeight'],
+                        reasons=reasons,
+                    )
+                )
             continue
         for z in row['heights']:
             rays += 1
-            hit = tree.ray_cast(Vector((x + nx * .4, y + ny * .4, z)),
-                                Vector((-nx, -ny, 0)), .8)[0]
+            hit = tree.ray_cast(
+                Vector((x + nx * 0.4, y + ny * 0.4, z)), Vector((-nx, -ny, 0)), 0.8
+            )[0]
             if hit is None:
                 missing.append(z)
         if missing:
-            failures.append(dict(facade=row['facade'], part=row['part'], xy=row['xy'],
-                                 ground=row['surfaceHeight'], missingHeights=missing))
-    return dict(passed=not failures, facadeLocations=len(rows), rays=rays,
-                contactOnlyLocations=sum(r['contactOnly'] for r in rows),
-                openCorridorContactLocations=sum(bool(r.get('openCorridorContact')) for r in rows),
-                parts={part:sum(r['part'] == part for r in rows)
-                       for part in sorted({r['part'] for r in rows})},
-                openGapLocations=len(failures), failures=failures)
+            failures.append(
+                dict(
+                    facade=row['facade'],
+                    part=row['part'],
+                    xy=row['xy'],
+                    ground=row['surfaceHeight'],
+                    missingHeights=missing,
+                )
+            )
+    return dict(
+        passed=not failures,
+        facadeLocations=len(rows),
+        rays=rays,
+        contactOnlyLocations=sum(r['contactOnly'] for r in rows),
+        openCorridorContactLocations=sum(
+            bool(r.get('openCorridorContact')) for r in rows
+        ),
+        parts={
+            part: sum(r['part'] == part for r in rows)
+            for part in sorted({r['part'] for r in rows})
+        },
+        openGapLocations=len(failures),
+        failures=failures,
+    )
 
 
 def main():
@@ -130,12 +180,14 @@ def main():
     parser.add_argument('--building-id', required=True)
     parser.add_argument('--report', type=Path, required=True)
     parser.add_argument('--fail-on-gap', action='store_true')
-    args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
+    args = parser.parse_args(sys.argv[sys.argv.index('--') + 1 :])
     data = args.root / 'public/data/buildings.json'
     b = next(b for b in json.loads(data.read_text()) if b['id'] == args.building_id)
-    paths = dict(source=args.root / 'blender/gxu-campus.blend',
-                 base=args.root / 'public/models/base.glb',
-                 near=args.root / f'public/models/{b["chunk"]}.glb')
+    paths = dict(
+        source=args.root / 'blender/gxu-campus.blend',
+        base=args.root / 'public/models/base.glb',
+        near=args.root / f'public/models/{b["chunk"]}.glb',
+    )
     results = []
     for name, path in paths.items():
         if name == 'source':
@@ -150,24 +202,41 @@ def main():
             roads, _ = top_tree([o for o in objects if layer(o) == 'roads'])
             rows = probes(b, ground, roads)
         # The near chunk uses the same ground and probes as the base model.
-        target = ([o for o in objects if o.get('featureId') == b['id']] if name == 'source'
-                  else [o for o in objects if o.type == 'MESH' and layer(o) == 'buildings'])
+        target = (
+            [o for o in objects if o.get('featureId') == b['id']]
+            if name == 'source'
+            else [o for o in objects if o.type == 'MESH' and layer(o) == 'buildings']
+        )
         result = check(wall_tree(target), rows)
         results.append(dict(representation=name, **result))
-    report = dict(buildingId=b['id'], datum=b['elevation'], representations=results,
-                  passed=all(r['passed'] for r in results),
-                  sampling=dict(horizontalSpacingMeters=2, verticalSpacingMaximumMeters=.1,
-                                groundClearanceMeters=.05, facadeOffsetMeters=.02,
-                                contactAtOrAboveDatum=True,
-                                groundGalleryContact='Actual floor and recessed rear wall, 0.05m tolerance; below-floor plinths and end walls retain horizontal probes',
-                                surface='Highest actual terrain or road hit, including roads above datum',
-                                horizontalRayLengthMeters=.8),
-                  limitations='Sampled model wall closure, not measured site elevations or proof of watertightness.',
-                  fingerprints={k: hashlib.sha256(p.read_bytes()).hexdigest()
-                                for k, p in dict(buildings=data, **paths).items()})
+    report = dict(
+        buildingId=b['id'],
+        datum=b['elevation'],
+        representations=results,
+        passed=all(r['passed'] for r in results),
+        sampling=dict(
+            horizontalSpacingMeters=2,
+            verticalSpacingMaximumMeters=0.1,
+            groundClearanceMeters=0.05,
+            facadeOffsetMeters=0.02,
+            contactAtOrAboveDatum=True,
+            groundGalleryContact='Actual floor and recessed rear wall, 0.05m tolerance; below-floor plinths and end walls retain horizontal probes',
+            surface='Highest actual terrain or road hit, including roads above datum',
+            horizontalRayLengthMeters=0.8,
+        ),
+        limitations='Sampled model wall closure, not measured site elevations or proof of watertightness.',
+        fingerprints={
+            k: hashlib.sha256(p.read_bytes()).hexdigest()
+            for k, p in dict(buildings=data, **paths).items()
+        },
+    )
     args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
-    print('WALL_GAPS', [(r['representation'], r['openGapLocations']) for r in results], flush=True)
+    print(
+        'WALL_GAPS',
+        [(r['representation'], r['openGapLocations']) for r in results],
+        flush=True,
+    )
     if args.fail_on_gap and not report['passed']:
         raise AssertionError('Open gaps under sampled facade walls')
 

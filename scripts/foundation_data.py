@@ -1,4 +1,5 @@
 """Local mesh repair masks; do not alter DEM samples or building datums."""
+
 import json
 import math
 from pathlib import Path
@@ -19,17 +20,24 @@ def protected_site_shape(site):
     A courtyard's AABB can overlap the surrounding building wings. Its prepared
     polygon is the actual protected ground; unknown site types retain the AABB.
     """
-    if site.get('type') not in ('courtyard-paving','recessed-entry-ground'):
+    if site.get('type') not in ('courtyard-paving', 'recessed-entry-ground'):
         return box(*site['gradingBounds'])
     rings = [site.get('pavingPolygon')]
     if 'stairConnection' in site:
         rings.append(site['stairConnection'].get('polygon'))
     shapes = []
     for ring in rings:
-        if (not isinstance(ring, list) or len(ring) < 4 or ring[0] != ring[-1]
-                or any(not isinstance(p, (list, tuple)) or len(p) != 2
-                       or any(type(v) not in (int, float) or not math.isfinite(v) for v in p)
-                       for p in ring)):
+        if (
+            not isinstance(ring, list)
+            or len(ring) < 4
+            or ring[0] != ring[-1]
+            or any(
+                not isinstance(p, (list, tuple))
+                or len(p) != 2
+                or any(type(v) not in (int, float) or not math.isfinite(v) for v in p)
+                for p in ring
+            )
+        ):
             raise ValueError('Invalid protected courtyard polygon')
         shape = Polygon(ring)
         if not shape.is_valid or shape.area <= 1e-7:
@@ -40,23 +48,34 @@ def protected_site_shape(site):
 
 
 def convex_masks(shape):
-    if shape.is_empty:return []
+    if shape.is_empty:
+        return []
     data = triangulate(shape)
-    pieces = [Polygon([data['vertices'][k] for k in data['triangles'][i:i+3]])
-              for i in range(0,len(data['triangles']),3)]
+    pieces = [
+        Polygon([data['vertices'][k] for k in data['triangles'][i : i + 3]])
+        for i in range(0, len(data['triangles']), 3)
+    ]
     # Shared triangulation diagonals are not grading boundaries. Merge convex
     # neighbors before clipping actual terrain to avoid needless sliver fans.
     changed = True
     while changed:
         changed = False
-        for i,a in enumerate(pieces):
-            for j in range(i+1,len(pieces)):
+        for i, a in enumerate(pieces):
+            for j in range(i + 1, len(pieces)):
                 b = pieces[j]
-                if a.boundary.intersection(b.boundary).length < 1e-7: continue
+                if a.boundary.intersection(b.boundary).length < 1e-7:
+                    continue
                 merged = a.union(b)
-                if merged.geom_type == 'Polygon' and merged.convex_hull.area-merged.area < 1e-7:
-                    pieces[i] = merged.convex_hull; pieces.pop(j); changed = True; break
-            if changed: break
+                if (
+                    merged.geom_type == 'Polygon'
+                    and merged.convex_hull.area - merged.area < 1e-7
+                ):
+                    pieces[i] = merged.convex_hull
+                    pieces.pop(j)
+                    changed = True
+                    break
+            if changed:
+                break
     return [list(p.exterior.coords)[:-1] for p in pieces]
 
 
@@ -65,117 +84,228 @@ def prepare_foundations(root=ROOT):
     config = context['config']
     if config.get('schemaVersion') != 1:
         raise ValueError('Unknown foundation repair schema')
-    effective = effective_surfaces(context['surfaces'],
-        [context[k]['surfaceOverrides'] for k in ('infrastructure', 'surroundings', 'campus-roads', 'sites')],
-        set(context['infrastructure']['replaceSurfaceIds']))
+    effective = effective_surfaces(
+        context['surfaces'],
+        [
+            context[k]['surfaceOverrides']
+            for k in ('infrastructure', 'surroundings', 'campus-roads', 'sites')
+        ],
+        set(context['infrastructure']['replaceSurfaceIds']),
+    )
     records = []
     if len({i['id'] for i in config['foundations']}) != len(config['foundations']):
         raise ValueError('Duplicate foundation repair ID')
     for item in config['foundations']:
-        preserve_roads=item.get('preserveRoads',False)
+        preserve_roads = item.get('preserveRoads', False)
         if type(preserve_roads) is not bool:
             raise ValueError('Invalid foundation preserve roads flag')
-        road_protection_margin=item.get('roadProtectionMargin',.1)
-        if (type(road_protection_margin) not in (int,float)
-                or not math.isfinite(road_protection_margin)
-                or not 0 <= road_protection_margin <= .1):
+        road_protection_margin = item.get('roadProtectionMargin', 0.1)
+        if (
+            type(road_protection_margin) not in (int, float)
+            or not math.isfinite(road_protection_margin)
+            or not 0 <= road_protection_margin <= 0.1
+        ):
             raise ValueError('Invalid foundation road protection margin')
         if 'roadExportConformMargin' in item:
-            margin=item['roadExportConformMargin']
-            if type(margin) not in (int,float) or not math.isfinite(margin) or not 0<margin<=50:
+            margin = item['roadExportConformMargin']
+            if (
+                type(margin) not in (int, float)
+                or not math.isfinite(margin)
+                or not 0 < margin <= 50
+            ):
                 raise ValueError('Invalid foundation road export conform margin')
-        simplification=item.get('meshSimplification',{})
-        if not isinstance(simplification,dict) or set(simplification)-{'normalTolerance','weldDistance'}:
+        simplification = item.get('meshSimplification', {})
+        if not isinstance(simplification, dict) or set(simplification) - {
+            'normalTolerance',
+            'weldDistance',
+        }:
             raise ValueError('Invalid foundation mesh simplification')
-        for key,default,minimum in [('normalTolerance',1e-6,1e-8),('weldDistance',0,0)]:
-            value=simplification.get(key,default)
-            if type(value) not in (int,float) or not math.isfinite(value) or not minimum<=value<=1e-4:
+        for key, default, minimum in [
+            ('normalTolerance', 1e-6, 1e-8),
+            ('weldDistance', 0, 0),
+        ]:
+            value = simplification.get(key, default)
+            if (
+                type(value) not in (int, float)
+                or not math.isfinite(value)
+                or not minimum <= value <= 1e-4
+            ):
                 raise ValueError('Invalid foundation mesh simplification tolerance')
-        for key in ('coreMargin','roadTrimMargin','haloMeters','groundOffset'):
-            if type(item[key]) not in (int,float) or not math.isfinite(item[key]):
+        for key in ('coreMargin', 'roadTrimMargin', 'haloMeters', 'groundOffset'):
+            if type(item[key]) not in (int, float) or not math.isfinite(item[key]):
                 raise ValueError('Invalid foundation dimension')
-        if not -.1 <= item['groundOffset'] <= 0:
+        if not -0.1 <= item['groundOffset'] <= 0:
             raise ValueError('Invalid foundation floor offset')
         b = next(b for b in context['buildings'] if b['id'] == item['buildingId'])
-        if not 0 < item['coreMargin'] < item['roadTrimMargin'] < item['haloMeters'] <= 8:
+        if (
+            not 0
+            < item['coreMargin']
+            < item['roadTrimMargin']
+            < item['haloMeters']
+            <= 8
+        ):
             raise ValueError('Invalid local foundation margins')
-        parts=b.get('form',{}).get('parts') or [{'polygons':b['polygons']}]
-        closed = unary_union([Polygon(p[0], p[1:]) for part in parts
-                              if not part.get('openBelow') for p in part['polygons']])
-        building_closed_area=closed.area
+        parts = b.get('form', {}).get('parts') or [{'polygons': b['polygons']}]
+        closed = unary_union(
+            [
+                Polygon(p[0], p[1:])
+                for part in parts
+                if not part.get('openBelow')
+                for p in part['polygons']
+            ]
+        )
+        building_closed_area = closed.area
         if 'repairBounds' in item and 'repairRegions' in item:
             raise ValueError('Use either foundation repair bounds or regions')
         if 'repairBounds' in item or 'repairRegions' in item:
-            regions=item.get('repairRegions',[item.get('repairBounds')])
-            if not isinstance(regions,list) or not 1<=len(regions)<=8:
+            regions = item.get('repairRegions', [item.get('repairBounds')])
+            if not isinstance(regions, list) or not 1 <= len(regions) <= 8:
                 raise ValueError('Invalid foundation repair regions')
             for repair_bounds in regions:
-                if (not isinstance(repair_bounds,list) or len(repair_bounds)!=4
-                    or any(type(v) not in (int,float) or not math.isfinite(v) for v in repair_bounds)
-                    or repair_bounds[0]>=repair_bounds[2] or repair_bounds[1]>=repair_bounds[3]):
+                if (
+                    not isinstance(repair_bounds, list)
+                    or len(repair_bounds) != 4
+                    or any(
+                        type(v) not in (int, float) or not math.isfinite(v)
+                        for v in repair_bounds
+                    )
+                    or repair_bounds[0] >= repair_bounds[2]
+                    or repair_bounds[1] >= repair_bounds[3]
+                ):
                     raise ValueError('Invalid foundation repair bounds')
             # Union the selected regions before grading. Sequential repairs
             # would repeatedly split and lower their shared transition zone.
-            closed=closed.intersection(unary_union([box(*bounds) for bounds in regions]))
-            if closed.is_empty or closed.area<=1e-7:
-                raise ValueError('Foundation repair bounds do not intersect a closed floor')
+            closed = closed.intersection(
+                unary_union([box(*bounds) for bounds in regions])
+            )
+            if closed.is_empty or closed.area <= 1e-7:
+                raise ValueError(
+                    'Foundation repair bounds do not intersect a closed floor'
+                )
         core = closed.buffer(item['coreMargin'], join_style=2)
         trim = closed.buffer(item['roadTrimMargin'], join_style=2)
         halo = closed.buffer(item['haloMeters'], join_style=2)
         road_shapes = [surface_shape(s) for s in effective if s['kind'] == 'roads']
-        for layer in context['campus-roads']['layers'] + context['surroundings']['layers']:
+        for layer in (
+            context['campus-roads']['layers'] + context['surroundings']['layers']
+        ):
             vs, ts = layer['vertices'], layer['triangles']
-            road_shapes.extend(Polygon([vs[k][:2] for k in ts[i:i+3]]) for i in range(0,len(ts),3))
+            road_shapes.extend(
+                Polygon([vs[k][:2] for k in ts[i : i + 3]])
+                for i in range(0, len(ts), 3)
+            )
         roads = unary_union(road_shapes)
-        protected_road=roads.difference(trim).buffer(road_protection_margin, join_style=2)
+        protected_road = roads.difference(trim).buffer(
+            road_protection_margin, join_style=2
+        )
         if preserve_roads:
             # Leave a transition between the retained road and lowered core.
             # The source building footprint itself is never rewritten.
-            protected_road=roads.buffer(road_protection_margin,join_style=2)
-            core=core.difference(roads.buffer(road_protection_margin+item['coreMargin'],join_style=2))
-            trim=Polygon()
-            if core.is_empty:raise ValueError('Retained roads cover the foundation core')
+            protected_road = roads.buffer(road_protection_margin, join_style=2)
+            core = core.difference(
+                roads.buffer(road_protection_margin + item['coreMargin'], join_style=2)
+            )
+            trim = Polygon()
+            if core.is_empty:
+                raise ValueError('Retained roads cover the foundation core')
         protection = [protected_road]
-        protection.extend(Polygon(p[0],p[1:]).buffer(.5,join_style=2)
-                          for other in context['buildings'] if other['id'] != b['id'] for p in other['polygons'])
-        protection.extend(protected_site_shape(s) for s in context['sites']['sites'] if 'gradingBounds' in s)
+        protection.extend(
+            Polygon(p[0], p[1:]).buffer(0.5, join_style=2)
+            for other in context['buildings']
+            if other['id'] != b['id']
+            for p in other['polygons']
+        )
+        protection.extend(
+            protected_site_shape(s)
+            for s in context['sites']['sites']
+            if 'gradingBounds' in s
+        )
         protected = unary_union(protection)
         if core.intersection(protected).area > 1e-7:
-            raise ValueError('Foundation core intersects protected road, site, or neighboring building')
+            raise ValueError(
+                'Foundation core intersects protected road, site, or neighboring building'
+            )
         area = halo.difference(protected)
         ring = area.difference(core)
         if core.difference(area).area > 1e-7:
             raise ValueError('Foundation repair does not cover the closed building')
-        t=context['terrain'];x,y=b.get('form',{}).get('stairTower',{}).get('hostCenter',b['center'])
-        x0,y0,x1,y1=t['bounds'];cols,rows=t['cols'],t['rows'];hh=t['heights']
-        u=max(0,min(cols-1.001,(x-x0)/(x1-x0)*(cols-1)));v=max(0,min(rows-1.001,(y-y0)/(y1-y0)*(rows-1)))
-        i,j=int(u),int(v);a,c=u-int(u),v-int(v)
-        datum=(hh[j*cols+i]*(1-a)+hh[j*cols+i+1]*a)*(1-c)+(hh[(j+1)*cols+i]*(1-a)+hh[(j+1)*cols+i+1]*a)*c
-        record = {**item, 'datum': datum, 'bounds': list(area.bounds),
-                  'corePolygons': geometry_rings(core), 'gradingPolygons': geometry_rings(area),
-                  'coreMasks': convex_masks(core), 'transitionMasks': convex_masks(ring),
-                  'roadTrimMasks': convex_masks(trim), 'roadTrimBounds': None if trim.is_empty else list(trim.bounds),
-                  'closedArea': closed.area, 'gradingArea': area.area,
-                  'trimmedRoadArea': roads.intersection(trim).area}
+        t = context['terrain']
+        x, y = b.get('form', {}).get('stairTower', {}).get('hostCenter', b['center'])
+        x0, y0, x1, y1 = t['bounds']
+        cols, rows = t['cols'], t['rows']
+        hh = t['heights']
+        u = max(0, min(cols - 1.001, (x - x0) / (x1 - x0) * (cols - 1)))
+        v = max(0, min(rows - 1.001, (y - y0) / (y1 - y0) * (rows - 1)))
+        i, j = int(u), int(v)
+        a, c = u - int(u), v - int(v)
+        datum = (hh[j * cols + i] * (1 - a) + hh[j * cols + i + 1] * a) * (1 - c) + (
+            hh[(j + 1) * cols + i] * (1 - a) + hh[(j + 1) * cols + i + 1] * a
+        ) * c
+        record = {
+            **item,
+            'datum': datum,
+            'bounds': list(area.bounds),
+            'corePolygons': geometry_rings(core),
+            'gradingPolygons': geometry_rings(area),
+            'coreMasks': convex_masks(core),
+            'transitionMasks': convex_masks(ring),
+            'roadTrimMasks': convex_masks(trim),
+            'roadTrimBounds': None if trim.is_empty else list(trim.bounds),
+            'closedArea': closed.area,
+            'gradingArea': area.area,
+            'trimmedRoadArea': roads.intersection(trim).area,
+        }
         if preserve_roads:
-            record['roadProtectedClosedArea']=closed.intersection(protected_road).area
+            record['roadProtectedClosedArea'] = closed.intersection(protected_road).area
         if 'repairBounds' in item or 'repairRegions' in item:
-            record['buildingClosedArea']=building_closed_area
+            record['buildingClosedArea'] = building_closed_area
         # Every mask must cover exactly its intended region, including holes.
-        for masks, shape in ((record['coreMasks'],core),(record['transitionMasks'],ring),(record['roadTrimMasks'],trim)):
-            if unary_union([Polygon(t) for t in masks]).symmetric_difference(shape).area > 1e-6:
+        for masks, shape in (
+            (record['coreMasks'], core),
+            (record['transitionMasks'], ring),
+            (record['roadTrimMasks'], trim),
+        ):
+            if (
+                unary_union([Polygon(t) for t in masks])
+                .symmetric_difference(shape)
+                .area
+                > 1e-6
+            ):
                 raise ValueError('Incomplete foundation triangulation')
         if 'groundedServiceRoad' in item:
-            export_with=item['groundedServiceRoad'].get('exportWith')
-            if export_with is not None and not any(p['id']==export_with and 'groundedService' in p for p in context['pavings']['pavings']):
+            export_with = item['groundedServiceRoad'].get('exportWith')
+            if export_with is not None and not any(
+                p['id'] == export_with and 'groundedService' in p
+                for p in context['pavings']['pavings']
+            ):
                 raise ValueError('Missing grounded road export group')
             from service_road_data import derive_service_road
-            record['groundedServiceRoad']=derive_service_road(item['groundedServiceRoad'],effective,context['campus-roads']['layers']+context['surroundings']['layers'],trim,convex_masks)
+
+            record['groundedServiceRoad'] = derive_service_road(
+                item['groundedServiceRoad'],
+                effective,
+                context['campus-roads']['layers'] + context['surroundings']['layers'],
+                trim,
+                convex_masks,
+            )
         records.append(record)
     digest = revision(context)
-    result = {'schemaVersion':1, 'contextRevision':digest, 'foundations':records}
-    (root/'public/data/foundations.json').write_text(json.dumps(result,ensure_ascii=False,separators=(',',':'))+'\n')
-    print('Foundation masks', [(r['id'],len(r['coreMasks']),len(r['transitionMasks']),r['trimmedRoadArea']) for r in records])
+    result = {'schemaVersion': 1, 'contextRevision': digest, 'foundations': records}
+    (root / 'public/data/foundations.json').write_text(
+        json.dumps(result, ensure_ascii=False, separators=(',', ':')) + '\n'
+    )
+    print(
+        'Foundation masks',
+        [
+            (
+                r['id'],
+                len(r['coreMasks']),
+                len(r['transitionMasks']),
+                r['trimmedRoadArea'],
+            )
+            for r in records
+        ],
+    )
 
 
 if __name__ == '__main__':

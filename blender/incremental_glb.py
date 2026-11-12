@@ -1,4 +1,5 @@
 """Splice selected static campus nodes without re-encoding retained resources."""
+
 import copy
 import hashlib
 import json
@@ -8,10 +9,14 @@ from preserve_glb_geometry import mesh_nodes_by_name, unpack
 
 
 def _check(doc):
-    if (doc.get('animations') or doc.get('skins') or len(doc['scenes']) != 1
-            or set(doc['scenes'][0]['nodes']) != set(range(len(doc['nodes'])))
-            or any('children' in n or 'mesh' not in n for n in doc['nodes'])
-            or set(doc.get('extensionsUsed', [])) - {'KHR_draco_mesh_compression'}):
+    if (
+        doc.get('animations')
+        or doc.get('skins')
+        or len(doc['scenes']) != 1
+        or set(doc['scenes'][0]['nodes']) != set(range(len(doc['nodes'])))
+        or any('children' in n or 'mesh' not in n for n in doc['nodes'])
+        or set(doc.get('extensionsUsed', [])) - {'KHR_draco_mesh_compression'}
+    ):
         raise ValueError('Incremental campus export requires flat static Draco nodes')
     mesh_nodes_by_name(doc)  # Reject ambiguous logical names.
 
@@ -21,9 +26,13 @@ def pack(doc, binary):
     doc['buffers'] = [{'byteLength': len(binary)}]
     header = json.dumps(doc, separators=(',', ':'), ensure_ascii=False).encode()
     header += b' ' * (-len(header) % 4)
-    return (struct.pack('<4sII', b'glTF', 2, 28 + len(header) + len(binary))
-            + struct.pack('<I4s', len(header), b'JSON') + header
-            + struct.pack('<I4s', len(binary), b'BIN\0') + binary)
+    return (
+        struct.pack('<4sII', b'glTF', 2, 28 + len(header) + len(binary))
+        + struct.pack('<I4s', len(header), b'JSON')
+        + header
+        + struct.pack('<I4s', len(binary), b'BIN\0')
+        + binary
+    )
 
 
 def splice_nodes(previous, candidate, selected):
@@ -39,7 +48,16 @@ def splice_nodes(previous, candidate, selected):
     old, new = [mesh_nodes_by_name(doc) for doc, _ in sources]
     selected = set(selected)
     output = copy.deepcopy(sources[0][0])
-    tables = ('nodes', 'meshes', 'accessors', 'bufferViews', 'materials', 'textures', 'images', 'samplers')
+    tables = (
+        'nodes',
+        'meshes',
+        'accessors',
+        'bufferViews',
+        'materials',
+        'textures',
+        'images',
+        'samplers',
+    )
     for table in tables:
         output[table] = []
     binary = bytearray()
@@ -54,9 +72,13 @@ def splice_nodes(previous, candidate, selected):
         value = copy.deepcopy(doc[table][index])
         if table == 'bufferViews':
             start = value.get('byteOffset', 0)
-            if value['buffer'] != 0 or start < 0 or start + value['byteLength'] > len(payload):
+            if (
+                value['buffer'] != 0
+                or start < 0
+                or start + value['byteLength'] > len(payload)
+            ):
                 raise ValueError('Invalid internal buffer view')
-            data = payload[start:start + value['byteLength']]
+            data = payload[start : start + value['byteLength']]
             value.pop('byteOffset', None)
             signature = (json.dumps(value, sort_keys=True), data)
             if signature not in unique[table]:
@@ -75,7 +97,10 @@ def splice_nodes(previous, candidate, selected):
                     raise ValueError('Expected Draco primitive')
                 ext = p['extensions']['KHR_draco_mesh_compression']
                 ext['bufferView'] = transfer(source, 'bufferViews', ext['bufferView'])
-                p['attributes'] = {k: transfer(source, 'accessors', v) for k, v in p['attributes'].items()}
+                p['attributes'] = {
+                    k: transfer(source, 'accessors', v)
+                    for k, v in p['attributes'].items()
+                }
                 if 'indices' in p:
                     p['indices'] = transfer(source, 'accessors', p['indices'])
                 if 'material' in p:
@@ -124,6 +149,7 @@ def node_signatures(raw):
     """Semantic resource closure including exact encoded payloads, independent of indices."""
     doc, binary = unpack(raw)
     _check(doc)
+
     def resolve(value):
         if isinstance(value, list):
             return [resolve(v) for v in value]
@@ -132,26 +158,45 @@ def node_signatures(raw):
         result = {}
         for k, v in value.items():
             if k == 'bufferView':
-                view = doc['bufferViews'][v]; start = view.get('byteOffset', 0)
+                view = doc['bufferViews'][v]
+                start = view.get('byteOffset', 0)
                 result[k] = [
-                    {key: val for key, val in view.items() if key not in ('buffer', 'byteOffset')},
-                    hashlib.sha256(binary[start:start + view['byteLength']]).hexdigest()]
+                    {
+                        key: val
+                        for key, val in view.items()
+                        if key not in ('buffer', 'byteOffset')
+                    },
+                    hashlib.sha256(
+                        binary[start : start + view['byteLength']]
+                    ).hexdigest(),
+                ]
             elif k in ('mesh', 'material', 'sampler', 'source', 'indices'):
-                table = {'mesh':'meshes', 'material':'materials', 'sampler':'samplers', 'source':'images', 'indices':'accessors'}[k]
+                table = {
+                    'mesh': 'meshes',
+                    'material': 'materials',
+                    'sampler': 'samplers',
+                    'source': 'images',
+                    'indices': 'accessors',
+                }[k]
                 result[k] = resolve(doc[table][v])
             elif k == 'attributes' and 'bufferView' not in value:
-                result[k] = {name: resolve(doc['accessors'][index]) for name, index in v.items()}
+                result[k] = {
+                    name: resolve(doc['accessors'][index]) for name, index in v.items()
+                }
             elif k.endswith('Texture'):
                 result[k] = {**v, 'index': resolve(doc['textures'][v['index']])}
             else:
                 result[k] = resolve(v)
         return result
+
     return {name: resolve(node) for name, node in mesh_nodes_by_name(doc).items()}
 
 
 def validate_retained(previous, candidate, selected):
     old, new = node_signatures(previous), node_signatures(candidate)
-    unexpected = [name for name in old if name not in selected and old[name] != new.get(name)]
+    unexpected = [
+        name for name in old if name not in selected and old[name] != new.get(name)
+    ]
     unexpected += [name for name in new if name not in old and name not in selected]
     if unexpected:
         raise ValueError(f'Unrelated base nodes changed: {unexpected}')

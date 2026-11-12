@@ -3,6 +3,7 @@
 --generated-only checks generators before rebuilding. The default also checks
 real source vertex groups and ray samples in base and every near chunk.
 """
+
 import json
 import math
 import re
@@ -15,7 +16,7 @@ from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT/'blender'))
+sys.path.insert(0, str(ROOT / 'blender'))
 from generic_buildings import compact_form_source, ordinary_building
 from geometry import MATERIALS
 from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS
@@ -24,20 +25,29 @@ from student_water_tower import TOWER_ID
 
 
 def ordinary(b):
-    return (not b['landmark'] and not b.get('customModel') and b['id'] != 'way/948683815'
-            and b['tags'].get('memorial') != 'column')
+    return (
+        not b['landmark']
+        and not b.get('customModel')
+        and b['id'] != 'way/948683815'
+        and b['tags'].get('memorial') != 'column'
+    )
 
 
 def component_vertices(obj, group):
     # Generator coordinates and roof probes are world-space. Incremental
     # adjustments may retain a translated/rotated editable object.
-    return [obj.matrix_world @ v.co for v in obj.data.vertices
-            if any(g.group == group.index for g in v.groups)]
+    return [
+        obj.matrix_world @ v.co
+        for v in obj.data.vertices
+        if any(g.group == group.index for g in v.groups)
+    ]
 
 
 def mesh_tree(obj):
-    return BVHTree.FromPolygons([obj.matrix_world@v.co for v in obj.data.vertices],
-                                [tuple(p.vertices) for p in obj.data.polygons])
+    return BVHTree.FromPolygons(
+        [obj.matrix_world @ v.co for v in obj.data.vertices],
+        [tuple(p.vertices) for p in obj.data.polygons],
+    )
 
 
 def vertex_tree(objects):
@@ -51,9 +61,15 @@ def vertex_tree(objects):
 
 def check_neighbour_facade(b, kd, C, detail):
     expected = ordinary_building(b, b['elevation'], C, detail)
-    ranges = [(start, end) for name, start, end in expected.parts if name in ('04_立面窗格', '05_临街店面')]
+    ranges = [
+        (start, end)
+        for name, start, end in expected.parts
+        if name in ('04_立面窗格', '05_临街店面')
+    ]
     # Includes catalogue datum rounding (5 mm) and the chunk's Draco grid.
-    assert all(kd.find(p)[2] < .012 for start, end in ranges for p in expected.v[start:end]), (b['id'], 'missing exported facade')
+    assert all(
+        kd.find(p)[2] < 0.012 for start, end in ranges for p in expected.v[start:end]
+    ), (b['id'], 'missing exported facade')
 
 
 def root_name(obj):
@@ -63,280 +79,569 @@ def root_name(obj):
 
 
 def samples(b):
-    form = b['form']; z = b['elevation']; points = []
+    form = b['form']
+    z = b['elevation']
+    points = []
     if b['id'] == TOWER_ID:
-        x,y=b['center'];h=b['height']
+        x, y = b['center']
+        h = b['height']
         # Avoid the central antenna and the tank lip; probe both tank overhangs.
-        return [{'x':x+dx,'y':y,'top':z+h+.5,'expected':z+h,'kind':'water-tank-roof'}
-                for dx in (-2.3,2.3)]
+        return [
+            {
+                'x': x + dx,
+                'y': y,
+                'top': z + h + 0.5,
+                'expected': z + h,
+                'kind': 'water-tank-roof',
+            }
+            for dx in (-2.3, 2.3)
+        ]
+
     def area(tri):
-        a,c,d = tri
-        return abs((c[0]-a[0])*(d[1]-a[1])-(c[1]-a[1])*(d[0]-a[0]))/2
-    def edge_distance(x,y,polygons):
-        distances=[]
+        a, c, d = tri
+        return abs((c[0] - a[0]) * (d[1] - a[1]) - (c[1] - a[1]) * (d[0] - a[0])) / 2
+
+    def edge_distance(x, y, polygons):
+        distances = []
         for poly in polygons:
             for ring in poly:
-                for a,c in zip(ring,ring[1:]):
-                    dx,dy=c[0]-a[0],c[1]-a[1];length2=dx*dx+dy*dy
-                    t=max(0,min(1,((x-a[0])*dx+(y-a[1])*dy)/length2)) if length2 else 0
-                    distances.append(math.hypot(x-a[0]-t*dx,y-a[1]-t*dy))
+                for a, c in zip(ring, ring[1:]):
+                    dx, dy = c[0] - a[0], c[1] - a[1]
+                    length2 = dx * dx + dy * dy
+                    t = (
+                        max(0, min(1, ((x - a[0]) * dx + (y - a[1]) * dy) / length2))
+                        if length2
+                        else 0
+                    )
+                    distances.append(math.hypot(x - a[0] - t * dx, y - a[1] - t * dy))
         return min(distances)
-    parts=form['parts'] or [{'id':'body','polygons':b['polygons'],'triangles':b['roofTriangles'],
-                            'height':form['height'],'roof':form['roof']}]
+
+    parts = form['parts'] or [
+        {
+            'id': 'body',
+            'polygons': b['polygons'],
+            'triangles': b['roofTriangles'],
+            'height': form['height'],
+            'roof': form['roof'],
+        }
+    ]
     for part in parts:
-        roof=part['roof'];triangles=[]
-        if roof['type']!='flat':
-            vertices=roof['geometry']['vertices'];indices=roof['geometry']['triangles']
-            triangles=[[vertices[k] for k in indices[i:i+3]] for i in range(0,len(indices),3)]
+        roof = part['roof']
+        triangles = []
+        if roof['type'] != 'flat':
+            vertices = roof['geometry']['vertices']
+            indices = roof['geometry']['triangles']
+            triangles = [
+                [vertices[k] for k in indices[i : i + 3]]
+                for i in range(0, len(indices), 3)
+            ]
         else:
-            geometry=part.get('openBelow',{}).get('roofGeometry',part)
-            for poly,indices in zip(geometry['polygons'],geometry['triangles']):
-                vertices=[list(p)+[0] for ring in poly for p in ring[:-1]]
-                triangles += [[vertices[k] for k in indices[i:i+3]] for i in range(0,len(indices),3)]
-        count=0
-        for tri in sorted(triangles,key=area,reverse=True):
-            x,y,h=[sum(p[k] for p in tri)/3 for k in range(3)]
-            clearance=.02 if 'slattedRoof' in part.get('openBelow',{}) else .5
-            if area(tri)<.1 or edge_distance(x,y,part['polygons'])<clearance:continue
+            geometry = part.get('openBelow', {}).get('roofGeometry', part)
+            for poly, indices in zip(geometry['polygons'], geometry['triangles']):
+                vertices = [list(p) + [0] for ring in poly for p in ring[:-1]]
+                triangles += [
+                    [vertices[k] for k in indices[i : i + 3]]
+                    for i in range(0, len(indices), 3)
+                ]
+        count = 0
+        for tri in sorted(triangles, key=area, reverse=True):
+            x, y, h = [sum(p[k] for p in tri) / 3 for k in range(3)]
+            clearance = 0.02 if 'slattedRoof' in part.get('openBelow', {}) else 0.5
+            if area(tri) < 0.1 or edge_distance(x, y, part['polygons']) < clearance:
+                continue
             dome = form.get('roofDome')
             # Probe the supporting slab from inside the drum where covered;
             # a compact roof can have every triangle centroid below its dome.
             # The separate apex probe checks the new visible silhouette.
-            covered = dome and math.dist((x,y),dome['center']) < dome['radius']+.1
+            covered = dome and math.dist((x, y), dome['center']) < dome['radius'] + 0.1
             for volume in form.get('roofVolumes', []):
-                if volume['part'] != part['id']:continue
-                dx,dy=x-volume['center'][0],y-volume['center'][1]
-                cs,sn=math.cos(volume['angle']),math.sin(volume['angle'])
-                overhang=volume.get('cap',{}).get('overhang',0)
-                covered = covered or (abs(dx*cs+dy*sn)<=volume['width']/2+overhang+.01 and
-                                      abs(-dx*sn+dy*cs)<=volume['depth']/2+overhang+.01)
+                if volume['part'] != part['id']:
+                    continue
+                dx, dy = x - volume['center'][0], y - volume['center'][1]
+                cs, sn = math.cos(volume['angle']), math.sin(volume['angle'])
+                overhang = volume.get('cap', {}).get('overhang', 0)
+                covered = covered or (
+                    abs(dx * cs + dy * sn) <= volume['width'] / 2 + overhang + 0.01
+                    and abs(-dx * sn + dy * cs) <= volume['depth'] / 2 + overhang + 0.01
+                )
             crown = form.get('roofCrown')
             if crown and crown['part'] == part['id']:
-                dx,dy=x-crown['corner'][0],y-crown['corner'][1]
-                u,v=crown['u'],crown['v'];det=u[0]*v[1]-u[1]*v[0]
-                s,t=(dx*v[1]-dy*v[0])/det,(u[0]*dy-u[1]*dx)/det
-                covered = covered or (0<=s<=crown['width'] and 0<=t<=crown['depth']) or (0<=s<=crown['screenThickness'] and crown['depth']<=t<=crown['screenBottomDepth'])
-            points.append({'kind':'roof','part':part['id'],'x':x,'y':y,
-                           'top':z+part['height']+h+(.05 if covered else 4),'expected':z+part['height']+h})
-            count+=1
-            if count>=3:break
-        assert count>0,(b['id'],part['id'],'no usable roof samples')
+                dx, dy = x - crown['corner'][0], y - crown['corner'][1]
+                u, v = crown['u'], crown['v']
+                det = u[0] * v[1] - u[1] * v[0]
+                s, t = (dx * v[1] - dy * v[0]) / det, (u[0] * dy - u[1] * dx) / det
+                covered = (
+                    covered
+                    or (0 <= s <= crown['width'] and 0 <= t <= crown['depth'])
+                    or (
+                        0 <= s <= crown['screenThickness']
+                        and crown['depth'] <= t <= crown['screenBottomDepth']
+                    )
+                )
+            points.append(
+                {
+                    'kind': 'roof',
+                    'part': part['id'],
+                    'x': x,
+                    'y': y,
+                    'top': z + part['height'] + h + (0.05 if covered else 4),
+                    'expected': z + part['height'] + h,
+                }
+            )
+            count += 1
+            if count >= 3:
+                break
+        assert count > 0, (b['id'], part['id'], 'no usable roof samples')
     if 'roofDome' in form:
-        dome=form['roofDome'];x,y=dome['center']
-        apex=z+dome['baseHeight']+dome['drumHeight']+dome['rise']
-        points.append({'kind':'roof-dome-apex','x':x,'y':y,'top':apex+1,'expected':apex})
+        dome = form['roofDome']
+        x, y = dome['center']
+        apex = z + dome['baseHeight'] + dome['drumHeight'] + dome['rise']
+        points.append(
+            {
+                'kind': 'roof-dome-apex',
+                'x': x,
+                'y': y,
+                'top': apex + 1,
+                'expected': apex,
+            }
+        )
     for volume in form.get('roofVolumes', []):
-        x,y=volume['center'];apex=z+volume['baseHeight']+volume['rise']+volume.get('cap',{}).get('height',0)
-        points.append({'kind':'roof-volume-top','x':x,'y':y,'top':apex+1,'expected':apex})
+        x, y = volume['center']
+        apex = (
+            z
+            + volume['baseHeight']
+            + volume['rise']
+            + volume.get('cap', {}).get('height', 0)
+        )
+        points.append(
+            {
+                'kind': 'roof-volume-top',
+                'x': x,
+                'y': y,
+                'top': apex + 1,
+                'expected': apex,
+            }
+        )
     if 'roofCrown' in form:
-        c=form['roofCrown']
-        for kind,s,t,rise in [('curtain-crown',c['width']/2,c['depth']/2,c['rise']),
-                              ('crown-screen',c['screenThickness']/2,(c['depth']+c['screenTopDepth'])/2,c['screenRise'])]:
-            x,y=[c['corner'][k]+c['u'][k]*s+c['v'][k]*t for k in (0,1)]
-            apex=z+c['baseHeight']+rise
-            points.append({'kind':kind,'x':x,'y':y,'top':apex+1,'expected':apex})
+        c = form['roofCrown']
+        for kind, s, t, rise in [
+            ('curtain-crown', c['width'] / 2, c['depth'] / 2, c['rise']),
+            (
+                'crown-screen',
+                c['screenThickness'] / 2,
+                (c['depth'] + c['screenTopDepth']) / 2,
+                c['screenRise'],
+            ),
+        ]:
+            x, y = [c['corner'][k] + c['u'][k] * s + c['v'][k] * t for k in (0, 1)]
+            apex = z + c['baseHeight'] + rise
+            points.append(
+                {'kind': kind, 'x': x, 'y': y, 'top': apex + 1, 'expected': apex}
+            )
     if 'gableScreen' in form:
-        c=form['gableScreen'];s=c['length']*c['peakT'];d=c['thickness']/2
-        x,y=[c['start'][k]+c['tangent'][k]*s-c['normal'][k]*d for k in (0,1)]
-        apex=z+c['baseHeight']+c['peakRise']
-        points.append({'kind':'gable-screen-apex','x':x,'y':y,'top':apex+1,'expected':apex})
+        c = form['gableScreen']
+        s = c['length'] * c['peakT']
+        d = c['thickness'] / 2
+        x, y = [
+            c['start'][k] + c['tangent'][k] * s - c['normal'][k] * d for k in (0, 1)
+        ]
+        apex = z + c['baseHeight'] + c['peakRise']
+        points.append(
+            {
+                'kind': 'gable-screen-apex',
+                'x': x,
+                'y': y,
+                'top': apex + 1,
+                'expected': apex,
+            }
+        )
     if 'stairTower' in form:
-        s=form['stairTower'];x,y=s['origin'];floor=z+s['config']['baseHeight']
-        points.append({'kind':'stair-ground-platform','x':x,'y':y,'top':floor+.5,'expected':floor})
+        s = form['stairTower']
+        x, y = s['origin']
+        floor = z + s['config']['baseHeight']
+        points.append(
+            {
+                'kind': 'stair-ground-platform',
+                'x': x,
+                'y': y,
+                'top': floor + 0.5,
+                'expected': floor,
+            }
+        )
         return points
     for e in form['entrances']:
-        x,y=e['center'];a=math.radians(e['bearing']);nx,ny=math.sin(a),math.cos(a)
+        x, y = e['center']
+        a = math.radians(e['bearing'])
+        nx, ny = math.sin(a), math.cos(a)
         if 'recessedStairEntry' in e:
-            p=e['recessedStairEntry'];distance=(p['outerEnd']+p['innerStart'])/2
-            points.append({'kind':'recessed-entry-landing','x':x-nx*distance,'y':y-ny*distance,
-                           'top':z+p['platformHeight']+.2,'expected':z+p['platformHeight']})
+            p = e['recessedStairEntry']
+            distance = (p['outerEnd'] + p['innerStart']) / 2
+            points.append(
+                {
+                    'kind': 'recessed-entry-landing',
+                    'x': x - nx * distance,
+                    'y': y - ny * distance,
+                    'top': z + p['platformHeight'] + 0.2,
+                    'expected': z + p['platformHeight'],
+                }
+            )
             continue
         if 'flushEntrance' in e:
-            p=e['flushEntrance'];expected=z+p['floorHeight']+p['doorHeight']+p['frameWidth']/2
-            points.append({'kind':'flush-door-header','x':x+nx*.13,'y':y+ny*.13,
-                           'top':expected+.2,'expected':expected})
+            p = e['flushEntrance']
+            expected = z + p['floorHeight'] + p['doorHeight'] + p['frameWidth'] / 2
+            points.append(
+                {
+                    'kind': 'flush-door-header',
+                    'x': x + nx * 0.13,
+                    'y': y + ny * 0.13,
+                    'top': expected + 0.2,
+                    'expected': expected,
+                }
+            )
             continue
         if 'shelter' in e:
             # This building owns the doorway; a separate mapped roof owns
             # its floor and canopy. Probe its stone header below that soffit.
-            p=e['shelter'];expected=z+p['floorHeight']+p['doorHeight']+p['transomHeight']+.12
+            p = e['shelter']
+            expected = (
+                z + p['floorHeight'] + p['doorHeight'] + p['transomHeight'] + 0.12
+            )
             for i in range(p['bays']):
-                offset=-e['width']/2+(i+.5)*e['width']/p['bays']
-                points.append({'kind':'sheltered-door-header','x':x+nx*.10+ny*offset,
-                               'y':y+ny*.10-nx*offset,'top':expected+.03,'expected':expected})
+                offset = -e['width'] / 2 + (i + 0.5) * e['width'] / p['bays']
+                points.append(
+                    {
+                        'kind': 'sheltered-door-header',
+                        'x': x + nx * 0.10 + ny * offset,
+                        'y': y + ny * 0.10 - nx * offset,
+                        'top': expected + 0.03,
+                        'expected': expected,
+                    }
+                )
             continue
         if 'attachedPortico' in e:
-            p=e['attachedPortico'];distance=p['depth']/2
-            points.append({'kind':'entrance-platform','x':x+nx*distance,'y':y+ny*distance,
-                           'top':z+p['platformHeight']+.5,'expected':z+p['platformHeight']})
-            points.append({'kind':'entrance-canopy','x':x+nx*distance,'y':y+ny*distance,
-                           'top':z+p['clearHeight']+p['slabThickness']+.5,
-                           'expected':z+p['clearHeight']+p['slabThickness']})
+            p = e['attachedPortico']
+            distance = p['depth'] / 2
+            points.append(
+                {
+                    'kind': 'entrance-platform',
+                    'x': x + nx * distance,
+                    'y': y + ny * distance,
+                    'top': z + p['platformHeight'] + 0.5,
+                    'expected': z + p['platformHeight'],
+                }
+            )
+            points.append(
+                {
+                    'kind': 'entrance-canopy',
+                    'x': x + nx * distance,
+                    'y': y + ny * distance,
+                    'top': z + p['clearHeight'] + p['slabThickness'] + 0.5,
+                    'expected': z + p['clearHeight'] + p['slabThickness'],
+                }
+            )
             continue
         if 'stairFlight' in e:
-            p=e['stairFlight'];rise=(e['landingHeight']-p['baseHeight'])/p['riserCount']
+            p = e['stairFlight']
+            rise = (e['landingHeight'] - p['baseHeight']) / p['riserCount']
             for i in range(p['riserCount']):
-                distance=p['landingDepth']/2 if i==0 else p['landingDepth']+(i-.5)*p['tread']
-                expected=z+e['landingHeight']-i*rise
-                for offset in (-p['width']/2+.2,0,p['width']/2-.2):
-                    points.append({'kind':'entrance-stair','x':x+nx*distance+ny*offset,
-                                   'y':y+ny*distance-nx*offset,'top':expected+.4,'expected':expected})
+                distance = (
+                    p['landingDepth'] / 2
+                    if i == 0
+                    else p['landingDepth'] + (i - 0.5) * p['tread']
+                )
+                expected = z + e['landingHeight'] - i * rise
+                for offset in (-p['width'] / 2 + 0.2, 0, p['width'] / 2 - 0.2):
+                    points.append(
+                        {
+                            'kind': 'entrance-stair',
+                            'x': x + nx * distance + ny * offset,
+                            'y': y + ny * distance - nx * offset,
+                            'top': expected + 0.4,
+                            'expected': expected,
+                        }
+                    )
             continue
-        platform=e['landingHeight']/2 if 'landingHeight' in e else e.get('platformHeight',.075)
-        points.append({'kind':'entrance-platform','x':x+nx*1.6,'y':y+ny*1.6,
-                       'top':z+platform+.5,'expected':z+platform})
+        platform = (
+            e['landingHeight'] / 2
+            if 'landingHeight' in e
+            else e.get('platformHeight', 0.075)
+        )
+        points.append(
+            {
+                'kind': 'entrance-platform',
+                'x': x + nx * 1.6,
+                'y': y + ny * 1.6,
+                'top': z + platform + 0.5,
+                'expected': z + platform,
+            }
+        )
     return points
 
 
 def check_samples(b, trees, tolerance):
     result = []
     for p in samples(b):
-        hits = [tree.ray_cast(Vector((p['x'],p['y'],p['top'])), Vector((0,0,-1))) for tree in trees]
+        hits = [
+            tree.ray_cast(Vector((p['x'], p['y'], p['top'])), Vector((0, 0, -1)))
+            for tree in trees
+        ]
         heights = [hit[0].z for hit in hits if hit[0] is not None]
         if not heights:
-            raise AssertionError((b['id'],p,'missing surface'))
-        actual = max(heights); error = abs(actual-p['expected'])
+            raise AssertionError((b['id'], p, 'missing surface'))
+        actual = max(heights)
+        error = abs(actual - p['expected'])
         if error > tolerance:
-            raise AssertionError((b['id'],p,actual,error,tolerance))
-        result.append({'kind':p['kind'],'errorMeters':round(error,6)})
+            raise AssertionError((b['id'], p, actual, error, tolerance))
+        result.append({'kind': p['kind'], 'errorMeters': round(error, 6)})
     return result
 
 
 def main():
-    prefix=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'generic')
-    if not re.fullmatch('[a-z0-9-]+',prefix):raise ValueError('Invalid report prefix')
-    bs = [b for b in json.loads((ROOT/'public/data/buildings.json').read_text()) if ordinary(b)]
-    chunk = next((a.split('=', 1)[1] for a in sys.argv if a.startswith('--chunk=')), None)
+    prefix = next(
+        (a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')),
+        'generic',
+    )
+    if not re.fullmatch('[a-z0-9-]+', prefix):
+        raise ValueError('Invalid report prefix')
+    bs = [
+        b
+        for b in json.loads((ROOT / 'public/data/buildings.json').read_text())
+        if ordinary(b)
+    ]
+    chunk = next(
+        (a.split('=', 1)[1] for a in sys.argv if a.startswith('--chunk=')), None
+    )
     if chunk:
         bs = [b for b in bs if b.get('chunk') == chunk]
         assert bs, ('Unknown or empty ordinary building chunk', chunk)
-    colors = ['pink','livingWarm','livingCool','stone','stoneWarm','stoneCool','white','paleRoof','blueRoof','red','dark','path','shadeGlass','glass','grass','green','metal']
-    C = {k:i for i,k in enumerate(colors)}
-    MATERIALS[:]=[bpy.data.materials.new('generic-check-'+name) for name in colors]
+    colors = [
+        'pink',
+        'livingWarm',
+        'livingCool',
+        'stone',
+        'stoneWarm',
+        'stoneCool',
+        'white',
+        'paleRoof',
+        'blueRoof',
+        'red',
+        'dark',
+        'path',
+        'shadeGlass',
+        'glass',
+        'grass',
+        'green',
+        'metal',
+    ]
+    C = {k: i for i, k in enumerate(colors)}
+    MATERIALS[:] = [bpy.data.materials.new('generic-check-' + name) for name in colors]
     generated = []
     for b in bs:
-        low = ordinary_building(b,b.get('elevation',0),C,False)
-        high = ordinary_building(b,b.get('elevation',0),C,True)
-        for (name,a,c),(other,x,y) in zip(low.parts[:3],high.parts[:3]):
-            assert name == other and low.v[a:c] == high.v[x:y], (b['id'],name,'LOD form mismatch')
+        low = ordinary_building(b, b.get('elevation', 0), C, False)
+        high = ordinary_building(b, b.get('elevation', 0), C, True)
+        for (name, a, c), (other, x, y) in zip(low.parts[:3], high.parts[:3]):
+            assert name == other and low.v[a:c] == high.v[x:y], (
+                b['id'],
+                name,
+                'LOD form mismatch',
+            )
         assert all(math.isfinite(x) for v in high.v for x in v)
-        if b['form']['roof']['type']!='flat':
-            obj=high.object('source-weld-check',bpy.context.scene.collection)
+        if b['form']['roof']['type'] != 'flat':
+            obj = high.object('source-weld-check', bpy.context.scene.collection)
             compact_form_source(obj)
-            group=obj.vertex_groups['02_屋顶轮廓'].index
-            actual=[v.co for v in obj.data.vertices if any(g.group==group for g in v.groups)]
-            kd=KDTree(len(actual))
-            for i,point in enumerate(actual):kd.insert(point,i)
+            group = obj.vertex_groups['02_屋顶轮廓'].index
+            actual = [
+                v.co
+                for v in obj.data.vertices
+                if any(g.group == group for g in v.groups)
+            ]
+            kd = KDTree(len(actual))
+            for i, point in enumerate(actual):
+                kd.insert(point, i)
             kd.balance()
-            _,start,end=high.parts[1]
-            assert all(kd.find(point)[2]<.0002 for point in high.v[start:end]),(b['id'],'welding lost shared eave group')
-            mesh=obj.data;bpy.data.objects.remove(obj,do_unlink=True);bpy.data.meshes.remove(mesh)
+            _, start, end = high.parts[1]
+            assert all(kd.find(point)[2] < 0.0002 for point in high.v[start:end]), (
+                b['id'],
+                'welding lost shared eave group',
+            )
+            mesh = obj.data
+            bpy.data.objects.remove(obj, do_unlink=True)
+            bpy.data.meshes.remove(mesh)
         # Dining facilities must not get the residential balcony extension.
         if b['form']['archetype'] == 'canteen':
-            residential = {**b, 'form': {**b['form'], 'archetype':'dormitory'}}
-            assert len(high.v) < len(ordinary_building(residential,b.get('elevation',0),C,True).v)
-        generated.append({'id':b['id'],'roof':b['form']['roof']['type'],
-                          'archetype':b['form']['archetype'],'sharedComponents':min(3,len(high.parts))})
-    report = {'generatedBuildings':len(bs),'generated':generated,
-              'scope':'ordinary buildings only; dedicated landmarks and monuments use their existing verifiers',
-              'tolerancesMeters': {'source':.011,'baseDraco':.05,'nearDraco':.02}}
-    target = ROOT/'docs/model-checks/refinement'
-    target.mkdir(parents=True,exist_ok=True)
+            residential = {**b, 'form': {**b['form'], 'archetype': 'dormitory'}}
+            assert len(high.v) < len(
+                ordinary_building(residential, b.get('elevation', 0), C, True).v
+            )
+        generated.append(
+            {
+                'id': b['id'],
+                'roof': b['form']['roof']['type'],
+                'archetype': b['form']['archetype'],
+                'sharedComponents': min(3, len(high.parts)),
+            }
+        )
+    report = {
+        'generatedBuildings': len(bs),
+        'generated': generated,
+        'scope': 'ordinary buildings only; dedicated landmarks and monuments use their existing verifiers',
+        'tolerancesMeters': {'source': 0.011, 'baseDraco': 0.05, 'nearDraco': 0.02},
+    }
+    target = ROOT / 'docs/model-checks/refinement'
+    target.mkdir(parents=True, exist_ok=True)
     if '--generated-only' in sys.argv:
-        report['generatedPassed']=True
-        (target/(prefix+'-generated.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-        print(f'Generated form passed: {len(bs)} ordinary buildings',flush=True)
+        report['generatedPassed'] = True
+        (target / (prefix + '-generated.json')).write_text(
+            json.dumps(report, ensure_ascii=False, indent=2) + '\n'
+        )
+        print(f'Generated form passed: {len(bs)} ordinary buildings', flush=True)
         return
-    bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'))
-    objects = {o.get('featureId'):o for o in bpy.context.scene.objects if o.type=='MESH' and o.get('featureId')}
-    C.clear();MATERIALS.clear()
+    bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'blender/gxu-campus.blend'))
+    objects = {
+        o.get('featureId'): o
+        for o in bpy.context.scene.objects
+        if o.type == 'MESH' and o.get('featureId')
+    }
+    C.clear()
+    MATERIALS.clear()
     for mat in bpy.data.materials:
-        C[mat.name]=len(MATERIALS);MATERIALS.append(mat)
-    report['source']=[]
+        C[mat.name] = len(MATERIALS)
+        MATERIALS.append(mat)
+    report['source'] = []
     for b in bs:
-        o=objects[b['id']]
-        expected=ordinary_building(b,b['elevation'],C,b['insideCampus'])
-        if b['id']==TOWER_ID:
-            actual=[o.matrix_world@v.co for v in o.data.vertices]
-            for left,right in ((actual,expected.v),(expected.v,actual)):
+        o = objects[b['id']]
+        expected = ordinary_building(b, b['elevation'], C, b['insideCampus'])
+        if b['id'] == TOWER_ID:
+            actual = [o.matrix_world @ v.co for v in o.data.vertices]
+            for left, right in ((actual, expected.v), (expected.v, actual)):
                 assert left and right
-                kd=KDTree(len(right))
-                for i,point in enumerate(right):kd.insert(point,i)
+                kd = KDTree(len(right))
+                for i, point in enumerate(right):
+                    kd.insert(point, i)
                 kd.balance()
-                assert all(kd.find(point)[2]<.011 for point in left),'Stale editable water tower'
-        for name,start,end in (expected.parts if b['id'] in NEW_EAST_NEIGHBOURS else expected.parts[:3]):
-            group=o.vertex_groups.get(name)
-            assert group is not None,(b['id'],name,'missing editable component')
-            actual=component_vertices(o,group)
+                assert all(kd.find(point)[2] < 0.011 for point in left), (
+                    'Stale editable water tower'
+                )
+        for name, start, end in (
+            expected.parts if b['id'] in NEW_EAST_NEIGHBOURS else expected.parts[:3]
+        ):
+            group = o.vertex_groups.get(name)
+            assert group is not None, (b['id'], name, 'missing editable component')
+            actual = component_vertices(o, group)
             # Source vertices are welded for file size; compare geometry in
             # both directions, independent of duplicate count or mesh ordering.
-            predicted=expected.v[start:end]
-            for left,right in ((actual,predicted),(predicted,actual)):
-                if not left and not right:continue
-                assert left and right,(b['id'],name,'empty source component')
-                kd=KDTree(len(right))
-                for i,point in enumerate(right):kd.insert(point,i)
+            predicted = expected.v[start:end]
+            for left, right in ((actual, predicted), (predicted, actual)):
+                if not left and not right:
+                    continue
+                assert left and right, (b['id'], name, 'empty source component')
+                kd = KDTree(len(right))
+                for i, point in enumerate(right):
+                    kd.insert(point, i)
                 kd.balance()
-                assert all(kd.find(point)[2]<.011 for point in left),(b['id'],name,'stale source form')
-        report['source'].append({'id':b['id'],'samples':check_samples(b,[mesh_tree(o)],.011)})
+                assert all(kd.find(point)[2] < 0.011 for point in left), (
+                    b['id'],
+                    name,
+                    'stale source form',
+                )
+        report['source'].append(
+            {'id': b['id'], 'samples': check_samples(b, [mesh_tree(o)], 0.011)}
+        )
     neighbours = [b for b in bs if b['id'] in NEW_EAST_NEIGHBOURS]
     if neighbours:
-        gate, = [o for o in bpy.context.scene.objects if o.get('landmark') == 'new-east-gate']
+        (gate,) = [
+            o for o in bpy.context.scene.objects if o.get('landmark') == 'new-east-gate'
+        ]
         gate_tree = mesh_tree(gate)
         for b in neighbours:
-            assert not gate_tree.overlap(mesh_tree(objects[b['id']])), (b['id'], 'facade intersects gate enclosure')
+            assert not gate_tree.overlap(mesh_tree(objects[b['id']])), (
+                b['id'],
+                'facade intersects gate enclosure',
+            )
         report['neighbourGateClearancePassed'] = True
         for shop_id in sorted(SHOP_BUILDINGS & {b['id'] for b in neighbours}):
             shop = objects[shop_id]
             group = shop.vertex_groups['05_临街店面'].index
-            indices = {v.index for v in shop.data.vertices if any(g.group == group for g in v.groups)}
-            faces = [tuple(p.vertices) for p in shop.data.polygons if all(i in indices for i in p.vertices)]
-            shop_tree = BVHTree.FromPolygons([shop.matrix_world @ v.co for v in shop.data.vertices], faces)
+            indices = {
+                v.index
+                for v in shop.data.vertices
+                if any(g.group == group for g in v.groups)
+            }
+            faces = [
+                tuple(p.vertices)
+                for p in shop.data.polygons
+                if all(i in indices for i in p.vertices)
+            ]
+            shop_tree = BVHTree.FromPolygons(
+                [shop.matrix_world @ v.co for v in shop.data.vertices], faces
+            )
             for other in neighbours:
                 if other['id'] != shop_id:
-                    assert not shop_tree.overlap(mesh_tree(objects[other['id']])), 'Shopfront intersects adjacent building'
+                    assert not shop_tree.overlap(mesh_tree(objects[other['id']])), (
+                        'Shopfront intersects adjacent building'
+                    )
             report['shopfrontNeighbourClearancePassed'] = True
             terrain_tree = mesh_tree(bpy.data.objects['terrain'])
-            paving = [p for p in shop.data.polygons if shop.data.materials[p.material_index].name in {'eastShopPaving', 'eastShopPavingJoint'}]
+            paving = [
+                p
+                for p in shop.data.polygons
+                if shop.data.materials[p.material_index].name
+                in {'eastShopPaving', 'eastShopPavingJoint'}
+            ]
             assert paving, 'Missing shop apron'
             for face in paving:
                 point = shop.matrix_world @ face.center
-                hit, *_ = terrain_tree.ray_cast(point+Vector((0, 0, 2)), Vector((0, 0, -1)), 5)
-                assert hit is not None and .01 < point.z-hit.z < .08, ('Shop apron ground clearance', point, hit)
+                hit, *_ = terrain_tree.ray_cast(
+                    point + Vector((0, 0, 2)), Vector((0, 0, -1)), 5
+                )
+                assert hit is not None and 0.01 < point.z - hit.z < 0.08, (
+                    'Shop apron ground clearance',
+                    point,
+                    hit,
+                )
             report['shopApronGroundingPassed'] = True
     # Import shipping meshes, not a newly re-exported test substitute.
     bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/models/base.glb'))
+    bpy.ops.import_scene.gltf(filepath=str(ROOT / 'public/models/base.glb'))
     bpy.context.view_layer.update()
-    objects={}
+    objects = {}
     for o in bpy.context.scene.objects:
-        if o.type=='MESH': objects.setdefault(root_name(o),[]).append(o)
-    trees={key:[mesh_tree(o) for o in group] for key,group in objects.items()}
-    neighbour_keys={b['chunk'] if b['insideCampus'] else 'context' for b in neighbours}
-    facade_trees={key:vertex_tree(objects[key]) for key in neighbour_keys}
-    report['base']=[]
+        if o.type == 'MESH':
+            objects.setdefault(root_name(o), []).append(o)
+    trees = {key: [mesh_tree(o) for o in group] for key, group in objects.items()}
+    neighbour_keys = {
+        b['chunk'] if b['insideCampus'] else 'context' for b in neighbours
+    }
+    facade_trees = {key: vertex_tree(objects[key]) for key in neighbour_keys}
+    report['base'] = []
     for b in bs:
-        key=b['chunk'] if b['insideCampus'] else 'context'
-        report['base'].append({'id':b['id'],'samples':check_samples(b,trees[key],.05)})
+        key = b['chunk'] if b['insideCampus'] else 'context'
+        report['base'].append(
+            {'id': b['id'], 'samples': check_samples(b, trees[key], 0.05)}
+        )
         if b['id'] in NEW_EAST_NEIGHBOURS:
             check_neighbour_facade(b, facade_trees[key], C, False)
-    report['near']=[]
+    report['near'] = []
     for chunk in sorted({b['chunk'] for b in bs if b['insideCampus']}):
         bpy.ops.wm.read_factory_settings(use_empty=True)
-        bpy.ops.import_scene.gltf(filepath=str(ROOT/'public/models'/f'{chunk}.glb'))
+        bpy.ops.import_scene.gltf(filepath=str(ROOT / 'public/models' / f'{chunk}.glb'))
         bpy.context.view_layer.update()
-        objects=[o for o in bpy.context.scene.objects if o.type=='MESH']
-        trees=[mesh_tree(o) for o in objects]
-        facade_tree=vertex_tree(objects) if chunk in neighbour_keys else None
+        objects = [o for o in bpy.context.scene.objects if o.type == 'MESH']
+        trees = [mesh_tree(o) for o in objects]
+        facade_tree = vertex_tree(objects) if chunk in neighbour_keys else None
         for b in bs:
-            if b.get('chunk')==chunk:
-                report['near'].append({'id':b['id'],'samples':check_samples(b,trees,.02)})
+            if b.get('chunk') == chunk:
+                report['near'].append(
+                    {'id': b['id'], 'samples': check_samples(b, trees, 0.02)}
+                )
                 if b['id'] in NEW_EAST_NEIGHBOURS:
                     check_neighbour_facade(b, facade_tree, C, True)
-    report['passed']=True
-    (target/(prefix+'-geometry.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-    print(f'Source/base/near form passed: {len(bs)} buildings',flush=True)
+    report['passed'] = True
+    (target / (prefix + '-geometry.json')).write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + '\n'
+    )
+    print(f'Source/base/near form passed: {len(bs)} buildings', flush=True)
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

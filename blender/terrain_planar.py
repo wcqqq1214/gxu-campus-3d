@@ -4,6 +4,7 @@ Run after quantized zero-area cleanup. Nothing moves: only almost coplanar,
 upward, globally XY/4-textured connected patches can be retriangulated. The
 editable mesh is restored even if the caller's export fails.
 """
+
 import math
 from collections import Counter, defaultdict
 from contextlib import contextmanager
@@ -13,8 +14,8 @@ import bpy
 import numpy as np
 from mathutils import Matrix
 
-PLANE_ERROR = .0001  # metres; two surfaces can differ by at most twice this
-NORMAL_ERROR = .0006  # reserve room within .001 for Blender's split-normal storage
+PLANE_ERROR = 0.0001  # metres; two surfaces can differ by at most twice this
+NORMAL_ERROR = 0.0006  # reserve room within .001 for Blender's split-normal storage
 POSITION_BITS = 18
 
 
@@ -24,10 +25,14 @@ def quantized_positions(vertices, triangles):
     xyz[:, 2] *= -1
     used = xyz[np.unique(triangles)]
     minimum, maximum = used.min(axis=0), used.max(axis=0)
-    extent = np.float32((maximum-minimum).max())
-    maximum_value = (1 << POSITION_BITS)-1
-    grid = np.floor((xyz-minimum)*np.float32(maximum_value/float(extent)) + np.float32(.5))
-    decoded = (grid*np.float32(float(extent)/maximum_value)+minimum).astype(np.float64)
+    extent = np.float32((maximum - minimum).max())
+    maximum_value = (1 << POSITION_BITS) - 1
+    grid = np.floor(
+        (xyz - minimum) * np.float32(maximum_value / float(extent)) + np.float32(0.5)
+    )
+    decoded = (grid * np.float32(float(extent) / maximum_value) + minimum).astype(
+        np.float64
+    )
     decoded = decoded[:, [0, 2, 1]]
     decoded[:, 1] *= -1
     return decoded
@@ -50,8 +55,9 @@ def read_mesh(mesh):
         'triangles': np.array([tuple(t.vertices) for t in mesh.loop_triangles]),
         'uvs': np.array([tuple(d.uv) for d in mesh.uv_layers.active.data])[loops],
         'normals': np.array([tuple(d.vector) for d in mesh.corner_normals])[loops],
-        'materials': np.array([mesh.polygons[t.polygon_index].material_index
-                               for t in mesh.loop_triangles]),
+        'materials': np.array(
+            [mesh.polygons[t.polygon_index].material_index for t in mesh.loop_triangles]
+        ),
         'polygon_ids': np.array([t.polygon_index for t in mesh.loop_triangles]),
     }
 
@@ -70,20 +76,29 @@ def simplify_mesh_arrays(source):
     points = xyz[faces]
     decoded = quantized_positions(xyz, faces)
     decoded_points = decoded[faces]
-    decoded_cross = np.cross(decoded_points[:, 1]-decoded_points[:, 0], decoded_points[:, 2]-decoded_points[:, 0])
+    decoded_cross = np.cross(
+        decoded_points[:, 1] - decoded_points[:, 0],
+        decoded_points[:, 2] - decoded_points[:, 0],
+    )
     cross = np.cross(points[:, 1] - points[:, 0], points[:, 2] - points[:, 0])
     area = cross[:, 2] / 2
-    eligible = ((cross[:, 2] > .99 * np.linalg.norm(cross, axis=1))
-                & (area > 1e-12)
-                & (decoded_cross[:, 2] > 0)
-                & np.all(uv == points[:, :, :2] / 4, axis=(1, 2)))
+    eligible = (
+        (cross[:, 2] > 0.99 * np.linalg.norm(cross, axis=1))
+        & (area > 1e-12)
+        & (decoded_cross[:, 2] > 0)
+        & np.all(uv == points[:, :, :2] / 4, axis=(1, 2))
+    )
     incidence = defaultdict(list)
     for i, face in enumerate(faces):
         for a, b in zip(face, np.roll(face, -1)):
             incidence[tuple(sorted((int(a), int(b))))].append(i)
-    edges = [tuple(ids) for ids in incidence.values()
-             if len(ids) == 2 and all(eligible[i] for i in ids)
-             and materials[ids[0]] == materials[ids[1]]]
+    edges = [
+        tuple(ids)
+        for ids in incidence.values()
+        if len(ids) == 2
+        and all(eligible[i] for i in ids)
+        and materials[ids[0]] == materials[ids[1]]
+    ]
     edges.sort(key=lambda ids: (-max(area[list(ids)]), ids))
     parent = list(range(len(faces)))
     members = {i: set(map(int, f)) for i, f in enumerate(faces) if eligible[i]}
@@ -128,7 +143,9 @@ def simplify_mesh_arrays(source):
     for root, ids in groups.items():
         original, replacement = faces[ids], None
         id_set = set(ids)
-        complete_polygons = all(polygon_faces[int(source['polygon_ids'][i])] <= id_set for i in ids)
+        complete_polygons = all(
+            polygon_faces[int(source['polygon_ids'][i])] <= id_set for i in ids
+        )
         if len(ids) >= 3 and eligible[root] and complete_polygons:
             bm = bmesh.new()
             try:
@@ -143,18 +160,29 @@ def simplify_mesh_arrays(source):
                     bm.normal_update()
                     protected = {i for i, v in verts.items() if v.is_boundary}
                     bmesh.ops.dissolve_limit(
-                        bm, angle_limit=math.pi / 2, use_dissolve_boundaries=False,
-                        verts=[v for v in bm.verts if not v.is_boundary and v.is_manifold],
-                        edges=[e for e in bm.edges if e.is_manifold], delimit=set())
+                        bm,
+                        angle_limit=math.pi / 2,
+                        use_dissolve_boundaries=False,
+                        verts=[
+                            v for v in bm.verts if not v.is_boundary and v.is_manifold
+                        ],
+                        edges=[e for e in bm.edges if e.is_manifold],
+                        delimit=set(),
+                    )
                     bmesh.ops.triangulate(bm, faces=list(bm.faces))
-                    candidate = [[unique[tuple(v.co)] for v in f.verts] for f in bm.faces]
-                    if (len(candidate) < len(original)
-                            and boundary_chain(candidate) == boundary_chain(original.tolist())
-                            and protected <= {i for f in candidate for i in f}):
+                    candidate = [
+                        [unique[tuple(v.co)] for v in f.verts] for f in bm.faces
+                    ]
+                    if (
+                        len(candidate) < len(original)
+                        and boundary_chain(candidate)
+                        == boundary_chain(original.tolist())
+                        and protected <= {i for f in candidate for i in f}
+                    ):
                         p = xyz[np.array(candidate)]
                         c = np.cross(p[:, 1] - p[:, 0], p[:, 2] - p[:, 0])
                         q = decoded[np.array(candidate)]
-                        quantized_cross = np.cross(q[:, 1]-q[:, 0], q[:, 2]-q[:, 0])
+                        quantized_cross = np.cross(q[:, 1] - q[:, 0], q[:, 2] - q[:, 0])
                         if np.all(c[:, 2] > 0) and np.all(quantized_cross[:, 2] > 0):
                             replacement = candidate
             finally:
@@ -169,24 +197,44 @@ def simplify_mesh_arrays(source):
             out_uv.extend((xyz[np.array(replacement), :2] / 4).tolist())
             out_normal.extend([[normals[root, 0].tolist()] * 3 for _ in replacement])
             out_material.extend([int(materials[root])] * len(replacement))
-            records.append({'oldFaces': len(ids), 'newFaces': len(replacement), 'seed': root})
-            patches.append({'polygons': sorted(set(map(int, source['polygon_ids'][ids]))),
-                            'faces': replacement, 'material': int(materials[root]),
-                            'normal': normals[root, 0].tolist(),
-                            'normalMin': normal_min[root], 'normalMax': normal_max[root]})
+            records.append(
+                {'oldFaces': len(ids), 'newFaces': len(replacement), 'seed': root}
+            )
+            patches.append(
+                {
+                    'polygons': sorted(set(map(int, source['polygon_ids'][ids]))),
+                    'faces': replacement,
+                    'material': int(materials[root]),
+                    'normal': normals[root, 0].tolist(),
+                    'normalMin': normal_min[root],
+                    'normalMax': normal_max[root],
+                }
+            )
 
     triangles = np.array(output)
     old_used, new_used = points.reshape(-1, 3), xyz[triangles].reshape(-1, 3)
-    if not (np.array_equal(old_used.min(axis=0), new_used.min(axis=0))
-            and np.array_equal(old_used.max(axis=0), new_used.max(axis=0))):
+    if not (
+        np.array_equal(old_used.min(axis=0), new_used.min(axis=0))
+        and np.array_equal(old_used.max(axis=0), new_used.max(axis=0))
+    ):
         raise ValueError('Terrain position bounds changed; reject candidate')
-    result = dict(vertices=xyz, triangles=triangles, uvs=np.array(out_uv),
-                  normals=np.array(out_normal), materials=np.array(out_material))
-    report = {'originalFaces': len(faces), 'candidateFaces': len(output),
-              'removedFaces': len(faces) - len(output),
-              'optimizedComponents': len(records), 'components': records,
-              'planeErrorMetres': PLANE_ERROR, 'normalError': NORMAL_ERROR,
-              'positionBoundsPreserved': True}
+    result = dict(
+        vertices=xyz,
+        triangles=triangles,
+        uvs=np.array(out_uv),
+        normals=np.array(out_normal),
+        materials=np.array(out_material),
+    )
+    report = {
+        'originalFaces': len(faces),
+        'candidateFaces': len(output),
+        'removedFaces': len(faces) - len(output),
+        'optimizedComponents': len(records),
+        'components': records,
+        'planeErrorMetres': PLANE_ERROR,
+        'normalError': NORMAL_ERROR,
+        'positionBoundsPreserved': True,
+    }
     result['patches'] = patches
     return result, report
 
@@ -196,14 +244,35 @@ def planar_terrain_candidate(obj, *, dump_directory=None, shared_position_bounds
     # Multi-material roads use the same 18-bit position domain for every
     # primitive. Without that exporter guarantee, retain terrain-only use.
     original = obj.data
-    if (obj.get('layer') not in ({'terrain','roads'} if shared_position_bounds else {'terrain'}) or obj.matrix_world != Matrix.Identity(4)
-            or original.shape_keys or obj.modifiers or obj.vertex_groups
-            or original.has_custom_normals or any(p.use_smooth for p in original.polygons)
-            or len(original.uv_layers) != 1 or original.color_attributes):
-        raise ValueError('Candidate requires plain, untransformed, flat terrain with one UV layer')
-    supported = {'position', '.edge_verts', '.corner_vert', '.corner_edge',
-                 'material_index', 'sharp_face', 'sharp_edge', original.uv_layers.active.name}
-    if any(a.name not in supported and not a.name.startswith('.') for a in original.attributes):
+    if (
+        obj.get('layer')
+        not in ({'terrain', 'roads'} if shared_position_bounds else {'terrain'})
+        or obj.matrix_world != Matrix.Identity(4)
+        or original.shape_keys
+        or obj.modifiers
+        or obj.vertex_groups
+        or original.has_custom_normals
+        or any(p.use_smooth for p in original.polygons)
+        or len(original.uv_layers) != 1
+        or original.color_attributes
+    ):
+        raise ValueError(
+            'Candidate requires plain, untransformed, flat terrain with one UV layer'
+        )
+    supported = {
+        'position',
+        '.edge_verts',
+        '.corner_vert',
+        '.corner_edge',
+        'material_index',
+        'sharp_face',
+        'sharp_edge',
+        original.uv_layers.active.name,
+    }
+    if any(
+        a.name not in supported and not a.name.startswith('.')
+        for a in original.attributes
+    ):
         raise ValueError('Unsupported terrain attributes must be preserved explicitly')
     source = read_mesh(original)
     if len(set(source['materials'])) != 1 and not shared_position_bounds:
@@ -220,7 +289,10 @@ def planar_terrain_candidate(obj, *, dump_directory=None, shared_position_bounds
         for polygon in original.polygons:
             if polygon.index not in removed:
                 faces.append(list(polygon.vertices))
-                uvs.extend(tuple(original.uv_layers.active.data[i].uv) for i in polygon.loop_indices)
+                uvs.extend(
+                    tuple(original.uv_layers.active.data[i].uv)
+                    for i in polygon.loop_indices
+                )
                 materials.append(polygon.material_index)
                 smooth.append(False)
                 # A zero custom normal preserves Blender's automatic polygon
@@ -232,8 +304,8 @@ def planar_terrain_candidate(obj, *, dump_directory=None, shared_position_bounds
                 points = result['vertices'][face]
                 at = len(vertices)
                 vertices.extend(points.tolist())
-                faces.append([at, at+1, at+2])
-                uvs.extend((points[:, :2]/4).tolist())
+                faces.append([at, at + 1, at + 2])
+                uvs.extend((points[:, :2] / 4).tolist())
                 materials.append(patch['material'])
                 smooth.append(True)
                 normals.extend([patch['normal']] * 3)
@@ -248,11 +320,16 @@ def planar_terrain_candidate(obj, *, dump_directory=None, shared_position_bounds
         temporary.normals_split_custom_set(normals)
         temporary.update()
         actual_normals = np.array([tuple(n.vector) for n in temporary.corner_normals])
-        maximum_stored_error = 0.
+        maximum_stored_error = 0.0
         for patch in result['patches']:
-            actual = actual_normals[patch['loopStart']:patch['loopEnd']]
-            error = np.linalg.norm(np.maximum(np.abs(actual-patch['normalMin']),
-                                             np.abs(actual-patch['normalMax'])), axis=1).max()
+            actual = actual_normals[patch['loopStart'] : patch['loopEnd']]
+            error = np.linalg.norm(
+                np.maximum(
+                    np.abs(actual - patch['normalMin']),
+                    np.abs(actual - patch['normalMax']),
+                ),
+                axis=1,
+            ).max()
             maximum_stored_error = max(maximum_stored_error, float(error))
         # This pairs every new corner with an entire component's normal box,
         # including distant faces that never overlap. Keep it diagnostic; the
@@ -260,14 +337,18 @@ def planar_terrain_candidate(obj, *, dump_directory=None, shared_position_bounds
         report['maximumStoredNormalEnvelope'] = maximum_stored_error
         actual_uv = np.array(uvs)
         old_uv = source['uvs'].reshape(-1, 2)
-        if not (np.array_equal(actual_uv.min(axis=0), old_uv.min(axis=0))
-                and np.array_equal(actual_uv.max(axis=0), old_uv.max(axis=0))):
+        if not (
+            np.array_equal(actual_uv.min(axis=0), old_uv.min(axis=0))
+            and np.array_equal(actual_uv.max(axis=0), old_uv.max(axis=0))
+        ):
             raise ValueError('Terrain UV quantization domain changed')
         report['uvBoundsPreserved'] = True
         if dump_directory is not None:
             dump_directory.mkdir(parents=True, exist_ok=True)
             np.savez_compressed(dump_directory / 'original.npz', **source)
-            np.savez_compressed(dump_directory / 'candidate.npz', **read_mesh(temporary))
+            np.savez_compressed(
+                dump_directory / 'candidate.npz', **read_mesh(temporary)
+            )
         obj.data = temporary
         yield report
     finally:

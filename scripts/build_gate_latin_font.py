@@ -4,6 +4,7 @@
 Run with fontTools and brotli installed. The renamed derivative is covered by
 blender/fonts/GXUGateSerif-OFL.txt; no system font or network fetch is needed.
 """
+
 from pathlib import Path
 
 from fontTools import subset
@@ -21,8 +22,13 @@ def main():
     worker = subset.Subsetter(options=options)
     worker.populate(text='GUANGXI UNIVERSITY')
     worker.subset(font)
-    names = {1: 'GXU Gate Serif', 2: 'Regular', 3: 'GXUGateSerif-1',
-             4: 'GXU Gate Serif', 6: 'GXUGateSerif'}
+    names = {
+        1: 'GXU Gate Serif',
+        2: 'Regular',
+        3: 'GXUGateSerif-1',
+        4: 'GXU Gate Serif',
+        6: 'GXUGateSerif',
+    }
     for record in font['name'].names:
         if record.nameID in names:
             record.string = names[record.nameID].encode(record.getEncoding())

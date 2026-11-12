@@ -10,6 +10,7 @@ copy in app/ and components/. Rerun after adding names with new characters:
 Requires fontTools and brotli. The source font is not kept in the repository;
 download it from https://github.com/notofonts/noto-cjk (Serif/SubsetOTF/SC).
 """
+
 import json
 import re
 import sys
@@ -53,7 +54,9 @@ def main() -> None:
     subsetter.subset(font)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     subset.save_font(font, str(OUT), options)
-    print(f'{OUT.relative_to(ROOT)}: {len(text)} characters, {OUT.stat().st_size} bytes')
+    print(
+        f'{OUT.relative_to(ROOT)}: {len(text)} characters, {OUT.stat().st_size} bytes'
+    )
 
 
 if __name__ == '__main__':
