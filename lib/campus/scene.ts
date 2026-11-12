@@ -30,18 +30,18 @@ import {
   type ModelManifest as Manifest,
 } from './boot';
 import {
-  bridgeEntrancePose,
-  entranceBox,
-  fitBox,
-  fitPoints,
-  campusOverviewPoints,
-  landmarkBox,
-  landmarkDirection,
   benchmarkOrbitEnabled,
+  buildingPose,
+  campusOverviewPoints,
+  landmarkPose,
+  orbitPose,
+  overviewPose,
+  viewPose,
+  type MapView,
 } from './camera';
 import { DEFAULT_LAYERS } from './types';
 import { AdaptiveQuality, qualityProfile } from './quality';
-import { FramePacer } from './frame-pacing';
+import { FramePacer, FrameStats } from './frame-pacing';
 import { BenchmarkOrbit } from './benchmark-orbit';
 import { ShadowFrustum } from './shadow-frustum';
 import { disposeObject } from './resources';
@@ -275,11 +275,7 @@ export function createScene(
   let lastFrame = 0;
   let benchmarkRun: BenchmarkOrbit | null = null;
   const framePacer = new FramePacer();
-  let sampleStart = performance.now();
-  let fps = 0;
-  let lastRendered = 0;
-  let activeFrameMs = 0;
-  let activeFrames = 0;
+  const stats = new FrameStats(performance.now());
   let dirty = true;
   let pendingRequest = 0;
   let frame: ViewportFrame = {
@@ -432,6 +428,28 @@ export function createScene(
         start: performance.now(),
       };
   }
+  function jumpTo(pose: { target: THREE.Vector3; position: THREE.Vector3 }) {
+    tween = null;
+    controls.target.copy(pose.target);
+    camera.position.copy(pose.position);
+    controls.update();
+    dirty = true;
+  }
+  function selectionRing(radius: number, center: number[], elevation: number) {
+    const ring = new THREE.Mesh(
+      new THREE.RingGeometry(radius, radius + 0.6, 64),
+      new THREE.MeshBasicMaterial({
+        color: '#d9ae56',
+        transparent: true,
+        opacity: 0.8,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      }),
+    );
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.set(center[0], elevation + 0.6, -center[1]);
+    return ring;
+  }
   function focus(
     id: string,
     origin: import('./types').SelectionOrigin = 'manual',
@@ -447,39 +465,17 @@ export function createScene(
     selectedView = 'oblique';
     autoFramed = true;
     setOrbit(false);
-    const c = l;
     composeViewport();
     frameLandmark();
-    const radius = Math.max(
-      12,
-      Math.hypot(c.bounds[2] - c.bounds[0], c.bounds[3] - c.bounds[1]) * 0.54,
-    );
     clearGroup(highlight);
-    const mark = new THREE.Mesh(
-      new THREE.RingGeometry(radius, radius + 0.6, 64),
-      new THREE.MeshBasicMaterial({
-        color: '#d9ae56',
-        transparent: true,
-        opacity: 0.8,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-      }),
-    );
-    mark.rotation.x = -Math.PI / 2;
-    mark.position.set(c.center[0], c.elevation + 0.6, -c.center[1]);
-    if (l?.placeKind === 'sports' || l?.placeKind === 'bridge') {
-      mark.geometry.dispose();
-      mark.material.dispose();
-    } else highlight.add(mark);
+    // Sports grounds and bridges are already distinct; a ring would cut across them.
+    if (l.placeKind !== 'sports' && l.placeKind !== 'bridge') {
+      const [x0, y0, x1, y1] = l.bounds;
+      const radius = Math.max(12, Math.hypot(x1 - x0, y1 - y0) * 0.54);
+      highlight.add(selectionRing(radius, l.center, l.elevation));
+    }
     callbacks.onSelect(id, origin);
     reconcileDetails(true);
-  }
-  function buildingBox(b: Building) {
-    const [x0, y0, x1, y1] = b.bounds;
-    return new THREE.Box3(
-      new THREE.Vector3(x0 - 4, b.elevation - 0.5, -y1 - 4),
-      new THREE.Vector3(x1 + 4, b.elevation + b.height + 4, -y0 + 4),
-    );
   }
   function focusBuilding(
     id: string,
@@ -513,85 +509,36 @@ export function createScene(
     highlight.add(outline);
     const [x0, y0, x1, y1] = b.bounds;
     const radius = Math.max(10, Math.hypot(x1 - x0, y1 - y0) * 0.54);
-    const ring = new THREE.Mesh(
-      new THREE.RingGeometry(radius, radius + 0.6, 64),
-      new THREE.MeshBasicMaterial({
-        color: '#d9ae56',
-        transparent: true,
-        opacity: 0.8,
-        side: THREE.DoubleSide,
-        depthWrite: false,
-      }),
-    );
-    ring.rotation.x = -Math.PI / 2;
-    ring.position.set(b.center[0], b.elevation + 0.6, -b.center[1]);
-    highlight.add(ring);
+    highlight.add(selectionRing(radius, b.center, b.elevation));
     callbacks.onSelect(id, origin);
     reconcileDetails(true);
   }
   function frameLandmark(animate = true) {
     const place = landmarks.find((p) => p.id === selected);
     const building = place ? undefined : namedBuildings.get(selected ?? '');
-    if (building) {
-      const fit = fitBox(
-        buildingBox(building),
-        selectedView === 'top'
-          ? new THREE.Vector3(0, 1, 0.025).normalize()
-          : new THREE.Vector3(-0.5, 0.66, 1).normalize(),
-        cameraFrame,
-        { width: host.clientWidth, height: host.clientHeight },
-        camera.fov,
-      );
-      if (animate) moveTo(fit.target, fit.position);
-      else {
-        tween = null;
-        controls.target.copy(fit.target);
-        camera.position.copy(fit.position);
-        controls.update();
-        dirty = true;
-      }
-      return;
-    }
-    if (!place) return;
-    const detail = details.loaded.get('landmark-' + place.id);
-    let box = detail
-      ? new THREE.Box3().setFromObject(detail)
-      : landmarkBox(place);
-    if (selectedView === 'oblique') {
-      const anchor = labels.anchor(place.id);
-      // Full views include the label above small gates, which otherwise clips.
-      box.expandByPoint(anchor.clone().add(new THREE.Vector3(0, 5, 0)));
-    }
-    if (selectedView === 'entrance' || selectedView === 'rear-entrance')
-      box = entranceBox(
-        place,
-        box,
-        selectedView === 'rear-entrance',
-        buildings.find((b) => b.landmark === selected)?.architecture,
-      );
-    const framing = fitBox(
-      box,
-      landmarkDirection(
-        place,
-        selectedView,
-        buildings.find((b) => b.landmark === selected)?.architecture,
-      ),
-      cameraFrame,
-      { width: host.clientWidth, height: host.clientHeight },
-      camera.fov,
-    );
-    const fitted =
-      selectedView === 'entrance'
-        ? bridgeEntrancePose(place, framing)
-        : framing;
-    if (animate) moveTo(fitted.target, fitted.position);
-    else {
-      tween = null;
-      controls.target.copy(fitted.target);
-      camera.position.copy(fitted.position);
-      controls.update();
-      dirty = true;
-    }
+    const viewport = { width: host.clientWidth, height: host.clientHeight };
+    const architecture = buildings.find(
+      (b) => b.landmark === selected,
+    )?.architecture;
+    const pose = building
+      ? buildingPose(building, selectedView, cameraFrame, viewport, camera.fov)
+      : place
+        ? landmarkPose(
+            place,
+            selectedView,
+            {
+              model: details.loaded.get('landmark-' + place.id),
+              anchor: labels.anchor(place.id),
+              architecture,
+            },
+            cameraFrame,
+            viewport,
+            camera.fov,
+          )
+        : null;
+    if (!pose) return;
+    if (animate) moveTo(pose.target, pose.position);
+    else jumpTo(pose);
   }
   function landmarkView(value: LandmarkView) {
     restoredPose = null;
@@ -621,26 +568,14 @@ export function createScene(
           startedAt,
           camera.position.clone().sub(controls.target),
         );
-        sampleStart = startedAt;
         lastFrame = startedAt;
-        lastRendered = 0;
-        activeFrameMs = 0;
-        activeFrames = 0;
+        stats.restart(startedAt);
         return;
       }
-      // A sphere fits through a complete rotation, including the wider sides.
       const place = landmarks.find((p) => p.id === selected)!;
-      const detail = details.loaded.get('landmark-' + place.id);
-      const box = detail
-        ? new THREE.Box3().setFromObject(detail)
-        : landmarkBox(place);
-      const sphere = box.getBoundingSphere(new THREE.Sphere());
-      const fit = fitBox(
-        new THREE.Box3().setFromCenterAndSize(
-          sphere.center,
-          new THREE.Vector3().setScalar(sphere.radius * 2),
-        ),
-        landmarkDirection(place, 'oblique'),
+      const fit = orbitPose(
+        place,
+        details.loaded.get('landmark-' + place.id),
         cameraFrame,
         { width: host.clientWidth, height: host.clientHeight },
       );
@@ -723,21 +658,12 @@ export function createScene(
     if (frameReady) applyRestoredPose();
   }
   function overview(animate = true) {
-    const box = new THREE.Box3(
-      new THREE.Vector3(-920, -10, -1260),
-      new THREE.Vector3(1000, 65, 1300),
-    );
-    const direction = new THREE.Vector3(0.55, 1.1, 1);
-    const viewport = { width: host.clientWidth, height: host.clientHeight };
-    const { target: t, position: p } = overviewPoints
-      ? fitPoints(overviewPoints, direction, cameraFrame, viewport)
-      : fitBox(box, direction, cameraFrame, viewport);
-    if (animate) moveTo(t, p);
-    else {
-      controls.target.copy(t);
-      camera.position.copy(p);
-      controls.update();
-    }
+    const pose = overviewPose(overviewPoints, cameraFrame, {
+      width: host.clientWidth,
+      height: host.clientHeight,
+    });
+    if (animate) moveTo(pose.target, pose.position);
+    else jumpTo(pose);
   }
   overview(false);
   function classify(o: THREE.Object3D) {
@@ -1269,7 +1195,7 @@ export function createScene(
     }
     dirty = true;
   }
-  function view(v: string) {
+  function view(v: 'overview' | MapView) {
     restoredPose = null;
     setOrbit(false);
     if (v === 'overview') {
@@ -1284,36 +1210,11 @@ export function createScene(
     }
     autoFramed = false;
     if (v === 'top' || v === 'tilt' || v === 'north') composeViewport();
-    const t = controls.target.clone();
-    const offset = camera.position.clone().sub(t);
-    if (v === 'top')
-      moveTo(t, t.clone().add(new THREE.Vector3(0, offset.length(), 0.01)));
-    else if (v === 'tilt')
-      moveTo(
-        t,
-        t
-          .clone()
-          .add(
-            new THREE.Vector3(-0.45, 0.66, 0.8)
-              .normalize()
-              .multiplyScalar(offset.length()),
-          ),
-      );
-    else if (v === 'north')
-      moveTo(
-        t,
-        t
-          .clone()
-          .add(new THREE.Vector3(0, offset.y, Math.hypot(offset.x, offset.z))),
-      );
-    else {
-      const factor = v === 'zoomIn' ? 0.75 : 1.33;
-      const d = Math.max(
-        controls.minDistance,
-        Math.min(controls.maxDistance, offset.length() * factor),
-      );
-      moveTo(t, t.clone().add(offset.normalize().multiplyScalar(d)));
-    }
+    const pose = viewPose(v, controls.target, camera.position, {
+      min: controls.minDistance,
+      max: controls.maxDistance,
+    });
+    moveTo(pose.target, pose.position);
   }
   function onKey(e: KeyboardEvent) {
     const dirs: Record<string, [number, number]> = {
@@ -1380,27 +1281,9 @@ export function createScene(
   observer.observe(host);
   resize();
   function shadowFrustum() {
-    const size = Math.min(
-      1700,
-      Math.max(100, camera.position.distanceTo(controls.target) * 0.8),
-    );
-    const t = controls.target;
-    if (!shadowVolume.changed(t.x, t.y, t.z, size, preset)) return;
-    renderer.shadowMap.needsUpdate = true;
-    sun.shadow.normalBias = preset === 'evening' ? 1.2 : size < 350 ? 0.3 : 0.8;
-    sun.shadow.bias = preset === 'evening' ? -0.00025 : -0.00012;
-    sun.target.position.copy(t);
-    const dir = LIGHTING[preset].direction;
-    sun.position.set(t.x + dir[0], t.y + dir[1], t.z + dir[2]);
-    Object.assign(sun.shadow.camera, {
-      left: -size,
-      right: size,
-      top: size,
-      bottom: -size,
-      near: 1,
-      far: 5000,
-    });
-    sun.shadow.camera.updateProjectionMatrix();
+    const distance = camera.position.distanceTo(controls.target);
+    if (shadowVolume.fit(sun, controls.target, distance, preset))
+      renderer.shadowMap.needsUpdate = true;
   }
   function metrics(): Metrics {
     const mem = (
@@ -1429,7 +1312,7 @@ export function createScene(
         : {}),
       heapMiB: mem ? Math.round(mem.usedJSHeapSize / 1048576) : null,
       shadowUpdates,
-      fps: Math.round(fps),
+      fps: Math.round(stats.fps),
       triangles: renderer.info.render.triangles,
       drawCalls: renderer.info.render.calls,
       geometries: renderer.info.memory.geometries,
@@ -1530,14 +1413,7 @@ export function createScene(
       }
       dirty = false;
       lastFrame = time;
-      if (
-        lastRendered &&
-        (time - lastRendered < 1000 || orbiting || moving || tween)
-      ) {
-        activeFrameMs += time - lastRendered;
-        activeFrames++;
-      }
-      lastRendered = time;
+      stats.rendered(time, Boolean(orbiting || moving || tween));
       labels.layout(camera, { hovered, selected, frame, hidden: labelHidden });
     }
 
@@ -1546,23 +1422,19 @@ export function createScene(
       cameraSampleAt = time;
       cameraChanged = false;
     }
-    if (benchmarkRun ? benchmarkRun.sampleDue() : time - sampleStart > 1500) {
-      if (activeFrames > 0 && activeFrameMs > 0)
-        fps = (1000 * activeFrames) / activeFrameMs;
+    if (benchmarkRun ? benchmarkRun.sampleDue() : stats.due(time)) {
+      const activeFrames = stats.sample(time);
       callbacks.onMetrics?.(metrics());
       if (quality === 'auto' && !compact() && !saveData() && !document.hidden) {
         if (
           adaptive.sample(
-            fps,
+            stats.fps,
             activeFrames,
             orbiting || Boolean(tween) || Boolean(moving),
           )
         )
           applyQuality();
       }
-      activeFrameMs = 0;
-      activeFrames = 0;
-      sampleStart = time;
     }
     if (
       manifest &&

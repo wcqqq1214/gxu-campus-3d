@@ -1,4 +1,4 @@
-import { Box3, Vector3 } from 'three';
+import { Box3, Sphere, Vector3, type Object3D } from 'three';
 import type { Building, Landmark, LandmarkView, ViewportFrame } from './types';
 
 /** Opt-in measurement mode: retain a shared pose when starting an orbit. */
@@ -280,4 +280,151 @@ export function entranceBox(
     center,
     new Vector3(width, Math.min(16, place.height + 3), width * 0.35),
   );
+}
+
+type Pose = { target: Vector3; position: Vector3 };
+type Viewport = { width: number; height: number };
+export type MapView = 'top' | 'tilt' | 'north' | 'zoomIn' | 'zoomOut';
+
+/** Padded box of an ordinary building, from its footprint and height. */
+export function buildingBox(b: Building) {
+  const [x0, y0, x1, y1] = b.bounds;
+  return new Box3(
+    new Vector3(x0 - 4, b.elevation - 0.5, -y1 - 4),
+    new Vector3(x1 + 4, b.elevation + b.height + 4, -y0 + 4),
+  );
+}
+
+/** Ordinary buildings have a top and an oblique view only. */
+export function buildingPose(
+  b: Building,
+  view: LandmarkView,
+  frame: ViewportFrame,
+  viewport: Viewport,
+  fov?: number,
+) {
+  return fitBox(
+    buildingBox(b),
+    view === 'top'
+      ? new Vector3(0, 1, 0.025).normalize()
+      : new Vector3(-0.5, 0.66, 1).normalize(),
+    frame,
+    viewport,
+    fov,
+  );
+}
+
+/**
+ * Frames a landmark from a named view. The loaded model, when present, gives
+ * the bounds; full oblique views also keep the label above small gates.
+ */
+export function landmarkPose(
+  place: Landmark,
+  view: LandmarkView,
+  {
+    model,
+    anchor,
+    architecture,
+  }: {
+    model?: Object3D;
+    anchor: Vector3;
+    architecture?: Building['architecture'];
+  },
+  frame: ViewportFrame,
+  viewport: Viewport,
+  fov?: number,
+): Pose {
+  let box = model ? new Box3().setFromObject(model) : landmarkBox(place);
+  if (view === 'oblique')
+    box.expandByPoint(anchor.clone().add(new Vector3(0, 5, 0)));
+  if (view === 'entrance' || view === 'rear-entrance')
+    box = entranceBox(place, box, view === 'rear-entrance', architecture);
+  const framing = fitBox(
+    box,
+    landmarkDirection(place, view, architecture),
+    frame,
+    viewport,
+    fov,
+  );
+  return view === 'entrance' ? bridgeEntrancePose(place, framing) : framing;
+}
+
+/** A sphere fits through a complete rotation, including the wider sides. */
+export function orbitPose(
+  place: Landmark,
+  model: Object3D | undefined,
+  frame: ViewportFrame,
+  viewport: Viewport,
+) {
+  const box = model ? new Box3().setFromObject(model) : landmarkBox(place);
+  const sphere = box.getBoundingSphere(new Sphere());
+  return fitBox(
+    new Box3().setFromCenterAndSize(
+      sphere.center,
+      new Vector3().setScalar(sphere.radius * 2),
+    ),
+    landmarkDirection(place, 'oblique'),
+    frame,
+    viewport,
+  );
+}
+
+/** The whole campus; the measured boundary replaces the fixed box once loaded. */
+export function overviewPose(
+  points: Vector3[] | null,
+  frame: ViewportFrame,
+  viewport: Viewport,
+) {
+  const direction = new Vector3(0.55, 1.1, 1);
+  return points
+    ? fitPoints(points, direction, frame, viewport)
+    : fitBox(
+        new Box3(new Vector3(-920, -10, -1260), new Vector3(1000, 65, 1300)),
+        direction,
+        frame,
+        viewport,
+      );
+}
+
+/** Changes the viewing angle or zoom around the current target. */
+export function viewPose(
+  view: MapView,
+  target: Vector3,
+  position: Vector3,
+  distance: { min: number; max: number },
+): Pose {
+  const t = target.clone();
+  const offset = position.clone().sub(t);
+  if (view === 'top')
+    return {
+      target: t,
+      position: t.clone().add(new Vector3(0, offset.length(), 0.01)),
+    };
+  if (view === 'tilt')
+    return {
+      target: t,
+      position: t
+        .clone()
+        .add(
+          new Vector3(-0.45, 0.66, 0.8)
+            .normalize()
+            .multiplyScalar(offset.length()),
+        ),
+    };
+  if (view === 'north')
+    return {
+      target: t,
+      position: t
+        .clone()
+        .add(new Vector3(0, offset.y, Math.hypot(offset.x, offset.z))),
+    };
+  const factor = view === 'zoomIn' ? 0.75 : 1.33;
+  const d = Math.max(
+    distance.min,
+    Math.min(distance.max, offset.length() * factor),
+  );
+  return {
+    target: t,
+    position: t.clone().add(offset.normalize().multiplyScalar(d)),
+  };
 }

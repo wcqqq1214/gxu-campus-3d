@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { FramePacer } from '../lib/campus/frame-pacing.ts';
+import { FramePacer, FrameStats } from '../lib/campus/frame-pacing.ts';
 
 function count(refresh, jitter = 0) {
   const pacer = new FramePacer();
@@ -40,4 +40,21 @@ test('非流畅档不受限帧影响，切回流畅档采用新的时间起点',
   assert.equal(pacer.shouldUpdate(2017, false), true);
   assert.equal(pacer.shouldUpdate(2018, true), true);
   assert.equal(pacer.shouldUpdate(2034, true), false);
+});
+
+test('帧率只统计活动渲染，静止后的首帧不拉低结果', () => {
+  const stats = new FrameStats(100);
+  for (let t = 100; t <= 1100; t += 20) stats.rendered(t, false);
+  // A static map renders again only after a long pause; that gap is not a slow frame.
+  stats.rendered(4000, false);
+  assert.equal(stats.due(1500), false);
+  assert.equal(stats.due(1700), true);
+  assert.equal(stats.sample(4000), 50);
+  assert.equal(Math.round(stats.fps), 50);
+  stats.rendered(5500, true);
+  assert.equal(stats.sample(5600), 1);
+  assert.ok(Math.abs(stats.fps - 1000 / 1500) < 1e-9);
+  stats.restart(6000);
+  stats.rendered(6010, true);
+  assert.equal(stats.sample(6100), 0, 'restart drops the previous frame time');
 });
