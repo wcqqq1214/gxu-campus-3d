@@ -1,0 +1,8 @@
+[tool.ruff]
+target-version = "py312"
+required-version = "==0.17.4"
+extend-exclude = ["work", "out", "output", "outputs", "dist"]
+
+[tool.ruff.lint]
+# 第一阶段只拦截语法和高确定性错误；风格、导入排序与格式化后续分批接入。
+select = ["E9", "F63", "F7", "F82"]

@@ -24,14 +24,19 @@ jobs:
           cache: npm
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version-file: '.python-version'
           cache: pip
-          cache-dependency-path: scripts/requirements.txt
+          cache-dependency-path: |
+            scripts/requirements.txt
+            scripts/requirements-dev.txt
+            scripts/constraints-geodata.txt
       - uses: actions/configure-pages@v5
         id: pages
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
       - run: npm ci
-      - run: python -m pip install -r scripts/requirements.txt -c scripts/constraints-geodata.txt
+      - run: python -m pip install -r scripts/requirements-dev.txt -c scripts/constraints-geodata.txt
+      - name: Python 静态检查（第一阶段）
+        run: npm run lint:python -- --output-format=github
       - name: 安装无损 JPEG 测试依赖
         run: |
           sudo apt-get update

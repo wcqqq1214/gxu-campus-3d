@@ -10,6 +10,7 @@
     "build": "vinext build",
     "start": "npm run dev",
     "lint": "oxlint",
+    "lint:python": "python3 -m ruff check .",
     "format": "oxfmt",
     "typecheck": "tsc --noEmit",
     "check": "npm run typecheck && npm run lint && npm test",

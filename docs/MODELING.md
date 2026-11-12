@@ -27,7 +27,7 @@ npm run build:pages
 
 `build:pages` 生成 `out/`，`PAGES_BASE_PATH` 可指定仓库子路径；`npm run preview` 默认在 4300 端口预览该目录。清理或重建前确认是否仍有预览使用它。`out/data/buildings.json` 只保留网页读取的字段，轮廓取整到厘米（`scripts/runtime-data.mjs`）；建模、校验和指纹始终以 `public/data/buildings.json` 的完整记录为准。前端 `Building` 类型增减字段时同步该清单，`test-runtime-data.mjs` 会检查两者一致。
 
-`npm run check` 按顺序运行类型检查、lint 和 JavaScript/TypeScript 测试，任一失败立即退出；不需要 Python、Blender 或本地 `.blend`。完整检查另外运行 `npm run test:data`、`npm run test:geometry` 和 `npm run test:browser`（包含静态构建）。
+`npm run check` 按顺序运行类型检查、lint 和 JavaScript/TypeScript 测试，任一失败立即退出；不需要 Python、Blender 或本地 `.blend`。完整检查另外运行 `npm run lint:python`、`npm run test:data`、`npm run test:geometry` 和 `npm run test:browser`（包含静态构建）。
 
 推送 `dev`、推送 `main` 或向 `main` 提交 PR 会自动运行 Linux 完整检查，包含 Python 数据测试、Blender 几何回归和浏览器回归；也可运行 `gh workflow run pages.yml --ref dev` 手动触发。非 `main` 分支使用 `/gxu-campus-3d` 前缀且跳过部署；只有 `main` 的非 PR 运行且全部检查通过后允许发布。依赖版本和检查顺序见 [pages.yml](../.github/workflows/pages.yml)；CI 安装 `libjpeg-turbo-progs`，确保需要 `jpegtran` 的回归不因缺少工具而跳过。
 
@@ -51,7 +51,7 @@ npm run test:browser
 
 ## 数据和完整模型构建
 
-数据处理使用 Python 3.12 及仓库依赖约束；建模需要 Blender（当前源文件和 CI 使用 5.2.2）与提供 `jpegtran` 的 libjpeg-turbo。字体和自制纹理随仓库提供。
+数据处理使用 [.python-version](../.python-version) 指定的 Python 3.12 系列及仓库依赖约束，CI 从同一文件读取版本；补丁版本随 3.12 系列更新。建模需要 Blender（当前源文件和 CI 使用 5.2.2）与提供 `jpegtran` 的 libjpeg-turbo；Blender 继续使用自身内置 Python。字体和自制纹理随仓库提供。
 
 ```sh
 python3.12 -m venv work/venv
@@ -60,6 +60,24 @@ npm run data:restore
 work/venv/bin/python scripts/prepare_geodata.py
 npm run models:build
 ```
+
+### Python 静态检查
+
+开发和 CI 使用 [requirements-dev.txt](../scripts/requirements-dev.txt)，它包含数据处理依赖并固定 Ruff 版本。首次检查时创建 Python 3.12 虚拟环境并激活，避免 npm 脚本调用系统自带的其他 Python：
+
+```sh
+python3.12 -m venv work/python-ci-venv
+source work/python-ci-venv/bin/activate
+python -m pip install -r scripts/requirements-dev.txt -c scripts/constraints-geodata.txt
+npm run lint:python
+npm run test:data
+```
+
+[pyproject.toml](../pyproject.toml) 将 Ruff 目标设为 `py312`，并要求与开发依赖相同的 Ruff 版本。第一阶段扫描仓库 Python 源码（含 `scripts/`、`blender/`），排除生成目录和本地工作目录，仅启用 `E9`、`F63`、`F7`、`F82`，拦截语法错误、未定义名称和明显的控制流错误。检查不执行 Blender 脚本，也不需要安装 `bpy`。
+
+CI 在安装 Python 依赖后立即运行相同入口；失败会阻断后续步骤，并显示 GitHub 文件行号标注。当前阶段不运行自动修复、格式化、导入排序或风格检查，也没有通过逐文件忽略隐藏历史问题。以后按规则或模块分批扩展并单独评审，避免全仓脚本一次性变更；规则含义见 [Ruff 官方文档](https://docs.astral.sh/ruff/rules/)。
+
+### 完整构建说明
 
 `blender` 须位于 PATH，也可用本机绝对路径执行对应脚本。全新重建必须先恢复快照，再准备数据并运行不带 `--base-only` 的完整构建；不能拿已生成的建筑数据代替首次构建验证。仅在明确更新底图时运行 `scripts/fetch_geodata.py --refresh`，随后核对来源日期、统计、稳定 ID 和模型。
 
