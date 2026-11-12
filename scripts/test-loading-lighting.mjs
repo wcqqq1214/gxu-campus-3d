@@ -49,11 +49,11 @@ const makeLoader = compileFunction(
   const { root, initialPreset, onYield } = fixture;
   const scene = new THREE.Scene(), palette = createPalette([]), nightStyle = createNightStyle();
   const contextStyle = { apply() {} }, lifecycle = new AbortController();
-  const progresses = new Map(), landmarks = [], loaded = new Map(), geometryCosts = new Map();
+  const progresses = new Map(), landmarks = [], details = { remeasure() {} };
   const sky = { setPreset() {} }, sun = { color: new THREE.Color() };
   const ambient = { color: new THREE.Color(), groundColor: new THREE.Color() };
   const fill = { color: new THREE.Color() }, renderer = {}, effects = { setNight() {} };
-  const labels = { dataset: {} }, syncRoadLights = () => {}, reconcileDetails = () => {};
+  const labels = { setLight() {} }, syncRoadLights = () => {}, reconcileDetails = () => {};
   const updateLoadStatus = () => {}, asset = x => x, modelUrl = x => x.url;
   const fetchModel = async () => new ArrayBuffer(0), loader = { parseAsync: async () => ({ scene: root }) };
   let preset = initialPreset, disposed = false, loadedBytes = 0, dirty = false, yields = 0;

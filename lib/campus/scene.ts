@@ -1,11 +1,10 @@
 import { loadCampusBoundary } from './boundary-data';
-import { placeName, translate, type Locale, type Message } from './i18n';
-import { landmarkLabelAnchor } from './labels';
+import { translate, type Locale, type Message } from './i18n';
 import { createNightStyle, createRoadLights } from './night';
 import { createPalette } from './palette';
 import { createSky, fogRange } from './sky';
 import { LIGHTING } from './lighting';
-import { navigationFootprints, searchableBuildings } from './navigation';
+import { searchableBuildings } from './navigation';
 import {
   treeAppearance,
   treeRotation,
@@ -21,15 +20,8 @@ import { batchSportsSurfaces } from './sports-batching';
 import { batchStaticRoadSurfaces } from './road-batching';
 import { pruneGroundTriangles } from './ground-triangles';
 import { createConvexCulling } from './convex-culling';
-import { isTap } from './math';
 import type { CameraSnapshot } from './share';
-import {
-  fetchModel,
-  fetchJson,
-  nearbyChunks,
-  planDetails,
-  ResourceQueue,
-} from './streaming';
+import { fetchModel, fetchJson } from './streaming';
 import type { StreamAsset as Asset } from './streaming';
 import {
   asset,
@@ -55,6 +47,14 @@ import { ShadowFrustum } from './shadow-frustum';
 import { disposeObject } from './resources';
 import { createBoundary } from './boundary';
 import { createContextStyle } from './context-style';
+import { createDetailStreaming } from './scene-details';
+import { downloadCanvas } from './scene-export';
+import { createSceneLabels } from './scene-labels';
+import {
+  createScenePicking,
+  footprintMesh,
+  forwardOverlayWheel,
+} from './scene-pointer';
 import type {
   Building,
   Landmark,
@@ -137,28 +137,7 @@ export function createScene(
     MIDDLE: THREE.MOUSE.DOLLY,
     RIGHT: THREE.MOUSE.PAN,
   };
-  const wheelHost = host.parentElement ?? host;
-  function onOverlayWheel(event: WheelEvent) {
-    if (event.target === canvas || event.defaultPrevented) return;
-    if (!(event.target instanceof Element)) return;
-    // Scrollable menus keep their wheel gestures; other overlays zoom the map.
-    for (let el: Element | null = event.target; el; el = el.parentElement) {
-      const style = getComputedStyle(el);
-      if (
-        (/(auto|scroll)/.test(style.overflowY) &&
-          el.scrollHeight > el.clientHeight) ||
-        (/(auto|scroll)/.test(style.overflowX) &&
-          el.scrollWidth > el.clientWidth) ||
-        el.matches('[role="dialog"], dialog')
-      )
-        return;
-      if (el === wheelHost) break;
-    }
-    // Retain wheel units, cursor position and pinch modifiers for OrbitControls.
-    if (!canvas.dispatchEvent(new WheelEvent('wheel', event)))
-      event.preventDefault();
-  }
-  wheelHost.addEventListener('wheel', onOverlayWheel, { passive: false });
+  const releaseWheel = forwardOverlayWheel(host.parentElement ?? host, canvas);
   const ambient = new THREE.HemisphereLight('#d4e6fa', '#818363', 0.72);
   scene.add(ambient);
   const sun = new THREE.DirectionalLight('#fff3de', 3.35);
@@ -322,18 +301,60 @@ export function createScene(
   let cameraSampleAt = 0;
   const compact = () => window.innerWidth < 760;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const loaded = new Map<string, THREE.Group>();
   const loading = new Set<string>();
-  const failed = new Map<string, Asset>();
-  const detailQueue = new ResourceQueue<void>(2);
   const lifecycle = new AbortController();
   const progresses = new Map<
     string,
     { label: string; name?: string; fraction: number }
   >();
-  const geometryCosts = new Map<string, number>();
-  const wanted = new Set<string>();
-  const recentlyUsed = new Map<string, number>();
+  const details = createDetailStreaming({
+    scene,
+    root: dynamic,
+    layers,
+    detailLayer,
+    view: () => ({
+      manifest,
+      ready: initialReady,
+      selected,
+      smooth: modeSmooth,
+      budgetMiB: profile.detailBudgetMiB,
+      // A flight selects details around its destination, not the passing campus area.
+      target: tween?.toTarget ?? controls.target,
+      camera: tween?.to ?? camera.position,
+    }),
+    load: (a, key, signal) => loadGLB(a, key, signal),
+    nearTrees: (distance) =>
+      profile.nearTrees &&
+      treesRoot &&
+      manifest?.treesNear &&
+      !highTreesReady &&
+      !highTreesFailed &&
+      !loading.has('trees') &&
+      distance < 1000
+        ? (signal) => loadTrees(true, signal)
+        : undefined,
+    onNearTreesFailed: () =>
+      callbacks.onStatus('近处树木加载失败，可重试', true),
+    onAttached: (key) => {
+      if (key.startsWith('landmark-'))
+        updateLabelAnchors(key.slice('landmark-'.length));
+      if (key === 'landmark-' + selected && autoFramed && !orbiting)
+        frameLandmark();
+    },
+    onReleased: (key) => {
+      if (key.startsWith('landmark-'))
+        updateLabelAnchors(key.slice('landmark-'.length));
+    },
+    onSettled: () => {
+      pendingRequest = performance.now();
+    },
+    onFailed: updateLoadStatus,
+    onReconciled: () => {
+      applyLayers();
+      updateLoadStatus();
+    },
+  });
+  const reconcileDetails = (focusing = false) => details.reconcile(focusing);
   let tween: {
     from: THREE.Vector3;
     to: THREE.Vector3;
@@ -341,225 +362,60 @@ export function createScene(
     toTarget: THREE.Vector3;
     start: number;
   } | null = null;
-  const labels = document.createElement('div');
-  labels.className = 'scene-labels';
-  host.appendChild(labels);
-  const labelNodes = landmarks.map((l, i) => {
-    const el = document.createElement('button');
-    el.className = 'map-label';
-    el.dataset.placeId = l.id;
-    el.onpointerenter = () => setHovered(l.id);
-    el.onpointerleave = () => setHovered(null);
-    el.onfocus = () => setHovered(l.id);
-    el.onblur = () => setHovered(null);
-    const number = document.createElement('span');
-    number.textContent = String(i + 1).padStart(2, '0');
-    el.appendChild(number);
-    const caption = document.createElement('span');
-    caption.className = 'map-label-name';
-    caption.textContent = placeName(l.name, locale);
-    el.appendChild(caption);
-    el.title = t('查看{name}', { name: placeName(l.name, locale) });
-    el.onclick = () => {
+  const labels = createSceneLabels({
+    host,
+    landmarks,
+    invalidate: () => {
+      dirty = true;
+    },
+    onHover: setHovered,
+    onChoose: (id) => {
       callbacks.onInteract();
-      focus(l.id);
-    };
-    labels.appendChild(el);
-    return {
-      l,
-      el,
-      caption,
-      width: 0,
-      height: 0,
-      point: landmarkLabelAnchor(l),
-      bounds: [0, 0, 0, 0],
-    };
+      focus(id);
+    },
   });
-  const labelOrder = [...labelNodes];
-  let orderedHover: string | null | undefined;
-  let orderedSelection: string | null | undefined;
-  const labelProjection = new THREE.Vector3();
+  const labelHidden = (l: Landmark) =>
+    l.placeKind === 'sports'
+      ? !layers.sports
+      : !layers[detailLayer('landmark-' + l.id)];
   const orbitOffset = new THREE.Vector3();
   const orbitAxis = new THREE.Vector3(0, 1, 0);
-  const occupiedLabels: number[][] = [];
-  const labelViewport = { width: 0, height: 0 };
-  function measureLabels() {
-    const layerDisplay = labels.style.display;
-    labels.style.display = '';
-    const displays = labelNodes.map(({ el }) => el.style.display);
-    for (const { el } of labelNodes) el.style.display = '';
-    for (const node of labelNodes) {
-      node.width = node.el.offsetWidth;
-      node.height = node.el.offsetHeight;
-    }
-    labelNodes.forEach(({ el }, i) => {
-      el.style.display = displays[i];
-    });
-    labels.style.display = layerDisplay;
-    dirty = true;
-  }
   function setLocale(value: Locale) {
     locale = value;
-    labels.lang = value === 'zh' ? 'zh-CN' : 'en';
     canvas.setAttribute(
       'aria-label',
       t('广西大学三维校园，方向键平移，加减键缩放，Home返回全景'),
     );
-    for (const { l, el, caption } of labelNodes) {
-      const name = placeName(l.name, locale);
-      caption.textContent = name;
-      el.title = t('查看{name}', { name });
-      el.setAttribute('aria-label', el.title);
-    }
-    measureLabels();
+    labels.setLocale(value);
   }
   function updateLabelAnchors(id?: string) {
-    for (const node of labelNodes) {
-      if (id && node.l.id !== id) continue;
-      const key = 'landmark-' + node.l.id;
-      const model = loaded.get(key) ?? baseRoot?.getObjectByName(key);
-      node.point.copy(landmarkLabelAnchor(node.l, model));
-      node.el.dataset.anchor = node.point
-        .toArray()
-        .map((v) => v.toFixed(2))
-        .join(',');
-    }
-    dirty = true;
+    labels.updateAnchors(
+      (key) => details.loaded.get(key) ?? baseRoot?.getObjectByName(key),
+      id,
+    );
   }
   function setHovered(id: string | null) {
     if (hovered === id) return;
     hovered = id;
-    for (const { l, el } of labelNodes)
-      el.classList.toggle('linked-hover', l.id === id);
+    labels.setHovered(id);
     callbacks.onHover(id);
     dirty = true;
-  }
-  const proxies: THREE.Mesh[] = [];
-  function footprintMesh(b: {
-    polygons: number[][][][];
-    height: number;
-    elevation: number;
-  }) {
-    const groupShapes = b.polygons.map((poly) => {
-      const s = new THREE.Shape(
-        poly[0].map((v) => new THREE.Vector2(v[0], v[1])),
-      );
-      for (const ring of poly.slice(1))
-        s.holes.push(
-          new THREE.Path(ring.map((v) => new THREE.Vector2(v[0], v[1]))),
-        );
-      return s;
-    });
-    const geo = new THREE.ExtrudeGeometry(groupShapes, {
-      depth: b.height,
-      bevelEnabled: false,
-      steps: 1,
-    });
-    geo.rotateX(-Math.PI / 2);
-    const mesh = new THREE.Mesh(
-      geo,
-      new THREE.MeshBasicMaterial({ side: THREE.DoubleSide }),
-    );
-    mesh.position.y = b.elevation;
-    mesh.updateMatrixWorld();
-    return mesh;
-  }
-  let proxiesReady = false;
-  function ensurePickProxies() {
-    if (proxiesReady) return;
-    for (const b of navigationFootprints(buildings, landmarks)) {
-      const mesh = footprintMesh(b);
-      mesh.userData = { id: b.landmark ?? b.id, layer: b.layer };
-      proxies.push(mesh);
-    }
-    proxiesReady = true;
   }
   const namedBuildings = new Map(
     searchableBuildings(buildings, landmarks).map((b) => [b.id, b]),
   );
-  // Only curated places participate in map hover and click selection.
-  function pickTargets() {
-    ensurePickProxies();
-    return proxies.filter((p) => layers[p.userData.layer as LayerKey]);
-  }
-  function pick(clientX: number, clientY: number) {
-    const rect = canvas.getBoundingClientRect();
-    pointer.set(
-      ((clientX - rect.left) / rect.width) * 2 - 1,
-      (-(clientY - rect.top) / rect.height) * 2 + 1,
-    );
-    raycaster.setFromCamera(pointer, camera);
-    return raycaster.intersectObjects(pickTargets(), false)[0]?.object
-      .userData as { id: string } | undefined;
-  }
-  let hoverFrame = 0;
-  let hoverPoint: { x: number; y: number } | null = null;
-  function clearPointerHover() {
-    canvas.style.cursor = '';
-    setHovered(null);
-  }
-  function updatePointerHover() {
-    hoverFrame = 0;
-    if (!hoverPoint || tween || downPointers > 0) return;
-    const hit = pick(hoverPoint.x, hoverPoint.y);
-    setHovered(hit?.id ?? null);
-    canvas.style.cursor = hit ? 'pointer' : '';
-  }
+  const picking = createScenePicking({
+    canvas,
+    camera,
+    buildings,
+    landmarks,
+    layers,
+    moving: () => Boolean(tween),
+    onHover: setHovered,
+    onPick: (id) => focus(id),
+  });
   const highlight = new THREE.Group();
   scene.add(highlight);
-  const raycaster = new THREE.Raycaster();
-  const pointer = new THREE.Vector2();
-  let down = { x: 0, y: 0, time: 0 };
-  let maxTravel = 0;
-  let downPointers = 0;
-  function onDown(e: PointerEvent) {
-    downPointers++;
-    down = { x: e.clientX, y: e.clientY, time: performance.now() };
-    maxTravel = downPointers > 1 ? 999 : 0;
-  }
-  function onMove(e: PointerEvent) {
-    maxTravel = Math.max(
-      maxTravel,
-      Math.hypot(e.clientX - down.x, e.clientY - down.y),
-    );
-    if (e.pointerType !== 'mouse' || e.buttons) {
-      clearPointerHover();
-      return;
-    }
-    hoverPoint = { x: e.clientX, y: e.clientY };
-    if (!hoverFrame) hoverFrame = requestAnimationFrame(updatePointerHover);
-  }
-  function onLeave() {
-    hoverPoint = null;
-    clearPointerHover();
-  }
-  function onUp(e: PointerEvent) {
-    if (e.button !== 0) {
-      downPointers = Math.max(0, downPointers - 1);
-      return;
-    }
-    downPointers = Math.max(0, downPointers - 1);
-    if (
-      !isTap(
-        down,
-        { x: e.clientX, y: e.clientY, time: performance.now() },
-        maxTravel,
-      )
-    )
-      return;
-    const hit = pick(e.clientX, e.clientY);
-    clearPointerHover();
-    if (hit) focus(hit.id);
-  }
-  function onCancel() {
-    downPointers = 0;
-    maxTravel = 999;
-  }
-  canvas.addEventListener('pointerdown', onDown);
-  canvas.addEventListener('pointermove', onMove);
-  canvas.addEventListener('pointerup', onUp);
-  canvas.addEventListener('pointercancel', onCancel);
-  canvas.addEventListener('pointerleave', onLeave);
   function moveTo(target: THREE.Vector3, position: THREE.Vector3) {
     dirty = true;
     tween = null;
@@ -630,7 +486,7 @@ export function createScene(
     origin: import('./types').SelectionOrigin = 'manual',
   ) {
     const b = namedBuildings.get(id)!;
-    clearPointerHover();
+    picking.clearHover();
     selected = id;
     restoredPose = null;
     selectedView = 'oblique';
@@ -697,12 +553,12 @@ export function createScene(
       return;
     }
     if (!place) return;
-    const detail = loaded.get('landmark-' + place.id);
+    const detail = details.loaded.get('landmark-' + place.id);
     let box = detail
       ? new THREE.Box3().setFromObject(detail)
       : landmarkBox(place);
     if (selectedView === 'oblique') {
-      const anchor = labelNodes.find((node) => node.l.id === place.id)!.point;
+      const anchor = labels.anchor(place.id);
       // Full views include the label above small gates, which otherwise clips.
       box.expandByPoint(anchor.clone().add(new THREE.Vector3(0, 5, 0)));
     }
@@ -774,7 +630,7 @@ export function createScene(
       }
       // A sphere fits through a complete rotation, including the wider sides.
       const place = landmarks.find((p) => p.id === selected)!;
-      const detail = loaded.get('landmark-' + place.id);
+      const detail = details.loaded.get('landmark-' + place.id);
       const box = detail
         ? new THREE.Box3().setFromObject(detail)
         : landmarkBox(place);
@@ -960,7 +816,7 @@ export function createScene(
       : 'buildings';
   }
   function applyLayers() {
-    for (const [key, root] of loaded) {
+    for (const [key, root] of details.loaded) {
       const isZone =
         key.startsWith('chunk-') ||
         key.startsWith('infra-') ||
@@ -971,11 +827,11 @@ export function createScene(
       for (const child of baseRoot.children)
         child.visible =
           (layers[classify(child) as LayerKey] ?? true) &&
-          !loaded.get(child.name)?.visible;
+          !details.loaded.get(child.name)?.visible;
     syncRoadLights();
     boundaryRoot.visible = layers.boundary;
     if (treesRoot) treesRoot.visible = layers.vegetation;
-    labels.style.display = layers.labels ? '' : 'none';
+    labels.setVisible(layers.labels);
     highlight.visible = layers[detailLayer('landmark-' + selected)];
     // Model attach/release, tree density, quality and layer changes all arrive here.
     renderer.shadowMap.needsUpdate = true;
@@ -1012,7 +868,7 @@ export function createScene(
       callbacks.onStatus('校园边界加载失败，可重试', true);
     else if (treesFailed || (highTreesFailed && !modeSmooth))
       callbacks.onStatus('部分树木加载失败，可重试', true);
-    else if ([...failed.keys()].some((key) => wanted.has(key)))
+    else if (details.hasFailures())
       callbacks.onStatus('部分细节加载失败，可重试', true);
     else if (initialReady) callbacks.onStatus('');
   }
@@ -1083,160 +939,6 @@ export function createScene(
       progresses.delete(key);
       updateLoadStatus();
     }
-  }
-  function releaseDetail(key: string) {
-    const root = loaded.get(key);
-    if (!root) return;
-    dynamic.remove(root);
-    disposeObject(root, [scene]);
-    loaded.delete(key);
-    if (key.startsWith('landmark-'))
-      updateLabelAnchors(key.slice('landmark-'.length));
-    recentlyUsed.delete(key);
-  }
-  function detailCost(root: THREE.Object3D) {
-    const buffers = new Set<ArrayBufferLike>();
-    root.traverse((o) => {
-      if (!(o instanceof THREE.Mesh)) return;
-      for (const attribute of Object.values(o.geometry.attributes) as (
-        | THREE.BufferAttribute
-        | THREE.InterleavedBufferAttribute
-      )[]) {
-        const a =
-          attribute instanceof THREE.InterleavedBufferAttribute
-            ? attribute.data.array
-            : attribute.array;
-        buffers.add(a.buffer);
-      }
-      if (o.geometry.index) buffers.add(o.geometry.index.array.buffer);
-    });
-    return [...buffers].reduce((n, buffer) => n + buffer.byteLength, 0);
-  }
-  function reconcileDetails(focusing = false) {
-    if (!manifest || disposed || !initialReady) return;
-    const cap = profile.detailBudgetMiB * 1048576;
-    const currentKey = 'landmark-' + selected;
-    const foreground = manifest.landmarks.find((a) => a.id === selected);
-    // A flight selects details around its destination, not the passing campus area.
-    const destination = tween?.toTarget ?? controls.target;
-    const destinationCamera = tween?.to ?? camera.position;
-    const x = destination.x;
-    const y = -destination.z;
-    const near =
-      !modeSmooth &&
-      (focusing || destinationCamera.distanceTo(destination) < 1050);
-    const candidates =
-      near && layers.buildings ? nearbyChunks(manifest.zones, x, y) : [];
-    // Keep in-flight building chunks ahead of new background work.
-    candidates.sort(
-      (a, b) =>
-        Number(Boolean(detailQueue.tasks.get(b.asset.id!)?.started)) -
-        Number(Boolean(detailQueue.tasks.get(a.asset.id!)?.started)),
-    );
-    const plan = planDetails({
-      foreground:
-        foreground && layers[detailLayer(currentKey)]
-          ? [currentKey, foreground]
-          : undefined,
-      foregroundReady: loaded.has(currentKey),
-      roads:
-        near && layers.roads
-          ? nearbyChunks(manifest.infrastructure ?? [], x, y, 230).map(
-              ({ asset }) => asset,
-            )
-          : [],
-      buildings: candidates.map(({ asset }) => asset),
-      sports:
-        near && layers.sports && destinationCamera.distanceTo(destination) < 300
-          ? nearbyChunks(manifest.sports ?? [], x, y, 120).map(
-              ({ asset }) => asset,
-            )
-          : [],
-      costs: geometryCosts,
-      cap,
-    });
-    const wantedAssets = plan.assets;
-    let allocation = plan.allocation;
-    wanted.clear();
-    wantedAssets.forEach(([key]) => wanted.add(key));
-    for (const key of detailQueue.tasks.keys())
-      if (key !== 'trees-near' && !wanted.has(key)) detailQueue.cancel(key);
-    for (const key of failed.keys()) if (!wanted.has(key)) failed.delete(key);
-    // One recent landmark can stay warm if it fits the decoded-geometry budget.
-    const older = [...loaded.keys()]
-      .filter((key) => !wanted.has(key))
-      .sort((a, b) => (recentlyUsed.get(b) ?? 0) - (recentlyUsed.get(a) ?? 0));
-    let warm = false;
-    for (const key of older) {
-      const cost = geometryCosts.get(key) ?? 0;
-      if (
-        !warm &&
-        key.startsWith('landmark-') &&
-        layers[detailLayer(key)] &&
-        allocation + cost <= cap
-      ) {
-        allocation += cost;
-        warm = true;
-      } else releaseDetail(key);
-    }
-    for (const [index, [key, a]] of wantedAssets.entries()) {
-      if (loaded.has(key)) recentlyUsed.set(key, performance.now());
-      else loadDetail(a, key, index);
-    }
-    if (
-      profile.nearTrees &&
-      treesRoot &&
-      manifest.treesNear &&
-      !highTreesReady &&
-      !highTreesFailed &&
-      !loading.has('trees') &&
-      !detailQueue.tasks.has('trees-near') &&
-      destinationCamera.distanceTo(destination) < 1000
-    )
-      void detailQueue
-        .enqueue('trees-near', 5, (signal) => loadTrees(true, signal))
-        .catch((error) => {
-          if (!disposed && error?.name !== 'AbortError')
-            callbacks.onStatus('近处树木加载失败，可重试', true);
-        });
-    applyLayers();
-    updateLoadStatus();
-  }
-  function loadDetail(a: Asset, key: string, priority = 2) {
-    if (
-      loaded.has(key) ||
-      detailQueue.tasks.has(key) ||
-      failed.has(key) ||
-      disposed
-    )
-      return;
-    void detailQueue
-      .enqueue(key, priority, async (signal) => {
-        const g = await loadGLB(a, key, signal);
-        if (disposed || !wanted.has(key)) {
-          disposeObject(g.scene);
-          return;
-        }
-        dynamic.add(g.scene);
-        loaded.set(key, g.scene);
-        if (key.startsWith('landmark-'))
-          updateLabelAnchors(key.slice('landmark-'.length));
-        recentlyUsed.set(key, performance.now());
-        geometryCosts.set(key, detailCost(g.scene));
-        failed.delete(key);
-        if (key === 'landmark-' + selected && autoFramed && !orbiting)
-          frameLandmark();
-        reconcileDetails();
-      })
-      .catch((error) => {
-        if (!disposed && error?.name !== 'AbortError') {
-          failed.set(key, a);
-          updateLoadStatus();
-        }
-      })
-      .finally(() => {
-        if (!disposed) pendingRequest = performance.now();
-      });
   }
   async function loadTrees(near = false, signal = lifecycle.signal) {
     if (
@@ -1524,7 +1226,7 @@ export function createScene(
       sun.shadow.mapPass = null;
     }
     if (!profile.nearTrees) {
-      detailQueue.cancel('trees-near');
+      details.cancel('trees-near');
       if (treesRoot && highTreesReady) {
         const retired = new THREE.Group();
         for (const child of treesRoot.children.slice())
@@ -1558,12 +1260,11 @@ export function createScene(
     // reapplying the same preset while its cached volume is unchanged.
     effects?.setNight(p === 'night');
     syncRoadLights();
-    labels.dataset.light = p;
+    labels.setLight(p);
     applyModelLighting(scene);
     if (p === 'night') {
       // Pane attributes are created lazily; include them in the existing LOD budget.
-      for (const [key, root] of loaded)
-        geometryCosts.set(key, detailCost(root));
+      details.remeasure();
       reconcileDetails();
     }
     dirty = true;
@@ -1657,9 +1358,7 @@ export function createScene(
   });
   function resize() {
     const rect = host.getBoundingClientRect();
-    labelViewport.width = rect.width;
-    labelViewport.height = rect.height;
-    measureLabels();
+    labels.resize(rect.width, rect.height);
     const w = host.clientWidth,
       h = host.clientHeight;
     renderer.setSize(w, h);
@@ -1742,9 +1441,9 @@ export function createScene(
       nearTrees: profile.nearTrees,
       detailBudgetMiB: profile.detailBudgetMiB,
       loadedBytes,
-      loadedDetails: [...loaded.keys()],
-      queuedDetails: detailQueue.tasks.size,
-      residentDetailBytes: [...loaded.keys()].reduce(
+      loadedDetails: [...details.loaded.keys()],
+      queuedDetails: details.queued,
+      residentDetailBytes: [...details.loaded.keys()].reduce(
         (n, key) =>
           n +
           (manifest?.landmarks.find((a) => 'landmark-' + a.id === key)?.bytes ??
@@ -1756,8 +1455,8 @@ export function createScene(
       ),
       detailGeometryMiB:
         Math.round(
-          ([...loaded.keys()].reduce(
-            (n, key) => n + (geometryCosts.get(key) ?? 0),
+          ([...details.loaded.keys()].reduce(
+            (n, key) => n + (details.geometryCosts.get(key) ?? 0),
             0,
           ) /
             1048576) *
@@ -1839,58 +1538,7 @@ export function createScene(
         activeFrames++;
       }
       lastRendered = time;
-      if (orderedHover !== hovered || orderedSelection !== selected) {
-        orderedHover = hovered;
-        orderedSelection = selected;
-        // Reset tie order to the catalogue order, matching the previous sort.
-        for (let i = 0; i < labelNodes.length; i++)
-          labelOrder[i] = labelNodes[i];
-        labelOrder.sort(
-          (a, b) =>
-            Number(b.l.id === hovered) * 2 +
-            Number(b.l.id === selected) -
-            (Number(a.l.id === hovered) * 2 + Number(a.l.id === selected)),
-        );
-      }
-      const occupied = occupiedLabels;
-      occupied.length = 0;
-      for (const { l, el, point, width, height, bounds } of labelOrder) {
-        const p = labelProjection.copy(point).project(camera);
-        const dist = camera.position.distanceTo(point);
-        const x = ((p.x + 1) * labelViewport.width) / 2,
-          y = ((-p.y + 1) * labelViewport.height) / 2;
-        bounds[0] = x - width / 2;
-        bounds[1] = y - height;
-        bounds[2] = x + width / 2;
-        bounds[3] = y;
-        const overlap = occupied.some(
-          (r) =>
-            bounds[0] < r[2] + 6 &&
-            bounds[2] > r[0] - 6 &&
-            bounds[1] < r[3] + 6 &&
-            bounds[3] > r[1] - 6,
-        );
-        const obscured =
-          bounds[0] < frame.left ||
-          bounds[2] > frame.left + frame.width ||
-          bounds[1] < frame.top ||
-          bounds[3] > frame.top + frame.height;
-        const hidden =
-          (l.placeKind === 'sports'
-            ? !layers.sports
-            : !layers[detailLayer('landmark-' + l.id)]) ||
-          p.z < 0 ||
-          p.z > 1 ||
-          Math.abs(p.x) > 1 ||
-          Math.abs(p.y) > 1 ||
-          (selected && dist > 650) ||
-          overlap ||
-          obscured;
-        el.style.display = hidden ? 'none' : '';
-        if (!hidden) occupied.push(bounds);
-        el.style.transform = `translate(${x}px,${y}px) translate(-50%,-100%)`;
-        el.classList.toggle('active', selected === l.id);
-      }
+      labels.layout(camera, { hovered, selected, frame, hidden: labelHidden });
     }
 
     if (cameraChanged && time - cameraSampleAt > 200) {
@@ -1961,49 +1609,10 @@ export function createScene(
     exportImage: async () => {
       convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
       renderScene();
-      const out = document.createElement('canvas');
-      out.width = canvas.width;
-      out.height = canvas.height;
-      const ctx = out.getContext('2d');
-      if (!ctx) throw new Error('Canvas unavailable');
-      ctx.drawImage(canvas, 0, 0);
-      const size = Math.max(15, Math.round(out.width / 110));
-      ctx.font = `${size}px sans-serif`;
       const segments = [t('广西大学 校园地图'), '© OpenStreetMap contributors'];
       if (layers.boundary && boundaryReady)
         segments.push(t('白色细线：校园大致边界'));
-      const label = segments.join('  |  ');
-      const available = out.width - size * 2;
-      const lines =
-        ctx.measureText(label).width <= available ? [label] : segments;
-      const lineHeight = size * 1.5;
-      const footerHeight = lineHeight * lines.length + size;
-      ctx.fillStyle = '#1d3b31dd'; // Radix jade-12
-      ctx.fillRect(0, out.height - footerHeight, out.width, footerHeight);
-      ctx.fillStyle = 'white';
-      for (let i = 0; i < lines.length; i++) {
-        ctx.font = `${size}px sans-serif`;
-        const fittedSize = Math.min(
-          size,
-          (size * available) / ctx.measureText(lines[i]).width,
-        );
-        ctx.font = `${fittedSize}px sans-serif`;
-        ctx.fillText(
-          lines[i],
-          size,
-          out.height - footerHeight + size + lineHeight * i,
-        );
-      }
-      const blob = await new Promise<Blob | null>((resolve) =>
-        out.toBlob(resolve, 'image/png'),
-      );
-      if (!blob) throw new Error('Export failed');
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = t('广西大学-校园视图.png');
-      link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      await downloadCanvas(canvas, segments, t('广西大学-校园视图.png'));
     },
     retry: () => {
       // A rejected decoderPending is permanent for that loader instance.
@@ -2017,7 +1626,7 @@ export function createScene(
       if (!initialReady) void initialize();
       else {
         void loadBoundary();
-        failed.clear();
+        details.retry();
         highTreesFailed = false;
         treesFailed = false;
         reconcileDetails();
@@ -2033,34 +1642,25 @@ export function createScene(
     dispose: () => {
       disposed = true;
       lifecycle.abort();
-      detailQueue.dispose();
+      details.dispose();
       cancelAnimationFrame(loop);
       clearTimeout(convexPreparation);
       observer.disconnect();
-      wheelHost.removeEventListener('wheel', onOverlayWheel);
+      releaseWheel();
       controls.dispose();
       draco.dispose();
-      canvas.removeEventListener('pointerdown', onDown);
-      canvas.removeEventListener('pointermove', onMove);
-      canvas.removeEventListener('pointerup', onUp);
-      canvas.removeEventListener('pointercancel', onCancel);
-      canvas.removeEventListener('pointerleave', onLeave);
-      cancelAnimationFrame(hoverFrame);
+      picking.dispose();
       canvas.removeEventListener('keydown', onKey);
       canvas.removeEventListener('webglcontextlost', onLost);
       canvas.removeEventListener('webglcontextrestored', onRestored);
       convexCulling = null;
       disposeObject(scene);
-      for (const p of proxies) {
-        p.geometry.dispose();
-        (p.material as THREE.Material).dispose();
-      }
       contextStyle.dispose();
       effects?.dispose();
       sky.dispose();
       renderer.dispose();
       canvas.remove();
-      labels.remove();
+      labels.dispose();
     },
   };
 }
