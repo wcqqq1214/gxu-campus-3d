@@ -1,85 +1,55 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import { compileFunction } from 'node:vm';
-import ts from 'typescript';
 import * as THREE from 'three';
-import { LIGHTING } from '../lib/campus/lighting.ts';
 import { createNightStyle } from '../lib/campus/night.ts';
 import { createPalette } from '../lib/campus/palette.ts';
-import { batchSportsSurfaces } from '../lib/campus/sports-batching.ts';
-import { batchStaticRoadSurfaces } from '../lib/campus/road-batching.ts';
-import { pruneGroundTriangles } from '../lib/campus/ground-triangles.ts';
 import { disposeObject } from '../lib/campus/resources.ts';
+import { createModelPipeline } from '../lib/campus/scene-models.ts';
 
-// Run the actual loading and preset functions without requiring a WebGL context.
-// Only transport, scheduling and unrelated scene services are replaced.
-const source = fs.readFileSync(
-  new URL('../lib/campus/scene.ts', import.meta.url),
-  'utf8',
-);
-const ast = ts.createSourceFile(
-  'scene.ts',
-  source,
-  ts.ScriptTarget.Latest,
-  true,
-);
-const sceneFunction = ast.statements.find(
-  (node) => ts.isFunctionDeclaration(node) && node.name?.text === 'createScene',
-);
-const names = ['styleMeshes', 'applyModelLighting', 'loadGLB', 'setPreset'];
-const functions = sceneFunction.body.statements.filter(
-  (node) => ts.isFunctionDeclaration(node) && names.includes(node.name?.text),
-);
-for (const name of ['styleMeshes', 'loadGLB', 'setPreset'])
-  assert.ok(functions.some((node) => node.name.text === name));
-const compiled = ts.transpileModule(
-  functions.map((node) => node.getText(ast)).join('\n'),
-  {
-    compilerOptions: {
-      target: ts.ScriptTarget.ES2022,
-      module: ts.ModuleKind.ESNext,
-    },
-  },
-).outputText;
-const makeLoader = compileFunction(
-  `
-  const { THREE, LIGHTING, createNightStyle, createPalette, batchSportsSurfaces,
-    batchStaticRoadSurfaces, pruneGroundTriangles, disposeObject } = services;
-  const { root, initialPreset, onYield } = fixture;
-  const scene = new THREE.Scene(), palette = createPalette([]), nightStyle = createNightStyle();
-  const contextStyle = { apply() {} }, lifecycle = new AbortController();
-  const progresses = new Map(), landmarks = [], details = { remeasure() {} };
-  const sky = { setPreset() {} }, sun = { color: new THREE.Color() };
-  const ambient = { color: new THREE.Color(), groundColor: new THREE.Color() };
-  const fill = { color: new THREE.Color() }, renderer = {}, effects = { setNight() {} };
-  const labels = { setLight() {} }, syncRoadLights = () => {}, reconcileDetails = () => {};
-  const updateLoadStatus = () => {}, asset = x => x, modelUrl = x => x.url;
-  const fetchModel = async () => new ArrayBuffer(0), loader = { parseAsync: async () => ({ scene: root }) };
-  let preset = initialPreset, disposed = false, loadedBytes = 0, dirty = false, yields = 0;
-  const setTimeout = resume => globalThis.setTimeout(() => {
-    onYield(++yields, { setPreset, abort: () => lifecycle.abort() });
-    resume();
-  }, 0);
-  ${compiled}
-  return async key => {
-    const gltf = await loadGLB({ url: 'fixture.glb', bytes: 1 }, key);
+// Run the real model pipeline without a WebGL context. Only transport, the
+// decoder and task scheduling are replaced; each styling slice is observable.
+function makeLoader({ root, initialPreset, onYield }) {
+  const scene = new THREE.Scene();
+  const lifecycle = new AbortController();
+  let preset = initialPreset,
+    yields = 0;
+  const models = createModelPipeline({
+    loader: { parseAsync: async () => ({ scene: root }) },
+    palette: createPalette([]),
+    contextStyle: { apply() {} },
+    nightStyle: createNightStyle(),
+    landmarks: [],
+    preset: () => preset,
+    lifetime: lifecycle.signal,
+    onProgress() {},
+    schedule: (resume) =>
+      setTimeout(() => {
+        onYield(++yields, {
+          // Like the scene, a preset change restyles only attached models.
+          setPreset(value) {
+            preset = value;
+            models.applyLighting(scene);
+          },
+          abort: () => lifecycle.abort(),
+        });
+        resume();
+      }, 0),
+  });
+  const download = {
+    base: Promise.resolve(new ArrayBuffer(0)),
+    onProgress: () => () => {},
+  };
+  return async (key) => {
+    const gltf = await models.load(
+      { url: 'fixture.glb', bytes: 1 },
+      key,
+      undefined,
+      download,
+    );
     scene.add(gltf.scene);
     return { preset, yields };
   };
-`,
-  ['services', 'fixture'],
-);
-const services = {
-  THREE,
-  LIGHTING,
-  createNightStyle,
-  createPalette,
-  batchSportsSurfaces,
-  batchStaticRoadSurfaces,
-  pruneGroundTriangles,
-  disposeObject,
-};
+}
 function model() {
   const root = new THREE.Group();
   const materials = {};
@@ -106,7 +76,7 @@ for (const key of ['base', 'landmark-test'])
         const target = initialPreset === 'day' ? 'night' : 'day';
         const night = target === 'night';
         try {
-          const run = makeLoader(services, {
+          const run = makeLoader({
             root,
             initialPreset,
             onYield(index, controls) {
@@ -140,7 +110,7 @@ test('cancellation during the last slice still disposes the unpublished model', 
   root.children.forEach((mesh) =>
     mesh.geometry.addEventListener('dispose', () => released++),
   );
-  const run = makeLoader(services, {
+  const run = makeLoader({
     root,
     initialPreset: 'day',
     onYield(index, controls) {

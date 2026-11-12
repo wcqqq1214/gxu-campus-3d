@@ -7,16 +7,11 @@ import { LIGHTING } from './lighting';
 import { searchableBuildings } from './navigation';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { batchSportsSurfaces } from './sports-batching';
-import { batchStaticRoadSurfaces } from './road-batching';
-import { pruneGroundTriangles } from './ground-triangles';
 import { createConvexCulling } from './convex-culling';
 import type { CameraSnapshot } from './share';
-import { fetchModel, fetchJson } from './streaming';
-import type { StreamAsset as Asset } from './streaming';
+import { fetchJson } from './streaming';
 import {
   asset,
-  modelUrl,
   type BasePrefetch,
   type ModelManifest as Manifest,
 } from './boot';
@@ -41,6 +36,7 @@ import { createContextStyle } from './context-style';
 import { createModelLoader, matchGround, refineBase } from './scene-base';
 import { createDetailStreaming } from './scene-details';
 import { createSceneEffects } from './scene-effects';
+import { createModelPipeline } from './scene-models';
 import { createSceneTrees } from './scene-trees';
 import { downloadCanvas } from './scene-export';
 import { createSceneLabels } from './scene-labels';
@@ -173,7 +169,6 @@ export function createScene(
   let hovered: string | null = null;
   let initialReady = false;
   let readyMs = 0;
-  let loadedBytes = 0;
   let loop = 0;
   let modeSmooth = false;
   const qualityControl = new QualityControl();
@@ -238,12 +233,26 @@ export function createScene(
     toTarget: THREE.Vector3;
     start: number;
   } | null = null;
+  const models = createModelPipeline({
+    loader,
+    palette,
+    contextStyle,
+    nightStyle,
+    landmarks,
+    preset: () => preset,
+    lifetime: lifecycle.signal,
+    onProgress: (key, progress) => {
+      if (progress) progresses.set(key, progress);
+      else progresses.delete(key);
+      updateLoadStatus();
+    },
+  });
   const trees = createSceneTrees({
     scene,
     lifetime: lifecycle.signal,
     nightStyle,
     night: () => preset === 'night',
-    load: (a, key, signal) => loadGLB(a, key, signal),
+    load: (a, key, signal) => models.load(a, key, signal),
     onLoaded: () => {
       setQuality(qualityControl.quality);
       applyLayers();
@@ -267,7 +276,7 @@ export function createScene(
       target: tween?.toTarget ?? controls.target,
       camera: tween?.to ?? camera.position,
     }),
-    load: (a, key, signal) => loadGLB(a, key, signal),
+    load: (a, key, signal) => models.load(a, key, signal),
     nearTrees: (distance) =>
       profile.nearTrees && distance < 1000
         ? trees.nearLoader(manifest)
@@ -610,54 +619,6 @@ export function createScene(
     }
     return '';
   }
-  function styleMeshes(root: THREE.Object3D, refineTerrain = true) {
-    root.traverse((o) => {
-      if (!(o instanceof THREE.Mesh)) return;
-      if (refineTerrain) palette.terrain(o);
-      o.castShadow = true;
-      o.receiveShadow = true;
-      const mats = Array.isArray(o.material) ? o.material : [o.material];
-      for (const m of mats) {
-        if (m instanceof THREE.MeshStandardMaterial) {
-          palette.surface(m);
-          contextStyle.apply(m);
-          if (
-            ['sportWhite', 'roadWhite', 'roadYellow', 'tactile'].includes(
-              m.name,
-            )
-          ) {
-            // Paint is a decal surface: bias its depth at oblique/distant views
-            // as well as retaining geometric separation through Draco export.
-            m.polygonOffset = true;
-            m.polygonOffsetFactor = -2;
-            m.polygonOffsetUnits = -2;
-            o.castShadow = false;
-          }
-          if (m.name === 'water') {
-            o.castShadow = false;
-            m.roughness = 0.3;
-            m.metalness = 0.28;
-          }
-          if (m.name === 'timeSilver') m.envMapIntensity = 1.5;
-        }
-      }
-    });
-    applyModelLighting(root);
-  }
-  function applyModelLighting(root: THREE.Object3D) {
-    root.traverse((o) => {
-      if (!(o instanceof THREE.Mesh)) return;
-      nightStyle.apply(o, preset === 'night');
-      for (const m of Array.isArray(o.material) ? o.material : [o.material]) {
-        if (!(m instanceof THREE.MeshStandardMaterial)) continue;
-        if (m.name === 'timeSilver' || m.name === 'timeLight') {
-          m.emissive.set('#83b6e2');
-          m.emissiveIntensity =
-            preset === 'night' ? (m.name === 'timeSilver' ? 0.16 : 1.8) : 0;
-        }
-      }
-    });
-  }
   function syncRoadLights() {
     if (preset === 'night' && baseRoot && !roadLights) {
       roadLights = createRoadLights(baseRoot);
@@ -734,74 +695,6 @@ export function createScene(
       callbacks.onStatus('部分细节加载失败，可重试', true);
     else if (initialReady) callbacks.onStatus('');
   }
-  async function loadGLB(
-    a: Asset,
-    key = 'base',
-    signal = lifecycle.signal,
-    prefetched?: BasePrefetch,
-  ) {
-    const label =
-      key === 'base'
-        ? '正在加载校园'
-        : key.startsWith('trees')
-          ? '正在加载树木'
-          : key.startsWith('landmark-')
-            ? '正在加载{name}'
-            : '正在加载周边细节';
-    const progress = (fraction: number) => {
-      progresses.set(key, {
-        label,
-        fraction,
-        name: key.startsWith('landmark-')
-          ? (landmarks.find((l) => 'landmark-' + l.id === key)?.name ?? '地标')
-          : undefined,
-      });
-      updateLoadStatus();
-    };
-    let unsubscribe: (() => void) | undefined;
-    try {
-      let buffer: ArrayBuffer;
-      if (prefetched) {
-        unsubscribe = prefetched.onProgress(progress);
-        buffer = await prefetched.base;
-      } else buffer = await fetchModel(modelUrl(a), a.bytes, signal, progress);
-      signal.throwIfAborted();
-      const gltf = await loader.parseAsync(buffer, asset('models/'));
-      if (disposed || signal.aborted) {
-        disposeObject(gltf.scene);
-        throw new DOMException('Request cancelled', 'AbortError');
-      }
-      loadedBytes += a.bytes;
-      const yieldLoading = async () => {
-        await new Promise<void>((resolve) => setTimeout(resolve, 0));
-        signal.throwIfAborted();
-        if (disposed) throw new DOMException('Scene disposed', 'AbortError');
-      };
-      try {
-        if (key !== 'base') palette.buildings(gltf.scene, key);
-        const styledPreset = preset;
-        styleMeshes(gltf.scene, key !== 'base');
-        await yieldLoading();
-        batchSportsSurfaces(gltf.scene);
-        await yieldLoading();
-        batchStaticRoadSurfaces(gltf.scene);
-        await yieldLoading();
-        if (key === 'base') pruneGroundTriangles(gltf.scene);
-        // Preset changes during a yield cannot reach this unattached root.
-        // Synchronize after the last yield, before the caller publishes it.
-        if (preset !== styledPreset) applyModelLighting(gltf.scene);
-        return gltf;
-      } catch (error) {
-        // A cancelled detail must not leak a decoded root while yielding.
-        disposeObject(gltf.scene);
-        throw error;
-      }
-    } finally {
-      unsubscribe?.();
-      progresses.delete(key);
-      updateLoadStatus();
-    }
-  }
   async function loadBoundary() {
     if (boundaryLoading || boundaryReady || disposed) return;
     boundaryLoading = true;
@@ -833,7 +726,12 @@ export function createScene(
       manifest = await (boot?.manifest ??
         fetchJson<Manifest>(asset('data/models.json'), lifecycle.signal));
       if (disposed) return;
-      const gltf = await loadGLB(manifest.base, 'base', lifecycle.signal, boot);
+      const gltf = await models.load(
+        manifest.base,
+        'base',
+        lifecycle.signal,
+        boot,
+      );
       baseRoot = gltf.scene;
       scene.add(baseRoot);
       updateLabelAnchors();
@@ -918,7 +816,7 @@ export function createScene(
     effects.setNight(p === 'night');
     syncRoadLights();
     labels.setLight(p);
-    applyModelLighting(scene);
+    models.applyLighting(scene);
     if (p === 'night') {
       // Pane attributes are created lazily; include them in the existing LOD budget.
       details.remeasure();
@@ -1048,7 +946,7 @@ export function createScene(
       shadows: profile.shadows,
       nearTrees: profile.nearTrees,
       detailBudgetMiB: profile.detailBudgetMiB,
-      loadedBytes,
+      loadedBytes: models.loadedBytes,
       loadedDetails: [...details.loaded.keys()],
       queuedDetails: details.queued,
       residentDetailBytes: manifest ? details.residentBytes(manifest) : 0,
