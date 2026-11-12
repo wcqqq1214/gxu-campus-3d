@@ -69,7 +69,8 @@ try {
         position: camera.position.toArray(), target: controls.target.toArray(),
         projection: camera.projectionMatrix.toArray(), span: getSnapshot().span,
         loading: [...loading], orbiting, tweenStart: tween?.start ?? null,
-        frame: {...frame}, width: host.clientWidth, height: host.clientHeight
+        frame: {...frame}, width: host.clientWidth, height: host.clientHeight,
+        framedWidth, framedHeight
       });\n`;
       await route.fulfill({
         response,
@@ -225,10 +226,26 @@ try {
       .click();
     await settle();
     const beforeResize = await snapshot();
-    await page.setViewportSize({
+    const resizedViewport = {
       width: viewport.width + 120,
       height: viewport.height - 80,
-    });
+    };
+    await page.setViewportSize(resizedViewport);
+    // Software rendering can delay resize events and ResizeObserver beyond the
+    // animation wait. Wait for layout and composition, not for the assertion itself.
+    await page.waitForFunction(
+      ({ width, height }) => {
+        const scene = globalThis.__panelCameraProbe();
+        return (
+          scene.width === width &&
+          scene.height === height &&
+          scene.framedWidth === width &&
+          scene.framedHeight === height
+        );
+      },
+      resizedViewport,
+      { timeout: 90000 },
+    );
     await settle();
     const afterResize = await snapshot();
     assert.notDeepEqual(
