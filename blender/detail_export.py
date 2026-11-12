@@ -1,5 +1,6 @@
 """Shared export precision for the gate and its small facade details."""
 import bpy
+
 from export_attributes import omit_unused_uvs
 
 

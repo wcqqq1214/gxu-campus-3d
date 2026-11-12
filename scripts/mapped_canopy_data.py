@@ -1,5 +1,9 @@
 """Attach a sourced doorway to a separately mapped, already modelled canopy."""
-import copy,hashlib,json,math
+import copy
+import hashlib
+import json
+import math
+
 from public_data_fields import without_documentation
 
 
@@ -15,9 +19,10 @@ def validate_mapped_canopy(config):
 
 
 def resolve_mapped_canopy_context(buildings,check_only=False):
-    from shapely.geometry import Polygon,LineString,box
-    from shapely.affinity import rotate,translate
+    from shapely.affinity import rotate, translate
+    from shapely.geometry import LineString, Polygon, box
     from shapely.ops import unary_union
+
     from building_overrides import footprint_revision
     by_id={b['id']:b for b in buildings}
     for b in buildings:

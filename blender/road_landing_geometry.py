@@ -1,10 +1,12 @@
 """Grade an interior road patch; retain its footprint, boundary and outside planes."""
 import math
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 from geometry import Mesh
+from shore_geometry import bounds, conform_edges, overlaps, triangles_into
 from site_geometry import mesh_triangles, split_convex
-from shore_geometry import bounds, overlaps, triangles_into, conform_edges
 
 
 def local(record, point):

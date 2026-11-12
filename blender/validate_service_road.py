@@ -1,11 +1,17 @@
 """Compare an actual grounded service road and its retained joins with baseline."""
-import argparse,json,math,sys,hashlib
+import argparse
+import hashlib
+import json
+import math
+import sys
 from pathlib import Path
+
 import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
-from inspect_foundation_clearance import top_tree,layer,covers
+from inspect_foundation_clearance import covers, layer, top_tree
 from shore_geometry import nearest
 
 

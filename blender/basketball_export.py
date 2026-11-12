@@ -5,6 +5,7 @@ import json
 import struct
 import sys
 from pathlib import Path
+
 if __name__ == '__main__':
     sys.path.insert(0, str(Path(__file__).resolve().parent))
 from preserve_glb_geometry import compact_buffer_views, mesh_nodes_by_name, unpack
@@ -65,11 +66,13 @@ def manifest_entries(data, directory):
 if __name__ == '__main__':
     import argparse
     import tempfile
+
     import bpy
-    from geometry import MATERIALS
+
     from basketball import bank_model
     from export_attributes import omit_unused_uvs
-    from preserve_glb_geometry import replace_compressed_node_parts, preserve_geometry
+    from geometry import MATERIALS
+    from preserve_glb_geometry import preserve_geometry, replace_compressed_node_parts
 
     parser = argparse.ArgumentParser(description='Create paired court assets in an isolated candidate.')
     parser.add_argument('--source', type=Path, required=True)

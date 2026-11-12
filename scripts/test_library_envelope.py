@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 from shapely.affinity import rotate, translate
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
 
 from architecture_data import architectural_envelope

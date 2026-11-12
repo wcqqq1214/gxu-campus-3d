@@ -1,10 +1,11 @@
 """Check exported ring paths, retained lawn and both real road seams."""
-import bpy
 import hashlib
 import json
 import math
 import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 

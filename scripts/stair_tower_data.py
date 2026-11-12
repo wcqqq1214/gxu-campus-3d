@@ -1,5 +1,8 @@
 """Evidence-attributed open return stair in an existing mapped round footprint."""
-import copy,hashlib,json,math
+import copy
+import hashlib
+import json
+import math
 
 
 def digest(value):
@@ -29,11 +32,12 @@ def context(b,host,c):
 
 
 def resolve_stair_tower_context(buildings):
-    from shapely.geometry import Polygon,box
+    from shapely.affinity import rotate, translate
+    from shapely.geometry import Polygon, box
     from shapely.geometry.polygon import orient
-    from shapely.affinity import rotate,translate
     from shapely.ops import unary_union
-    from building_overrides import anchor,footprint_revision,pack_geometry
+
+    from building_overrides import anchor, footprint_revision, pack_geometry
     by_id={b['id']:b for b in buildings}
     for b in buildings:b.get('form',{}).pop('stairAccessDoors',None)
     for b in buildings:

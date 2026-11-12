@@ -1,12 +1,19 @@
 """Validate road grade, soil clearance and source/Draco agreement at civil entry."""
-import bpy,json,math,sys,hashlib
+import hashlib
+import json
+import math
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
+from civil_forecourt_grade import height, load_grade
 from initial_model_budget import check_initial_model_budget
-from civil_forecourt_grade import load_grade,height
 from validation_inputs import baseline_root
+
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 REPORT=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--report=')),ROOT/'work/civil-grade-validation.json')
 

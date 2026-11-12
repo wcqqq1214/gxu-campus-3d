@@ -1,9 +1,12 @@
 """Style existing at-grade campus main roads; keep map axes, widths and side roads."""
 import json
 from pathlib import Path
-from shapely.geometry import shape,Point
-from shapely.ops import transform,unary_union,substring
-from surroundings_data import surface_shape,triangulate,tiled_triangles
+
+from shapely.geometry import Point, shape
+from shapely.ops import substring, transform, unary_union
+
+from surroundings_data import surface_shape, tiled_triangles, triangulate
+
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'public/data'
 MAIN_CLASSES={'residential','living_street','unclassified','tertiary','secondary','primary'}
 

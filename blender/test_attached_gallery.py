@@ -18,8 +18,8 @@ from mathutils.geometry import intersect_ray_tri
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
-from generic_buildings import ordinary_building
 from gallery_checks import check_galleries
+from generic_buildings import ordinary_building
 
 COLORS = {name: i for i, name in enumerate([
     'stone', 'pink', 'white', 'glass', 'dark', 'shadeGlass', 'paleRoof', 'red'])}

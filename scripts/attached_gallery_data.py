@@ -1,6 +1,7 @@
 """Explicit two-storey gallery additions attached outside mapped wall lines."""
 import copy
 import math
+
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 

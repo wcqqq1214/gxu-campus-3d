@@ -4,10 +4,13 @@ Callers select and label scene assets explicitly. This module does not import
 models, mutate assets, choose scene layers, or write acceptance reports.
 """
 import math
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
-from vegetation_layout import tree_rotation
+
 from mesh_volumes import MeshVolumes
+from vegetation_layout import tree_rotation
+
 
 def snapshot(obj):
     obj.data.calc_loop_triangles()

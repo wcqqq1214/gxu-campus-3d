@@ -1,17 +1,21 @@
 """Remove selected external overlays while retaining stable surface indices."""
-import gzip,json
+import gzip
+import json
 from pathlib import Path
+
 from shapely.geometry import shape
 from shapely.ops import transform
+
 ROOT=Path(__file__).resolve().parents[1]
 COLLEGE_IDS=(398115381,398114009)
 
 
 def prepare_external_surfaces():
-    from prepare_geodata import geom,project,inverse
     from shapely.geometry import mapping
-    from surroundings_data import surface_shape,triangulate
-    from scene_cleanup import EXCLUSIONS,TRIMS,trim_corridor_chunk
+
+    from prepare_geodata import geom, inverse, project
+    from scene_cleanup import EXCLUSIONS, TRIMS, trim_corridor_chunk
+    from surroundings_data import surface_shape, triangulate
     out=ROOT/'public/data'
     infrastructure=json.loads((out/'infrastructure.json').read_text())
     for chunk in infrastructure['chunks']:trim_corridor_chunk(chunk)

@@ -1,8 +1,14 @@
 """Fixed map/height probes for the annex gable screen and arched aperture."""
-import bpy,json,sys,re,hashlib
+import hashlib
+import json
+import re
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1]
 TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)
 PREFIX=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--report-prefix=')),'s2-civil-gable')

@@ -1,8 +1,13 @@
 """Read actual saved tree instances and compare their prepared attributes."""
-import bpy,json,math,sys
+import json
+import math
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1]
 args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 report_prefix=next((a.split('=',1)[1] for a in args if a.startswith('--report-prefix=')),'s4-background')
@@ -10,6 +15,7 @@ if not report_prefix or any(c not in 'abcdefghijklmnopqrstuvwxyz0123456789-' for
     raise ValueError('Invalid vegetation report prefix')
 sys.path.insert(0,str(ROOT/'scripts'))
 from vegetation_layout import tree_rotation
+
 bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'))
 rows=json.loads((ROOT/'public/data/vegetation.json').read_text())
 expected={(row[0],row[1]):row[2:] for row in rows}

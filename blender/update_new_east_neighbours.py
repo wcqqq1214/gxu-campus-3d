@@ -3,22 +3,31 @@ import argparse
 import hashlib
 import json
 import os
-from pathlib import Path
 import sys
+from pathlib import Path
+
 import bpy
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'blender'))
-from geometry import Mesh, MATERIALS
-from generic_buildings import ordinary_building, compact_form_source
-from new_east_neighbours import BUILDING_IDS, WEST_SHOPS, EAST_25, ensure_materials
-from incremental_glb import splice_nodes, validate_retained
-from incremental_update import copy_inputs, snapshot, publication_lock, publish, require_recovered, run_checked
-from initial_model_budget import check_initial_model_budget
-from preserve_glb_geometry import unpack, mesh_nodes_by_name
-from detail_export import export_detail
-from validate_generic import component_vertices
 from mathutils.kdtree import KDTree
+
+from detail_export import export_detail
+from generic_buildings import compact_form_source, ordinary_building
+from geometry import MATERIALS, Mesh
+from incremental_glb import splice_nodes, validate_retained
+from incremental_update import (
+    copy_inputs,
+    publication_lock,
+    publish,
+    require_recovered,
+    run_checked,
+    snapshot,
+)
+from initial_model_budget import check_initial_model_budget
+from new_east_neighbours import BUILDING_IDS, EAST_25, WEST_SHOPS, ensure_materials
+from preserve_glb_geometry import mesh_nodes_by_name, unpack
+from validate_generic import component_vertices
 
 
 def main():

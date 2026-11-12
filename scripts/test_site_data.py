@@ -1,9 +1,13 @@
 """Entrance-to-road constraints, sources, and crown-aware local exclusions."""
-import copy,json,unittest
+import copy
+import json
+import unittest
 from pathlib import Path
+
 from shapely.geometry import Polygon
-from site_data import derive_site,road_columns
+
 from architecture_data import architectural_envelope
+from site_data import derive_site, road_columns
 
 
 class SiteDataTests(unittest.TestCase):

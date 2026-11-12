@@ -1,8 +1,11 @@
 """Ground contact for a photo-calibrated projecting recessed stair entry."""
-import copy, math
+import copy
+import math
+
 from shapely.geometry import Polygon
-from site_data import world_shape
+
 from building_overrides import footprint_revision
+from site_data import world_shape
 
 
 def derive_recessed_entry_site(config, buildings, source_ids):
@@ -28,8 +31,9 @@ def derive_recessed_entry_site(config, buildings, source_ids):
                              (pw,-p['toe']),(pw,0),(-pw,0),(-pw,-p['toe'])]),
                      {'origin':e['center'],'angle':-math.radians(e['bearing'])})
     if 'landscape' in p:
-        from entry_forecourt_data import resolve_landscape
         from shapely.affinity import scale
+
+        from entry_forecourt_data import resolve_landscape
         _,extra=resolve_landscape({k:v for k,v in p['landscape'].items() if k!='lowerEnd'},p)
         from shapely.geometry import box
         from shapely.ops import unary_union

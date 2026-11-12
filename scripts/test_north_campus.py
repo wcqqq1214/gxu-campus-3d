@@ -3,8 +3,10 @@ import hashlib
 import json
 import unittest
 from pathlib import Path
-from shapely.geometry import Point, Polygon, LineString
+
+from shapely.geometry import LineString, Point, Polygon
 from shapely.ops import unary_union
+
 from surroundings_data import surface_shape
 
 ROOT=Path(__file__).resolve().parents[1]

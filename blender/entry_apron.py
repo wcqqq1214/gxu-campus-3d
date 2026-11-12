@@ -1,10 +1,12 @@
 """Flatten only a short apron and taper its surrounding terrain to old planes."""
 import math
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 from geometry import Mesh
-from site_geometry import mesh_triangles
 from paving_geometry import clear_paving_ground
+from site_geometry import mesh_triangles
 
 
 def build_entry_apron(site,C,elevation,terrain,roads):

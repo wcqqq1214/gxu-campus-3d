@@ -10,8 +10,8 @@ from mathutils.bvhtree import BVHTree
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
-from geometry import Mesh, material
 from entry_ground_bedding import bed_forecourt, grade_rear_road_contact
+from geometry import Mesh, material
 
 
 class RearShoulderTests(unittest.TestCase):

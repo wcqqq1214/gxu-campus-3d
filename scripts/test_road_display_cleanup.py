@@ -3,7 +3,7 @@ import json
 import unittest
 from pathlib import Path
 
-from shapely.geometry import Polygon, Point, shape
+from shapely.geometry import Point, Polygon, shape
 from shapely.ops import transform, unary_union
 
 from prepare_geodata import project

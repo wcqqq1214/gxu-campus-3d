@@ -1,8 +1,12 @@
-import copy,json,unittest
+import copy
+import json
+import unittest
 from pathlib import Path
+
 from shapely.geometry import Polygon
-from stair_tower_data import resolve_stair_tower_context,check_prepared_stair_towers
-from building_overrides import resolve_building,load_catalogue,source_catalogue
+
+from building_overrides import load_catalogue, resolve_building, source_catalogue
+from stair_tower_data import check_prepared_stair_towers, resolve_stair_tower_context
 
 ROOT=Path(__file__).resolve().parents[1]
 class StairTowerTests(unittest.TestCase):

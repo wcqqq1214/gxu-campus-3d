@@ -5,9 +5,9 @@ and Shapely; does not import the simplifier or use its patch classifications.
 This checks source geometry, not Draco output or browser performance.
 """
 import argparse
-from collections import Counter
 import hashlib
 import json
+from collections import Counter
 from pathlib import Path
 
 import numpy as np

@@ -1,7 +1,10 @@
 """A sourced short entrance apron without inventing a mapped road connection."""
-import copy,math
-from shapely.geometry import Polygon,box
+import copy
+import math
+
+from shapely.geometry import Polygon, box
 from shapely.ops import unary_union
+
 from building_overrides import footprint_revision
 
 

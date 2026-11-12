@@ -5,7 +5,8 @@ Dimensions are photo-scaled estimates; the mapped circle anchors tank width.
 Unseen rear openings are not duplicated from the visible south elevation.
 """
 import math
-from geometry import Mesh, MATERIALS, material
+
+from geometry import MATERIALS, Mesh, material
 
 TOWER_ID = 'way/955987491'
 

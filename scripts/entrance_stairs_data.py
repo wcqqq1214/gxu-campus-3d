@@ -1,7 +1,9 @@
 """Explicit external stair risers for an otherwise simple entrance."""
 import math
-from shapely.geometry import Polygon,LineString
+
+from shapely.geometry import LineString, Polygon
 from shapely.ops import unary_union
+
 
 def resolve_stair_flight(building,entry,config,length):
     keys={'width','landingDepth','riserCount','tread','baseHeight'}

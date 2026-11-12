@@ -7,7 +7,7 @@ import copy
 import math
 from collections import Counter
 
-from shapely.geometry import Polygon, LineString
+from shapely.geometry import LineString, Polygon
 from shapely.ops import unary_union
 
 

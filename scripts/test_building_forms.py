@@ -5,9 +5,11 @@ import json
 import math
 import unittest
 from pathlib import Path
+
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
-from building_forms import resolve_form, roof_geometry, fallback_entrances
+
+from building_forms import fallback_entrances, resolve_form, roof_geometry
 
 ROOT = Path(__file__).resolve().parents[1]
 

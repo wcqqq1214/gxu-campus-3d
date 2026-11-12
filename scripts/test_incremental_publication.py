@@ -1,19 +1,18 @@
 """Publication faults and real competing processes must not lose existing assets."""
 import json
 import os
-from pathlib import Path
 import select
 import shutil
 import subprocess
 import sys
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
 from incremental_update import publish, snapshot
-
 
 CHILD = r'''
 import fcntl,json,os,shutil,sys

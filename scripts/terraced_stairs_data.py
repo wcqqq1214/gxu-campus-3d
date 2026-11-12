@@ -5,6 +5,7 @@ door or altering the mapped building footprint. Dimensions need field evidence.
 """
 import copy
 import math
+
 from shapely.geometry import LineString, Polygon
 from shapely.ops import unary_union
 

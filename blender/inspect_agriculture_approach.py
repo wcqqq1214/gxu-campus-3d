@@ -8,8 +8,8 @@ import argparse
 import hashlib
 import json
 import math
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import bpy
 from mathutils import Vector

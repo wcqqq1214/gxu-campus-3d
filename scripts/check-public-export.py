@@ -1,12 +1,12 @@
 """Compare browser exports against a Git revision, permitting only documented removals."""
 import argparse
 import json
-from pathlib import Path
 import subprocess
+from pathlib import Path
 
-from mapped_canopy_data import check_prepared_mapped_canopies
 from foundation_contract import load_foundations
 from low_planting_contract import load_prepared
+from mapped_canopy_data import check_prepared_mapped_canopies
 
 ROOT = Path(__file__).resolve().parents[1]
 FILES = ('buildings.json', 'geography.geojson', 'sites.json', 'foundations.json', 'low-planting.json')

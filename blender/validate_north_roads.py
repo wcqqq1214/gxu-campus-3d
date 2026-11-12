@@ -1,9 +1,14 @@
 """Ray-test every static scene layer, not just road nodes, against original roads."""
-import gzip,json,math,hashlib
+import gzip
+import hashlib
+import json
+import math
 from pathlib import Path
+
 import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1]
 b=json.loads((ROOT/'public/data/north-campus.json').read_text())['underpass']
 fixture=json.loads(gzip.decompress((ROOT/'scripts/fixtures/north-road-baseline.json.gz').read_bytes()))

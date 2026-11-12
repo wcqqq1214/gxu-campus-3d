@@ -1,6 +1,6 @@
 """Omit unused UV streams before Draco compression; retain editable source UVs."""
-from contextlib import contextmanager
 import sys
+from contextlib import contextmanager
 
 _deduplicate_vertices = False
 _share_position_bounds = False
@@ -119,8 +119,8 @@ def omit_zero_area_terrain_faces(obj, *, position_quantization_bits=None):
     Optional quantized cleanup uses the caller's existing position precision;
     it does not lower that precision or modify the editable source geometry.
     """
-    import bpy
     import bmesh
+    import bpy
     original=obj.data
     collapsed=[]
     if obj.get('layer')=='terrain' and not original.shape_keys and not obj.modifiers:

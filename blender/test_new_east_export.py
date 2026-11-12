@@ -1,11 +1,11 @@
 """Decode the real build/export paths without rebuilding the whole campus."""
 import ast
-from contextlib import nullcontext
-from pathlib import Path
 import re
 import sys
 import tempfile
 import unittest
+from contextlib import nullcontext
+from pathlib import Path
 
 import bpy
 

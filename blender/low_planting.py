@@ -1,6 +1,8 @@
 """Low continuous hedge geometry; no tree template, trunk or invented planter."""
 import math
+
 import bpy
+
 from geometry import Mesh
 from tree_layout import ground_tree_rows
 

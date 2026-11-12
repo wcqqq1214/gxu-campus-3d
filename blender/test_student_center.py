@@ -3,6 +3,7 @@ import json
 import sys
 import unittest
 from pathlib import Path
+
 from mathutils.bvhtree import BVHTree
 
 ROOT=Path(__file__).resolve().parents[1]

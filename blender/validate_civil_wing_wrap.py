@@ -1,6 +1,11 @@
 """Probe the four north-wing return walls, independently of override rules."""
-import bpy, sys, json, re, hashlib
+import hashlib
+import json
+import re
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 

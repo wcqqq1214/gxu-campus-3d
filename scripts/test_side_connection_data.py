@@ -1,9 +1,15 @@
 """Sideways entrance connections must meet the selected mapped footway."""
-import copy,hashlib,json,unittest
+import copy
+import hashlib
+import json
+import unittest
 from pathlib import Path
+
 from shapely.geometry import Polygon
-from side_connection_data import derive_side_connection
+
 from shore_data import effective_surfaces
+from side_connection_data import derive_side_connection
+
 
 def revision(value):return hashlib.sha256(json.dumps(value,separators=(',',':'),sort_keys=True).encode()).hexdigest()
 

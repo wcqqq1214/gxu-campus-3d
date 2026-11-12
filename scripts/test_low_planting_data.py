@@ -3,11 +3,12 @@ import json
 import math
 import unittest
 from pathlib import Path
+
 from shapely.geometry import box
 
 from building_overrides import footprint_revision
-from low_planting_data import derive_plantings
 from low_planting_contract import context_value, digest
+from low_planting_data import derive_plantings
 
 
 class LowPlantingTests(unittest.TestCase):

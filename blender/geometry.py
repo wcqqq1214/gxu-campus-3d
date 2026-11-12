@@ -1,6 +1,9 @@
 """Small deterministic mesh assembler. Blender coordinates: east X, north Y, up Z."""
-import bpy,math
+import math
+
+import bpy
 from mathutils import Vector
+
 MATERIALS=[]
 def material(name,color,roughness=.8,metallic=0):
     m=bpy.data.materials.new(name);m.diffuse_color=(*color,1);m.use_nodes=True

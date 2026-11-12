@@ -4,14 +4,18 @@ OSM remains the positional source. A separate derived corridor mask is NOT a
 cadastral boundary. Exact terrain cuts keep the campus underpasses open even
 though the historic DEM is much coarser than a bridge.
 """
-import gzip,json,math
-import numpy as np
+import gzip
+import json
+import math
+
 import mapbox_earcut as earcut
-from shapely.geometry import Point,LineString,Polygon,box,mapping,shape
+import numpy as np
+from shapely.geometry import LineString, Point, Polygon, box, mapping, shape
 from shapely.geometry.polygon import orient
-from shapely.ops import transform,unary_union,linemerge,substring
-from prepare_geodata import ROOT,OUT,geom,project,inverse,polygons
+from shapely.ops import linemerge, substring, transform, unary_union
+
 from infrastructure_footprints import strip_shape
+from prepare_geodata import OUT, ROOT, geom, inverse, polygons, project
 
 SNAPSHOT=ROOT/'data/snapshots/infrastructure-2026-09-11.json.gz'
 MAIN_BRIDGES=[

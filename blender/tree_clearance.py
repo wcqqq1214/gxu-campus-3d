@@ -4,11 +4,13 @@ Both building and tree LODs participate. Road overhang is deliberately not a
 building collision. This is one final exclusion rule, not a whole-site audit.
 """
 import math
+
 import bpy
 from mathutils import Matrix, Vector
 from mathutils.bvhtree import BVHTree
-from vegetation_layout import tree_rotation
+
 from mesh_volumes import MeshVolumes
+from vegetation_layout import tree_rotation
 
 CLEARANCE_METERS = .03  # Model/export allowance, not a surveyed tree setback.
 

@@ -3,21 +3,23 @@
 --generated-only checks generators before rebuilding. The default also checks
 real source vertex groups and ray samples in base and every near chunk.
 """
-import bpy
 import json
 import math
-import sys
 import re
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'blender'))
-from generic_buildings import ordinary_building,compact_form_source
+from generic_buildings import compact_form_source, ordinary_building
 from geometry import MATERIALS
-from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS, SHOP_BUILDINGS
+from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS
+from new_east_neighbours import SHOP_BUILDINGS
 from student_water_tower import TOWER_ID
 
 

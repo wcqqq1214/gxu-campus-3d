@@ -5,11 +5,13 @@ from pathlib import Path
 
 from shapely.geometry import LineString, Polygon, shape
 from shapely.ops import transform
+
 from building_overrides import footprint_revision, read_json, source_catalogue
+from low_planting_contract import context_revision, context_value, digest
 from site_data import world_shape
 from vegetation_exclusions import INPUT_NAMES, ground_masks
-from vegetation_reservations import INPUT_NAMES as RESERVATION_INPUTS, crown_reservations
-from low_planting_contract import digest, context_value, context_revision
+from vegetation_reservations import INPUT_NAMES as RESERVATION_INPUTS
+from vegetation_reservations import crown_reservations
 
 ROOT = Path(__file__).resolve().parents[1]
 

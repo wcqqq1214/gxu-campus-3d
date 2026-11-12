@@ -1,9 +1,14 @@
 """Grade a small forecourt against real terrain and road triangles, both LODs."""
-import bisect,math,bpy
+import bisect
+import math
 from functools import lru_cache
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 from geometry import Mesh
+
 
 def mesh_triangles(mesh):
     data=bpy.data.meshes.new('site-sampling')

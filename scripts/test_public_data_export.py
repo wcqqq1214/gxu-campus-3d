@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from export_public_data import export_public_data, EXPORTS
+from export_public_data import EXPORTS, export_public_data
 from foundation_contract import foundation_context, load_foundations, revision
 from low_planting_contract import CONTEXT_FILES, context_value, digest, load_prepared
 from road_landing_contract import load_landings

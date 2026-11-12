@@ -1,13 +1,21 @@
-import copy
 import ast
+import copy
 import json
 import math
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from shapely.geometry import box, Polygon, Point
-from vegetation_data import load_zones, filter_zones, apply_stage, load_background, generate_background
+
+from shapely.geometry import Point, Polygon, box
+
+from vegetation_data import (
+    apply_stage,
+    filter_zones,
+    generate_background,
+    load_background,
+    load_zones,
+)
 from vegetation_layout import tree_rotation
 
 

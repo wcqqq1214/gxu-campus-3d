@@ -1,12 +1,14 @@
 """Ground a mapped service road on actual terrain, keeping existing contacts."""
 import math
 from functools import lru_cache
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
+from foundation_geometry import clipped_mesh, masks_for, simplify_local_planes
 from geometry import Mesh
-from site_geometry import mesh_triangles,split_convex,inside
-from shore_geometry import bounds,overlaps,triangles_into,conform_edges,smooth
-from foundation_geometry import masks_for,clipped_mesh,simplify_local_planes
+from shore_geometry import bounds, conform_edges, overlaps, smooth, triangles_into
+from site_geometry import inside, mesh_triangles, split_convex
 
 
 def build_service_road(record,C,terrain,roads):

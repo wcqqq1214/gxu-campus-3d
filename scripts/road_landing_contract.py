@@ -6,6 +6,7 @@ resolves the same source data. Blender can load this without Shapely.
 import hashlib
 import json
 import math
+
 from public_data_fields import without_documentation
 
 

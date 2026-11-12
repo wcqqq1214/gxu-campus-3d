@@ -1,10 +1,20 @@
 """Keep graded ground and ordinary roads accurate after Draco quantization."""
-import bpy,tempfile,re,sys,json
+import json
+import re
+import sys
+import tempfile
 from contextlib import nullcontext
 from pathlib import Path
+
+import bpy
+
 if __name__=='__main__':sys.path.insert(0,str(Path(__file__).resolve().parent))
-from preserve_glb_geometry import preserve_geometry,compact_buffer_views,replace_compressed_node_parts
-from export_attributes import omit_unused_uvs,omit_zero_area_terrain_faces
+from export_attributes import omit_unused_uvs, omit_zero_area_terrain_faces
+from preserve_glb_geometry import (
+    compact_buffer_views,
+    preserve_geometry,
+    replace_compressed_node_parts,
+)
 from terrain_precision_config import load_precision_regions
 
 TERRAIN_BITS=18
@@ -59,7 +69,8 @@ def replace_precise_terrain(path,objects,*,terrain_only=False,planar_report_dire
 
 
 if __name__=='__main__':
-    import argparse,sys
+    import argparse
+    import sys
     parser=argparse.ArgumentParser(description='Export only terrain into a candidate base copy; preserve the editable source and manifest.')
     parser.add_argument('--source',type=Path,required=True)
     parser.add_argument('--target',type=Path,required=True)

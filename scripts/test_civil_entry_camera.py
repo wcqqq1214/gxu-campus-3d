@@ -1,6 +1,8 @@
 import unittest
+
 import numpy as np
-from fit_civil_entry_camera import BASE,landmarks,project,roof_prediction,solve
+
+from fit_civil_entry_camera import BASE, landmarks, project, roof_prediction, solve
 
 
 class CameraFitTests(unittest.TestCase):

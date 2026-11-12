@@ -1,10 +1,17 @@
 """Resolved recessed stairs meet a mapped road using their actual outer face."""
-import copy,hashlib,json,math,unittest
+import copy
+import hashlib
+import json
+import math
+import unittest
 from pathlib import Path
+
 from shapely.geometry import Polygon
+
+from building_overrides import footprint_revision
 from front_connection_data import derive_front_connection
 from shore_data import effective_surfaces
-from building_overrides import footprint_revision
+
 
 def revision(value):return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 class RecessedConnectionTests(unittest.TestCase):

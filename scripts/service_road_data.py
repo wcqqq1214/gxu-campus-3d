@@ -1,10 +1,12 @@
 """A mapped at-grade service road, excluding retained neighboring road surfaces."""
 import math
-from shapely.geometry import Polygon,LineString,box
+
+from shapely.geometry import LineString, Polygon, box
 from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
-from surroundings_data import surface_shape,polys,triangulate
+
 from shore_data import geometry_rings
+from surroundings_data import polys, surface_shape, triangulate
 
 
 def derive_service_road(config,effective,other_layers,trim,convex_masks):

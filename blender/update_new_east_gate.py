@@ -4,8 +4,8 @@ import hashlib
 import json
 import os
 import shutil
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import bpy
 
@@ -15,9 +15,16 @@ from campus_gates import campus_gate
 from detail_export import export_detail
 from geometry import MATERIALS
 from incremental_glb import splice_nodes, validate_retained
-from incremental_update import copy_inputs, snapshot, publication_lock, publish, require_recovered, run_checked
+from incremental_update import (
+    copy_inputs,
+    publication_lock,
+    publish,
+    require_recovered,
+    run_checked,
+    snapshot,
+)
 from initial_model_budget import check_initial_model_budget
-from preserve_glb_geometry import unpack, mesh_nodes_by_name
+from preserve_glb_geometry import mesh_nodes_by_name, unpack
 
 
 def main():

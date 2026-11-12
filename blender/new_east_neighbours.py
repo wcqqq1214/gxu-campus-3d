@@ -5,11 +5,13 @@ slender frames and East 25 window guards. Dimensions, window spacing and
 hidden elevations remain estimates; mapped forms and floor counts stay intact.
 newEastExterior2021 supplements the street-side upper window proportions only.
 """
-import math
 import json
-from pathlib import Path
+import math
 from functools import lru_cache
+from pathlib import Path
+
 import bpy
+
 import geometry
 from geometry import Mesh
 

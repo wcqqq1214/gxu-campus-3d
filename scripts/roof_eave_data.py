@@ -1,6 +1,7 @@
 """Resolve a canted roof eave on a documented solid part's outer edge."""
 import copy
 import math
+
 from shapely.geometry import Polygon
 from shapely.ops import unary_union
 

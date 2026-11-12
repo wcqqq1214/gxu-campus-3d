@@ -4,7 +4,9 @@ Positional geometry is OSM-derived. Section sizes and unsighted components are
 explicit estimates in infrastructure.json, not a claim of engineering accuracy.
 """
 import math
+
 from geometry import Mesh
+
 
 def frames(path):
     result=[]

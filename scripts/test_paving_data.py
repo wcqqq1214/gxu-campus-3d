@@ -1,7 +1,12 @@
-import copy,unittest
-from shapely.geometry import box,Point,LineString
-from paving_data import derive_paving,context_revision
+import copy
+import unittest
+
+from shapely.geometry import LineString, Point, box
+
+from paving_data import context_revision, derive_paving
 from shore_data import revision
+
+
 class PavingDataTests(unittest.TestCase):
     def fixture(self):
         s={'id':'way/1','kind':'roads','insideCampus':True,'tags':{'highway':'pedestrian'},'vertices':[[0,0],[10,0],[10,6],[0,6]],'triangles':[0,1,2,0,2,3]}

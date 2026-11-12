@@ -1,6 +1,11 @@
-import copy,json,unittest
-from shapely.geometry import Point,LineString
-from building_overrides import ROOT,load_catalogue,resolve_building,source_catalogue
+import copy
+import json
+import unittest
+
+from shapely.geometry import LineString, Point
+
+from building_overrides import ROOT, load_catalogue, resolve_building, source_catalogue
+
 
 class RecessedStairEntryTests(unittest.TestCase):
     def setUp(self):
@@ -17,7 +22,11 @@ class RecessedStairEntryTests(unittest.TestCase):
     def test_projecting_approach_clears_effective_road_and_cuts_old_flat_floor(self):
         from shapely.geometry import Polygon
         from shapely.ops import unary_union
-        from audit_entry_road_context import conflicts_for_entry,effective_road_surfaces
+
+        from audit_entry_road_context import (
+            conflicts_for_entry,
+            effective_road_surfaces,
+        )
         b=self.resolve();e=b['form']['entrances'][0];p=e['recessedStairEntry']
         surfaces=json.loads((ROOT/'public/data/surfaces.json').read_text())
         self.assertEqual({v['roadId'] for v in conflicts_for_entry(b['id'],e,surfaces)},{'way/842784663'})

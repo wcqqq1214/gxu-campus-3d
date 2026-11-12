@@ -1,8 +1,13 @@
 """Reject stale or conflicting short aprons and preserve mapped geometry."""
-import copy,unittest
+import copy
+import unittest
+
 from shapely.geometry import Polygon
-from entry_apron_data import derive_entry_apron
+
 from building_overrides import footprint_revision
+from entry_apron_data import derive_entry_apron
+
+
 class EntryApronTests(unittest.TestCase):
  def fixture(self):
   b={'id':'test','center':[0,2],'polygons':[[[[-5,0],[5,0],[5,5],[-5,5],[-5,0]]]],'form':{'entrances':[{'id':'south','center':[0,0],'bearing':180,'stairFlight':{'front':1.22,'width':6.2,'baseHeight':.04}}]}}

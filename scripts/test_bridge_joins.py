@@ -1,8 +1,12 @@
 """Geographical invariants for the six transition aprons."""
-import json,unittest
+import json
+import unittest
 from pathlib import Path
+
 from shapely.geometry import Point
+
 from surroundings_data import surface_shape
+
 R=Path(__file__).resolve().parents[1]
 D=json.loads((R/'public/data/campus-roads.json').read_text())
 class Joins(unittest.TestCase):

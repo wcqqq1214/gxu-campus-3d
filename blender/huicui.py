@@ -1,7 +1,9 @@
 """Huicui north hotel wing and shared journalism envelope; photo-scaled, not surveyed."""
 import math
+
 from geometry import Mesh
 from south_gate import inscription
+
 
 def compact_source(obj):
     """Weld coincident source vertices while retaining face UVs and named groups."""

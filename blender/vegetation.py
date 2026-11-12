@@ -1,6 +1,11 @@
 """Deterministic near and far tree templates, shared by full and vegetation-only builds."""
-import math, random, bmesh
+import math
+import random
+
+import bmesh
+
 from geometry import Mesh
+
 
 def tree_templates(C, collection, detail):
     if detail:

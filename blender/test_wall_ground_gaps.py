@@ -3,10 +3,12 @@ import copy
 import sys
 import unittest
 from pathlib import Path
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from inspect_wall_ground_gaps import probes, check
+from inspect_wall_ground_gaps import check, probes
 
 
 def horizontal(z):

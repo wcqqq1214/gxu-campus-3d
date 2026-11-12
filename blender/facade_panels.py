@@ -4,6 +4,7 @@ Screen holes reveal a dark backing plane. This is an exterior approximation,
 not a cut-out building interior or a surveyed reproduction of floral tracery.
 """
 import math
+
 from facade_bands import frame
 
 

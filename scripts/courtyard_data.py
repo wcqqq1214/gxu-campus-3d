@@ -1,8 +1,10 @@
 """A bounded courtyard layout anchored to existing building vertices."""
 import copy
 import math
-from shapely.geometry import Point, Polygon, LineString
-from shapely.ops import unary_union, nearest_points
+
+from shapely.geometry import LineString, Point, Polygon
+from shapely.ops import nearest_points, unary_union
+
 from building_overrides import footprint_revision
 from surroundings_data import triangulate
 

@@ -1,11 +1,11 @@
 """Comparison commands must not silently use missing historical model inputs."""
 
-from contextlib import redirect_stderr
 import io
-from pathlib import Path
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr
+from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'blender'))
 from validation_inputs import baseline_root

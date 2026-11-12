@@ -3,10 +3,13 @@
 Dimensions and unseen rear ornament are estimates. No geometry from the obsolete
 freestanding-column gate is reused. Blender axes: east X, north Y, up Z.
 """
-import json,math
+import json
+import math
 from functools import lru_cache
 from pathlib import Path
+
 import bpy
+
 from geometry import Mesh
 
 

@@ -1,6 +1,7 @@
 """Shared foundation freshness check, usable in Blender without GIS libraries."""
 import hashlib
 import json
+
 from public_data_fields import without_documentation
 
 INPUTS = ('buildings', 'terrain', 'surfaces', 'infrastructure', 'surroundings',

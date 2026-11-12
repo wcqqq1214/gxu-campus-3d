@@ -1,16 +1,21 @@
 """Update campus roads, bridge transition aprons, end railings and the lawn tree mask."""
-import hashlib,json,sys
+import hashlib
+import json
+import sys
 from pathlib import Path
+
 import bpy
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 if not globals().get('_INCREMENTAL_CANDIDATE'):
     from incremental_update import staged_update
     staged_update(ROOT, __file__)
     raise SystemExit(0)
+from geometry import MATERIALS
 from incremental_glb import splice_nodes, validate_retained
 from initial_model_budget import check_initial_model_budget
-from geometry import MATERIALS
-from preserve_glb_geometry import unpack,mesh_nodes_by_name
+from preserve_glb_geometry import mesh_nodes_by_name, unpack
+
 previous=(ROOT/'public/models/base.glb').read_bytes()
 old_manifest=json.loads((ROOT/'public/data/models.json').read_text())
 old_banks={e['url']:(ROOT/'public'/e['url']).read_bytes() for e in old_manifest.get('sports',[])}
@@ -53,17 +58,22 @@ for name,color,rough,metal in records:
     materials.append(mat)
 MATERIALS[:]=materials
 from paving_geometry import sync_source_pavings
+
 sync_source_pavings(namespace['base'])
 from site_geometry import sync_source_sites
+
 sync_source_sites(namespace['base'])
 from shore_geometry import sync_source_shores
+
 sync_source_shores(namespace['base'],include_terrain=True)
 from low_planting import sync_source_low_planting
+
 sync_source_low_planting(namespace['base'])
 old=bpy.data.objects['roads'];collection=old.users_collection[0];data=old.data
 bpy.data.objects.remove(old,do_unlink=True);bpy.data.meshes.remove(data)
 obj=roads.object('roads',collection,{'layer':'roads','basis':'主路沿用桥底沥青、浅色路缘、中心虚线；标线为示意，保留原路幅和支路'})
 from huicui import compact_source
+
 compact_source(obj)
 for key,mesh in [(k,v) for k,v in namespace['base'].items() if k.startswith('infra-approach-')]:
     old=bpy.data.objects[key];data=old.data;bpy.data.objects.remove(old,do_unlink=True);bpy.data.meshes.remove(data)
@@ -74,6 +84,7 @@ for key,mesh in high.items():
     bpy.data.objects.remove(old,do_unlink=True);bpy.data.meshes.remove(data)
     compact_source(mesh.object(name,group,props))
 from mathutils.kdtree import KDTree
+
 trees=namespace['trees'];kd=KDTree(len(trees))
 for i,t in enumerate(trees):kd.insert((t[0],t[1],0),i)
 kd.balance();survivors=[]

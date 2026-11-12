@@ -1,7 +1,13 @@
-import copy,json,shutil,tempfile,unittest
+import copy
+import json
+import shutil
+import tempfile
+import unittest
 from pathlib import Path
-from shapely.geometry import box,Point
-from vegetation_avenues import derive_avenues,apply_avenues,revision
+
+from shapely.geometry import Point, box
+
+from vegetation_avenues import apply_avenues, derive_avenues, revision
 
 
 class AvenueTests(unittest.TestCase):

@@ -2,10 +2,12 @@ import copy
 import json
 import unittest
 from pathlib import Path
+
 from shapely.geometry import Point, Polygon
-from courtyard_data import derive_courtyard, apply_courtyards
+
 from building_overrides import source_catalogue
-from vegetation_exclusions import ground_masks, filter_ground
+from courtyard_data import apply_courtyards, derive_courtyard
+from vegetation_exclusions import filter_ground, ground_masks
 
 
 class CourtyardTests(unittest.TestCase):

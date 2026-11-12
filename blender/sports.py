@@ -4,6 +4,7 @@ The mapped red apron is retained, including east-field straight extensions.
 All paint is actual flat geometry, so it remains visible without remote textures.
 """
 import math
+
 from geometry import Mesh
 
 

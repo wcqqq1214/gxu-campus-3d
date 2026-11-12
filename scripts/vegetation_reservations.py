@@ -3,11 +3,13 @@
 An explicit no-plant reservation is not a 3D collision claim. Ordinary streets,
 unreviewed entrances and lake shores do not acquire new blanket crown buffers.
 """
+import math
 from collections import Counter
 from dataclasses import dataclass
-import math
+
 from shapely.geometry import LineString, Point, Polygon, box
 from shapely.strtree import STRtree
+
 from architecture_data import entrance_tree_masks
 from infrastructure_footprints import strip_shape
 

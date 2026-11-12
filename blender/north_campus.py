@@ -1,5 +1,6 @@
 """Northern campus building dispatch and site geometry."""
 import math
+
 from geometry import Mesh
 from north_campus_architecture import building_model  # noqa: F401 -- build_campus.py imports it from here
 

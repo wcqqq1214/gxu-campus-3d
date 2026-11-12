@@ -4,8 +4,9 @@ import json
 from pathlib import Path
 
 from foundation_contract import foundation_context, revision
-from low_planting_contract import CONTEXT_FILES, context_value, context_revision, digest
-from mapped_canopy_data import context_revision as canopy_revision, part_revision
+from low_planting_contract import CONTEXT_FILES, context_revision, context_value, digest
+from mapped_canopy_data import context_revision as canopy_revision
+from mapped_canopy_data import part_revision
 from public_data_fields import without_documentation
 
 ROOT = Path(__file__).resolve().parents[1]

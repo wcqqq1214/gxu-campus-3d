@@ -1,8 +1,12 @@
 """A shoreline must stay on land, retain its anchors and respect existing routes."""
-import copy, unittest
+import copy
+import unittest
+
 from shapely.geometry import Polygon, box
 from shapely.ops import unary_union
-from shore_data import derive_shore, revision, effective_surfaces
+
+from shore_data import derive_shore, effective_surfaces, revision
+
 
 class ShoreDataTests(unittest.TestCase):
     def example(self,reverse=False):

@@ -4,6 +4,7 @@ Visible features are reconstructed; all dimensions remain documented estimates.
 Local U runs left-to-right on the principal facade; positive V points inward.
 """
 import math
+
 from geometry import Mesh
 
 

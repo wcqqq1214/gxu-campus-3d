@@ -6,7 +6,7 @@ ordinary facade validator on that part before admitting a shared step wall.
 import copy
 import math
 
-from shapely.geometry import LineString, Polygon, Point
+from shapely.geometry import LineString, Point, Polygon
 from shapely.ops import unary_union
 
 

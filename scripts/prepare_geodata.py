@@ -1,17 +1,37 @@
 #!/usr/bin/env python3
 """Normalize OSM geometry, preserve courtyards, and assemble attributable scene data."""
-import collections,datetime,json,math
+import collections
+import datetime
+import json
+import math
+
+import mapbox_earcut as earcut
 import numpy as np
 from PIL import Image
-from shapely.geometry import Polygon,MultiPolygon,LineString,Point,mapping,shape,box
-from shapely.ops import polygonize,unary_union,transform
 from shapely import make_valid
+from shapely.geometry import (
+    LineString,
+    MultiPolygon,
+    Point,
+    Polygon,
+    box,
+    mapping,
+    shape,
+)
+from shapely.ops import polygonize, transform, unary_union
 from shapely.prepared import prep
-import mapbox_earcut as earcut
-from fetch_geodata import ROOT,CACHE,REGION,tile
+
+from architecture_data import architectural_envelope, clear_entrance_trees
+from building_overrides import (
+    calibration_stats,
+    load_catalogue,
+    resolve_building,
+    source_catalogue,
+    validate_ids,
+)
+from fetch_geodata import CACHE, REGION, ROOT, tile
 from sports_data import prepare_sports
-from architecture_data import architectural_envelope,clear_entrance_trees
-from building_overrides import load_catalogue,source_catalogue,validate_ids,resolve_building,calibration_stats
+
 OUT=ROOT/'public/data';OUT.mkdir(parents=True,exist_ok=True)
 LON,LAT=REGION['center'];MX=111320*math.cos(math.radians(LAT));MY=111320
 
@@ -226,7 +246,7 @@ def prepare():
     sportsmask=unary_union([transform(project,shape(f['geometry'])) for f in features if f['properties']['kind']=='sports'])
     valid=prep(campus.difference(unary_union([bg,waters.buffer(5),roadmask,sportsmask.buffer(3)])))
     greenmask=prep(greenmask)
-    from vegetation_data import load_background,generate_background
+    from vegetation_data import generate_background, load_background
     trees=generate_background(campus.bounds,valid,greenmask,load_background(ROOT))
     # Local exclusions never reseed other cells. Include crown radius at edges.
     grounds=unary_union([Polygon(field['ground']) for field in sports])

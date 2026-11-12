@@ -1,6 +1,12 @@
 """Check actual court/stair seams, gap fill and a bounded ground access route."""
-import bpy, sys, json, math, re, hashlib
+import hashlib
+import json
+import math
+import re
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 

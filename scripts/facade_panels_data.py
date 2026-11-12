@@ -92,8 +92,8 @@ def resolve_round_window_walls(panels, length):
     Coordinates are metres along the panel and above its bottom. Each circle
     uses 32 edges at both LODs; this is shallow exterior glazing, not an interior.
     """
-    import numpy as np
     import mapbox_earcut as earcut
+    import numpy as np
     result = {}
     for p in panels:
         if p['type'] != 'round-window-wall':

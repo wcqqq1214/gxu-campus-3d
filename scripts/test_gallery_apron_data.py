@@ -1,8 +1,13 @@
 """A gallery apron clears only its own open floor, never another building."""
-import copy,unittest
+import copy
+import unittest
+
 from shapely.geometry import Polygon
+
 from building_overrides import footprint_revision
 from gallery_apron_data import derive_gallery_apron
+
+
 class GalleryApronTests(unittest.TestCase):
  def fixture(self):
   f=dict(polygon=0,ring=0,edge=0,part='body',start=[0,0],end=[30,0],normal=[0,-1],rule={'openCorridor':{'firstLevel':0,'depth':1.8,'endInset':.3,'piers':{'bays':8,'width':.42,'depth':.5}}})

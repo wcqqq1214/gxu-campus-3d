@@ -4,8 +4,10 @@ Official gallery shows a pale curved low block and tall rear classroom wing.
 Partition heights, stairs, doors and unseen elevations remain estimates.
 """
 import math
+
 from geometry import Mesh
 from south_gate import inscription
+
 
 def teaching_ten(l,b,z,C,detail=True):
     m=Mesh();e=b['architecture'];wall=C['tenWall'];trim=C['tenTrim'];glass=C['tenGlass']

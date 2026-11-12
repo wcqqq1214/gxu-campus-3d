@@ -1,8 +1,21 @@
 """Full-source and base-only exports must preserve the same logical GLB node."""
-import copy,json,struct,sys,tempfile,unittest
+import copy
+import json
+import struct
+import sys
+import tempfile
+import unittest
 from pathlib import Path
+
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'blender'))
-from preserve_glb_geometry import mesh_nodes_by_name,preserve_geometry,unpack,compact_buffer_views,replace_compressed_node_parts
+from preserve_glb_geometry import (
+    compact_buffer_views,
+    mesh_nodes_by_name,
+    preserve_geometry,
+    replace_compressed_node_parts,
+    unpack,
+)
+
 
 class IncrementalGLBTests(unittest.TestCase):
     def encode(self,name,payload,count):

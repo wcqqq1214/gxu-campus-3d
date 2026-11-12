@@ -1,8 +1,13 @@
 """Mapped north-campus underpass, preserving the existing arterial alignment."""
-import gzip,json,math
-from shapely.geometry import LineString,Point
+import gzip
+import json
+import math
+
+from shapely.geometry import LineString, Point
 from shapely.ops import unary_union
-from surroundings_data import surface_shape,tiled_triangles
+
+from surroundings_data import surface_shape, tiled_triangles
+
 
 def prepare_underpass(root,elevation):
     raw=json.loads(gzip.decompress((root/'data/snapshots/osm-2026-09-09.json.gz').read_bytes()))

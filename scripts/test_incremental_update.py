@@ -10,9 +10,15 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
-from incremental_glb import splice_nodes, validate_retained, node_signatures, pack
-from preserve_glb_geometry import unpack, mesh_nodes_by_name
-from incremental_update import publish, snapshot, staged_update, validate_candidate, copy_inputs
+from incremental_glb import node_signatures, pack, splice_nodes, validate_retained
+from incremental_update import (
+    copy_inputs,
+    publish,
+    snapshot,
+    staged_update,
+    validate_candidate,
+)
+from preserve_glb_geometry import mesh_nodes_by_name, unpack
 
 
 class PublishedNodeTests(unittest.TestCase):

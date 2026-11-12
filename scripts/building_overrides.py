@@ -11,12 +11,12 @@ from pathlib import Path
 
 import mapbox_earcut as earcut
 import numpy as np
-from shapely.geometry import Polygon, Point, LineString, box
 from shapely.affinity import rotate, translate
+from shapely.geometry import LineString, Point, Polygon, box
 from shapely.ops import unary_union
 
-from building_forms import positive, infer_archetype, resolve_form, roof_geometry
 from attached_portico_data import resolve_attached_portico
+from building_forms import infer_archetype, positive, resolve_form, roof_geometry
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_LEVELS = {'living': 6, 'academic': 5, 'culture': 2, 'service': 3}
@@ -299,7 +299,7 @@ def resolve_parts(b, raw, roof):
 
 
 def resolve_facades(b, form, rules, *, panel_minimum_bottom=3.2):
-    from facade_bands_data import validate_window_bands, validate_horizontal_ledges
+    from facade_bands_data import validate_horizontal_ledges, validate_window_bands
     from facade_panels_data import validate_panels
     indexed = {}
     part_ids = {p['id'] for p in form['parts']} or {'body'}
@@ -517,7 +517,10 @@ def resolve_facades(b, form, rules, *, panel_minimum_bottom=3.2):
                             if corridor.get('lastLevel',corridor['firstLevel'])>=part['levels'] or corridor['railHeight']>=fh-.5:
                                 raise ValueError('Corridor floors or railing leave no upper opening')
                             length=math.dist(start,end);inset=corridor['endInset']
-                            from corridor_detail_data import validate_corridor_details, validate_corridor_facade_layers
+                            from corridor_detail_data import (
+                                validate_corridor_details,
+                                validate_corridor_facade_layers,
+                            )
                             validate_corridor_details(facade['rule'],length,part['height'],part['levels'])
                             validate_corridor_facade_layers(facade['rule'],part['height'],part['levels'])
                             if length-2*inset<2:
@@ -740,7 +743,10 @@ def resolve_building(building, record=None, source_ids=None):
                 from recessed_stair_entry_data import resolve_recessed_stair_entry
                 resolved['recessedStairEntry']=resolve_recessed_stair_entry(b,resolved,e['recessedStairEntry'],form['parts'])
             if 'flushEntrance' in e:
-                from flush_entrance_data import validate_flush_entrance, validate_flush_canopy_footprint
+                from flush_entrance_data import (
+                    validate_flush_canopy_footprint,
+                    validate_flush_entrance,
+                )
                 if set(e)-required-{'flushEntrance'}:
                     raise ValueError('Flush entrance cannot add other stair, canopy or portico systems')
                 wall_height=form['height']

@@ -1,9 +1,9 @@
 """Guard the observed open galleries and the two-flight entrance in both LODs."""
 import json
 import math
-from pathlib import Path
 import sys
 import unittest
+from pathlib import Path
 
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree

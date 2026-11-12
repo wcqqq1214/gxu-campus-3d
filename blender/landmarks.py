@@ -1,16 +1,16 @@
 """Distinct architectural studies, using the reference catalogue and OSM footprints."""
-from geometry import Mesh
-from student_center import student_center
-from laboratory import laboratory
-from huixue import huixue
-from south_gate import south_gate
-from library import library
-from international_residence import international_residence
 from campus_gates import campus_gate
-from time_gate import time_gate
-from teaching_ten import teaching_ten
-from teaching_six import teaching_six
+from geometry import Mesh
 from huicui import huicui
+from huixue import huixue
+from international_residence import international_residence
+from laboratory import laboratory
+from library import library
+from south_gate import south_gate
+from student_center import student_center
+from teaching_six import teaching_six
+from teaching_ten import teaching_ten
+from time_gate import time_gate
 
 DEDICATED_LANDMARKS = {
     'huixue': huixue,

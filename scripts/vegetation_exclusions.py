@@ -6,9 +6,11 @@ Explicit no-tree zones and final 3D building checks remain additional passes.
 """
 from collections import Counter
 from dataclasses import dataclass
+
 from shapely.geometry import Point, Polygon
 from shapely.prepared import prep
 from shapely.strtree import STRtree
+
 from shore_data import effective_surfaces
 from surroundings_data import surface_shape
 

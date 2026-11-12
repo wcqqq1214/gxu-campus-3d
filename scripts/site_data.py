@@ -1,12 +1,17 @@
 """Small sourced forecourts; keep mapped footprints and existing surface slots."""
-import copy,hashlib,json,math
+import copy
+import hashlib
+import json
+import math
 from pathlib import Path
-from shapely.geometry import Polygon,LineString,box
-from shapely.affinity import rotate,translate
+
+from shapely.affinity import rotate, translate
+from shapely.geometry import LineString, Polygon, box
 from shapely.ops import unary_union
-from building_overrides import read_json,footprint_revision
+
 from building_forms import positive
-from surroundings_data import surface_shape,triangulate,polys
+from building_overrides import footprint_revision, read_json
+from surroundings_data import polys, surface_shape, triangulate
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -133,9 +138,9 @@ def prepare_sites(root=ROOT):
             from entry_apron_data import derive_entry_apron
             site,area,grading=derive_entry_apron(config,buildings,source_ids)
         elif config.get('type') in ('side-connection','front-connection','terraced-stair-connection'):
-            from side_connection_data import derive_side_connection
             from front_connection_data import derive_front_connection
             from shore_data import effective_surfaces
+            from side_connection_data import derive_side_connection
             effective=effective_surfaces(ss,[infra['surfaceOverrides'],surround['surfaceOverrides'],roads['surfaceOverrides']],set(infra['replaceSurfaceIds']))
             target=next((s for s in effective if s['id']==config['surfaceId']),None)
             derive=derive_front_connection if config['type'] in ('front-connection','terraced-stair-connection') else derive_side_connection

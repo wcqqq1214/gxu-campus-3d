@@ -1,6 +1,7 @@
 """Shared visible surfaces and grading planes for the lower entrance landscape."""
 import math
-from geometry import Mesh, MATERIALS
+
+from geometry import MATERIALS, Mesh
 
 
 def _split_finish(polygon, boundary):

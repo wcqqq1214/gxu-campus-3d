@@ -1,8 +1,9 @@
 """Clip the old road from the entrance and clear ground below its paving."""
 import math
+
 from geometry import Mesh
-from site_geometry import mesh_triangles, contact_road
 from paving_geometry import clear_paving_ground
+from site_geometry import contact_road, mesh_triangles
 
 
 def build_recessed_entry_ground(site,C,elevation,terrain,roads):

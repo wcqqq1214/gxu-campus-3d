@@ -5,25 +5,31 @@ Usage: blender -b --python-exit-code 1 --python blender/update_road_display.py
 Inspect/validate the candidate before copying its blend, base GLB and manifest.
 """
 import argparse
-from collections import Counter
 import hashlib
 import json
-from pathlib import Path
-import sys
 import subprocess
+import sys
+from collections import Counter
+from pathlib import Path
 
 import bpy
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'blender'))
 from initial_model_budget import check_initial_model_budget
+
 sys.path.insert(0, str(ROOT/'scripts'))
 import geometry
+from export_attributes import omit_unused_uvs
 from geometry import Mesh
+from preserve_glb_geometry import (
+    compact_buffer_views,
+    mesh_nodes_by_name,
+    preserve_geometry,
+    unpack,
+)
 from road_display_cleanup import load_cuts, trim_mesh
 from road_surface_clearance import load_repairs, repair_clearance
-from export_attributes import omit_unused_uvs
-from preserve_glb_geometry import preserve_geometry, compact_buffer_views, unpack, mesh_nodes_by_name
 
 
 def signatures(raw):

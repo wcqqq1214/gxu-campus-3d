@@ -1,5 +1,6 @@
 """Ray stations for attached galleries, applicable to decoded and source meshes."""
 import math
+
 from mathutils import Vector
 
 

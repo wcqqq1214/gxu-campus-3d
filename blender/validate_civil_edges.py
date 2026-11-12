@@ -1,10 +1,15 @@
 """Check actual exterior profiles and source/export contacts, not only the plateau."""
-import bpy,json,sys
+import json
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from civil_forecourt_grade import load_grade
+
 TARGET=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),ROOT)
 REPORT=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--report=')),ROOT/'work/civil-edge-validation.json')
 

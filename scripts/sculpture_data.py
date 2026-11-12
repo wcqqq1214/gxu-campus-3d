@@ -1,6 +1,10 @@
 """Curated sculpture POIs; keep the mapped source name separate from display name."""
-import gzip,json,math
-from prepare_geodata import ROOT,OUT,CACHE,project
+import gzip
+import json
+import math
+
+from prepare_geodata import CACHE, OUT, ROOT, project
+
 
 def prepare_sculptures():
     catalogue=json.loads((ROOT/'data/sculptures.json').read_text())

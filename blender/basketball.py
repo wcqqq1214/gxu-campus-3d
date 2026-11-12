@@ -1,7 +1,9 @@
 """Mapped outdoor courts with proportioned markings and modeled basket units."""
 import math
+
 from geometry import Mesh
 from sports import strip
+
 
 def court_model(court,C,detail=True):
     m=Mesh();z=court['elevation']+.025

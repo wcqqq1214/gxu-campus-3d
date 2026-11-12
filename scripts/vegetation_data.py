@@ -10,7 +10,9 @@ import json
 import math
 import random
 from pathlib import Path
+
 from shapely.geometry import Point, Polygon
+
 from building_overrides import read_json, source_catalogue
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -117,10 +119,11 @@ def apply_stage(trees, stage, masks, root=ROOT):
 
 
 def prepare_vegetation(root=ROOT):
-    from vegetation_exclusions import INPUT_NAMES, final_ground_exclusions
-    from vegetation_reservations import INPUT_NAMES as RESERVATION_INPUTS, final_crown_reservations
-    from vegetation_avenues import derive_avenues, apply_avenues
     from courtyard_data import apply_courtyards
+    from vegetation_avenues import apply_avenues, derive_avenues
+    from vegetation_exclusions import INPUT_NAMES, final_ground_exclusions
+    from vegetation_reservations import INPUT_NAMES as RESERVATION_INPUTS
+    from vegetation_reservations import final_crown_reservations
     out = root / 'public/data'
     read = lambda name: json.loads((out / name).read_text())
     zones = load_zones(root)

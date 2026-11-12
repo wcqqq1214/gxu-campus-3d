@@ -1,6 +1,7 @@
 """Validate one explicitly located roof dome on an existing solid flat roof."""
 import copy
 import math
+
 from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
 

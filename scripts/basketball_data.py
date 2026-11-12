@@ -1,11 +1,15 @@
 """Derive mapped courts and explicitly estimated east-campus courts; no new POIs."""
-import json,math
+import json
+import math
 from pathlib import Path
+
 import numpy as np
-from shapely.geometry import shape,Polygon,Point,box
-from shapely.ops import transform,unary_union
+from shapely.geometry import Point, Polygon, box, shape
+from shapely.ops import transform, unary_union
+
 from prepare_geodata import project
-from surroundings_data import triangulate,tiled_triangles
+from surroundings_data import tiled_triangles, triangulate
+
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'public/data'
 def prepare_basketball():
     from external_surfaces_data import prepare_external_surfaces

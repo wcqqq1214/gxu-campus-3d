@@ -1,12 +1,19 @@
 """Inspect the actual turned path, both interfaces and outside terrain."""
-import bpy,json,math,sys,hashlib
+import hashlib
+import json
+import math
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
-from site_geometry import inside,ring_distance
 from inspect_foundation_clearance import covers
+from site_geometry import inside, ring_distance
 from validation_inputs import baseline_root
+
 PREFIX=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--report-prefix=')),'s3-mathematics-path')
 BASELINE=baseline_root(sys.argv)
 TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)

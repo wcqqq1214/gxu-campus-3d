@@ -1,7 +1,9 @@
 import copy
 import unittest
-from shapely.geometry import Polygon, Point
+
+from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
+
 from building_overrides import resolve_parts
 
 

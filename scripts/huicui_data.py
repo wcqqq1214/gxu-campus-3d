@@ -1,8 +1,11 @@
 """Photo-derived Huicui envelope within the existing journalism-building relation."""
-import json, math
+import json
+import math
 from pathlib import Path
-from shapely.geometry import Polygon, box
+
 from shapely.affinity import rotate, translate
+from shapely.geometry import Polygon, box
+
 from architecture_data import pack
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -1,11 +1,17 @@
 """Bounded repairs of mapped ordinary pavement; retain its exact footprint."""
-import copy,hashlib,json,math
+import copy
+import hashlib
+import json
+import math
 from pathlib import Path
-from shapely.geometry import Polygon,Point
+
+from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
-from shore_data import effective_surfaces,revision
-from surroundings_data import surface_shape
+
 from building_overrides import source_catalogue
+from shore_data import effective_surfaces, revision
+from surroundings_data import surface_shape
+
 ROOT=Path(__file__).resolve().parents[1]
 
 def context_revision(surfaces,infrastructure,surroundings,roads,sites):

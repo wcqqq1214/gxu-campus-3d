@@ -1,6 +1,11 @@
 """Fixed probes for the civil entrance's front and east return glazing."""
-import bpy, sys, json, re, hashlib
+import hashlib
+import json
+import re
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 

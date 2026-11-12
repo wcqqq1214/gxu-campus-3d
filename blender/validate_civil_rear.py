@@ -3,8 +3,13 @@
 Do not derive expected heights/positions from the production override. Dimensions
 are the adopted photo-constrained estimates, not a survey or whole-building QA.
 """
-import bpy, sys, json, re, hashlib
+import hashlib
+import json
+import re
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 

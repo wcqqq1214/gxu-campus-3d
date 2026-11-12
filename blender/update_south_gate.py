@@ -1,23 +1,29 @@
 """Rebuild only the south gate source and both published levels of detail."""
-import copy, struct
-from collections import Counter
+import copy
 import hashlib
 import json
+import struct
 import sys
 import tempfile
+from collections import Counter
 from pathlib import Path
 
 import bpy
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
-from initial_model_budget import check_initial_model_budget
 import geometry
-from geometry import MATERIALS, Mesh
-from south_gate_site import ensure_materials, repair_roads, REPAIR_BOUNDS
-from south_gate import south_gate
-from preserve_glb_geometry import compact_buffer_views, mesh_nodes_by_name, preserve_geometry, unpack
 from export_attributes import omit_unused_uvs
+from geometry import MATERIALS, Mesh
+from initial_model_budget import check_initial_model_budget
+from preserve_glb_geometry import (
+    compact_buffer_views,
+    mesh_nodes_by_name,
+    preserve_geometry,
+    unpack,
+)
+from south_gate import south_gate
+from south_gate_site import REPAIR_BOUNDS, ensure_materials, repair_roads
 
 
 def signatures(raw):

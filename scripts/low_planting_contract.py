@@ -1,6 +1,7 @@
 """Standard-library fingerprints used by data preparation and Blender."""
 import hashlib
 import json
+
 from public_data_fields import without_documentation
 
 CONTEXT_FILES = ('surfaces', 'infrastructure', 'surroundings', 'campus-roads',

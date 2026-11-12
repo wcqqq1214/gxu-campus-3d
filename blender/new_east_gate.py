@@ -8,7 +8,9 @@ faces are estimates, not a survey. Sources are recorded in data/sources.json.
 import math
 import random
 from pathlib import Path
+
 import bpy
+
 import geometry
 from geometry import Mesh
 from south_gate import gate_wordmark

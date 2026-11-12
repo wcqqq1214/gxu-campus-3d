@@ -1,9 +1,18 @@
 """Typed bounds remain bit-identical, including subnormals and signed zero."""
-import copy,json,random,struct,sys,tempfile,unittest
+import copy
+import json
+import random
+import struct
+import sys
+import tempfile
+import unittest
 from pathlib import Path
+
 sys.path.insert(0,str(Path(__file__).resolve().parent))
-from gltf_bounds import compact_float_bounds,compact_glb_float_bounds
+from gltf_bounds import compact_float_bounds, compact_glb_float_bounds
 from preserve_glb_geometry import unpack
+
+
 class FloatBoundsTests(unittest.TestCase):
  def test_float32_roundtrip_and_integer_bounds(self):
   rng=random.Random(42)

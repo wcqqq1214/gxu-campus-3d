@@ -3,6 +3,7 @@ import argparse
 import json
 import math
 from pathlib import Path
+
 import numpy as np
 
 # TL, TR, BR, BL glazing corners; front L/R and rear L/R column/soffit contacts.

@@ -7,9 +7,10 @@ coarse-DEM floor datums along with the ground; entrance/stair shapes are retaine
 """
 import json
 import math
+
 from geometry import Mesh
+from shore_geometry import bounds, conform_edges, overlaps, triangles_into
 from site_geometry import mesh_triangles, split_convex
-from shore_geometry import bounds, overlaps, triangles_into, conform_edges
 
 
 def load_grade(root):

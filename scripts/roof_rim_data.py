@@ -1,8 +1,9 @@
 """An inset edge rim following the supporting flat or explicit roof surface."""
 import math
-import numpy as np
+
 import mapbox_earcut as earcut
-from shapely.geometry import Polygon, LineString
+import numpy as np
+from shapely.geometry import LineString, Polygon
 from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
 

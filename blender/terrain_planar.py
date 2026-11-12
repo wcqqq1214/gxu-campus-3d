@@ -4,14 +4,14 @@ Run after quantized zero-area cleanup. Nothing moves: only almost coplanar,
 upward, globally XY/4-textured connected patches can be retriangulated. The
 editable mesh is restored even if the caller's export fails.
 """
+import math
 from collections import Counter, defaultdict
 from contextlib import contextmanager
-import math
 
 import bmesh
 import bpy
-from mathutils import Matrix
 import numpy as np
+from mathutils import Matrix
 
 PLANE_ERROR = .0001  # metres; two surfaces can differ by at most twice this
 NORMAL_ERROR = .0006  # reserve room within .001 for Blender's split-normal storage

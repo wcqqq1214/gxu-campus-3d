@@ -1,6 +1,7 @@
 """Two rising flights through a mapped open frame to a courtyard rear wall."""
 import math
-from shapely.geometry import LineString, Polygon, Point
+
+from shapely.geometry import LineString, Point, Polygon
 from shapely.ops import unary_union
 
 

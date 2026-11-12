@@ -1,10 +1,12 @@
 import copy
-import unittest
-from shapely.geometry import Polygon, Point
-from shapely.affinity import rotate, translate
-from slatted_roof_data import resolve_slatted_roof
-from building_overrides import ROOT, load_catalogue, resolve_building, source_catalogue
 import json
+import unittest
+
+from shapely.affinity import rotate, translate
+from shapely.geometry import Point, Polygon
+
+from building_overrides import ROOT, load_catalogue, resolve_building, source_catalogue
+from slatted_roof_data import resolve_slatted_roof
 
 
 class SlattedRoofTests(unittest.TestCase):

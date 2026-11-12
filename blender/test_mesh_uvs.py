@@ -6,7 +6,7 @@ from pathlib import Path
 import bpy
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from geometry import Mesh, MATERIALS, material
+from geometry import MATERIALS, Mesh, material
 
 
 class MeshUVTests(unittest.TestCase):

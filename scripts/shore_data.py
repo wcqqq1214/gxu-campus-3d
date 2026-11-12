@@ -1,10 +1,15 @@
 """Sourced, bounded shoreline grading masks; original water and roads stay fixed."""
-import copy, hashlib, json, math
+import copy
+import hashlib
+import json
+import math
 from pathlib import Path
-from shapely.geometry import Polygon, LineString, Point
+
+from shapely.geometry import LineString, Point, Polygon
 from shapely.ops import unary_union
+
 from building_overrides import read_json, source_catalogue
-from surroundings_data import surface_shape, polys, triangulate
+from surroundings_data import polys, surface_shape, triangulate
 
 ROOT = Path(__file__).resolve().parents[1]
 

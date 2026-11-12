@@ -1,9 +1,14 @@
 """Check delivered court placement and earthworks against independent map geometry."""
-import json,math,unittest
+import json
+import math
+import unittest
 from pathlib import Path
-from shapely.geometry import Polygon,Point
+
+from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
+
 from surroundings_data import surface_shape
+
 D=Path(__file__).resolve().parents[1]/'public/data'
 def read(n):return json.loads((D/n).read_text())
 class BasketballTest(unittest.TestCase):

@@ -1,9 +1,13 @@
 """Terrain-matched transition finishes, sharing the old ramp cross-section at entry."""
-import math,bpy
+import math
 from functools import lru_cache
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 from geometry import Mesh
+
 
 def bridge_join_mesh(data,C,elevation,terrain):
     ground_data=bpy.data.meshes.new('join-ground');ground_data.from_pydata(terrain.v,[],terrain.f);ground_data.calc_loop_triangles()

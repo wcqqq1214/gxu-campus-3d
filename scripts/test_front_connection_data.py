@@ -1,8 +1,14 @@
-import copy,hashlib,json,unittest
+import copy
+import hashlib
+import json
+import unittest
 from pathlib import Path
+
 from shapely.geometry import Polygon
+
 from front_connection_data import derive_front_connection
 from shore_data import effective_surfaces
+
 
 def revision(v):return hashlib.sha256(json.dumps(v,sort_keys=True,separators=(',',':')).encode()).hexdigest()
 

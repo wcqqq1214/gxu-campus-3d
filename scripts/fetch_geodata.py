@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 """Download a complete, versioned OSM snapshot and public elevation tiles."""
-import argparse, concurrent.futures, datetime, json, math, urllib.parse, urllib.request
+import argparse
+import concurrent.futures
+import datetime
+import json
+import math
+import urllib.parse
+import urllib.request
 from pathlib import Path
+
 ROOT=Path(__file__).resolve().parents[1]
 CACHE=ROOT/'work/geodata'
 REGION=json.loads((ROOT/'data/region.json').read_text())

@@ -1,7 +1,9 @@
 """Reject misplaced or disconnected two-flight stairs and test rotated anchors."""
 import copy
 import unittest
+
 from shapely.geometry import Polygon
+
 from building_overrides import footprint_revision, resolve_building
 from terraced_stairs_data import validate_terraced_stairs_context
 

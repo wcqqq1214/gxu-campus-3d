@@ -1,9 +1,10 @@
 """Local architectural envelopes clipped to mapped footprints, retaining inner rings."""
 import math
-import numpy as np
+
 import mapbox_earcut as earcut
-from shapely.geometry import Polygon, box
+import numpy as np
 from shapely.affinity import rotate, translate
+from shapely.geometry import Polygon, box
 
 
 def pack(g, name, height):

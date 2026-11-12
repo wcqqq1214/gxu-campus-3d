@@ -3,14 +3,18 @@
 Original OSM axes stay intact. Road widths / edge treatment are display estimates;
 grade-separated ways and the detailed Nongyuan corridor retain their existing models.
 """
-import json,math
+import json
+import math
 from pathlib import Path
-import numpy as np
+
 import mapbox_earcut as earcut
-from shapely.geometry import Polygon,shape,box
-from shapely.ops import transform,unary_union
+import numpy as np
 from shapely import make_valid
+from shapely.geometry import Polygon, box, shape
+from shapely.ops import transform, unary_union
+
 from context_data import select_context
+
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'public/data'
 def polys(g):return [g] if g.geom_type=='Polygon' else [p for p in getattr(g,'geoms',[]) if p.geom_type=='Polygon']
 def triangulate(g):

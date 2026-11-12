@@ -1,9 +1,11 @@
 """Drape courtyard paving over exact terrain triangles, keeping tree-pit holes."""
 import math
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 from geometry import Mesh
-from site_geometry import mesh_triangles, split_convex, ring_distance
+from site_geometry import mesh_triangles, ring_distance, split_convex
 
 
 def build_courtyard(site, C, elevation, terrain, roads):

@@ -1,9 +1,11 @@
 """Open the mapped passage below retained roads; no pavement over the arterial."""
 import hashlib
 import json
+
+from foundation_geometry import clipped_mesh, masks_for
 from geometry import Mesh
 from infrastructure import frames
-from foundation_geometry import clipped_mesh,masks_for
+
 
 def road_height_sampler(source,elevation):
     import bpy

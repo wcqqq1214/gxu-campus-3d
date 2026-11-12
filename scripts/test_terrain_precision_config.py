@@ -1,5 +1,9 @@
-import json,sys,tempfile,unittest
+import json
+import sys
+import tempfile
+import unittest
 from pathlib import Path
+
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'blender'))
 from terrain_precision_config import load_precision_regions
 

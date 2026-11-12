@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
 """Build editable campus source and spatially streamed Draco GLBs with Blender 5.2."""
-import bpy,sys,json,math,random,hashlib
+import hashlib
+import json
+import math
+import random
+import sys
 from contextlib import nullcontext
 from pathlib import Path
+
+import bpy
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 BASE_ONLY='--base-only' in sys.argv
-from geometry import Mesh,material,MATERIALS
+from generic_buildings import compact_form_source, ordinary_building
+from geometry import MATERIALS, Mesh, material
+from huicui import compact_source, huicui
+from infrastructure import approaches, bridge, lake_bridge, road_chunk
 from landmarks import landmark
-from huicui import huicui,compact_source
-from sports import athletics,west_stand
-from generic_buildings import ordinary_building,compact_form_source
-from infrastructure import road_chunk,bridge,approaches,lake_bridge
+from sports import athletics, west_stand
+
 DATA=ROOT/'public/data';MODELS=ROOT/'public/models';MODELS.mkdir(exist_ok=True)
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 for c in list(bpy.data.collections):
@@ -32,13 +40,17 @@ sites=json.loads((DATA/'sites.json').read_text())
 pavings=json.loads((DATA/'pavings.json').read_text())
 sys.path.insert(0,str(ROOT/'scripts'))
 from foundation_contract import load_foundations
+
 foundations=load_foundations(ROOT)
 from mapped_canopy_data import check_prepared_mapped_canopies
+
 check_prepared_mapped_canopies(buildings)
 from stair_tower_data import check_prepared_stair_towers
+
 check_prepared_stair_towers(buildings)
 from low_planting_contract import load_prepared
 from public_data_fields import without_documentation
+
 low_plantings=load_prepared(ROOT)
 # The pure hash is duplicated here to keep Blender independent of Shapely.
 paving_context=[surfaces,infrastructure,surroundings,campus_roads,sites]
@@ -137,6 +149,7 @@ for name,color,rough,metal in [('courtGreen','#347e69',.92,0),('courtKey','#bd64
 for name,color,rough,metal in [('huicuiWall','#c7b49b',.86,0),('huicuiTrim','#e0d8c8',.78,0),('huicuiGlass','#54747d',.24,.3),('huicuiFrame','#555c5d',.50,.3)]:
     C[name]=material(name,rgb(color),rough,metal)
 from student_center import student_center_materials
+
 student_center_materials(C)
 # Original deterministic JPEG textures; packed into both .blend and exported GLBs.
 texture_dir=ROOT/'blender/textures';texture_dir.mkdir(exist_ok=True)
@@ -155,13 +168,15 @@ for name in ['stone','grass','green','road','path','paleRoof','slate','sport','p
 for name,color in [('stoneWarm','#c6b69f'),('stoneCool','#c5c0b1'),('livingWarm','#d0b39f'),('livingCool','#c3b0a4'),('shadeGlass','#3b6573')]:
     C[name]=material(name,rgb(color),.28 if name.endswith('Glass') else .84,.28 if name.endswith('Glass') else 0)
 from south_gate_site import ensure_materials, repair_roads
+
 ensure_materials(C)
 cols=terrain['cols'];rows=terrain['rows'];xmin,ymin,xmax,ymax=terrain['bounds'];hh=terrain['heights']
 def elevation(x,y):
     u=max(0,min(cols-1.001,(x-xmin)/(xmax-xmin)*(cols-1)));v=max(0,min(rows-1.001,(y-ymin)/(ymax-ymin)*(rows-1)));i=int(u);j=int(v);a=u-i;b=v-j
     return (hh[j*cols+i]*(1-a)+hh[j*cols+i+1]*a)*(1-b)+(hh[(j+1)*cols+i]*(1-a)+hh[(j+1)*cols+i+1]*a)*b
 
-from civil_forecourt_grade import load_grade, grade_forecourt, building_datum
+from civil_forecourt_grade import building_datum, grade_forecourt, load_grade
+
 civil_grade = load_grade(ROOT)
 
 def building_elevation(b):
@@ -240,10 +255,12 @@ for si,original in enumerate(surfaces):
         if x1-x0>8 and y1-y0>12:
             for a,b in [((x0,y0),(x1,y0)),((x1,y0),(x1,y1)),((x1,y1),(x0,y1)),((x0,y1),(x0,y0)),((x0,(y0+y1)/2),(x1,(y0+y1)/2))]:base[layer].line((*a,elevation(*a)+.2),(*b,elevation(*b)+.2),.10,C['white'],4)
 from surroundings import surroundings_mesh
+
 base['roads'].extend(surroundings_mesh(surroundings,C,elevation,base['terrain']))
 base['roads'].extend(surroundings_mesh(campus_roads,C,elevation,base['terrain']))
 base['terrain'],base['roads']=grade_forecourt(base['terrain'],base['roads'],civil_grade)
 from paving_geometry import build_pavings
+
 # Grounded service roads must be repaired before their doorway/stair aprons
 # sample the road. Merge repaired surfaces and their contact strips into roads
 # so subsequent site clipping operates on the actual final road plane.
@@ -251,6 +268,7 @@ early_pavings=[p for p in pavings['pavings'] if 'groundedService' in p]
 base['terrain'],base['roads'],early_meshes,early_report=build_pavings({'pavings':early_pavings},C,base['terrain'],base['roads'],paving_originals)
 for mesh in early_meshes.values():base['roads'].extend(mesh)
 from site_geometry import build_sites
+
 base['terrain'],base['roads'],site_meshes,site_report=build_sites(sites,C,elevation,base['terrain'],base['roads'])
 base.update(site_meshes)
 (ROOT/'docs/model-checks/refinement/site-build.json').write_text(json.dumps(site_report,ensure_ascii=False,indent=2)+'\n')
@@ -259,12 +277,15 @@ paving_report=early_report+paving_report
 base.update(paving_meshes)
 (ROOT/'docs/model-checks/refinement/paving-build.json').write_text(json.dumps(paving_report,ensure_ascii=False,indent=2)+'\n')
 from shore_geometry import build_shores
+
 base['terrain'],base['green'],shore_meshes,shore_report=build_shores(shores,C,base['terrain'],base['green'])
 base.update(shore_meshes)
 from foundation_geometry import build_foundations
+
 base['terrain'],base['roads'],foundation_report=build_foundations(foundations,base['terrain'],base['roads'])
 (ROOT/'docs/model-checks/refinement/foundation-build.json').write_text(json.dumps(foundation_report,ensure_ascii=False,indent=2)+'\n')
 from service_road_geometry import build_service_road
+
 service_road_report=[]
 for foundation in foundations['foundations']:
     if foundation.get('groundedServiceRoad'):
@@ -273,6 +294,7 @@ for foundation in foundations['foundations']:
 (ROOT/'docs/model-checks/refinement/service-road-build.json').write_text(json.dumps(service_road_report,ensure_ascii=False,indent=2)+'\n')
 from road_landing_contract import load_landings
 from road_landing_geometry import build_landings
+
 base['roads'],road_landing_report=build_landings(load_landings(ROOT,building_elevation=lambda b:round(building_elevation(b),2)),base['roads'],base['terrain'],C['road'])
 (ROOT/'docs/model-checks/refinement/road-landing-build.json').write_text(json.dumps(road_landing_report,ensure_ascii=False,indent=2)+'\n')
 base['terrain'].ground_uv_bounds=[[v+(-1 if i<2 else 1) for i,v in enumerate(p['bounds'])] for p in pavings['pavings']]+[s['gradingBounds'] for s in sites['sites'] if s.get('type') in ('side-connection','front-connection','terraced-stair-connection','entry-apron','gallery-apron','canopy-connection')]
@@ -289,9 +311,11 @@ for chunk in infrastructure['chunks']:
 for b in infrastructure['bridges']:
     base['infra-approach-'+b['id']]=approaches(b,C)
 from bridge_joins import bridge_join_mesh
+
 for join in campus_roads.get('bridgeJoins',[]):
     base['infra-approach-'+join['bridgeId']].extend(bridge_join_mesh(join,C,elevation,base['terrain']))
-from road_display_cleanup import load_cuts,trim_mesh
+from road_display_cleanup import load_cuts, trim_mesh
+
 base['sports'],surface_display_report=trim_mesh(base['sports'],load_cuts(ROOT,filename='surface-display-cleanup.json'))
 if not BASE_ONLY:base['sports'].object('其他运动场地',GROUND,{'layer':'sports'})
 for field in fields:
@@ -300,7 +324,8 @@ for field in fields:
     # Separate nodes bound Draco quantization to ~180 meters instead of the
     # campus-wide sports extent; paint stays distinct at 16 bits without bloat.
     base['sports-'+field['id']]=mesh
-from basketball import bank_model,court_model,bank_paving
+from basketball import bank_model, bank_paving, court_model
+
 for bank in basketball['banks']:
     base[bank['id']]=bank_model(bank,basketball['courts'],C,False)
     if not BASE_ONLY:
@@ -375,16 +400,20 @@ gx0,gy0,gx1,gy1=gate_site['bounds']
 base['roads']=repair_roads(base['roads'],(gx0+gx1)/2,(gy0+gy1)/2,C)
 # Reusable tree templates; linked copies keep the Blender source small.
 from low_planting import hedge_mesh
+
 for planting in low_plantings:
     base['vegetation-low-'+planting['id']]=hedge_mesh(planting,base['terrain'].v,base['terrain'].f,C)
 from vegetation import tree_templates
+
 sys.path.insert(0,str(ROOT/'scripts'))
-from vegetation_layout import tree_rotation
 from tree_layout import ground_tree_rows
+from vegetation_layout import tree_rotation
+
 trees=ground_tree_rows(trees,base['terrain'].v,base['terrain'].f)
 templates=tree_templates(C,PLANTS,True)
 low_templates=tree_templates(C,PLANTS,False)
 from tree_clearance import filter_building_collisions
+
 trees,tree_clearance=filter_building_collisions(trees,{'near':templates,'base':low_templates},tree_obstacles)
 del tree_obstacles
 (DATA/'vegetation.json').write_text(json.dumps(trees,separators=(',',':'))+'\n')
@@ -398,12 +427,14 @@ for i,(x,y,h,t,z) in enumerate([] if BASE_ONLY else trees):
     o=bpy.data.objects.new(f'树木示意-{i:04}',templates[t].data);PLANTS.objects.link(o);o.location=(x,y,z);o.scale=(h/9,h/9,h/9);o.rotation_euler.z=tree_rotation(x,y)
 for t in templates:t.hide_render=True;t.hide_set(True)
 if (DATA/'north-campus.json').exists() and north_data.get('underpass'):
-    from north_underpass import cut_meshes,upper_road_model,road_height_sampler
+    from north_underpass import cut_meshes, road_height_sampler, upper_road_model
     base['north-campus-roads'].extend(upper_road_model(north_data['underpass'],C,road_height_sampler(base['roads'],elevation)))
     cut_meshes(base,north_data['underpass'])
-from road_display_cleanup import load_cuts,trim_mesh
+from road_display_cleanup import load_cuts, trim_mesh
+
 base['roads'],road_display_report=trim_mesh(base['roads'],load_cuts(ROOT))
-from road_surface_clearance import load_repairs,repair_clearance
+from road_surface_clearance import load_repairs, repair_clearance
+
 base['roads'],road_clearance_report=repair_clearance(base['roads'],base['terrain'],C,load_repairs(ROOT))
 for k,m in base.items():
     if not BASE_ONLY and k.startswith('north-campus-'):
@@ -419,6 +450,7 @@ world=bpy.data.worlds.new('南宁晴空');world.use_nodes=True;world.node_tree.n
 light=bpy.data.lights.new('下午日光','SUN');light.energy=2.5;light.angle=.08;sun=bpy.data.objects.new('下午日光',light);GROUND.objects.link(sun);sun.rotation_euler=(.4,-.6,-.6)
 camdata=bpy.data.cameras.new('校园鸟瞰');cam=bpy.data.objects.new('校园鸟瞰',camdata);GROUND.objects.link(cam)
 from mathutils import Vector
+
 cam.location=(1800,-2400,2600);cam.rotation_euler=(Vector((0,0,0))-cam.location).to_track_quat('-Z','Y').to_euler();camdata.type='ORTHO';camdata.ortho_scale=3700;bpy.context.scene.camera=cam
 scene=bpy.context.scene;scene.render.engine='CYCLES';scene.cycles.samples=24;scene.render.resolution_x=1600;scene.render.resolution_y=1200;scene.render.resolution_percentage=100
 scene.view_settings.view_transform='AgX';scene.unit_settings.system='METRIC';scene.unit_settings.scale_length=1
@@ -454,6 +486,7 @@ def export(name,groups):
     if name=='base.glb':
         # Replace only this landmark: other nodes retain their existing budgets.
         from tempfile import TemporaryDirectory
+
         from incremental_glb import splice_nodes
         for obj in objs:
             if obj.get('landmark')=='new-east-gate':
@@ -485,6 +518,7 @@ sizes={};sizes['base.glb']=export('base.glb',base)
 for bank in basketball['banks']:
     sizes[bank['id']+'.glb']=export(bank['id']+'.glb',{bank['id']:bank_model(bank,basketball['courts'],C)})
 from basketball_export import manifest_entries
+
 if BASE_ONLY:
     check_initial_budget()
     manifest=json.loads((DATA/'models.json').read_text())
@@ -511,6 +545,7 @@ bpy.ops.object.select_all(action='DESELECT')
 for o in low_templates:o.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(MODELS/'trees.glb'),export_format='GLB',use_selection=True,export_extras=True,export_draco_mesh_compression_enable=True)
 from preserve_glb_geometry import compact_buffer_views
+
 compact_buffer_views(MODELS/'trees.glb')
 for o in low_templates:
     mesh=o.data;bpy.data.objects.remove(o,do_unlink=True);bpy.data.meshes.remove(mesh)
@@ -520,6 +555,7 @@ manifest={'version':2,'chunkSizeMeters':CHUNK_METERS,'units':'meters','axes':{'x
 manifest['infrastructure']=[{'id':c['id'],'url':f"models/{c['id']}.glb",'bytes':sizes[c['id']+'.glb'],'bounds':c['bounds'],'layer':'roads'} for c in infrastructure['chunks']]
 manifest['sports']=manifest_entries(basketball,MODELS)
 from vegetation_priorities import priority_positions
+
 manifest['treePriorityPositions']=priority_positions(json.loads((DATA/'vegetation-zones.json').read_text()),trees)
 for entry in [manifest['base'],manifest['trees'],manifest['treesNear']]+manifest['zones']+manifest['landmarks']+manifest['infrastructure']:
     entry['sha256']=hashlib.sha256((ROOT/'public'/entry['url']).read_bytes()).hexdigest()

@@ -1,8 +1,11 @@
 """Local transition aprons at six existing underpass mouths; dimensions are estimates."""
 import math
-from shapely.geometry import Polygon,Point,LineString
-from shapely.ops import unary_union,linemerge,substring
-from surroundings_data import surface_shape,tiled_triangles
+
+from shapely.geometry import LineString, Point, Polygon
+from shapely.ops import linemerge, substring, unary_union
+
+from surroundings_data import surface_shape, tiled_triangles
+
 TRIM=8
 
 def smooth(t):

@@ -4,9 +4,11 @@ All cuts are made in the traced footprint; no generated solid seals a passage.
 Blender consumes the packed geometry without requiring Shapely at runtime.
 """
 import math
+
 from shapely.geometry import Polygon, box
-from shapely.ops import transform
 from shapely.geometry.polygon import orient
+from shapely.ops import transform
+
 from building_overrides import pack_geometry
 
 

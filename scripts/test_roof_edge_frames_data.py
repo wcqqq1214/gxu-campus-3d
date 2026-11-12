@@ -1,6 +1,8 @@
 import math
 import unittest
+
 from shapely.geometry import Polygon
+
 from building_overrides import footprint_revision, resolve_building
 from roof_edge_frames_data import resolve_roof_edge_frames
 

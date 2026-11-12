@@ -1,6 +1,7 @@
 """Derive complete athletics grounds without changing the original OSM topology."""
 import json
 import math
+
 from shapely.geometry import Polygon, shape
 from shapely.ops import transform
 

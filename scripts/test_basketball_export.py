@@ -4,6 +4,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'blender'))
 from basketball_export import extract_bank, write_glb
 from preserve_glb_geometry import unpack

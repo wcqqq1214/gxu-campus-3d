@@ -4,11 +4,15 @@
 2023 overall photograph: joined arch-like shoulders and small top projection.
 No external photographs or scan geometry are embedded in these meshes.
 """
-import bpy,math
+import math
 from functools import lru_cache
-from mathutils import Vector,noise
+
+import bpy
+from mathutils import Vector, noise
+
 from geometry import Mesh
 from south_gate import inscription
+
 
 @lru_cache(maxsize=2)
 def body(detail,metal):

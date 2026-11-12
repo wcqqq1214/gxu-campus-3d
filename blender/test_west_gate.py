@@ -1,9 +1,14 @@
 """Evidence-backed gate masses, bounds and traversable lanes in both LODs."""
-import json,sys,unittest
+import json
+import sys
+import unittest
 from pathlib import Path
+
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
-from campus_gates import west_gate,campus_gate
+from campus_gates import campus_gate, west_gate
+
 
 class WestGateGeometry(unittest.TestCase):
     def test_video_masses_and_open_lanes(self):

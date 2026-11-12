@@ -1,11 +1,15 @@
 """Connect an ordinary entrance sideways or forward to an actual road plane."""
-import bisect,math
+import bisect
+import math
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 from geometry import Mesh
-from site_geometry import mesh_triangles,split_convex,contact_road
 from paving_geometry import clear_paving_ground
-from shore_geometry import conform_edges,bounds,overlaps
+from shore_geometry import bounds, conform_edges, overlaps
+from site_geometry import contact_road, mesh_triangles, split_convex
+
 
 def build_side_connection(site,C,elevation,terrain,roads):
     angle=site['angle'];cs,sn=math.cos(angle),math.sin(angle);ox,oy=site['origin']

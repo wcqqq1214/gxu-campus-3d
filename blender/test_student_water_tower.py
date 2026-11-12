@@ -1,11 +1,16 @@
 """Both LODs must preserve the tall narrow shaft and wider tank, not a house."""
-import json,sys,unittest
+import json
+import sys
+import unittest
 from pathlib import Path
+
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
-from geometry import MATERIALS,material
 from generic_buildings import ordinary_building
+from geometry import MATERIALS, material
 from student_water_tower import TOWER_ID
+
 
 class TowerGeometry(unittest.TestCase):
     def test_tank_overhang_and_height_in_both_lods(self):

@@ -1,11 +1,13 @@
+import json
 import unittest
 from collections import Counter
-import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from shapely.geometry import Polygon, Point
+
+from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
-from road_surface_clearance import load_repairs, repair_clearance, plane
+
+from road_surface_clearance import load_repairs, plane, repair_clearance
 
 
 class Mesh:

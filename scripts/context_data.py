@@ -2,6 +2,7 @@
 import collections
 import json
 from pathlib import Path
+
 from shapely.geometry import Polygon, shape
 from shapely.ops import transform, unary_union
 

@@ -3,10 +3,16 @@
 Run Blender with --check-root=/path/to/candidate and --report=/path/to/report.json.
 Photo proportions are estimated; these checks do not validate real-world dimensions.
 """
-import bpy,sys,json,math,re
+import json
+import math
+import re
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 R=Path(__file__).resolve().parents[1]
 P=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--check-root=')),R)
 REPORT=next((Path(a.split('=',1)[1]).resolve() for a in sys.argv if a.startswith('--report=')),R/'work/materials-entry-geometry.json')

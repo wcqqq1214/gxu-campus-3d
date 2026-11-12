@@ -1,7 +1,8 @@
 """An evidenced gable-shaped screen on a flat roof, not a pitched roof claim."""
 import copy
 import math
-from shapely.geometry import Polygon, LineString
+
+from shapely.geometry import LineString, Polygon
 from shapely.ops import unary_union
 
 
@@ -13,7 +14,7 @@ def arch_outline(center, width, height, bottom):
 
 
 def resolve_gable_screen(building, form, config):
-    from building_overrides import anchor,pack_geometry
+    from building_overrides import anchor, pack_geometry
     fields={'part','polygon','edge','thickness','shoulderRise','peakRise','peakT','window'}
     if not isinstance(config,dict) or set(config)!=fields:
         raise ValueError('Gable screen requires one complete roof-edge anchor and window')

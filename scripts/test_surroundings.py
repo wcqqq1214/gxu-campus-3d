@@ -1,10 +1,16 @@
 """Validate delivered polygons independently of the road preparation algorithm."""
-import json,sys,unittest,math
+import json
+import math
+import sys
+import unittest
 from pathlib import Path
-from shapely.geometry import Polygon,LineString,shape
-from shapely.ops import unary_union,transform
+
+from shapely.geometry import LineString, Polygon, shape
+from shapely.ops import transform, unary_union
+
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from prepare_geodata import project
+
 ROOT=Path(__file__).resolve().parents[1];D=ROOT/'public/data'
 def read(name):return json.loads((D/name).read_text())
 def geometry(layer):

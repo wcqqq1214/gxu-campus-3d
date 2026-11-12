@@ -3,12 +3,14 @@ import copy
 import hashlib
 import json
 import math
+
 from shapely.affinity import scale
-from shapely.geometry import Point, Polygon, LineString
+from shapely.geometry import LineString, Point, Polygon
 from shapely.ops import unary_union
+
 from building_overrides import footprint_revision
+from shore_data import geometry_rings, revision
 from surroundings_data import surface_shape, triangulate
-from shore_data import revision, geometry_rings
 
 
 def surface_revision(surface):

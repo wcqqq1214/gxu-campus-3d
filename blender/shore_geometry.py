@@ -1,9 +1,11 @@
 """A bounded stone shore and graded land, sampling final terrain triangles."""
 import math
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 from geometry import Mesh
-from site_geometry import mesh_triangles, split_convex, polygon_distance
+from site_geometry import mesh_triangles, polygon_distance, split_convex
 
 
 def nearest(path,x,y):

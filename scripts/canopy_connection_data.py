@@ -1,13 +1,16 @@
 """A bounded connection from a mapped canopy's front edge to prepared campus road."""
-import copy,math
-from shapely.geometry import Polygon,LineString,box
+import copy
+import math
+
+from shapely.geometry import LineString, Polygon, box
 from shapely.ops import unary_union
+
 from building_overrides import footprint_revision
 from surroundings_data import triangulate
 
 
 def derive_canopy_connection(config,buildings,roads,source_ids):
-    from site_data import local_shape,world_shape,road_columns
+    from site_data import local_shape, road_columns, world_shape
     keys={'id','type','buildingId','footprintRevision','entranceId','canopyEdge','roadId','roadSearchDistance','meshStep','groundClearance','joinOverlap','roadContactDepth','roadContactSideMargin','sourceRefs','evidence'}
     if set(config)!=keys or config['type']!='canopy-connection':raise ValueError('Invalid canopy connection fields')
     b=next((b for b in buildings if b['id']==config['buildingId']),None)

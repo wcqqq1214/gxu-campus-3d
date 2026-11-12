@@ -1,8 +1,8 @@
 """Compare road-tail cleanup with an actual pre-change source and GLB baseline."""
 import argparse
 import json
-from pathlib import Path
 import sys
+from pathlib import Path
 
 import bpy
 from mathutils import Vector

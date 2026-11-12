@@ -2,15 +2,15 @@
 import argparse
 import json
 import os
-from pathlib import Path
 import subprocess
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
-from incremental_update import snapshot
 from incremental_glb import validate_retained
-from preserve_glb_geometry import unpack, mesh_nodes_by_name
+from incremental_update import snapshot
+from preserve_glb_geometry import mesh_nodes_by_name, unpack
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument('--output-root', type=Path, required=True, help='New directory for validated candidates')

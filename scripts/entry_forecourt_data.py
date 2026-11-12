@@ -1,5 +1,6 @@
 """Bounded, photo-derived lower stair / side courts and grounded exterior paving."""
 import math
+
 from shapely.geometry import Polygon, box
 from shapely.ops import unary_union
 

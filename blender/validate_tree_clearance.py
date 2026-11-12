@@ -3,8 +3,13 @@
 The shell primitive is shared with generation; the mesh collection and decoded
 inputs are independent. Known-volume regression fixtures test containment itself.
 """
-import bpy, hashlib, json, sys
+import hashlib
+import json
+import sys
 from pathlib import Path
+
+import bpy
+
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 sys.path.insert(0,str(ROOT/'blender'))
@@ -16,8 +21,7 @@ rows=json.loads((ROOT/'public/data/vegetation.json').read_text())
 manifest=json.loads((ROOT/'public/data/models.json').read_text())
 
 
-from tree_mesh_audit import snapshot, check_meshes
-
+from tree_mesh_audit import check_meshes, snapshot
 
 bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'))
 source_buildings=[(str(o.get('featureId'))+'/'+o.name,snapshot(o)) for o in bpy.context.scene.objects

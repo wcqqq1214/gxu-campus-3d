@@ -5,6 +5,7 @@ Run with fontTools and brotli installed. The renamed derivative is covered by
 blender/fonts/GXUGateSerif-OFL.txt; no system font or network fetch is needed.
 """
 from pathlib import Path
+
 from fontTools import subset
 from fontTools.ttLib import TTFont
 

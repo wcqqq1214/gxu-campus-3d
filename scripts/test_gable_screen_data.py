@@ -1,6 +1,10 @@
-import copy,math,unittest
-from shapely.geometry import Polygon,LineString
-from building_overrides import resolve_building,footprint_revision
+import copy
+import math
+import unittest
+
+from shapely.geometry import LineString, Polygon
+
+from building_overrides import footprint_revision, resolve_building
 
 
 class GableScreenTests(unittest.TestCase):

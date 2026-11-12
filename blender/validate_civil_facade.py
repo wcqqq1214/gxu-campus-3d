@@ -4,8 +4,13 @@ Independent fixed facade coordinates and sample heights check the estimated
 layout. They do not establish surveyed dimensions or verify the pending deep
 upper recesses and the western facade above the annex.
 """
-import bpy, json, sys, re, hashlib
+import hashlib
+import json
+import re
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 

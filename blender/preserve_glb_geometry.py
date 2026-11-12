@@ -3,7 +3,13 @@
 Only compressed geometry and accessor metadata are copied. Materials, layers and
 scene structure stay in the new export; no decode/re-encode loses precision.
 """
-import json,struct,copy,re,shutil,subprocess
+import copy
+import json
+import re
+import shutil
+import struct
+import subprocess
+
 
 def mesh_nodes_by_name(doc):
     """Full exports coexist with source objects and acquire Blender suffixes.

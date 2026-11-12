@@ -2,10 +2,13 @@
 
 Run with work/venv/bin/python. Imagery stays local; only traced vectors are shipped.
 """
-import json, math
+import json
+import math
 from pathlib import Path
+
 from shapely.geometry import Polygon, box
 from shapely.ops import triangulate, unary_union
+
 ROOT=Path(__file__).resolve().parents[1]
 p=ROOT/'data/south-gate-site.json';d=json.loads(p.read_text())
 features=d['features']

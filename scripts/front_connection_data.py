@@ -1,11 +1,17 @@
 """A calibrated threshold or stair toe joined to one mapped at-grade surface."""
-import copy,hashlib,json,math
+import copy
+import hashlib
+import json
+import math
+
 from shapely.geometry import Polygon
+
 from building_overrides import footprint_revision
-from surroundings_data import surface_shape,triangulate
+from surroundings_data import surface_shape, triangulate
+
 
 def derive_front_connection(config,buildings,surface,source_ids):
-    from site_data import local_shape,world_shape,road_columns
+    from site_data import local_shape, road_columns, world_shape
     terrace=config.get('type')=='terraced-stair-connection'
     keys={'id','type','buildingId','footprintRevision','surfaceId','surfaceRevision',
           'roadSearchDistance','meshStep','groundClearance','joinOverlap','roadContactDepth','roadContactSideMargin','sourceRefs','evidence'}

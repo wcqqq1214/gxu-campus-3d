@@ -7,15 +7,15 @@ import json
 import math
 from pathlib import Path
 
+from shapely.affinity import scale, translate
 from shapely.geometry import Point, Polygon, mapping, shape
 from shapely.geometry.polygon import orient
 from shapely.ops import transform, unary_union
-from shapely.affinity import translate, scale
 
 from building_forms import resolve_form
 from building_overrides import pack_geometry, source_catalogue
-from surroundings_data import tiled_triangles, surface_shape
 from north_campus_forms import prepare_form
+from surroundings_data import surface_shape, tiled_triangles
 
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'north-campus/'

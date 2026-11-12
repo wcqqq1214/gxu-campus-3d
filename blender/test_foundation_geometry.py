@@ -6,9 +6,9 @@ that exposed a roughly 6.7 mm change outside the grading boundary (e72301b).
 """
 import json
 import math
-from pathlib import Path
 import sys
 import unittest
+from pathlib import Path
 
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree

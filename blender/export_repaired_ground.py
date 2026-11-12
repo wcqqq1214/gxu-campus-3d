@@ -3,20 +3,26 @@
 Keeps other published nodes and material/texture payloads. Does not save the
 source or update the manifest; callers validate the candidate before promotion.
 """
-import argparse,json,sys,struct
+import argparse
+import json
+import struct
+import sys
 from pathlib import Path
+
 import bpy
-from mathutils import Vector,Matrix,geometry as math_geometry
+from mathutils import Matrix, Vector
+from mathutils import geometry as math_geometry
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'blender'));sys.path.insert(0,str(ROOT/'scripts'))
-from geometry import Mesh
 import geometry
 from foundation_contract import load_foundations
-from road_export import conform_foundation_road_exports
+from geometry import Mesh
 from paving_geometry import split_grounded_road_exports
+from preserve_glb_geometry import mesh_nodes_by_name, unpack
+from road_export import conform_foundation_road_exports
 from terrain_export import replace_precise_terrain
-from preserve_glb_geometry import unpack,mesh_nodes_by_name
 
 
 def road_object(source,records,pavings):

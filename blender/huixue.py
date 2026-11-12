@@ -4,6 +4,7 @@ Dimensions are a proportional reconstruction within the mapped footprint, not a 
 The unobserved rear remains approximate. Local front is -Y, rotated onto east.
 """
 import math
+
 from geometry import Mesh, material
 from south_gate import inscription
 

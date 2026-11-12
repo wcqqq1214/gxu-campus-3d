@@ -1,16 +1,21 @@
 """Update only basketball, general sports, terrain and draped roads; retain near assets."""
-import sys,json,hashlib
+import hashlib
+import json
+import sys
 from pathlib import Path
+
 import bpy
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 if not globals().get('_INCREMENTAL_CANDIDATE'):
     from incremental_update import staged_update
     staged_update(ROOT, __file__)
     raise SystemExit(0)
+from basketball import bank_paving, court_model
+from geometry import MATERIALS
 from incremental_glb import splice_nodes, validate_retained
 from initial_model_budget import check_initial_model_budget
-from geometry import MATERIALS
-from basketball import court_model,bank_paving
+
 previous_base=(ROOT/'public/models/base.glb').read_bytes()
 before={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/'public/models').glob('*.glb')}
 script=ROOT/'blender/build_campus.py';ns={'__file__':str(script),'__name__':'__main__'}
@@ -18,7 +23,8 @@ sys.argv.append('--base-only')
 try:exec(compile(script.read_text(),str(script),'exec'),ns)
 except SystemExit as e:
     if e.code not in (0,None):raise
-from preserve_glb_geometry import unpack, mesh_nodes_by_name
+from preserve_glb_geometry import mesh_nodes_by_name, unpack
+
 path=ROOT/'public/models/base.glb'
 generated=path.read_bytes()
 names=set(mesh_nodes_by_name(unpack(previous_base)[0]))|set(mesh_nodes_by_name(unpack(generated)[0]))
@@ -53,14 +59,19 @@ for court in ns['basketball']['courts']:
     from huicui import compact_source
     compact_source(obj)
 from paving_geometry import sync_source_pavings
+
 sync_source_pavings(ns['base'])
 from site_geometry import sync_source_sites
+
 sync_source_sites(ns['base'])
 from shore_geometry import sync_source_shores
+
 sync_source_shores(ns['base'])
 from low_planting import sync_source_low_planting
+
 sync_source_low_planting(ns['base'])
 from mathutils.kdtree import KDTree
+
 kd=KDTree(len(ns['trees']))
 for i,t in enumerate(ns['trees']):kd.insert((t[0],t[1],0),i)
 kd.balance();survivors=[]

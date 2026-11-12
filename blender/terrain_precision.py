@@ -1,12 +1,16 @@
 """Export bounded terrain separately, welding its seam to decoded global vertices."""
-import json,tempfile
+import json
+import tempfile
 from pathlib import Path
+
 import bpy
-from mathutils import Vector,Matrix
+from mathutils import Matrix, Vector
 from mathutils.kdtree import KDTree
+
+from export_attributes import omit_unused_uvs, omit_zero_area_terrain_faces
+from preserve_glb_geometry import compact_buffer_views, replace_compressed_node_parts
 from terrain_planar import planar_terrain_candidate
-from export_attributes import omit_unused_uvs,omit_zero_area_terrain_faces
-from preserve_glb_geometry import replace_compressed_node_parts,compact_buffer_views
+
 
 def subset(source,ids,name):
     m=source.data;vertices=[];faces=[];uvs=[]

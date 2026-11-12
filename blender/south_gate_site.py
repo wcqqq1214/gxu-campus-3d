@@ -3,9 +3,12 @@
 All dimensions below are estimates in world metres, independent of gate scaling.
 The outer ends meet the existing mapped carriageways. Seasonal pots are not beds.
 """
-import json, math, random
+import json
+import math
+import random
 from functools import lru_cache
 from pathlib import Path
+
 from geometry import Mesh, material
 
 # Ground traces from dated satellite imagery; vectors are kept separate from images.

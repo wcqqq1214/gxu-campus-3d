@@ -1,9 +1,17 @@
-import copy,json,unittest,shutil,tempfile,contextlib,io
+import contextlib
+import copy
+import io
+import json
+import shutil
+import tempfile
+import unittest
 from pathlib import Path
+
 from shapely.geometry import Polygon
-from surroundings_data import surface_shape
-from recessed_entry_site_data import derive_recessed_entry_site
+
 from audit_entry_road_context import effective_road_surfaces
+from recessed_entry_site_data import derive_recessed_entry_site
+from surroundings_data import surface_shape
 
 ROOT=Path(__file__).resolve().parents[1]
 

@@ -4,7 +4,9 @@ Portal locations follow the university's 2025 entrance diagram. Dimensions,
 back/side facade details and thresholds are estimates, not a measured survey.
 """
 import math
+
 from geometry import Mesh
+
 
 def teaching_six(l,b,z,C,detail=True):
     e=b['architecture'];m=Mesh();wall=C['stone'];trim=C['white'];glass=C['glass'];dark=C['dark'];h=b['height']

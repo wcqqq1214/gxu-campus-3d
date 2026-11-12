@@ -1,10 +1,17 @@
 """Check the actual ground UV and fine-triangle regression at the paving site."""
-import bpy,json,math,sys,hashlib
+import hashlib
+import json
+import math
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from site_geometry import split_convex
+
 record=json.loads((ROOT/'public/data/pavings.json').read_text())['pavings'][0]
 REPORT_PREFIX=next((a.split('=',1)[1] for a in sys.argv if a.startswith('--report-prefix=')),'s4-paving')
 x0,y0,x1,y1=[math.floor(v) if i<2 else math.ceil(v) for i,v in enumerate(record['bounds'])]

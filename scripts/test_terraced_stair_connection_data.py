@@ -1,10 +1,16 @@
 """A stair apron joins the lower toe without creating an entrance identity."""
-import copy,json,hashlib,unittest
+import copy
+import hashlib
+import json
+import unittest
 from pathlib import Path
+
 from shapely.geometry import Polygon
+
+from building_overrides import footprint_revision
 from front_connection_data import derive_front_connection
 from shore_data import effective_surfaces
-from building_overrides import footprint_revision
+
 
 class TerracedStairConnectionTests(unittest.TestCase):
     def fixture(self):

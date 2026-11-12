@@ -1,5 +1,7 @@
 import unittest
-from shapely.geometry import Polygon, LineString
+
+from shapely.geometry import LineString, Polygon
+
 from building_overrides import footprint_revision, resolve_building
 
 

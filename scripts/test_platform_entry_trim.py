@@ -1,6 +1,10 @@
-import copy,unittest
+import copy
+import unittest
+
 import test_building_overrides as fixtures
 from facade_panels_data import validate_panels
+
+
 class PlatformEntryTrimTests(unittest.TestCase):
  def fixture(self):
   f=fixtures.BuildingOverrideTests();b,v=f.portico_fixture()

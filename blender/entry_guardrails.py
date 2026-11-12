@@ -1,5 +1,6 @@
 """Photo-derived framed glass guards, scoped to the materials entry."""
 import math
+
 from geometry import MATERIALS, material
 
 

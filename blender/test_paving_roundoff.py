@@ -1,9 +1,12 @@
 """A sampled paving plane must not fragment sound ground for sub-mm noise."""
-import sys,unittest
+import sys
+import unittest
 from pathlib import Path
+
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from geometry import Mesh
 from paving_geometry import clear_paving_ground
+
 
 class GroundRoundoffTests(unittest.TestCase):
     def ground(self):

@@ -1,12 +1,17 @@
 """Road retriangulation must retain material boundaries, holes and source data."""
-import sys,unittest
+import sys
+import unittest
 from pathlib import Path
+
 import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
-from geometry import Mesh,material
+from geometry import Mesh, material
 from terrain_planar import planar_terrain_candidate
+
+
 class RoadPlanarTests(unittest.TestCase):
  def test_shared_domain_and_materials(self):
   m=Mesh();a=material('test-road',(.2,.2,.2));b=material('test-mark',(.8,.8,.5))

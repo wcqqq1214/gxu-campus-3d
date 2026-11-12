@@ -2,8 +2,8 @@ import copy
 import math
 import unittest
 
-from explicit_roof_data import resolve_roof_mesh
 from building_overrides import resolve_parts
+from explicit_roof_data import resolve_roof_mesh
 
 
 class ExplicitRoofTests(unittest.TestCase):

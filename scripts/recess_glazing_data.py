@@ -1,5 +1,6 @@
 """Bound the glazed rear wall of an already resolved open portico."""
 import math
+
 from shapely.geometry import LineString
 
 

@@ -1,12 +1,20 @@
 """Check mapped service-road continuity against its configured ground grade."""
-import bpy,json,math,sys,hashlib
+import hashlib
+import json
+import math
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
-from site_geometry import inside,ring_distance
+from civil_forecourt_grade import load_grade
+from civil_forecourt_grade import weight as grade_weight
+from site_geometry import inside, ring_distance
 from validation_inputs import baseline_root
-from civil_forecourt_grade import load_grade, weight as grade_weight
+
 PREFIX=next((s.split('=',1)[1] for s in sys.argv if s.startswith('--report-prefix=')),'s2-civil-front-connection-road-grade')
 TARGET=next((Path(s.split('=',1)[1]).resolve() for s in sys.argv if s.startswith('--check-root=')),ROOT)
 BASELINE=baseline_root(sys.argv)

@@ -1,9 +1,11 @@
 """Local mesh repair masks; do not alter DEM samples or building datums."""
-import math
 import json
+import math
 from pathlib import Path
+
 from shapely.geometry import Polygon, box
 from shapely.ops import unary_union
+
 from shore_data import effective_surfaces, geometry_rings
 from surroundings_data import surface_shape, triangulate
 

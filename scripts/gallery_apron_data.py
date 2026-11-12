@@ -1,6 +1,9 @@
 """Ground-floor galleries need a clear floor and a sourced exterior apron."""
-import copy,math
-from shapely.geometry import Polygon,box
+import copy
+import math
+
+from shapely.geometry import Polygon, box
+
 from building_overrides import footprint_revision
 
 

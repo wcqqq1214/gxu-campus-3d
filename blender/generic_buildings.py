@@ -1,19 +1,31 @@
 """Ordinary buildings: one architectural form, two levels of facade detail."""
 import hashlib
 import math
-from geometry import Mesh
-from facade_corridors import add_corridor, add_corridor_openings
+
 from attached_gallery import add_attached_gallery
-from facade_windows import add_grid_pilasters, add_grid_windows
 from attached_portico import add_attached_portico
-from facade_bands import add_band_ledges, add_band_windows, band_replaces_window, add_horizontal_ledges
+from facade_bands import (
+    add_band_ledges,
+    add_band_windows,
+    add_horizontal_ledges,
+    band_replaces_window,
+)
+from facade_corridors import add_corridor, add_corridor_openings
 from facade_panels import add_panels, panel_replaces_window
+from facade_windows import add_grid_pilasters, add_grid_windows
 from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
+from geometry import Mesh
+from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS
+from new_east_neighbours import (
+    SHOP_BUILDINGS,
+    facade_details,
+    shopfront_details,
+    wall_finish,
+)
 from recessed_stair_entry import add_recessed_stair_entry, recessed_entry_blocks_window
+from roof_crown import side_wall_blocks_window
 from roof_eave import add_roof_eave, replaces_parapet
 from terraced_stairs import blocks_window as stairs_block_window
-from roof_crown import side_wall_blocks_window
-from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS, SHOP_BUILDINGS, wall_finish, facade_details, shopfront_details
 
 
 def compact_form_source(obj):

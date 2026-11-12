@@ -6,9 +6,10 @@ New east: November 2025 photo and September 2026 route footage.
 Local facade faces -Y; rotation is derived from the catalogue compass bearing.
 """
 import math
+
 from geometry import Mesh
-from south_gate import inscription
 from new_east_gate import new_east_gate
+from south_gate import inscription
 
 
 def arch(m, x, half, spring, rise, depth, top, C, detail):

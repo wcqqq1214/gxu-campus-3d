@@ -1,8 +1,12 @@
 """Sourced avenue arrangements with estimated dimensions and stable stations."""
-import hashlib,json,math
-from shapely.geometry import Point,shape
-from shapely.ops import transform,substring,unary_union
-from building_overrides import read_json,source_catalogue
+import hashlib
+import json
+import math
+
+from shapely.geometry import Point, shape
+from shapely.ops import substring, transform, unary_union
+
+from building_overrides import read_json, source_catalogue
 
 
 def revision(coordinates):

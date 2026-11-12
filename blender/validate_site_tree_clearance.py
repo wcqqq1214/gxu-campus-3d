@@ -3,11 +3,17 @@
 Read-only: imports into a disposable Blender process; never saves source/models.
 Includes all infrastructure and landmark GLBs, not just the ordinary chunks.
 """
-import bpy,hashlib,json,sys
+import hashlib
+import json
+import sys
 from pathlib import Path
+
+import bpy
+
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'));sys.path.insert(0,str(ROOT/'blender'))
-from tree_mesh_audit import snapshot,check_meshes
+from tree_mesh_audit import check_meshes, snapshot
+
 LAYERS={'roads','water','sports'}
 args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 prefix=next((a.split('=',1)[1] for a in args if a.startswith('--report-prefix=')),'s4-site-trees')

@@ -1,8 +1,14 @@
-import copy,json,unittest
+import copy
+import json
+import unittest
 from pathlib import Path
-from mapped_canopy_data import resolve_mapped_canopy_context,check_prepared_mapped_canopies
+
+from building_overrides import load_catalogue, resolve_building, source_catalogue
 from canopy_connection_data import derive_canopy_connection
-from building_overrides import load_catalogue,resolve_building,source_catalogue
+from mapped_canopy_data import (
+    check_prepared_mapped_canopies,
+    resolve_mapped_canopy_context,
+)
 
 ROOT=Path(__file__).resolve().parents[1]
 class MappedCanopyTests(unittest.TestCase):

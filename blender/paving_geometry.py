@@ -1,11 +1,14 @@
 """Join one mapped pavement to real road triangles and close exposed sides."""
 import math
 from functools import lru_cache
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 from geometry import Mesh
-from site_geometry import mesh_triangles,split_convex,contact_road,inside
-from shore_geometry import conform_edges,smooth,bounds,overlaps,triangles_into
+from shore_geometry import bounds, conform_edges, overlaps, smooth, triangles_into
+from site_geometry import contact_road, inside, mesh_triangles, split_convex
+
 
 def clear_paving_ground(terrain,paving,record):
     """Lower only ground beneath the mapped paving, preserving both planes."""

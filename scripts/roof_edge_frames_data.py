@@ -1,6 +1,7 @@
 """Resolve roof-edge posts and beams with support and solid-intersection checks."""
 import copy
 import math
+
 from shapely.geometry import LineString, Polygon
 from shapely.ops import unary_union
 

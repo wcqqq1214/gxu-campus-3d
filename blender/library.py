@@ -2,6 +2,7 @@
 North door dimensions follow the 2026 procurement; other dimensions are estimates.
 """
 import math
+
 from geometry import Mesh
 from south_gate import inscription
 

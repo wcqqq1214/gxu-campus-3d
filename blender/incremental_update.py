@@ -1,15 +1,15 @@
 """Stage and validate legacy incremental workers before publishing any assets."""
 import argparse
-from contextlib import contextmanager
 import fcntl
 import hashlib
 import json
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import sys
 import tempfile
+from contextlib import contextmanager
+from pathlib import Path
 
 
 def snapshot(root):

@@ -4,7 +4,8 @@ The first polygon edge determines the slat direction. Optional solidBays
 close selected spaces between beams, for a solid canopy with open side bays.
 """
 import math
-from shapely.geometry import Polygon, Point
+
+from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
 
 

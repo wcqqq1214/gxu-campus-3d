@@ -6,10 +6,19 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from shapely.geometry import Polygon, Point, LineString, box
+from shapely.geometry import LineString, Point, Polygon, box
 from shapely.ops import split, unary_union
-from building_overrides import (ROOT, footprint_revision, load_catalogue,
-    resolve_building, resolve_parts, source_catalogue, validate_ids, unique_object)
+
+from building_overrides import (
+    ROOT,
+    footprint_revision,
+    load_catalogue,
+    resolve_building,
+    resolve_parts,
+    source_catalogue,
+    unique_object,
+    validate_ids,
+)
 
 
 class BuildingOverrideTests(unittest.TestCase):

@@ -1,7 +1,8 @@
 """An evidenced corner curtain crown and tapered screen, supported by a flat roof."""
 import copy
 import math
-from shapely.geometry import Polygon, LineString
+
+from shapely.geometry import LineString, Polygon
 from shapely.ops import unary_union
 
 

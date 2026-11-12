@@ -1,5 +1,7 @@
 import unittest
+
 from audit_entry_road_context import conflicts_for_entry
+
 
 class EntryRoadContextTests(unittest.TestCase):
     def setUp(self):

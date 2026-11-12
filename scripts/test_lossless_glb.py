@@ -1,13 +1,13 @@
 """Packing regressions: references, metadata boundaries and lossless JPEGs."""
 import io
 import json
-from pathlib import Path
 import shutil
 import struct
 import subprocess
 import sys
 import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'blender'))

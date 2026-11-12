@@ -1,9 +1,11 @@
 import copy
 import unittest
-from shapely.geometry import Polygon, Point
+
+from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
-from facade_panels_data import validate_panels, resolve_round_window_walls
+
 from building_overrides import resolve_facades
+from facade_panels_data import resolve_round_window_walls, validate_panels
 
 
 class RoundWindowWallTests(unittest.TestCase):

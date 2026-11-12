@@ -4,9 +4,10 @@ The road-facing edges retain their prepared road elevations. Raised walks
 and lightwells keep their separate grading surfaces and retaining walls.
 """
 import math
+
 from geometry import Mesh
-from site_geometry import mesh_triangles, split_convex
 from shore_geometry import bounds, overlaps, triangles_into
+from site_geometry import mesh_triangles, split_convex
 
 
 def bed_forecourt(terrain, entry, elevation, material):

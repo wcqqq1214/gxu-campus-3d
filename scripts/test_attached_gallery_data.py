@@ -1,6 +1,8 @@
 import copy
 import unittest
+
 from shapely.geometry import Polygon
+
 from attached_gallery_data import resolve_attached_gallery, validate_gallery_context
 from test_vegetation_exclusions import context
 from vegetation_exclusions import final_ground_exclusions
@@ -8,7 +10,7 @@ from vegetation_exclusions import final_ground_exclusions
 
 class AttachedGalleryTests(unittest.TestCase):
     def test_parser_rejects_conflicting_rules_and_preserves_derived_identity(self):
-        from building_overrides import resolve_building, footprint_revision
+        from building_overrides import footprint_revision, resolve_building
         b,f,p=self.fixture();b.update(name='Teaching block',category='academic',tags={},height=6.6,levels=2,center=[4,5])
         rule=dict(polygon=0,ring=0,edge=0,balconies=False,attachedGallery=p)
         record=dict(footprintRevision=footprint_revision(b),levels=2,roof={'type':'hipped','rise':1.4},facadeRules=[rule],evidence={})

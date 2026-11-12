@@ -1,9 +1,11 @@
 import unittest
-from shapely.geometry import Polygon,Point
+
+from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
-from surroundings_data import triangulate
+
 from foundation_data import convex_masks
 from service_road_data import derive_service_road
+from surroundings_data import triangulate
 
 
 class ServiceRoadPreparationTests(unittest.TestCase):

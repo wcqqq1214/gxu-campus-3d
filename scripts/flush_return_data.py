@@ -1,7 +1,8 @@
 """Glazed portal return and a connected L-shaped canopy at a mapped corner."""
 import copy
 import math
-from shapely.geometry import Polygon, LineString
+
+from shapely.geometry import LineString, Polygon
 from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
 

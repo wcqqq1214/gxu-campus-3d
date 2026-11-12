@@ -2,8 +2,10 @@
 import sys
 import unittest
 from pathlib import Path
+
 import bpy
 from mathutils import Matrix, Vector
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from validate_generic import component_vertices
 

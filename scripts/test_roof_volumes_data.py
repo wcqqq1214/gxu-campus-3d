@@ -1,7 +1,9 @@
 import copy
 import math
 import unittest
+
 from shapely.geometry import Polygon
+
 from building_overrides import footprint_revision, resolve_building
 from roof_volumes_data import resolve_roof_volumes
 

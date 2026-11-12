@@ -1,7 +1,7 @@
 """Bounded foundation clearance on actual terrain and ordinary road triangles."""
 from geometry import Mesh
-from site_geometry import mesh_triangles, split_convex, polygon_distance, ring_distance
-from shore_geometry import bounds, overlaps, triangles_into, conform_edges
+from shore_geometry import bounds, conform_edges, overlaps, triangles_into
+from site_geometry import mesh_triangles, polygon_distance, ring_distance, split_convex
 
 
 def masks_for(triangles):

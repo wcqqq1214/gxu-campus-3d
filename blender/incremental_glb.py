@@ -3,7 +3,8 @@ import copy
 import hashlib
 import json
 import struct
-from preserve_glb_geometry import unpack, mesh_nodes_by_name
+
+from preserve_glb_geometry import mesh_nodes_by_name, unpack
 
 
 def _check(doc):

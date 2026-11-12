@@ -4,9 +4,17 @@ import shutil
 import tempfile
 import unittest
 from pathlib import Path
+
 from shapely.geometry import Polygon, box
+
 from vegetation_data import prepare_vegetation
-from vegetation_exclusions import GroundMask, ground_masks, filter_ground, final_ground_exclusions, INPUT_NAMES
+from vegetation_exclusions import (
+    INPUT_NAMES,
+    GroundMask,
+    filter_ground,
+    final_ground_exclusions,
+    ground_masks,
+)
 
 
 def surface(ident, x=0, kind='roads', **extra):

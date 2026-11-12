@@ -1,10 +1,22 @@
-import copy,json,math,shutil,tempfile,unittest
+import copy
+import json
+import math
+import shutil
+import tempfile
+import unittest
 from pathlib import Path
-from shapely.geometry import Point,Polygon,box
-from architecture_data import entrance_tree_masks,clear_entrance_trees
+
+from shapely.geometry import Point, Polygon, box
+
+from architecture_data import clear_entrance_trees, entrance_tree_masks
 from infrastructure_footprints import strip_shape
 from vegetation_data import prepare_vegetation
-from vegetation_reservations import CrownReservation,filter_reservations,crown_reservations,INPUT_NAMES
+from vegetation_reservations import (
+    INPUT_NAMES,
+    CrownReservation,
+    crown_reservations,
+    filter_reservations,
+)
 
 
 class CrownReservationTests(unittest.TestCase):
@@ -64,8 +76,9 @@ class CrownReservationTests(unittest.TestCase):
                 self.assertEqual(filter_reservations([witness['tree']],[mask])[0],[])
             # Assert the failure mechanism explicitly: centre-only ground masks
             # and the two existing open zones do not reject these crown witnesses.
-            from vegetation_exclusions import INPUT_NAMES as GROUND,final_ground_exclusions
-            from vegetation_data import filter_zones,load_zones
+            from vegetation_data import filter_zones, load_zones
+            from vegetation_exclusions import INPUT_NAMES as GROUND
+            from vegetation_exclusions import final_ground_exclusions
             self.assertEqual(final_ground_exclusions(injected,{n:read(n) for n in GROUND})[0],injected)
             resolved={('campus-roads',read('campus-roads')['lawn']['osmId']):Polygon(read('campus-roads')['lawn']['polygon'])}
             resolved.update({('sites',s['id']):Polygon(s['pavingPolygon']) for s in read('sites')['sites']})

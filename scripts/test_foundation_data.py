@@ -2,10 +2,12 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+
 from shapely.geometry import Point, Polygon
 from shapely.ops import unary_union
-from foundation_data import prepare_foundations
+
 from foundation_contract import load_foundations
+from foundation_data import prepare_foundations
 
 
 class FoundationPreparationTests(unittest.TestCase):

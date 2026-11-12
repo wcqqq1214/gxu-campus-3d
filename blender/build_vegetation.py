@@ -1,10 +1,16 @@
 """Rebuild both tree LOD assets without regenerating unchanged campus buildings."""
-import bpy,sys,json,hashlib
+import hashlib
+import json
+import sys
 from pathlib import Path
+
+import bpy
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
 from geometry import material
-from vegetation import tree_templates
 from preserve_glb_geometry import compact_buffer_views
+from vegetation import tree_templates
+
 bpy.ops.object.select_all(action='SELECT');bpy.ops.object.delete(use_global=False)
 collection=bpy.context.scene.collection
 C={}

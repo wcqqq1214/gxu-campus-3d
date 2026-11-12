@@ -1,7 +1,8 @@
 """Bounded rectangular rooftop masses, anchored to retained exterior edges."""
 import copy
 import math
-from shapely.geometry import Polygon, LineString
+
+from shapely.geometry import LineString, Polygon
 from shapely.ops import unary_union
 
 

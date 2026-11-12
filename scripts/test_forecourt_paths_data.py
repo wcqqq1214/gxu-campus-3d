@@ -2,11 +2,13 @@ import copy
 import json
 import unittest
 from pathlib import Path
+
 from shapely.geometry import Point, Polygon
+from shapely.ops import unary_union
+
 from forecourt_paths_data import derive_forecourt_paths
 from shore_data import effective_surfaces
 from surroundings_data import surface_shape
-from shapely.ops import unary_union
 
 ROOT = Path(__file__).resolve().parents[1]
 

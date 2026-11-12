@@ -1,9 +1,13 @@
 """Joined ground-level perimeter roads, with disjoint pavement and curb polygons."""
-import math,bpy
-from geometry import Mesh
+import math
 from functools import lru_cache
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
+from geometry import Mesh
+
 
 def surroundings_mesh(data,C,elevation,terrain_mesh):
     mesh=Mesh()

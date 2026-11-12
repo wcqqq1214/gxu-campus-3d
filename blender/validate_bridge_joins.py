@@ -1,8 +1,12 @@
 """Ray-test delivered asphalt continuity at all six ramp mouths and apron boundaries."""
-import bpy,json,math
+import json
+import math
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 R=Path(__file__).resolve().parents[1];joins=json.loads((R/'public/data/campus-roads.json').read_text())['bridgeJoins']
 def owner(o):
     while o.parent:o=o.parent

@@ -1,11 +1,22 @@
 """Civil entrance must stay shallow on coarse, roof-contaminated DEM faces."""
-import sys, unittest
+import sys
+import unittest
 from pathlib import Path
+
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'blender'))
+from civil_forecourt_grade import (
+ building_datum,
+ grade_forecourt,
+ height,
+ load_grade,
+ weight,
+)
 from geometry import Mesh
-from civil_forecourt_grade import load_grade, grade_forecourt, height, building_datum, weight
+
+
 class CivilGradeTests(unittest.TestCase):
  def test_coarse_dem_and_road_hole(self):
   p=load_grade(ROOT);g=Mesh();r=Mesh()

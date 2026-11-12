@@ -1,11 +1,16 @@
 """Geometric regression checks against the saved source, not just catalogue flags."""
-import bpy,json,sys
+import json
+import sys
 from pathlib import Path
+
+import bpy
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
+
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'blender'))
 from south_gate_site import CROSSING_CENTRES, REPAIR_BOUNDS, SITE, ground
+
 bpy.ops.wm.open_mainfile(filepath=str(ROOT/'blender/gxu-campus.blend'))
 catalog=json.loads((ROOT/'public/data/landmarks.json').read_text())
 objects={o.get('landmark'):o for o in bpy.context.scene.objects if o.get('landmark')}

@@ -1,5 +1,6 @@
 """Shared bounded northern base export: ~2 cm worst-case position grid."""
 import bpy
+
 from export_attributes import omit_unused_uvs
 
 
@@ -15,8 +16,9 @@ def export_north_base(obj,path):
 def repack_north_base(path,objects,keys):
     import tempfile
     from pathlib import Path
-    from update_south_gate import replace_node_geometry,compact_static_accessors
+
     from preserve_glb_geometry import compact_buffer_views
+    from update_south_gate import compact_static_accessors, replace_node_geometry
     with tempfile.TemporaryDirectory(prefix='gxu-north-base-') as directory:
         temp=Path(directory)/'node.glb'
         for obj in objects:

@@ -6,9 +6,10 @@ import unittest
 from pathlib import Path
 
 from shapely.geometry import Polygon, box
+
+from building_overrides import source_catalogue
 from context_data import select_context
 from surroundings_data import building_obstacles
-from building_overrides import source_catalogue
 
 
 class PreparationPipelineTests(unittest.TestCase):

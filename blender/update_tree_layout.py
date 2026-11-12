@@ -1,9 +1,10 @@
 """Update editable tree rotation; --ground also resolves final terrain anchors."""
-import bpy
 import json
 import math
 import sys
 from pathlib import Path
+
+import bpy
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
