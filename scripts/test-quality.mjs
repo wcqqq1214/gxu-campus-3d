@@ -84,13 +84,26 @@ test('流畅档减少约19%像素预算，自动降到流畅时使用相同预�
   assert.equal(qualityProfile('fine', false, false, 0).resolutionScale, 1);
 });
 
-test('更换画质选择会重新开始自动调节，重复选择不会', () => {
+test('自动调节只在桌面自动档进行，更换画质选择会重新开始', (t) => {
+  const page = { innerWidth: 1280 };
+  t.after(() => {
+    delete globalThis.window;
+    delete globalThis.document;
+  });
+  globalThis.window = page;
+  globalThis.document = { hidden: false };
   const control = new QualityControl();
-  const continuous = Array.from({ length: 2 }, () => control['adaptive'].sample(20, 30));
-  assert.ok(continuous.at(-1));
+  const slow = () => control.sample(20, 30, false);
+  assert.equal(slow(), false);
+  assert.equal(slow(), true, 'two slow samples lower the automatic level');
   assert.equal(control.automaticLevel, 2);
   assert.equal(control.select('auto'), false);
-  assert.equal(control.automaticLevel, 2);
+  assert.equal(control.automaticLevel, 2, 'repeating the choice keeps tuning');
   assert.equal(control.select('fine'), true);
   assert.equal(control.automaticLevel, 1);
+  for (let i = 0; i < 4; i++) assert.equal(slow(), false, 'fixed choice');
+  control.select('auto');
+  page.innerWidth = 390;
+  for (let i = 0; i < 4; i++) assert.equal(slow(), false, 'phone layout');
+  assert.equal(control.profile().level, 2);
 });
