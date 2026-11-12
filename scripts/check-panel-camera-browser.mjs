@@ -65,12 +65,22 @@ try {
         controllerReturn,
         'Dev createScene must return its scene controller',
       );
-      const probe = `globalThis.__panelCameraProbe = () => ({
+      // A tween can finish after controls.update() and leave a pose that the next
+      // update still needs to clamp. Count actual settled updates, not wall time.
+      const probe = `let panelSettledUpdates = 0;
+      const panelUpdateControls = controls.update.bind(controls);
+      controls.update = (...args) => {
+        const moving = panelUpdateControls(...args);
+        panelSettledUpdates = tween || (moving && !orbiting)
+          ? 0 : panelSettledUpdates + 1;
+        return moving;
+      };
+      globalThis.__panelCameraProbe = () => ({
         position: camera.position.toArray(), target: controls.target.toArray(),
         projection: camera.projectionMatrix.toArray(), span: getSnapshot().span,
         loading: [...loading], orbiting, tweenStart: tween?.start ?? null,
         frame: {...frame}, width: host.clientWidth, height: host.clientHeight,
-        framedWidth, framedHeight
+        framedWidth, framedHeight, settledUpdates: panelSettledUpdates
       });\n`;
       await route.fulfill({
         response,
@@ -90,13 +100,13 @@ try {
           const metrics = document.querySelector('.debug-metrics')?.textContent;
           if (!metrics || !globalThis.__panelCameraProbe) return false;
           const m = JSON.parse(metrics);
+          const scene = globalThis.__panelCameraProbe();
           return (
             m.readyMs > 0 &&
             m.queuedDetails === 0 &&
-            globalThis.__panelCameraProbe().tweenStart === null &&
-            !globalThis
-              .__panelCameraProbe()
-              .loading.some((key) => key.startsWith('landmark-'))
+            scene.tweenStart === null &&
+            scene.settledUpdates >= 2 &&
+            !scene.loading.some((key) => key.startsWith('landmark-'))
           );
         },
         undefined,
