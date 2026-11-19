@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   treeAppearance,
+  treeCrownWidthFactor,
+  treeInstanceCounts,
   treeRotation,
   treeGroundHeight,
   treeElevation,
-  prioritizeTreeRows,
+  orderTreeGroup,
 } from '../lib/campus/vegetation.ts';
 
 const trees = JSON.parse(
@@ -62,21 +64,34 @@ test('流畅档在原有数量预算内保留庭院和行道树布局', () => {
   const priority = manifest.treePriorityPositions;
   assert.ok(priority.length >= 16);
   const key = ([x, y]) => `${x},${y}`;
-  const sectors = new Map();
-  for (const row of trees) {
-    const sector = `${Math.floor(row[0] / 450)},${Math.floor(row[1] / 450)},${row[3]}`;
-    if (!sectors.has(sector)) sectors.set(sector, []);
-    sectors.get(sector).push(row);
-  }
+  const priorityKeys = new Set(priority.map(key));
+  const sectors = Map.groupBy(
+    trees,
+    (r) => `${Math.floor(r[0] / 450)},${Math.floor(r[1] / 450)}`,
+  );
   const retained = new Set();
-  for (const rows of sectors.values()) {
-    const ordered = prioritizeTreeRows(rows, priority);
-    assert.equal(ordered.length, rows.length);
-    assert.deepEqual(new Set(ordered), new Set(rows));
+  for (const sector of sectors.values()) {
+    const species = [...Map.groupBy(sector, (row) => row[3]).values()];
+    const ordered = species.map((rows) => orderTreeGroup(rows, priorityKeys));
+    ordered.forEach(({ rows }, i) => {
+      assert.equal(rows.length, species[i].length);
+      assert.deepEqual(new Set(rows), new Set(species[i]));
+    });
+    const groups = ordered.map(({ rows, priorityCount }) => ({
+      total: rows.length,
+      priority: priorityCount,
+    }));
     for (const density of [0.55, 0.75, 1]) {
-      const shown = ordered.slice(0, Math.ceil(rows.length * density));
-      assert.equal(shown.length, Math.ceil(rows.length * density));
-      if (density === 0.55) for (const row of shown) retained.add(key(row));
+      const counts = treeInstanceCounts(groups, density);
+      assert.equal(
+        counts.reduce((sum, n) => sum + n, 0),
+        groups.reduce((sum, g) => sum + Math.ceil(g.total * density), 0),
+      );
+      ordered.forEach(({ rows }, i) => {
+        assert.ok(counts[i] >= 0 && counts[i] <= rows.length);
+        if (density === 0.55)
+          for (const row of rows.slice(0, counts[i])) retained.add(key(row));
+      });
     }
   }
   for (const point of priority)
@@ -90,13 +105,10 @@ test('优先排列保留旧数据顺序和实例属性，不修改输入', () =>
     [20, 20, 8, 0, 4],
   ];
   const before = structuredClone(rows);
-  assert.equal(prioritizeTreeRows(rows, []), rows);
+  assert.equal(orderTreeGroup(rows, new Set()).rows, rows);
   assert.deepEqual(
-    prioritizeTreeRows(rows, [
-      [20, 20],
-      [999, 999],
-    ]),
-    [rows[2], rows[0], rows[1]],
+    orderTreeGroup(rows, new Set(['20,20', '999,999'])),
+    { rows: [rows[2], rows[0], rows[1]], priorityCount: 1 },
   );
   assert.deepEqual(rows, before);
 });
@@ -110,4 +122,23 @@ test('树冠缩放与色调固定于坐标且不超过约定范围', () => {
     assert.ok(a.tint.every((v) => Number.isFinite(v) && v > 0.7 && v < 1.2));
   }
   assert.notDeepEqual(treeAppearance(1, 2), treeAppearance(2, 1));
+});
+
+test('西宿舍局部冠幅调整只作用于表中阔叶树', () => {
+  const widths = JSON.parse(
+    readFileSync(new URL('../data/west-dorm-crown-widths.json', import.meta.url)),
+  );
+  const factors = new Map(widths.map(([x, y, width]) => [`${x},${y}`, width]));
+  assert.equal(factors.size, widths.length);
+  let adjusted = 0;
+  for (const [x, y, , type] of trees) {
+    const factor = treeCrownWidthFactor(x, y);
+    assert.equal(factor, factors.get(`${x},${y}`) ?? 1);
+    if (factor !== 1) {
+      assert.ok(factor > 0 && factor < 1);
+      assert.equal(type, 0);
+      adjusted += 1;
+    }
+  }
+  assert.equal(adjusted, widths.length);
 });

@@ -79,12 +79,19 @@ def bridge_join_mesh(data, C, elevation, terrain):
         v, t = layer['vertices'], layer['triangles']
         mat = layer['material']
         for i in range(0, len(t), 3):
+            triangle = [v[k] for k in t[i : i + 3]]
+            finish = mat
+            if data['id'] == 'bocui-bridge-0' and mat == 'path':
+                # Carry the brick finish through the apron up to the first
+                # mapped road station. The transverse garden path stays distinct.
+                if min(point[0] for point in triangle) >= ramp[-1][0] - 0.25:
+                    finish = 'pavingRed'
             part.face(
                 [
-                    (v[k][0], v[k][1], level(*v[k], mat) + layer.get('zOffset', 0))
-                    for k in t[i : i + 3]
+                    (x, y, level(x, y, mat) + layer.get('zOffset', 0))
+                    for x, y in triangle
                 ],
-                C[mat],
+                C[finish],
             )
         mesh.add_part(layer['id'], part)
     return mesh

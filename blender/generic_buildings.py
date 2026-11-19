@@ -27,6 +27,8 @@ from recessed_stair_entry import add_recessed_stair_entry, recessed_entry_blocks
 from roof_crown import side_wall_blocks_window
 from roof_eave import add_roof_eave, replaces_parapet
 from terraced_stairs import blocks_window as stairs_block_window
+from west_dorms import NUMBERS as WEST_DORMS
+from west_dorms import west_dorm
 
 
 def compact_form_source(obj):
@@ -694,6 +696,8 @@ def ordinary_building(b, z, C, detail):
         )
     from student_water_tower import TOWER_ID, water_tower
 
+    if b['id'] in WEST_DORMS:
+        return west_dorm(b, z, C, detail)
     if b['id'] == TOWER_ID:
         return water_tower(b, z, C, detail)
     m = shared_form(b, z, C)

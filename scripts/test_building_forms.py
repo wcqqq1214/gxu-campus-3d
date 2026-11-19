@@ -19,7 +19,18 @@ class BuildingFormTests(unittest.TestCase):
     def test_refinement_preserves_every_existing_footprint(self):
         baseline = json.loads(
             (ROOT / 'scripts/fixtures/building-footprint-baseline.json').read_text()
-        )['footprints']
+        )
+        originals = baseline['positionedSourceRings']
+        baseline = baseline['footprints']
+        overrides = json.loads((ROOT / 'data/building-overrides.json').read_text())[
+            'buildings'
+        ]
+        poses = {
+            k: r['footprintPlacement']
+            for k, r in overrides.items()
+            if 'footprintPlacement' in r
+        }
+        self.assertEqual(set(poses), set(originals))
         buildings = json.loads((ROOT / 'public/data/buildings.json').read_text())
         supplements = [
             b for b in buildings if b.get('geometrySource') == 'manual-imagery-trace'
@@ -31,8 +42,25 @@ class BuildingFormTests(unittest.TestCase):
         buildings = [b for b in buildings if b not in supplements]
         self.assertEqual(set(baseline), {b['id'] for b in buildings})
         for b in buildings:
+            rings = originals.get(b['id'], b['polygons'])
+            if b['id'] in poses:
+                pose = poses[b['id']]
+                origin = Polygon(rings[0][0], rings[0][1:]).centroid
+                angle = math.radians(pose['angleDegrees'])
+                cos, sin = math.cos(angle), math.sin(angle)
+                self.assertEqual(len(rings), len(b['polygons']))
+                for src_poly, dst_poly in zip(rings, b['polygons'], strict=True):
+                    for src, dst in zip(src_poly, dst_poly, strict=True):
+                        for (x, y), (px, py) in zip(src, dst, strict=True):
+                            dx, dy = (x - origin.x) * pose['eastScale'], y - origin.y
+                            self.assertAlmostEqual(
+                                px, origin.x + pose['eastMeters'] + cos * dx - sin * dy
+                            )
+                            self.assertAlmostEqual(
+                                py, origin.y + pose['northMeters'] + sin * dx + cos * dy
+                            )
             digest = hashlib.sha256(
-                json.dumps(b['polygons'], separators=(',', ':')).encode()
+                json.dumps(rings, separators=(',', ':')).encode()
             ).hexdigest()
             self.assertEqual(digest, baseline[b['id']], b['id'])
 

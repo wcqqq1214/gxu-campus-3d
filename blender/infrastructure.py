@@ -7,6 +7,8 @@ explicit estimates in infrastructure.json, not a claim of engineering accuracy.
 import math
 
 from geometry import Mesh
+from new_east_neighbours import paving_height
+from west_dorm_garden import front_section, grade
 
 
 def frames(path):
@@ -148,11 +150,117 @@ def fence_panel(m, a, b, side, C, detail, axes, offsets):
             )
 
 
+def residence_fence_panel(m, a, b, offsets, axes, C, detail):
+    """West-dorm street view 3: stone courses, capped piers and paired iron fans."""
+    from new_east_neighbours import paving_height
+
+    def station(t, inset, rise):
+        ends = [
+            (p[0] - uy * (off + inset), p[1] + ux * (off + inset), p[2] + rise)
+            for p, (ux, uy), off in zip((a, b), axes, offsets)
+        ]
+        return tuple(u + (v - u) * t for u, v in zip(*ends))
+
+    angle = math.atan2(b[1] - a[1], b[0] - a[0])
+    # Pavement, wall footing and the lawn behind it share the road cross section.
+    edge_box(m, a, b, offsets, 0.42, 0.65, C['wallStone'], -0.06, axes)
+    edge_box(m, a, b, offsets, 0.48, 0.075, C['curb'], 0.59, axes)
+    shoulders = []
+    for t in (0, 1):
+        foot = station(t, -0.70, 0.17)
+        plinth = station(t, -0.20, 0.17)
+        p = station(t, 0.18, 0.46)
+        q = station(t, 0.83, 0.39)
+        toe = station(t, 2.35, 0)
+        shoulders.append(
+            [foot, plinth, p, q, (*toe[:2], paving_height(*toe[:2]) - 0.22)]
+        )
+    for j, mat in [(0, 'pavingRed'), (2, 'grass'), (3, 'grass')]:
+        a0, a1 = shoulders[0][j : j + 2]
+        b0, b1 = shoulders[1][j : j + 2]
+        m.face([a0, b0, b1, a1], C[mat])
+    x, y, z = station(0, 0, 0)
+    for width, bottom, top in [
+        (0.48, 0.08, 2.12),
+        (0.55, 2.12, 2.20),
+        (0.67, 2.20, 2.30),
+        (0.70, 2.30, 2.35),
+    ]:
+        m.box(
+            x,
+            y,
+            z + (top + bottom) / 2,
+            width,
+            width,
+            top - bottom,
+            C['wallStone'],
+            angle,
+        )
+    for level in (0.72, 1.99):
+        m.line(station(0, 0, level), station(1, 0, level), 0.045, C['fenceIron'], 4)
+    count = 8 if detail else 4
+    for left, right in [(0.08, 0.49), (0.51, 0.92)]:
+        for j in range(count):
+            t = (j + 0.5) / count
+            bottom = left + (right - left) * t
+            outer = left if left < 0.5 else right
+            top = outer + (bottom - outer) * 0.55
+            m.line(
+                station(bottom, 0, 0.72),
+                station(top, 0, 1.99),
+                0.022 if detail else 0.03,
+                C['fenceIron'],
+                4,
+            )
+    if detail:
+        for t in (0.08, 0.50, 0.92):
+            m.line(station(t, 0, 0.69), station(t, 0, 2.01), 0.034, C['fenceIron'], 4)
+        # Warm ashlar facing with staggered joints and the original continuous cap.
+        for row, (low, high) in enumerate(((0.17, 0.37), (0.38, 0.585))):
+            stops = (
+                (0, 0.23, 0.48, 0.73, 1) if row == 0 else (0, 0.12, 0.37, 0.62, 0.87, 1)
+            )
+            for j, (left, right) in enumerate(zip(stops, stops[1:])):
+                finish = 'dormStoneWarm' if (j + row) % 3 == 0 else 'dormStonePale'
+                m.face(
+                    [
+                        station(left + 0.002, -0.219, low),
+                        station(right - 0.002, -0.219, low),
+                        station(right - 0.002, -0.219, high),
+                        station(left + 0.002, -0.219, high),
+                    ],
+                    C[finish],
+                )
+
+
+def residence_paving(mesh, path, axes, inner, outer, C, detail):
+    """Muted red and grey paving fields along the Nongyuan Road frontage."""
+    cuts = 4 if detail else 2
+    grid = []
+    for p, (ux, uy), start, end in zip(path, axes, inner, outer):
+        row = []
+        for j in range(cuts + 1):
+            off = start + (end - start) * j / cuts
+            row.append((p[0] - uy * off, p[1] + ux * off, p[2] + 0.17))
+        grid.append(row)
+    # Follow each end's road frame so adjacent tiles share their edges on bends.
+    for i in range(cuts):
+        for j in range(cuts):
+            quad = []
+            for t, col in ((i, j), (i + 1, j), (i + 1, j + 1), (i, j + 1)):
+                a, b = grid[0][col], grid[1][col]
+                quad.append(tuple(x + (y - x) * t / cuts for x, y in zip(a, b)))
+            mid = cuts // 2
+            color = 'dormPaverGrey' if (i < mid) == (j < mid) else 'dormPaverRose'
+            mesh.face(quad, C[color])
+
+
 def road_chunk(chunk, C, detail):
     m = Mesh()
     p = chunk['path']
     axes = chunk['frames']
     sections = chunk['sections']
+    fill_bays = set(chunk.get('fillBays', ()))
     carleft = [s[0] for s in sections]
     carright = [s[1] for s in sections]
     centers = [(a + b) / 2 for a, b in zip(carleft, carright)]
@@ -160,7 +268,6 @@ def road_chunk(chunk, C, detail):
     for k, side in enumerate([-1, 1]):
         inner = [s[k] for s in sections]
         outer = [s[k + 2] for s in sections]
-        ribbon(m, p, inner, outer, C['pavingRed'], 0.17, axes)
         tactile = [(a + b) / 2 for a, b in zip(inner, outer)]
         ribbon(
             m,
@@ -175,20 +282,58 @@ def road_chunk(chunk, C, detail):
             edge_box(
                 m, a, b, inner[i : i + 2], 0.25, 0.18, C['curb'], axes=axes[i : i + 2]
             )
+            west_residence = (
+                side == 1
+                and chunk['id'] in ('infra-road-02', 'infra-road-03')
+                and -554 < (a[1] + b[1]) / 2 < -450
+            )
+            segment = slice(i, i + 2)
+            if i in fill_bays:
+                # Close the raised approaches down to the surrounding ground,
+                # leaving the span and the campus street below it fully open.
+                wall = []
+                for q, (tx, ty), off in zip(p[segment], axes[segment], outer[segment]):
+                    x, y = q[0] - ty * off, q[1] + tx * off
+                    wall.append(
+                        [
+                            (x, y, q[2] + 0.16),
+                            (x, y, min(q[2], paving_height(x, y)) - 0.20),
+                        ]
+                    )
+                m.face(
+                    [wall[0][0], wall[1][0], wall[1][1], wall[0][1]][::side],
+                    C['bridgeConcrete'],
+                )
+            if west_residence:
+                residence_paving(
+                    m,
+                    p[segment],
+                    axes[segment],
+                    inner[segment],
+                    outer[segment],
+                    C,
+                    detail,
+                )
+            else:
+                ribbon(
+                    m,
+                    p[segment],
+                    inner[segment],
+                    outer[segment],
+                    C['pavingRed'],
+                    0.17,
+                    axes[segment],
+                )
             if (
                 chunk['fence'][i][0 if side == -1 else 1]
                 and chunk['fence'][i + 1][0 if side == -1 else 1]
             ):
-                fence_panel(
-                    m,
-                    a,
-                    b,
-                    side,
-                    C,
-                    detail,
-                    axes[i : i + 2],
-                    [o + side * 0.7 for o in outer[i : i + 2]],
-                )
+                panel_axes = axes[i : i + 2]
+                offsets = [o + side * 0.7 for o in outer[i : i + 2]]
+                if west_residence:
+                    residence_fence_panel(m, a, b, offsets, panel_axes, C, detail)
+                else:
+                    fence_panel(m, a, b, side, C, detail, panel_axes, offsets)
     # Dashed centre line is visible even in the inexpensive overview mesh.
     for i in range(0, len(p) - 1, 3):
         ribbon(
@@ -281,6 +426,105 @@ def road_chunk(chunk, C, detail):
     return m
 
 
+def dorm_frontage_bank(walls, walkpath, axes, width, grass):
+    bank = []
+    for w, (tx, ty) in zip(walkpath, axes):
+        x, y = w[0] - ty * width, w[1] + tx * width
+        sections = grade()['frontWalk']
+        if not sections[0][0] <= x <= sections[-1][0]:
+            return False
+        edge_y, edge_z, _ = front_section(x)
+        if edge_y <= y:
+            return False
+        bank.append([(x, y, w[2]), (x, edge_y, edge_z)])
+    walls.face([bank[0][0], bank[1][0], bank[1][1], bank[0][1]], grass)
+    return True
+
+
+def dorm_street_pavement(mesh, points, walk, axes, side, inner, outer, start_x, C):
+    a, c = points
+    # Ease the broad apron at the join into the narrow roadside kerb.
+    # The paved surface falls gently towards it for drainage.
+    profiles = []
+    for point, w, (tx, ty) in zip(points, walk, axes):
+        blend = min(1, max(0, (point[0] - start_x) / 5))
+        blend *= min(1, max(0, (0.20 - (w[2] - point[2])) / 0.05))
+        boundary = inner - (inner - 5.28) * blend
+        lip = point[2] + 0.15 - 0.025 * blend
+        profiles.append(
+            [
+                (point[0] - ty * side * off, point[1] + tx * side * off, z)
+                for off, z in ((5, lip), (boundary, lip), (outer, w[2]))
+            ]
+        )
+    for k, finish in enumerate(('curb', 'pavingRed')):
+        face = [
+            profiles[0][k],
+            profiles[1][k],
+            profiles[1][k + 1],
+            profiles[0][k + 1],
+        ]
+        mesh.face(face[::side], C[finish])
+    lip_a, lip_c = profiles[0][0], profiles[1][0]
+    face = [
+        (*lip_a[:2], a[2] - 0.04),
+        (*lip_c[:2], c[2] - 0.04),
+        lip_c,
+        lip_a,
+    ]
+    mesh.face(face[::side], C['curb'])
+
+
+def bocui_bank(mesh, points, walk, axes, outer, side, bridge, grass):
+    # Continue the planted slope behind the portal wing, past the end of the
+    # span. Sample perpendicular distance to the upper road on this skew bridge.
+    ab, cd = bridge['upper']
+    dx, dy = cd[0] - ab[0], cd[1] - ab[1]
+    length = math.hypot(dx, dy)
+    rows = []
+    on_slope = []
+    for q, w, (tx, ty) in zip(points, walk, axes):
+        section = []
+        active = False
+        for offset in (outer, outer + 3, outer + 6, length / 2 + 1, length / 2 + 5):
+            x, y = q[0] - ty * side * offset, q[1] + tx * side * offset
+            gap = (
+                abs((-(x - ab[0]) * dy + (y - ab[1]) * dx) / length)
+                - bridge['deckWidth'] / 2
+            )
+            t = min(1, max(0, gap / 12))
+            t = t * t * (3 - 2 * t)
+            active |= t < 1
+            soil = paving_height(x, y) - 0.12
+            at_edge = max(w[2] + 0.02, q[3] + 0.12)
+            blend = min(1, (offset - outer) / 5)
+            foot = at_edge * (1 - blend) + soil * blend
+            z = (1 - t) * (bridge['deckElevation'] - 0.20) + t * foot
+            section.append((x, y, z))
+        rows.append(section)
+        on_slope.append(active)
+    if any(on_slope):
+        for left, right, far_left, far_right in zip(
+            rows[0], rows[0][1:], rows[1], rows[1][1:]
+        ):
+            mesh.face([left, far_left, far_right, right][::side], grass)
+        for row, raised, sign in zip(rows, on_slope, (side, -side)):
+            if not raised:
+                for left, right in zip(row, row[1:]):
+                    toe_l = (*left[:2], min(left[2], paving_height(*left[:2])) - 0.65)
+                    toe_r = (
+                        *right[:2],
+                        min(right[2], paving_height(*right[:2])) - 0.65,
+                    )
+                    mesh.face([left, right, toe_r, toe_l][::sign], grass)
+        for row in rows:
+            # The outside cut meets the DEM at the foot of the slope.
+            end = row[-1]
+            row.append((*end[:2], min(end[2], paving_height(*end[:2]) - 0.40)))
+        mesh.face([rows[0][-2], rows[1][-2], rows[1][-1], rows[0][-1]][::side], grass)
+    return [r[0][2] for r in rows]
+
+
 def approaches(b, C):
     m = Mesh()
     road = Mesh()
@@ -317,12 +561,26 @@ def approaches(b, C):
 
     ribbon(road, path, -5, 5, C['asphalt'], axes=axes)
     for side in [-1, 1]:
-        ribbon(road, path, side * 5, side * inner, C['curb'], 0.15, axes)
-        ribbon(walks, walkpath, side * inner, side * outer, C['path'], axes=axes)
         for i, (a, c) in enumerate(zip(path, path[1:])):
             ux, uy = axes[i]
             vx, vy = axes[i + 1]
             wa, wc = walkpath[i : i + 2]
+            bay_axes = axes[i : i + 2]
+            street = b['id'] == 'bocui-bridge'
+            if street:
+                dorm_street_pavement(
+                    walks, (a, c), (wa, wc), bay_axes, side, inner, outer, path[0][0], C
+                )
+            else:
+                ribbon(road, [a, c], side * 5, side * inner, C['curb'], 0.15, bay_axes)
+                ribbon(
+                    walks,
+                    [wa, wc],
+                    side * inner,
+                    side * outer,
+                    C['path'],
+                    axes=bay_axes,
+                )
             covered = covered_segment(a, c, side, axes[i : i + 2])
             # Terminate the outer wall inside the edge beam so their junction
             # closes, while staying below the public-road wearing surface.
@@ -330,12 +588,32 @@ def approaches(b, C):
             wall_top = tuple(
                 min(p[3] + 0.25, ceiling) if covered else p[3] + 0.25 for p in [a, c]
             )
+            if street:
+                wall_top = bocui_bank(
+                    walls, (a, c), (wa, wc), bay_axes, outer, side, b, C['grass']
+                )
+            # On the dorm side a planted bank rises from the brick footway
+            # to the existing upper walk. Close its toe at the actual road edge.
+            planted = (
+                street
+                and side == 1
+                and dorm_frontage_bank(walls, (wa, wc), bay_axes, outer, C['grass'])
+            )
             # Inner wall supports the raised walk; outer wall meets the terrain.
             # Neither the walk nor its railing inherits the uncut DEM elevation.
             for offset, lower, upper in [
                 (inner, (a[2] - 0.1, c[2] - 0.1), (wa[2], wc[2])),
-                (outer, (wa[2] - 0.15, wc[2] - 0.15), wall_top),
+                (
+                    outer,
+                    tuple(
+                        min(w[2] - 0.15, q[3] - 0.55) if street else w[2] - 0.15
+                        for w, q in ((wa, a), (wc, c))
+                    ),
+                    wall_top,
+                ),
             ]:
+                if (planted and offset == outer) or (street and offset == inner):
+                    continue
                 off = side * offset
                 wall = [
                     (a[0] - uy * off, a[1] + ux * off, lower[0]),
@@ -344,14 +622,15 @@ def approaches(b, C):
                     (a[0] - uy * off, a[1] + ux * off, upper[0]),
                 ]
                 walls.face(wall if side > 0 else wall[::-1], C['bridgeConcrete'])
-            edge_box(
-                walls, wa, wc, side * inner, 0.24, 0.10, C['curb'], axes=axes[i : i + 2]
-            )
+            if not street:
+                edge_box(
+                    walls, wa, wc, side * inner, 0.24, 0.10, C['curb'], axes=bay_axes
+                )
             # The outer cap also covers the small construction joint to the cut.
             top = [a[0], a[1], a[3]]
             top2 = [c[0], c[1], c[3]]
             # An untrimmed terrain-height cap would cut across the public road.
-            if not covered:
+            if not covered and not planted and not street:
                 edge_box(
                     walls,
                     top,
@@ -362,11 +641,43 @@ def approaches(b, C):
                     C['curb'],
                     axes=axes[i : i + 2],
                 )
-            edge_box(road, a, c, side * 5, 0.22, 0.18, C['curb'], axes=axes[i : i + 2])
+            if not street:
+                edge_box(road, a, c, side * 5, 0.22, 0.18, C['curb'], axes=bay_axes)
+    crossing = set()
+    if b['id'] == 'bocui-bridge':
+        # Street views place the zebra crossing just east of the central doorway.
+        mid = min(range(len(path)), key=lambda i: abs(path[i][0] - 101.5))
+        crossing = {mid - 1, mid}
+        for i in sorted(crossing):
+            for stripe in range(-5, 6):
+                offset = stripe * 0.86
+                ribbon(
+                    road,
+                    path[i : i + 2],
+                    offset - 0.23,
+                    offset + 0.23,
+                    C['roadWhite'],
+                    0.014,
+                    axes[i : i + 2],
+                )
     for i in range(0, len(path) - 1, 4):
-        ribbon(
-            road, path[i : i + 2], -0.07, 0.07, C['roadYellow'], 0.035, axes[i : i + 2]
-        )
+        if i not in crossing:
+            ribbon(
+                road,
+                path[i : i + 2],
+                -0.07,
+                0.07,
+                C['roadYellow'],
+                0.014 if b['id'] == 'bocui-bridge' else 0.035,
+                axes[i : i + 2],
+            )
+    if junction := b.get('sideJunction'):
+        from north_underpass import road_height_sampler
+        from road_display_cleanup import trim_mesh
+
+        m.bank_height = road_height_sampler(walls, lambda x, y: -100)
+        walks, _ = trim_mesh(walks, [junction['cut']])
+        walls, _ = trim_mesh(walls, [junction['cut']])
     m.add_part('下穿车行道与排水边带', road)
     m.add_part('两侧抬高人行步道', walks)
     m.add_part('步道支挡与外侧挡墙', walls)
@@ -606,6 +917,25 @@ def bridge(b, C, detail):
     m.add_part('桥面梁板与桥台', deck)
     path = b['underpass']
     axes = frames(path)
+    if b['id'] == 'bocui-bridge':
+        # Two lateral openings carry the flat brick sidewalks through the bridge.
+        ux, uy = axes[len(axes) // 2]
+        span = b['deckWidth'] / abs((dx * uy - dy * ux) / length)
+        for side in (-1, 1):
+            off = 5.58 * side
+            x, y = b['center']
+            # Intersect the offset street with the oblique bridge centreline.
+            along = -off * (dx * ux + dy * uy) / (dx * uy - dy * ux)
+            m.box(
+                x - uy * off + ux * along,
+                y + ux * off + uy * along,
+                (z - slab + floor) / 2,
+                span,
+                0.50,
+                z - slab - floor,
+                C['bridgeConcrete'],
+                math.atan2(uy, ux),
+            )
     if b['id'] == 'chongzuo-bridge':
         # Historical photo shows a median pier. Align it with the campus road.
         bearing = math.radians(b['frontBearing'])
@@ -628,6 +958,8 @@ def bridge(b, C, detail):
         for i, (a, c) in enumerate(zip(path, path[1:])):
             trim = b.get('joinTrim', 0)
             if i < trim or i >= len(path) - 1 - trim:
+                continue
+            if b['id'] == 'bocui-bridge':
                 continue
             ux, uy = axes[i]
             theta = math.atan2(uy, ux)

@@ -20,7 +20,7 @@ if not report_prefix or any(
 ):
     raise ValueError('Invalid vegetation report prefix')
 sys.path.insert(0, str(ROOT / 'scripts'))
-from vegetation_layout import tree_rotation
+from vegetation_layout import tree_rotation, tree_scale
 
 bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'blender/gxu-campus.blend'))
 rows = json.loads((ROOT / 'public/data/vegetation.json').read_text())
@@ -45,7 +45,7 @@ for o in objects:
     x, y = round(o.location.x, 1), round(o.location.y, 1)
     h, typ, z = expected[(x, y)]
     assert o.data == templates[typ]
-    assert max(abs(s - h / 9) for s in o.scale) < 1e-5
+    assert max(abs(a - b) for a, b in zip(o.scale, tree_scale(x, y, h))) < 1e-5
     assert (
         abs(math.remainder(o.rotation_euler.z - tree_rotation(x, y), math.tau)) < 1e-6
     )

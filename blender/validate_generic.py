@@ -22,6 +22,8 @@ from geometry import MATERIALS
 from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS
 from new_east_neighbours import SHOP_BUILDINGS
 from student_water_tower import TOWER_ID
+from west_dorms import FINISHES, roof_frame
+from west_dorms import NUMBERS as WEST_DORMS
 
 
 def ordinary(b):
@@ -82,6 +84,24 @@ def samples(b):
     form = b['form']
     z = b['elevation']
     points = []
+    if b['id'] in WEST_DORMS:
+        ux, uy, x0, y0, x1, _ = roof_frame(b)
+        h = z + b['height']
+        # Open perimeter of the flat roof and a collector within the eastern array.
+        for label, x, y, lift in [
+            ('south-deck', (x0 + x1) / 2, y0 + 0.56, 0),
+            ('east-collector', x1 - 9.0, y0 + 2.7, 0.47),
+        ]:
+            points.append(
+                dict(
+                    kind=label,
+                    x=ux * x - uy * y,
+                    y=uy * x + ux * y,
+                    top=h + 2,
+                    expected=h + lift,
+                )
+            )
+        return points
     if b['id'] == TOWER_ID:
         x, y = b['center']
         h = b['height']
@@ -416,6 +436,11 @@ def main():
         assert bs, ('Unknown or empty ordinary building chunk', chunk)
     colors = [
         'pink',
+        'residenceStone',
+        *FINISHES,
+        'curb',
+        'leaf',
+        'leaf2',
         'livingWarm',
         'livingCool',
         'stone',

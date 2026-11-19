@@ -8,7 +8,7 @@ def priority_positions(layout, trees):
     present = {tuple(t[:2]) for t in trees}
     positions = {
         tuple(t[:2])
-        for kind in ('avenues', 'courtyards')
+        for kind in ('avenues', 'courtyards', 'canopies')
         for group in layout.get(kind, [])
         for t in group['retainedCandidates']
     }

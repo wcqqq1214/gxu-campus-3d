@@ -189,6 +189,28 @@ def apply_stage(trees, stage, masks, root=ROOT):
     )
 
 
+def apply_west_dorm_canopy(root, candidates, existing):
+    """Apply aerial crown centres after the regularly spaced avenues."""
+    patch = read_json(root / 'data/west-dorm-canopy.json')
+    rows = patch['trees']
+    for row in rows:
+        if (
+            len(row) != 4
+            or not all(type(v) in (int, float) and math.isfinite(v) for v in row)
+            or row[2] <= 0
+            or type(row[3]) is not int
+            or row[3] not in (0, 1, 2, 3)
+        ):
+            raise ValueError('Invalid West dormitory tree row')
+    positions = {tuple(row[:2]) for row in rows}
+    if len(positions) != len(rows):
+        raise ValueError('Duplicate West dormitory canopy position')
+    kept = [t for t in candidates if tuple(t[:2]) not in positions]
+    ground = {tuple(t[:2]): t[4:] for t in existing}
+    additions = [t + ground.get(tuple(t[:2]), []) for t in rows]
+    return kept + additions, additions
+
+
 def prepare_vegetation(root=ROOT):
     from courtyard_data import apply_courtyards
     from vegetation_avenues import apply_avenues, derive_avenues
@@ -212,8 +234,19 @@ def prepare_vegetation(root=ROOT):
         }
     )
     trees = read('vegetation.json')
-    candidates, avenue_records = apply_avenues(trees, derive_avenues(root))
+    prior = out / 'vegetation-zones.json'
+    groups = read_json(prior).get('canopies', []) if prior.exists() else []
+    prior_canopy = {
+        tuple(row[:2])
+        for group in groups
+        if group['id'] == 'west-dorm-canopy'
+        for row in group['retainedCandidates']
+    }
+    # Restore the avenue layout first if a previous canopy override was removed.
+    background_rows = [t for t in trees if tuple(t[:2]) not in prior_canopy]
+    candidates, avenue_records = apply_avenues(background_rows, derive_avenues(root))
     candidates, courtyard_records = apply_courtyards(candidates, sites)
+    candidates, canopy = apply_west_dorm_canopy(root, candidates, trees)
     context = {
         name: read(name + '.json')
         for name in dict.fromkeys(INPUT_NAMES + RESERVATION_INPUTS)
@@ -221,10 +254,12 @@ def prepare_vegetation(root=ROOT):
     ground_kept, ground_report = final_ground_exclusions(candidates, context)
     reserved_kept, reservation_report = final_crown_reservations(ground_kept, context)
     kept = filter_zones(reserved_kept, zones, masks)
-    kept_positions = {tuple(t[:2]) for t in kept}
+    kept_positions = {tuple(t[:2]): t for t in kept}
     for avenue in avenue_records:
         avenue['retainedCandidates'] = [
-            t for t in avenue['candidates'] if tuple(t[:2]) in kept_positions
+            kept_positions[tuple(t[:2])]
+            for t in avenue['candidates']
+            if tuple(t[:2]) in kept_positions
         ]
     for court in courtyard_records:
         court['retainedCandidates'] = [
@@ -256,6 +291,14 @@ def prepare_vegetation(root=ROOT):
         'trees': len(kept),
         'removedInFinalPass': len(candidates) - len(kept),
         'avenues': avenue_records,
+        'canopies': [
+            {
+                'id': 'west-dorm-canopy',
+                'retainedCandidates': [
+                    t for t in canopy if tuple(t[:2]) in kept_positions
+                ],
+            }
+        ],
         'courtyards': courtyard_records,
         'finalGroundExclusion': ground_report,
         'finalCrownReservations': reservation_report,

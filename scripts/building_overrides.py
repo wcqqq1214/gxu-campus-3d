@@ -12,7 +12,7 @@ from pathlib import Path
 
 import mapbox_earcut as earcut
 import numpy as np
-from shapely.affinity import rotate, translate
+from shapely.affinity import affine_transform, rotate, translate
 from shapely.geometry import LineString, Point, Polygon, box
 from shapely.ops import unary_union
 
@@ -39,6 +39,7 @@ ARCHETYPES = {
     'external-stair',
 }
 FIELDS = {
+    'footprintPlacement',
     'archetype',
     'levels',
     'floorHeight',
@@ -66,6 +67,40 @@ def ordinary(b):
         or b.get('customModel')
         or b['id'] == 'way/948683815'
         or b.get('tags', {}).get('memorial') == 'column'
+    )
+
+
+def positioned_footprint(geometry, record):
+    """Place the source ring about its centroid in local east/north coordinates."""
+    if not record or 'footprintPlacement' not in record:
+        return geometry
+    pose = record['footprintPlacement']
+    fields = {'eastMeters', 'northMeters', 'angleDegrees', 'eastScale'}
+    if (
+        not isinstance(pose, dict)
+        or set(pose) != fields
+        or any(
+            type(value) not in (float, int) or not math.isfinite(value)
+            for value in pose.values()
+        )
+        or pose['eastScale'] <= 0
+    ):
+        raise ValueError('Invalid footprint placement')
+    heading = math.radians(pose['angleDegrees'])
+    sine, cosine = math.sin(heading), math.cos(heading)
+    a, b = pose['eastScale'] * cosine, -sine
+    d, e = pose['eastScale'] * sine, cosine
+    x, y = geometry.centroid.coords[0]
+    return affine_transform(
+        geometry,
+        [
+            a,
+            b,
+            d,
+            e,
+            x - a * x - b * y + pose['eastMeters'],
+            y - d * x - e * y + pose['northMeters'],
+        ],
     )
 
 
@@ -1963,6 +1998,10 @@ def resolve_building(building, record=None, source_ids=None):
             'review': copy.deepcopy(record.get('review', {})),
             'warnings': warnings,
         }
+        if 'footprintPlacement' in record:
+            b['calibration']['footprintPlacement'] = copy.deepcopy(
+                record['footprintPlacement']
+            )
         b['sourceRefs'] = sorted(
             {'osm'} | {ref for p in provenance.values() for ref in p['sourceRefs']}
         )
@@ -1984,6 +2023,12 @@ def prepare_existing_overrides():
     validate_ids(catalogue, buildings)
     sources = source_catalogue()
     source_ids = {s['id'] for s in sources}
+    for b in buildings:
+        placement = catalogue.get(b['id'], {}).get('footprintPlacement')
+        if b.get('calibration', {}).get('footprintPlacement') != placement:
+            raise ValueError(
+                f'{b["id"]}: footprint placement changed; run prepare_geodata'
+            )
     resolved = [
         resolve_building(b, catalogue.get(b['id']), source_ids) for b in buildings
     ]

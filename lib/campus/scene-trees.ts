@@ -5,8 +5,10 @@ import type { createNightStyle } from './night';
 import { disposeObject } from './resources';
 import type { StreamAsset } from './streaming';
 import {
-  prioritizeTreeRows,
+  orderTreeGroup,
   treeAppearance,
+  treeCrownWidthFactor,
+  treeInstanceCounts,
   treeElevation,
   treeRotation,
 } from './vegetation';
@@ -88,7 +90,10 @@ export function createSceneTrees({
       g.scene.traverse((o) => {
         if (o instanceof THREE.Mesh) parts.push(o);
       });
-      for (let typ = 0; typ < 3; typ++) {
+      const priority = new Set(
+        (manifest.treePriorityPositions ?? []).map(([x, y]) => `${x},${y}`),
+      );
+      for (const typ of new Set(all.map((row) => row[3]))) {
         const partsForType = parts.filter((o) => {
           let p: THREE.Object3D | null = o;
           while (p) {
@@ -137,11 +142,8 @@ export function createSceneTrees({
           if (!sectors.has(key)) sectors.set(key, []);
           sectors.get(key)!.push(row);
         }
-        for (const sectorRows of sectors.values()) {
-          const rows = prioritizeTreeRows(
-            sectorRows,
-            manifest.treePriorityPositions || [],
-          );
+        for (const [sector, sectorRows] of sectors) {
+          const { rows, priorityCount } = orderTreeGroup(sectorRows, priority);
           const inst = new THREE.InstancedMesh(geometry, material, rows.length);
           const transform = new THREE.Object3D();
           rows.forEach((row, i) => {
@@ -149,10 +151,11 @@ export function createSceneTrees({
             transform.position.set(x, treeElevation(row, terrain), -y);
             transform.rotation.set(0, treeRotation(x, y), 0);
             const appearance = treeAppearance(x, y);
+            const width = (treeCrownWidthFactor(x, y) * appearance.width * h) / 9;
             transform.scale.set(
-              (appearance.width * h) / 9,
+              width,
               (appearance.height * h) / 9,
-              (appearance.width * h) / 9,
+              width,
             );
             transform.updateMatrix();
             inst.setMatrixAt(i, transform.matrix);
@@ -163,7 +166,9 @@ export function createSceneTrees({
           inst.computeBoundingSphere();
           inst.castShadow = true;
           inst.receiveShadow = true;
+          inst.userData.sector = sector;
           inst.userData.fullCount = rows.length;
+          inst.userData.priorityCount = priorityCount;
           inst.userData.lod = near ? 1 : 0;
           inst.userData.center = new THREE.Vector3(
             rows.reduce((sum, r) => sum + r[0], 0) / rows.length,
@@ -223,10 +228,25 @@ export function createSceneTrees({
         disposeObject(retired, [scene]);
         nearReady = false;
       }
-      root?.traverse((o) => {
-        if (o instanceof THREE.InstancedMesh)
-          o.count = Math.ceil(o.userData.fullCount * density);
-      });
+      const sectors = new Map<string, THREE.InstancedMesh[]>();
+      for (const mesh of root?.children ?? []) {
+        if (!(mesh instanceof THREE.InstancedMesh)) continue;
+        const key = `${mesh.userData.lod}/${mesh.userData.sector}`;
+        if (!sectors.has(key)) sectors.set(key, []);
+        sectors.get(key)!.push(mesh);
+      }
+      for (const meshes of sectors.values()) {
+        const counts = treeInstanceCounts(
+          meshes.map(({ userData }) => ({
+            total: userData.fullCount,
+            priority: userData.priorityCount,
+          })),
+          density,
+        );
+        meshes.forEach((mesh, i) => {
+          mesh.count = counts[i];
+        });
+      }
     },
     /** Swaps sectors between near and far sets; returns whether any visibility changed. */
     updateLOD(camera: THREE.Vector3, near: boolean) {

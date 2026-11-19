@@ -54,7 +54,7 @@ for key, lod in [('trees', 'base'), ('treesNear', 'near')]:
         for o in bpy.context.scene.objects
         if o.type == 'MESH' and o.get('template') is not None
     }
-    assert set(templates[lod]) == {0, 1, 2}
+    assert set(templates[lod]) == {0, 1, 2, 3}
     bpy.ops.wm.read_factory_settings(use_empty=True)
 buildings = []
 assets = [manifest['base']] + manifest['zones'] + manifest['landmarks']

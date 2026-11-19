@@ -26,6 +26,7 @@ from architecture_data import architectural_envelope, clear_entrance_trees
 from building_overrides import (
     calibration_stats,
     load_catalogue,
+    positioned_footprint,
     resolve_building,
     source_catalogue,
     validate_ids,
@@ -191,6 +192,8 @@ def prepare():
         if kind in ('buildings', 'green', 'water', 'sports') and not polygons(g):
             continue
         eid = f'{e["type"]}/{e["id"]}'
+        if kind == 'buildings':
+            g = positioned_footprint(g, overrides.get(eid))
         inside = campus.covers(g.representative_point())
         c = g.representative_point()
         props = {

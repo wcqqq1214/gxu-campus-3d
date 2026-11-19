@@ -19,6 +19,8 @@ collection = bpy.context.scene.collection
 C = {}
 for name, color in [
     ('bark', '#6e6650'),
+    ('palmStem', '#a29a87'),
+    ('palmLimewash', '#d9d6c7'),
     ('leaf', '#3f7049'),
     ('leaf2', '#56824c'),
     ('leaf3', '#67904f'),

@@ -10,7 +10,7 @@ import bpy
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 sys.path.insert(0, str(ROOT / 'blender'))
-from vegetation_layout import tree_rotation
+from vegetation_layout import tree_rotation, tree_scale
 
 path = ROOT / 'blender/gxu-campus.blend'
 bpy.ops.wm.open_mainfile(filepath=str(path))
@@ -44,7 +44,7 @@ corrections = []
 for o in objects:
     x, y = round(o.location.x, 1), round(o.location.y, 1)
     h, typ = expected[(x, y)][:2]
-    assert max(abs(v - h / 9) for v in o.scale) < 1e-5
+    o.scale = tree_scale(x, y, h)
     o.rotation_euler.z = tree_rotation(x, y)
     if grounded:
         corrections.append(expected[(x, y)][2] - o.location.z)

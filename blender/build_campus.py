@@ -69,11 +69,17 @@ for name, color, rough, metal in [
     ('pitch', '#659578', 1, 0),
     ('metal', '#8e9b9e', 0.45, 0.45),
     ('bark', '#6e6650', 1, 0),
+    ('palmStem', '#a29a87', 1, 0),
+    ('palmLimewash', '#d9d6c7', 1, 0),
     ('leaf', '#3f7049', 1, 0),
     ('leaf2', '#56824c', 1, 0),
     ('leaf3', '#67904f', 1, 0),
 ]:
     C[name] = material(name, rgb(color), rough, metal)
+from west_dorms import FINISHES as WEST_DORM_FINISHES
+
+for name, color in WEST_DORM_FINISHES.items():
+    C[name] = material(name, rgb(color))
 terrain = json.loads((DATA / 'terrain.json').read_text())
 buildings = json.loads((DATA / 'buildings.json').read_text())
 landmarks = json.loads((DATA / 'landmarks.json').read_text())
@@ -1044,7 +1050,7 @@ from vegetation import tree_templates
 
 sys.path.insert(0, str(ROOT / 'scripts'))
 from tree_layout import ground_tree_rows
-from vegetation_layout import tree_rotation
+from vegetation_layout import tree_rotation, tree_scale
 
 trees = ground_tree_rows(trees, base['terrain'].v, base['terrain'].f)
 templates = tree_templates(C, PLANTS, True)
@@ -1082,7 +1088,7 @@ for i, (x, y, h, t, z) in enumerate([] if BASE_ONLY else trees):
     o = bpy.data.objects.new(f'树木示意-{i:04}', templates[t].data)
     PLANTS.objects.link(o)
     o.location = (x, y, z)
-    o.scale = (h / 9, h / 9, h / 9)
+    o.scale = tree_scale(x, y, h)
     o.rotation_euler.z = tree_rotation(x, y)
 for t in templates:
     t.hide_render = True
@@ -1104,6 +1110,22 @@ from road_surface_clearance import load_repairs, repair_clearance
 base['roads'], road_clearance_report = repair_clearance(
     base['roads'], base['terrain'], C, load_repairs(ROOT)
 )
+from bocui_junction import cut_ground, junction_mesh
+from north_underpass import road_height_sampler
+
+for bridge_data in infrastructure['bridges']:
+    if junction := bridge_data.get('sideJunction'):
+        ground_z = road_height_sampler(
+            base['terrain'], lambda x, y: elevation(x, y) - 0.4
+        )
+        street_z = road_height_sampler(base['roads'], ground_z)
+        approach = base['infra-approach-' + bridge_data['id']]
+        approach.extend(
+            junction_mesh(junction, C, ground_z, street_z, approach.bank_height)
+        )
+        for layer in ('terrain', 'roads'):
+            base[layer] = cut_ground(base[layer], junction['cut'])
+
 for k, m in base.items():
     if not BASE_ONLY and k.startswith('north-campus-'):
         m.object(

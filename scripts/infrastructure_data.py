@@ -56,6 +56,11 @@ def samples(line, step=3):
     ]
 
 
+def approach_weight(distance, flat_length, approach_length):
+    t = min(1, max(0, (distance - flat_length) / max(1, approach_length - flat_length)))
+    return t * t * (3 - 2 * t)
+
+
 def path_frames(path):
     result = []
     for i in range(len(path)):
@@ -167,6 +172,12 @@ def prepare_infrastructure():
     corridor = road.buffer(carriage / 2 + sidewalk + 1, cap_style=2, join_style=2)
     bridges = []
     cuts = []
+    bocui = json.loads((ROOT / 'data/bocui-bridge-profile.json').read_text())
+    stations_x = [p['x'] for p in bocui['stations']]
+    rises = [p['relativeHeight'] for p in bocui['stations']]
+    anchor_x, anchor_y = bocui['anchor']
+    anchor_road = elevation(anchor_x, anchor_y) + 0.40 + bocui['anchorRoadOffset']
+    bocui_floor = anchor_road - float(np.interp(anchor_x, stations_x, rises))
     for ident, name, upperid, lowerids, reference in MAIN_BRIDGES:
         upper = geom(byid[upperid])
         lower = linemerge([geom(byid[i]) for i in lowerids])
@@ -182,13 +193,24 @@ def prepare_infrastructure():
         beam_depth = 0.245
         clearance = 4.5
         floor = deck - slab - beam_depth - clearance
+        is_bocui = ident == 'bocui-bridge'
+        if is_bocui:
+            crossing_rise = float(np.interp(crossing.x, stations_x, rises))
+            reference_drop = anchor_road - (bocui_floor + crossing_rise)
+            extra_drop = bocui['targetDropMeters'] - reference_drop
+            anchor_distance = abs(lower.project(Point(anchor_x, anchor_y)) - distance)
+            deck = round(
+                bocui_floor + slab + beam_depth + bocui['referenceBeamClearance'], 3
+            )
+            floor = round(bocui_floor - extra_drop, 3)
+            clearance = round(deck - slab - beam_depth - floor, 3)
         under = lower.intersection(
             upper.buffer(carriage / 2 + sidewalk + 1, cap_style=2)
         )
         covered = under.length / 2 + 1.5
         path = []
         pedestrian_path = []
-        pedestrian_clearance = 2.45
+        pedestrian_clearance = clearance - bocui['kerbRise'] if is_bocui else 2.45
         pedestrian_floor = deck - slab - beam_depth - pedestrian_clearance
         pedestrian_inner = 6.3
         pedestrian_width = 2.2
@@ -198,23 +220,32 @@ def prepare_infrastructure():
             s = abs(signed)
             # Short approaches must meet the mapped T junction at ground level.
             available = min(80, distance if signed < 0 else lower.length - distance)
-            weight = min(1, max(0, (s - covered) / max(1, available - covered)))
-            weight = weight * weight * (3 - 2 * weight)
+            weight = approach_weight(s, covered, available)
             natural = elevation(x, y) + 0.40
             vehicle_height = floor * (1 - weight) + natural * weight
+            if is_bocui:
+                profile = floor + float(np.interp(x, stations_x, rises))
+                # Blend the additional drop into the measured profile. At the
+                # dorm frontage the adjustment is zero, at the portal it is full.
+                profile += extra_drop * approach_weight(
+                    s, 0 if signed < 0 else covered, anchor_distance
+                )
+                # Rejoin the coarser campus elevations near the ends of the mapped road.
+                blend_start = 64 if x < crossing.x else 23
+                at_grade = approach_weight(s, blend_start, available)
+                vehicle_height = profile + (natural - profile) * at_grade
             path.append([x, y, round(vehicle_height, 3), round(natural, 3)])
             # Raised side walks have their own vertical alignment. The old rail
             # followed the untouched DEM and consequently cut through the deck.
             # Extend the flat section for the full side-walk width on skew crossings.
             walk_covered = covered + cut_half_width
-            walk_weight = min(
-                1, max(0, (s - walk_covered) / max(1, available - walk_covered))
-            )
-            walk_weight = walk_weight * walk_weight * (3 - 2 * walk_weight)
+            walk_weight = approach_weight(s, walk_covered, available)
             walk_height = max(
                 vehicle_height + 0.15,
                 pedestrian_floor * (1 - walk_weight) + (natural + 0.15) * walk_weight,
             )
+            if is_bocui:
+                walk_height = vehicle_height + bocui['kerbRise']
             pedestrian_path.append([x, y, round(walk_height, 3)])
         # Portal ends follow the actual crossing angle, rather than assumed E-W axes.
         p0 = lower.interpolate(max(0, distance - 0.5))
@@ -276,6 +307,8 @@ def prepare_infrastructure():
                 'basis': (
                     '崇左桥两侧抬高步道依据用户现场指正，2023 年校方坡道照片辅助核对内侧护栏与挡墙。'
                     if ident == 'chongzuo-bridge'
+                    else '博萃桥口实拍可见红砖步道沿低路缘通入桥下。西侧坡形参考同批街景，桥下落差按模型展示要求调整。'
+                    if is_bocui
                     else '两侧步道采用通用连通构造估算，尚无近期完整桥洞照片核实。'
                 )
                 + '步道宽度、高程、坡度与净空为视觉估算。',
@@ -293,6 +326,11 @@ def prepare_infrastructure():
             'nameBasis': '桥名由校方资料与相交校道位置匹配；农院路 OSM 桥段未直接标注 bridge:name。',
             'dimensionBasis': '车道宽、桥面宽、净高、坡度、桥墩数量及跨径分配为视觉估算，非工程测量。',
         }
+        if is_bocui:
+            from bocui_junction_data import prepare_junction
+
+            branch = geom(byid[759147084])
+            item['sideJunction'] = prepare_junction(path, path_frames(path), branch)
         bridges.append(item)
         # Remove ground below the full deck as well as the lower passage. Coarse
         # DEM / Draco rounding can otherwise expose grass through the bridge road.
@@ -313,7 +351,14 @@ def prepare_infrastructure():
         start, end = sorted(
             road.project(Point(p)) for p in [b['upper'][0], b['upper'][-1]]
         )
-        bridge_ranges.append(((start + end) / 2, (end - start) / 2, b['deckElevation']))
+        bridge_ranges.append(
+            (
+                (start + end) / 2,
+                (end - start) / 2,
+                b['deckElevation'],
+                76 if b['id'] == 'bocui-bridge' else 22,
+            )
+        )
         deck_stations.extend([start, end])
     # Round unsurveyed sharp polyline corners within the estimated road width.
     # Shared smooth stations keep wide sidewalks from folding inside a bend.
@@ -346,7 +391,7 @@ def prepare_infrastructure():
         total = sum(w for _, w in weights)
         smooth = [sum(rawpoints[j][k] * w for j, w in weights) / total for k in [0, 1]]
         blend = min(1, station / 21, (road.length - station) / 21)
-        for center, half, _ in bridge_ranges:
+        for center, half, _, _ in bridge_ranges:
             blend = min(blend, max(0, min(1, (abs(station - center) - half - 6) / 21)))
         renderpoints.append([p[k] * (1 - blend) + smooth[k] * blend for k in [0, 1]])
     # Preserve the original source line and mask while including rounded display edges.
@@ -362,9 +407,9 @@ def prepare_infrastructure():
     for x, y in renderpoints:
         s = road.project(Point(x, y))
         z = elevation(x, y) + 0.40
-        for center, half, height in bridge_ranges:
+        for center, half, height, taper in bridge_ranges:
             gap = abs(s - center) - half
-            w = max(0, min(1, 1 - gap / 22))
+            w = max(0, min(1, 1 - gap / taper))
             w = w * w * (3 - 2 * w)
             z = z * (1 - w) + height * w
         roadpoints.append([x, y, round(z, 3)])
@@ -471,6 +516,15 @@ def prepare_infrastructure():
                 deck_shape.buffer(-0.1),
             ]
         )
+    bocui_bridge = next(b for b in bridges if b['id'] == 'bocui-bridge')
+    deck_start, deck_end = sorted(
+        road.project(Point(xy)) for xy in bocui_bridge['upper']
+    )
+    fill_bays = {
+        i
+        for i, (a, b) in enumerate(zip(stations, stations[1:]))
+        if 0 < max(deck_start - (a + b) / 2, (a + b) / 2 - deck_end) < 76
+    }
     # Open railings at mapped at-grade junctions; an underpass is not a street entrance.
     roadnodes = {n for e in roadways for n in e.get('nodes', [])}
     junctions = []
@@ -560,7 +614,11 @@ def prepare_infrastructure():
     overrides = {}
     surfaces = json.loads((OUT / 'surfaces.json').read_text())
     for i, surface in enumerate(surfaces):
-        if surface['id'] in replace_ids or surface['kind'] == 'water':
+        if (
+            surface['id'] in replace_ids
+            or surface['kind'] == 'water'
+            or not surface['triangles']
+        ):
             continue
         verts = surface['vertices']
         indices = surface['triangles']
@@ -654,6 +712,15 @@ def prepare_infrastructure():
             {
                 'id': f'infra-road-{start // 90:02d}',
                 'kind': 'corridor',
+                **(
+                    {
+                        'fillBays': [
+                            i for i in range(len(pts) - 1) if start + i in fill_bays
+                        ]
+                    }
+                    if any(start + i in fill_bays for i in range(len(pts) - 1))
+                    else {}
+                ),
                 'path': pts,
                 'frames': roadframes[start : start + len(pts)],
                 'sections': sections[start : start + len(pts)],
@@ -739,6 +806,8 @@ def prepare_infrastructure():
         recent = (
             '2023 年校方照片核对下穿坡道、排水沟与圆形护栏；桥洞总体结构仅有 2013 年历史照片辅助。'
             if b['id'] == 'chongzuo-bridge'
+            else '2024 年校方照片可辨桥下路缘、侧向步行通道和限高标志，2025 年照片补充桥侧边坡。'
+            if b['id'] == 'bocui-bridge'
             else '近期校方资料核对桥名、路段或围栏；尚缺近期完整桥体照片，结构依据 OSM 层级与通用构造估算。'
         )
         landmarks.append(
@@ -788,7 +857,12 @@ def prepare_infrastructure():
                 + (
                     ['chongzuoReport2013', 'chongzuoHistoric2013', 'chongzuoRoute2025']
                     if b['id'] == 'chongzuo-bridge'
-                    else ['bocuiNotice2023']
+                    else [
+                        'bocuiNotice2023',
+                        'bocuiTreesAutumn2024',
+                        'bocuiBank2025',
+                        'westDormStreet5',
+                    ]
                     if b['id'] == 'bocui-bridge'
                     else ['bridgeNamingGuide']
                 ),
@@ -796,7 +870,12 @@ def prepare_infrastructure():
                 + (
                     ['chongzuoReport2013', 'chongzuoHistoric2013', 'chongzuoRoute2025']
                     if b['id'] == 'chongzuo-bridge'
-                    else ['bocuiNotice2023']
+                    else [
+                        'bocuiNotice2023',
+                        'bocuiTreesAutumn2024',
+                        'bocuiBank2025',
+                        'westDormStreet5',
+                    ]
                     if b['id'] == 'bocui-bridge'
                     else ['bridgeNamingGuide']
                 ),

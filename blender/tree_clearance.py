@@ -11,7 +11,7 @@ from mathutils import Matrix, Vector
 from mathutils.bvhtree import BVHTree
 
 from mesh_volumes import MeshVolumes
-from vegetation_layout import tree_rotation
+from vegetation_layout import tree_rotation, tree_scale
 
 CLEARANCE_METERS = 0.03  # Model/export allowance, not a surveyed tree setback.
 
@@ -80,7 +80,7 @@ def filter_building_collisions(rows, templates, obstacles):
         transform = (
             Matrix.Translation((x, y, z))
             @ Matrix.Rotation(tree_rotation(x, y), 4, 'Z')
-            @ Matrix.Scale(h / 9, 4)
+            @ Matrix.Diagonal(Vector((*tree_scale(x, y, h), 1)))
         )
         hit = None
         for (tree_lod, tree_type), (

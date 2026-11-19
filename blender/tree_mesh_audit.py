@@ -10,7 +10,7 @@ from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
 from mesh_volumes import MeshVolumes
-from vegetation_layout import tree_rotation
+from vegetation_layout import tree_rotation, tree_scale
 
 
 def snapshot(obj):
@@ -44,7 +44,7 @@ def check_meshes(rows, buildings, templates):
     tested = 0
     for i, row in enumerate(rows):
         x, y, h, typ, z = row
-        scale = h / 9
+        horizontal, _, vertical = tree_scale(x, y, h)
         angle = tree_rotation(x, y)
         c, s = math.cos(angle), math.sin(angle)
         for lod, variants in templates.items():
@@ -52,9 +52,9 @@ def check_meshes(rows, buildings, templates):
             world = [
                 Vector(
                     (
-                        x + scale * (c * v.x - s * v.y),
-                        y + scale * (s * v.x + c * v.y),
-                        z + scale * v.z,
+                        x + horizontal * (c * v.x - s * v.y),
+                        y + horizontal * (s * v.x + c * v.y),
+                        z + vertical * v.z,
                     )
                 )
                 for v in vs
@@ -75,9 +75,9 @@ def check_meshes(rows, buildings, templates):
             volumes = tree_volumes[lod, typ]
             points = [
                 (
-                    x + scale * (c * v[0] - s * v[1]),
-                    y + scale * (s * v[0] + c * v[1]),
-                    z + scale * v[2],
+                    x + horizontal * (c * v[0] - s * v[1]),
+                    y + horizontal * (s * v[0] + c * v[1]),
+                    z + vertical * v[2],
                 )
                 for v in volumes.representatives
             ]
@@ -96,9 +96,9 @@ def check_meshes(rows, buildings, templates):
                     if witness is None and volumes.shells:
                         local = (
                             (
-                                (c * (v[0] - x) + s * (v[1] - y)) / scale,
-                                (-s * (v[0] - x) + c * (v[1] - y)) / scale,
-                                (v[2] - z) / scale,
+                                (c * (v[0] - x) + s * (v[1] - y)) / horizontal,
+                                (-s * (v[0] - x) + c * (v[1] - y)) / horizontal,
+                                (v[2] - z) / vertical,
                             )
                             for v in other['volumes'].representatives_in_bounds(
                                 (lo, hi)
@@ -109,9 +109,9 @@ def check_meshes(rows, buildings, templates):
                         if witness is not None:
                             a, b, h = witness
                             witness = (
-                                x + scale * (c * a - s * b),
-                                y + scale * (s * a + c * b),
-                                z + scale * h,
+                                x + horizontal * (c * a - s * b),
+                                y + horizontal * (s * a + c * b),
+                                z + vertical * h,
                             )
                 if pairs or witness is not None:
                     hits.append(

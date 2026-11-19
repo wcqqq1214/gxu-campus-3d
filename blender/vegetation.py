@@ -8,6 +8,72 @@ import bmesh
 from geometry import Mesh
 
 
+def areca_palm(C, detail):
+    """Slender ringed trunk, a green crownshaft and pinnate, arching fronds."""
+    mesh = Mesh()
+    sides = 12 if detail else 7
+    mesh.cylinder(0, 0, 0.44, 0.17, 0.88, C['palmLimewash'], sides, topr=0.14)
+    mesh.cylinder(0, 0, 3.39, 0.14, 5.02, C['palmStem'], sides, topr=0.115)
+    mesh.cylinder(0, 0, 6.35, 0.13, 0.9, C['leaf2'], sides, topr=0.11)
+    if detail:
+        for i in range(12):
+            z = 1.1 + i * 0.41
+            radius = 0.142 - (z - 0.88) * 0.005
+            mesh.cylinder(0, 0, z, radius, 0.024, C['bark'], sides)
+    # Outer mature fronds hang below the crownshaft; newer fronds stand higher.
+    for i in range(11):
+        angle = i * 2.39996
+        ux, uy = math.cos(angle), math.sin(angle)
+        tier = i % 3
+        reach = (2.55, 2.25, 1.45)[tier]
+        rise = (1.25, 2.05, 2.5)[tier]
+        drop = (2.15, 1.8, 1.30)[tier]
+        material = C[('leaf', 'leaf2', 'leaf3')[tier]]
+
+        def point(t, side=0, sag=0):
+            r = reach * t
+            z = 6.76 + rise * t - drop * t * t
+            return (ux * r - uy * side, uy * r + ux * side, z - sag)
+
+        sections = 15 if detail else 7
+        for j in range(sections):
+            t, end = j / sections, (j + 1) / sections
+            if detail:
+                mesh.line(point(t), point(end), 0.018 * (1 - 0.7 * t), material, 4)
+                if j == 0:
+                    continue
+                # Each leaf tapers from a narrow base, with a slight fold and drooping tip.
+                length = 0.15 + 0.58 * math.sin(math.pi * t) ** 0.7
+                for sign in (-1, 1):
+                    base = point(t)
+                    tip = point(t + 0.7 * length / reach, sign * length, 0.48 * length)
+                    mid = t + 0.24 * length / reach
+                    spread = sign * length * 0.47
+                    mesh.face(
+                        [
+                            base,
+                            point(mid - 0.024, spread, 0.12 * length),
+                            tip,
+                            point(mid + 0.024, spread, 0.16 * length),
+                        ][::-sign],
+                        material,
+                    )
+            else:
+                # Joined, folded blades retain an unbroken silhouette in the far model.
+                def edge(u, sign):
+                    width = 0.38 * math.sin(math.pi * u)
+                    return point(u, sign * width, width * 0.42)
+
+                for sign in (-1, 1):
+                    blade = [point(t), edge(t, sign), edge(end, sign), point(end)]
+                    if j == 0:
+                        blade.pop(1)
+                    elif j == sections - 1:
+                        blade.pop(2)
+                    mesh.face(blade[::-sign], material)
+    return mesh
+
+
 def tree_templates(C, collection, detail):
     if detail:
         templates = []
@@ -117,4 +183,7 @@ def tree_templates(C, collection, detail):
             templates.append(
                 m.object(f'Tree-far-template-{typ}', collection, {'template': typ})
             )
+    palm = areca_palm(C, detail)
+    prefix = 'Tree-template' if detail else 'Tree-far-template'
+    templates.append(palm.object(f'{prefix}-3', collection, {'template': 3}))
     return templates

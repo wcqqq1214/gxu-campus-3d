@@ -9,6 +9,13 @@ from tree_layout import ground_tree_rows
 
 
 def hedge_mesh(item, terrain_vertices, terrain_faces, colors):
+    return profiled_hedge(
+        item, colors, lambda xy: ground_tree_rows(xy, terrain_vertices, terrain_faces)
+    )
+
+
+def profiled_hedge(item, colors, ground_rows):
+    """Build the continuous leaf mass on the supplied ground samples."""
     a, b = item['line']
     dx, dy = b[0] - a[0], b[1] - a[1]
     length = math.hypot(dx, dy)
@@ -41,7 +48,7 @@ def hedge_mesh(item, terrain_vertices, terrain_faces, colors):
                 ]
             )
             rises.append(-0.03 if top == 0 else top * item['heightMeters'] * crown)
-    grounded = ground_tree_rows(xy, terrain_vertices, terrain_faces)
+    grounded = ground_rows(xy)
     mesh = Mesh()
     vertices = [(p[0], p[1], p[4] + rise) for p, rise in zip(grounded, rises)]
     count = len(profile)
