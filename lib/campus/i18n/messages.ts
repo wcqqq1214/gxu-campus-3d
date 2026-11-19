@@ -86,7 +86,6 @@ export const englishMessages: Record<string, string> = {
   '{count} 个地点': '{count} places',
   '返回 {name}': 'Back to {name}',
   '查看{name}': 'View {name}',
-  '{category}建筑。': 'A building in the {category} category.',
   '广西大学 校园地图': 'Guangxi University Campus Map',
   '白色细线：校园大致边界': 'White line: approximate campus boundary',
   '广西大学-校园视图.png': 'Guangxi-University-Campus.png',
