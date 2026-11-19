@@ -17,11 +17,16 @@ from mathutils.kdtree import KDTree
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
+from dining_halls import BEI, BI, BO, CUI, DONG, FRONTS, XIU
+from east27_dining import EAST27_ID, hall_frame
 from generic_buildings import compact_form_source, ordinary_building
 from geometry import MATERIALS
+from nanyuan import CANTEEN_ID
 from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS
 from new_east_neighbours import SHOP_BUILDINGS
 from student_water_tower import TOWER_ID
+from west22 import WEST22
+from west23 import WEST23
 from west_dorms import FINISHES, roof_frame
 from west_dorms import NUMBERS as WEST_DORMS
 
@@ -102,6 +107,107 @@ def samples(b):
                 )
             )
         return points
+    if b['id'] == WEST23:
+        x = b['bounds'][0] + 6.3
+        y = b['bounds'][3]
+        return [
+            dict(kind=kind, x=x - u, y=y - v, expected=z + h, top=z + h + 0.13)
+            for kind, u, v, h in [
+                ('roof', -20, 8, b['height'] + 0.12),
+                ('west-arcade', 1.6, 0.8, 0),
+                ('left-entrance-mat', -14.4, -0.35, 0.021),
+                ('right-entrance-mat', -11.4, -0.30, 0.021),
+                ('fascia', -3.4, -0.28, 2.66),
+            ]
+        ]
+    if b['id'] == WEST22:
+        xmin, ymin, xmax, ymax = b['bounds']
+        length = xmax - xmin
+        targets = [
+            ('roof', length / 2, (ymax - ymin) / 2, b['height'] + 0.14),
+            ('threshold-mat', length * 3.5 / 18 + 1.2, 0.22, 0.024),
+            ('arcade', 30, -2.1, 0),
+        ]
+        angle = math.radians(-2.45)
+        for k in range(6):
+            v = -(k + 0.5) * 2.50 / 6
+            targets.append(
+                (
+                    f'east-tread-{k + 1}',
+                    length + 1.94 - v * math.sin(angle),
+                    -8.01 + v * math.cos(angle),
+                    -(k + 1) * 1.245 / 7,
+                )
+            )
+        return [
+            dict(kind=kind, x=xmin + x, y=ymin + y, top=z + h + 0.12, expected=z + h)
+            for kind, x, y, h in targets
+        ]
+    if b['id'] == EAST27_ID:
+        x, y, a = hall_frame(b)
+        for kind, u, v, top, h in (
+            ('covered-dining-floor', -3, -4.1, 0.60, 0.07),
+            ('serving-ledge', 2, -0.27, 1.58, 1.0),
+            ('east-link-roof', 29, 16.5, 25, b['height'] + 0.12),
+            ('court-crossing', -34, 16.55, 0.60, 0.09),
+        ):
+            points.append(
+                dict(
+                    kind=kind,
+                    x=x + u * math.cos(a) - v * math.sin(a),
+                    y=y + u * math.sin(a) + v * math.cos(a),
+                    top=z + top,
+                    expected=z + h,
+                )
+            )
+        return points
+    if b['id'] == BEI:
+        ring = b['polygons'][0][0]
+        angle = math.atan2(ring[1][1] - ring[2][1], ring[1][0] - ring[2][0])
+        c, s = math.cos(angle), math.sin(angle)
+        return [
+            dict(
+                kind=kind,
+                x=b['center'][0] + u * c - v * s,
+                y=b['center'][1] + u * s + v * c,
+                top=z + b['height'] + 4,
+                expected=z + b['height'] + lift,
+            )
+            for kind, u, v, lift in [
+                ('west-ridge', -12.5, 5, 1.12),
+                ('east-ridge', 27.1, 0, 0.52),
+                ('main-roof', 7, 8, 0),
+            ]
+        ]
+    if b['id'] == CANTEEN_ID:
+        # Probe independently in north-elevation coordinates, from inside each
+        # gallery. A filled-in opening or a south-facing copy fails these rays.
+        ring = b['polygons'][0][0]
+        x, y = ring[5]
+        dx, dy = (ring[4][i] - ring[5][i] for i in (0, 1))
+        length = math.hypot(dx, dy)
+        c, s = dx / length, dy / length
+        probes = [
+            ('hall-roof', 12, 26, b['height'] + 0.68),
+            ('north-stair-low', 6.26, 2.05, 3.31 / 20),
+            ('north-stair-high', 11.69, 2.05, 3.31),
+            ('east-terrace', -0.8, 26, 17.30),
+            ('wing-roof', -6.6, 41.5, b['height'] * 0.79),
+            ('roof-plant', -12.04, 45.0, b['height'] + 1.90),
+        ]
+        probes += [
+            ('north-gallery', 2, 2, h) for h in (3.31, 7.19, 11.43, 16.25, 19.96)
+        ]
+        return [
+            {
+                'kind': kind,
+                'x': x + c * u - s * v,
+                'y': y + s * u + c * v,
+                'top': z + height + 1.5,
+                'expected': z + height,
+            }
+            for kind, u, v, height in probes
+        ]
     if b['id'] == TOWER_ID:
         x, y = b['center']
         h = b['height']
@@ -289,6 +395,106 @@ def samples(b):
             }
         )
         return points
+    if b['id'] in FRONTS:
+        # Probe the photo-specific stairs and canopies in each published entrance
+        # frame. Stock platform distances do not apply to these buildings.
+        entry = form['entrances'][0]
+        nx, ny = (
+            math.sin(math.radians(entry['bearing'])),
+            math.cos(math.radians(entry['bearing'])),
+        )
+        front_probes = {
+            CUI: [
+                ('lowest-step', 3.95, 0.12),
+                ('middle-step', 3.74, 0.24),
+                ('top-step', 3.50, 0.36),
+                ('portico', 3.43, 4.799),
+            ],
+            BO: [
+                ('threshold', 0.78, 0.212),
+                ('light-landing', 2.58, 0.17),
+                ('outer-granite', 5.455, 0.086),
+                ('fascia', 2.30, 4.641),
+            ],
+            DONG: [
+                ('upper-landing', 1.63, 0.32),
+                ('lowest-step', 2.01, 0.178),
+                ('entrance-canopy', 1.12, 3.99),
+            ],
+            XIU: [
+                ('top-step', 5.95, 2.027),
+                ('lowest-step', 10.52, 0.127),
+                ('canopy', 1.8, 6.173),
+            ],
+            BI: [('threshold', 0.6, 0.09)],
+        }
+        for kind, out, height in front_probes[b['id']]:
+            points.append(
+                dict(
+                    kind=kind,
+                    x=entry['center'][0] + nx * out,
+                    y=entry['center'][1] + ny * out,
+                    top=z + height + (0.07 if b['id'] in (CUI, DONG) else 0.26),
+                    expected=z + height,
+                )
+            )
+        if b['id'] == BI:
+            # Probe each finished tread from within the stairwell, below the cover.
+            a, c = b['polygons'][0][0][1:3]
+            half = math.dist(a, c) / 2
+            start, end = half + 1.45, half + 4.55
+            going = (end - start) / 12
+            stair_samples = [
+                ('entrance-paving', start - 0.55, 3.05, 0.17),
+                ('turn-platform', half + 4.73, 2.80, 1.725),
+                ('upper-landing', start - 0.7, 1.25, 3.28),
+            ]
+            for i in range(12):
+                rise = 1.555 * (i + 1) / 12
+                stair_samples.extend(
+                    [
+                        ('outward-tread', start + (i + 0.5) * going, 3.05, 0.17 + rise),
+                        (
+                            'return-tread',
+                            end - (i + 0.5) * (4.55 - 1.05) / 12,
+                            2.14,
+                            1.725 + rise,
+                        ),
+                    ]
+                )
+            for kind, along, local_out, h in stair_samples:
+                out = local_out - 7.32
+                points.append(
+                    dict(
+                        kind=kind,
+                        x=entry['center'][0] - ny * along + nx * out,
+                        y=entry['center'][1] + nx * along + ny * out,
+                        top=z + h + 0.08,
+                        expected=z + h,
+                    )
+                )
+            east = next(e for e in form['entrances'] if e['id'] == 'flavor-east')
+            angle = math.radians(east['bearing'])
+            assert 70 < east['bearing'] < 110 and not east['primary']
+            # Probe the sign's drip edge beside the overhead light.
+            for kind, out, along, height in [
+                ('flavor-step', 0.8, 0.0, 0.15),
+                ('flavor-sign', 0.29, 0.95, 3.672),
+            ]:
+                points.append(
+                    dict(
+                        kind=kind,
+                        x=east['center'][0]
+                        + math.sin(angle) * out
+                        - math.cos(angle) * along,
+                        y=east['center'][1]
+                        + math.cos(angle) * out
+                        + math.sin(angle) * along,
+                        top=z + height + 0.22,
+                        expected=z + height,
+                    )
+                )
+        return points
     for e in form['entrances']:
         x, y = e['center']
         a = math.radians(e['bearing'])
@@ -413,6 +619,33 @@ def check_samples(b, trees, tolerance):
         if error > tolerance:
             raise AssertionError((b['id'], p, actual, error, tolerance))
         result.append({'kind': p['kind'], 'errorMeters': round(error, 6)})
+    if b['id'] == BI:
+        # A solid end drum can also carry a landing. Check the clear span underneath.
+        a, c = b['polygons'][0][0][1:3]
+        tangent = (Vector(a) - Vector(c)).normalized()
+        outward = Vector((tangent.y, -tangent.x))
+        xy = (
+            (Vector(a) + Vector(c)) / 2
+            + tangent * (math.dist(a, c) / 2 + 5.60)
+            + outward * (4.48 - 7.32)
+        )
+        origin = Vector((*xy, b['elevation'] + 0.75))
+        inward = Vector((-outward.x, -outward.y, 0))
+        assert all(tree.ray_cast(origin, inward, 3.85)[0] is None for tree in trees), (
+            b['id'],
+            'blocked half-landing clearance',
+        )
+    if b['id'] == CANTEEN_ID:
+        # A floor ray alone could also pass if a later edit sealed the north wall.
+        ring = b['polygons'][0][0]
+        west = (Vector(ring[4]) - Vector(ring[5])).normalized()
+        inward = Vector((-west.y, west.x, 0))
+        front = Vector((*ring[5], b['elevation'])) + Vector((west.x, west.y, 0)) * 2
+        for h in (5.8, 10, 14.7, 19, 22.5):
+            origin = front - inward + Vector((0, 0, h))
+            hits = [tree.ray_cast(origin, inward, 8) for tree in trees]
+            depths = [hit[3] - 1 for hit in hits if hit[0] is not None]
+            assert depths and 4.5 < min(depths) < 5.1, (b['id'], h, depths)
     return result
 
 
@@ -445,8 +678,17 @@ def main():
         'livingCool',
         'stone',
         'stoneWarm',
+        'wood',
         'stoneCool',
         'white',
+        'timeLetter',
+        'wallStone',
+        'fenceIron',
+        'gateRed',
+        'gateRecess',
+        'libraryInk',
+        'residenceGlass',
+        'slate',
         'paleRoof',
         'blueRoof',
         'red',
@@ -493,7 +735,7 @@ def main():
             bpy.data.objects.remove(obj, do_unlink=True)
             bpy.data.meshes.remove(mesh)
         # Dining facilities must not get the residential balcony extension.
-        if b['form']['archetype'] == 'canteen':
+        if b['form']['archetype'] == 'canteen' and b['id'] != CANTEEN_ID:
             residential = {**b, 'form': {**b['form'], 'archetype': 'dormitory'}}
             assert len(high.v) < len(
                 ordinary_building(residential, b.get('elevation', 0), C, True).v
@@ -548,7 +790,11 @@ def main():
                     'Stale editable water tower'
                 )
         for name, start, end in (
-            expected.parts if b['id'] in NEW_EAST_NEIGHBOURS else expected.parts[:3]
+            expected.parts
+            if b['id'] in NEW_EAST_NEIGHBOURS
+            or b['id'] in FRONTS
+            or b['id'] in (CANTEEN_ID, EAST27_ID, WEST22, WEST23)
+            else expected.parts[:3]
         ):
             group = o.vertex_groups.get(name)
             assert group is not None, (b['id'], name, 'missing editable component')

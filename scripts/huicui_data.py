@@ -30,21 +30,33 @@ def prepare_huicui():
     # Ground-floor north colonnade is genuinely recessed; no opaque wall behind columns.
     north = local.bounds[3]
     arcade = local.intersection(box(-100, north - 4.2, 100, north + 1))
-    parts = [
-        pack(local.difference(arcade), '首层及夹层 · 北侧退进门厅', 6.8),
-        pack(local, '三至七层 · 保留映射内院与西侧凹口', b['height'] - 6.8),
+    # The lobby doors sit behind the column line. The two-storey notch below
+    # the west end of the dining floor is open in the May 2026 lawn view.
+    vestibule = box(-4.07, north - 8.0, 4.07, north)
+    west_loggia = box(local.bounds[0] - 1, north - 4.5, -36.1, north + 1)
+    storeys = [
+        (
+            local.difference(arcade).difference(vestibule),
+            '首层及夹层 · 北侧退进门厅',
+            0,
+            8.15,
+        ),
+        (local, '三至四层 · 保留内院', 8.15, 16.70),
+        (local.difference(west_loggia), '五至六层 · 西端开敞柱廊', 16.70, 24.55),
+        (local, '七层 · 荟萃餐厅', 24.55, 30.32),
     ]
+    parts = [
+        dict(pack(shape, name, top - base), base=base)
+        for shape, name, base, top in storeys
+    ]
+    catalogue = json.loads((ROOT / 'data/landmarks.json').read_text())
+    l = next(l for l in catalogue if l['id'] == 'huicui').copy()
     b.update(
+        height=l['height'],
+        heightBasis='北立面跨度与七层窗带照片比例估算',
         customModel='huicui',
-        facadeBasis='荟萃楼北立面依据校方全景与入口照片独立建模；其余立面按轮廓及同楼风格估算',
-        sourceRefs=[
-            'osm',
-            'huicuiExterior2020',
-            'huicuiEntrance2018',
-            'huicuiUse2024',
-            'huicuiMaintenance2026',
-            'huicuiLocation',
-        ],
+        facadeBasis='荟萃楼北立面依据2026年5月住客入口与草坪斜拍、校方全景独立建模；其余立面按轮廓及同楼风格估算',
+        sourceRefs=['osm', l['reference'], *l['additionalReferences']],
         architecture={
             'origin': origin,
             'angle': angle,
@@ -55,15 +67,13 @@ def prepare_huicui():
             + [list(r.coords) for r in local.interiors],
             'hotelEntrance': [0, north],
             'arcadeDepth': 4.2,
-            'arcadeClearHeight': 6.8,
-            'precision': '荟萃楼为新闻传播学院同一 OSM 建筑北翼；保留整栋关系 ID、轮廓和内院。7 层来自 OSM，总高按 3.3 米/层估算；楼层分段、门窗、雨棚尺寸及未拍到立面均非实测。',
+            'arcadeClearHeight': 8.15,
+            'precision': '荟萃楼为新闻传播学院同一 OSM 建筑北翼；保留整栋关系 ID、轮廓和内院。7 层来自 OSM，北翼檐顶高度按照片比例估算；楼层分段、门窗、雨棚尺寸及未拍到立面均非实测。',
             'navigation': '第 20 处精选地标；支持名称搜索、定位、详情与巡游。',
         },
     )
     b['landmark'] = 'huicui'
     b.pop('chunk', None)
-    catalogue = json.loads((ROOT / 'data/landmarks.json').read_text())
-    l = next(l for l in catalogue if l['id'] == 'huicui').copy()
     l.update(
         center=b['center'],
         bounds=b['bounds'],

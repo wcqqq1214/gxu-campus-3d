@@ -7,7 +7,7 @@ Unseen rear openings are not duplicated from the visible south elevation.
 
 import math
 
-from geometry import MATERIALS, Mesh, material
+from geometry import MATERIALS, Mesh, material, tile_material
 
 TOWER_ID = 'way/955987491'
 
@@ -30,8 +30,37 @@ def water_tower(b, z, C, detail):
     tank_bottom = h * 0.865
     brick = C['studentTowerBrick']
     tank = C['studentTowerTank']
+    # Weathered rim and masonry bands appear much darker than the red shaft.
+    weathered = (0.092, 0.063, 0.048, 1)
+    mat = MATERIALS[tank]
+    mat.diffuse_color = weathered
+    mat.node_tree.nodes.get('Principled BSDF').inputs[
+        'Base Color'
+    ].default_value = weathered
     n = 48 if detail else 24
-    m.cylinder(x, y, z + neck / 2, shaft, neck, brick, n)
+    if detail:
+        tile_material(
+            C, 'studentTowerMasonry', 'tower-cafe-brick.png', (0.37, 0.145, 0.075)
+        )
+        for i in range(n):
+            a, b = math.tau * i / n, math.tau * (i + 1) / n
+            points = [
+                (x + shaft * math.cos(t), y + shaft * math.sin(t), z + h)
+                for t, h in ((a, 0), (b, 0), (b, neck), (a, neck))
+            ]
+            m.face(
+                points,
+                C['studentTowerMasonry'],
+                [
+                    (u * 12 / n, h / 0.64)
+                    for u, h in ((i, 0), (i + 1, 0), (i + 1, neck), (i, neck))
+                ],
+            )
+        m.cylinder(x, y, z + neck - 0.03, shaft, 0.06, brick, n)
+    else:
+        m.cylinder(x, y, z + neck / 2, shaft, neck, brick, n)
+    for fraction in (0.14, 0.35, 0.53, 0.70, 0.835):
+        m.cylinder(x, y, z + h * fraction, shaft + 0.024, 0.09, tank, n)
     m.cylinder(
         x,
         y,
@@ -47,18 +76,36 @@ def water_tower(b, z, C, detail):
         m.cylinder(x, y, z + level, radius + 0.10, 0.20, tank, n)
     # Four narrow openings visible on the near/south shaft, not generic floors.
     for fraction in (0.205, 0.39, 0.575, 0.76):
-        m.box(x, y - shaft - 0.015, z + h * fraction, 0.52, 0.07, 1.35, C['dark'])
+        bearing = math.radians(17) if fraction == 0.205 else 0
+        xx, yy = (
+            x + (shaft + 0.035) * math.sin(bearing),
+            y - (shaft + 0.035) * math.cos(bearing),
+        )
+        height = 1.94 if fraction == 0.205 else 1.35
+        m.box(xx, yy, z + h * fraction, 0.52, 0.07, height, C['dark'], bearing)
         if detail:
+            edge = C['stone'] if fraction != 0.205 else tank
             for side in (-1, 1):
                 m.box(
-                    x + side * 0.30,
-                    y - shaft - 0.06,
+                    xx + side * 0.30 * math.cos(bearing),
+                    yy + side * 0.30 * math.sin(bearing),
                     z + h * fraction,
+                    0.075,
                     0.09,
-                    0.12,
-                    1.53,
-                    C['stone'],
+                    height + 0.08,
+                    edge,
+                    bearing,
                 )
+            m.box(
+                xx,
+                yy,
+                z + h * fraction + height / 2 + 0.04,
+                0.79,
+                0.125,
+                0.11,
+                edge,
+                bearing,
+            )
     # Gallery photo shows rooftop telecom rods; simplified, not a surveyed array.
     m.cylinder(x, y, z + h + 0.7, 0.18, 1.4, C['metal'], 12)
     for angle in (0, math.tau / 3, math.tau * 2 / 3):
@@ -66,26 +113,4 @@ def water_tower(b, z, C, detail):
         ay = y + 0.48 * math.sin(angle)
         m.line((x, y, z + h + 0.35), (ax, ay, z + h + 1.2), 0.045, C['metal'])
         m.box(ax, ay, z + h + 2, 0.16, 0.20, 1.3, C['white'], angle)
-    # Low circular guard visible at the one-storey platform; no slab over void.
-    ring = radius + 0.43
-    deck = 4.4
-    for i in range(n):
-        a = math.tau * i / n
-        c = math.tau * (i + 1) / n
-        m.line(
-            (x + ring * math.cos(a), y + ring * math.sin(a), z + deck + 0.95),
-            (x + ring * math.cos(c), y + ring * math.sin(c), z + deck + 0.95),
-            0.04,
-            C['metal'],
-        )
-        if i % (2 if detail else 1) == 0:
-            m.cylinder(
-                x + ring * math.cos(a),
-                y + ring * math.sin(a),
-                z + deck + 0.475,
-                0.035,
-                0.95,
-                C['metal'],
-                6,
-            )
     return m

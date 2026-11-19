@@ -6,11 +6,25 @@ export const LANDMARK_ALIASES: Record<string, string[]> = {
   'south-gate': ['南门', '大学东路校门'],
   library: ['校图书馆', '西大图书馆'],
   huixue: ['君武文化艺术教育中心'],
-  huicui: ['荟萃楼酒店', '西大荟萃楼', '新闻传播学院', '新闻与传播学院'],
+  huicui: [
+    '荟萃楼酒店',
+    '荟萃餐厅',
+    '荟萃楼餐厅',
+    '荟萃食堂',
+    '西大荟萃楼',
+    '新闻传播学院',
+    '新闻与传播学院',
+  ],
   'teaching-ten': ['十教', '10教', '教学十楼', '多媒体教学楼'],
   'teaching-six': ['六教', '6教'],
   'teaching-two': ['二教', '2教', '南宁楼'],
-  'student-center': ['大活', '学生活动中心'],
+  'student-center': [
+    '大活',
+    '学生活动中心',
+    '老水塔咖啡厅',
+    '老水塔西餐厅',
+    '水塔餐厅',
+  ],
   computer: ['计电', '计电学院', '计算机学院'],
   'international-residence': ['留学生', '国际学生公寓'],
   'new-east-gate': ['新东园门', '新东园入口', '秀灵西一里'],
@@ -95,12 +109,17 @@ export function navigationFootprints(
 
 /** Search associations do not change the canonical name or merge physical places. */
 export const ENGLISH_ALIASES: Record<string, string[]> = {
+  'student-center': ['Old Water Tower Café', 'Old Water Tower Cafe'],
   computer: [
     'School of Computer and Electronic Information',
     'Computer Science',
   ],
   huixue: ['Huixuetang Hall', 'Junwu Center for Culture and Arts Education'],
-  huicui: ['Huicui Building Hotel', 'School of Journalism and Communication'],
+  huicui: [
+    'Huicui Building Hotel',
+    'Huicui Dining Hall',
+    'School of Journalism and Communication',
+  ],
   'teaching-ten': [
     'Multimedia Teaching Building',
     'Teaching Building 10',
@@ -196,6 +215,25 @@ export function buildingLocationLabel(
   });
 }
 
+const BUILDING_ALIASES: Record<string, string[]> = {
+  'way/759140894': ['西23栋供餐点', '西23供餐点', 'West 23 Dining Point'],
+  'way/759140893': ['西22栋供餐点', '西22供餐点', 'West 22 Dining Point'],
+  'relation/12774256': ['东27栋供餐点', '东27栋B区供餐点', '东27食堂', 'East 27 Dining Point'],
+  'way/1544361473': ['博萃餐厅', '博萃食堂', 'Bocui Dining Hall'],
+  'way/759337794': ['萃苑食堂', 'Cuiyuan Dining Hall'],
+  'way/759191485': ['东苑食堂', 'Dongyuan Dining Hall'],
+  'way/822812186': ['秀苑食堂', 'Xiuyuan Dining Hall'],
+  'way/759609659': [
+    '碧湖苑食堂',
+    '碧湖苑风味餐厅',
+    '风味食堂',
+    'Bihuyuan Dining Hall',
+    'Bihuyuan Specialty Dining Hall',
+  ],
+  'way/760187419': ['北苑食堂', 'Beiyuan Dining Hall'],
+  'way/948683821': ['南苑', '南苑食堂', '南苑二餐厅', '南苑第二食堂'],
+};
+
 /** Exact names first, then prefixes, then any substring in either language; ties sort by displayed name. */
 export function searchBuildings(
   buildings: Building[],
@@ -210,6 +248,7 @@ export function searchBuildings(
       building.name,
       placeName(building.name, 'zh'),
       placeName(building.name, 'en'),
+      ...(BUILDING_ALIASES[building.id] ?? []),
     ].map((name) => name.toLocaleLowerCase());
     if (names.some((name) => name === term)) return 0;
     if (names.some((name) => name.startsWith(term))) return 1;

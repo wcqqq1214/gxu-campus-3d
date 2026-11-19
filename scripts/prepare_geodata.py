@@ -41,6 +41,16 @@ MX = 111320 * math.cos(math.radians(LAT))
 MY = 111320
 
 
+# Heights of the five connected market sections, estimated from the 2019 street views.
+MARKET_HEIGHTS = {
+    'way/1544361469': 4.44,
+    'way/759340886': 7.13,
+    'way/759345904': 4.27,
+    'way/1544361466': 3.40,
+    'way/1544361467': 4.78,
+}
+
+
 def project(lon, lat, z=None):
     return ((lon - LON) * MX, (lat - LAT) * MY)
 
@@ -268,6 +278,22 @@ def prepare():
             )
             if lm and lm['id'] == 'teaching-two':
                 b['facadeBasis'] = '重点体量，立面按类型推定'
+            if eid in MARKET_HEIGHTS:
+                b.update(
+                    customModel='west-market',
+                    category='service',
+                    levels=1,
+                    height=MARKET_HEIGHTS[eid],
+                    heightBasis='按街景估算',
+                    facadeBasis='按 2019 年 3 月北侧沿街实景复原',
+                )
+                props['levels'] = b['levels']
+                if eid == 'way/1544361469':
+                    b['name'] = '西菜市场'
+            if eid == 'relation/12774256':
+                # The university's annotated aerial identifies this courtyard residence.
+                b['name'] = '东校园学生公寓27栋'
+                b['category'] = 'living'
             if eid == 'way/948683815':
                 b['name'] = '西田径场主席台'
                 b['category'] = 'culture'

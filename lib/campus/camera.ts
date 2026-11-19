@@ -303,11 +303,13 @@ export function buildingPose(
   viewport: Viewport,
   fov?: number,
 ) {
+  // Bihuyuan has a south dining entrance and an east specialty dining entrance.
+  const obliqueX = b.id === 'way/759609659' ? 1 : -0.5;
   return fitBox(
     buildingBox(b),
     view === 'top'
       ? new Vector3(0, 1, 0.025).normalize()
-      : new Vector3(-0.5, 0.66, 1).normalize(),
+      : new Vector3(obliqueX, 0.66, 1).normalize(),
     frame,
     viewport,
     fov,

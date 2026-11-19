@@ -2456,6 +2456,19 @@
             "gxuDonationProjects"
           ],
           "note": "PDF第43页可见主体屋面边缘与女儿墙，以平屋面表达；背部屋顶小构件和完整设备层未确认。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "diningPhotoDong",
+            "gxuDonationProjects",
+            "diningDongCourt",
+            "diningDongDoors",
+            "diningDongGate",
+            "diningDongApproach",
+            "diningDongNorth"
+          ],
+          "note": "西侧长立面设中央入口和两侧拉闸门，北端竖排题字旁另有入口。门窗和两级踏步尺寸由实拍估算。街景摄于2016年，未核实2026年立面装修状态。"
         }
       },
       "review": {
@@ -2473,13 +2486,33 @@
         },
         "entrances": {
           "status": "partial",
-          "note": "已看照片门厅，但外边锚点和主次入口尚不能可靠定位，保留标为估算的自动入口。"
+          "note": "西侧长立面设中央入口和两侧拉闸门，北端竖排题字旁另有入口。门窗和两级踏步尺寸由实拍估算。街景摄于2016年，未核实2026年立面装修状态。"
         },
         "facadeRules": {
           "status": "partial",
-          "note": "窗列改用校准层数；照片中的大窗、实墙和走廊尚未逐立面定位，现有窗尺寸仍为示意。"
+          "note": "北端以2024年发布的导览斜照和校方项目册交叉核对，西侧门头、窗带和台阶采用2016年街景。东面及南端为估算。"
         }
-      }
+      },
+      "entrances": [
+        {
+          "id": "dining-front",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 2,
+          "t": 0.5,
+          "width": 3.05,
+          "primary": true
+        },
+        {
+          "id": "dining-north",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 3,
+          "t": 0.353,
+          "width": 1.78,
+          "primary": false
+        }
+      ]
     },
     "way/759609659": {
       "name": "碧湖苑餐厅",
@@ -2511,6 +2544,17 @@
             "gxuDonationProjects"
           ],
           "note": "PDF第43页可见主体屋面边缘与女儿墙，以平屋面表达；背部屋顶小构件和完整设备层未确认。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "diningPhotoBi",
+            "gxuDonationProjects",
+            "diningFlavorFront",
+            "diningFlavorCourtSouth",
+            "diningFlavorCourtNorth"
+          ],
+          "note": "用户在航拍图上指认，题字折返楼梯位于主楼东侧靠南、向东外挑处，风味餐厅也在主楼东侧。楼梯接入二层平台，外挑尺寸据影像估算。篮球场边两个拍摄点可辨东侧门面、窗栅和台阶，具体坐标和尺寸仍为估算。"
         }
       },
       "review": {
@@ -2528,13 +2572,33 @@
         },
         "entrances": {
           "status": "partial",
-          "note": "已看照片门厅，但外边锚点和主次入口尚不能可靠定位，保留标为估算的自动入口。"
+          "note": "用户在航拍图上指认，题字折返楼梯位于主楼东侧靠南、向东外挑处，风味餐厅也在主楼东侧。楼梯接入二层平台，外挑尺寸据影像估算。篮球场边两个拍摄点可辨东侧门面、窗栅和台阶，具体坐标和尺寸仍为估算。"
         },
         "facadeRules": {
           "status": "partial",
-          "note": "窗列改用校准层数；照片中的大窗、实墙和走廊尚未逐立面定位，现有窗尺寸仍为示意。"
+          "note": "已据两处照片建模拱窗格栅和室外折返梯，背面窗洞仍为估算。"
         }
-      }
+      },
+      "entrances": [
+        {
+          "id": "dining-front",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "t": 0.5,
+          "width": 5.4,
+          "primary": true
+        },
+        {
+          "id": "flavor-east",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 0,
+          "t": 0.5,
+          "width": 2.45,
+          "primary": false
+        }
+      ]
     },
     "way/759132933": {
       "name": "第三教学楼",
@@ -11994,6 +12058,329 @@
         "northMeters": 0.1,
         "angleDegrees": 1.15,
         "eastScale": 0.985
+      }
+    },
+    "way/760187419": {
+      "name": "北苑餐厅",
+      "footprintRevision": "e1a43d5a5c0e04fcb8808f80608404c4a78474038df6a3aead6b9405e8e3e072",
+      "evidence": {
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "diningPhotoBei",
+            "diningBeiyuanGallery",
+            "diningBeiyuanWest",
+            "diningRoofImagery",
+            "diningBeiEastStair",
+            "diningBeiEastGallery",
+            "diningBeiWestWindow",
+            "diningBeiWestWalk",
+            "diningBeiStreetSteps"
+          ],
+          "note": "东侧双层外廊，两端有折返楼梯；西侧为挑檐柱廊和沿街两级台阶。朝向据独立街景机位与后勤照片核对，开间、尺寸及二楼内门的楼内位置估算。"
+        }
+      },
+      "entrances": [
+        {
+          "id": "dining-front",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 0,
+          "t": 0.5,
+          "width": 7.0,
+          "primary": true
+        },
+        {
+          "id": "dining-west-walk",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 2,
+          "t": 0.5,
+          "width": 7.0,
+          "primary": false
+        }
+      ]
+    },
+    "way/822812186": {
+      "name": "秀苑餐厅",
+      "footprintRevision": "5b9c0b820e7b34312a95509ff280725e60184ead325b0a8b36e79feae717372a",
+      "evidence": {
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "diningPhotoXiu",
+            "diningRoofImagery",
+            "diningXiuCourt",
+            "diningXiuSide",
+            "diningXiuSteps",
+            "diningXiuSouth"
+          ],
+          "note": "入口朝西，正面宽梯与南北两端的横向梯段共用平台。街景用于核对窗带和石阶，金色题字与银色雨棚按餐饮导览近照建模。尺寸由影像比例估算。"
+        }
+      },
+      "entrances": [
+        {
+          "id": "dining-front",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 4,
+          "t": 0.5,
+          "width": 20.51,
+          "primary": true
+        }
+      ]
+    },
+    "way/1544361473": {
+      "name": "博萃楼",
+      "footprintRevision": "34a26eca1864d28e18a826ea3c6772dd9770c029e8d74b5b50c544a69006254a",
+      "evidence": {
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "bocuiAprilCourtyard",
+            "diningPhotoBo",
+            "bocuiOpening"
+          ],
+          "note": "北侧面向萃苑的两组玻璃门为餐厅入口，位于宾馆入口以东，中隔四组窗；门槛与近乎齐平的石材铺地由近照估算。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "bocuiAprilCourtyard"
+          ],
+          "note": "按2026年北立面全景的五层上部窗和首层门面估算，未实测。"
+        }
+      },
+      "entrances": [
+        {
+          "id": "dining-front",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "t": 0.5884246,
+          "width": 6.2,
+          "primary": true
+        }
+      ],
+      "height": 21.35
+    },
+    "way/948683821": {
+      "name": "南苑第二餐厅",
+      "footprintRevision": "75b16a7d582236e2ab17eca84e2bdc9c5a9a7a97b61532f4d25b5d08980d034b",
+      "height": 26.0,
+      "levels": 6,
+      "evidence": {
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "nanyuanSignedElevation",
+            "nanyuanNorthwestFlight"
+          ],
+          "note": "依据北端街面照、斜航拍与地图轮廓估算主体檐高约 26 米，局部题字墙和屋顶设备高出檐口。"
+        },
+        "levels": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "nanyuanSignedElevation"
+          ],
+          "note": "北立面底层通口上方依次可见五层廊口和窗组。"
+        }
+      }
+    },
+    "way/759337794": {
+      "name": "萃苑餐厅",
+      "footprintRevision": "0ccafaa97b55c8f0ac1efedba3ad15d365f5e5281a6ff7de6bcc4cb694e76707",
+      "evidence": {
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "diningCuiForecourt",
+            "diningPhotoCui",
+            "diningCuiEast",
+            "diningCuiWest"
+          ],
+          "note": "南门位于萃苑与博萃之间的庭院。窗格、托杆和银色雨棚以近期导览和校方斜照为主，三层踏步位置以旧街景补足。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "diningCuiForecourt",
+            "diningPhotoCui",
+            "diningCuiEast",
+            "diningCuiWest"
+          ],
+          "note": "东南和西南斜照、屋顶轮廓共同显示低前厅及后退的北侧高楼，分界为估算。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "diningCuiForecourt",
+            "diningPhotoCui",
+            "diningCuiEast",
+            "diningCuiWest"
+          ],
+          "note": "按两个街景机位中屋顶相对题字横梁的投影估算北侧高楼高度，未实测。"
+        }
+      },
+      "entrances": [
+        {
+          "id": "dining-front",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 10,
+          "t": 0.5,
+          "width": 6.0,
+          "primary": true
+        }
+      ],
+      "height": 24.4,
+      "parts": [
+        {
+          "id": "south-portico",
+          "height": 9.7,
+          "levels": 2,
+          "polygons": [
+            [
+              [
+                [
+                  -592.1587370364495,
+                  -581.613603999935
+                ],
+                [
+                  -592.1484784098728,
+                  -578.5300399998896
+                ],
+                [
+                  -600.3040870222666,
+                  -578.5189079997594
+                ],
+                [
+                  -600.2983556126893,
+                  -573.9
+                ],
+                [
+                  -545.7747932152629,
+                  -573.9
+                ],
+                [
+                  -545.7794835298158,
+                  -577.5170279999161
+                ],
+                [
+                  -552.437332573099,
+                  -577.5058959997859
+                ],
+                [
+                  -552.437332573099,
+                  -580.4113479997274
+                ],
+                [
+                  -560.4082858969091,
+                  -580.4002159999927
+                ],
+                [
+                  -560.4185445234857,
+                  -584.107171999809
+                ],
+                [
+                  -583.520972945799,
+                  -584.0737759998142
+                ],
+                [
+                  -583.520972945799,
+                  -581.624736000065
+                ],
+                [
+                  -592.1587370364495,
+                  -581.613603999935
+                ]
+              ]
+            ]
+          ]
+        },
+        {
+          "id": "north-block",
+          "height": 24.4,
+          "levels": 6,
+          "polygons": [
+            [
+              [
+                [
+                  -600.2733111396211,
+                  -553.7168119998125
+                ],
+                [
+                  -545.7487076486283,
+                  -553.7836039998022
+                ],
+                [
+                  -545.7747932152629,
+                  -573.9
+                ],
+                [
+                  -600.2983556126893,
+                  -573.9
+                ],
+                [
+                  -600.2733111396211,
+                  -553.7168119998125
+                ]
+              ]
+            ]
+          ]
+        }
+      ]
+    },
+    "relation/12774256": {
+      "name": "东校园学生公寓27栋",
+      "footprintRevision": "58439d44b562b4e80b5cb140aee114cb5813700e56791e61dd72826c8f0d3580",
+      "levels": 6,
+      "height": 19.95,
+      "archetype": "dormitory",
+      "entrances": [
+        {
+          "id": "east27-dining",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "t": 0.3345032,
+          "width": 4.5,
+          "primary": true
+        }
+      ],
+      "evidence": {
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "east27Location"
+          ],
+          "note": "参照六层平面标注及航拍估算。"
+        },
+        "levels": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "east27Location"
+          ],
+          "note": "学校公告附图2的宿舍平面标注6F，附图1标出东27栋。"
+        },
+        "archetype": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "east27Service",
+            "east27Location"
+          ],
+          "note": "学生宿舍首层设供餐点。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "east27Service",
+            "east27Hall",
+            "east27Welcome",
+            "east27Location"
+          ],
+          "note": "楼栋、B区和首层供餐已核实。具体外门朝向和门槛未经近照确认，暂沿南侧道路示意。"
+        }
       }
     }
   }

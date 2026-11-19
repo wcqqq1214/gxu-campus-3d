@@ -1,6 +1,7 @@
-"""Run in Blender: mapped tower void and one-storey terrace must survive both LODs."""
+"""Run in Blender: mapped tower void and café stair and terrace must survive both LODs."""
 
 import json
+import math
 import sys
 import unittest
 from pathlib import Path
@@ -47,9 +48,21 @@ class StudentCenterGeometry(unittest.TestCase):
             with self.subTest(detail=detail):
                 mesh = landmark(l, b, 0, c, detail)
                 tree = BVHTree.FromPolygons(mesh.v, mesh.f)
-                hit = tree.ray_cast((230, 42, 50), (0, 0, -1))[0]
+                hit = tree.ray_cast((232, 46, 50), (0, 0, -1))[0]
                 self.assertIsNotNone(hit)
+                self.assertAlmostEqual(hit.z, 8.8, places=3)
+                hit = tree.ray_cast((232, 46, 7.8), (0, 0, -1))[0]
                 self.assertAlmostEqual(hit.z, 4.4, places=3)
+                from tower_cafe_wing import DOOR_ANGLE, STAIR_SWEEP, polar
+
+                bearing = DOOR_ANGLE + math.tau / 26
+                ray = (math.cos(bearing), math.sin(bearing), 0)
+                self.assertIsNone(tree.ray_cast(polar(3.7, bearing, 5.9), ray, 1.5)[0])
+                # Every tread midpoint rises exactly once up to the landing.
+                for i in range(26):
+                    angle = DOOR_ANGLE - STAIR_SWEEP * (1 - (i + 0.5) / 26)
+                    hit = tree.ray_cast(polar(3, angle, 5), (0, 0, -1))[0]
+                    self.assertAlmostEqual(hit.z, 4.4 * (i + 1) / 26, places=3)
                 self.assertIsNone(
                     tree.ray_cast((239.9, 50.1, 50), (0, 0, -1))[0],
                     'Do not cap the mapped water-tower void',

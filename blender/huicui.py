@@ -2,8 +2,9 @@
 
 import math
 
+from dining_interiors import interior_finish
 from geometry import Mesh
-from south_gate import inscription
+from huicui_front import dining_windows, finishes, hotel_lobby, lobby_side_glazing
 
 
 def compact_source(obj):
@@ -19,11 +20,12 @@ def compact_source(obj):
 
 
 def huicui(b, z, C, detail=True):
+    finishes(C)
     e = b['architecture']
     m = Mesh()
     wall = C['huicuiWall']
     trim = C['huicuiTrim']
-    glass = C['huicuiGlass']
+    glass = C['huiDiningGlass']
     frame = C['huicuiFrame']
     x0, y0, x1, yn = e['bounds']
     height = b['height']
@@ -33,7 +35,7 @@ def huicui(b, z, C, detail=True):
         part.extrude(
             p['polygons'],
             p['triangles'],
-            z + (6.8 if i else -0.6),
+            z + (p['base'] if i else -0.6),
             p['height'] + (0 if i else 0.6),
             wall,
             C['paleRoof'],
@@ -45,7 +47,10 @@ def huicui(b, z, C, detail=True):
         flat = [v for r in poly for v in r[:-1]]
         for i in range(0, len(tri), 3):
             ceiling.face(
-                [(flat[k][0], flat[k][1], z + 6.8) for k in reversed(tri[i : i + 3])],
+                [
+                    (flat[k][0], flat[k][1], z + e['arcadeClearHeight'])
+                    for k in reversed(tri[i : i + 3])
+                ],
                 trim,
             )
     m.add_part('北侧通高柱廊 · 真实退进与顶板', ceiling)
@@ -88,99 +93,48 @@ def huicui(b, z, C, detail=True):
     north = Mesh()
     # The two lower rows, two tightly spaced upper rows and framed seventh floor
     # are distinct in the official whole-building photograph.
-    for zz in [8.35, 11.45]:
-        for i in range(17):
-            pane(north, -35.5 + i * 4.35, yn, zz, 2.55, 2.1, normal=-1, divisions=3)
-    for zz in [14.85, 18.0]:
-        for i in range(47):
-            pane(north, -39.0 + i * 1.64, yn, zz, 0.97, 2.4, normal=-1, divisions=1)
-    for i in range(18):
-        pane(north, -35.5 + i * 4.16, yn, 21.45, 2.08, 2.65, normal=-1, divisions=2)
+    for zz in [10.83, 14.21]:
+        for i in range(20):
+            pane(north, -38.23 + i * 3.98, yn, zz, 2.35, 2.65, normal=-1, divisions=3)
+    for zz in [19.08, 22.85]:
+        for i in range(57):
+            x = -34.95 + i * 1.33
+            pane(north, x, yn, zz, 0.86, 2.18, normal=-1, divisions=1)
+    dining_windows(north, yn, z, C, detail)
     for zz, depth, h in [
-        (6.8, 0.7, 0.42),
-        (9.94, 0.62, 0.2),
-        (13.02, 1.25, 0.40),
-        (19.60, 1.15, 0.42),
-        (23.2, 0.75, 0.38),
+        (8.15, 0.7, 0.42),
+        (12.73, 0.62, 0.2),
+        (16.70, 1.25, 0.40),
+        (24.52, 1.15, 0.42),
+        (30.99, 0.26, 0.17),
     ]:
         north.box((x0 + x1) / 2, yn + 0.20, z + zz, x1 - x0 + 0.7, depth, h, trim)
     # Slender continuous stone fins over the closely spaced fifth/sixth-floor windows.
-    for i in range(48):
-        north.box(-39.82 + i * 1.64, yn + 0.26, z + 16.45, 0.20, 0.60, 5.95, trim)
+    for i in range(58):
+        north.box(-35.61 + i * 1.33, yn + 0.26, z + 20.58, 0.19, 0.60, 7.50, trim)
+    for x in (-40.9, -38.5):
+        north.cylinder(x, yn - 0.26, z + 20.62, 0.35, 7.81, trim, 16 if detail else 8)
     if detail:
-        for i in range(29):
-            north.box(
-                x0 + 1 + i * 2.91,
-                yn + 0.035,
-                z + 21.48,
-                0.018,
-                0.06,
-                3.02,
-                C['gateJoint'],
-            )
-        for zz in [20.1, 22.8]:
-            north.box(0, yn + 0.035, z + zz, x1 - x0 - 0.2, 0.06, 0.018, C['gateJoint'])
+        for h in (17.05, 17.40, 17.77):
+            north.box(-38.9, yn, z + h, 5.20, 0.07, 0.05, frame)
     m.add_part('北立面 · 方窗、密集窄窗、石材顶层与分层挑檐', north)
 
     arcade = Mesh()
     for x in [-38, -30.4, -22.8, -15.2, 15.2, 22.8, 30.4, 38]:
-        arcade.cylinder(x, yn - 0.50, z + 3.69, 0.43, 6.22, trim, 16 if detail else 8)
+        arcade.cylinder(x, yn - 0.50, z + 4.365, 0.48, 7.57, trim, 16 if detail else 8)
         arcade.cylinder(x, yn - 0.50, z + 0.60, 0.58, 0.25, trim, 16 if detail else 8)
     # Dark glazing is behind the recessed external colonnade, never across its front.
     for i in range(20):
-        pane(arcade, -38 + i * 4, back + 0.04, 3.35, 3.55, 5.6, normal=-1, divisions=2)
+        x = -38 + i * 4
+        if abs(x) > 12:
+            pane(arcade, x, back + 0.04, 4.11, 3.72, 6.91, normal=-1, divisions=2)
+    lobby_side_glazing(arcade, yn, z, C, detail)
     arcade.box(0, (back + yn) / 2, z - 0.60, x1 - x0, yn - back, 2.0, trim)
     arcade.box(0, (back + yn) / 2, z + 0.49, x1 - x0, yn - back, 0.18, C['path'])
     m.add_part('北侧落地玻璃与八根通高圆柱', arcade)
 
-    entry = Mesh()
-    # Twin-column, metal-clad hotel canopy visible in the historic entrance close-up.
-    entry.box(0, yn + 0.65, z + 4.78, 15.2, 7.8, 0.48, frame)
-    entry.box(0, yn + 0.65, z + 5.05, 15.5, 8.0, 0.09, C['metal'])
-    for x in [-6.25, 6.25]:
-        entry.cylinder(x, yn + 3.3, z + 2.58, 0.49, 4.1, trim, 20 if detail else 10)
-        entry.cylinder(x, yn + 3.3, z + 0.62, 0.64, 0.26, trim, 20 if detail else 10)
-    entry.box(0, yn + 0.03, z + 5.89, 15.2, 0.20, 1.20, C['wood'])
-    if detail:
-        for i in range(100):
-            entry.box(
-                -7.45 + i * 0.15,
-                yn + 0.18,
-                z + 5.89,
-                0.034,
-                0.075,
-                1.18,
-                C['huicuiWall'],
-            )
-        for x in [-5, -2.5, 0, 2.5, 5]:
-            for yy in [yn - 1.6, yn + 1.1, yn + 3.3]:
-                entry.box(x, yy, z + 4.525, 0.12, 0.12, 0.018, C['lampGlass'])
-        for x in [-5, 0, 5]:
-            entry.box(x, yn + 0.65, z + 4.528, 0.012, 7.6, 0.01, C['dark'])
-        for yy in [yn - 1.8, yn + 0.65, yn + 3.1]:
-            entry.box(0, yy, z + 4.528, 15, 0.012, 0.01, C['dark'])
-    # Raised lettering faces north, readable from the lawn. Bundled font -> mesh.
-    text = inscription('荟萃楼', 0, 0, z + 4.8, 2.8, 0.65, trim, detail)
-    text.rotate_z(0, 0, math.pi)
-    text.v = [(x - 4.3, y + yn + 4.57, zz) for x, y, zz in text.v]
-    entry.extend(text)
-    # The north forecourt DEM is lower than the shared building anchor. Eight
-    # estimated treads meet the slope; a buried foundation avoids floating risers.
-    for i in range(8):
-        depth = 7.0 - i * 0.80
-        top = -0.44 + i * 1.02 / 7
-        entry.box(0, yn + depth / 2, z + (top - 1.6) / 2, 16.2, depth, top + 1.6, trim)
-    pane(entry, 0, back + 0.07, 2.25, 5.2, 3.3, normal=-1, divisions=4)
-    if detail:
-        for x in [-0.35, 0.35]:
-            entry.line(
-                (x, back + 0.40, z + 1.55),
-                (x, back + 0.40, z + 2.2),
-                0.028,
-                C['metal'],
-                8,
-            )
-    m.add_part('荟萃楼北门 · 双圆柱金属雨棚、字牌、玻璃门与踏步', entry)
+    entry = hotel_lobby(yn, z, C, detail)
+    m.add_part('荟萃楼北门 · 双柱铝板雨棚、滑动玻璃门与两级踏步', entry)
 
     other = Mesh()
     roof = Mesh()
@@ -197,21 +151,23 @@ def huicui(b, z, C, detail=True):
             angle = math.atan2(dy, dx)
             nx, ny = dy / length * sign, -dx / length * sign
             mx, my = (a[0] + b1[0]) / 2, (a[1] + b1[1]) / 2
-            roof.box(mx, my, z + height + 0.38, length, 0.32, 0.76, trim, angle)
-            roof.box(mx, my, z + height + 0.81, length + 0.1, 0.56, 0.12, trim, angle)
+            roof.box(mx, my, z + height - 0.43, length, 0.32, 0.76, trim, angle)
+            roof.box(mx, my, z + height - 0.055, length + 0.1, 0.56, 0.12, trim, angle)
             if my > yn - 0.6 and ri == 0:
                 continue
             n = max(1, round(length / 4.2))
-            for zz in [2.7, 5.25, 8.35, 11.45, 14.85, 18.0, 21.45]:
+            for zz in [2.9, 6.05, 10.83, 14.21, 19.08, 22.85, 27.03]:
                 for i in range(n):
                     t = (i + 0.5) / n
                     x = a[0] + t * dx
                     y = a[1] + t * dy
                     # Do not cap the side ends of the north colonnade with glazing.
-                    if zz < 6.8 and y > back - 0.5:
+                    if zz < 8.15 and y > back - 0.5:
+                        continue
+                    if 16.7 < zz < 24.55 and x < -36.1 and y > yn - 4.5:
                         continue
                     pane(other, x, y, zz, min(2.3, length / n * 0.64), 1.9, angle, sign)
-            for zz in [6.8, 13.02, 19.6]:
+            for zz in [8.15, 16.70, 24.55]:
                 other.box(
                     mx + nx * 0.14,
                     my + ny * 0.14,
@@ -224,6 +180,15 @@ def huicui(b, z, C, detail=True):
                 )
     m.add_part('学院侧翼、内院与西侧弧形凹口 · 估算立面', other)
     m.add_part('平屋顶 · 外缘及内院女儿墙', roof)
+    if detail:
+        # Preserve the backing surfaces and depth behind the seventh-floor windows.
+        room = Mesh()
+        stone = interior_finish(C, 'banquetWall', (0.70, 0.63, 0.50), 0.81)
+        room.box(0, 0, -0.04, 6.8, 6.8, 0.08, stone)
+        room.box(0, 3.26, 1.61, 6.8, 0.16, 3.22, stone)
+        room.box(3.34, 0, 1.61, 0.12, 6.6, 3.22, stone)
+        room.v = [(x, y + yn - 8, zz + z + 24.58) for x, y, zz in room.v]
+        m.add_part('七楼窗后楼板与墙面', room)
     m.rotate_z(0, 0, e['angle'])
     ox, oy = e['origin']
     m.v = [(x + ox, y + oy, zz) for x, y, zz in m.v]

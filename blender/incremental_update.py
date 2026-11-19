@@ -26,7 +26,15 @@ def snapshot(root):
 def copy_inputs(root, candidate):
     if any(
         candidate.resolve().is_relative_to((root / name).resolve())
-        for name in ('data', 'public', 'scripts', 'lib', 'blender', 'node_modules')
+        for name in (
+            'data',
+            'public',
+            'scripts',
+            'lib',
+            'blender',
+            'app/fonts',
+            'node_modules',
+        )
     ):
         raise ValueError('Candidate cannot be inside a copied input directory')
     candidate.mkdir(parents=True, exist_ok=False)
@@ -34,10 +42,11 @@ def copy_inputs(root, candidate):
         shutil.copytree(
             root / name, candidate / name, ignore=shutil.ignore_patterns('__pycache__')
         )
+    shutil.copytree(root / 'app/fonts', candidate / 'app/fonts')
     (candidate / 'blender').mkdir()
     for path in (root / 'blender').glob('*.py'):
         shutil.copy2(path, candidate / 'blender' / path.name)
-    for name in ('textures', 'fonts', 'fixtures'):
+    for name in ('textures', 'fonts', 'fixtures', 'assets'):
         shutil.copytree(root / 'blender' / name, candidate / 'blender' / name)
     shutil.copy2(
         root / 'blender/gxu-campus.blend', candidate / 'blender/gxu-campus.blend'

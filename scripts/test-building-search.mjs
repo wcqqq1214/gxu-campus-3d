@@ -33,6 +33,47 @@ test('all confirmed Huixue aliases resolve only to the curated hall', () => {
   }
 });
 
+test('南苑食堂的常用搜索词定位到旧餐厅北侧的南苑第二餐厅', () => {
+  for (const query of ['南苑食堂', '南苑第二食堂', '南苑二餐厅', '南苑']) {
+    const [place] = searchBuildings(buildings, landmarks, query);
+    assert.equal(place.id, 'way/948683821');
+    assert.equal(place.name, '南苑第二餐厅');
+  }
+  assert.equal(
+    searchBuildings(buildings, landmarks, '南苑餐厅')[0].id,
+    'way/759147049',
+  );
+});
+
+test('餐厅别名可定位到独立餐厅或其所在楼栋', () => {
+  for (const [query, id] of [
+    ['西23栋供餐点', 'way/759140894'],
+    ['西22栋供餐点', 'way/759140893'],
+    ['萃苑食堂', 'way/759337794'],
+    ['博萃餐厅', 'way/1544361473'],
+    ['东苑食堂', 'way/759191485'],
+    ['秀苑食堂', 'way/822812186'],
+    ['碧湖苑食堂', 'way/759609659'],
+    ['风味餐厅', 'way/759609659'],
+    ['碧湖苑风味餐厅', 'way/759609659'],
+    ['北苑食堂', 'way/760187419'],
+    ['荟萃餐厅', 'huicui'],
+    ['Huicui Dining Hall', 'huicui'],
+    ['老水塔咖啡厅', 'student-center'],
+    ['Old Water Tower Café', 'student-center'],
+  ]) {
+    const matches = [
+      ...searchLandmarks(landmarks, query),
+      ...searchBuildings(buildings, landmarks, query),
+    ];
+    assert.deepEqual(
+      matches.map((place) => place.id),
+      [id],
+      query,
+    );
+  }
+});
+
 test('internal model descriptions and the disputed footprint are not destinations', () => {
   const evidence = read('../data/i18n-name-sources.json');
   const internal = buildings.filter(

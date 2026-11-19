@@ -59,6 +59,9 @@ export function CampusPlaceDetail({
               })}
         </p>
       )}
+      {building?.id === 'way/759609659' && (
+        <p>{t('风味餐厅入口在碧湖苑主楼东侧。')}</p>
+      )}
       <CampusViewControls
         landmark={landmark}
         view={view}

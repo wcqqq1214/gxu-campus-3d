@@ -5,6 +5,19 @@ import math
 
 from attached_gallery import add_attached_gallery
 from attached_portico import add_attached_portico
+from dining_halls import (
+    BEI,
+    BI,
+    FLAVOR_HALF_WIDTH,
+    FRONTS,
+    XIU,
+    bihuyuan_shell,
+    north_roof,
+    photographed_facade,
+    place,
+)
+from dining_interiors import beiyuan_entry
+from east27_dining import EAST27_ID, east27
 from facade_bands import (
     add_band_ledges,
     add_band_windows,
@@ -16,6 +29,7 @@ from facade_panels import add_panels, panel_replaces_window
 from facade_windows import add_grid_pilasters, add_grid_windows
 from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
 from geometry import Mesh
+from nanyuan import CANTEEN_ID, nanyuan
 from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS
 from new_east_neighbours import (
     SHOP_BUILDINGS,
@@ -27,6 +41,8 @@ from recessed_stair_entry import add_recessed_stair_entry, recessed_entry_blocks
 from roof_crown import side_wall_blocks_window
 from roof_eave import add_roof_eave, replaces_parapet
 from terraced_stairs import blocks_window as stairs_block_window
+from west22 import WEST22, west22
+from west23 import WEST23, west23
 from west_dorms import NUMBERS as WEST_DORMS
 from west_dorms import west_dorm
 
@@ -52,6 +68,10 @@ def compact_form_source(obj):
 
 
 def wall_material(b, C):
+    if b['id'] == XIU:
+        return C['xiuIvory']
+    if b['id'] in FRONTS:
+        return C['stone' if b['id'] == BI else 'white']
     if b['id'] in NEW_EAST_NEIGHBOURS:
         return wall_finish(b, C)
     # A shared small palette keeps the all-campus base batched. Per-building
@@ -68,7 +88,7 @@ def wall_material(b, C):
     return wall
 
 
-def shared_form(b, z, C):
+def shared_form(b, z, C, *, entrance_mesh=None):
     """All silhouette-defining components; never receives a detail flag."""
     if 'stairTower' in b['form']:
         from stair_tower import stair_tower_model
@@ -81,7 +101,7 @@ def shared_form(b, z, C):
     result = Mesh()
     body = Mesh()
     top = Mesh()
-    entrance = Mesh()
+    entrance = Mesh() if entrance_mesh is None else entrance_mesh
     panels = Mesh()
     parts = form['parts'] or [
         {
@@ -222,7 +242,11 @@ def shared_form(b, z, C):
                     )
         else:
             roof_material = (
-                C['blueRoof'] if roof.get('finish') == 'blue-metal' else C['paleRoof']
+                C['red']
+                if b['id'] == XIU
+                else C['blueRoof']
+                if roof.get('finish') == 'blue-metal'
+                else C['paleRoof']
             )
             top_indices = (
                 [[] for _ in part['polygons']] if 'inset' in roof else triangles
@@ -431,7 +455,7 @@ def shared_form(b, z, C):
         from stair_tower import stair_access_door
 
         stair_access_door(entrance, door, z, C)
-    for e in form['entrances']:
+    for e in form['entrances'] if entrance_mesh is None else []:
         if 'recessedStairEntry' in e:
             add_recessed_stair_entry(entrance, e, z, C)
             continue
@@ -653,6 +677,8 @@ def shared_form(b, z, C):
         from terraced_stairs import add_terraced_stairs
 
         add_terraced_stairs(entrance, form['terracedStairs'], z, C['stone'])
+    if b['id'] == BEI:
+        top.extend(north_roof(b, z, C))
     result.add_part('01_主体轮廓', body)
     result.add_part('02_屋顶轮廓', top)
     result.add_part('03_入口与平台', entrance)
@@ -698,9 +724,26 @@ def ordinary_building(b, z, C, detail):
 
     if b['id'] in WEST_DORMS:
         return west_dorm(b, z, C, detail)
+    if b['id'] == WEST23:
+        return west23(b, z, C, detail)
+    if b['id'] == WEST22:
+        return west22(b, z, C, detail)
+    if b['id'] == EAST27_ID:
+        return east27(b, z, C, detail)
     if b['id'] == TOWER_ID:
         return water_tower(b, z, C, detail)
-    m = shared_form(b, z, C)
+    if b['id'] == CANTEEN_ID:
+        return nanyuan(b, z, C, detail)
+    hall_fronts = FRONTS.get(b['id'], {})
+    pane_glass = C['glass']
+    windows = Mesh()
+    entrance = None
+    if hall_fronts:
+        entrance, windows = photographed_facade(b, z, C, detail)
+        pane_glass = C['xiuBlueGlass' if b['id'] == XIU else 'residenceGlass']
+    if b['id'] == BI:
+        b = bihuyuan_shell(b)
+    m = shared_form(b, z, C, entrance_mesh=entrance)
     if b['id'] in NEW_EAST_NEIGHBOURS:
         facades = facade_segments(b)
         m.add_part('04_立面窗格', facade_details(b, z, C, detail, facades))
@@ -709,16 +752,30 @@ def ordinary_building(b, z, C, detail):
         return m
     if 'stairTower' in b['form']:
         return m
-    windows = Mesh()
     form = b['form']
     h = form['height']
     wall = wall_material(b, C)
     seed = int(hashlib.sha256(b['id'].encode()).hexdigest()[:8], 16)
     levels = max(1, round(form['levels']))
     balconies = form['archetype'] in ('dormitory', 'residential-block')
-    for facade in facade_segments(b):
+    flavor_center = (
+        next(
+            (
+                entry['center']
+                for entry in form['entrances']
+                if entry['id'] == 'flavor-east'
+            ),
+            None,
+        )
+        if b['id'] == BI
+        else None
+    )
+    for edge, facade in enumerate(facade_segments(b)):
         a, c = facade['start'], facade['end']
         rule = facade['rule']
+        if b['id'] == XIU and edge in (3, 5):
+            # These short returns have continuous glazing to the west entrance.
+            continue
         if rule.get('windows') is False:
             continue
         if 'windowGrid' in rule:
@@ -737,7 +794,9 @@ def ordinary_building(b, z, C, detail):
         num = max(1, int(length / rule.get('spacing', 4)))
         floor_heights = facade.get('floorHeights')
         for level in range(levels):
-            if level in rule.get('skipWindowLevels', []):
+            if level in hall_fronts.get(
+                facade.get('edge', edge), ()
+            ) or level in rule.get('skipWindowLevels', []):
                 continue
             floor_bottom = (
                 math.fsum(floor_heights[:level])
@@ -761,6 +820,13 @@ def ordinary_building(b, z, C, detail):
             for i in range(num):
                 f = (i + 0.5) / num
                 x, y = a[0] + dx * f + nx * 0.07, a[1] + dy * f + ny * 0.07
+                if (
+                    flavor_center
+                    and edge == 0
+                    and level == 1
+                    and math.dist((x, y), flavor_center) < FLAVOR_HALF_WIDTH
+                ):
+                    continue
                 if gallery:
                     x += nx * gallery['depth']
                     y += ny * gallery['depth']
@@ -884,8 +950,8 @@ def ordinary_building(b, z, C, detail):
                         0.10,
                         wh,
                         C['shadeGlass']
-                        if (seed + i * 7 + level * 13) % 7 < 2
-                        else C['glass'],
+                        if b['id'] not in FRONTS and (seed + i * 7 + level * 13) % 7 < 2
+                        else pane_glass,
                         theta,
                     )
                     windows.box(
@@ -928,7 +994,20 @@ def ordinary_building(b, z, C, detail):
                             (x + ux, y + uy, zz + wh / 2),
                             (x - ux, y - uy, zz + wh / 2),
                         ],
-                        C['glass'],
+                        pane_glass,
                     )
     m.add_part('04_立面窗格', windows)
+    if b['id'] == BEI:
+        # The guide identifies the second storey. Position within the hall is approximate.
+        door = beiyuan_entry(C, detail)
+        interior = Mesh()
+        place(
+            door,
+            interior,
+            b['center'][0],
+            b['center'][1] - 12,
+            z + 3.3,
+            math.radians(-7.56),
+        )
+        m.add_part('06_二楼餐厅内门', interior)
     return m

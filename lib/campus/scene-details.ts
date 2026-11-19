@@ -156,6 +156,7 @@ export function createDetailStreaming({
           ? [currentKey, foreground]
           : undefined,
       foregroundReady: loaded.has(currentKey),
+      selectedBuildingId: selected,
       roads:
         near && layers.roads
           ? nearbyChunks(manifest.infrastructure ?? [], x, y, 230).map(

@@ -268,3 +268,14 @@ test('sports details share the memory cap and cannot displace building details',
     'missing bounds do not load a bank everywhere',
   );
 });
+
+test('选中的宿舍分块优先于周边道路且仍遵守内存预算', () => {
+  const building = { id: 'campus-block', bytes: 2, featureIds: ['residence'] };
+  const road = { id: 'campus-road', bytes: 1 };
+  const options = {
+    foregroundReady: false, selectedBuildingId: 'residence',
+    roads: [road], buildings: [building], costs: new Map(), cap: 64,
+  };
+  assert.deepEqual(planDetails(options).assets.map(([key]) => key), ['campus-block']);
+  assert.deepEqual(planDetails({ ...options, cap: 50 }).assets.map(([key]) => key), ['campus-road']);
+});

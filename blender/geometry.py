@@ -1,6 +1,7 @@
 """Small deterministic mesh assembler. Blender coordinates: east X, north Y, up Z."""
 
 import math
+from pathlib import Path
 
 import bpy
 from mathutils import Vector
@@ -18,6 +19,20 @@ def material(name, color, roughness=0.8, metallic=0):
     bs.inputs['Metallic'].default_value = metallic
     MATERIALS.append(m)
     return len(MATERIALS) - 1
+
+
+def tile_material(colors, name, file, base):
+    if name in colors:
+        return
+    colors[name] = material(name, base, 0.58)
+    mat = MATERIALS[colors[name]]
+    tex = mat.node_tree.nodes.new('ShaderNodeTexImage')
+    tex.image = bpy.data.images.load(
+        str(Path(__file__).parent / 'textures' / file), check_existing=True
+    )
+    tex.image.pack()
+    shader = mat.node_tree.nodes.get('Principled BSDF')
+    mat.node_tree.links.new(tex.outputs['Color'], shader.inputs['Base Color'])
 
 
 class Mesh:
@@ -53,7 +68,7 @@ class Mesh:
         self.f.append(tuple(range(i, i + len(coords))))
         self.m.append(mat)
 
-    def box(self, x, y, z, w, d, h, mat, angle=0):
+    def box(self, x, y, z, w, d, h, mat, angle=0, *, bottom=True):
         c = math.cos(angle)
         s = math.sin(angle)
         pts = [
@@ -69,8 +84,9 @@ class Mesh:
                 (-w / 2, d / 2, h / 2),
             ]
         ]
+        if bottom:
+            self.face([pts[i] for i in (3, 2, 1, 0)], mat)
         for face in [
-            (3, 2, 1, 0),
             (0, 1, 5, 4),
             (1, 2, 6, 5),
             (2, 3, 7, 6),

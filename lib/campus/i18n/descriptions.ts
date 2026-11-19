@@ -11,7 +11,7 @@ export const englishDescriptions: Record<string, string> = {
   stadium:
     'The comprehensive gymnasium on the west campus, defined by a broad shallow-pitched roof, vertical piers and a glazed entrance.',
   'student-center':
-    'A student activity space beside Biyun Lake, with flowing floor plates and continuous windows reflected in the water.',
+    'A student activity space beside Biyun Lake, with flowing floor plates and continuous windows reflected in the water. A spiral stair leads to the Old Water Tower Café at the west end of the second floor. Window seats look onto the brick tower.',
   'teaching-six':
     'A large teaching building on the east campus, with enclosed courtyards and connecting corridors.',
   'teaching-two':
@@ -39,7 +39,7 @@ export const englishDescriptions: Record<string, string> = {
   'teaching-ten':
     'Known as Shijiao, this building north of the square by the east campus library connects a curved low-rise teaching section to a taller northern wing, with smart classrooms and lecture halls.',
   huicui:
-    'A campus guest hotel in the north wing of the building shared with the School of Journalism and Communication on the west campus. Its northern entrance has tall columns and a canopy.',
+    'A campus guest hotel occupying the north wing of the building shared with the School of Journalism and Communication on the west campus, fronted by tall columns and a canopy. Huicui Dining Hall is on the seventh floor via the north lobby elevators.',
 };
 
 export function landmarkDescription(

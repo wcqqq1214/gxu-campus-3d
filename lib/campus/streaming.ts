@@ -38,6 +38,7 @@ export function nearbyChunks(
 export function planDetails(options: {
   foreground?: [string, StreamAsset];
   foregroundReady: boolean;
+  selectedBuildingId?: string | null;
   roads: StreamAsset[];
   buildings: StreamAsset[];
   sports?: StreamAsset[];
@@ -61,9 +62,22 @@ export function planDetails(options: {
       assets.push([item.id, item]);
       count++;
     }
+    return count;
   };
+  // Reserve space for the selected building before nearby roads and blocks.
+  const selectedId = options.selectedBuildingId;
+  const selectedBlock =
+    selectedId && !foreground
+      ? buildings.find((item) => item.featureIds?.includes(selectedId))
+      : undefined;
+  const reserved = selectedBlock ? append([selectedBlock], 1, 32) : 0;
+  const blockLimit = foreground && !foregroundReady ? 1 : 3;
   append(roads.slice(0, 3), 3, 28);
-  append(buildings, foreground && !foregroundReady ? 1 : 3, 32);
+  append(
+    reserved ? buildings.filter((item) => item !== selectedBlock) : buildings,
+    blockLimit - reserved,
+    32,
+  );
   append(options.sports ?? [], 2, 32);
   return { assets, allocation };
 }

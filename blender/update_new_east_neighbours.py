@@ -103,7 +103,7 @@ def main():
         (high, target / 'public/models' / f'{key}.glb'),
     ]:
         obj = mesh.object(key, bpy.context.scene.collection, props)
-        export_detail(obj, path)
+        export_detail(obj, path, base_chunk=mesh is low)
         data = obj.data
         bpy.data.objects.remove(obj, do_unlink=True)
         bpy.data.meshes.remove(data)

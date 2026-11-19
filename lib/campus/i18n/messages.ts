@@ -167,5 +167,7 @@ export const englishMessages: Record<string, string> = {
   '正在加载{name} {percent}%': 'Loading {name} {percent}%',
   '正在加载{name}': 'Loading {name}',
   '{label} {percent}%': '{label} {percent}%',
+  '风味餐厅入口在碧湖苑主楼东侧。':
+    'The specialty dining entrance is on the east side of Bihuyuan Canteen.',
   '约 {levels} 层，高约 {height} 米': 'About {levels} floors, {height} m tall',
 };

@@ -20,6 +20,8 @@ from huicui import compact_source, huicui
 from infrastructure import approaches, bridge, lake_bridge, road_chunk
 from landmarks import landmark
 from sports import athletics, west_stand
+from west_market import DATUM as MARKET_DATUM
+from west_market import market_building, market_ground
 
 DATA = ROOT / 'public/data'
 MODELS = ROOT / 'public/models'
@@ -503,6 +505,8 @@ civil_grade = load_grade(ROOT)
 
 
 def building_elevation(b):
+    if b.get('customModel') == 'west-market':
+        return MARKET_DATUM
     if b.get('customModel') == 'north-campus':
         return b['elevation']
     return building_datum(
@@ -515,6 +519,8 @@ def building_elevation(b):
 
 
 def generic(b, detail):
+    if b.get('customModel') == 'west-market':
+        return market_building(b['id'], detail)
     if b.get('customModel') == 'north-campus':
         from north_campus import building_model
 
@@ -1103,6 +1109,12 @@ if (DATA / 'north-campus.json').exists() and north_data.get('underpass'):
     )
     cut_meshes(base, north_data['underpass'])
 from road_display_cleanup import load_cuts, trim_mesh
+from west22_ground import bed_surface
+
+base['terrain'] = bed_surface(base['terrain'], is_road=False)
+base['roads'] = bed_surface(base['roads'], is_road=True)
+base['terrain'] = market_ground(base['terrain'])
+base['roads'] = market_ground(base['roads'], clearance=0.02)
 
 base['roads'], road_display_report = trim_mesh(base['roads'], load_cuts(ROOT))
 from road_surface_clearance import load_repairs, repair_clearance
@@ -1260,9 +1272,12 @@ def export(name, groups):
 
     # Keep the base budget reproducible through the normal build: share only
     # byte-identical vertex attributes, without lowering geometry/UV precision.
-    if name == 'new-east-gate.glb':
-        (gate,) = objs
-        export_detail(gate, path)
+    if name == 'new-east-gate.glb' or any(
+        b.get('customModel') == 'west-market' and b['chunk'] + '.glb' == name
+        for b in buildings
+    ):
+        (obj,) = objs
+        export_detail(obj, path)
     else:
         with (
             omit_unused_uvs(deduplicate_vertices=name == 'base.glb')

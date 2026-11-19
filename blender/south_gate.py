@@ -77,17 +77,35 @@ def arch_band(m, cx, y, cz, radius, side, width, depth, mat, segments):
         prism(m, outline, y, depth, mat)
 
 
-def inscription(text, x, y, z, width, height, mat, detail):
+def inscription(
+    text,
+    x,
+    y,
+    z,
+    width,
+    height,
+    mat,
+    detail,
+    *,
+    font_path=None,
+    flat=False,
+    outline=None,
+    stroke_offset=0.0,
+    curve_resolution=None,
+):
     """Self-contained raised glyph meshes; bundled OFL font, no runtime font fetch."""
-    path = str(Path(__file__).parent / 'fonts/MaShanZheng-Regular.ttf')
-    font = bpy.data.fonts.get('MaShanZheng-Regular') or bpy.data.fonts.load(path)
-    font.name = 'MaShanZheng-Regular'
+    path = font_path or Path(__file__).parent / 'fonts/MaShanZheng-Regular.ttf'
+    font = bpy.data.fonts.get(path.stem) or bpy.data.fonts.load(str(path))
+    font.name = path.stem
     curve = bpy.data.curves.new('校名字形临时', 'FONT')
     curve.body = text
     curve.font = font
     curve.size = 1
-    curve.extrude = 0.012
-    curve.resolution_u = 8 if detail else 3
+    curve.offset = stroke_offset
+    curve.extrude = 0 if flat else 0.012
+    if flat:
+        curve.fill_mode = 'FRONT'
+    curve.resolution_u = curve_resolution or (8 if detail else 3)
     curve.bevel_depth = 0.002 if detail else 0
     curve.bevel_resolution = 1
     obj = bpy.data.objects.new('校名字形临时', curve)
@@ -101,20 +119,32 @@ def inscription(text, x, y, z, width, height, mat, detail):
     d = max(v.co.y for v in mesh.vertices)
     scale = min(width / (b - a), height / (d - c))
     m = Mesh()
-    for face in mesh.polygons:
-        # Text XY becomes the south-facing XZ plane, with extrusion toward south.
-        m.face(
-            [
-                (
-                    x + (mesh.vertices[i].co.x - (a + b) / 2) * scale,
-                    y - mesh.vertices[i].co.z * scale,
-                    z + (mesh.vertices[i].co.y - (c + d) / 2) * scale,
-                )
-                for i in face.vertices
-            ],
-            mat,
-        )
+
+    def append_faces(mesh, finish, setback):
+        for face in mesh.polygons:
+            m.face(
+                [
+                    (
+                        x + (mesh.vertices[i].co.x - (a + b) / 2) * scale,
+                        y - mesh.vertices[i].co.z * scale + setback,
+                        z + (mesh.vertices[i].co.y - (c + d) / 2) * scale,
+                    )
+                    for i in face.vertices
+                ],
+                finish,
+            )
+
+    append_faces(mesh, mat, 0)
     evaluated.to_mesh_clear()
+    if outline:
+        width_m, finish = outline
+        curve.offset = width_m / scale
+        curve.extrude = 0
+        curve.fill_mode = 'FRONT'
+        deps.update()
+        evaluated = obj.evaluated_get(deps)
+        append_faces(evaluated.to_mesh(), finish, 0.012)
+        evaluated.to_mesh_clear()
     bpy.data.objects.remove(obj, do_unlink=True)
     bpy.data.curves.remove(curve)
     return m
