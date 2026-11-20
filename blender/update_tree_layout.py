@@ -89,6 +89,7 @@ prefix = next(
     (a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')),
     's4-tree',
 )
-target = ROOT / f'docs/model-checks/refinement/{prefix}-source.json'
+target = ROOT / f'work/model-checks/{prefix}-source.json'
+target.parent.mkdir(parents=True, exist_ok=True)
 target.write_text(json.dumps(report, indent=2) + '\n')
 print(report, flush=True)

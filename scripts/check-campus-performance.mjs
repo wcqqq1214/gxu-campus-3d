@@ -3,8 +3,15 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { openPanelTab } from './browser-check-helpers.mjs';
 import { beginBenchmarkCapture } from './benchmark-capture.mjs';
+
+async function openPanelTab(page, name) {
+  const expand = page.getByRole('button', { name: '展开面板', exact: true });
+  if (await expand.isVisible()) await expand.click();
+  const back = page.getByRole('button', { name: '返回地点列表', exact: true });
+  if (await back.isVisible()) await back.click();
+  await page.getByRole('tab', { name, exact: true }).click();
+}
 
 const baseline = process.env.BASELINE_URL;
 const candidate = process.env.REFINEMENT_URL;

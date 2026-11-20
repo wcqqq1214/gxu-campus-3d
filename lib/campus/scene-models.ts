@@ -10,7 +10,7 @@ import { batchSportsSurfaces } from './sports-batching.ts';
 import { fetchModel, type StreamAsset } from './streaming.ts';
 import type { Landmark, Preset } from './types.ts';
 
-export interface LoadProgress {
+interface LoadProgress {
   label: string;
   name?: string;
   fraction: number;

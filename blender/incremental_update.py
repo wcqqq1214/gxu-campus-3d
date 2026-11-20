@@ -51,8 +51,7 @@ def copy_inputs(root, candidate):
     shutil.copy2(
         root / 'blender/gxu-campus.blend', candidate / 'blender/gxu-campus.blend'
     )
-    (candidate / 'docs/model-checks/refinement').mkdir(parents=True)
-    (candidate / 'work').mkdir()
+    (candidate / 'work/model-checks').mkdir(parents=True)
     (candidate / 'node_modules').symlink_to(
         (root / 'node_modules').resolve(), target_is_directory=True
     )

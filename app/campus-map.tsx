@@ -82,7 +82,6 @@ function CampusMap() {
   const error = useSyncExternalStore(
     loadStatusStore.subscribe,
     loadStatusStore.getError,
-    () => false,
   );
   const [ready, setReady] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
@@ -124,7 +123,9 @@ function CampusMap() {
   const [panelExpanded, setPanelExpanded] = useState(false);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [debug, setDebug] = useState(false);
+  const [debug] = useState(() =>
+    new URLSearchParams(location.search).has('debug'),
+  );
   const [hovered, setHovered] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
   const [cameraStore] = useState(createCameraStore);
@@ -169,10 +170,6 @@ function CampusMap() {
   useEffect(() => {
     let active = true;
     const lifetime = new AbortController();
-    const debugMetrics = new URLSearchParams(location.search).has('debug');
-    queueMicrotask(() => {
-      if (active) setDebug(debugMetrics);
-    });
     let cleanup: (() => void) | undefined;
     // The base model is the longest download; start it beside the scene code
     // and building data instead of after them.
@@ -186,13 +183,14 @@ function CampusMap() {
         if (!active || !host.current) return;
         setBuildings(bs);
         setLandmarks(ls);
+        let c: SceneController;
         try {
           if (
             import.meta.env.DEV &&
             new URLSearchParams(location.search).has('test-webgl-unavailable')
           )
             throw new Error('WebGL test');
-          const c = createScene(
+          c = createScene(
             host.current,
             bs,
             ls,
@@ -247,7 +245,7 @@ function CampusMap() {
               },
               // Metrics are only displayed in debug mode; elsewhere each
               // report would re-render the whole page every 1.5 s.
-              onMetrics: debugMetrics
+              onMetrics: debug
                 ? (m) => {
                     if (active) setMetrics(m);
                   }
@@ -255,29 +253,6 @@ function CampusMap() {
             },
             boot,
           );
-          c.setLocale(localeRef.current);
-          controller.current = c;
-          cleanup = () => c.dispose();
-          c.setQuality(settings.current.quality);
-          c.setPreset(settings.current.preset);
-          for (const key of Object.keys(settings.current.layers) as LayerKey[])
-            c.setLayer(key, settings.current.layers[key]);
-          const shared = decodeShare(location.hash, [
-            ...ls.map((l) => l.id),
-            ...searchableBuildings(bs, ls).map((b) => b.id),
-          ]);
-          if (shared) {
-            if (presetEdited.current) shared.preset = settings.current.preset;
-            c.restoreSnapshot(shared);
-            if (shared.preset) {
-              settings.current.preset = shared.preset;
-              setPreset(shared.preset);
-            }
-            setLandmarkView(
-              shared.view ?? (shared.position ? null : 'oblique'),
-            );
-          }
-          cleanup = () => c.dispose();
         } catch {
           // Without WebGL nothing will consume the prefetched model.
           lifetime.abort();
@@ -285,6 +260,27 @@ function CampusMap() {
             '无法显示三维画面，请开启硬件加速或使用支持 WebGL 2 的浏览器',
             true,
           );
+          return;
+        }
+        c.setLocale(localeRef.current);
+        controller.current = c;
+        cleanup = () => c.dispose();
+        c.setQuality(settings.current.quality);
+        c.setPreset(settings.current.preset);
+        for (const key of Object.keys(settings.current.layers) as LayerKey[])
+          c.setLayer(key, settings.current.layers[key]);
+        const shared = decodeShare(location.hash, [
+          ...ls.map((l) => l.id),
+          ...searchableBuildings(bs, ls).map((b) => b.id),
+        ]);
+        if (shared) {
+          if (presetEdited.current) shared.preset = settings.current.preset;
+          c.restoreSnapshot(shared);
+          if (shared.preset) {
+            settings.current.preset = shared.preset;
+            setPreset(shared.preset);
+          }
+          setLandmarkView(shared.view ?? (shared.position ? null : 'oblique'));
         }
       })
       .catch(() => {
@@ -299,7 +295,7 @@ function CampusMap() {
       controller.current = null;
     };
     // The store is created once; listing it only satisfies the hook rule.
-  }, [retrySeed, cameraStore, loadStatusStore, setTour, setTourIndex]);
+  }, [retrySeed, debug, cameraStore, loadStatusStore, setTour, setTourIndex]);
   useEffect(() => {
     const preference = matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => setReducedMotion(preference.matches);

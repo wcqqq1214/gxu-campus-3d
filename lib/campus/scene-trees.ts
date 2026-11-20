@@ -11,14 +11,8 @@ import {
   treeInstanceCounts,
   treeElevation,
   treeRotation,
+  type TreeTerrain,
 } from './vegetation';
-
-interface Terrain {
-  bounds: number[];
-  cols: number;
-  rows: number;
-  heights: number[];
-}
 
 /**
  * Instanced campus trees. The far set loads after the base model; the near
@@ -53,7 +47,7 @@ export function createSceneTrees({
   let nearFailed = false;
   let farFailed = false;
   let loading = false;
-  let data: { rows: number[][]; terrain: Terrain } | null = null;
+  let data: { rows: number[][]; terrain: TreeTerrain | null } | null = null;
   async function json<T>(path: string, name: string) {
     const response = await fetch(asset(path), { signal: lifetime });
     if (!response.ok) throw new Error(name);
@@ -67,12 +61,15 @@ export function createSceneTrees({
     if ((near ? nearReady || !manifest.treesNear : root) || loading) return;
     loading = true;
     try {
-      const [all, terrain] = data
-        ? [data.rows, data.terrain]
-        : await Promise.all([
-            json<number[][]>('data/vegetation.json', 'vegetation'),
-            json<Terrain>('data/terrain.json', 'terrain'),
-          ]);
+      const all = data
+        ? data.rows
+        : await json<number[][]>('data/vegetation.json', 'vegetation');
+      if (lifetime.aborted) return;
+      const terrain = data
+        ? data.terrain
+        : all.some((row) => !Number.isFinite(row[4]))
+          ? await json<TreeTerrain>('data/terrain.json', 'terrain')
+          : null;
       if (lifetime.aborted) return;
       data = { rows: all, terrain };
       const g = await load(
@@ -151,12 +148,9 @@ export function createSceneTrees({
             transform.position.set(x, treeElevation(row, terrain), -y);
             transform.rotation.set(0, treeRotation(x, y), 0);
             const appearance = treeAppearance(x, y);
-            const width = (treeCrownWidthFactor(x, y) * appearance.width * h) / 9;
-            transform.scale.set(
-              width,
-              (appearance.height * h) / 9,
-              width,
-            );
+            const width =
+              (treeCrownWidthFactor(x, y) * appearance.width * h) / 9;
+            transform.scale.set(width, (appearance.height * h) / 9, width);
             transform.updateMatrix();
             inst.setMatrixAt(i, transform.matrix);
             inst.setColorAt(i, new THREE.Color(...appearance.tint));

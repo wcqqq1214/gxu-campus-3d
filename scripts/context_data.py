@@ -80,7 +80,8 @@ def prepare_context():
             )
             + ('\n' if name == 'overview.json' else '')
         )
-    report_path = ROOT / 'docs/model-checks/context-selection.json'
+    report_path = ROOT / 'work/model-checks/context-selection.json'
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     # Re-running an already-filtered snapshot keeps its removal audit intact.
     previous = json.loads(report_path.read_text()) if report_path.exists() else {}
     exclusions = {} if excluded else {b['id']: b for b in previous.get('excluded', [])}

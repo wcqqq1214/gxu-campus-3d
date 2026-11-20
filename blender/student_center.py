@@ -82,7 +82,7 @@ def upper_outline(b):
 def prism(m, ring, bottom, top, wall, cap):
     points = [Vector((x, y, top)) for x, y in ring]
     for tri in tessellate_polygon([points]):
-        vertices = [tuple(points[p] if isinstance(p, int) else p) for p in tri]
+        vertices = [tuple(points[p]) for p in tri]
         m.face(vertices, cap)
         m.face([(x, y, bottom) for x, y, _ in reversed(vertices)], wall)
     for a, b in zip(ring, ring[1:] + ring[:1]):

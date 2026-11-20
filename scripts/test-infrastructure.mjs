@@ -208,7 +208,7 @@ test('仅三座主要桥梁加入精选导航，拾取跟随道路图层与真�
     ids,
   );
   assert.deepEqual(
-    searchLandmarks(landmarks, '', 'infrastructure').map((l) => l.id),
+    landmarks.filter((l) => l.category === 'infrastructure').map((l) => l.id),
     ids,
   );
   const picks = navigationFootprints(buildings, landmarks);

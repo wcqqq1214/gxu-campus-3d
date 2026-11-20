@@ -22,32 +22,20 @@ const LocaleContext = createContext({
     translate('zh', source, values),
   name: (source: string) => placeName(source, 'zh'),
 });
+function readInitialLocale(): Locale {
+  const requested = new URLSearchParams(location.search).get('lang');
+  if (isLocale(requested)) return requested;
+  try {
+    const saved = localStorage.getItem(LOCALE_STORAGE_KEY);
+    if (isLocale(saved)) return saved;
+  } catch {
+    /* Storage may be disabled. */
+  }
+  return 'zh';
+}
 export function CampusLocaleProvider({ children }: { children: ReactNode }) {
-  // Match the static Chinese document for hydration; restore preference after mount.
-  const [locale, setLocale] = useState<Locale>('zh');
-  const [restored, setRestored] = useState(false);
+  const [locale, setLocale] = useState<Locale>(readInitialLocale);
   useEffect(() => {
-    const requested = new URLSearchParams(location.search).get('lang');
-    let saved: string | null = null;
-    try {
-      saved = localStorage.getItem(LOCALE_STORAGE_KEY);
-    } catch {
-      /* Storage may be disabled. */
-    }
-    let active = true;
-    queueMicrotask(() => {
-      if (!active) return;
-      setLocale(
-        isLocale(requested) ? requested : isLocale(saved) ? saved : 'zh',
-      );
-      setRestored(true);
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
-  useEffect(() => {
-    if (!restored) return;
     document.documentElement.lang = locale === 'zh' ? 'zh-CN' : 'en';
     document.title = translate(locale, '广西大学 校园地图');
     document
@@ -64,7 +52,7 @@ export function CampusLocaleProvider({ children }: { children: ReactNode }) {
     } catch {
       /* The in-memory switch still works. */
     }
-  }, [locale, restored]);
+  }, [locale]);
   const changeLocale = useCallback((next: Locale) => {
     setLocale(next);
     const url = new URL(location.href);

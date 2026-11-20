@@ -50,11 +50,11 @@ const manifest = JSON.parse(
 for (const a of [
   manifest.base,
   manifest.trees,
-  ...(manifest.treesNear ? [manifest.treesNear] : []),
+  manifest.treesNear,
   ...manifest.zones,
   ...manifest.landmarks,
-  ...(manifest.infrastructure ?? []),
-  ...(manifest.sports ?? []),
+  ...manifest.infrastructure,
+  ...manifest.sports,
 ])
   await access(path.join(out, a.url));
 for (const a of [

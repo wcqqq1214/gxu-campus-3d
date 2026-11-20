@@ -2016,87 +2016,6 @@ def resolve_building(building, record=None, source_ids=None):
     return b
 
 
-def prepare_existing_overrides():
-    out = ROOT / 'public/data'
-    buildings = read_json(out / 'buildings.json')
-    catalogue = load_catalogue()
-    validate_ids(catalogue, buildings)
-    sources = source_catalogue()
-    source_ids = {s['id'] for s in sources}
-    for b in buildings:
-        placement = catalogue.get(b['id'], {}).get('footprintPlacement')
-        if b.get('calibration', {}).get('footprintPlacement') != placement:
-            raise ValueError(
-                f'{b["id"]}: footprint placement changed; run prepare_geodata'
-            )
-    resolved = [
-        resolve_building(b, catalogue.get(b['id']), source_ids) for b in buildings
-    ]
-    from attached_gallery_data import validate_gallery_context
-
-    validate_gallery_context(resolved)
-    from mapped_canopy_data import resolve_mapped_canopy_context
-
-    resolve_mapped_canopy_context(resolved)
-    from stair_tower_data import resolve_stair_tower_context
-
-    resolve_stair_tower_context(resolved)
-    geo = read_json(out / 'geography.geojson')
-    features = {f['id']: f for f in geo['features']}
-    props = (
-        'height',
-        'levels',
-        'heightBasis',
-        'facadeBasis',
-        'archetype',
-        'roofBasis',
-        'sourceRefs',
-        'calibration',
-    )
-    for b in resolved:
-        if ordinary(b):
-            target = features[b['id']]['properties']
-            for key in props:
-                if key in b:
-                    target[key] = b[key]
-                else:
-                    target.pop(key, None)
-    overview = read_json(out / 'overview.json')
-    overview['estimatedHeights'] = sum(
-        b['heightBasis'] == '按类型估算' for b in resolved
-    )
-    overview['buildingCalibrations'] = calibration_stats(resolved, catalogue)
-    # All validation finishes before replacing any public data.
-    for name, data in [
-        ('buildings.json', resolved),
-        ('geography.geojson', geo),
-        ('overview.json', overview),
-        ('sources.json', {'version': 1, 'sources': sources}),
-    ]:
-        (out / name).write_text(
-            json.dumps(data, ensure_ascii=False, separators=(',', ':'))
-        )
-    report = {
-        'buildings': [
-            {
-                'id': b['id'],
-                'name': b['name'],
-                'before': {k: resolve_building(old)[k] for k in ('height', 'levels')},
-                'after': {'height': b['height'], 'levels': b['levels']},
-                'calibration': b['calibration'],
-            }
-            for old, b in zip(buildings, resolved)
-            if b['id'] in catalogue
-        ]
-    }
-    (ROOT / 'docs/model-checks/refinement/s2-calibrations.json').write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + '\n'
-    )
-    print(
-        f'Applied {len(catalogue)} attributed ordinary-building records; preserved site/terrain/tree files'
-    )
-
-
 def calibration_stats(buildings, catalogue):
     return {
         'records': len(catalogue),
@@ -2111,7 +2030,3 @@ def calibration_stats(buildings, catalogue):
             for b in buildings
         ),
     }
-
-
-if __name__ == '__main__':
-    prepare_existing_overrides()

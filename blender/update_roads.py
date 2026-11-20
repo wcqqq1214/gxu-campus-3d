@@ -213,9 +213,9 @@ report = {
     'initialBytes': len(blob) + manifest['trees']['bytes'],
     'blendBytes': (ROOT / 'blender/gxu-campus.blend').stat().st_size,
 }
-(ROOT / 'docs/model-checks/bridge-joins-models.json').write_text(
-    json.dumps(report, indent=2) + '\n'
-)
+report_path = ROOT / 'work/model-checks/bridge-joins-models.json'
+report_path.parent.mkdir(parents=True, exist_ok=True)
+report_path.write_text(json.dumps(report, indent=2) + '\n')
 check_initial_model_budget(report['initialBytes'])
 assert report['blendBytes'] < 100 * 1024 * 1024, report
 print(report, flush=True)

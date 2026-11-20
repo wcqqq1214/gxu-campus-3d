@@ -10,7 +10,7 @@ import {
 import type { LayerKey } from './types';
 
 /** Decoded geometry bytes of a model; shared buffers count once. */
-export function detailCost(root: THREE.Object3D) {
+function detailCost(root: THREE.Object3D) {
   const buffers = new Set<ArrayBufferLike>();
   root.traverse((o) => {
     if (!(o instanceof THREE.Mesh)) return;
@@ -29,7 +29,7 @@ export function detailCost(root: THREE.Object3D) {
   return [...buffers].reduce((n, buffer) => n + buffer.byteLength, 0);
 }
 
-export interface DetailView {
+interface DetailView {
   manifest: ModelManifest | null;
   /** The base model is published and the scene is not disposed. */
   ready: boolean;
@@ -54,7 +54,6 @@ export function createDetailStreaming({
   view,
   load,
   nearTrees,
-  onNearTreesFailed,
   onAttached,
   onReleased,
   onSettled,
@@ -76,7 +75,6 @@ export function createDetailStreaming({
   nearTrees: (
     distance: number,
   ) => ((signal: AbortSignal) => Promise<void>) | undefined;
-  onNearTreesFailed: () => void;
   onAttached: (key: string) => void;
   onReleased: (key: string) => void;
   /** A queued request finished; the scene schedules a later reconcile. */
@@ -132,7 +130,7 @@ export function createDetailStreaming({
     if (disposed) return;
     const state = view();
     const { manifest, selected } = state;
-    if (!manifest || disposed || !state.ready) return;
+    if (!manifest || !state.ready) return;
     const cap = state.budgetMiB * 1048576;
     const currentKey = 'landmark-' + selected;
     const foreground = manifest.landmarks.find((a) => a.id === selected);
@@ -206,7 +204,7 @@ export function createDetailStreaming({
       : nearTrees(distance);
     if (loadNearTrees)
       void queue.enqueue('trees-near', 5, loadNearTrees).catch((error) => {
-        if (!disposed && error?.name !== 'AbortError') onNearTreesFailed();
+        if (!disposed && error?.name !== 'AbortError') onFailed();
       });
     onReconciled();
   }

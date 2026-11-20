@@ -39,7 +39,7 @@ class RoadSurfaceClearanceTests(unittest.TestCase):
         for a, b in zip(corners, corners[1:] + corners[:1]):
             terrain.face([a, b, (0, 0, 0.5)], 0)
         repairs = [{'bounds': [-2, -2, 2, 2], 'clearance': 0.08, 'maxLift': 0.8}]
-        fixed, report = repair_clearance(road, terrain, 0, repairs)
+        fixed, report = repair_clearance(road, terrain, {'asphalt': 0}, repairs)
         self.assertEqual(report['changedFaces'], 2)
         self.assertAlmostEqual(report['maxLift'], 0.58)
         polygons = [
@@ -79,7 +79,7 @@ class RoadSurfaceClearanceTests(unittest.TestCase):
                 for value in values:
                     self.assertAlmostEqual(value, expected)
         self.assertIn(road.f[-1], fixed.f)
-        twice, second = repair_clearance(fixed, terrain, 0, repairs)
+        twice, second = repair_clearance(fixed, terrain, {'asphalt': 0}, repairs)
         self.assertEqual(second['changedFaces'], 0)
         self.assertEqual(twice.f, fixed.f)
 
@@ -91,7 +91,7 @@ class RoadSurfaceClearanceTests(unittest.TestCase):
             repair_clearance(
                 road,
                 terrain,
-                0,
+                {'asphalt': 0},
                 [{'bounds': [0, 0, 2, 2], 'clearance': 0.08, 'maxLift': 0.8}],
             )
 

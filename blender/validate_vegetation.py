@@ -98,7 +98,7 @@ report['shippingGLBTerrain'] = {
     'toleranceMeters': 0.15,
 }
 assert max(abs(v) for v in errors) < 0.15, report['shippingGLBTerrain']
-(ROOT / f'docs/model-checks/refinement/{report_prefix}-tree-source.json').write_text(
-    json.dumps(report, indent=2) + '\n'
-)
+target = ROOT / f'work/model-checks/{report_prefix}-tree-source.json'
+target.parent.mkdir(parents=True, exist_ok=True)
+target.write_text(json.dumps(report, indent=2) + '\n')
 print({k: v for k, v in report.items() if k != 'savedTransforms'}, flush=True)

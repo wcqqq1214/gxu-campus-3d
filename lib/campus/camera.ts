@@ -232,7 +232,7 @@ export function entranceBox(
       ),
     );
   }
-  if (place.placeKind === 'bridge' && place.portalCenter) {
+  if (place.placeKind === 'bridge') {
     const forward = landmarkDirection(place, 'front').setY(0).normalize();
     // Crop the opening rather than an 18 m cube. A deep cube pushes a portrait
     // camera beyond the curved ramp, where the retaining wall obscures the view.
@@ -287,7 +287,7 @@ type Viewport = { width: number; height: number };
 export type MapView = 'top' | 'tilt' | 'north' | 'zoomIn' | 'zoomOut';
 
 /** Padded box of an ordinary building, from its footprint and height. */
-export function buildingBox(b: Building) {
+function buildingBox(b: Building) {
   const [x0, y0, x1, y1] = b.bounds;
   return new Box3(
     new Vector3(x0 - 4, b.elevation - 0.5, -y1 - 4),

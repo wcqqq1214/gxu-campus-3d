@@ -257,8 +257,8 @@ def prepare_pavings(root=ROOT):
         'treesUnchanged': True,
         'passed': True,
     }
-    (root / 'docs/model-checks/refinement').mkdir(parents=True, exist_ok=True)
-    (root / 'docs/model-checks/refinement/paving-preparation.json').write_text(
+    (root / 'work/model-checks').mkdir(parents=True, exist_ok=True)
+    (root / 'work/model-checks/paving-preparation.json').write_text(
         json.dumps(report, indent=2) + '\n'
     )
     print(report)

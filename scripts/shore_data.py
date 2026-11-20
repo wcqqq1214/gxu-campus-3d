@@ -324,7 +324,7 @@ def prepare_shores(root=ROOT):
         'surfaceSlotsAndWaterGeometryPreserved': True,
         'passed': True,
     }
-    folder = root / 'docs/model-checks/refinement'
+    folder = root / 'work/model-checks'
     folder.mkdir(parents=True, exist_ok=True)
     (folder / 'shore-preparation.json').write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + '\n'

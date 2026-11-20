@@ -230,10 +230,8 @@ export function CampusHelp({
 /** Follows camera samples without re-rendering the surrounding map controls. */
 function NorthArrow({ camera }: { camera: CameraStore }) {
   // A primitive selection skips renders for samples that only pan or zoom.
-  const bearing = useSyncExternalStore(
-    camera.subscribe,
-    () => cameraBearing(camera.get()),
-    () => cameraBearing(null),
+  const bearing = useSyncExternalStore(camera.subscribe, () =>
+    cameraBearing(camera.get()),
   );
   return (
     <Navigation size={20} style={{ transform: `rotate(${bearing - 45}deg)` }} />

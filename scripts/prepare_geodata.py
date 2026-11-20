@@ -468,9 +468,6 @@ def prepare():
                     'tags': f['properties']['tags'],
                 }
             )
-    (OUT / 'surfaces.json').write_text(
-        json.dumps(surfaces, ensure_ascii=False, separators=(',', ':'))
-    )
     geo = {
         'type': 'FeatureCollection',
         'metadata': {

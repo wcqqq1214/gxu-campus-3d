@@ -33,7 +33,8 @@ def prepare_external_surfaces():
     ]
     masks = [(e['tags']['name'], geom(e)) for e in schools]
     geo = json.loads((out / 'geography.geojson').read_text())
-    report_path = ROOT / 'docs/model-checks/external-surfaces.json'
+    report_path = ROOT / 'work/model-checks/external-surfaces.json'
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     previous = json.loads(report_path.read_text()) if report_path.exists() else {}
     removed = {e['id']: e for e in previous.get('excluded', [])}
     for f in geo['features']:

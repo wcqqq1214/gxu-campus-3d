@@ -15,6 +15,7 @@ from shapely.geometry import Polygon, box, shape
 from shapely.ops import transform, unary_union
 
 from context_data import select_context
+from terrain_elevation import make_elevation
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'public/data'
@@ -216,18 +217,7 @@ def prepare_surroundings():
             ('curb', 'white', curb),
         ]
     ]
-    cols, rows = terrain['cols'], terrain['rows']
-    x0, y0, x1, y1 = terrain['bounds']
-    hh = terrain['heights']
-
-    def elevation(x, y):
-        u = max(0, min(cols - 1.001, (x - x0) / (x1 - x0) * (cols - 1)))
-        v = max(0, min(rows - 1.001, (y - y0) / (y1 - y0) * (rows - 1)))
-        i, j = int(u), int(v)
-        a, t = u - i, v - j
-        return (hh[j * cols + i] * (1 - a) + hh[j * cols + i + 1] * a) * (1 - t) + (
-            hh[(j + 1) * cols + i] * (1 - a) + hh[(j + 1) * cols + i + 1] * a
-        ) * t
+    elevation = make_elevation(terrain)
 
     rings = []
     for p in polys(display.simplify(0.35, preserve_topology=True)):
@@ -285,9 +275,9 @@ def prepare_surroundings():
         (OUT / name).write_text(
             json.dumps(value, ensure_ascii=False, separators=(',', ':'))
         )
-    (ROOT / 'docs/model-checks/surroundings-data.json').write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + '\n'
-    )
+    report_path = ROOT / 'work/model-checks/surroundings-data.json'
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     print(report)
 
 

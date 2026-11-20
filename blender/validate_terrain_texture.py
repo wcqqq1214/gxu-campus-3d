@@ -125,7 +125,7 @@ report['fingerprints'] = {
         'public/data/pavings.json',
     ]
 }
-(
-    ROOT / f'docs/model-checks/refinement/{REPORT_PREFIX}-terrain-texture.json'
-).write_text(json.dumps(report, indent=2) + '\n')
+target = ROOT / f'work/model-checks/{REPORT_PREFIX}-terrain-texture.json'
+target.parent.mkdir(parents=True, exist_ok=True)
+target.write_text(json.dumps(report, indent=2) + '\n')
 print(report, flush=True)

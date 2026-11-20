@@ -61,10 +61,13 @@ export function treeGroundHeight(
   );
 }
 
-export function treeElevation(row: number[], terrain: TreeTerrain): number {
+export function treeElevation(
+  row: number[],
+  terrain?: TreeTerrain | null,
+): number {
   return Number.isFinite(row[4])
     ? row[4]
-    : treeGroundHeight(terrain, row[0], row[1]);
+    : treeGroundHeight(terrain!, row[0], row[1]);
 }
 
 /** Stable partition inside each existing template/sector budget. Sourced groups

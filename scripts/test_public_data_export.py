@@ -8,7 +8,13 @@ from pathlib import Path
 
 from export_public_data import EXPORTS, export_public_data
 from foundation_contract import foundation_context, load_foundations, revision
-from low_planting_contract import CONTEXT_FILES, context_value, digest, load_prepared
+from low_planting_contract import (
+    CONTEXT_FILES,
+    context_revision,
+    context_value,
+    digest,
+    load_prepared,
+)
 from road_landing_contract import load_landings
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,7 +73,9 @@ class PublicExportTests(unittest.TestCase):
         config = json.loads((self.root / 'data/low-planting.json').read_text())
         data = {name: self.read(name + '.json') for name in CONTEXT_FILES}
         low = self.read('low-planting.json')
-        low['contextRevision'] = digest(context_value(self.root, config, data))
+        low['contextRevision'] = context_revision(
+            context_value(self.root, config, data)
+        )
         self.write('low-planting.json', low)
 
     def test_fresh_preparation_fingerprints_follow_exported_site_fields(self):
@@ -101,7 +109,7 @@ class PublicExportTests(unittest.TestCase):
                 self.assertEqual(self.snapshot(), before)
                 self.write(name, original)
 
-    def test_legacy_migration_idempotence_and_documentation_independence(self):
+    def test_export_idempotence_and_documentation_independence(self):
         buildings = self.read('buildings.json')
         buildings[0]['heightBasis'] = 'test estimate'
         buildings[0]['nested'] = {'note': 'nested annotation'}
@@ -109,14 +117,7 @@ class PublicExportTests(unittest.TestCase):
         sites = self.read('sites.json')
         sites['sites'][0]['evidence'] = {'dimensions': 'not surveyed'}
         self.write('sites.json', sites)
-        foundation = self.read('foundations.json')
-        foundation['contextRevision'] = digest(foundation_context(self.root))
-        self.write('foundations.json', foundation)
-        config = json.loads((self.root / 'data/low-planting.json').read_text())
-        data = {name: self.read(name + '.json') for name in CONTEXT_FILES}
-        low = self.read('low-planting.json')
-        low['contextRevision'] = digest(context_value(self.root, config, data))
-        self.write('low-planting.json', low)
+        self.prepare_dependent_fingerprints()
         export_public_data(self.root)
         load_foundations(self.root)
         load_prepared(self.root)

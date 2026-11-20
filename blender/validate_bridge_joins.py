@@ -118,7 +118,7 @@ for o in bpy.context.scene.objects:
     if main_road(o) or owner(o).name.startswith('infra-approach-'):
         objects.append(o)
 report.append(check(objects, 'base GLB'))
-(R / 'docs/model-checks/bridge-joins-geometry.json').write_text(
-    json.dumps(report, indent=2) + '\n'
-)
+target = R / 'work/model-checks/bridge-joins-geometry.json'
+target.parent.mkdir(parents=True, exist_ok=True)
+target.write_text(json.dumps(report, indent=2) + '\n')
 print(report, flush=True)

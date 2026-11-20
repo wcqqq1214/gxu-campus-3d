@@ -85,7 +85,7 @@ test('English and Chinese search resolve the same stable landmark IDs', () => {
   assert.deepEqual(searchLandmarks(landmarks, 'Mathematics'), []); // No new navigable entities.
 });
 test('in-flight progress is translated from the same message after switching language', () => {
-  assert.equal(translate('en', '{count} 处', { count: 1 }), '1 place');
+  assert.equal(translate('en', '{count} 个地点', { count: 1 }), '1 place');
   assert.equal(translate('en', '{count} 个结果', { count: 1 }), '1 result');
   const message = {
     text: '正在加载{name} {percent}%',

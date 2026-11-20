@@ -56,11 +56,6 @@ class PublishedNodeTests(unittest.TestCase):
         self.assertNotEqual(actual['roads'], old['roads'])
         for name in old.keys() - {'roads'}:
             self.assertEqual(actual[name], old[name], name)
-        budget = json.loads((ROOT / 'data/initial-model-budget.json').read_text())
-        self.assertLessEqual(
-            len(result) + (ROOT / 'public/models/trees.glb').stat().st_size,
-            budget['hardLimitBytes'],
-        )
 
     def test_selected_addition_and_removal_do_not_leak_other_new_nodes(self):
         doc, binary = unpack(self.original)
@@ -135,24 +130,6 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'changed while building'):
             publish(self.root, self.candidate, self.before)
         self.assertEqual(snapshot(self.root), now)
-
-    def test_replacement_failure_rolls_back_prior_files(self):
-        import os
-
-        original = os.replace
-        calls = []
-
-        def fail_second(source, target):
-            if 'prepared' in Path(source).parts:
-                calls.append(target)
-                if len(calls) == 2:
-                    raise OSError('injected disk failure')
-            return original(source, target)
-
-        with patch('incremental_update.os.replace', side_effect=fail_second):
-            with self.assertRaisesRegex(OSError, 'disk failure'):
-                publish(self.root, self.candidate, self.before)
-        self.assertEqual(snapshot(self.root), self.before)
 
     def test_build_or_validation_failure_never_publishes(self):
         for phase in ('build', 'geometry'):

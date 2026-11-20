@@ -47,12 +47,9 @@ export interface Building {
   bounds: number[];
 }
 export interface Landmark {
-  /** Optional east/north/up label position in metres. */
-  labelAnchor?: [number, number, number];
   modelingBasis: 'photo' | 'type' | 'inferred';
-  placeKind?: 'sports' | 'gate' | 'bridge' | 'sculpture';
+  placeKind?: 'gate' | 'bridge' | 'sculpture';
   pickPolygon?: number[][];
-  portalCenter?: [number, number];
   approachPath?: number[][];
   additionalReferences?: string[];
   id: string;

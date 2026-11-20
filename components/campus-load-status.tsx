@@ -18,7 +18,7 @@ export function CampusLoadStatus({
     message: status,
     error,
     progress: loadProgress,
-  } = useSyncExternalStore(store.subscribe, store.get, store.getInitial);
+  } = useSyncExternalStore(store.subscribe, store.get);
   const [backgroundStatusVisible, setBackgroundStatusVisible] = useState(false);
   const backgroundStatus = Boolean(status) && ready && !error;
   useEffect(() => {

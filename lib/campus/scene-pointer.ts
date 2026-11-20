@@ -64,7 +64,7 @@ export function createScenePicking({
     if (proxiesReady) return;
     for (const b of navigationFootprints(buildings, landmarks)) {
       const mesh = footprintMesh(b);
-      mesh.userData = { id: b.landmark ?? b.id, layer: b.layer };
+      mesh.userData = { id: b.landmark, layer: b.layer };
       proxies.push(mesh);
     }
     proxiesReady = true;

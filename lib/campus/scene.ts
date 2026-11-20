@@ -220,7 +220,7 @@ export function createScene(
   let cameraChanged = true;
   let cameraSampleAt = 0;
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const loading = new Set<string>();
+  let baseLoading = false;
   const lifecycle = new AbortController();
   const progresses = new Map<
     string,
@@ -281,8 +281,6 @@ export function createScene(
       profile.nearTrees && distance < 1000
         ? trees.nearLoader(manifest)
         : undefined,
-    onNearTreesFailed: () =>
-      callbacks.onStatus('近处树木加载失败，可重试', true),
     onAttached: (key) => {
       if (key.startsWith('landmark-'))
         updateLabelAnchors(key.slice('landmark-'.length));
@@ -302,7 +300,6 @@ export function createScene(
       updateLoadStatus();
     },
   });
-  const reconcileDetails = (focusing = false) => details.reconcile(focusing);
   const labels = createSceneLabels({
     host,
     landmarks,
@@ -315,10 +312,7 @@ export function createScene(
       focus(id);
     },
   });
-  const labelHidden = (l: Landmark) =>
-    l.placeKind === 'sports'
-      ? !layers.sports
-      : !layers[detailLayer('landmark-' + l.id)];
+  const labelHidden = (l: Landmark) => !layers[detailLayer('landmark-' + l.id)];
   const orbitOffset = new THREE.Vector3();
   const orbitAxis = new THREE.Vector3(0, 1, 0);
   function setLocale(value: Locale) {
@@ -413,14 +407,14 @@ export function createScene(
     composeViewport();
     frameLandmark();
     clearGroup(highlight);
-    // Sports grounds and bridges are already distinct; a ring would cut across them.
-    if (l.placeKind !== 'sports' && l.placeKind !== 'bridge') {
+    // Bridges are already distinct; a ring would cut across them.
+    if (l.placeKind !== 'bridge') {
       const [x0, y0, x1, y1] = l.bounds;
       const radius = Math.max(12, Math.hypot(x1 - x0, y1 - y0) * 0.54);
       highlight.add(selectionRing(radius, l.center, l.elevation));
     }
     callbacks.onSelect(id, origin);
-    reconcileDetails(true);
+    details.reconcile(true);
   }
   function focusBuilding(
     id: string,
@@ -456,7 +450,7 @@ export function createScene(
     const radius = Math.max(10, Math.hypot(x1 - x0, y1 - y0) * 0.54);
     highlight.add(selectionRing(radius, b.center, b.elevation));
     callbacks.onSelect(id, origin);
-    reconcileDetails(true);
+    details.reconcile(true);
   }
   function frameLandmark(animate = true) {
     const place = landmarks.find((p) => p.id === selected);
@@ -716,60 +710,58 @@ export function createScene(
     }
   }
   async function initialize() {
-    if (loading.has('base') || initialReady) return;
-    loading.add('base');
+    if (baseLoading || initialReady) return;
+    baseLoading = true;
     callbacks.onStatus('正在加载校园…');
     // A failed prefetch is not reused: retries go through the normal fetches.
     const boot = pendingPrefetch;
     pendingPrefetch = undefined;
+    let gltf: { scene: THREE.Group };
     try {
       manifest = await (boot?.manifest ??
         fetchJson<Manifest>(asset('data/models.json'), lifecycle.signal));
       if (disposed) return;
-      const gltf = await models.load(
-        manifest.base,
-        'base',
-        lifecycle.signal,
-        boot,
-      );
-      baseRoot = gltf.scene;
-      scene.add(baseRoot);
-      updateLabelAnchors();
-      matchGround(ground, baseRoot, {
-        nightStyle,
-        contextStyle,
-        night: preset === 'night',
-      });
-      initialReady = true;
-      syncEffects();
-      readyMs = Math.round(performance.now());
-      applyLayers();
-      callbacks.onReady();
-      callbacks.onStatus('');
-      // Publish and paint the base before optional CPU-side colour/normal refinement.
-      // No additional model or texture transfer; deferred work keeps startup latency flat.
-      requestAnimationFrame(() => {
-        if (disposed) return;
-        const refine = async () => {
-          if (disposed || !baseRoot) return;
-          if (!(await refineBase(baseRoot, palette, () => disposed))) return;
-          renderer.shadowMap.needsUpdate = true;
-          dirty = true;
-        };
-        if ('requestIdleCallback' in window)
-          window.requestIdleCallback(refine, { timeout: 1500 });
-        else setTimeout(refine, 0);
-      });
-      void loadBoundary();
-      reconcileDetails();
-      void trees.load(manifest).catch(() => {
-        if (!disposed) callbacks.onStatus('树木加载失败，可重试', true);
-      });
+      gltf = await models.load(manifest.base, 'base', lifecycle.signal, boot);
     } catch {
       if (!disposed) callbacks.onStatus('校园加载失败，请检查网络后重试', true);
+      return;
     } finally {
-      loading.delete('base');
+      baseLoading = false;
     }
+    if (disposed) return;
+    baseRoot = gltf.scene;
+    scene.add(baseRoot);
+    updateLabelAnchors();
+    matchGround(ground, baseRoot, {
+      nightStyle,
+      contextStyle,
+      night: preset === 'night',
+    });
+    initialReady = true;
+    syncEffects();
+    readyMs = Math.round(performance.now());
+    applyLayers();
+    callbacks.onReady();
+    callbacks.onStatus('');
+    // Publish and paint the base before optional CPU-side colour/normal refinement.
+    // No additional model or texture transfer; deferred work keeps startup latency flat.
+    requestAnimationFrame(() => {
+      if (disposed) return;
+      const refine = async () => {
+        if (disposed || !baseRoot) return;
+        if (!(await refineBase(baseRoot, palette, () => disposed))) return;
+        renderer.shadowMap.needsUpdate = true;
+        dirty = true;
+      };
+      if ('requestIdleCallback' in window)
+        window.requestIdleCallback(refine, { timeout: 1500 });
+      else setTimeout(refine, 0);
+    });
+    void loadBoundary();
+    details.reconcile();
+    void trees.load(manifest).catch(() => {
+      if (!disposed) updateLoadStatus();
+    });
   }
   function setQuality(q: Quality) {
     if (qualityControl.select(q)) effects.resetFailure();
@@ -796,7 +788,7 @@ export function createScene(
     trees.configure(profile.treeDensity, profile.nearTrees);
     dirty = true;
     applyLayers();
-    reconcileDetails();
+    details.reconcile();
   }
   function setPreset(p: Preset) {
     preset = p;
@@ -820,7 +812,7 @@ export function createScene(
     if (p === 'night') {
       // Pane attributes are created lazily; include them in the existing LOD budget.
       details.remeasure();
-      reconcileDetails();
+      details.reconcile();
     }
     dirty = true;
   }
@@ -995,26 +987,19 @@ export function createScene(
       shadowFrustum();
       if (trees.updateLOD(camera.position, profile.nearTrees))
         renderer.shadowMap.needsUpdate = true;
-      convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
+      convexCulling?.update(camera, modeSmooth);
       renderScene();
       // Paint the complete geometry first. Only the shadow-free smooth tier
       // needs this CPU-side optimisation; switching away cancels its need.
       if (
         baseRoot &&
         modeSmooth &&
-        !renderer.shadowMap.enabled &&
         !convexCulling &&
         convexPreparation === undefined
       ) {
         convexPreparation = setTimeout(() => {
           convexPreparation = undefined;
-          if (
-            disposed ||
-            !baseRoot ||
-            !modeSmooth ||
-            renderer.shadowMap.enabled
-          )
-            return;
+          if (disposed || !baseRoot || !modeSmooth) return;
           convexCulling = createConvexCulling(baseRoot);
           dirty = true;
         }, 0);
@@ -1049,7 +1034,7 @@ export function createScene(
       time - pendingRequest > 450
     ) {
       pendingRequest = 0;
-      reconcileDetails();
+      details.reconcile();
     }
   }
   loop = requestAnimationFrame(animate);
@@ -1077,7 +1062,7 @@ export function createScene(
       layers[key] = on;
       applyLayers();
       if (key === 'buildings' || key === 'roads' || key === 'sports')
-        reconcileDetails();
+        details.reconcile();
       if (key === 'boundary' && on) void loadBoundary();
       updateLoadStatus();
     },
@@ -1085,7 +1070,7 @@ export function createScene(
     setQuality,
     view,
     exportImage: async () => {
-      convexCulling?.update(camera, modeSmooth && !renderer.shadowMap.enabled);
+      convexCulling?.update(camera, modeSmooth);
       renderScene();
       const segments = [t('广西大学 校园地图'), '© OpenStreetMap contributors'];
       if (layers.boundary && boundaryReady)
@@ -1101,11 +1086,11 @@ export function createScene(
         void loadBoundary();
         details.retry();
         trees.resetFailures();
-        reconcileDetails();
+        details.reconcile();
         if (!trees.loaded)
-          void trees
-            .load(manifest!)
-            .catch(() => callbacks.onStatus('树木加载失败，请稍后重试', true));
+          void trees.load(manifest!).catch(() => {
+            if (!disposed) updateLoadStatus();
+          });
       }
     },
     setLocale,

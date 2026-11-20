@@ -190,9 +190,6 @@ def conform_repaired_edges(mesh, repairs, targets):
 
 
 def repair_clearance(mesh, terrain, materials, repairs):
-    # Keep the original asphalt-only call compatible with existing scripts.
-    if isinstance(materials, int):
-        materials = {'asphalt': materials}
     targets = {
         r.get('material', 'asphalt'): materials[r.get('material', 'asphalt')]
         for r in repairs

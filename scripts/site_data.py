@@ -331,7 +331,7 @@ def prepare_sites(root=ROOT):
         'pavingAreasMeters2': [round(a.area, 3) for a in areas],
         'passed': True,
     }
-    report_path = root / 'docs/model-checks/refinement/site-preparation.json'
+    report_path = root / 'work/model-checks/site-preparation.json'
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     print('Entrance sites prepared', report, flush=True)

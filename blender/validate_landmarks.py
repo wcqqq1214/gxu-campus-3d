@@ -321,7 +321,7 @@ report['maximumPotGapMeters'] = round(max(abs(g) for g in pot_gaps), 4)
 report['maximumRoadSeamMeters'] = round(max_seam, 4)
 report['clearApproachLanes'] = 6
 report['openPhotoApron'] = True
-(ROOT / 'docs/model-checks/geometry-check.json').write_text(
-    json.dumps(report, ensure_ascii=False, indent=2)
-)
+target = ROOT / 'work/model-checks/geometry-check.json'
+target.parent.mkdir(parents=True, exist_ok=True)
+target.write_text(json.dumps(report, ensure_ascii=False, indent=2))
 print(json.dumps(report), flush=True)

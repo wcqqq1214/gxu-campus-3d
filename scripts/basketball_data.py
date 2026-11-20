@@ -10,6 +10,7 @@ from shapely.ops import transform, unary_union
 
 from prepare_geodata import project
 from surroundings_data import tiled_triangles, triangulate
+from terrain_elevation import make_elevation
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'public/data'
@@ -137,18 +138,9 @@ def prepare_basketball():
         groups.append(group)
     x0, y0, x1, y1 = terrain['bounds']
     cols, rows = terrain['cols'], terrain['rows']
-    hh = terrain['heights']
     sx = (x1 - x0) / (cols - 1)
     sy = (y1 - y0) / (rows - 1)
-
-    def elevation(x, y):
-        u = max(0, min(cols - 1.001, (x - x0) / sx))
-        v = max(0, min(rows - 1.001, (y - y0) / sy))
-        i, j = int(u), int(v)
-        a, b = u - i, v - j
-        return (hh[j * cols + i] * (1 - a) + hh[j * cols + i + 1] * a) * (1 - b) + (
-            hh[(j + 1) * cols + i] * (1 - a) + hh[(j + 1) * cols + i + 1] * a
-        ) * b
+    elevation = make_elevation(terrain)
 
     banks = []
     cells = set()

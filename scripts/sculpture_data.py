@@ -5,6 +5,7 @@ import json
 import math
 
 from prepare_geodata import CACHE, OUT, ROOT, project
+from terrain_elevation import make_elevation
 
 
 def prepare_sculptures():
@@ -31,21 +32,7 @@ def prepare_sculptures():
         f for f in geo['features'] if f['id'] not in {s['osmId'] for s in catalogue}
     ]
     terrain = json.loads((OUT / 'terrain.json').read_text())
-    x0, y0, x1, y1 = terrain['bounds']
-    cols = terrain['cols']
-    rows = terrain['rows']
-    hh = terrain['heights']
-
-    def height(x, y):
-        u = max(0, min(cols - 1.001, (x - x0) / (x1 - x0) * (cols - 1)))
-        v = max(0, min(rows - 1.001, (y - y0) / (y1 - y0) * (rows - 1)))
-        i = int(u)
-        j = int(v)
-        a = u - i
-        b = v - j
-        return (hh[j * cols + i] * (1 - a) + hh[j * cols + i + 1] * a) * (1 - b) + (
-            hh[(j + 1) * cols + i] * (1 - a) + hh[(j + 1) * cols + i + 1] * a
-        ) * b
+    height = make_elevation(terrain)
 
     for l in catalogue:
         e = elements[l['osmId']]

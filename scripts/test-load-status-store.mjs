@@ -4,7 +4,6 @@ import { createLoadStatusStore } from '../lib/campus/load-status-store.ts';
 
 test('progress changes only the status snapshot; error selectors stay stable', () => {
   const store = createLoadStatusStore();
-  const initial = store.getInitial();
   let calls = 0;
   const stop = store.subscribe(() => calls++);
   const message = {
@@ -24,7 +23,6 @@ test('progress changes only the status snapshot; error selectors stay stable', (
   assert.equal(store.get().progress, undefined);
   store.set('正在重新加载…');
   assert.equal(store.getError(), false);
-  assert.equal(store.getInitial(), initial);
   stop();
   store.set('');
   assert.equal(calls, 3);

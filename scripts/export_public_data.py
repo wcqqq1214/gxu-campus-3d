@@ -25,18 +25,13 @@ def export_public_data(root=ROOT):
     planting_config = json.loads((root / 'data/low-planting.json').read_text())
     planting_data = {name: read(name + '.json') for name in CONTEXT_FILES}
     planting = context_value(root, planting_config, planting_data)
-    # Accept the old fingerprint only when it still matches the complete input.
-    # Never bless a geometry/config change by merely replacing its fingerprint.
-    if values['foundations.json']['contextRevision'] not in (
-        digest(foundation),
-        revision(foundation),
-    ):
+    if values['foundations.json']['contextRevision'] != revision(foundation):
         raise ValueError(
             'Foundation context is stale; run data preparation before export'
         )
     low = values['low-planting.json']
     if (
-        low['contextRevision'] not in (digest(planting), context_revision(planting))
+        low['contextRevision'] != context_revision(planting)
         or low['configRevision'] != digest(planting_config)
         or not low['placementPassed']
     ):
@@ -86,21 +81,12 @@ def export_public_data(root=ROOT):
             roof = by_id[config['buildingId']]
             part = next(p for p in roof['form']['parts'] if p['id'] == config['partId'])
             shelter = entry['shelter']
-            payload = [
-                {k: v for k, v in entry.items() if k != 'shelter'},
-                roof['center'],
-                roof['polygons'],
-                part,
-            ]
-            if shelter['contextRevision'] not in (
-                digest(payload),
-                canopy_revision(entry, roof, part),
-            ) or shelter['partRevision'] not in (digest(part), part_revision(part)):
+            if shelter['contextRevision'] != canopy_revision(
+                entry, roof, part
+            ) or shelter['partRevision'] != part_revision(part):
                 raise ValueError(
                     'Mapped canopy context is stale; prepare the data before export'
                 )
-            shelter['contextRevision'] = canopy_revision(entry, roof, part)
-            shelter['partRevision'] = part_revision(part)
     for name in EXPORTS:
         values[name] = without_documentation(values[name])
     # Canopy fingerprints are part of the building input to the foundation guard.

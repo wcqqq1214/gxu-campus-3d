@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT / 'blender'))
 BASE_ONLY = '--base-only' in sys.argv
 from generic_buildings import compact_form_source, ordinary_building
 from geometry import MATERIALS, Mesh, material
-from huicui import compact_source, huicui
+from huicui import compact_source
 from infrastructure import approaches, bridge, lake_bridge, road_chunk
 from landmarks import landmark
 from sports import athletics, west_stand
@@ -25,7 +25,9 @@ from west_market import market_building, market_ground
 
 DATA = ROOT / 'public/data'
 MODELS = ROOT / 'public/models'
+REPORTS = ROOT / 'work/model-checks'
 MODELS.mkdir(exist_ok=True)
+REPORTS.mkdir(parents=True, exist_ok=True)
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete(use_global=False)
 for c in list(bpy.data.collections):
@@ -336,7 +338,7 @@ for site in sites['sites']:
             'Site entrance anchors are stale; run the full data preparation'
         )
 bridge_by_id = {b['id']: b for b in infrastructure['bridges']}
-for join in campus_roads.get('bridgeJoins', []):
+for join in campus_roads['bridgeJoins']:
     bridge_by_id[join['bridgeId']]['joinTrim'] = join['trim']
 lake_by_id = {b['id']: b for b in infrastructure['lakeBridges']}
 for name, color, rough, metal in [
@@ -487,20 +489,10 @@ xmin, ymin, xmax, ymax = terrain['bounds']
 hh = terrain['heights']
 
 
-def elevation(x, y):
-    u = max(0, min(cols - 1.001, (x - xmin) / (xmax - xmin) * (cols - 1)))
-    v = max(0, min(rows - 1.001, (y - ymin) / (ymax - ymin) * (rows - 1)))
-    i = int(u)
-    j = int(v)
-    a = u - i
-    b = v - j
-    return (hh[j * cols + i] * (1 - a) + hh[j * cols + i + 1] * a) * (1 - b) + (
-        hh[(j + 1) * cols + i] * (1 - a) + hh[(j + 1) * cols + i + 1] * a
-    ) * b
-
-
 from civil_forecourt_grade import building_datum, grade_forecourt, load_grade
+from terrain_elevation import make_elevation
 
+elevation = make_elevation(terrain)
 civil_grade = load_grade(ROOT)
 
 
@@ -525,8 +517,6 @@ def generic(b, detail):
         from north_campus import building_model
 
         return building_model(b, C, detail)
-    if b.get('customModel') == 'huicui':
-        return huicui(b, elevation(*b['center']), C, detail)
     m = Mesh()
     h = b['height']
     cx, cy = b['center']
@@ -590,14 +580,12 @@ def generic(b, detail):
 
 
 base = {k: Mesh() for k in ['terrain', 'roads', 'water', 'green', 'sports', 'context']}
-north_replaced = set()
-if (DATA / 'north-campus.json').exists():
-    from north_campus import site_models
+from north_campus import site_models
 
-    north_data = json.loads((DATA / 'north-campus.json').read_text())
-    north_replaced = set(north_data['replacedSurfaceIds'])
-    for key, mesh in site_models(north_data, C, elevation).items():
-        base[key] = mesh
+north_data = json.loads((DATA / 'north-campus.json').read_text())
+north_replaced = set(north_data['replacedSurfaceIds'])
+for key, mesh in site_models(north_data, C, elevation).items():
+    base[key] = mesh
 paving_originals = {}
 paving_ids = {p['surfaceId'] for p in pavings['pavings']}
 cut_cells = set(infrastructure['terrainCells']) | set(basketball['terrainCells'])
@@ -739,7 +727,7 @@ base['terrain'], base['roads'], site_meshes, site_report = build_sites(
     sites, C, elevation, base['terrain'], base['roads']
 )
 base.update(site_meshes)
-(ROOT / 'docs/model-checks/refinement/site-build.json').write_text(
+(REPORTS / 'site-build.json').write_text(
     json.dumps(site_report, ensure_ascii=False, indent=2) + '\n'
 )
 base['terrain'], base['roads'], paving_meshes, paving_report = build_pavings(
@@ -751,7 +739,7 @@ base['terrain'], base['roads'], paving_meshes, paving_report = build_pavings(
 )
 paving_report = early_report + paving_report
 base.update(paving_meshes)
-(ROOT / 'docs/model-checks/refinement/paving-build.json').write_text(
+(REPORTS / 'paving-build.json').write_text(
     json.dumps(paving_report, ensure_ascii=False, indent=2) + '\n'
 )
 from shore_geometry import build_shores
@@ -765,7 +753,7 @@ from foundation_geometry import build_foundations
 base['terrain'], base['roads'], foundation_report = build_foundations(
     foundations, base['terrain'], base['roads']
 )
-(ROOT / 'docs/model-checks/refinement/foundation-build.json').write_text(
+(REPORTS / 'foundation-build.json').write_text(
     json.dumps(foundation_report, ensure_ascii=False, indent=2) + '\n'
 )
 from service_road_geometry import build_service_road
@@ -777,7 +765,7 @@ for foundation in foundations['foundations']:
             foundation['groundedServiceRoad'], C, base['terrain'], base['roads']
         )
         service_road_report.append(report)
-(ROOT / 'docs/model-checks/refinement/service-road-build.json').write_text(
+(REPORTS / 'service-road-build.json').write_text(
     json.dumps(service_road_report, ensure_ascii=False, indent=2) + '\n'
 )
 from road_landing_contract import load_landings
@@ -789,7 +777,7 @@ base['roads'], road_landing_report = build_landings(
     base['terrain'],
     C['road'],
 )
-(ROOT / 'docs/model-checks/refinement/road-landing-build.json').write_text(
+(REPORTS / 'road-landing-build.json').write_text(
     json.dumps(road_landing_report, ensure_ascii=False, indent=2) + '\n'
 )
 base['terrain'].ground_uv_bounds = [
@@ -809,7 +797,7 @@ base['terrain'].ground_uv_bounds = [
     )
 ]
 base['terrain'].ground_uv_bounds.extend(r['bounds'] for r in foundations['foundations'])
-(ROOT / 'docs/model-checks/refinement/shore-build.json').write_text(
+(REPORTS / 'shore-build.json').write_text(
     json.dumps(shore_report, ensure_ascii=False, indent=2) + '\n'
 )
 print('Ground assembled', flush=True)
@@ -838,7 +826,7 @@ for b in infrastructure['bridges']:
     base['infra-approach-' + b['id']] = approaches(b, C)
 from bridge_joins import bridge_join_mesh
 
-for join in campus_roads.get('bridgeJoins', []):
+for join in campus_roads['bridgeJoins']:
     base['infra-approach-' + join['bridgeId']].extend(
         bridge_join_mesh(join, C, elevation, base['terrain'])
     )
@@ -887,8 +875,6 @@ if not BASE_ONLY:
                 'basketballCourt': court['id'],
             },
         )
-        from huicui import compact_source
-
         compact_source(obj)
 # Whole buildings belong to one 360 m cell, including their courtyard rings.
 # Base nodes use the same key, so each near chunk replaces exactly its own low LOD.
@@ -974,9 +960,7 @@ for index, b in enumerate(buildings):
         if not BASE_ONLY:
             near[key].extend(high)
             obj = high.object(
-                '荟萃楼 · 新闻传播学院共用楼体'
-                if b.get('customModel') == 'huicui'
-                else b['name'],
+                b['name'],
                 SOURCE,
                 {
                     'featureId': b['id'],
@@ -985,11 +969,7 @@ for index, b in enumerate(buildings):
                     'sourceUrl': b['sourceUrl'],
                 },
             )
-            if b.get('customModel') == 'huicui':
-                obj['customModel'] = 'huicui'
-                obj['precision'] = b['architecture']['precision']
-                compact_source(obj)
-            elif 'form' in b:
+            if 'form' in b:
                 obj['archetype'] = b['form']['archetype']
                 if 'roofBasis' in b:
                     obj['roofBasis'] = b['roofBasis']
@@ -1052,10 +1032,8 @@ for planting in low_plantings:
     base['vegetation-low-' + planting['id']] = hedge_mesh(
         planting, base['terrain'].v, base['terrain'].f, C
     )
-from vegetation import tree_templates
-
-sys.path.insert(0, str(ROOT / 'scripts'))
 from tree_layout import ground_tree_rows
+from vegetation import tree_templates
 from vegetation_layout import tree_rotation, tree_scale
 
 trees = ground_tree_rows(trees, base['terrain'].v, base['terrain'].f)
@@ -1080,7 +1058,7 @@ for filename in ['overview.json', 'vegetation-zones.json']:
     (DATA / filename).write_text(
         json.dumps(record, ensure_ascii=False, separators=(',', ':')) + '\n'
     )
-(ROOT / 'docs/model-checks/refinement/tree-building-clearance.json').write_text(
+(REPORTS / 'tree-building-clearance.json').write_text(
     json.dumps(tree_clearance, ensure_ascii=False, indent=2) + '\n'
 )
 print(
@@ -1099,16 +1077,14 @@ for i, (x, y, h, t, z) in enumerate([] if BASE_ONLY else trees):
 for t in templates:
     t.hide_render = True
     t.hide_set(True)
-if (DATA / 'north-campus.json').exists() and north_data.get('underpass'):
-    from north_underpass import cut_meshes, road_height_sampler, upper_road_model
+from north_underpass import cut_meshes, road_height_sampler, upper_road_model
 
-    base['north-campus-roads'].extend(
-        upper_road_model(
-            north_data['underpass'], C, road_height_sampler(base['roads'], elevation)
-        )
+base['north-campus-roads'].extend(
+    upper_road_model(
+        north_data['underpass'], C, road_height_sampler(base['roads'], elevation)
     )
-    cut_meshes(base, north_data['underpass'])
-from road_display_cleanup import load_cuts, trim_mesh
+)
+cut_meshes(base, north_data['underpass'])
 from west22_ground import bed_surface
 
 base['terrain'] = bed_surface(base['terrain'], is_road=False)
@@ -1495,9 +1471,6 @@ for entry in (
     ).hexdigest()
 check_initial_budget()
 (DATA / 'models.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
-# Remove only obsolete generated near models after the new manifest is complete.
-for old in [MODELS / 'west.glb', MODELS / 'east.glb', MODELS / 'north.glb']:
-    old.unlink(missing_ok=True)
 bpy.data.collections.remove(EXPORT)
 bpy.ops.wm.save_as_mainfile(
     filepath=str(ROOT / 'blender/gxu-campus.blend'), compress=True

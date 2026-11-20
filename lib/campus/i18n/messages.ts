@@ -74,7 +74,6 @@ export const englishMessages: Record<string, string> = {
   '广西大学三维校园，方向键平移，加减键缩放，Home返回全景':
     'Guangxi University 3D campus. Arrow keys pan, plus and minus zoom, and Home resets the view.',
   地标: 'Landmark',
-  均衡: 'Balanced',
   教学: 'Academic',
   生活: 'Living',
   文体: 'Culture & sports',
@@ -82,7 +81,6 @@ export const englishMessages: Record<string, string> = {
   路桥: 'Roads & bridges',
   校门: 'Gates',
   关闭: 'Close',
-  '{count} 处': '{count} places',
   '{count} 个地点': '{count} places',
   '返回 {name}': 'Back to {name}',
   '查看{name}': 'View {name}',
@@ -105,11 +103,7 @@ export const englishMessages: Record<string, string> = {
     'About {distance} m {direction} of {name}',
   精选地点: 'Featured places',
   其他建筑: 'Other buildings',
-  '还有 {count} 处，请输入更完整的名称': '{count} more. Type more of the name.',
-  建筑: 'Building',
-  东校园: 'East Campus',
-  西校园: 'West Campus',
-  北校园: 'North Campus',
+  '还有 {count} 处，请输入更完整的名称': '{count} more — type a fuller name',
   '高约 {height} 米': 'About {height} m tall',
   收起列表: 'Collapse list',
   水面: 'Water',
@@ -139,7 +133,7 @@ export const englishMessages: Record<string, string> = {
   '拖动旋转，右键拖动平移，滚轮缩放':
     'Drag to rotate, right-drag to pan, scroll to zoom',
   'Tab 切换控件，Enter 确认；选中地图后，方向键平移，+ 和 − 缩放，Home 回到全景':
-    'Tab moves between controls and Enter activates. With the map focused, arrow keys pan, + and − zoom, Home returns to the overview',
+    'Press Tab to switch controls and Enter to activate. With the map focused, use arrow keys to pan, + and − to zoom, and Home to return to the overview.',
   搜索: 'Search',
   '支持名称和简称，如“六教”': 'Search by name or short name, such as “No. 6”',
   游览: 'Tour',
@@ -157,13 +151,10 @@ export const englishMessages: Record<string, string> = {
   正在加载校园: 'Loading campus',
   正在加载树木: 'Loading trees',
   正在加载周边细节: 'Loading nearby details',
-  '近处树木加载失败，可重试': 'Nearby trees didn’t load. You can retry',
-  '树木加载失败，可重试': 'Trees didn’t load. You can retry',
   '校园加载失败，请检查网络后重试':
     'Campus didn’t load. Check your connection and try again',
   '图形显示中断，恢复后将自动重绘，也可刷新页面':
-    'Graphics were interrupted. The map redraws when they recover, or reload the page',
-  '树木加载失败，请稍后重试': 'Trees didn’t load. Try again later',
+    'Graphics were interrupted. The map will redraw automatically once recovered, or you can reload the page.',
   '正在加载{name} {percent}%': 'Loading {name} {percent}%',
   '正在加载{name}': 'Loading {name}',
   '{label} {percent}%': '{label} {percent}%',

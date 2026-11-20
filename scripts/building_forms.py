@@ -202,19 +202,3 @@ def resolve_form(b):
         'roof': roof,
         'entrances': fallback_entrances(b['polygons']),
     }
-
-
-def prepare_existing_forms():
-    """Update only ordinary forms on the current, already-normalized snapshot.
-
-    Full prepare_geodata also calls resolve_form. This incremental entry point
-    deliberately leaves terrain, road patches, surfaces and source dates alone.
-    """
-    # Keep the S1 CLI compatible without accidentally discarding S2 overrides.
-    from building_overrides import prepare_existing_overrides
-
-    prepare_existing_overrides()
-
-
-if __name__ == '__main__':
-    prepare_existing_forms()

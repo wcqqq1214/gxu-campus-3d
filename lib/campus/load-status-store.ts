@@ -11,7 +11,6 @@ export function createLoadStatusStore() {
   const listeners = new Set<() => void>();
   return {
     get: () => snapshot,
-    getInitial: () => initial,
     getError: () => snapshot.error,
     set(message: Message, error = false, progress?: number) {
       // The status text already rounds to whole percentages. Match the bar's

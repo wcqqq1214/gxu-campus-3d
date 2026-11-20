@@ -9,6 +9,7 @@ from shapely.ops import unary_union
 
 from shore_data import effective_surfaces, geometry_rings
 from surroundings_data import surface_shape, triangulate
+from terrain_elevation import sample_elevation
 
 ROOT = Path(__file__).resolve().parents[1]
 from foundation_contract import foundation_context, revision
@@ -229,18 +230,8 @@ def prepare_foundations(root=ROOT):
         ring = area.difference(core)
         if core.difference(area).area > 1e-7:
             raise ValueError('Foundation repair does not cover the closed building')
-        t = context['terrain']
         x, y = b.get('form', {}).get('stairTower', {}).get('hostCenter', b['center'])
-        x0, y0, x1, y1 = t['bounds']
-        cols, rows = t['cols'], t['rows']
-        hh = t['heights']
-        u = max(0, min(cols - 1.001, (x - x0) / (x1 - x0) * (cols - 1)))
-        v = max(0, min(rows - 1.001, (y - y0) / (y1 - y0) * (rows - 1)))
-        i, j = int(u), int(v)
-        a, c = u - int(u), v - int(v)
-        datum = (hh[j * cols + i] * (1 - a) + hh[j * cols + i + 1] * a) * (1 - c) + (
-            hh[(j + 1) * cols + i] * (1 - a) + hh[(j + 1) * cols + i + 1] * a
-        ) * c
+        datum = sample_elevation(context['terrain'], x, y)
         record = {
             **item,
             'datum': datum,

@@ -58,12 +58,7 @@ def replace_precise_terrain(
     # identically. Keep the textured service-road material's previous UV budget.
     exports = [(terrain[0], TERRAIN_BITS, 18, 'terrain', None)]
     if not terrain_only:
-        exports.extend(
-            [
-                (roads[0], ROAD_BITS, 12, 'roads', None),
-                (roads[0], ROAD_BITS, ROAD_UV_BITS, 'roads', {'road'}),
-            ]
-        )
+        exports.append((roads[0], ROAD_BITS, ROAD_UV_BITS, 'roads', None))
     # The joined civil service roads use a small position domain. Match the
     # granular-texture UV precision without lowering position precision.
     if not terrain_only:

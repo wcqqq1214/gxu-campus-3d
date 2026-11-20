@@ -28,8 +28,11 @@ def repack_north_base(path, objects, keys):
     import tempfile
     from pathlib import Path
 
-    from preserve_glb_geometry import compact_buffer_views
-    from update_south_gate import compact_static_accessors, replace_node_geometry
+    from preserve_glb_geometry import (
+        compact_buffer_views,
+        compact_static_accessors,
+        replace_node_geometry,
+    )
 
     with tempfile.TemporaryDirectory(prefix='gxu-north-base-') as directory:
         temp = Path(directory) / 'node.glb'

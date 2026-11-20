@@ -17,6 +17,7 @@ from building_forms import resolve_form
 from building_overrides import pack_geometry, source_catalogue
 from north_campus_forms import prepare_form
 from surroundings_data import surface_shape, tiled_triangles
+from terrain_elevation import sample_elevation as elevation
 
 ROOT = Path(__file__).resolve().parents[1]
 PREFIX = 'north-campus/'
@@ -33,19 +34,6 @@ def write(path, value):
         path.write_text(
             json.dumps(value, ensure_ascii=False, separators=(',', ':')) + '\n'
         )
-
-
-def elevation(terrain, x, y):
-    cols, rows = terrain['cols'], terrain['rows']
-    x0, y0, x1, y1 = terrain['bounds']
-    u = max(0, min(cols - 1.001, (x - x0) / (x1 - x0) * (cols - 1)))
-    v = max(0, min(rows - 1.001, (y - y0) / (y1 - y0) * (rows - 1)))
-    i, j = int(u), int(v)
-    a, b = u - i, v - j
-    h = terrain['heights']
-    return (h[j * cols + i] * (1 - a) + h[j * cols + i + 1] * a) * (1 - b) + (
-        h[(j + 1) * cols + i] * (1 - a) + h[(j + 1) * cols + i + 1] * a
-    ) * b
 
 
 def prepare(root=ROOT):
@@ -336,7 +324,8 @@ def prepare(root=ROOT):
         write(out / 'vegetation.json', kept)
         prepare_vegetation(root)
         removed = [t for t in trees if t not in kept]
-        report_path = root / 'docs/model-checks/north-campus-trees.json'
+        report_path = root / 'work/model-checks/north-campus-trees.json'
+        report_path.parent.mkdir(parents=True, exist_ok=True)
         previous = read(report_path) if report_path.exists() else {'removed': []}
         removed = {tuple(t[:2]): t for t in previous['removed'] + removed}
         write(

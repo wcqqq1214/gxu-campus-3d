@@ -1,7 +1,7 @@
 import { placeName, translate, type Locale } from './i18n/index.ts';
-import type { Building, Category, Landmark } from './types';
+import type { Building, Landmark } from './types';
 
-export const LANDMARK_ALIASES: Record<string, string[]> = {
+const LANDMARK_ALIASES: Record<string, string[]> = {
   'time-gate': ['时空之门', '时光广场', '图书馆北广场'],
   'south-gate': ['南门', '大学东路校门'],
   library: ['校图书馆', '西大图书馆'],
@@ -39,29 +39,27 @@ export const LANDMARK_ALIASES: Record<string, string[]> = {
 export function searchLandmarks(
   landmarks: Landmark[],
   query: string,
-  category: Category | 'all' = 'all',
 ): Landmark[] {
   const term = query.trim().toLocaleLowerCase();
-  return landmarks.filter(
-    (place) =>
-      (category === 'all' || place.category === category) &&
-      [
-        place.name,
-        placeName(place.name, 'zh'),
-        placeName(place.name, 'en'),
-        ...(LANDMARK_ALIASES[place.id] ?? []),
-        ...(ENGLISH_ALIASES[place.id] ?? []),
-      ].some((name) => name.toLocaleLowerCase().includes(term)),
+  return landmarks.filter((place) =>
+    [
+      place.name,
+      placeName(place.name, 'zh'),
+      placeName(place.name, 'en'),
+      ...(LANDMARK_ALIASES[place.id] ?? []),
+      ...(ENGLISH_ALIASES[place.id] ?? []),
+    ].some((name) => name.toLocaleLowerCase().includes(term)),
   );
 }
 
 export function navigableBuildings(
   buildings: Building[],
   landmarks: Landmark[],
-): Building[] {
+): (Building & { landmark: string })[] {
   const ids = new Set(landmarks.map((place) => place.id));
   return buildings.filter(
-    (building) => building.landmark !== null && ids.has(building.landmark),
+    (building): building is Building & { landmark: string } =>
+      building.landmark !== null && ids.has(building.landmark),
   );
 }
 
@@ -108,7 +106,7 @@ export function navigationFootprints(
 }
 
 /** Search associations do not change the canonical name or merge physical places. */
-export const ENGLISH_ALIASES: Record<string, string[]> = {
+const ENGLISH_ALIASES: Record<string, string[]> = {
   'student-center': ['Old Water Tower Café', 'Old Water Tower Cafe'],
   computer: [
     'School of Computer and Electronic Information',
@@ -218,7 +216,12 @@ export function buildingLocationLabel(
 const BUILDING_ALIASES: Record<string, string[]> = {
   'way/759140894': ['西23栋供餐点', '西23供餐点', 'West 23 Dining Point'],
   'way/759140893': ['西22栋供餐点', '西22供餐点', 'West 22 Dining Point'],
-  'relation/12774256': ['东27栋供餐点', '东27栋B区供餐点', '东27食堂', 'East 27 Dining Point'],
+  'relation/12774256': [
+    '东27栋供餐点',
+    '东27栋B区供餐点',
+    '东27食堂',
+    'East 27 Dining Point',
+  ],
   'way/1544361473': ['博萃餐厅', '博萃食堂', 'Bocui Dining Hall'],
   'way/759337794': ['萃苑食堂', 'Cuiyuan Dining Hall'],
   'way/759191485': ['东苑食堂', 'Dongyuan Dining Hall'],

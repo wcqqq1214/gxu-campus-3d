@@ -27,10 +27,8 @@ export const CampusMinimap = memo(function CampusMinimap({
   const { t } = useCampusLocale();
   const [open, setOpen] = useState(false);
   // A closed minimap ignores camera samples instead of re-rendering for them.
-  const camera = useSyncExternalStore(
-    cameraStore.subscribe,
-    () => (open ? cameraStore.get() : null),
-    () => null,
+  const camera = useSyncExternalStore(cameraStore.subscribe, () =>
+    open ? cameraStore.get() : null,
   );
   const [boundary, setBoundary] = useState<number[][][]>([]);
   useEffect(() => {

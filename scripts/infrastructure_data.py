@@ -17,6 +17,7 @@ from shapely.ops import linemerge, substring, transform, unary_union
 
 from infrastructure_footprints import strip_shape
 from prepare_geodata import OUT, ROOT, geom, inverse, polygons, project
+from terrain_elevation import make_elevation
 
 SNAPSHOT = ROOT / 'data/snapshots/infrastructure-2026-09-11.json.gz'
 MAIN_BRIDGES = [
@@ -140,18 +141,7 @@ def prepare_infrastructure():
     cols = terrain['cols']
     rows = terrain['rows']
     xmin, ymin, xmax, ymax = terrain['bounds']
-    hh = terrain['heights']
-
-    def elevation(x, y):
-        u = max(0, min(cols - 1.001, (x - xmin) / (xmax - xmin) * (cols - 1)))
-        v = max(0, min(rows - 1.001, (y - ymin) / (ymax - ymin) * (rows - 1)))
-        i = int(u)
-        j = int(v)
-        a = u - i
-        b = v - j
-        return (hh[j * cols + i] * (1 - a) + hh[j * cols + i + 1] * a) * (1 - b) + (
-            hh[(j + 1) * cols + i] * (1 - a) + hh[(j + 1) * cols + i + 1] * a
-        ) * b
+    elevation = make_elevation(terrain)
 
     def provenance(e):
         return {
@@ -843,7 +833,7 @@ def prepare_infrastructure():
                 'description': {
                     'chongzuo-bridge': '连接农院路两侧校园的下穿通道，两侧抬高步道与坡道相接，圆形护栏沿道路延伸。',
                     'bocui-bridge': '农院路沿线的校园联络通道，校内交通从公共道路下方穿行。',
-                    'huixian-bridge': '农院路两侧校园之间的通行节点，桥上公共道路与桥下校内通道分层交叉。',
+                    'huixian-bridge': '农院路下的校内通道，桥面通行社会车辆，桥下连接东西两侧校园。',
                 }[b['id']],
                 'detail': recent
                 + ' '

@@ -3,9 +3,8 @@
 import copy
 import hashlib
 import json
-import struct
 
-from preserve_glb_geometry import mesh_nodes_by_name, unpack
+from preserve_glb_geometry import mesh_nodes_by_name, pack_glb, unpack
 
 
 def _check(doc):
@@ -22,17 +21,8 @@ def _check(doc):
 
 
 def pack(doc, binary):
-    binary = bytes(binary) + b'\0' * (-len(binary) % 4)
-    doc['buffers'] = [{'byteLength': len(binary)}]
-    header = json.dumps(doc, separators=(',', ':'), ensure_ascii=False).encode()
-    header += b' ' * (-len(header) % 4)
-    return (
-        struct.pack('<4sII', b'glTF', 2, 28 + len(header) + len(binary))
-        + struct.pack('<I4s', len(header), b'JSON')
-        + header
-        + struct.pack('<I4s', len(binary), b'BIN\0')
-        + binary
-    )
+    doc['buffers'] = [{'byteLength': 0}]
+    return pack_glb(doc, binary, ensure_ascii=False)
 
 
 def splice_nodes(previous, candidate, selected):

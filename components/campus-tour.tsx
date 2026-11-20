@@ -55,17 +55,11 @@ export function CampusTour({
               className="tour-end"
               title={t('结束游览')}
               aria-label={t('结束游览')}
-              onClick={(event) => {
-                const panel = event.currentTarget.closest('aside');
+              onClick={() => {
                 tour.setPlaying(false);
                 tour.setStarted(false);
                 requestAnimationFrame(() => {
-                  const target =
-                    entry.current ??
-                    panel?.querySelector<HTMLButtonElement>(
-                      '[role="tab"][aria-selected="true"]',
-                    );
-                  target?.focus({ preventScroll: true });
+                  entry.current?.focus({ preventScroll: true });
                 });
               }}
             >

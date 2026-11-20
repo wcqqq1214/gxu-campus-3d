@@ -197,9 +197,9 @@ def prepare_campus_roads():
         and report['uncoveredArea'] < 1e-5
         and report['lawnRemainingTrees'] == 0
     )
-    (ROOT / 'docs/model-checks/campus-roads.json').write_text(
-        json.dumps(report, ensure_ascii=False, indent=2) + '\n'
-    )
+    report_path = ROOT / 'work/model-checks/campus-roads.json'
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
     print(report)
 
 

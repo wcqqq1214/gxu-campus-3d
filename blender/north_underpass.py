@@ -1,8 +1,5 @@
 """Open the mapped passage below retained roads; no pavement over the arterial."""
 
-import hashlib
-import json
-
 from foundation_geometry import clipped_mesh, masks_for
 from geometry import Mesh
 from infrastructure import frames
@@ -13,21 +10,15 @@ def road_height_sampler(source, elevation):
     from mathutils import Vector
     from mathutils.bvhtree import BVHTree
 
-    if hasattr(source, 'data'):
-        data = source.data
-        temporary = False
-    else:
-        data = bpy.data.meshes.new('north-road-sampling')
-        data.from_pydata(source.v, [], source.f)
-        temporary = True
+    data = bpy.data.meshes.new('north-road-sampling')
+    data.from_pydata(source.v, [], source.f)
     data.calc_loop_triangles()
     tree = BVHTree.FromPolygons(
         [v.co for v in data.vertices],
         [tuple(t.vertices) for t in data.loop_triangles],
         all_triangles=True,
     )
-    if temporary:
-        bpy.data.meshes.remove(data)
+    bpy.data.meshes.remove(data)
 
     def height(x, y):
         p = tree.ray_cast(Vector((x, y, 50)), Vector((0, 0, -1)), 100)[0]
@@ -170,117 +161,3 @@ def cut_meshes(base, b):
         base[key], _ = clipped_mesh(base[key], masks_for(b[mask]), b['bounds'])
         base[key].ground_uv_bounds = original.ground_uv_bounds
         base[key].xy_uv_materials = original.xy_uv_materials
-
-
-def cut_signature(masks, area):
-    return hashlib.sha256(
-        json.dumps([masks, area], separators=(',', ':')).encode()
-    ).hexdigest()
-
-
-def clip_source(obj, masks, area, colors):
-    """Clip original faces while interpolating UVs and retaining all other faces."""
-    import bpy
-
-    signature = cut_signature(masks, area)
-    if obj.get('northUnderpassCut') == signature:
-        return obj
-    mesh = Mesh()
-    uvs = []
-    original = obj.data
-    uv = original.uv_layers.active
-    outlines = [p for p, _ in masks_for(masks)]
-
-    def split(points, outline):
-        current = points
-        outside = []
-        for a, b in zip(outline, outline[1:] + outline[:1]):
-            if not current:
-                break
-            pos = []
-            neg = []
-
-            def side(p):
-                return (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])
-
-            for p, q in zip(current, current[1:] + current[:1]):
-                u, v = side(p), side(q)
-                (pos if u >= 0 else neg).append(p)
-                if (u >= 0) != (v >= 0):
-                    t = u / (u - v)
-                    cross = tuple(p[k] + (q[k] - p[k]) * t for k in range(5))
-                    pos.append(cross)
-                    neg.append(cross)
-            if len(neg) >= 3:
-                outside.append(neg)
-            current = pos
-        return current, outside
-
-    original.calc_loop_triangles()
-    face_triangles = {}
-    for triangle in original.loop_triangles:
-        face_triangles.setdefault(triangle.polygon_index, []).append(triangle)
-    affected = 0
-    for face in original.polygons:
-        pts = [
-            (*original.vertices[original.loops[i].vertex_index].co, *uv.data[i].uv)
-            for i in face.loop_indices
-        ]
-        hit = not (
-            max(p[0] for p in pts) < area[0]
-            or min(p[0] for p in pts) > area[2]
-            or max(p[1] for p in pts) < area[1]
-            or min(p[1] for p in pts) > area[3]
-        )
-        parts = [pts]
-        if hit:
-            # Compacted roads contain concave n-gons. Clipping those as convex
-            # polygons can remove visible road pieces outside the cut mask.
-            parts = [
-                [
-                    (
-                        *original.vertices[original.loops[i].vertex_index].co,
-                        *uv.data[i].uv,
-                    )
-                    for i in tri.loops
-                ]
-                for tri in face_triangles[face.index]
-            ]
-            face_affected = False
-            for outline in outlines:
-                remainder = []
-                for part in parts:
-                    inside, outside = split(part, outline)
-                    area2 = abs(
-                        sum(
-                            p[0] * q[1] - p[1] * q[0]
-                            for p, q in zip(inside, inside[1:] + inside[:1])
-                        )
-                    )
-                    if area2 > 1e-9:
-                        affected += 1
-                        face_affected = True
-                        remainder.extend(outside)
-                    else:
-                        remainder.append(part)
-                parts = remainder
-            if not face_affected:
-                parts = [pts]
-        for part in parts:
-            mesh.face(
-                [p[:3] for p in part],
-                colors[original.materials[face.material_index].name],
-            )
-            uvs.append([p[3:] for p in part])
-    if not affected:
-        obj['northUnderpassCut'] = signature
-        return obj
-    new = mesh.object(obj.name + '-cut', obj.users_collection[0], dict(obj.items()))
-    for face, values in zip(new.data.polygons, uvs):
-        for index, value in zip(face.loop_indices, values):
-            new.data.uv_layers.active.data[index].uv = value
-    name = obj.name
-    bpy.data.objects.remove(obj, do_unlink=True)
-    new.name = name
-    new['northUnderpassCut'] = signature
-    return new

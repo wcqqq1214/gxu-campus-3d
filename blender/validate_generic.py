@@ -754,7 +754,7 @@ def main():
         'scope': 'ordinary buildings only; dedicated landmarks and monuments use their existing verifiers',
         'tolerancesMeters': {'source': 0.011, 'baseDraco': 0.05, 'nearDraco': 0.02},
     }
-    target = ROOT / 'docs/model-checks/refinement'
+    target = ROOT / 'work/model-checks'
     target.mkdir(parents=True, exist_ok=True)
     if '--generated-only' in sys.argv:
         report['generatedPassed'] = True

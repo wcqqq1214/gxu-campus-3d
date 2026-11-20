@@ -206,7 +206,7 @@ report = {
     'initialBytes': manifest['base']['bytes'] + manifest['trees']['bytes'],
     'blendBytes': (ROOT / 'blender/gxu-campus.blend').stat().st_size,
 }
-(ROOT / 'docs/model-checks/basketball-retained-nodes.json').write_text(
-    json.dumps(report, ensure_ascii=False, indent=2) + '\n'
-)
+report_path = ROOT / 'work/model-checks/basketball-retained-nodes.json'
+report_path.parent.mkdir(parents=True, exist_ok=True)
+report_path.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
 print(report, flush=True)

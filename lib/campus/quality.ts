@@ -1,5 +1,5 @@
 import type { Quality } from './types';
-export type QualityLevel = 0 | 1 | 2;
+type QualityLevel = 0 | 1 | 2;
 
 /** Only active, visible samples count; recovery is deliberately slower than degradation. */
 export class AdaptiveQuality {
@@ -52,7 +52,7 @@ export function qualityProfile(
     pixelRatio: [1.75, 1.4, 1.25][level],
     resolutionScale: level === 2 ? 0.9 : 1,
     shadows: level === 0,
-    postprocessing: quality === 'fine' && level === 0,
+    postprocessing: quality === 'fine',
     nearTrees: level === 0,
     treeDensity: [1, 0.75, 0.55][level],
     detailBudgetMiB: Math.min(compact ? 32 : 64, [64, 48, 24][level]),

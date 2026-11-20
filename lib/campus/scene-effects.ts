@@ -65,7 +65,7 @@ export function createSceneEffects({
     },
     /** Renders through the effects; returns false when they are not active. */
     render() {
-      if (!effects || !enabled) return false;
+      if (!effects) return false;
       effects.render();
       return true;
     },

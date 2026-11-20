@@ -34,6 +34,21 @@ def unpack(raw):
     return json.loads(raw[20 : 20 + size]), raw[28 + size :]
 
 
+def pack_glb(doc, binary, *, pad_binary=True, ensure_ascii=True):
+    body = bytes(binary) + (b'\0' * (-len(binary) % 4) if pad_binary else b'')
+    if pad_binary and doc.get('buffers'):
+        doc['buffers'][0]['byteLength'] = len(body)
+    header = json.dumps(doc, separators=(',', ':'), ensure_ascii=ensure_ascii).encode()
+    header += b' ' * (-len(header) % 4)
+    return (
+        struct.pack('<4sII', b'glTF', 2, 28 + len(header) + len(body))
+        + struct.pack('<I4s', len(header), b'JSON')
+        + header
+        + struct.pack('<I4s', len(body), b'BIN\0')
+        + body
+    )
+
+
 def replace_compressed_node_parts(path, name, parts):
     """Replace one node with disjoint Draco parts using existing named materials.
 
@@ -126,17 +141,7 @@ def replace_compressed_node_parts(path, name, parts):
             p['material'] = matches[0]
             primitives.append(p)
     doc['meshes'][node['mesh']]['primitives'] = primitives
-    binary.extend(b'\0' * (-len(binary) % 4))
-    doc['buffers'][0]['byteLength'] = len(binary)
-    header = json.dumps(doc, separators=(',', ':')).encode()
-    header += b' ' * (-len(header) % 4)
-    path.write_bytes(
-        struct.pack('<4sII', b'glTF', 2, 28 + len(header) + len(binary))
-        + struct.pack('<I4s', len(header), b'JSON')
-        + header
-        + struct.pack('<I4s', len(binary), b'BIN\0')
-        + binary
-    )
+    path.write_bytes(pack_glb(doc, binary))
 
 
 def compact_buffer_views(path, *, optimize_jpegs=False):
@@ -230,17 +235,7 @@ def compact_buffer_views(path, *, optimize_jpegs=False):
     for parent, key, index in references:
         parent[key] = remap[index]
     doc['bufferViews'] = views
-    packed.extend(b'\0' * (-len(packed) % 4))
-    doc['buffers'][0]['byteLength'] = len(packed)
-    header = json.dumps(doc, separators=(',', ':')).encode()
-    header += b' ' * (-len(header) % 4)
-    path.write_bytes(
-        struct.pack('<4sII', b'glTF', 2, 28 + len(header) + len(packed))
-        + struct.pack('<I4s', len(header), b'JSON')
-        + header
-        + struct.pack('<I4s', len(packed), b'BIN\0')
-        + packed
-    )
+    path.write_bytes(pack_glb(doc, packed))
 
 
 def preserve_geometry(previous, path, names, materials=None):
@@ -279,11 +274,6 @@ def preserve_geometry(previous, path, names, materials=None):
                 old['materials'][p['material']]['name']
                 == new['materials'][q['material']]['name']
             )
-            if (
-                materials is not None
-                and old['materials'][p['material']]['name'] not in materials
-            ):
-                continue
             ext = copy.deepcopy(p['extensions']['KHR_draco_mesh_compression'])
             view = old['bufferViews'][ext['bufferView']]
             offset = view.get('byteOffset', 0)
@@ -317,14 +307,67 @@ def preserve_geometry(previous, path, names, materials=None):
                 metadata = copy.deepcopy(old['accessors'][p['indices']])
                 assert 'bufferView' not in metadata
                 new['accessors'][q['indices']] = metadata
-    binary.extend(b'\0' * ((-len(binary)) % 4))
-    new['buffers'][0]['byteLength'] = len(binary)
-    header = json.dumps(new, separators=(',', ':')).encode()
-    header += b' ' * ((-len(header)) % 4)
-    path.write_bytes(
-        struct.pack('<4sII', b'glTF', 2, 28 + len(header) + len(binary))
-        + struct.pack('<I4s', len(header), b'JSON')
-        + header
-        + struct.pack('<I4s', len(binary), b'BIN\0')
-        + binary
-    )
+    path.write_bytes(pack_glb(new, binary))
+
+
+def replace_node_geometry(raw, path, name):
+    """Allow this node's material set to grow, keeping other payloads verbatim."""
+    src, payload = unpack(raw)
+    dst, old_payload = unpack(path.read_bytes())
+    binary = bytearray(old_payload)
+    source = mesh_nodes_by_name(src)[name]
+    target = mesh_nodes_by_name(dst)[name]
+    byname = {m['name']: i for i, m in enumerate(dst['materials'])}
+    primitives = []
+    for primitive in src['meshes'][source['mesh']]['primitives']:
+        p = copy.deepcopy(primitive)
+        mat = src['materials'][p['material']]
+        matname = mat['name']
+        if matname not in byname:
+            assert 'Texture' not in json.dumps(mat), (
+                'New textured material needs explicit texture remapping'
+            )
+            byname[matname] = len(dst['materials'])
+            dst['materials'].append(copy.deepcopy(mat))
+        p['material'] = byname[matname]
+        ext = p['extensions']['KHR_draco_mesh_compression']
+        view = src['bufferViews'][ext['bufferView']]
+        binary.extend(b'\0' * (-len(binary) % 4))
+        offset = len(binary)
+        start = view.get('byteOffset', 0)
+        binary.extend(payload[start : start + view['byteLength']])
+        ext['bufferView'] = len(dst['bufferViews'])
+        dst['bufferViews'].append(
+            {'buffer': 0, 'byteOffset': offset, 'byteLength': view['byteLength']}
+        )
+        for field, index in list(p['attributes'].items()) + [('indices', p['indices'])]:
+            a = copy.deepcopy(src['accessors'][index])
+            assert 'bufferView' not in a
+            if field == 'indices':
+                p[field] = len(dst['accessors'])
+            else:
+                p['attributes'][field] = len(dst['accessors'])
+            dst['accessors'].append(a)
+        primitives.append(p)
+    dst['meshes'][target['mesh']]['primitives'] = primitives
+    path.write_bytes(pack_glb(dst, binary))
+
+
+def compact_static_accessors(path):
+    """Drop orphaned metadata from repeated bounded static-mesh replacements."""
+    doc, binary = unpack(path.read_bytes())
+    assert not doc.get('animations') and not doc.get('skins')
+    refs = []
+    for mesh in doc['meshes']:
+        for p in mesh['primitives']:
+            refs.extend((p['attributes'], key) for key in p['attributes'])
+            if 'indices' in p:
+                refs.append((p, 'indices'))
+            for target in p.get('targets', []):
+                refs.extend((target, key) for key in target)
+    live = sorted({obj[key] for obj, key in refs})
+    remap = {old: new for new, old in enumerate(live)}
+    for obj, key in refs:
+        obj[key] = remap[obj[key]]
+    doc['accessors'] = [doc['accessors'][i] for i in live]
+    path.write_bytes(pack_glb(doc, binary))

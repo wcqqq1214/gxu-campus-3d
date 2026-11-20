@@ -34,7 +34,7 @@ function hash(value: string) {
 }
 
 /** Classification is presentation-only; does not claim verified facade colours. */
-export function facadePalette(building: Pick<Building, 'category' | 'name'>) {
+function facadePalette(building: Pick<Building, 'category' | 'name'>) {
   if (building.category === 'living' || /宿舍|公寓/.test(building.name))
     return 0;
   if (/行政|办公|实验|科研/.test(building.name)) return 2;
