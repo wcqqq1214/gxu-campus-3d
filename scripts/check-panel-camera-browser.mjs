@@ -2,12 +2,7 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import ts from 'typescript';
-const { chromium } = await import(
-  process.env.PLAYWRIGHT_MODULE || 'playwright'
-);
-const browser = await chromium.launch({
-  executablePath: process.env.CHROMIUM_PATH,
-});
+import { browserCheck } from './browser-check.mjs';
 const baselineText = process.env.PANEL_SCENE_REV
   ? execFileSync(
       'git',
@@ -15,6 +10,12 @@ const baselineText = process.env.PANEL_SCENE_REV
       { encoding: 'utf8' },
     )
   : null;
+// The baseline swaps only createScene and keeps the current module imports, so
+// it supports revisions after createScene was split into lib/campus/scene-*.ts.
+if (baselineText && !baselineText.includes("from './scene-details'"))
+  throw new Error(
+    `PANEL_SCENE_REV=${process.env.PANEL_SCENE_REV} 早于场景模块拆分，不支持作为基准`,
+  );
 const baselineSource = baselineText
   ? ts.transpileModule(
       baselineText.slice(baselineText.indexOf('export function createScene')),
@@ -28,6 +29,7 @@ const baselineSource = baselineText
   : null;
 const errors = [];
 const results = [];
+const browser = await browserCheck('camera');
 try {
   for (const viewport of [
     { width: 1280, height: 800 },
@@ -69,11 +71,22 @@ try {
         controllerReturn,
         'Dev createScene must return its scene controller',
       );
-      const probe = `globalThis.__panelCameraProbe = () => ({
+      // A tween can finish after controls.update() and leave a pose that the next
+      // update still needs to clamp. Count actual settled updates, not wall time.
+      const probe = `let panelSettledUpdates = 0;
+      const panelUpdateControls = controls.update.bind(controls);
+      controls.update = (...args) => {
+        const moving = panelUpdateControls(...args);
+        panelSettledUpdates = tween || (moving && !orbiting)
+          ? 0 : panelSettledUpdates + 1;
+        return moving;
+      };
+      globalThis.__panelCameraProbe = () => ({
         position: camera.position.toArray(), target: controls.target.toArray(),
         projection: camera.projectionMatrix.toArray(), span: getSnapshot().span,
-        loading: [...loading], orbiting, tweenStart: tween?.start ?? null,
-        frame: {...frame}, width: host.clientWidth, height: host.clientHeight
+        queuedDetails: details.queued, orbiting, tweenStart: tween?.start ?? null,
+        frame: {...frame}, width: host.clientWidth, height: host.clientHeight,
+        framedWidth, framedHeight, settledUpdates: panelSettledUpdates
       });\n`;
       await route.fulfill({
         response,
@@ -93,13 +106,12 @@ try {
           const metrics = document.querySelector('.debug-metrics')?.textContent;
           if (!metrics || !globalThis.__panelCameraProbe) return false;
           const m = JSON.parse(metrics);
+          const scene = globalThis.__panelCameraProbe();
           return (
             m.readyMs > 0 &&
-            m.queuedDetails === 0 &&
-            globalThis.__panelCameraProbe().tweenStart === null &&
-            !globalThis
-              .__panelCameraProbe()
-              .loading.some((key) => key.startsWith('landmark-'))
+            scene.queuedDetails === 0 &&
+            scene.tweenStart === null &&
+            scene.settledUpdates >= 2
           );
         },
         undefined,
@@ -171,7 +183,10 @@ try {
       controls,
     );
     const beforeView = await snapshot();
-    await page.getByRole('button', { name: '俯视', exact: true }).click();
+    await page
+      .getByRole('group', { name: '地点观察视角', exact: true })
+      .getByRole('button', { name: '俯视', exact: true })
+      .click();
     await toggleCycle('俯视保持相机与投影');
     assert.notDeepEqual(
       beforeView.position,
@@ -221,14 +236,31 @@ try {
     );
     await toggleCycle('分享链接恢复后保持相机与投影');
     await page
-      .getByRole('button', { name: '返回校园全景', exact: true })
+      .locator('.masthead')
+      .getByRole('button', { name: '回到全景', exact: true })
       .click();
     await settle();
     const beforeResize = await snapshot();
-    await page.setViewportSize({
+    const resizedViewport = {
       width: viewport.width + 120,
       height: viewport.height - 80,
-    });
+    };
+    await page.setViewportSize(resizedViewport);
+    // Software rendering can delay resize events and ResizeObserver beyond the
+    // animation wait. Wait for layout and composition, not for the assertion itself.
+    await page.waitForFunction(
+      ({ width, height }) => {
+        const scene = globalThis.__panelCameraProbe();
+        return (
+          scene.width === width &&
+          scene.height === height &&
+          scene.framedWidth === width &&
+          scene.framedHeight === height
+        );
+      },
+      resizedViewport,
+      { timeout: 90000 },
+    );
     await settle();
     const afterResize = await snapshot();
     assert.notDeepEqual(
@@ -243,7 +275,7 @@ try {
     );
     await toggleCycle('窗口缩放后仍保持构图');
     assert.equal(await page.locator('vite-error-overlay').count(), 0);
-    await page.close();
+    await browser.closePage(page);
   }
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ passed: results.length, errors }, null, 2));

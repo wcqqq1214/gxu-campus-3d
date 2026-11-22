@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export interface ClosedPart {
+interface ClosedPart {
   faces: number[];
   planes: THREE.Plane[];
   bounds: THREE.Box3;

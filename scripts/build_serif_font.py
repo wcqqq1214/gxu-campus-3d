@@ -3,13 +3,14 @@
 
 The serif face is only used for place names and dialog titles, so the subset
 covers the characters of every landmark and building name plus the interface
-copy in app/page.tsx. Rerun after adding names with new characters:
+copy in app/ and components/. Rerun after adding names with new characters:
 
     python3 scripts/build_serif_font.py /path/to/NotoSerifSC-SemiBold.otf
 
 Requires fontTools and brotli. The source font is not kept in the repository;
 download it from https://github.com/notofonts/noto-cjk (Serif/SubsetOTF/SC).
 """
+
 import json
 import re
 import sys
@@ -28,7 +29,11 @@ def characters() -> str:
     for file in ('buildings.json', 'landmarks.json'):
         data = json.loads((ROOT / 'public/data' / file).read_text('utf-8'))
         names += [item.get('name') or '' for item in data]
-    copy = (ROOT / 'app/page.tsx').read_text('utf-8')
+    copy = ''.join(
+        path.read_text('utf-8')
+        for folder in ('app', 'components')
+        for path in sorted((ROOT / folder).rglob('*.tsx'))
+    )
     text = ''.join(names) + ''.join(CJK.findall(copy)) + BASIC
     return ''.join(sorted(set(text)))
 
@@ -49,7 +54,9 @@ def main() -> None:
     subsetter.subset(font)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     subset.save_font(font, str(OUT), options)
-    print(f'{OUT.relative_to(ROOT)}: {len(text)} characters, {OUT.stat().st_size} bytes')
+    print(
+        f'{OUT.relative_to(ROOT)}: {len(text)} characters, {OUT.stat().st_size} bytes'
+    )
 
 
 if __name__ == '__main__':

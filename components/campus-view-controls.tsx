@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef } from 'react';
 import { Orbit, Pause } from 'lucide-react';
 import { useCampusLocale } from '@/components/campus-locale';

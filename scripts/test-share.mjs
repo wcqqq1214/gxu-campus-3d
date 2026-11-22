@@ -11,21 +11,20 @@ const landmarks = JSON.parse(
   await readFile(new URL('../public/data/landmarks.json', import.meta.url)),
 );
 const ids = landmarks.map((l) => l.id);
-test('别名与分类仍限于精选目录', () => {
+test('别名仍限于精选目录', () => {
   assert.deepEqual(
     searchLandmarks(landmarks, '六教').map((l) => l.id),
     ['teaching-six'],
   );
   assert.deepEqual(
-    searchLandmarks(landmarks, '新东园门', 'landmark').map((l) => l.id),
+    searchLandmarks(landmarks, '新东园门').map((l) => l.id),
     ['new-east-gate'],
   );
   assert.deepEqual(
     searchLandmarks(landmarks, '南宁楼').map((l) => l.id),
     ['teaching-two'],
   );
-  assert.equal(searchLandmarks(landmarks, '六教', 'living').length, 0);
-  assert.equal(searchLandmarks(landmarks, '', 'landmark').length, 4);
+  assert.equal(landmarks.filter((l) => l.category === 'landmark').length, 4);
 });
 test('分享保留地标、相机与光照，输入异常不会生成无效镜头', () => {
   const snapshot = {

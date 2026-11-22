@@ -2,6 +2,11 @@
   "checkedAt": "2026-10-12",
   "basis": "User-approved bilingual naming table; display overrides do not change source geometry or assert current building occupancy.",
   "sources": {
+    "GXUWestMarket": [
+      "广西大学保卫处西校园菜市场现场报道",
+      "https://bwc.gxu.edu.cn/info/1080/9244.htm",
+      "2026-05-28；中文地点名，英文为说明性翻译。"
+    ],
     "G01": [
       "学校英文校园图库",
       "https://www.gxu.edu.cn/en/info/1086/1279.htm",
@@ -276,6 +281,11 @@
       "动物科学技术学院英文介绍",
       "https://www.gxu.edu.cn/en/info/1152/1716.htm",
       "英文；本轮读取的校级学院介绍标题。"
+    ],
+    "E27": [
+      "广西大学关于临时封闭鸪江路北端的公告附图",
+      "https://www.gxu.edu.cn/info/1364/30562.htm",
+      "附图标记东27栋；英文为宿舍楼编号的项目译名。"
     ]
   },
   "entries": {
@@ -1206,10 +1216,30 @@
       "sources": [],
       "note": "内部建模/范围描述，不作为官方地名或新的导航地点。"
     },
+    "三至四层 · 保留内院": {
+      "status": "技",
+      "sources": [],
+      "note": "内部建模/范围描述，不作为官方地名或新的导航地点。"
+    },
+    "五至六层 · 西端开敞柱廊": {
+      "status": "技",
+      "sources": [],
+      "note": "内部建模/范围描述，不作为官方地名或新的导航地点。"
+    },
+    "七层 · 荟萃餐厅": {
+      "status": "技",
+      "sources": [],
+      "note": "内部建模/范围描述，不作为官方地名或新的导航地点。"
+    },
     "北侧柱廊顶板": {
       "status": "技",
       "sources": [],
       "note": "内部建模/范围描述，不作为官方地名或新的导航地点。"
+    },
+    "新闻学院南侧柱廊": {
+      "status": "技",
+      "sources": [],
+      "note": "荟萃楼 relation/11970574 的 architecture.southArcade 构件名，来自 scripts/huicui_data.py。英文为建模描述的译名。"
     },
     "首层教室与门厅实墙": {
       "status": "技",
@@ -1982,10 +2012,10 @@
       "sources": [],
       "note": "数据生成的占位名称；数字不是已确认的校方楼号，不建议作为公开标签。"
     },
-    "校内建筑 12774256": {
-      "status": "技",
-      "sources": [],
-      "note": "数据生成的占位名称；数字不是已确认的校方楼号，不建议作为公开标签。"
+    "东校园学生公寓27栋": {
+      "status": "项",
+      "sources": ["E27"],
+      "note": "学校航拍标注东27栋。B区一层供餐点为宿舍楼内的目的地。"
     },
     "校内建筑 12874253": {
       "status": "技",
@@ -2097,10 +2127,10 @@
       "sources": [],
       "note": "数据生成的占位名称；数字不是已确认的校方楼号，不建议作为公开标签。"
     },
-    "校内建筑 1544361469": {
-      "status": "技",
-      "sources": [],
-      "note": "数据生成的占位名称；数字不是已确认的校方楼号，不建议作为公开标签。"
+    "西菜市场": {
+      "status": "项",
+      "sources": ["GXUWestMarket"],
+      "note": "西校园菜市场的地图简称；英文为说明性翻译。"
     },
     "校内建筑 20510973": {
       "status": "技",

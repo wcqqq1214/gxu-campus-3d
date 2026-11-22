@@ -27,12 +27,3 @@ test('锚点以高处主体而非入口铺装或错误中心定位', () => {
     [35, 30.6, -20],
   );
 });
-test('手工覆盖按东、北、高程米制转换且优先于模型', () => {
-  assert.deepEqual(
-    landmarkLabelAnchor(
-      { ...landmark, labelAnchor: [12, 34, 56] },
-      new Group(),
-    ).toArray(),
-    [12, 56, -34],
-  );
-});

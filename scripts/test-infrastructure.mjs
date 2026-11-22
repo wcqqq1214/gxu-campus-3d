@@ -11,6 +11,7 @@ const read = async (name) =>
     await readFile(new URL(`../public/data/${name}`, import.meta.url)),
   );
 const data = await read('infrastructure.json');
+const campusRoads = await read('campus-roads.json');
 const geo = await read('geography.geojson');
 const landmarks = await read('landmarks.json');
 const buildings = await read('buildings.json');
@@ -56,7 +57,13 @@ test('立交上下层分离，短坡道也连续接回原校道', () => {
           b.clearance,
       ) < 1e-6,
     );
-    assert.ok(b.clearance >= 4.2);
+    if (b.id === 'bocui-bridge') {
+      // The photographed 3.5 m sign is a posted limit. The mesh clearance is estimated.
+      assert.ok(b.clearance >= 3.5);
+      for (const [i, p] of b.underpass.entries()) {
+        assert.ok(Math.abs(b.pedestrian.path[i][2] - p[2] - 0.15) < 0.003);
+      }
+    } else assert.ok(b.clearance >= 4.2);
     for (const p of [b.underpass[0], b.underpass.at(-1)])
       assert.ok(Math.abs(p[2] - p[3]) < 0.005, `${b.name} ramp endpoint`);
     assert.ok(
@@ -67,6 +74,42 @@ test('立交上下层分离，短坡道也连续接回原校道', () => {
       '1',
     );
     assert.ok(b.dimensionBasis.includes('估算'));
+  }
+});
+
+test('西五楼前整段车道连续缓降，路缘与步道在路口接回', () => {
+  const bridge = data.bridges.find((b) => b.id === 'bocui-bridge');
+  const doorX = buildings.find((b) => b.id === 'way/759158608').form
+    .entrances[0].center[0];
+  const sections = bridge.underpass.filter(([x]) => Math.abs(x - doorX) <= 11);
+  assert.ok(sections.length >= 10);
+  for (let i = 1; i < sections.length; i++) {
+    const [x, y, z] = sections[i];
+    const [px, py, pz] = sections[i - 1];
+    const slope = (pz - z) / Math.hypot(x - px, y - py);
+    assert.ok(
+      slope >= 0 && slope < 0.075,
+      `unexpected frontage grade ${slope}`,
+    );
+  }
+  const join = campusRoads.bridgeJoins.find((j) => j.id === 'bocui-bridge-0');
+  assert.deepEqual(join.start, bridge.underpass[join.trim]);
+  assert.equal(join.walkStart, bridge.pedestrian.path[join.trim][2]);
+});
+
+test('博萃桥西坡从宿舍门前连续下行至桥洞', () => {
+  const bridge = data.bridges.find((item) => item.id === 'bocui-bridge');
+  const stations = bridge.underpass.filter(
+    ([x]) => x >= 89 && x <= bridge.center[0],
+  );
+  const drop = stations[0][2] - stations.at(-1)[2];
+  // The first sampled road station lies about 0.24 m past the frontage datum.
+  assert.ok(Math.abs(drop - 3.2) < 0.025);
+  for (const [i, [x, y, z]] of stations.entries()) {
+    if (!i) continue;
+    const [px, py, pz] = stations[i - 1];
+    const grade = (pz - z) / Math.hypot(x - px, y - py);
+    assert.ok(grade >= 0 && grade <= 0.085);
   }
 });
 
@@ -101,6 +144,32 @@ function inTriangle(p, a, b, c) {
   const signs = [sign(a, b, p), sign(b, c, p), sign(c, a, p)];
   return signs.every((n) => n >= -1e-7) || signs.every((n) => n <= 1e-7);
 }
+test('西五南侧支路连续接入下穿车道，步道绕过两个转角', () => {
+  const { sideJunction } = data.bridges.find((b) => b.id === 'bocui-bridge');
+  const materialsAt = (point) =>
+    sideJunction.layers
+      .filter(({ vertices, triangles }) => {
+        for (let i = 0; i < triangles.length; i += 3) {
+          if (
+            inTriangle(
+              point,
+              ...triangles.slice(i, i + 3).map((v) => vertices[v]),
+            )
+          )
+            return true;
+        }
+        return false;
+      })
+      .map((layer) => layer.material);
+  for (const x of [121.2, 123.7, 126.2]) {
+    for (let y = -622.5; y <= -592.5; y += 0.5)
+      assert.deepEqual(materialsAt([x, y]), ['asphalt']);
+  }
+  for (const x of [118.5, 128.8]) {
+    assert.ok(materialsAt([x, -600.5]).includes('pavingRed'));
+  }
+});
+
 test('粗 DEM 与替换三角形不会填住三处桥洞', () => {
   const [x0, y0, x1, y1] = terrain.bounds;
   for (const b of data.bridges) {
@@ -139,7 +208,7 @@ test('仅三座主要桥梁加入精选导航，拾取跟随道路图层与真�
     ids,
   );
   assert.deepEqual(
-    searchLandmarks(landmarks, '', 'infrastructure').map((l) => l.id),
+    landmarks.filter((l) => l.category === 'infrastructure').map((l) => l.id),
     ids,
   );
   const picks = navigationFootprints(buildings, landmarks);

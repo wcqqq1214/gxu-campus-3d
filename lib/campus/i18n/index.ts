@@ -27,7 +27,7 @@ export function translate(
     values.count === 1
       ? source === '{count} 个结果'
         ? '{count} result'
-        : source === '{count} 处' || source === '{count} 个地点'
+        : source === '{count} 个地点'
           ? '{count} place'
           : undefined
       : undefined;

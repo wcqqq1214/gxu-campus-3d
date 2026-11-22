@@ -1,0 +1,14 @@
+[tool.ruff]
+target-version = "py312"
+required-version = "==0.17.4"
+extend-exclude = ["work", "out"]
+# Scripts import sibling modules by bare name; treat both folders as project code.
+src = [".", "scripts", "blender"]
+
+[tool.ruff.lint]
+# 语法错误、全部 pyflakes 规则（未使用导入、未定义名称等）与导入排序。
+select = ["E9", "F", "I"]
+
+[tool.ruff.format]
+# The scripts were written with single quotes; keep them to limit churn.
+quote-style = "single"

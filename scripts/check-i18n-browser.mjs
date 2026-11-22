@@ -1,14 +1,13 @@
 /* Set I18N_BROWSER=webkit and BROWSER_PATH for WebKit; Chromium is the default. */
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-const playwright = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
+import { pathToFileURL } from 'node:url';
+import path from 'node:path';
+import { browserCheck } from './browser-check.mjs';
 const engine = process.env.I18N_BROWSER || 'chromium';
 const base = process.env.I18N_URL || 'http://127.0.0.1:4310/';
-const output = new URL('../outputs/i18n-browser/', import.meta.url);
-await fs.mkdir(output, { recursive: true });
-const browser = await playwright[engine].launch({
-  executablePath: process.env.BROWSER_PATH || process.env.CHROMIUM_PATH,
-});
+const browser = await browserCheck('i18n', engine);
+const output = pathToFileURL(browser.output + path.sep);
 const errors = [];
 const results = [];
 const waitForSceneReady = (page) =>
@@ -191,9 +190,10 @@ try {
     await languageTrigger(page).waitFor();
     await waitForSceneReady(page);
     results.push({ width, ...layout, passed: true });
-    await page.close();
+    await browser.closePage(page);
   }
   const page = await browser.newPage();
+  page.on('pageerror', (error) => errors.push(String(error)));
   await page.addInitScript(() => {
     Object.defineProperty(window, 'localStorage', {
       get() {
@@ -213,16 +213,25 @@ try {
     };
   });
   await page.goto(base + '?lang=en');
-  await page.getByRole('alert').filter({ hasText: 'WebGL 2' }).waitFor();
+  await page
+    .getByRole('alert')
+    .filter({ hasText: 'Can’t show 3D graphics' })
+    .waitFor();
   await setLanguage(page, 'zh');
-  await page.getByRole('alert').filter({ hasText: '此浏览器' }).waitFor();
+  await page
+    .getByRole('alert')
+    .filter({ hasText: '无法显示三维画面' })
+    .waitFor();
   results.push({ storageUnavailable: true, webglFallbackTranslated: true });
   assert.deepEqual(errors, []);
   console.log(JSON.stringify(results, null, 2));
 } finally {
-  await fs.writeFile(
-    new URL('results.json', output),
-    JSON.stringify({ results, errors }, null, 2),
-  );
-  await browser.close();
+  try {
+    await fs.writeFile(
+      new URL('results.json', output),
+      JSON.stringify({ results, errors }, null, 2),
+    );
+  } finally {
+    await browser.close();
+  }
 }

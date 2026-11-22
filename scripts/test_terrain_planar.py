@@ -1,4 +1,5 @@
 """Negative controls for the independent terrain acceptance checker."""
+
 import copy
 import json
 import tempfile
@@ -14,11 +15,18 @@ class TerrainCoverageTest(unittest.TestCase):
     def pair(self, *, reversed_face=False, height=0, uv_shift=0, hole=False):
         vertices = np.array([[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]], dtype=float)
         faces = np.array([[0, 1, 2], [0, 2, 3]])
-        uv = vertices[faces, :2]/4
-        normals = np.tile([0., 0., 1.], (2, 3, 1))
+        uv = vertices[faces, :2] / 4
+        normals = np.tile([0.0, 0.0, 1.0], (2, 3, 1))
         with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory)/'mesh.npz'
-            np.savez(path, vertices=vertices, triangles=faces, uvs=uv, normals=normals, materials=np.zeros(2))
+            path = Path(directory) / 'mesh.npz'
+            np.savez(
+                path,
+                vertices=vertices,
+                triangles=faces,
+                uvs=uv,
+                normals=normals,
+                materials=np.zeros(2),
+            )
             before = read(path)
             vertices[:, 2] += height
             uv += uv_shift
@@ -26,17 +34,24 @@ class TerrainCoverageTest(unittest.TestCase):
                 faces = faces[:, ::-1]
                 uv = uv[:, ::-1]
             count = 1 if hole else 2
-            np.savez(path, vertices=vertices, triangles=faces[:count], uvs=uv[:count], normals=normals[:count], materials=np.zeros(count))
+            np.savez(
+                path,
+                vertices=vertices,
+                triangles=faces[:count],
+                uvs=uv[:count],
+                normals=normals[:count],
+                materials=np.zeros(count),
+            )
             return before, read(path)
 
     def test_identical_and_bounded_height(self):
         a, b = self.pair()
         self.assertTrue(check(a, b)['passed'])
-        a, b = self.pair(height=.0001)
+        a, b = self.pair(height=0.0001)
         self.assertTrue(check(a, b)['passed'])
 
     def test_height_change_rejected(self):
-        a, b = self.pair(height=.01)
+        a, b = self.pair(height=0.01)
         self.assertFalse(check(a, b)['passed'])
 
     def test_missing_coverage_rejected(self):
@@ -48,7 +63,7 @@ class TerrainCoverageTest(unittest.TestCase):
         self.assertFalse(check(b, a)['passed'])
 
     def test_uv_change_rejected(self):
-        a, b = self.pair(uv_shift=.1)
+        a, b = self.pair(uv_shift=0.1)
         self.assertFalse(check(a, b)['passed'])
 
 
@@ -57,14 +72,18 @@ class DecodedTerrainCoverageTest(unittest.TestCase):
         vertices = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0]]
         if vertical:
             vertices = [[x, 0, y] for x, y, _ in vertices]
-        return dict(vertices=vertices, triangles=[[0, 1, 2], [0, 2, 3]],
-                    uvs=[[0, 0], [.25, 0], [.25, .25], [0, .25]],
-                    normals=[[0, -1, 0] if vertical else [0, 0, 1] for _ in vertices],
-                    material={'name': 'terrain'}, modelSHA256='fixture')
+        return dict(
+            vertices=vertices,
+            triangles=[[0, 1, 2], [0, 2, 3]],
+            uvs=[[0, 0], [0.25, 0], [0.25, 0.25], [0, 0.25]],
+            normals=[[0, -1, 0] if vertical else [0, 0, 1] for _ in vertices],
+            material={'name': 'terrain'},
+            modelSHA256='fixture',
+        )
 
     def read_pair(self, before, after):
         with tempfile.TemporaryDirectory() as directory:
-            paths = [Path(directory)/name for name in ('before.json', 'after.json')]
+            paths = [Path(directory) / name for name in ('before.json', 'after.json')]
             for path, data in zip(paths, (before, after)):
                 path.write_text(json.dumps(data))
             return tuple(read_decoded(path) for path in paths)
@@ -75,7 +94,9 @@ class DecodedTerrainCoverageTest(unittest.TestCase):
             for cyclic in (False, True):
                 after = copy.deepcopy(before)
                 if cyclic:
-                    after['triangles'] = [face[1:]+face[:1] for face in after['triangles']]
+                    after['triangles'] = [
+                        face[1:] + face[:1] for face in after['triangles']
+                    ]
                 a, b = self.read_pair(before, after)
                 for source, target in ((a, b), (b, a)):
                     with self.subTest(vertical=vertical, cyclic=cyclic):
@@ -86,8 +107,10 @@ class DecodedTerrainCoverageTest(unittest.TestCase):
     def test_bounded_uv_and_normal_rounding_passes_in_both_directions(self):
         before = self.fixture()
         after = copy.deepcopy(before)
-        after['uvs'] = [[u+5e-10, v] for u, v in after['uvs']]
-        after['normals'] = [[.0005, 0, (1-.0005**2)**.5] for _ in after['normals']]
+        after['uvs'] = [[u + 5e-10, v] for u, v in after['uvs']]
+        after['normals'] = [
+            [0.0005, 0, (1 - 0.0005**2) ** 0.5] for _ in after['normals']
+        ]
         a, b = self.read_pair(before, after)
         for source, target in ((a, b), (b, a)):
             self.assertTrue(check(source, target)['passed'])
@@ -96,8 +119,11 @@ class DecodedTerrainCoverageTest(unittest.TestCase):
         before = self.fixture()
         for attribute in ('uvs', 'normals'):
             after = copy.deepcopy(before)
-            after[attribute] = ([[u+.1, v] for u, v in before['uvs']] if attribute == 'uvs'
-                                else [[0, 1, 0] for _ in before['normals']])
+            after[attribute] = (
+                [[u + 0.1, v] for u, v in before['uvs']]
+                if attribute == 'uvs'
+                else [[0, 1, 0] for _ in before['normals']]
+            )
             a, b = self.read_pair(before, after)
             for direction, (source, target) in enumerate(((a, b), (b, a))):
                 with self.subTest(attribute=attribute, direction=direction):
@@ -107,8 +133,8 @@ class DecodedTerrainCoverageTest(unittest.TestCase):
         before = self.fixture()
         before['vertices'] *= 2
         before['normals'] *= 2
-        before['triangles'] += [[i+4 for i in face] for face in before['triangles']]
-        before['uvs'] += [[u+.5, v] for u, v in before['uvs']]
+        before['triangles'] += [[i + 4 for i in face] for face in before['triangles']]
+        before['uvs'] += [[u + 0.5, v] for u, v in before['uvs']]
         after = copy.deepcopy(before)
         after['uvs'][4:] = copy.deepcopy(after['uvs'][:4])
         a, b = self.read_pair(before, after)

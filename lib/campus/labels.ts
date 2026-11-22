@@ -1,12 +1,7 @@
 import { Box3, Mesh, Vector3, type Object3D } from 'three';
 import type { Landmark } from './types';
 
-/** Optional override is in source east/north/up metres, not Three's x/y/z. */
 export function landmarkLabelAnchor(landmark: Landmark, model?: Object3D) {
-  if (landmark.labelAnchor) {
-    const [east, north, up] = landmark.labelAnchor;
-    return new Vector3(east, up, -north);
-  }
   const fallback = new Vector3(
     (landmark.bounds[0] + landmark.bounds[2]) / 2,
     landmark.elevation + landmark.height + 0.6,

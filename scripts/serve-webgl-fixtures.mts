@@ -1,5 +1,5 @@
 import { createServer } from 'vite';
-// Independent HTML fixtures import production modules without starting vinext.
+// Independent HTML fixtures import production modules without the app entry.
 const server = await createServer({
   configFile: false,
   server: {

@@ -3,6 +3,12 @@ import {
   navigableBuildings,
   navigationFootprints,
 } from '../lib/campus/navigation.ts';
+import {
+  landmarkDirection,
+  landmarkBox,
+  entranceBox,
+} from '../lib/campus/camera.ts';
+import { Vector3 } from 'three';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -188,10 +194,11 @@ test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
   for (const a of [
     manifest.base,
     manifest.trees,
-    ...(manifest.treesNear ? [manifest.treesNear] : []),
+    manifest.treesNear,
     ...manifest.zones,
     ...manifest.landmarks,
-    ...(manifest.infrastructure ?? []),
+    ...manifest.infrastructure,
+    ...manifest.sports,
   ]) {
     const bytes = await readFile(
       new URL(`../public/${a.url}`, import.meta.url),
@@ -215,21 +222,21 @@ test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
     ),
   );
 });
-test('首屏模型与嵌入纹理：8 MB 目标、10 MB 硬上限', async (t) => {
-  const budget = JSON.parse(
-    await readFile(
-      new URL('../data/initial-model-budget.json', import.meta.url),
-      'utf8',
-    ),
-  );
+const modelBudget = JSON.parse(
+  await readFile(
+    new URL('../data/initial-model-budget.json', import.meta.url),
+    'utf8',
+  ),
+);
+test('首屏模型与嵌入纹理符合配置的体积预算', (t) => {
   const total = manifest.base.bytes + manifest.trees.bytes;
-  if (total > budget.targetBytes)
+  if (total > modelBudget.targetBytes)
     t.diagnostic(
-      `WARNING: ${total} bytes exceeds target ${budget.targetBytes}`,
+      `WARNING: ${total} bytes exceeds target ${modelBudget.targetBytes}`,
     );
   assert.ok(
-    total <= budget.hardLimitBytes,
-    `${total} bytes exceeds hard limit ${budget.hardLimitBytes}`,
+    total <= modelBudget.hardLimitBytes,
+    `${total} bytes exceeds hard limit ${modelBudget.hardLimitBytes}`,
   );
 });
 test('基础模型逐节点压缩几何预算，阻止远景节点继续膨胀', async () => {
@@ -256,7 +263,7 @@ test('基础模型逐节点压缩几何预算，阻止远景节点继续膨胀',
     );
     const limit =
       exceptions[node.name] ??
-      { roads: 1_300_000, terrain: 1_200_000 }[node.extras?.layer] ??
+      modelBudget.baseLayerLimitBytes[node.extras?.layer] ??
       300_000;
     assert.ok(bytes <= limit, `${node.name}: ${bytes} bytes exceeds ${limit}`);
   }
@@ -411,7 +418,7 @@ test('时光之门绑定原雕塑节点、保留别名并纳入精选文体地�
   assert.ok(!buildings.some((b) => b.id === l.osmId));
   for (const name of ['时光之门', '时空之门', '图书馆北广场'])
     assert.deepEqual(
-      searchLandmarks(landmarks, name, 'culture').map((p) => p.id),
+      searchLandmarks(landmarks, name).map((p) => p.id),
       [l.id],
     );
   assert.equal(
@@ -460,7 +467,7 @@ test('十教绑定原八层轮廓、索引十九且不再重复出现在普通�
   assert.ok(l.center[1] > landmarks[17].center[1]);
   for (const name of ['第十教学楼', '十教', '10教', '多媒体教学楼'])
     assert.deepEqual(
-      searchLandmarks(landmarks, name, 'academic').map((p) => p.id),
+      searchLandmarks(landmarks, name).map((p) => p.id),
       [l.id],
     );
   assert.equal(
@@ -487,4 +494,49 @@ test('十教绑定原八层轮廓、索引十九且不再重复出现在普通�
   }
   const sources = (await json('sources')).sources;
   for (const id of l.sourceRefs) assert.ok(sources.some((s) => s.id === id));
+});
+
+test('荟萃楼进入第20项索引并复用原关系及内院', async () => {
+  const sources = (await json('sources')).sources;
+  const records = buildings.filter((b) => b.customModel === 'huicui');
+  assert.equal(records.length, 1);
+  const b = records[0];
+  assert.equal(b.id, 'relation/11970574');
+  assert.equal(b.landmark, 'huicui');
+  assert.equal(landmarks.length, 20);
+  const l = landmarks[19];
+  assert.equal(l.id, 'huicui');
+  assert.ok(landmarkDirection(l, 'entrance', b.architecture).z < -0.8);
+  const door = entranceBox(l, landmarkBox(l), false, b.architecture).getCenter(
+    new Vector3(),
+  );
+  assert.ok(door.z < -b.bounds[3]);
+  assert.ok(Math.abs(door.x - b.architecture.origin[0]) < 1);
+  assert.ok(manifest.landmarks.some((m) => m.id === 'huicui'));
+  for (const name of ['荟萃楼', '荟萃楼酒店', '新闻传播学院'])
+    assert.deepEqual(
+      searchLandmarks(landmarks, name).map((p) => p.id),
+      ['huicui'],
+    );
+  assert.equal(
+    navigationFootprints(buildings, landmarks).filter(
+      (p) => p.landmark === 'huicui',
+    ).length,
+    1,
+  );
+  assert.equal(
+    manifest.zones.filter((z) => z.featureIds.includes(b.id)).length,
+    0,
+  );
+  assert.equal(b.polygons[0].length, 2);
+  assert.equal(b.architecture.parts[1].polygons[0].length, 2);
+  assert.ok(b.sourceRefs.every((id) => sources.some((s) => s.id === id)));
+  assert.equal(
+    sources.find((s) => s.id === 'huicuiExterior2020').publishedAt,
+    '2020-01-10',
+  );
+  assert.equal(
+    sources.find((s) => s.id === 'huicuiExterior2020').capturedAt,
+    null,
+  );
 });

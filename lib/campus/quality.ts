@@ -1,5 +1,5 @@
 import type { Quality } from './types';
-export type QualityLevel = 0 | 1 | 2;
+type QualityLevel = 0 | 1 | 2;
 
 /** Only active, visible samples count; recovery is deliberately slower than degradation. */
 export class AdaptiveQuality {
@@ -52,9 +52,58 @@ export function qualityProfile(
     pixelRatio: [1.75, 1.4, 1.25][level],
     resolutionScale: level === 2 ? 0.9 : 1,
     shadows: level === 0,
-    postprocessing: quality === 'fine' && level === 0,
+    postprocessing: quality === 'fine',
     nearTrees: level === 0,
     treeDensity: [1, 0.75, 0.55][level],
     detailBudgetMiB: Math.min(compact ? 32 : 64, [64, 48, 24][level]),
   };
+}
+
+const saveData = () =>
+  Boolean(
+    (navigator as Navigator & { connection?: { saveData?: boolean } })
+      .connection?.saveData,
+  );
+const compactViewport = () => window.innerWidth < 760;
+
+/**
+ * The selected quality and the automatic level beneath it. Phone-sized
+ * layouts and data saver keep automatic quality at the smooth tier.
+ */
+export class QualityControl {
+  quality: Quality = 'auto';
+  private adaptive = new AdaptiveQuality();
+
+  get automaticLevel() {
+    return this.adaptive.level;
+  }
+
+  /** Returns whether the choice changed; a new choice restarts automatic tuning. */
+  select(quality: Quality) {
+    const changed = quality !== this.quality;
+    if (changed) this.adaptive.reset();
+    this.quality = quality;
+    return changed;
+  }
+
+  profile() {
+    return qualityProfile(
+      this.quality,
+      compactViewport(),
+      saveData(),
+      this.adaptive.level,
+    );
+  }
+
+  /** Feeds a frame-rate sample; returns whether the automatic level changed. */
+  sample(fps: number, frames: number, continuous: boolean) {
+    if (
+      this.quality !== 'auto' ||
+      compactViewport() ||
+      saveData() ||
+      document.hidden
+    )
+      return false;
+    return this.adaptive.sample(fps, frames, continuous);
+  }
 }

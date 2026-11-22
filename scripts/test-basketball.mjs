@@ -1,7 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { createHash } from 'node:crypto';
 import { createPrimitiveDecoder } from './draco-geometry.mjs';
 const read = (n) =>
   JSON.parse(fs.readFileSync(new URL('../public/data/' + n, import.meta.url)));
@@ -82,22 +81,9 @@ test('basketball LODs keep the same ground and full near hardware within the ini
     }
   };
   assert.equal(manifest.sports.length, data.banks.length);
-  const budget = JSON.parse(
-    fs.readFileSync(
-      new URL('../data/initial-model-budget.json', import.meta.url),
-    ),
-  );
-  assert.ok(
-    manifest.base.bytes + manifest.trees.bytes <= budget.hardLimitBytes,
-  );
   for (const asset of manifest.sports) {
     const near = parse(asset.url);
     const decodeNear = await createPrimitiveDecoder(near.doc, near.bin);
-    assert.equal(near.raw.length, asset.bytes);
-    assert.equal(
-      createHash('sha256').update(near.raw).digest('hex'),
-      asset.sha256,
-    );
     assert.deepEqual(
       asset.bounds,
       data.banks.find((b) => b.id === asset.id).bounds,

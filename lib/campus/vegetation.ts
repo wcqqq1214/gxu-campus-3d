@@ -1,3 +1,13 @@
+import crownWidths from '../../data/west-dorm-crown-widths.json' with { type: 'json' };
+
+const crownWidthByPosition = new Map(
+  crownWidths.map(([x, y, width]) => [`${x},${y}`, width]),
+);
+
+export function treeCrownWidthFactor(x: number, y: number): number {
+  return crownWidthByPosition.get(`${x},${y}`) ?? 1;
+}
+
 /** Stable schematic orientation; matches scripts/vegetation_layout.py.
  * Stored positions have decimetre precision. Order, type and sector do not
  * change the orientation of a surviving tree.
@@ -51,28 +61,55 @@ export function treeGroundHeight(
   );
 }
 
-export function treeElevation(row: number[], terrain: TreeTerrain): number {
+export function treeElevation(
+  row: number[],
+  terrain?: TreeTerrain | null,
+): number {
   return Number.isFinite(row[4])
     ? row[4]
-    : treeGroundHeight(terrain, row[0], row[1]);
+    : treeGroundHeight(terrain!, row[0], row[1]);
 }
 
 /** Stable partition inside each existing template/sector budget. Sourced groups
  * must not vanish merely because preparation appends them after background trees.
  * Counts, transforms and the background's relative order stay unchanged.
  */
-export function prioritizeTreeRows(
+export function orderTreeGroup(
   rows: number[][],
-  positions: number[][],
-): number[][] {
-  const keys = new Set(positions.map(([x, y]) => `${x},${y}`));
-  if (!keys.size) return rows;
+  priorityKeys: ReadonlySet<string>,
+) {
+  if (!priorityKeys.size) return { rows, priorityCount: 0 };
   const priority: number[][] = [],
     background: number[][] = [];
   for (const row of rows) {
-    (keys.has(`${row[0]},${row[1]}`) ? priority : background).push(row);
+    (priorityKeys.has(`${row[0]},${row[1]}`) ? priority : background).push(row);
   }
-  return [...priority, ...background];
+  return { rows: [...priority, ...background], priorityCount: priority.length };
+}
+
+/** Share a sector's density budget across species when a small planting is all priority trees. */
+export function treeInstanceCounts(
+  groups: { total: number; priority: number }[],
+  density: number,
+): number[] {
+  const counts = groups.map(({ total }) => Math.ceil(total * density));
+  let available = groups.reduce(
+    (sum, { priority }, i) => sum + Math.max(0, counts[i] - priority),
+    0,
+  );
+  let transferred = 0;
+  for (const [i, { priority }] of groups.entries()) {
+    const extra = Math.min(available, Math.max(0, priority - counts[i]));
+    counts[i] += extra;
+    transferred += extra;
+    available -= extra;
+  }
+  for (const [i, { priority }] of groups.entries()) {
+    const give = Math.min(transferred, Math.max(0, counts[i] - priority));
+    counts[i] -= give;
+    transferred -= give;
+  }
+  return counts;
 }
 
 /** Coordinates, not instance order, seed both LOD templates identically. */

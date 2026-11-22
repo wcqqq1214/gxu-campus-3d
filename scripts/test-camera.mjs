@@ -10,6 +10,7 @@ import {
   landmarkDirection,
   entranceBox,
   benchmarkOrbitEnabled,
+  viewPose,
 } from '../lib/campus/camera.ts';
 
 test('fixed-pose benchmark requires both explicit debug and measurement mode', () => {
@@ -293,4 +294,31 @@ test('新东园门近景降低俯角，远近资源就绪前后构图一致且�
       );
     }
   }
+});
+
+test('俯视、鸟瞰与朝北保持目标和距离，缩放受控制器距离限制', () => {
+  const target = new Vector3(10, 0, -20);
+  const position = new Vector3(310, 400, 380);
+  const distance = position.distanceTo(target);
+  for (const view of ['top', 'tilt', 'north']) {
+    const pose = viewPose(view, target, position, { min: 18, max: 18000 });
+    assert.ok(pose.target.equals(target), view);
+    assert.ok(
+      Math.abs(pose.position.distanceTo(target) - distance) < 1e-6,
+      view,
+    );
+  }
+  const north = viewPose('north', target, position, { min: 18, max: 18000 });
+  assert.ok(Math.abs(north.position.x - target.x) < 1e-9);
+  assert.ok(north.position.z > target.z);
+  const zoomIn = viewPose('zoomIn', target, position, { min: 18, max: 18000 });
+  assert.ok(
+    Math.abs(zoomIn.position.distanceTo(target) - distance * 0.75) < 1e-6,
+  );
+  const clamped = viewPose('zoomOut', target, position, { min: 18, max: 600 });
+  assert.ok(Math.abs(clamped.position.distanceTo(target) - 600) < 1e-6);
+  assert.ok(
+    target.equals(new Vector3(10, 0, -20)),
+    'input target is not mutated',
+  );
 });

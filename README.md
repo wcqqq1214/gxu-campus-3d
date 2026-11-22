@@ -2,7 +2,7 @@
 
 <p align="center"><strong>简体中文</strong> · <a href="README.en.md">English</a></p>
 
-广西大学大学东路主校区的交互式三维地图，使用 Three.js、Blender 与 React，基于 OpenStreetMap 和公开资料建模。
+广西大学大学东路主校区的交互式三维地图。地理底图取自 OpenStreetMap，主要建筑与地标参考公开资料在 Blender 中建模，网页端基于 Three.js 和 React 实现。
 
 **[在线游览](https://wcqqq1214.github.io/gxu-campus-3d/)**
 
@@ -10,20 +10,20 @@
 
 ## 功能
 
-- 搜索校园地点和建筑，切换观察视角，跟随校园游览路线。
-- 晨光、日间、黄昏、夜景四种光影，可调整图层与画质。
-- 分享当前视角，或导出带 OpenStreetMap 署名的 PNG。
-- 适配手机与键盘操作，支持系统“减少动态效果”偏好。
+- 按名称或简称搜索校园地点与建筑，切换观察视角，或开启校园游览按站浏览。
+- 提供清晨、白天、黄昏、夜晚四种光照，可自由开关地图图层并调节渲染画质。
+- 复制当前视角链接分享给他人，或导出带有 OpenStreetMap 署名的 PNG 截图。
+- 适配手机触屏与键盘导航，并响应系统的“减少动态效果”设置。
 
 <details>
 <summary>更多截图：光影、近景与手机界面</summary>
 
-| 晨光 | 日间 |
+| 清晨 | 白天 |
 | --- | --- |
-| ![晨光下的图书馆](docs/screenshots/readme/library-morning.jpg) | ![日间的图书馆](docs/screenshots/readme/library-day.jpg) |
-| 黄昏 | 夜景 |
-| ![黄昏下的图书馆](docs/screenshots/readme/library-evening.jpg) | ![夜景中的图书馆](docs/screenshots/readme/library-night.jpg) |
-| 图书馆北侧 | 崇左桥下穿道路 |
+| ![清晨的图书馆](docs/screenshots/readme/library-morning.jpg) | ![白天的图书馆](docs/screenshots/readme/library-day.jpg) |
+| 黄昏 | 夜晚 |
+| ![黄昏的图书馆](docs/screenshots/readme/library-evening.jpg) | ![夜晚的图书馆](docs/screenshots/readme/library-night.jpg) |
+| 图书馆北侧 | 崇左桥下穿通道 |
 | ![图书馆北侧与入口](docs/screenshots/readme/library-north.jpg) | ![崇左桥桥下道路](docs/screenshots/readme/chongzuo-bridge.jpg) |
 | 手机地点详情 | 手机工具菜单 |
 | ![手机上的六教详情](docs/screenshots/readme/mobile-detail.jpg) | ![手机上的工具菜单](docs/screenshots/readme/mobile-tools.jpg) |
@@ -32,11 +32,11 @@
 
 </details>
 
-全景截图：2026-10-27；其余截图：2026-10-12。均来自本地 `dev` 静态构建，手机为浏览器模拟，可能与在线站点不同。
+> 全景截图摄于 2026-10-27，其余截图摄于 2026-10-12，均来自本地 `dev` 静态构建（手机界面为浏览器模拟视口），与在线站点可能略有不同。
 
 ## 本地运行
 
-使用 Node.js 24，无需地图密钥或后端服务。
+项目使用 Node.js 24（见 [.nvmrc](.nvmrc)，与 CI 保持一致；使用 nvm 时可运行 `nvm install && nvm use`）。页面为纯静态前端，无需地图 API 密钥或后端服务：
 
 ```sh
 git clone --branch dev https://github.com/wcqqq1214/gxu-campus-3d.git
@@ -45,14 +45,27 @@ npm ci
 npm run dev
 ```
 
-打开终端输出的 Local 地址。静态构建运行 `npm run build:pages`，产物位于 `out/`；运行 `npm run preview` 后访问 <http://127.0.0.1:4300/gxu-campus-3d/>。
+启动后打开终端输出的 Local 地址即可浏览。如需打包静态站点或在本地预览构建结果：
+
+```sh
+npm run build:pages   # 构建静态文件到 out/
+npm run preview       # 本地预览：http://127.0.0.1:4300/gxu-campus-3d/
+```
+
+### 检查与测试
+
+- **前端检查**：`npm run check` 会依次执行 TypeScript 类型检查、oxlint 校验和 JS/TS 单元测试。
+- **Python 检查**：Python 版本在 [.python-version](.python-version) 中固定为 3.12。安装开发依赖后，可用 `npm run lint:python` 运行 Ruff 检查，用 `npm run format:python` 格式化代码。
+- **浏览器回归**：先运行 `npx playwright install chromium`，再执行 `npm run test:browser`，验证菜单交互、相机控制以及中英文界面。
+
+向 `dev` 分支推送代码时，CI 会自动运行上述检查、Python 数据测试、Blender 几何回归与静态构建（仅验证，不部署）。完整环境说明见[模型结构、测试与重建](docs/MODELING.md)。
 
 ## 数据与文档
 
-覆盖东、西、北校园。未经实地测绘，部分高度、立面和设施布局为估算。
+模型涵盖东、西、北三个校园区域。由于未做实地测绘，部分建筑高度、外立面和场地布局依据公开资料估算。
 
 - [数据来源与精度](docs/DATA.md)
-- [模型结构、测试与重建](docs/MODELING.md)（Blender 源文件未分发，运行网页无需该文件）
+- [模型结构、测试与重建](docs/MODELING.md)（Blender 源文件不随仓库分发，运行网页无需该文件）
 - [界面与交互](docs/DESIGN.md)
 
-原创代码、文档、模型、材质及渲染图采用 [MIT](LICENSE)；OpenStreetMap 地理数据库及衍生数据采用 ODbL，署名 **© OpenStreetMap contributors**。其他资源见 [第三方说明](licenses/THIRD_PARTY.md)。参考照片与视频不随仓库分发。
+项目原创代码、文档、模型、材质和渲染图采用 [MIT](LICENSE) 许可；OpenStreetMap 地理数据库及其衍生数据遵循 ODbL，署名 **© OpenStreetMap contributors**。其余资源的授权见[第三方说明](licenses/THIRD_PARTY.md)，参考照片与视频不随仓库分发。

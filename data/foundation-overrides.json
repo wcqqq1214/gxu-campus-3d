@@ -303,6 +303,26 @@
         "weldDistance": 0.0001
       },
       "evidence": "Model repair: lower terrain crossing the existing closed ground-floor volume. Retain the adopted building datum, footprint, original DEM and roads, with a bounded 3 m transition. This is not a surveyed elevation or a building calibration."
+    },
+    {
+      "id": "medicine-west-wing-foundation",
+      "buildingId": "way/759096577",
+      "repairBounds": [
+        518.8,
+        -486.95,
+        550.1,
+        -476.23
+      ],
+      "coreMargin": 1.3,
+      "roadTrimMargin": 1.5,
+      "haloMeters": 7,
+      "groundOffset": 0,
+      "preserveRoads": true,
+      "meshSimplification": {
+        "normalTolerance": 0.0001,
+        "weldDistance": 0.0001
+      },
+      "evidence": "北侧184°街景可见首层有栅窗及低墙脚。发布模型西部地形高于楼基约2.4米，横穿窗带。本条只削低西翼穿墙部分；楼基、道路与邻楼受保护。1.3米核心外扩及7米接续带是网格衔接参数；未据此判定真实坡度、南侧下层或挡墙。街景 https://mapsv0.bdimg.com/?qt=pr3d&panoid=09007200121903051020595949B&heading=184&pitch=10&fovy=72&width=960&height=640&quality=95"
     }
   ]
 }

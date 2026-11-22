@@ -5,6 +5,7 @@ open mesh. Reconstruct consistent winding per shell; input face normals are not
 trusted. Open/non-manifold components remain available as surface witnesses and
 are reported separately, not silently treated as occupied bounding boxes.
 """
+
 import math
 from collections import defaultdict
 from itertools import product
@@ -13,24 +14,28 @@ CELL_METERS = 16
 
 
 def cell(point):
-    return tuple(math.floor(value/CELL_METERS) for value in point)
+    return tuple(math.floor(value / CELL_METERS) for value in point)
 
 
 def cells(box):
     low, high = cell(box[0]), cell(box[1])
-    return product(*(range(a, b+1) for a, b in zip(low, high)))
+    return product(*(range(a, b + 1) for a, b in zip(low, high)))
 
 
 def dot(a, b):
-    return sum(x*y for x, y in zip(a, b))
+    return sum(x * y for x, y in zip(a, b))
 
 
 def cross(a, b):
-    return (a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0])
+    return (
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0],
+    )
 
 
 def subtract(a, b):
-    return tuple(x-y for x, y in zip(a, b))
+    return tuple(x - y for x, y in zip(a, b))
 
 
 def contains_bounds(box, point):
@@ -41,7 +46,9 @@ class ClosedShell:
     def __init__(self, vertices, triangles):
         self.triangles = [tuple(vertices[i] for i in tri) for tri in triangles]
         points = [p for tri in self.triangles for p in tri]
-        self.bounds = tuple(tuple(fn(p[k] for p in points) for k in range(3)) for fn in (min, max))
+        self.bounds = tuple(
+            tuple(fn(p[k] for p in points) for k in range(3)) for fn in (min, max)
+        )
 
     def contains(self, point):
         if not contains_bounds(self.bounds, point):
@@ -53,11 +60,13 @@ class ClosedShell:
             if min(la, lb, lc) == 0:
                 return True
             numerator = dot(a, cross(b, c))
-            denominator = la*lb*lc + dot(a, b)*lc + dot(b, c)*la + dot(c, a)*lb
-            angles.append(2*math.atan2(numerator, denominator))
+            denominator = (
+                la * lb * lc + dot(a, b) * lc + dot(b, c) * la + dot(c, a) * lb
+            )
+            angles.append(2 * math.atan2(numerator, denominator))
         # A closed consistent shell subtends ±4π inside and zero outside.
         # Boundary contact is also handled by the caller's surface overlap pass.
-        return abs(math.fsum(angles)) > 2*math.pi
+        return abs(math.fsum(angles)) > 2 * math.pi
 
 
 class MeshVolumes:
@@ -89,7 +98,7 @@ class MeshVolumes:
         face_edges = []
         for i, face in enumerate(faces):
             edges = []
-            for a, b in zip(face, face[1:]+face[:1]):
+            for a, b in zip(face, face[1:] + face[:1]):
                 edge = tuple(sorted((a, b)))
                 direction = 1 if (a, b) == edge else -1
                 edge_faces[edge].append((i, direction))
@@ -114,7 +123,7 @@ class MeshVolumes:
                     for other, other_direction in neighbors:
                         if other == current:
                             continue
-                        expected = -signs[current]*direction*other_direction
+                        expected = -signs[current] * direction * other_direction
                         if other in signs:
                             if signs[other] != expected:
                                 closed = False
@@ -124,7 +133,10 @@ class MeshVolumes:
                             pending.append(other)
             self.representatives.append(welded[faces[first][0]])
             if closed:
-                oriented = [faces[i] if sign == 1 else faces[i][::-1] for i, sign in signs.items()]
+                oriented = [
+                    faces[i] if sign == 1 else faces[i][::-1]
+                    for i, sign in signs.items()
+                ]
                 self.shells.append(ClosedShell(welded, oriented))
             else:
                 self.open_components += 1
@@ -132,7 +144,7 @@ class MeshVolumes:
         self._large_shells = []
         for shell in self.shells:
             low, high = cell(shell.bounds[0]), cell(shell.bounds[1])
-            if math.prod(b-a+1 for a, b in zip(low, high)) > 4096:
+            if math.prod(b - a + 1 for a, b in zip(low, high)) > 4096:
                 self._large_shells.append(shell)
             else:
                 for key in cells(shell.bounds):
@@ -149,6 +161,8 @@ class MeshVolumes:
     def witness_inside(self, points):
         for point in points:
             nearby = self._shell_cells.get(cell(point), ())
-            if any(shell.contains(point) for shell in nearby) or any(shell.contains(point) for shell in self._large_shells):
+            if any(shell.contains(point) for shell in nearby) or any(
+                shell.contains(point) for shell in self._large_shells
+            ):
                 return tuple(point)
         return None

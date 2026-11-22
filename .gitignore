@@ -10,10 +10,9 @@
 
 # testing
 /coverage
+/.ruff_cache/
 
-# next.js
-/.next/
-/.vinext/
+# build output
 /out/
 
 # misc
@@ -31,13 +30,11 @@ yarn-error.log*
 
 # deployment and generated files
 .vercel
-next-env.d.ts
-/dist/
 /.wrangler/
-/outputs/
 /work/
 
 *.blend
+!/blender/assets/west-market.blend
 *.blend[0-9]*
 # Development reports, acceptance records and screenshots stay local.
 # Only maintained project documentation and README images are tracked.

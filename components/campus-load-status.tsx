@@ -1,4 +1,3 @@
-'use client';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { LoaderCircle } from 'lucide-react';
 import { useCampusLocale } from '@/components/campus-locale';
@@ -19,7 +18,7 @@ export function CampusLoadStatus({
     message: status,
     error,
     progress: loadProgress,
-  } = useSyncExternalStore(store.subscribe, store.get, store.getInitial);
+  } = useSyncExternalStore(store.subscribe, store.get);
   const [backgroundStatusVisible, setBackgroundStatusVisible] = useState(false);
   const backgroundStatus = Boolean(status) && ready && !error;
   useEffect(() => {
