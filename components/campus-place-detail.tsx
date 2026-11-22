@@ -8,6 +8,7 @@ import { CATEGORY_NAMES } from '@/lib/campus/types';
 
 /** Detail of the selected landmark or, failing that, ordinary building. */
 export function CampusPlaceDetail({
+  title,
   landmark,
   building,
   landmarks,
@@ -18,6 +19,7 @@ export function CampusPlaceDetail({
   onOrbitChange,
   onShare,
 }: {
+  title: string;
   landmark?: Landmark;
   building?: Building;
   landmarks: Landmark[];
@@ -28,12 +30,12 @@ export function CampusPlaceDetail({
   onOrbitChange: () => void;
   onShare: () => void;
 }) {
-  const { t, name, locale } = useCampusLocale();
+  const { t, locale } = useCampusLocale();
   const current = (landmark ?? building)!;
   return (
     <section className="place-detail" aria-label={t('地点详情')}>
       <div className="detail-heading">
-        <h2>{name(current.name)}</h2>
+        <h2>{title}</h2>
         <p className="detail-meta">
           <span className="detail-category">
             {t(CATEGORY_NAMES[current.category])}

@@ -1,3 +1,4 @@
+import { collegeSearchNames, collegeVenues } from './college-venues.ts';
 import { placeName, translate, type Locale } from './i18n/index.ts';
 import type { Building, Landmark } from './types';
 
@@ -34,23 +35,6 @@ const LANDMARK_ALIASES: Record<string, string[]> = {
   'bocui-bridge': ['博萃', '博翠桥', '农院路'],
   'huixian-bridge': ['荟贤', '汇贤桥', '农院路'],
 };
-
-/** Search the curated catalogue, including its confirmed bilingual aliases. */
-export function searchLandmarks(
-  landmarks: Landmark[],
-  query: string,
-): Landmark[] {
-  const term = query.trim().toLocaleLowerCase();
-  return landmarks.filter((place) =>
-    [
-      place.name,
-      placeName(place.name, 'zh'),
-      placeName(place.name, 'en'),
-      ...(LANDMARK_ALIASES[place.id] ?? []),
-      ...(ENGLISH_ALIASES[place.id] ?? []),
-    ].some((name) => name.toLocaleLowerCase().includes(term)),
-  );
-}
 
 export function navigableBuildings(
   buildings: Building[],
@@ -164,9 +148,12 @@ export function searchableBuildings(
     (building) =>
       building.insideCampus &&
       !EXCLUDED_BUILDINGS.has(building.id) &&
-      building.name.trim() !== '' &&
-      !PLACEHOLDER_NAME.test(building.name) &&
-      !(building.landmark && curated.has(building.landmark)),
+      (collegeVenues.has(building.id) ||
+        (building.name.trim() !== '' &&
+          !PLACEHOLDER_NAME.test(building.name))) &&
+      !curated.has(
+        building.landmark ?? collegeVenues.get(building.id)?.landmark ?? '',
+      ),
   );
 }
 
@@ -237,37 +224,172 @@ const BUILDING_ALIASES: Record<string, string[]> = {
   'way/948683821': ['南苑', '南苑食堂', '南苑二餐厅', '南苑第二食堂'],
 };
 
-/** Exact names first, then prefixes, then any substring in either language; ties sort by displayed name. */
+type Place = Landmark | Building;
+
+function normalizeName(value: string) {
+  return value
+    .normalize('NFKC')
+    .toLowerCase()
+    .replace(/[\s,，·‐‑‒–—−-]+/gu, '');
+}
+
+const venueTerms = new Map(
+  [...new Set(collegeVenues.values())].map((venue) => [
+    venue,
+    collegeSearchNames(venue).map(normalizeName),
+  ]),
+);
+
+/** Use the original landmark name on the explore tab and for its original purpose. */
+export function destinationName(place: Place, locale: Locale, query = '') {
+  const venue = collegeVenues.get(place.id);
+  const original = placeName(place.name, locale);
+  if (!venue) return original;
+  if (place.id === venue.landmark) {
+    const term = normalizeName(query);
+    if (
+      !term ||
+      !venueTerms.get(venue)?.some((n) => n.includes(term)) ||
+      [
+        place.name,
+        placeName(place.name, 'en'),
+        placeName(place.name, 'zh'),
+      ].some((n) => normalizeName(n).includes(term))
+    )
+      return original;
+  }
+  return venue[locale];
+}
+
+function indexPlace<T extends Place>(place: T, aliases: string[]) {
+  const venue = collegeVenues.get(place.id);
+  const named =
+    Boolean(place.name.trim()) && !PLACEHOLDER_NAME.test(place.name);
+  const names = [
+    ...(named
+      ? [place.name, placeName(place.name, 'zh'), placeName(place.name, 'en')]
+      : []),
+    ...aliases,
+  ];
+
+  return {
+    place,
+    names: [
+      ...new Set(
+        [
+          ...names.map(normalizeName),
+          ...(venue ? (venueTerms.get(venue) ?? []) : []),
+        ].filter(Boolean),
+      ),
+    ],
+    zh: venue?.zh ?? placeName(place.name, 'zh'),
+    en: venue?.en ?? placeName(place.name, 'en'),
+    secondary: venue?.secondary ? 1 : 0,
+  };
+}
+
+function matchesFor<T extends Place>(
+  entries: ReturnType<typeof indexPlace<T>>[],
+  term: string,
+  locale?: Locale,
+) {
+  const matches = [];
+  for (const entry of entries) {
+    let rank = 3;
+    for (const name of entry.names) {
+      if (name === term) {
+        rank = 0;
+        break;
+      }
+      if (name.startsWith(term)) rank = 1;
+      else if (rank > 2 && name.includes(term)) rank = 2;
+    }
+    if (rank < 3) matches.push({ entry, rank });
+  }
+  if (locale)
+    matches.sort(
+      (a, b) =>
+        a.rank - b.rank ||
+        a.entry.secondary - b.entry.secondary ||
+        collators[locale].compare(a.entry[locale], b.entry[locale]) ||
+        a.entry.place.id.localeCompare(b.entry.place.id),
+    );
+  return matches;
+}
+
+function buildSearchIndex(buildings: Building[], landmarks: Landmark[]) {
+  const featured = landmarks.map((p) =>
+    indexPlace(p, [
+      ...(LANDMARK_ALIASES[p.id] ?? []),
+      ...(ENGLISH_ALIASES[p.id] ?? []),
+    ]),
+  );
+  const ordinary = searchableBuildings(buildings, landmarks).map((b) =>
+    indexPlace(b, BUILDING_ALIASES[b.id] ?? []),
+  );
+  return {
+    query(value: string, locale: Locale = 'zh') {
+      const term = normalizeName(value);
+      if (!term)
+        return {
+          places: value.trim() ? [] : landmarks,
+          buildings: [] as Building[],
+          buildingsFirst: false,
+        };
+      const places = matchesFor(featured, term);
+      const matches = matchesFor(ordinary, term, locale);
+      const buildingsFirst =
+        places.length > 0 &&
+        matches.length > 0 &&
+        Boolean(collegeVenues.get(matches[0].entry.place.id)) &&
+        (matches[0].rank < places[0].rank ||
+          (matches[0].rank === places[0].rank &&
+            matches[0].entry.secondary < places[0].entry.secondary));
+      return {
+        places: places.map((m) => m.entry.place),
+        buildings: matches.map((m) => m.entry.place),
+        buildingsFirst,
+      };
+    },
+  };
+}
+
+// Arrays are replaced on data refresh. A WeakMap lets a retired snapshot be collected.
+type PlaceSearchIndex = ReturnType<typeof buildSearchIndex>;
+const indices = new WeakMap<
+  Building[],
+  WeakMap<Landmark[], PlaceSearchIndex>
+>();
+export function getPlaceSearchIndex(
+  buildings: Building[],
+  landmarks: Landmark[],
+): PlaceSearchIndex {
+  let snapshots = indices.get(buildings);
+  if (!snapshots) {
+    snapshots = new WeakMap();
+    indices.set(buildings, snapshots);
+  }
+  let index = snapshots.get(landmarks);
+  if (!index) {
+    index = buildSearchIndex(buildings, landmarks);
+    snapshots.set(landmarks, index);
+  }
+  return index;
+}
+
+const noBuildings: Building[] = [];
+export function searchLandmarks(
+  landmarks: Landmark[],
+  query: string,
+): Landmark[] {
+  return getPlaceSearchIndex(noBuildings, landmarks).query(query).places;
+}
 export function searchBuildings(
   buildings: Building[],
   landmarks: Landmark[],
   query: string,
-  locale: 'zh' | 'en' = 'zh',
+  locale: Locale = 'zh',
 ): Building[] {
-  const term = query.trim().toLocaleLowerCase();
-  if (!term) return [];
-  const rank = (building: Building) => {
-    const names = [
-      building.name,
-      placeName(building.name, 'zh'),
-      placeName(building.name, 'en'),
-      ...(BUILDING_ALIASES[building.id] ?? []),
-    ].map((name) => name.toLocaleLowerCase());
-    if (names.some((name) => name === term)) return 0;
-    if (names.some((name) => name.startsWith(term))) return 1;
-    return names.some((name) => name.includes(term)) ? 2 : -1;
-  };
-  return searchableBuildings(buildings, landmarks)
-    .map((building) => ({ building, rank: rank(building) }))
-    .filter(({ rank }) => rank >= 0)
-    .sort(
-      (a, b) =>
-        a.rank - b.rank ||
-        collators[locale].compare(
-          placeName(a.building.name, locale),
-          placeName(b.building.name, locale),
-        ) ||
-        a.building.id.localeCompare(b.building.id),
-    )
-    .map(({ building }) => building);
+  return getPlaceSearchIndex(buildings, landmarks).query(query, locale)
+    .buildings;
 }

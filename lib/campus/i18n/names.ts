@@ -302,6 +302,10 @@ export const campusNames: Record<string, readonly [string, string]> = {
   '五至六层 · 西端开敞柱廊': ['五至六层西端柱廊', 'West Colonnade on Floors 5–6'],
   '七层 · 荟萃餐厅': ['七楼荟萃餐厅', 'Huicui Dining Hall on Floor 7'],
   北侧柱廊顶板: ['北侧柱廊顶板', 'North Colonnade Roof Slab'],
+  新闻学院南侧柱廊: [
+    '新闻学院南侧柱廊',
+    'South Colonnade of the School of Journalism and Communication',
+  ],
   首层教室与门厅实墙: [
     '首层教室与门厅实墙',
     'Ground-Floor Classroom and Lobby Solid Walls',

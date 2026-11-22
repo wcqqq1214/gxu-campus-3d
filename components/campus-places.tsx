@@ -4,8 +4,8 @@ import { useCampusLocale } from '@/components/campus-locale';
 import { Input } from '@/components/ui/input';
 import {
   buildingLocationLabel,
-  searchBuildings,
-  searchLandmarks,
+  destinationName,
+  getPlaceSearchIndex,
 } from '@/lib/campus/navigation';
 import type { Building, Category, Landmark } from '@/lib/campus/types';
 import { CATEGORY_NAMES } from '@/lib/campus/types';
@@ -50,14 +50,15 @@ export function CampusPlaces({
 }) {
   const { t, locale } = useCampusLocale();
   const searchWrap = useRef<HTMLDivElement>(null);
-  const places = useMemo(
-    () => searchLandmarks(landmarks, query),
-    [landmarks, query],
+  const index = useMemo(
+    () => getPlaceSearchIndex(buildings, landmarks),
+    [buildings, landmarks],
   );
-  const buildingMatches = useMemo(
-    () => searchBuildings(buildings, landmarks, query, locale),
-    [buildings, landmarks, query, locale],
-  );
+  const {
+    places,
+    buildings: buildingMatches,
+    buildingsFirst,
+  } = useMemo(() => index.query(query, locale), [index, query, locale]);
   const searching = Boolean(query.trim());
   const resultCount = places.length + buildingMatches.length;
   const groups = searching
@@ -73,6 +74,31 @@ export function CampusPlaces({
     onQueryChange('');
     searchWrap.current?.querySelector('input')?.focus();
   }
+  const landmarkRows = (
+    <PlaceGroups
+      key="places"
+      query={query}
+      groups={groups}
+      landmarks={landmarks}
+      selected={selected}
+      hovered={hovered}
+      ready={ready}
+      searching={searching && !buildingMatches.length}
+      onHover={onHover}
+      onChoose={onChoose}
+    />
+  );
+  const buildingRows = (
+    <BuildingResults
+      key="buildings"
+      buildings={buildingMatches}
+      landmarks={landmarks}
+      selected={selected}
+      ready={ready}
+      titled={places.length > 0}
+      onChoose={onChoose}
+    />
+  );
   return (
     <>
       <div className="search-wrap" ref={searchWrap}>
@@ -114,24 +140,9 @@ export function CampusPlaces({
           )
         ) : resultCount ? (
           <>
-            <PlaceGroups
-              groups={groups}
-              landmarks={landmarks}
-              selected={selected}
-              hovered={hovered}
-              ready={ready}
-              searching={searching && !buildingMatches.length}
-              onHover={onHover}
-              onChoose={onChoose}
-            />
-            <BuildingResults
-              buildings={buildingMatches}
-              landmarks={landmarks}
-              selected={selected}
-              ready={ready}
-              titled={places.length > 0}
-              onChoose={onChoose}
-            />
+            {buildingsFirst
+              ? [buildingRows, landmarkRows]
+              : [landmarkRows, buildingRows]}
           </>
         ) : (
           <div className="empty-state">
@@ -147,6 +158,7 @@ export function CampusPlaces({
 }
 
 function PlaceGroups({
+  query,
   groups,
   landmarks,
   selected,
@@ -156,6 +168,7 @@ function PlaceGroups({
   onHover,
   onChoose,
 }: {
+  query: string;
   groups: { key: string; name: string; places: Landmark[] }[];
   landmarks: Landmark[];
   selected: string | null;
@@ -165,7 +178,7 @@ function PlaceGroups({
   onHover: (id: string | null) => void;
   onChoose: (id: string) => void;
 }) {
-  const { name } = useCampusLocale();
+  const { locale } = useCampusLocale();
   return (
     <>
       {groups.map((group) => (
@@ -194,7 +207,7 @@ function PlaceGroups({
                 )}
               </span>
               <span className="place-copy">
-                <strong>{name(p.name)}</strong>
+                <strong>{destinationName(p, locale, query)}</strong>
               </span>
               <ChevronRight size={16} aria-hidden="true" />
             </button>
@@ -220,7 +233,7 @@ function BuildingResults({
   titled: boolean;
   onChoose: (id: string) => void;
 }) {
-  const { t, name, locale } = useCampusLocale();
+  const { t, locale } = useCampusLocale();
   if (!buildings.length) return null;
   const shown = buildings.slice(0, BUILDING_RESULT_LIMIT);
   return (
@@ -239,7 +252,7 @@ function BuildingResults({
         >
           <Building2 size={15} className="place-kind" aria-hidden="true" />
           <span className="place-copy">
-            <strong>{name(b.name)}</strong>
+            <strong>{destinationName(b, locale)}</strong>
             <small>
               <span>{t(CATEGORY_NAMES[b.category])}</span>
               <span>{buildingLocationLabel(b, landmarks, locale)}</span>

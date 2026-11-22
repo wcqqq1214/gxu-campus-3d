@@ -42,7 +42,7 @@ import { useCampusTour } from '@/hooks/use-campus-tour';
 import { asset, prefetchBase } from '@/lib/campus/boot';
 import { createCameraStore } from '@/lib/campus/camera-store';
 import { createLoadStatusStore } from '@/lib/campus/load-status-store';
-import { searchableBuildings } from '@/lib/campus/navigation';
+import { destinationName, searchableBuildings } from '@/lib/campus/navigation';
 import { decodeShare } from '@/lib/campus/share';
 import { fetchJson } from '@/lib/campus/streaming';
 import type {
@@ -65,7 +65,7 @@ export default function CampusApp() {
   );
 }
 function CampusMap() {
-  const { locale, t, name } = useCampusLocale();
+  const { locale, t } = useCampusLocale();
   const localeRef = useRef(locale);
   const dock = useRef<HTMLElement>(null);
   const panelToggle = useRef<HTMLButtonElement>(null);
@@ -357,6 +357,7 @@ function CampusMap() {
     ? buildings.find((b) => b.id === selected || b.landmark === selected)
     : undefined;
   const current = currentLandmark ?? currentBuilding;
+  const currentName = current ? destinationName(current, locale, query) : '';
   function hoverPlace(id: string | null) {
     controller.current?.setHovered(id);
   }
@@ -444,7 +445,7 @@ function CampusMap() {
               <span>
                 {panelMode === 'detail' && current
                   ? collapsed
-                    ? name(current.name)
+                    ? currentName
                     : ''
                   : t('校园浏览')}
               </span>
@@ -463,6 +464,7 @@ function CampusMap() {
         >
           {panelMode === 'detail' && current ? (
             <CampusPlaceDetail
+              title={currentName}
               landmark={currentLandmark}
               building={currentBuilding}
               landmarks={landmarks}
@@ -577,7 +579,7 @@ function CampusMap() {
                     setPanelExpanded(false);
                   }}
                 >
-                  {t('返回 {name}', { name: name(current.name) })}
+                  {t('返回 {name}', { name: currentName })}
                   <ChevronRight size={16} aria-hidden="true" />
                 </button>
               )}
