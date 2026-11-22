@@ -4,12 +4,16 @@ import json
 from pathlib import Path
 
 
-def check_initial_model_budget(total):
-    budget = json.loads(
+def load_model_budget():
+    return json.loads(
         (
             Path(__file__).resolve().parents[1] / 'data/initial-model-budget.json'
         ).read_text()
     )
+
+
+def check_initial_model_budget(total):
+    budget = load_model_budget()
     target, limit = budget['targetBytes'], budget['hardLimitBytes']
     if total > limit:
         raise RuntimeError(
