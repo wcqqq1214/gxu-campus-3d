@@ -158,7 +158,7 @@ blender --background --python-exit-code 1 --python blender/validate_materials_en
 
 模型统一采用 Draco 压缩并内嵌纹理，解码器置于 `public/draco/`。发布须同步源对象、基础节点、相关近景与清单，并核对无关资产未变；`--base-only` 仅用于区块键不变时的基础包重导（两档篮球场仍同步更新）。
 
-首屏模型 `base.glb + trees.glb` 的体积预算配置在 [initial-model-budget.json](../data/initial-model-budget.json) 中：合计超过 `8,000,000` 字节警告，超过 `10,000,000` 字节阻止构建（全量、`--base-only` 与增量入口均检查；JS、JSON 与解码器另计）。
+首屏模型 `base.glb + trees.glb` 的体积预算配置在 [initial-model-budget.json](../data/initial-model-budget.json) 中：合计超过 `8,000,000` 字节警告，超过 `16,000,000` 字节阻止构建（全量、`--base-only` 与增量入口均检查；JS、JSON 与解码器另计）。同一配置中的 `baseLayerLimitBytes` 规定基础模型单节点压缩几何的上限，道路为 `2,000,000` 字节，地形为 `3,000,000` 字节。
 
 ### 导出约束
 
