@@ -222,21 +222,21 @@ test('GLB 资源、压缩、自包含纹理和分区映射', async () => {
     ),
   );
 });
-test('首屏模型与嵌入纹理：8 MB 目标、10 MB 硬上限', async (t) => {
-  const budget = JSON.parse(
-    await readFile(
-      new URL('../data/initial-model-budget.json', import.meta.url),
-      'utf8',
-    ),
-  );
+const modelBudget = JSON.parse(
+  await readFile(
+    new URL('../data/initial-model-budget.json', import.meta.url),
+    'utf8',
+  ),
+);
+test('首屏模型与嵌入纹理符合配置的体积预算', (t) => {
   const total = manifest.base.bytes + manifest.trees.bytes;
-  if (total > budget.targetBytes)
+  if (total > modelBudget.targetBytes)
     t.diagnostic(
-      `WARNING: ${total} bytes exceeds target ${budget.targetBytes}`,
+      `WARNING: ${total} bytes exceeds target ${modelBudget.targetBytes}`,
     );
   assert.ok(
-    total <= budget.hardLimitBytes,
-    `${total} bytes exceeds hard limit ${budget.hardLimitBytes}`,
+    total <= modelBudget.hardLimitBytes,
+    `${total} bytes exceeds hard limit ${modelBudget.hardLimitBytes}`,
   );
 });
 test('基础模型逐节点压缩几何预算，阻止远景节点继续膨胀', async () => {
@@ -263,7 +263,7 @@ test('基础模型逐节点压缩几何预算，阻止远景节点继续膨胀',
     );
     const limit =
       exceptions[node.name] ??
-      { roads: 1_300_000, terrain: 1_200_000 }[node.extras?.layer] ??
+      modelBudget.baseLayerLimitBytes[node.extras?.layer] ??
       300_000;
     assert.ok(bytes <= limit, `${node.name}: ${bytes} bytes exceeds ${limit}`);
   }
