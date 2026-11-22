@@ -6,11 +6,12 @@ import json
 import unittest
 from pathlib import Path
 
-from shapely.geometry import Polygon
+from shapely.geometry import LineString, Polygon
 
 from building_overrides import footprint_revision
 from front_connection_data import derive_front_connection
 from shore_data import effective_surfaces
+from site_data import world_shape
 
 
 def revision(value):
@@ -68,23 +69,29 @@ class AttachedFrontConnectionTests(unittest.TestCase):
         site, area, _ = derive_front_connection(config, buildings, surface, {'osm'})
         self.assertEqual((buildings, surface), original)
         self.assertAlmostEqual(site['startY'], 4.105)
-        self.assertEqual(site['halfWidth'], 4.5)
+        portico = site['entry']['attachedPortico']
+        # The Forestry south entrance was calibrated against the 26° street view.
+        self.assertEqual(portico['width'], 14)
+        self.assertEqual(site['halfWidth'], 7)
         self.assertEqual(site['stairBaseHeight'], 0.24)
         self.assertEqual(site['material'], 'path')
-        self.assertAlmostEqual(area.area, 57.173724867, places=6)
-        self.assertGreater(
-            area.boundary.intersection(
-                Polygon(surface['vertices']).boundary.buffer(1e-6)
-            ).length,
-            9,
-        )
-        # The stored exclusion footprint is nominal, while actual tread boxes
-        # extend a further 5 mm. Verify the connector has that exact separation.
+        self.assertAlmostEqual(area.area, 94.505745597, places=6)
+        road = Polygon(surface['vertices'])
+        self.assertAlmostEqual(area.intersection(road).area, 0, places=7)
+        # The oblique mapped road edge is slightly longer than the stair width.
         self.assertAlmostEqual(
-            area.distance(Polygon(site['entry']['attachedPortico']['footprint'])),
-            0.005,
-            places=7,
+            area.boundary.intersection(road.boundary.buffer(1e-6)).length,
+            14.006113,
+            delta=1e-5,
         )
+        # The paving meets the physical tread across the entire 14 m. The
+        # nominal stair footprint ends 5 mm behind that face at both jambs.
+        footprint = Polygon(portico['footprint'])
+        for boundary, depth in [(footprint.boundary, 4.100), (area.boundary, 4.105)]:
+            with self.subTest(depth=depth):
+                edge = world_shape(LineString([(-7, depth), (7, depth)]), site)
+                self.assertTrue(boundary.buffer(1e-7).covers(edge))
+        self.assertAlmostEqual(area.distance(footprint), 0.005, places=7)
 
     def test_incomplete_stairs_arbitrary_width_and_missing_road_rejected(self):
         config, buildings, surface = self.fixture()

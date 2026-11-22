@@ -29,7 +29,7 @@ def validate_stair_tower(c):
         'doorHeight',
         'columns',
     }
-    if not isinstance(c, dict) or set(c) != keys:
+    if not isinstance(c, dict) or set(c) - {'canopyOpeningRatio'} != keys:
         raise ValueError('Invalid stair tower fields')
     host = c['host']
     if not isinstance(host, dict) or set(host) != {
@@ -56,6 +56,8 @@ def validate_stair_tower(c):
         'doorWidth': (1.2, 2),
         'doorHeight': (2, 2.5),
     }
+    if 'canopyOpeningRatio' in c:
+        limits['canopyOpeningRatio'] = (0.2, 0.85)
     for k, (lo, hi) in limits.items():
         v = c[k]
         if type(v) not in (int, float) or not math.isfinite(v) or not lo <= v <= hi:
@@ -95,7 +97,7 @@ def context(b, host, c):
 
 
 def resolve_stair_tower_context(buildings):
-    from shapely.affinity import rotate, translate
+    from shapely.affinity import rotate, scale, translate
     from shapely.geometry import Polygon, box
     from shapely.geometry.polygon import orient
     from shapely.ops import unary_union
@@ -189,12 +191,17 @@ def resolve_stair_tower_context(buildings):
             shape = unary_union([Polygon(p[0], p[1:]) for p in other['polygons']])
             if occupied.intersection(shape).area > 1e-5:
                 raise ValueError('Stair bridge crosses a mapped building')
+        canopy = foot
+        if 'canopyOpeningRatio' in c:
+            ratio = c['canopyOpeningRatio']
+            opening = scale(foot, xfact=ratio, yfact=ratio, origin=(0, 0))
+            canopy = foot.difference(opening)
         supports = []
         for p in c['columns']:
             x, y = p['center']
             w = p['width']
             shape = box(x - w / 2, y - w / 2, x + w / 2, y + w / 2)
-            support_area = foot if p['top'] == 'roof' else upper
+            support_area = canopy if p['top'] == 'roof' else upper
             if (
                 not support_area.covers(shape)
                 or any(shape.intersection(lane).area > 1e-5 for lane in lanes)
@@ -233,7 +240,7 @@ def resolve_stair_tower_context(buildings):
             ground=packed(foot),
             north=packed(upper),
             south=packed(negative),
-            roof=packed(foot),
+            roof=packed(canopy),
             bridgeFootprint=[world(p) for p in extra.exterior.coords],
             doors=doors,
             contextRevision=context(b, host, c),

@@ -490,6 +490,7 @@ hh = terrain['heights']
 
 
 from civil_forecourt_grade import building_datum, grade_forecourt, load_grade
+from materials_civil_lanes import CIVIL, CIVIL_SHIFT, build_materials_civil_lanes
 from terrain_elevation import make_elevation
 
 elevation = make_elevation(terrain)
@@ -501,13 +502,14 @@ def building_elevation(b):
         return MARKET_DATUM
     if b.get('customModel') == 'north-campus':
         return b['elevation']
-    return building_datum(
+    datum = building_datum(
         b,
         elevation(
             *b.get('form', {}).get('stairTower', {}).get('hostCenter', b['center'])
         ),
         civil_grade,
     )
+    return datum + CIVIL_SHIFT if b['id'] == CIVIL else datum
 
 
 def generic(b, detail):
@@ -1098,6 +1100,40 @@ from road_surface_clearance import load_repairs, repair_clearance
 base['roads'], road_clearance_report = repair_clearance(
     base['roads'], base['terrain'], C, load_repairs(ROOT)
 )
+from computer_site import computer_forecourt
+
+base['terrain'], base['site-computer-north'] = computer_forecourt(
+    base['terrain'], base['roads'], C
+)
+from electrical_forecourt import electrical_approaches
+
+electrical_datum = next(b['elevation'] for b in buildings if b['id'] == 'way/759096561')
+base['terrain'], base['site-electrical-entrances'] = electrical_approaches(
+    base['terrain'], base['roads'], electrical_datum, C
+)
+from lightning_forecourt import lightning_forecourt
+
+lightning_datum = next(b['elevation'] for b in buildings if b['id'] == 'way/759079684')
+base['terrain'], base['site-lightning-north'] = lightning_forecourt(
+    base['terrain'], base['roads'], lightning_datum, C
+)
+from materials_northeast_stair import applies as materials_side_entry
+from materials_northeast_stair import finish_materials_road
+
+for building in buildings:
+    if building['id'] == 'relation/11564999':
+        for entrance in building['form']['entrances']:
+            if materials_side_entry(entrance):
+                finish_materials_road(
+                    base['roads'], entrance, building['elevation'], C, terrain=base['terrain']
+                )
+                build_materials_civil_lanes(
+                    base, entrance, building['elevation'], C, trees
+                )
+                (DATA / 'vegetation.json').write_text(
+                    json.dumps(trees, separators=(',', ':')) + '\n'
+                )
+
 from bocui_junction import cut_ground, junction_mesh
 from north_underpass import road_height_sampler
 
@@ -1113,6 +1149,12 @@ for bridge_data in infrastructure['bridges']:
         )
         for layer in ('terrain', 'roads'):
             base[layer] = cut_ground(base[layer], junction['cut'])
+
+from physics_approaches import build_physics_approaches
+from physics_street_grade import build_physics_street_grade
+
+build_physics_approaches(base, C)
+build_physics_street_grade(base, C)
 
 for k, m in base.items():
     if not BASE_ONLY and k.startswith('north-campus-'):
@@ -1307,6 +1349,10 @@ def export(name, groups):
         from gltf_bounds import compact_glb_float_bounds
 
         compact_glb_float_bounds(path)
+    if name in ('base.glb', 'chunk-n2-n3.glb', 'chunk-p0-n3.glb'):
+        from college_chunk_budget import optimize_export
+
+        optimize_export(path)
     if name.startswith('basketball-bank-'):
         from basketball_export import extract_bank
 

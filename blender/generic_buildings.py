@@ -3,8 +3,37 @@
 import hashlib
 import math
 
+import college_facades as colleges
 from attached_gallery import add_attached_gallery
 from attached_portico import add_attached_portico
+from chemical_college import BUILDING_ID as CHEMICAL_ID
+from chemical_college import chemical_college
+from college_annexes import (
+    ELECTRIC_CENTER,
+    ENERGY,
+    ENVIRONMENT,
+    FOOD_ANNEX,
+    INORGANIC,
+    LIGHTNING,
+    electric_center,
+    energy_center,
+    environment_center,
+    food_annex,
+    inorganic_lab,
+    lightning_lab,
+)
+from college_refinements import (
+    CIVIL,
+    MATERIALS,
+    MATERIALS_REAR,
+    PHYSICS,
+    PHYSICS_STREET,
+    civil_details,
+    materials_rear,
+    materials_screen,
+    physics_fronts,
+)
+from computer_college import RESEARCH_WING, computer_west_wing
 from dining_halls import (
     BEI,
     BI,
@@ -18,6 +47,10 @@ from dining_halls import (
 )
 from dining_interiors import beiyuan_entry
 from east27_dining import EAST27_ID, east27
+from electrical_college import BUILDING_ID as ELECTRICAL_ID
+from electrical_college import electrical_college
+from engineering_training import BUILDING_ID as TRAINING_ID
+from engineering_training import add_training_front
 from facade_bands import (
     add_band_ledges,
     add_band_windows,
@@ -28,7 +61,33 @@ from facade_corridors import add_corridor, add_corridor_openings
 from facade_panels import add_panels, panel_replaces_window
 from facade_windows import add_grid_pilasters, add_grid_windows
 from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
+from food_college import BUILDING_ID as FOOD_ID
+from food_college import food_college
 from geometry import Mesh
+from mechanical_college import BUILDING_ID as MECHANICAL_ID
+from mechanical_college import mechanical_college
+from humanities_facades import (
+    GATE,
+    HISTORIC_PAIR,
+    MANAGEMENT,
+    RED_HOUSE,
+    SHAW,
+    YULIN,
+    arts_entry_sign,
+    continuing_canopy,
+    continuing_roof_edge,
+    continuing_street_front,
+    finish,
+    historic_windows,
+    new_east_gatehouse,
+    physics_lobby,
+    red_house_ends,
+    rotunda,
+    rotunda_faces,
+    rotunda_shell,
+    shaw_front,
+    yulin_front,
+)
 from nanyuan import CANTEEN_ID, nanyuan
 from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS
 from new_east_neighbours import (
@@ -37,9 +96,13 @@ from new_east_neighbours import (
     shopfront_details,
     wall_finish,
 )
+from physics_court import court_joints
+from physics_pilotis import FRAME_SLOT, SOUTH_LIGHT_BAY, open_physics_portal
+from physics_pilotis import PORTAL as PHYSICS_PORTAL
 from recessed_stair_entry import add_recessed_stair_entry, recessed_entry_blocks_window
 from roof_crown import side_wall_blocks_window
 from roof_eave import add_roof_eave, replaces_parapet
+from shaw_entrance import ShawEntrance
 from terraced_stairs import blocks_window as stairs_block_window
 from west22 import WEST22, west22
 from west23 import WEST23, west23
@@ -68,6 +131,19 @@ def compact_form_source(obj):
 
 
 def wall_material(b, C):
+    if b['id'] in (
+        colleges.MEDICINE,
+        colleges.LIFE,
+        colleges.SPORTS,
+        colleges.SPORTS_WING,
+    ):
+        return C['white']
+    if b['id'] == 'way/759185166':
+        return C['pink']
+    if b['id'] == 'relation/11564998' and 'physicsTile' in C:
+        return C['physicsTile']
+    if b['id'] == 'way/880089961':
+        return C['white']
     if b['id'] == XIU:
         return C['xiuIvory']
     if b['id'] in FRONTS:
@@ -88,7 +164,7 @@ def wall_material(b, C):
     return wall
 
 
-def shared_form(b, z, C, *, entrance_mesh=None):
+def shared_form(b, z, C, *, entrance_mesh=None, shaw_entry=None):
     """All silhouette-defining components; never receives a detail flag."""
     if 'stairTower' in b['form']:
         from stair_tower import stair_tower_model
@@ -112,6 +188,9 @@ def shared_form(b, z, C, *, entrance_mesh=None):
         }
     ]
     for part in parts:
+        podium_entry = shaw_entry if part.get('id') == 'front-podium' else None
+        if podium_entry:
+            part = podium_entry.notch_part(part)
         part_body = Mesh()
         part_wall = C[part['wallFinish']] if 'wallFinish' in part else wall
         roof = part['roof']
@@ -293,6 +372,17 @@ def shared_form(b, z, C, *, entrance_mesh=None):
                     part_wall,
                     roof_material,
                 )
+            elif b['id'] == colleges.SPORTS_WING:
+                # The east wall, including its openings, is built by sports_wing.
+                colleges.sports_wing_shell(
+                    part_body,
+                    part['polygons'][0][0],
+                    z,
+                    depth,
+                    h,
+                    part_wall,
+                    roof_material,
+                )
             else:
                 part_body.extrude(
                     part['polygons'],
@@ -331,18 +421,44 @@ def shared_form(b, z, C, *, entrance_mesh=None):
             if (
                 facade['part'] == part.get('id', 'body')
                 and 'openCorridor' in facade['rule']
+                and not (b['id'] == PHYSICS and facade['edge'] == 16)
             ):
-                finish = facade['rule']['openCorridor'].get('finish', {})
+                if podium_entry and facade['edge'] == 8:
+                    continue
+                if podium_entry and facade['edge'] == 9:
+                    facade = podium_entry.west_corridor()
+                corridor = facade['rule']['openCorridor']
+                finish = corridor.get('finish', {})
+                front_arcade = (
+                    b['id'] == SHAW
+                    and corridor['firstLevel'] == 0
+                    and 'shawPinkGranite' in C
+                )
+                wall_color = C[finish['wall']] if 'wall' in finish else wall
+                if b['id'] == 'way/1501460953' and facade['edge'] in (4, 6):
+                    wall_color = wall
                 add_corridor(
                     part_body,
                     facade,
                     z,
-                    C[finish['wall']] if 'wall' in finish else wall,
-                    C['white'],
+                    C['shawPinkGranite'] if front_arcade else wall_color,
+                    C['shawPinkGranite'] if front_arcade else C['white'],
                     C[finish.get('rail', 'white')],
                     pitched_roof=roof['type'] != 'flat',
                 )
-                add_corridor_openings(part_body, facade, z, C)
+                opening_colors = {**C, 'white': C['dark']} if front_arcade else C
+                add_corridor_openings(part_body, facade, z, opening_colors)
+        if podium_entry:
+            podium_entry.face_returns(part_body, C['shawPinkGranite'])
+        custom_rotunda = (
+            b['id'] == MANAGEMENT
+            and part.get('id') == 'main'
+            and any(f['rule'].get('panels') for f in form.get('facades', []))
+        )
+        if custom_rotunda:
+            rotunda_shell(part_body, b, z, C)
+        if b['id'] == PHYSICS and part.get('id') == 'body':
+            open_physics_portal(part_body, b, z, C)
         body.extend(part_body)
         if roof['type'] != 'flat':
             geometry = roof['geometry']
@@ -361,7 +477,11 @@ def shared_form(b, z, C, *, entrance_mesh=None):
                     ],
                     roof_material,
                 )
-        elif 'slattedRoof' not in part.get('openBelow', {}) and 'rim' not in roof:
+        elif (
+            b['id'] not in (colleges.MEDICINE, colleges.HALL, colleges.SPORTS_WING)
+            and 'slattedRoof' not in part.get('openBelow', {})
+            and 'rim' not in roof
+        ):
             # Parapets follow each actual terrace elevation in both LODs.
             edges = part.get(
                 'parapetEdges',
@@ -378,19 +498,43 @@ def shared_form(b, z, C, *, entrance_mesh=None):
             screen = form.get('gableScreen')
             if screen and screen['part'] == part.get('id', 'body'):
                 edges = screen['retainedParapetEdges']
+            # The approved 44.1 m design envelope includes an unallocated 1.8 m
+            # above the 42.3 m storey stack. Represent it as an estimated upper
+            # roof edge only on the tallest parts, pending the as-built section.
+            rim_height = (
+                44.1 - h
+                if b['id'] == colleges.LAB and part['id'].endswith('-top')
+                else 0.8
+            )
+            if custom_rotunda:
+                curved = {
+                    (tuple(f['start']), tuple(f['end'])) for f in rotunda_faces(b)
+                }
+                edges = [(a, c) for a, c in edges if (tuple(a), tuple(c)) not in curved]
             for a, c in edges:
                 if replaces_parapet(form.get('roofEave'), part.get('id', 'body'), a, c):
                     continue
                 length = math.dist(a, c)
                 if length < 2:
                     continue
+                if (
+                    b['id'] == 'way/1501460953'
+                    and form['levels'] == 6
+                    and continuing_roof_edge(top, a, c, z + h, C)
+                ):
+                    continue
+                parapet_height = (
+                    0.26 if b['id'] == 'way/880089961' and 'openBelow' in part else rim_height
+                )
+                if b['id'] == 'way/759165563':
+                    parapet_height = 1.12
                 top.box(
                     (a[0] + c[0]) / 2,
                     (a[1] + c[1]) / 2,
-                    z + h + 0.4,
+                    z + h + parapet_height / 2,
                     length,
                     0.25,
-                    0.8,
+                    parapet_height,
                     C['white'],
                     math.atan2(c[1] - a[1], c[0] - a[0]),
                 )
@@ -444,7 +588,25 @@ def shared_form(b, z, C, *, entrance_mesh=None):
         if 'attachedGallery' in facade:
             add_attached_gallery(body, facade, z, wall, C)
         if 'panels' in facade['rule']:
-            add_panels(panels, facade, z, C)
+            panel_colors = C
+            if b['id'] == YULIN and any(
+                p['type'] == 'round-window-wall' for p in facade['rule']['panels']
+            ):
+                panel_colors = {**C, 'white': C['pink']}
+            if (
+                b['id'] == SHAW
+                and facade['part'] == 'front-podium'
+                and facade['edge'] in (7, 8, 9)
+                and 'shawCurtainGlass' in C
+            ):
+                if facade['edge'] == 8:
+                    continue
+                panel_colors = {
+                    **C,
+                    'glass': C['shawCurtainGlass'],
+                    'dark': C['shawGlazingFrame'],
+                }
+            add_panels(panels, facade, z, panel_colors)
         if 'windowGrid' in facade['rule']:
             add_grid_pilasters(body, facade, z, C)
         if 'windowBands' in facade['rule']:
@@ -465,10 +627,24 @@ def shared_form(b, z, C, *, entrance_mesh=None):
         if 'mappedCanopy' in e:
             from mapped_canopy_entry import add_mapped_canopy_entry
 
+            if b['id'] == 'way/759165563' and any(
+                f['rule'].get('windowBands') for f in form.get('facades', [])
+            ):
+                shelter = e['shelter']
+                e = {
+                    **e,
+                    'shelter': {
+                        **shelter,
+                        'floorHeight': shelter['floorHeight'] + 0.36,
+                        'doorHeight': shelter['doorHeight'] - 0.36,
+                    },
+                }
             add_mapped_canopy_entry(entrance, e, z, C)
             continue
         if 'attachedPortico' in e:
             add_attached_portico(entrance, e, z, C)
+            if b['id'] == 'relation/11564998' and e['id'] == 'south-glazed-entry':
+                physics_lobby(entrance, e, z, C, form)
             continue
         x, y = e['center']
         bearing = math.radians(e['bearing'])
@@ -608,7 +784,16 @@ def shared_form(b, z, C, *, entrance_mesh=None):
             )
         else:
             entrance.box(x, y, z + landing + 1.3, width, 0.35, 2.6, C['glass'], theta)
-        entrance.box(x, y, z + landing + 2.9, width + 1.3, 2.5, 0.25, C['white'], theta)
+        if (
+            b['id'] == 'way/1501460953'
+            and e['id'] == 'north-court'
+            and 'stairFlight' in e
+        ):
+            continuing_canopy(entrance, e, z, C)
+        else:
+            entrance.box(
+                x, y, z + landing + 2.9, width + 1.3, 2.5, 0.25, C['white'], theta
+            )
         if 'stairFlight' in e:
             p = e['stairFlight']
             bottom = p['baseHeight'] - 0.15
@@ -679,6 +864,10 @@ def shared_form(b, z, C, *, entrance_mesh=None):
         add_terraced_stairs(entrance, form['terracedStairs'], z, C['stone'])
     if b['id'] == BEI:
         top.extend(north_roof(b, z, C))
+    if b['id'] == PHYSICS:
+        from physics_east_front import east_shell
+
+        east_shell(body, top, b, z, C)
     result.add_part('01_主体轮廓', body)
     result.add_part('02_屋顶轮廓', top)
     result.add_part('03_入口与平台', entrance)
@@ -715,13 +904,61 @@ def facade_segments(b):
     return result
 
 
+COLLEGE_MODELS = {
+    MECHANICAL_ID: mechanical_college,
+    CHEMICAL_ID: chemical_college,
+    ELECTRICAL_ID: electrical_college,
+    FOOD_ID: food_college,
+    LIGHTNING: lightning_lab,
+    INORGANIC: inorganic_lab,
+    ENERGY: energy_center,
+    RESEARCH_WING: computer_west_wing,
+    FOOD_ANNEX: food_annex,
+    ENVIRONMENT: environment_center,
+    ELECTRIC_CENTER: electric_center,
+}
+
+# Edge indices follow the outer footprint in buildings.json. Other edges and
+# floors continue through the ordinary window generator, including trim in
+# high detail. Filtering windows before emission keeps every frame complete.
+COLLEGE_CUSTOM_EDGES = {
+    MECHANICAL_ID: {5, 6},
+    CHEMICAL_ID: {2, 3, 5, 7, 8, 9, 10, 11, 13},
+    TRAINING_ID: {0, 1, 2, 3},
+    FOOD_ID: {3, 4, 5, 6, 7, 8, 9, 10, 12},
+    ELECTRICAL_ID: {1},
+    LIGHTNING: {3},
+    RESEARCH_WING: {2, 3},
+    INORGANIC: {9, 11},
+    FOOD_ANNEX: {3, 4, 5, 6},
+    ELECTRIC_CENTER: {*range(11), 16, 17},
+    ENVIRONMENT: {1, 3},
+}
+COLLEGE_LEVELS = {
+    RESEARCH_WING: (8, 30.5),
+    FOOD_ANNEX: (4, 14.8),
+    ENVIRONMENT: (7, 25.1),
+    ELECTRIC_CENTER: (6, 21.2),
+    FOOD_ID: (6, 20.6),
+    INORGANIC: (6, 23.45),
+    CHEMICAL_ID: (5, 17.3),
+}
+
+
 def ordinary_building(b, z, C, detail):
     if b.get('form', {}).get('version') != 1:
         raise ValueError(
             f'{b["id"]}: run data:prepare before rebuilding ordinary buildings'
         )
+    if b['id'] == PHYSICS:
+        from physics_east_front import fit_upper_storeys, source_grid
+
+        physics_roof = b['height']
+        b = source_grid(b)
     from student_water_tower import TOWER_ID, water_tower
 
+    if b['id'] == GATE and b['form']['levels'] == 1:
+        return new_east_gatehouse(b, z, C, detail)
     if b['id'] in WEST_DORMS:
         return west_dorm(b, z, C, detail)
     if b['id'] == WEST23:
@@ -734,6 +971,41 @@ def ordinary_building(b, z, C, detail):
         return water_tower(b, z, C, detail)
     if b['id'] == CANTEEN_ID:
         return nanyuan(b, z, C, detail)
+    if b['id'] == 'relation/11564998' and any(
+        e['id'] == 'south-glazed-entry' for e in b['form']['entrances']
+    ):
+        C = {
+            **C,
+            'glass': finish(
+                C, 'physicsBlueGreenGlass', (0.15, 0.28, 0.255), 0.22, 0.32
+            ),
+            'physicsTile': finish(C, 'physicsWarmTile', (0.66, 0.55, 0.48), 0.78),
+        }
+    if b['id'] == 'way/1501460953' and any(
+        e['id'] == 'north-court' for e in b['form']['entrances']
+    ):
+        C = {
+            **C,
+            'glass': finish(
+                C, 'continuingDoorGlass', (0.088, 0.105, 0.093), 0.32, 0.20
+            ),
+        }
+    if b['id'] == YULIN and b['form'].get('roofVolumes'):
+        C = {
+            **C,
+            'glass': finish(C, 'yulinGreyGlass', (0.16, 0.175, 0.17), 0.30, 0.23),
+            'pink': finish(C, 'yulinPaleRender', (0.70, 0.62, 0.58), 0.84),
+        }
+    if b['id'] in ('way/759165563', 'way/880089961'):
+        # The independent canopy and the west courtyard share a buff stone finish.
+        # The college's frontal photograph also shows smoky windows and dark doors.
+        trim = finish(C, 'artsCourtyardStone', (0.49, 0.395, 0.32), 0.79)
+        C = {
+            **C,
+            'glass': finish(C, 'artsCourtyardGlass', (0.074, 0.085, 0.089), 0.27, 0.25),
+            'pink': finish(C, 'artsCourtyardPlaster', (0.63, 0.46, 0.38), 0.86),
+            'white': trim,
+        }
     hall_fronts = FRONTS.get(b['id'], {})
     pane_glass = C['glass']
     windows = Mesh()
@@ -741,11 +1013,93 @@ def ordinary_building(b, z, C, detail):
     if hall_fronts:
         entrance, windows = photographed_facade(b, z, C, detail)
         pane_glass = C['xiuBlueGlass' if b['id'] == XIU else 'residenceGlass']
+    if b['id'] == CIVIL:
+        # One complete entrance in both LODs; the generic axis-aligned
+        # flush canopy would otherwise remain below the two oblique eaves.
+        entrance, civil_finish = civil_details(b, z, C, detail)
+    if b['id'] in (
+        colleges.MEDICINE,
+        colleges.SPORTS,
+        colleges.SPORTS_WING,
+        colleges.LIFE,
+        colleges.HALL,
+        colleges.EAST_GYM,
+        colleges.REPRODUCTION_INSTITUTE,
+    ):
+        entrance = Mesh()
     if b['id'] == BI:
         b = bihuyuan_shell(b)
-    m = shared_form(b, z, C, entrance_mesh=entrance)
+    shaw_entry = None
+    if b['id'] == SHAW and any(p['id'] == 'stair-core' for p in b['form']['parts']):
+        shaw_entry = ShawEntrance(b)
+        # The primary door is an explicit opening on the recessed arcade wall.
+        C = {
+            **C,
+            'shawPinkGranite': finish(C, 'shawPinkGranite', (0.30, 0.164, 0.132), 0.57),
+            'shawDoorGlass': finish(
+                C, 'shawDoorGlass', (0.023, 0.028, 0.027), 0.24, 0.32
+            ),
+            'shawCurtainGlass': finish(
+                C, 'shawCurtainGlass', (0.24, 0.25, 0.26), 0.105, 0.74
+            ),
+            'shawGlazingFrame': finish(
+                C, 'shawGlazingFrame', (0.039, 0.031, 0.028), 0.36, 0.55
+            ),
+            'glass': finish(C, 'shawSmokedGlass', (0.13, 0.14, 0.145), 0.13, 0.66),
+        }
+        entrance = Mesh()
+    if b['id'] == YULIN and any(
+        f['edge'] == 6 and 'openCorridor' in f['rule']
+        for f in b['form'].get('facades', [])
+    ):
+        entrance = Mesh()
+    glazed_rotunda = (
+        b['id'] == MANAGEMENT
+        and any(p['id'] == 'main' for p in b['form']['parts'])
+        and any(f['rule'].get('panels') for f in b['form'].get('facades', []))
+    )
+    if glazed_rotunda:
+        C = {
+            **C,
+            'glass': finish(C, 'managementGreenGlass', (0.18, 0.27, 0.25), 0.27, 0.36),
+        }
+        entrance = Mesh()
+    builder = COLLEGE_MODELS.get(b['id'])
+    college = builder is not None or b['id'] == TRAINING_ID
+    if builder:
+        m = builder(b, z, C, detail)
+        if b['id'] == ENERGY:
+            return m
+    else:
+        m = shared_form(b, z, C, entrance_mesh=entrance, shaw_entry=shaw_entry)
+        if b['id'] == TRAINING_ID:
+            add_training_front(b, m, z, C, detail)
+    if (
+        b['id'] == 'way/759165563'
+        and any(e.get('shelter') for e in b['form']['entrances'])
+        and any(f['rule'].get('windowBands') for f in b['form'].get('facades', []))
+    ):
+        m.add_part('西门院名与窗间壁柱', arts_entry_sign(b, z, C))
+    if b['id'] == RED_HOUSE and b['form']['roof']['type'] == 'hipped':
+        m.add_part('端部山花、外墙与踏步', red_house_ends(b, z, C))
+    if b['id'] in HISTORIC_PAIR and any(
+        f['rule'].get('panels') for f in b['form'].get('facades', [])
+    ):
+        m.add_part('三层窗间板与首层竖窗', historic_windows(b, z, C))
+    if shaw_entry:
+        m.add_part('南廊腰线与邵逸夫楼塔面', shaw_front(b, z, C, shaw_entry))
+    if b['id'] == YULIN and 'roofVolumes' in b['form']:
+        m.add_part('育林楼中央弧饰与重檐', yulin_front(b, z, C, detail))
+    if glazed_rotunda:
+        m.add_part('圆厅柱列与幕墙腰线', rotunda(b, z, C))
     if b['id'] in NEW_EAST_NEIGHBOURS:
         facades = facade_segments(b)
+        if (
+            b['id'] == 'way/1501460953'
+            and b['form']['levels'] == 6
+            and any(f['edge'] == 2 and 'windowBands' in f['rule'] for f in facades)
+        ):
+            m.add_part('沿街窗下板与壁柱', continuing_street_front(b, z, C))
         m.add_part('04_立面窗格', facade_details(b, z, C, detail, facades))
         if b['id'] in SHOP_BUILDINGS:
             m.add_part('05_临街店面', shopfront_details(b, z, C, detail, facades))
@@ -771,10 +1125,21 @@ def ordinary_building(b, z, C, detail):
         else None
     )
     for edge, facade in enumerate(facade_segments(b)):
+        if b['id'] in (colleges.LAB, colleges.HALL) or (
+            facade.get('ring', 0) == 0
+            and facade.get('edge', edge) in colleges.PHOTO_EDGES.get(b['id'], ())
+        ):
+            continue
         a, c = facade['start'], facade['end']
         rule = facade['rule']
         if b['id'] == XIU and edge in (3, 5):
             # These short returns have continuous glazing to the west entrance.
+            continue
+        if (
+            b['id'] == MATERIALS
+            and facade.get('part') == 'high-body'
+            and facade.get('edge') in MATERIALS_REAR
+        ):
             continue
         if rule.get('windows') is False:
             continue
@@ -787,6 +1152,18 @@ def ordinary_building(b, z, C, detail):
         levels = max(1, round(facade['levels']))
         dx, dy = c[0] - a[0], c[1] - a[1]
         length = math.hypot(dx, dy)
+        if college:
+            if edge in COLLEGE_CUSTOM_EDGES[b['id']]:
+                continue
+            levels, h = COLLEGE_LEVELS.get(b['id'], (levels, h))
+            if b['id'] == MECHANICAL_ID:
+                levels, h = 6, 22.2
+            if b['id'] == CHEMICAL_ID and edge in (0, 1):
+                levels, h = 6, 19.4
+            if b['id'] == FOOD_ID and edge in (1, 2):
+                levels, h = 6, 19.1
+            if b['id'] == LIGHTNING:
+                levels, h = 3, 11.6
         if length < 2:
             continue
         nx, ny = facade['normal']
@@ -794,6 +1171,11 @@ def ordinary_building(b, z, C, detail):
         num = max(1, int(length / rule.get('spacing', 4)))
         floor_heights = facade.get('floorHeights')
         for level in range(levels):
+            if b['id'] == PHYSICS and edge == 16 and level == 4:
+                continue  # The east gallery carries its own inset window wall.
+            if b['id'] == PHYSICS and edge in PHYSICS_STREET and level != 4:
+                if level > 0 or edge in (15, 16, 17):
+                    continue
             if level in hall_fronts.get(
                 facade.get('edge', edge), ()
             ) or level in rule.get('skipWindowLevels', []):
@@ -804,6 +1186,14 @@ def ordinary_building(b, z, C, detail):
                 else level * h / levels
             )
             floor_height = floor_heights[level] if floor_heights else h / levels
+            if (
+                level == 0
+                and b['id'] == 'relation/11564703'
+                and facade.get('ring', 0) == 0
+                and facade.get('edge') == 5
+            ):
+                # Forestry's photographed ground-floor grilles flank the south porch.
+                continue
             gallery = facade.get('attachedGallery')
             if gallery and level > 0:
                 continue
@@ -820,6 +1210,47 @@ def ordinary_building(b, z, C, detail):
             for i in range(num):
                 f = (i + 0.5) / num
                 x, y = a[0] + dx * f + nx * 0.07, a[1] + dy * f + ny * 0.07
+                if b['id'] == PHYSICS and edge == 2 and level == levels - 1:
+                    from physics_east_front import JOINT
+
+                    if JOINT[0] < y < JOINT[1]:
+                        continue  # The glazed link stops one storey below the two wings.
+                if (
+                    b['id'] == PHYSICS
+                    and edge == 10
+                    and level <= 4
+                    and PHYSICS_PORTAL[0] - 1.2 < y < PHYSICS_PORTAL[1] + 1.2
+                ):
+                    continue
+                if b['id'] == PHYSICS and (
+                    (
+                        edge == 10
+                        and 1 <= level <= 3
+                        and FRAME_SLOT[0] - 1.2 < y < FRAME_SLOT[1] + 1.2
+                    )
+                    or (
+                        edge == 2
+                        and level == 4
+                        and SOUTH_LIGHT_BAY[0] - 1.2 < y < SOUTH_LIGHT_BAY[1] + 1.2
+                    )
+                ):
+                    continue
+                if b['id'] == INORGANIC and edge == 5 and -551.0 < x < -533.18:
+                    continue
+                if b['id'] == FOOD_ID and edge == 0 and x > -607.03 and level >= 5:
+                    continue
+                if b['id'] == FOOD_ANNEX and x > -598.87 and level >= 2:
+                    continue
+                if college and b['id'] == MECHANICAL_ID:
+                    if (x >= -261.35 and level >= 5) or (edge in (3, 4) and level > 0):
+                        continue
+                if (
+                    college
+                    and b['id'] == ELECTRICAL_ID
+                    and edge in (0, 2)
+                    and y < -819.7
+                ):
+                    continue
                 if (
                     flavor_center
                     and edge == 0
@@ -996,7 +1427,23 @@ def ordinary_building(b, z, C, detail):
                         ],
                         pane_glass,
                     )
-    m.add_part('04_立面窗格', windows)
+    m.add_part('未核立面沿用原窗格' if college else '04_立面窗格', windows)
+    if b['id'] == CIVIL and detail:
+        m.add_part('土木东南檐面题字与分缝', civil_finish)
+    if b['id'] == PHYSICS:
+        m.add_part('沿街深色窗墙与东门台阶', physics_fronts(b, z, C, detail))
+        if detail:
+            court_joints(m, z, C)
+        fit_upper_storeys(m, z, physics_roof)
+        from physics_corner_access import finish_corner
+
+        finish_corner(m, z, C, detail)
+        from physics_aerial_stairs import east_stair_assembly
+
+        m.add_part('物理东侧宽梯、折梯与院内平台', east_stair_assembly(z, C, detail))
+    if b['id'] == MATERIALS:
+        m.add_part('东门北塔显示屏与门额', materials_screen(b, z, C, detail))
+        m.add_part('西北侧深窗墙', materials_rear(b, z, C, detail))
     if b['id'] == BEI:
         # The guide identifies the second storey. Position within the hall is approximate.
         door = beiyuan_entry(C, detail)
@@ -1010,4 +1457,6 @@ def ordinary_building(b, z, C, detail):
             math.radians(-7.56),
         )
         m.add_part('06_二楼餐厅内门', interior)
+    if b['id'] in colleges.BUILDERS:
+        m.add_part('05_学院外观', colleges.BUILDERS[b['id']](b, z, C, detail))
     return m

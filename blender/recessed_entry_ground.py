@@ -73,6 +73,10 @@ def build_recessed_entry_ground(site, C, elevation, terrain, roads):
 
         terrain, bedding = bed_forecourt(terrain, e, z, C['grass'])
         report['bedding'] = bedding
+        from materials_northeast_stair import applies, seat_stair
+
+        if applies(e):
+            terrain = seat_stair(terrain, e, z, C)
     # Isolate nearby original faces once. Re-clipping the entire campus for
     # every small paving triangle is unnecessary and changes vertex order.
     outside = Mesh()

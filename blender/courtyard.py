@@ -5,8 +5,31 @@ import math
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 
-from geometry import Mesh
+from geometry import Mesh, tile_material
 from site_geometry import mesh_triangles, ring_distance, split_convex
+
+
+def arts_court_pavers(mesh, site, colors):
+    """Lay the photographed square courses across court and stair approach."""
+    tile_material(
+        colors, 'artsCourtPavers', 'arts-court-pavers.png', (0.33, 0.33, 0.30)
+    )
+    ox, oy = site['origin']
+    cs, sn = math.cos(site['angle']), math.sin(site['angle'])
+    for i, ids in enumerate(mesh.f):
+        pts = [mesh.v[n] for n in ids]
+        a, b, c = (Vector(p) for p in pts[:3])
+        if abs((b - a).cross(c - a).normalized().z) < 0.7:
+            continue
+        mesh.m[i] = colors['artsCourtPavers']
+        # Eight estimated 18 cm pavers per repeat, fixed to the courtyard axes.
+        mesh.face_uvs[i] = [
+            (
+                ((x - ox) * cs + (y - oy) * sn) / 1.44,
+                (-(x - ox) * sn + (y - oy) * cs) / 1.44,
+            )
+            for x, y, _ in pts
+        ]
 
 
 def build_courtyard(site, C, elevation, terrain, roads):
@@ -147,6 +170,8 @@ def build_courtyard(site, C, elevation, terrain, roads):
         connection, detail = build_stair_connection(site, C, elevation, height, nearby)
         mesh.add_part('03_庭院与楼梯接面', connection)
         report['stairConnection'] = detail
+    if site['id'] == 'arts-east-courtyard':
+        arts_court_pavers(mesh, site, C)
     return terrain, roads, {'site-' + site['id']: mesh}, [report]
 
 

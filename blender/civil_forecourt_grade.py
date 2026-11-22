@@ -132,7 +132,7 @@ def building_datum(building, default, p):
     )
 
 
-def grade_mesh(mesh, p, clearance=0, original_ground=None):
+def grade_mesh(mesh, p, clearance=0, original_ground=None, *, target_height=None):
     area = p['extent']
     step = p['meshStep']
     result = Mesh()
@@ -211,7 +211,8 @@ def grade_mesh(mesh, p, clearance=0, original_ground=None):
                 # gap in the fade. Ease out that excess as well as the DEM
                 # height; t=0 retains the protected/outside road exactly.
                 z -= max(0.0, z - ground - clearance) * t
-        return x, y, z * (1 - t) + (height(x, y, p) + clearance) * t
+        target = target_height(x, y) if target_height is not None else height(x, y, p)
+        return x, y, z * (1 - t) + (target + clearance) * t
 
     for ids, fi in mesh_triangles(mesh):
         if fi not in selected:

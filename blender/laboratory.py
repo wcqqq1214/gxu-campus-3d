@@ -122,4 +122,37 @@ def laboratory(l, b, z, C, detail=True):
             m.box(x, yy, (z + top) / 2, w * 0.29, tread, top - z, stone)
     m.box(x, stair_back - 5.6, z + 0.3, w * 0.29, 1.6, 0.6, stone)
     m.box(x, stair_back + 0.8, z + 0.9, w * 0.31, 1.6, 1.8, stone)
+    # Camera north of the building (heading 190) confirms the second colonnade
+    # and a broad straight stair. Its run is an estimate from the panorama.
+    north_y = y + d * 0.35 + 2.2
+    m.box(x, north_y - 1.6, z + 0.90, w * 0.61, 6.4, 1.8, stone)
+    for side in (-1, 1):
+        for offset in (0.112, 0.169, 0.226, 0.283):
+            xx = x + side * w * offset
+            m.cylinder(
+                xx, north_y, floor + shaft / 2, 0.56, shaft, stone, 20 if detail else 12
+            )
+            m.cylinder(xx, north_y, floor + shaft - 0.14, 0.70, 0.28, white)
+    m.box(x, north_y, floor + shaft + 0.20, w * 0.61, 3.1, 0.48, white)
+    for i in range(12):
+        rise = (12 - i) * 0.15
+        m.box(x, north_y + 1.78 + i * 0.39, z + rise / 2, w * 0.30, 0.40, rise, stone)
+    # Looking west from the east road: a stone plinth, four grille windows,
+    # flat canopy and stair flanked by low cheeks, then three upper window axes.
+    east = x + w * 0.49
+    wall_depth = d * 0.40
+    m.box(east - 0.22, y, z + 2.02, 0.55, wall_depth, 4.04, stone)
+    m.box(east + 0.12, y, z + 2.14, 0.13, 2.6, 2.32, glass)
+    m.box(east + 0.82, y, z + 4.02, 1.95, 4.9, 0.34, white)
+    for i in range(6):
+        rise = (6 - i) * 0.16
+        m.box(east + 0.30 + i * 0.34, y, z + rise / 2, 0.35, 3.8, rise, stone)
+    for side in (-1, 1):
+        for offset in (3.3, 5.25):
+            m.box(east + 0.12, y + side * offset, z + 2.39, 0.15, 1.32, 1.8, glass)
+        m.box(east + 0.99, y + side * 2.04, z + 0.54, 2.13, 0.28, 1.08, stone)
+    for i in range(1, 7):
+        zz = floor + (i + 0.45) * h * 0.61 / 7
+        for offset in (-2.85, 0, 2.85):
+            m.box(east + 0.05, y + offset, zz, 0.11, 1.36, 1.83, glass)
     return m

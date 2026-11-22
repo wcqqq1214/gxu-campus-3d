@@ -3,12 +3,12 @@
 import math
 
 
-def add_roof_dome(mesh, config, elevation, material):
+def add_roof_dome(mesh, config, elevation, material, *, segments=32):
     x, y = config['center']
     radius, rise = config['radius'], config['rise']
     floor = elevation + config['baseHeight']
     spring = floor + config['drumHeight']
-    segments, bands = 32, 8
+    bands = 8
 
     def ring(r, z):
         return [

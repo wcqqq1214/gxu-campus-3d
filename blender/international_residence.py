@@ -3,7 +3,7 @@ Official exterior photo: gjxy.gxu.edu.cn current gallery, capture date unknown.
 Footprint and floors are mapped; tower setbacks / unseen elevations are estimates.
 """
 
-from geometry import Mesh
+from geometry import Mesh, material
 from library import outline_edges
 from south_gate import inscription
 
@@ -173,6 +173,65 @@ def international_residence(l, b, z, C, detail):
             (j + 1) * 0.20,
             C['stone'],
         )
+    # West, facing Gujiang Road. The 2026 campus map locates the college here.
+    # The July group portrait and the west-side panorama agree on the two stone
+    # piers, glazing, central steps and flanking planters. The bay is estimated.
+    college = Mesh()
+    if 'collegeBlackGranite' not in C:
+        C['collegeBlackGranite'] = material(
+            'collegeBlackGranite', (0.032, 0.040, 0.043), 0.29, 0.13
+        )
+    pier = C['collegeBlackGranite']
+    entry_y = 8.4
+    college.box(-32.74, entry_y, z + 3.09, 0.19, 7.5, 3.86, glass)
+    # A fixed toplight and mullions divide the entrance from the continuous podium glazing.
+    college.box(-32.93, entry_y, z + 4.06, 0.21, 6.43, 0.16, pier)
+    for dy in (-2.75, -1.44, 0, 1.44, 2.75):
+        college.box(-32.94, entry_y + dy, z + 2.67, 0.16, 0.10, 2.98, pier)
+    for dy in (-0.16, 0.16):
+        college.box(-33.05, entry_y + dy, z + 2.19, 0.075, 0.055, 0.62, C['metal'])
+    for offset in (-3.45, 3.45):
+        college.box(-33.05, entry_y + offset, z + 3.02, 0.78, 0.85, 3.76, pier)
+        college.box(-33.46, entry_y + offset, z + 3.59, 0.07, 0.55, 2.25, trim)
+        # Planter sides rise with the flight. The brown planting bed sits below two black copings.
+        for j in range(7):
+            x = -33.4 - 0.45 * j
+            h = 1.54 - 0.14 * j
+            college.box(x, entry_y + offset, z + h / 2, 0.46, 0.90, h, pier)
+            college.box(x, entry_y + offset, z + h + 0.015, 0.46, 0.64, 0.08, C['bark'])
+            if detail:
+                college.ellipsoid(
+                    x,
+                    entry_y + offset,
+                    z + h + 0.09,
+                    0.24,
+                    0.28,
+                    0.12,
+                    C['leaf2'],
+                    8,
+                    3,
+                )
+    for step in range(7):
+        top = (7 - step) * 0.16
+        college.box(
+            -33.09 - step * 0.37, entry_y, z + top / 2, 0.39, 5.94, top, C['stone']
+        )
+    if detail:
+        # The photo shows three titles on two plaques. B203 is an indoor room.
+        for label, offset in [
+            ('中国—东盟经济学院', -3.45),
+            ('经济学院', 3.32),
+            ('中国—东盟金融合作学院', 3.58),
+        ]:
+            for i, char in enumerate(label):
+                glyph = inscription(char, 0, 0, 0, 0.15, 0.16, pier, False, flat=True)
+                glyph.rotate_z(0, 0, -1.57079632679)
+                glyph.v = [
+                    (x - 33.51, y + entry_y + offset, zz + z + 4.49 - i * 0.19)
+                    for x, y, zz in glyph.v
+                ]
+                college.extend(glyph)
+    m.add_part('09_鸪江路学院入口', college)
     for name, part in [
         ('01_地图裙楼与双翼', body),
         ('02_逐层凹阳台', balconies),

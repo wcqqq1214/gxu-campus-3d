@@ -1,6 +1,7 @@
 """Distinct architectural studies, using the reference catalogue and OSM footprints."""
 
 from campus_gates import campus_gate
+from computer_college import computer_college
 from geometry import Mesh
 from huicui import huicui
 from huixue import huixue
@@ -14,6 +15,7 @@ from teaching_ten import teaching_ten
 from time_gate import time_gate
 
 DEDICATED_LANDMARKS = {
+    'computer': computer_college,
     'huixue': huixue,
     'laboratory': laboratory,
     'student-center': student_center,
@@ -167,76 +169,11 @@ def landmark(l, b, z, C, detail=True):
                 )
         steps(m, x, front - 6, z, w * 0.94, 9, 1.2, stone)
     elif k == 'stadium':
-        # Official 2021 video, 00:07 and 00:12: broad shallow roof, vertical piers, horizontal louvers.
-        # The mapped footprint has a narrow north wing. Using the full bounding
-        # rectangle filled that concavity and pushed the east annex into Nongyuan Road.
-        ring = b['polygons'][0][0][:-1]
-        winding = sum(
-            a[0] * c[1] - c[0] * a[1] for a, c in zip(ring, ring[1:] + ring[:1])
-        )
-        reflex = []
-        for i, p in enumerate(ring):
-            a = ring[i - 1]
-            c = ring[(i + 1) % len(ring)]
-            cross = (p[0] - a[0]) * (c[1] - p[1]) - (p[1] - a[1]) * (c[0] - p[0])
-            if cross * winding < 0:
-                reflex.append(p)
-        notch = max(reflex, key=lambda p: p[0])
-        split = notch[1]
-        north = [p for p in ring if p[1] > split + 1]
-        wing_left = min(p[0] for p in north)
-        wing_right = max(p[0] for p in north)
-        mainw = w * 0.9
-        maind = (split - ymin) * 0.93
-        hh = h * 0.83
-        xx = x
-        y = (ymin + split) / 2
-        facade(m, xx, y, z, mainw, maind, hh, stone, glass, white, 2, 5, True)
-        m.roof(xx, y, z + hh + 1.4, mainw + 8, maind + 8, 1.9, C['paleRoof'])
-        for sy in [-1, 1]:
-            front = y + sy * (maind / 2 + 0.3)
-            for i in range(9):
-                m.box(
-                    xx + (i - 4) * mainw * 0.108,
-                    front,
-                    z + hh * 0.47,
-                    1.8,
-                    2.0,
-                    hh * 0.94,
-                    stone,
-                )
-            for j in range(5):
-                m.box(
-                    xx,
-                    front + sy * 0.8,
-                    z + hh * 0.66 + j * 0.85,
-                    mainw - 5,
-                    0.35,
-                    0.22,
-                    C['metal'],
-                )
-            m.box(xx, front, z + hh + 1.1, mainw + 8, 4, 1.1, dark)
-        facade(
-            m,
-            (wing_left + wing_right) / 2,
-            (split + ymax) / 2,
-            z,
-            (wing_right - wing_left) * 0.93,
-            (ymax - split) * 0.96,
-            h * 0.48,
-            stone,
-            glass,
-            white,
-            2,
-            4,
-            True,
-        )
-        for row in range(5):
-            for col in range(6):
-                sx = xx + (col - 2.5) * mainw * 0.115
-                sy = y + (row - 2) * maind * 0.14
-                m.box(sx, sy, z + hh + 3.1, 2.3, 2.3, 0.7, white)
-        steps(m, xx, ymin - 3, z, mainw * 0.65, 8, 1.2, stone)
+        from west_gym_shell import stadium_shell
+        from west_gym_entrances import add_entrances
+
+        m = stadium_shell(l, b, z, C, detail)
+        add_entrances(m, l, b, z, C, detail)
     elif k == 'teaching-two':
         facade(m, x, y, z, w, d, h, C['pink'], glass, white, 7, 3.8)
         m.box(x, ymin - 1.6, z + h * 0.50, 9, 3, h, stone)
@@ -244,25 +181,4 @@ def landmark(l, b, z, C, detail=True):
         for sx in [-1, 1]:
             m.box(x + sx * (w * 0.4), y, z + h + 1, 6, d * 0.8, 2.2, stone)
         steps(m, x, ymin - 4, z, 14, 6, 0.8, stone)
-    elif k == 'computer':
-        facade(m, x, y, z, w, d, h, white, glass, stone, 10, 3.6)
-        m.box(x + w * 0.44, y, z + h / 2, w * 0.18, d + 1, h, C['pink'])
-        m.box(x - w * 0.05, ymin - 0.8, z + h * 0.52, w * 0.14, 0.35, h * 0.91, glass)
-        for i in range(8):
-            m.box(
-                x - w * 0.4 + i * w * 0.05,
-                ymin - 0.8,
-                z + h * 0.48,
-                0.9,
-                1.0,
-                h * 0.79,
-                stone,
-            )
-        m.box(x, y, z + h + 1.8, w + 5, d + 3, 0.55, white)
-        m.box(x + w * 0.18, ymin - 0.6, z + h / 2, w * 0.15, 1.4, h + 2, stone)
-        m.box(x - w * 0.35, ymax - d * 0.2, z + h + 1, w * 0.26, d * 0.28, 3, stone)
-        m.box(x, ymin - 2, z + 4.6, 12, 7, 0.55, white)
-        for sx in [-1, 1]:
-            m.cylinder(x + sx * 4.5, ymin - 4, z + 2.2, 0.4, 4.4, stone)
-        steps(m, x, ymin - 4, z, 12, 6, 0.7, stone)
     return m

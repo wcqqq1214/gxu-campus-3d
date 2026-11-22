@@ -512,6 +512,25 @@ def samples(b):
                 }
             )
             continue
+        if b['id'] == 'relation/12875606' and e['id'] == 'southeast-main':
+            # Sample the roof near both sloping eaves and the actual central
+            # door header. The former rectangular generic roof was replaced.
+            cx, cy = e['flushEntrance']['returnGlazing']['corner']
+            for kind, dx, dy, h in [
+                ('civil-west-eave', -11.3, -4.7, 8.21),
+                ('civil-inscribed-eave', -2.0, -4.7, 8.21),
+                ('civil-door-header', -6.23, -0.30, 2.78),
+            ]:
+                points.append(
+                    dict(
+                        kind=kind,
+                        x=cx + dx,
+                        y=cy + dy,
+                        top=z + h + 0.18,
+                        expected=z + h,
+                    )
+                )
+            continue
         if 'flushEntrance' in e:
             p = e['flushEntrance']
             expected = z + p['floorHeight'] + p['doorHeight'] + p['frameWidth'] / 2

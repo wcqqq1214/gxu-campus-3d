@@ -41,25 +41,42 @@ up = Vector((0, 0, 1))
 point = lambda w, d, h: front + u * w - n * d + up * h
 
 
+def in_northeast_stair(w, d):
+    # Bounds of the surveyed side-flight replacement in the original entry frame.
+    return (
+        -21 <= w < -9
+        and -20 < d < -8.4
+        or -25.39 < w < -16
+        and -20 < d <= -4
+        or -16.4 <= w < -12.82
+        and -8.415 < d <= -0.3
+        or -12.82 <= w < -9.42
+        and -7.49 < d < -5.44
+    )
+
+
 def finish_name(name):
     return re.sub(r'\.\d+$', '', name).replace('entryBorderStone', 'stone')
 
 
-def trees(objects):
+def trees(objects, *, upward_only=False):
     result = []
     for o in objects:
         if o.type != 'MESH':
             continue
+        faces = o.data.polygons
+        if upward_only:
+            normal_matrix = o.matrix_world.to_3x3().inverted_safe().transposed()
+            faces = [f for f in faces if (normal_matrix @ f.normal).z > 0.93]
+            if not faces:
+                continue
         result.append(
             (
                 BVHTree.FromPolygons(
                     [o.matrix_world @ v.co for v in o.data.vertices],
-                    [tuple(f.vertices) for f in o.data.polygons],
+                    [tuple(f.vertices) for f in faces],
                 ),
-                [
-                    finish_name(o.data.materials[f.material_index].name)
-                    for f in o.data.polygons
-                ],
+                [finish_name(o.data.materials[f.material_index].name) for f in faces],
             )
         )
     return result
@@ -104,6 +121,8 @@ def parking_joint_alignment(objects):
             for j in range(28):
                 w = w0 + i * 0.6 + 0.14
                 d = -19 + j * 0.65 + 0.14
+                if in_northeast_stair(w, d):
+                    continue
                 sample = None
                 for a, b, c, den in triangles:
                     aa = ((b[1] - c[1]) * (w - c[0]) + (c[0] - b[0]) * (d - c[1])) / den
@@ -179,6 +198,8 @@ def border_course_alignment(objects):
     ]
     errors = []
     for w, d, axis, factor in probes + nose_probes:
+        if in_northeast_stair(w, d) or (w < 0 and abs(d + 8.4) < 0.001):
+            continue
         candidates = []
         for a, b, c, den in tris:
             aa = ((b[1] - c[1]) * (w - c[0]) + (c[0] - b[0]) * (d - c[1])) / den
@@ -209,6 +230,124 @@ def border_course_alignment(objects):
     return max(errors)
 
 
+def check_northeast_site(building, roads, ground, tol):
+    # Independent positions and tolerance bands from the three panoramas.
+    surfaces = building + roads
+
+    def finish(w, d, expected, start=5.10):
+        hit = ray(surfaces, point(w, d, start), -up, 8)
+        assert hit and hit[3] == expected and hit[2].z > 0.65, (
+            'east entrance finish',
+            w,
+            d,
+            expected,
+            hit,
+        )
+        return hit[1].z - z
+
+    for w, d, name in [
+        (-24.23, -10.15, 'grass'),
+        (-22.64, -9.53, 'grass'),
+        (-15.8, -11.4, 'grass'),
+        (-18.65, -13.4, 'stone'),
+        (-18.4, -9.85, 'stone'),
+        (-18.38, -6.2, 'asphalt'),
+        (-23.28, -14.92, 'materialsGrassPaver'),
+        (-21.48, -15.60, 'materialsGrassPaver'),
+        (-14.5, -3, 'grass'),
+        (-14, -6.2, 'asphalt'),
+        (-11.56, -6.5, 'asphalt'),
+    ]:
+        finish(w, d, name)
+    # The upper east pier, soffit and the two perpendicular stone returns
+    # must be real surfaces. Rays also detect a fascia painted across the entry.
+    for w, d, direction in [(-20.65, -16.1, u), (-18.53, -14.0, n)]:
+        hit = ray(building, point(w, d, 3.65), direction, 0.85)
+        assert (
+            hit and hit[3] == 'materialsRetainingStone' and hit[2].dot(direction) < -0.9
+        ), ('stone face', w, d, hit)
+    for d in [-16.8, -15.08]:
+        assert abs(finish(-20.1, d, 'gateStone', 4.65) - 4.447) < tol + 0.006, (
+            'stone cap',
+            d,
+        )
+    l = ray(building, point(-12.48, -6.4, 3.3), up, 4)
+    assert l and l[2].z < -0.98 and abs(l[1].z - z - 6.45) < tol + 0.008, (
+        'passage soffit',
+        l,
+    )
+    for d in (-7.15, -6.43, -5.80):
+        assert ray(building, point(-15.7, d, 4.74), u, 6.05) is None, (
+            'first passage bay obstructed',
+            d,
+        )
+        h = finish(-11.56, d, 'asphalt')
+        soil = ray(ground, point(-11.56, d, 3.5), -up, 2.5)
+        assert soil and 0.004 < h + z - soil[1].z < 0.09, (
+            'first bay bedding',
+            d,
+            h,
+            soil,
+        )
+        assert abs(h - 3.08) < tol + 0.006, ('passage floor', d, h)
+    assert 3.30 < l[1].z - z - 3.08 < 3.45
+    # Probe individual sections through the previously visible west lawn hump.
+    # Three independent street views put the outer lawn corner below the wall foot.
+    corner = ray(surfaces, point(-25.39254, -11.91251, 3.8), -up, 2.0)
+    wall_foot = ray(surfaces, point(-20.18575, -14.41659, 2.96), -up, 0.9)
+    assert corner and wall_foot, (
+        'missing paired lawn/wall benchmarks',
+        corner,
+        wall_foot,
+    )
+    relative = corner[1].z - wall_foot[1].z
+    assert -0.30 < relative < -0.205, (
+        'street lawn relative to retaining wall foot',
+        relative,
+    )
+    profile = []
+    for d in (-11.25, -10.1, -9.05, -8.55):
+        hs = []
+        for w in (
+            -24.9,
+            -24.4,
+            -23.9,
+            -23.4,
+            -22.9,
+            -22.4,
+            -21.9,
+            -21.4,
+            -20.9,
+            -20.4,
+            -19.9,
+            -19.4,
+        ):
+            hit = ray(surfaces, point(w, d, 6), -up, 7)
+            assert hit, ('north lawn/parking seam', w, d)
+            hs.append(hit[1].z - z)
+        assert (
+            0.15 < hs[-1] - hs[0] < 0.34
+            and min(y - x for x, y in zip(hs, hs[1:])) > -tol - 0.008
+        ), (
+            'west lawn reverses slope',
+            d,
+            hs,
+        )
+        profile.append(hs)
+    hs = [
+        finish(-18.37, d, 'stone')
+        for d in (-13.5, -12.7, -11.9, -10.8, -9.9, -8.7, -8.0)
+    ]
+    assert max(hs) - min(hs) < 0.075 + tol, ('crosswalk has a ridge', hs)
+    return dict(
+        sideStairSamples=33,
+        coveredPassageClearance=l[1].z - z - 3.08,
+        crosswalkRange=max(hs) - min(hs),
+        westLawnSections=profile,
+        lawnMinusWallFootMeters=relative,
+    )
+
+
 def check(objects, ground, tol, roads):
     ts = trees(objects)
     rows = []
@@ -216,6 +355,19 @@ def check(objects, ground, tol, roads):
     def top(kind, w, d, h):
         hit = ray(ts, point(w, d, h + 0.12), -up, 0.3)
         assert hit and abs(hit[1].z - z - h) < tol, (kind, w, d, h, hit)
+        if kind == 'canopy-crossbeam' and hit[2].z < 0:
+            # At the front crossbeam the 15-bit export snaps an existing
+            # soffit face onto the beam top. BVH tie order depends on the
+            # whole chunk. Require an upward face at the same XY, Z and material.
+            face = ray(
+                trees(objects, upward_only=True), point(w, d, h + 0.12), -up, 0.3
+            )
+            assert face and face[3] == hit[3] and abs(face[1].z - hit[1].z) < 0.0005, (
+                'missing coplanar beam top',
+                face,
+                hit,
+            )
+            hit = face
         assert hit[2].z > 0.93, (kind, 'top facing down', hit)
         rows.append(dict(kind=kind, w=w, d=d, expected=h, actual=hit[1].z - z))
 
@@ -308,7 +460,8 @@ def check(objects, ground, tol, roads):
         for w in (-8, 0, 8):
             top('lower-tread', w, -10.5 + (i + 0.5) * 0.3, 2.8 + 0.15 * (i + 1))
     for w in (-14, -6, 0, 6, 14):
-        top('raised-terrace', w, -7, 4)
+        if w != -14:  # The north end is the surveyed passage approach.
+            top('raised-terrace', w, -7, 4)
     for side in (-1, 1):
         for d in (-4.5, -3, -1):
             top('sunken-floor', side * 8.5, d, 1.3)
@@ -337,7 +490,8 @@ def check(objects, ground, tol, roads):
         for w in (11.45, 12.75):
             hit = ray(ts, point(side * w, -3.525, 3.7), -up, 0.5)
             assert hit and hit[3] == 'dark', ('descending handrail missing', side, w)
-        top('outer-walk', side * 14.5, -3, 4)
+        if side > 0:
+            top('outer-walk', side * 14.5, -3, 4)
     # Ground and pavement samples span every external patch, plus the low approach.
     # The outer grade now continues all the way to the level stair approach;
     # no abrupt change of slope is left at the old two-metre perimeter strip.
@@ -357,10 +511,32 @@ def check(objects, ground, tol, roads):
 
     for w in (-15, -8, 0, 8, 15):
         for d in (-23.5, -21, -18, -15, -12.1):
-            top('graded-plaza', w, d, plaza_height(w, d))
+            if not in_northeast_stair(w, d):
+                top('graded-plaza', w, d, plaza_height(w, d))
     for w in (-8, 0, 8):
         for d in (-11.9, -11.2, -10.6):
             top('level-stair-approach', w, d, 2.8)
+    # Field views at 183°, 152° and 211° fix a north-facing stair. Check the
+    # flight and its two exits in place of the former parking/plaza samples.
+    for i in range(11):
+        w = -17 + (i + 0.5) * 3.95 / 11
+        h = 2.71 + (i + 1) * 0.15
+        for d in (-14.15, -13.46, -12.76):
+            top('northeast-side-tread', w, d, h)
+            soil = ray(ground, point(w, d, h + 0.2), -up, 10)
+            assert soil and soil[1].z < z + h - 0.004, ('soil through side stair', w, d)
+        assert ray(ts, point(w, -13.46, h + 0.08), up, 1.9) is None, (
+            'blocked side stair',
+            i,
+        )
+    for d in (-14.425, -12.495):
+        rail = ray(ts, point(-15.025, d, 5.11), -up, 0.9)
+        assert rail and rail[3] == 'dark', ('missing side-flight handrail', d, rail)
+    top('northeast-foot-walk', -17.45, -13.45, 2.71)
+    top('northeast-exit', -12.0, -11.0, 4.36 - 0.36 * 1.45 / 4.05)
+    assert ray(ts, point(-12.0, -8.6, 4.7), -n, 0.45) is None, (
+        'blocked side-to-terrace exit'
+    )
     clearances = []
     for patch in p['landscape']['groundPatches']:
         vs = patch['vertices']
@@ -368,6 +544,8 @@ def check(objects, ground, tol, roads):
         for i in range(0, len(indices), 3):
             tri = [vs[k] for k in indices[i : i + 3]]
             w, d, h = [sum(v[k] for v in tri) / 3 for k in (0, 1, 2)]
+            if in_northeast_stair(w, d):
+                continue
             hit = ray(ts, point(w, d, h + 0.15), -up, 0.3)
             g = ray(ground, point(w, d, h + 1), -up, 10)
             assert hit and g, ('missing external paving', patch['id'], w, d)
@@ -394,7 +572,8 @@ def check(objects, ground, tol, roads):
     edges += [(w, -0.3, 0, 1) for w in (-21, -19, -17, 17, 19, 23, 26, 29)]
     edge_steps = []
     for w, d, dw, dd in edges:
-        paving = ray(ts, point(w - dw * 0.08, d - dd * 0.08, 12), -up, 15)
+        # Start below the projecting information screen when reading ground finishes.
+        paving = ray(ts, point(w - dw * 0.08, d - dd * 0.08, 6), -up, 12)
         lawn = ray(ground, point(w + dw * 0.08, d + dd * 0.08, 12), -up, 15)
         assert paving and lawn, ('missing outer edge', w, d)
         step = paving[1].z - lawn[1].z
@@ -427,7 +606,11 @@ def check(objects, ground, tol, roads):
                 if min(a[1], b[1]) <= d <= max(a[1], b[1]) and abs(b[1] - a[1]) > 1e-7:
                     edges.append(a[0] + (b[0] - a[0]) * (d - a[1]) / (b[1] - a[1]))
             w = min(edges) if side < 0 else max(edges)
-            paving = ray(ts, point(w - side * 0.08, d, 12), -up, 15)
+            if side < 0 and -20 < d < -4:
+                # The new continuous inlay spans the old gap. The boundary
+                # between road-owned and building-owned faces moved 9 cm.
+                w -= 0.09
+            paving = ray(ts, point(w - side * 0.08, d, 6), -up, 15)
             road = ray(roads, point(w + side * 0.08, d, 12), -up, 15)
             assert paving and road, ('missing parking/road contact', patch['id'], d)
             step = paving[1].z - road[1].z
@@ -441,8 +624,28 @@ def check(objects, ground, tol, roads):
     # The lane also wraps behind both parking areas. These checks must not
     # silently skip asphalt when checking the rear edge against nearby soil.
     rear_joins = []
-    for w in (-21.5, -21, -20, -19, -18, -17, 17, 18, 19, 20, 21, 23, 25, 27, 28, 29):
-        paving = ray(ts, point(w, -0.38, 12), -up, 15)
+    # At w=21 the two differently quantized paving materials meet.
+    # Check both adjacent surfaces against the road, 2 cm from the joint.
+    for w in (
+        -21.5,
+        -21,
+        -20,
+        -19,
+        -18,
+        -17,
+        17,
+        18,
+        19,
+        20,
+        20.98,
+        21.02,
+        23,
+        25,
+        27,
+        28,
+        29,
+    ):
+        paving = ray(ts, point(w, -0.38, 6), -up, 15)
         road = ray(roads, point(w, -0.22, 12), -up, 15)
         assert paving and road, ('missing rear parking/road join', w)
         step = paving[1].z - road[1].z
@@ -469,6 +672,8 @@ def check(objects, ground, tol, roads):
     # its coping, without exposing a floating wall foot or filling the court.
     for side in (-1, 1):
         for d in (-6, -4, -2, -0.6):
+            if side < 0:  # Replaced at W=-16 by the open north approach, tested below.
+                continue
             paving = ray(ts, point(side * 16.25, d, 12), -up, 15)
             assert paving, ('missing wall-side parking', side, d)
             h = paving[1].z - z + 0.15
@@ -482,7 +687,7 @@ def check(objects, ground, tol, roads):
     # Sample below the projecting wall coping: the narrow margin must sit on
     # the parking grade, not on a new raised foundation or kerb.
     wall_slopes = []
-    for side in (-1, 1):
+    for side in (1,):
         for d in (-6, -4, -2):
             a = ray(ts, point(side * 16.3, d, 3.8), -up, 3)
             b = ray(ts, point(side * 16.8, d, 3.8), -up, 3)
@@ -517,6 +722,8 @@ def check(objects, ground, tol, roads):
             (16.22, -8.25, 'path'),
             (16.22, -7.95, 'stone'),
         ):
+            if side < 0 and d <= -8.4:
+                continue
             end = ray(ts, point(side * w, d, 3.8), -up, 3)
             assert end and end[3] == material, (
                 'wall-foot inlay has a blunt start',
@@ -558,6 +765,8 @@ def check(objects, ground, tol, roads):
                 ):
                     w = w0 + i * 0.6 + dw
                     d = -19 + j * 0.65 + dd
+                    if in_northeast_stair(w, d):
+                        continue
                     grass = ray(ts, point(w, d, 6), -up, 6)
                     assert grass and grass[3] == 'green', (
                         'missing or buried grass-cell edge',
@@ -585,6 +794,9 @@ def check(objects, ground, tol, roads):
     transition_bends = []
     for w in (-20, -18, -16.3, 16.3, 18, 20, 20.9, 21.1, 23, 25, 27, 29):
         stations = (-10, -8, -6, -4, -2, -0.9, -0.34)
+        stations = tuple(d for d in stations if not in_northeast_stair(w, d))
+        if len(stations) < 3:
+            continue
         heights = []
         for d in stations:
             hit = ray(ts, point(w, d, 3.8), -up, 3)
@@ -598,7 +810,9 @@ def check(objects, ground, tol, roads):
             for a, b, da, db in zip(heights, heights[1:], stations, stations[1:])
         ]
         bend = max(abs(b - a) for a, b in zip(slopes, slopes[1:]))
-        inner_bend = max(abs(b - a) for a, b in zip(slopes[2:], slopes[3:]))
+        inner_bend = max(
+            (abs(b - a) for a, b in zip(slopes[2:], slopes[3:])), default=0
+        )
         assert inner_bend < 0.055, (
             'concentrated parking grade change before rear edge',
             w,
@@ -644,6 +858,7 @@ def check(objects, ground, tol, roads):
         canopyGaps=True,
         rearDoor=True,
         passageClear=True,
+        northeastSite=check_northeast_site(ts, roads, ground, tol),
         parkingRoadMaxStep=max(abs(v) for v in joins),
         outerEdgeMaxStep=max(edge_steps),
         rearParkingRoadMaxStep=max(abs(v) for v in rear_joins),
@@ -680,10 +895,18 @@ report['source'] = check(
 bpy.ops.wm.read_factory_settings(use_empty=True)
 bpy.ops.import_scene.gltf(filepath=str(P / 'public/models/base.glb'))
 bpy.context.view_layer.update()
+
+
+def exported_road(o):
+    name = root_name(o)
+    return name == 'roads' or name.startswith('paving-') and name.endswith('-export')
+
+
+road_objects = [o for o in bpy.context.scene.objects if exported_road(o)]
 ground = trees(
-    [o for o in bpy.context.scene.objects if root_name(o) in ('terrain', 'roads')]
+    road_objects + [o for o in bpy.context.scene.objects if root_name(o) == 'terrain']
 )
-roads = trees([o for o in bpy.context.scene.objects if root_name(o) == 'roads'])
+roads = trees(road_objects)
 report['base'] = check(
     [o for o in bpy.context.scene.objects if root_name(o) == b['chunk']],
     ground,

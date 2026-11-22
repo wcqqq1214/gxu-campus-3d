@@ -32,6 +32,25 @@ class StairTowerTests(unittest.TestCase):
         self.assertGreater(bridge.boundary.intersection(wall.buffer(1e-6)).length, 2.39)
         self.assertEqual(s['hostCenter'], h['center'])
 
+    def test_open_canopy_keeps_its_column_bearings_and_ground_platform(self):
+        bs, b, _ = self.fixture()
+        config = load_catalogue()[b['id']]['stairTower']
+        b['form']['stairTower']['config'] = copy.deepcopy(config)
+        resolve_stair_tower_context(bs)
+        stair = b['form']['stairTower']
+        exterior, opening = stair['roof']['polygons'][0]
+        self.assertTrue(
+            Polygon(exterior).equals(Polygon(stair['ground']['polygons'][0][0]))
+        )
+        self.assertAlmostEqual(
+            Polygon(opening).area / Polygon(exterior).area,
+            config['canopyOpeningRatio'] ** 2,
+        )
+        self.assertEqual(len(stair['ground']['polygons'][0]), 1)
+        stair['config']['canopyOpeningRatio'] = 0.82
+        with self.assertRaisesRegex(ValueError, 'support'):
+            resolve_stair_tower_context(bs)
+
     def test_stale_host_shape_height_or_derived_geometry_is_rejected(self):
         for change in ['height', 'footprint', 'door', 'geometry']:
             bs, b, h = self.fixture()

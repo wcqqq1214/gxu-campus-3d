@@ -428,17 +428,19 @@
             "osm",
             "gxuDonationProjects",
             "gxuForestryEntranceBanner",
-            "gxuForestrySouthGate2026"
+            "gxuForestrySouthGate2026",
+            "forestryPortico26"
           ],
-          "note": "学院石资料与横幅交叉定位南门；项目册第39页长立面右端低门廊与OSM南侧长边第5边对应。t=0.16使入口靠东端，9米门廊宽、3.2米外挑、4.2米门宽、相对楼栋基准0.60米平台、0.24米台阶起算标高（按最终模型地面衔接，非测量高差）、3级台阶及柱位均为照片约束估算。四根方柱和两排镂空栏板按可见形制简化；不改变OSM主体和内院，不将边锚点视为测量坐标。"
+          "note": "保留南面第5边。以26°街景相机(147.07,-130.32)及14米左右门廊突出端对照，外排左右柱约在960像素图的345与735处；在距墙3.2米、按72°竖直视场的平面反投影，柱轴落在边参数0.50至0.26间，中点取0.38。宽14米及栏板高度均为图像估算。入口平台及柱距非测绘。固定机位复核，首排柱脚与实景基本重合，挑盖原先明显偏低；把盖板以下的镂空带调高至2.30米。"
         },
         "facadeRules": {
           "status": "estimated",
           "sourceRefs": [
             "gxuDonationProjects",
-            "osm"
+            "osm",
+            "forestryPortico26"
           ],
-          "note": "项目册PDF第39页林学院具名原图显示南侧长立面中段的宽窗组、较窄间隔窗及水平挑檐，背后保留实体墙，不按开放走廊处理。采用第5边t=0.28–0.84、二至六层的4宽3窄窗组作照片约束简化；窗口边界、宽窄组数、4分格、窗高比0.55及0.38米外挑/0.18米厚度均为估算，非精确窗数或现场尺寸。底层、东西端、其他立面及近入口竖向突出体尚无充分资料确认。"
+          "note": "项目册PDF第39页林学院具名原图显示南侧长立面中段的宽窗组、较窄间隔窗及水平挑檐，背后保留实体墙，不按开放走廊处理。采用第5边t=0.28–0.84、二至六层的4宽3窄窗组作照片约束简化；窗口边界、宽窄组数、4分格、窗高比0.55及0.38米外挑/0.18米厚度均为估算，非精确窗数或现场尺寸。底层、东西端、其他立面及近入口竖向突出体尚无充分资料确认。一层南侧以26°实景长栅窗为依据，去掉同一层通用短窗，免与实景开间重叠。"
         }
       },
       "review": {
@@ -470,17 +472,17 @@
           "polygon": 0,
           "ring": 0,
           "edge": 5,
-          "t": 0.16,
+          "t": 0.38,
           "width": 4.2,
           "primary": true,
           "attachedPortico": {
-            "width": 9,
+            "width": 14,
             "depth": 3.2,
             "platformHeight": 0.6,
             "clearHeight": 3.5,
             "slabThickness": 0.2,
-            "parapetHeight": 1,
-            "columnWidth": 0.55,
+            "parapetHeight": 2.3,
+            "columnWidth": 0.69,
             "columnInset": 0.45,
             "steps": 3,
             "tread": 0.3,
@@ -578,27 +580,33 @@
             "osm",
             "gxuAgricultureBanner",
             "gxuAgricultureEvent2026",
-            "gxuDonationProjects"
+            "gxuDonationProjects",
+            "gxuAgricultureAnniversaryContext",
+            "agriWestGableStreet"
           ],
-          "note": "官网具名正面横幅及2026年活动照片显示中央低门廊，非五层凸楼。对应OSM外环8–11号顶点构成的17.8×4.74米凸部，采用4米顶高、3.4米板底、0.45米地板和四根0.85米方柱，均为照片约束估算。其余主体沿用5层/16.5米，后翼四层露台范围尚无充分资料确认。 模型接地修补：封闭主体墙脚向采用楼底下延伸1.1米，封闭西翼粗地形下的缝隙；不改变楼底和主体高度，不代表实测基础深度。"
+          "note": "官网具名正面横幅及2026年活动照片显示中央低门廊，非五层凸楼。对应OSM外环8–11号顶点构成的17.8×4.74米凸部，采用4米顶高、3.4米板底、0.45米地板和四根0.85米方柱，均为照片约束估算。其余主体沿用5层/16.5米，后翼四层露台范围尚无充分资料确认。 模型接地修补：封闭主体墙脚向采用楼底下延伸1.1米，封闭西翼粗地形下的缝隙；不改变楼底和主体高度，不代表实测基础深度。院庆片04:15及其连续镜头中，西侧垂直翼屋面比主楼矮，南端露台再低。采用原轮廓内的西四层与南端三层分区，13.2、9.9米和8米露台进深是估值；可确认的是两次退台。沿用基础下延深度。东翼与中央后翼层数未因该镜头改动。 西翼北山墙的四排外挑板和金属栏杆可见，最高板是屋面平台或上层外廊尚未证实。"
         },
         "entrances": {
           "status": "estimated",
           "sourceRefs": [
             "osm",
             "gxuAgricultureBanner",
-            "gxuAgricultureEvent2026"
+            "gxuAgricultureEvent2026",
+            "agriEastWingStreet",
+            "agriWestGableStreet"
           ],
-          "note": "正门与南侧中央凸出门廊对应，将最长边示意入口改到外环第9边轴线，门面退至门廊后墙；6.8米门宽、三阶共0.45米及柱距为照片比例估算。定位由OSM轮廓匹配推定，非测绘坐标。"
+          "note": "正门与南侧中央凸出门廊对应，将最长边示意入口改到外环第9边轴线，门面退至门廊后墙；6.8米门宽、三阶共0.45米及柱距为照片比例估算。定位由OSM轮廓匹配推定，非测绘坐标。 东翼东墙侧门约在第4边 t=0.86，西翼北端入门约在第15边 t=0.53。相机射线与底图外墙交会估位，台阶、门宽和金属栏杆尺寸均估算。"
         },
         "facadeRules": {
           "status": "estimated",
           "sourceRefs": [
             "osm",
             "gxuAgricultureBanner",
-            "gxuAgricultureAdmission2026"
+            "gxuAgricultureAdmission2026",
+            "agriEastWingStreet",
+            "agriWestGableStreet"
           ],
-          "note": "官网具名正面横幅显示中央门廊两侧主墙各层窗上方连续水平挑檐，按原外环第7及11边配置各五道。顶部标高3.3/6.6/9.9/13.2/16.5米、挑出0.65米、厚0.16米均为照片比例约束估算，非实测。只处理这两段主体正面，不延伸到端部退台或门廊上方中央特殊檐口；原窗距仍为通用示意，东侧顶层小窗等差异待逐窗核对。 官网高清横幅与招生片25秒可交叉辨认东侧主墙顶层共15扇窗；从原第7边东端向中央数，第4、5、7、14、15扇较矮。替换该层9扇通用窗，其他四层保留示意。等距15列、宽1.65米、共同底标高14.15米、常规窗顶16.0米/小窗顶14.95米及窗框尺寸为照片约束估算；窗外防护栏、空调、顶部气窗及精确窗距尚未复刻，玻璃为表面近似。 招生片约25秒具名正面可辨东侧第四层（自下而上）连续15扇窗，与既有顶层列位对应；用15扇显式窗替换该排9扇通用窗。宽1.65米、等距排列、相对楼底10.8–12.7米、双列及0.72高度处上亮窗分隔、框宽0.06米/深0.10米均为照片约束估算。底部三层受树木遮挡，继续保留示意；不据本排推定其他层、背面、空调、防护栏或屋面分级。"
+          "note": "官网具名正面横幅显示中央门廊两侧主墙各层窗上方连续水平挑檐，按原外环第7及11边配置各五道。顶部标高3.3/6.6/9.9/13.2/16.5米、挑出0.65米、厚0.16米均为照片比例约束估算，非实测。只处理这两段主体正面，不延伸到端部退台或门廊上方中央特殊檐口；原窗距仍为通用示意，东侧顶层小窗等差异待逐窗核对。 官网高清横幅与招生片25秒可交叉辨认东侧主墙顶层共15扇窗；从原第7边东端向中央数，第4、5、7、14、15扇较矮。替换该层9扇通用窗，其他四层保留示意。等距15列、宽1.65米、共同底标高14.15米、常规窗顶16.0米/小窗顶14.95米及窗框尺寸为照片约束估算；窗外防护栏、空调、顶部气窗及精确窗距尚未复刻，玻璃为表面近似。 招生片约25秒具名正面可辨东侧第四层（自下而上）连续15扇窗，与既有顶层列位对应；用15扇显式窗替换该排9扇通用窗。宽1.65米、等距排列、相对楼底10.8–12.7米、双列及0.72高度处上亮窗分隔、框宽0.06米/深0.10米均为照片约束估算。底部三层受树木遮挡，继续保留示意；不据本排推定其他层、背面、空调、防护栏或屋面分级。 东侧道路269°可见每开间纵向壁柱、两低层密栅和上部窗檐；西翼北端215°可见四层外挑板与栏杆、两侧盲墙。窗轴、板宽和出挑量按照片估算。"
         },
         "roofEave": {
           "status": "estimated",
@@ -638,11 +646,11 @@
         },
         "facadeRules": {
           "status": "partial",
-          "note": "门廊四柱、三个开放柱间及后墙门面采用照片比例估算；主楼窗距仍为通用示意，不声称已逐窗核对。 官网具名正面横幅显示中央门廊两侧主墙各层窗上方连续水平挑檐，按原外环第7及11边配置各五道。顶部标高3.3/6.6/9.9/13.2/16.5米、挑出0.65米、厚0.16米均为照片比例约束估算，非实测。只处理这两段主体正面，不延伸到端部退台或门廊上方中央特殊檐口；原窗距仍为通用示意，东侧顶层小窗等差异待逐窗核对。 官网高清横幅与招生片25秒可交叉辨认东侧主墙顶层共15扇窗；从原第7边东端向中央数，第4、5、7、14、15扇较矮。替换该层9扇通用窗，其他四层保留示意。等距15列、宽1.65米、共同底标高14.15米、常规窗顶16.0米/小窗顶14.95米及窗框尺寸为照片约束估算；窗外防护栏、空调、顶部气窗及精确窗距尚未复刻，玻璃为表面近似。 招生片约25秒具名正面可辨东侧第四层（自下而上）连续15扇窗，与既有顶层列位对应；用15扇显式窗替换该排9扇通用窗。宽1.65米、等距排列、相对楼底10.8–12.7米、双列及0.72高度处上亮窗分隔、框宽0.06米/深0.10米均为照片约束估算。底部三层受树木遮挡，继续保留示意；不据本排推定其他层、背面、空调、防护栏或屋面分级。"
+          "note": "门廊四柱、三个开放柱间及后墙门面采用照片比例估算；主楼窗距仍为通用示意，不声称已逐窗核对。 官网具名正面横幅显示中央门廊两侧主墙各层窗上方连续水平挑檐，按原外环第7及11边配置各五道。顶部标高3.3/6.6/9.9/13.2/16.5米、挑出0.65米、厚0.16米均为照片比例约束估算，非实测。只处理这两段主体正面，不延伸到端部退台或门廊上方中央特殊檐口；原窗距仍为通用示意，东侧顶层小窗等差异待逐窗核对。 官网高清横幅与招生片25秒可交叉辨认东侧主墙顶层共15扇窗；从原第7边东端向中央数，第4、5、7、14、15扇较矮。替换该层9扇通用窗，其他四层保留示意。等距15列、宽1.65米、共同底标高14.15米、常规窗顶16.0米/小窗顶14.95米及窗框尺寸为照片约束估算；窗外防护栏、空调、顶部气窗及精确窗距尚未复刻，玻璃为表面近似。 招生片约25秒具名正面可辨东侧第四层（自下而上）连续15扇窗，与既有顶层列位对应；用15扇显式窗替换该排9扇通用窗。宽1.65米、等距排列、相对楼底10.8–12.7米、双列及0.72高度处上亮窗分隔、框宽0.06米/深0.10米均为照片约束估算。底部三层受树木遮挡，继续保留示意；不据本排推定其他层、背面、空调、防护栏或屋面分级。 东侧道路269°可见每开间纵向壁柱、两低层密栅和上部窗檐；西翼北端215°可见四层外挑板与栏杆、两侧盲墙。窗轴、板宽和出挑量按照片估算。"
         },
         "parts": {
           "status": "partial",
-          "note": "已将南侧门廊从五层挤出体分离，保留主体与后翼五层默认；四层东西露台的确切范围尚无充分资料确认，不按施工公告给整翼降层。",
+          "note": "官网具名正面横幅及2026年活动照片显示中央低门廊，非五层凸楼。对应OSM外环8–11号顶点构成的17.8×4.74米凸部，采用4米顶高、3.4米板底、0.45米地板和四根0.85米方柱，均为照片约束估算。其余主体沿用5层/16.5米，后翼四层露台范围尚无充分资料确认。 模型接地修补：封闭主体墙脚向采用楼底下延伸1.1米，封闭西翼粗地形下的缝隙；不改变楼底和主体高度，不代表实测基础深度。院庆片04:15及其连续镜头中，西侧垂直翼屋面比主楼矮，南端露台再低。采用原轮廓内的西四层与南端三层分区，13.2、9.9米和8米露台进深是估值；可确认的是两次退台。沿用基础下延深度。东翼与中央后翼层数未因该镜头改动。",
           "sourceRefs": [
             "gxuAgricultureRepair2024",
             "gxuAgricultureBanner",
@@ -700,22 +708,6 @@
                 [
                   263.8005980786463,
                   -351.2479959999474
-                ],
-                [
-                  264.2724949288685,
-                  -353.3519440000141
-                ],
-                [
-                  248.8435196421502,
-                  -356.8362599999969
-                ],
-                [
-                  236.4716152560285,
-                  -302.0222919997308
-                ],
-                [
-                  253.03929815980925,
-                  -298.2819399999198
                 ],
                 [
                   261.9437865574873,
@@ -816,6 +808,78 @@
               }
             ]
           }
+        },
+        {
+          "id": "west-four-storeys",
+          "polygons": [
+            [
+              [
+                [
+                  236.4716152560285,
+                  -302.0222919997308
+                ],
+                [
+                  253.03929815980925,
+                  -298.2819399999198
+                ],
+                [
+                  261.9437865574873,
+                  -337.7337479998184
+                ],
+                [
+                  263.00249409765075,
+                  -345.4392345795465
+                ],
+                [
+                  247.0821700179768,
+                  -349.032565522288
+                ],
+                [
+                  236.4716152560285,
+                  -302.0222919997308
+                ]
+              ]
+            ]
+          ],
+          "height": 13.2,
+          "levels": 4,
+          "baseDepth": 1.1
+        },
+        {
+          "id": "west-front-terrace",
+          "polygons": [
+            [
+              [
+                [
+                  264.2724949288685,
+                  -353.3519440000141
+                ],
+                [
+                  248.8435196421502,
+                  -356.8362599999969
+                ],
+                [
+                  247.0821700179768,
+                  -349.032565522288
+                ],
+                [
+                  263.00249409765075,
+                  -345.4392345795465
+                ],
+                [
+                  263.8005980786463,
+                  -351.2479959999474
+                ],
+                [
+                  264.2724949288685,
+                  -353.3519440000141
+                ]
+              ]
+            ]
+          ],
+          "height": 9.9,
+          "levels": 3,
+          "baseDepth": 1.1
         }
       ],
       "entrances": [
@@ -828,6 +892,46 @@
           "width": 6.8,
           "primary": true,
           "recess": 4.735669910963352
+        },
+        {
+          "id": "east-wing-door",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 4,
+          "t": 0.86,
+          "width": 2.4,
+          "primary": false,
+          "flushEntrance": {
+            "floorHeight": 0.39,
+            "glazingHeight": 3.4,
+            "splitHeight": 2.83,
+            "bays": 1,
+            "pierWidth": 0.26,
+            "pierDepth": 0.16,
+            "doorWidth": 1.68,
+            "doorHeight": 2.21,
+            "frameWidth": 0.06
+          }
+        },
+        {
+          "id": "west-north-door",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 15,
+          "t": 0.53,
+          "width": 2.3,
+          "primary": false,
+          "flushEntrance": {
+            "floorHeight": 0.39,
+            "glazingHeight": 3.4,
+            "splitHeight": 2.83,
+            "bays": 1,
+            "pierWidth": 0.26,
+            "pierDepth": 0.16,
+            "doorWidth": 1.68,
+            "doorHeight": 2.21,
+            "frameWidth": 0.06
+          }
         }
       ],
       "facadeRules": [
@@ -1279,6 +1383,20 @@
             "depth": 0.65,
             "thickness": 0.16
           }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 4,
+          "windows": false,
+          "balconies": false
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 15,
+          "windows": false,
+          "balconies": false
         }
       ],
       "roofEave": {
@@ -1637,6 +1755,21 @@
             "gxuDonationProjects"
           ],
           "note": "学院用途与OSM内院轮廓共同约束的院落教学实验楼形制；不推定内部房间用途。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "lifeExterior"
+          ],
+          "note": "官网图5东侧弧形低体约半高；沿原轮廓3至11点截分，三层及屋面高度估算。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "lifeExterior"
+          ],
+          "note": "低门廊位于南长边，按影像估计中心，车道和侧后入口未核。"
         }
       },
       "review": {
@@ -1653,15 +1786,156 @@
           "note": "已看具名照片；主体平屋面为照片约束估算，背部小屋面和设备不推定。"
         },
         "entrances": {
-          "status": "pending",
-          "note": "照片门厅未完成与地图外边的方向对应，继续使用标注为估算的入口。"
+          "status": "partial",
+          "note": "低门廊位于南长边，按影像估计中心，车道和侧后入口未核。"
         },
         "facadeRules": {
           "status": "partial",
           "note": "已核对照片可见窗层；未把不可见立面、精确窗列及小构件视作已核实。"
         }
       },
-      "archetype": "courtyard-lab"
+      "archetype": "courtyard-lab",
+      "parts": [
+        {
+          "id": "teaching",
+          "polygons": [
+            [
+              [
+                [
+                  109.37748305284656,
+                  -171.5441199999522
+                ],
+                [
+                  105.5817909935422,
+                  -172.80203600001926
+                ],
+                [
+                  111.44972574377677,
+                  -199.07355599973656
+                ],
+                [
+                  100.05239094074496,
+                  -216.48400399991587
+                ],
+                [
+                  36.807954342115366,
+                  -230.2542879998731
+                ],
+                [
+                  28.672862982874783,
+                  -188.0862719998717
+                ],
+                [
+                  23.72820467993145,
+                  -189.22173600008975
+                ],
+                [
+                  19.204150091411684,
+                  -167.7258440000216
+                ],
+                [
+                  107.17187820767361,
+                  -147.1650399998073
+                ],
+                [
+                  111.12144967437389,
+                  -168.38263199978712
+                ],
+                [
+                  109.37748305284656,
+                  -171.5441199999522
+                ]
+              ],
+              [
+                [
+                  42.26554400450296,
+                  -184.91365199997205
+                ],
+                [
+                  47.517961123695976,
+                  -207.38916000001893
+                ],
+                [
+                  78.8272912942017,
+                  -200.06430399984538
+                ],
+                [
+                  73.57487417500867,
+                  -177.59992799992858
+                ],
+                [
+                  42.26554400450296,
+                  -184.91365199997205
+                ]
+              ]
+            ]
+          ],
+          "levels": 6,
+          "height": 19.8
+        },
+        {
+          "id": "round-return",
+          "polygons": [
+            [
+              [
+                [
+                  111.44972574377677,
+                  -199.07355599973656
+                ],
+                [
+                  113.66558921698415,
+                  -201.6116519997354
+                ],
+                [
+                  114.92740036025484,
+                  -204.46144399981733
+                ],
+                [
+                  114.92740036025484,
+                  -207.31123599989928
+                ],
+                [
+                  113.66558921698415,
+                  -210.78441999975198
+                ],
+                [
+                  112.07550200285273,
+                  -213.3225159997508
+                ],
+                [
+                  109.8596385311032,
+                  -215.53778399993192
+                ],
+                [
+                  106.06394647179884,
+                  -216.48400399991587
+                ],
+                [
+                  100.05239094074496,
+                  -216.48400399991587
+                ],
+                [
+                  111.44972574377677,
+                  -199.07355599973656
+                ]
+              ]
+            ]
+          ],
+          "levels": 3,
+          "height": 9.9
+        }
+      ],
+      "entrances": [
+        {
+          "id": "photo-1",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 11,
+          "t": 0.5,
+          "width": 9.8,
+          "primary": true
+        }
+      ]
     },
     "way/759080588": {
       "name": "轻工与食品工程学院",
@@ -3258,6 +3532,14 @@
             "artsDoorRepair2024"
           ],
           "note": "学院具名正面照片与西侧独立雨棚轮廓对应，采用主楼西立面雨棚下三组玻璃门。维修照片支持深色门框、上亮窗及石材边框；门组宽9.9米、边框0.6米、门高2.55米与上亮窗0.45米均为估算，沿用独立雨棚平台，不重复生成雨棚或台阶。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "artsEnvironment2024",
+            "gxuArtsStreet49"
+          ],
+          "note": "学院Environment首图及49°街景对应西院雨棚、九跨顶层窗和中英文深色字牌，门与外廊按独立雨棚轮廓连接。"
         }
       },
       "review": {
@@ -3279,7 +3561,7 @@
         },
         "facadeRules": {
           "status": "partial",
-          "note": "可见窗列与材质待校准，现有立面为示意。"
+          "note": "学院Environment首图及49°街景对应西院雨棚、九跨顶层窗和中英文深色字牌，门与外廊按独立雨棚轮廓连接。"
         },
         "parts": {
           "status": "partial",
@@ -3303,6 +3585,134 @@
             "pierWidth": 0.6,
             "doorHeight": 2.55,
             "transomHeight": 0.45
+          }
+        }
+      ],
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 10,
+          "balconies": false,
+          "wallFinish": "pink",
+          "windowBands": {
+            "from": 0,
+            "to": 1,
+            "firstLevel": 1,
+            "heightRatio": 0.54,
+            "depth": 0.19,
+            "thickness": 0.11,
+            "windows": [
+              {
+                "from": 0.017777777777777778,
+                "to": 0.08444444444444445,
+                "panes": 2
+              },
+              {
+                "from": 0.1288888888888889,
+                "to": 0.19555555555555557,
+                "panes": 2
+              },
+              {
+                "from": 0.24000000000000002,
+                "to": 0.30666666666666664,
+                "panes": 2
+              },
+              {
+                "from": 0.35111111111111115,
+                "to": 0.41777777777777775,
+                "panes": 2
+              },
+              {
+                "from": 0.46222222222222226,
+                "to": 0.5288888888888889,
+                "panes": 2
+              },
+              {
+                "from": 0.5733333333333334,
+                "to": 0.64,
+                "panes": 2
+              },
+              {
+                "from": 0.6844444444444444,
+                "to": 0.7511111111111111,
+                "panes": 2
+              },
+              {
+                "from": 0.7955555555555556,
+                "to": 0.8622222222222222,
+                "panes": 2
+              },
+              {
+                "from": 0.9066666666666667,
+                "to": 0.9733333333333333,
+                "panes": 2
+              }
+            ]
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 11,
+          "balconies": false,
+          "wallFinish": "pink",
+          "windowBands": {
+            "from": 0,
+            "to": 1,
+            "firstLevel": 1,
+            "heightRatio": 0.54,
+            "depth": 0.19,
+            "thickness": 0.11,
+            "windows": [
+              {
+                "from": 0.045,
+                "to": 0.235,
+                "panes": 2
+              },
+              {
+                "from": 0.365,
+                "to": 0.5549999999999999,
+                "panes": 2
+              },
+              {
+                "from": 0.685,
+                "to": 0.875,
+                "panes": 2
+              }
+            ]
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 12,
+          "balconies": false,
+          "wallFinish": "pink",
+          "windowBands": {
+            "from": 0,
+            "to": 1,
+            "firstLevel": 1,
+            "heightRatio": 0.54,
+            "depth": 0.19,
+            "thickness": 0.11,
+            "windows": [
+              {
+                "from": 0.06,
+                "to": 0.22,
+                "panes": 1
+              },
+              {
+                "from": 0.39,
+                "to": 0.56,
+                "panes": 2
+              },
+              {
+                "from": 0.74,
+                "to": 0.91,
+                "panes": 2
+              }
+            ]
           }
         }
       ]
@@ -3645,6 +4055,7 @@
         "parapetHeight": 0.9,
         "parapetThickness": 0.16,
         "roofThickness": 0.25,
+        "canopyOpeningRatio": 0.54,
         "bridgeWidth": 2.4,
         "doorWidth": 1.6,
         "doorHeight": 2.3,
@@ -3654,7 +4065,7 @@
               -3,
               -2.8
             ],
-            "width": 0.4,
+            "width": 0.55,
             "top": "roof"
           },
           {
@@ -3662,7 +4073,7 @@
               -3,
               2.8
             ],
-            "width": 0.4,
+            "width": 0.55,
             "top": "roof"
           },
           {
@@ -3670,7 +4081,7 @@
               3,
               -2.8
             ],
-            "width": 0.4,
+            "width": 0.55,
             "top": "roof"
           },
           {
@@ -3678,7 +4089,7 @@
               3,
               2.8
             ],
-            "width": 0.4,
+            "width": 0.55,
             "top": "roof"
           },
           {
@@ -3749,7 +4160,7 @@
             "artsCourtyardEvent2024",
             "artsLakeArchive"
           ],
-          "note": "根据湖景中可见重复斜向段和弧形平台，采用每层两跑的开放折返表达；各跑10级、梯宽2米、梯井0.8米、栏板0.9米和柱位均为估算。北向2.4米宽连接平台及1.6米宽上层门按附楼南墙投影定位，原OSM轮廓不改；楼梯与附楼共用附楼地形基准，避免两中心取高造成悬差。"
+          "note": "学院中庭合影可见方柱、浅色小方砖和单道粉色砖带。柱宽按照片比例估为0.55米。根据湖景中可见重复斜向段和弧形平台，采用每层两跑的开放折返表达；各跑10级、梯宽2米、梯井0.8米、栏板0.9米和柱位均为估算。北向2.4米宽连接平台及1.6米宽上层门按附楼南墙投影定位，原OSM轮廓不改；楼梯与附楼共用附楼地形基准，避免两中心取高造成悬差。"
         },
         "entrances": {
           "status": "estimated",
@@ -3768,7 +4179,7 @@
             "artsEnvironment2024",
             "artsLakeArchive"
           ],
-          "note": "照片显示低于附楼屋顶的薄平圆棚，沿用原圆形OSM轮廓，不附加常规0.8米女儿墙。"
+          "note": "档案馆《碧云湖全景》和学院临湖照片可辨薄棚后缘与透空，保留地图外轮廓，内孔直径取外径的54%作近似。内缘形状和是否有横梁仍待俯拍。"
         }
       },
       "review": {
@@ -7654,7 +8065,16 @@
           "sourceRefs": [
             "osm"
           ],
-          "note": "Model ground repair: extend only the closed walls below the adopted datum from 0.5 to 2 metres. Keep nine storeys, both courts, fifth-floor corridors, dome, body height and floor datum. The depth closes observed model gaps; it is not surveyed foundation depth."
+          "note": "沿用原底图外轮廓及2米墙基。平屋面随东正面与设计方航拍的上部四层高度估值调整，院内活动面、台阶和第五层开放带沿用既有接点。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "hualanInnovationArticle2021",
+            "hualanInnovationCenter",
+            "osm"
+          ],
+          "note": "以东面约98.36米底图长度校正华蓝竣工照，上部白檐至下缘的投影比约0.21。官网航拍四角拟合在临街面南北两端推得约20.3–20.7米。模型采用20.38米（连檐），沿用五层开放带标高，主体平屋面估高36.1米。尚缺竣工标高表。"
         }
       },
       "review": {
@@ -7663,8 +8083,8 @@
           "note": "设计团队2021年项目详解分层图标注1–2F、3–5F、6–9F，实景上部四排窗、中部开放层与下部楼层支持九层的解释。与既有OSM九层一致；依据为设计方图文，不是竣工测绘；电梯12停层不作为地上层数。"
         },
         "height": {
-          "status": "pending",
-          "note": "主体29.7米仍为资料支持九层×3.3米估算层高，未取得测量或设计总高；本批不调高主体，不能称为尺寸校准完成。"
+          "status": "partial",
+          "note": "以东面约98.36米底图长度校正华蓝竣工照，上部白檐至下缘的投影比约0.21。官网航拍四角拟合在临街面南北两端推得约20.3–20.7米。模型采用20.38米（连檐），沿用五层开放带标高，主体平屋面估高36.1米。尚缺竣工标高表。"
         },
         "roof": {
           "status": "partial",
@@ -7680,7 +8100,7 @@
         },
         "parts": {
           "status": "partial",
-          "note": "Model ground repair: extend only the closed walls below the adopted datum from 0.5 to 2 metres. Keep nine storeys, both courts, fifth-floor corridors, dome, body height and floor datum. The depth closes observed model gaps; it is not surveyed foundation depth."
+          "note": "沿用原底图外轮廓及2米墙基。平屋面随东正面与设计方航拍的上部四层高度估值调整，院内活动面、台阶和第五层开放带沿用既有接点。"
         }
       },
       "levels": 9,
@@ -7903,11 +8323,12 @@
               ]
             ]
           ],
-          "height": 29.7,
+          "height": 36.1,
           "levels": 9.0,
           "baseDepth": 2
         }
-      ]
+      ],
+      "height": 36.1
     },
     "relation/12875606": {
       "name": "土木建筑工程学院",
@@ -11743,6 +12164,22 @@
             "gxuCivilDemolitionScope2022"
           ],
           "note": "两来源可见低平屋面与直线女儿墙，使用现有平屋顶；不复制原招待所瓶形栏杆。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuIntleastStreet171",
+            "gxuDonationProjects"
+          ],
+          "note": "北面中段门口可见，宽度和门扇形式按街景估算。西栋前方科技馆标牌不足以确定整栋用途。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuIntleastStreet171",
+            "gxuDonationProjects"
+          ],
+          "note": "北面竖向深窗带和浅墙垛按街景分配；树木遮挡开间采用近似数，南面沿用概化窗。"
         }
       },
       "review": {
@@ -11759,14 +12196,280 @@
           "note": "只确认可见平顶轮廓；设备、屋面细节待核实。"
         },
         "entrances": {
-          "status": "pending",
-          "note": "保留示意入口，位置和尺寸待核实。"
+          "status": "partial",
+          "note": "北面中段门口可见，宽度和门扇形式按街景估算。西栋前方科技馆标牌不足以确定整栋用途。"
         },
         "facadeRules": {
           "status": "partial",
-          "note": "仅将通用窗列随层数降为三层；竖向窗墙、柱距和未见面暂不作精确复原。"
+          "note": "北面竖向深窗带和浅墙垛按街景分配；树木遮挡开间采用近似数，南面沿用概化窗。"
         }
-      }
+      },
+      "entrances": [
+        {
+          "id": "north-door",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 3,
+          "t": 0.5,
+          "width": 2.12,
+          "primary": true,
+          "flushEntrance": {
+            "floorHeight": 0.05,
+            "glazingHeight": 3.25,
+            "splitHeight": 2.65,
+            "bays": 1,
+            "pierWidth": 0.26,
+            "pierDepth": 0.17,
+            "doorWidth": 1.55,
+            "doorHeight": 2.18,
+            "frameWidth": 0.06
+          }
+        }
+      ],
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 19,
+          "balconies": false,
+          "windows": false,
+          "wallFinish": "white",
+          "panels": [
+            {
+              "id": "vertical-0",
+              "type": "glazing",
+              "from": 0.07666666666666665,
+              "to": 0.25666666666666665,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-1",
+              "type": "glazing",
+              "from": 0.41,
+              "to": 0.59,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-2",
+              "type": "glazing",
+              "from": 0.7433333333333334,
+              "to": 0.9233333333333333,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "balconies": false,
+          "windows": false,
+          "wallFinish": "white",
+          "panels": [
+            {
+              "id": "vertical-0",
+              "type": "glazing",
+              "from": 0.11499999999999999,
+              "to": 0.385,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-1",
+              "type": "glazing",
+              "from": 0.615,
+              "to": 0.885,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 3,
+          "balconies": false,
+          "windows": false,
+          "wallFinish": "white",
+          "panels": [
+            {
+              "id": "vertical-0",
+              "type": "glazing",
+              "from": 0.22999999999999998,
+              "to": 0.77,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 5,
+          "balconies": false,
+          "windows": false,
+          "wallFinish": "white",
+          "panels": [
+            {
+              "id": "vertical-0",
+              "type": "glazing",
+              "from": 0.11499999999999999,
+              "to": 0.385,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-1",
+              "type": "glazing",
+              "from": 0.615,
+              "to": 0.885,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 7,
+          "balconies": false,
+          "windows": false,
+          "wallFinish": "white",
+          "panels": [
+            {
+              "id": "vertical-0",
+              "type": "glazing",
+              "from": 0.07666666666666665,
+              "to": 0.25666666666666665,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-1",
+              "type": "glazing",
+              "from": 0.41,
+              "to": 0.59,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-2",
+              "type": "glazing",
+              "from": 0.7433333333333334,
+              "to": 0.9233333333333333,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 8,
+          "balconies": false,
+          "windows": false,
+          "wallFinish": "white",
+          "panels": [
+            {
+              "id": "vertical-0",
+              "type": "glazing",
+              "from": 0.07666666666666665,
+              "to": 0.25666666666666665,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-1",
+              "type": "glazing",
+              "from": 0.41,
+              "to": 0.59,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-2",
+              "type": "glazing",
+              "from": 0.7433333333333334,
+              "to": 0.9233333333333333,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        }
+      ]
     },
     "way/842784665": {
       "name": "国际学院",
@@ -11800,6 +12503,29 @@
             "gxuCivilDemolitionScope2022"
           ],
           "note": "两来源可见低平屋面与直线女儿墙，使用现有平屋顶；不复制原招待所瓶形栏杆。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuIntlwestStreet160",
+            "gxuDonationProjects"
+          ],
+          "note": "北面中段门口可见，宽度和门扇形式按街景估算。西栋前方科技馆标牌不足以确定整栋用途。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuIntlwestStreet160",
+            "gxuDonationProjects"
+          ],
+          "note": "北面竖向深窗带和浅墙垛按街景分配；树木遮挡开间采用近似数，南面沿用概化窗。"
+        },
+        "roofVolumes": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuIntlwestStreet160"
+          ],
+          "note": "北面中央高窗顶部凸出屋面；深度和退距估算。"
         }
       },
       "review": {
@@ -11816,14 +12542,232 @@
           "note": "只确认可见平顶轮廓；设备、屋面细节待核实。"
         },
         "entrances": {
-          "status": "pending",
-          "note": "保留示意入口，位置和尺寸待核实。"
+          "status": "partial",
+          "note": "北面中段门口可见，宽度和门扇形式按街景估算。西栋前方科技馆标牌不足以确定整栋用途。"
         },
         "facadeRules": {
           "status": "partial",
-          "note": "仅将通用窗列随层数降为三层；竖向窗墙、柱距和未见面暂不作精确复原。"
+          "note": "北面竖向深窗带和浅墙垛按街景分配；树木遮挡开间采用近似数，南面沿用概化窗。"
+        },
+        "roofVolumes": {
+          "status": "partial",
+          "note": "北面中央高窗顶部凸出屋面；深度和退距估算。"
         }
-      }
+      },
+      "entrances": [
+        {
+          "id": "north-door",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "t": 0.5,
+          "width": 2.12,
+          "primary": true,
+          "flushEntrance": {
+            "floorHeight": 0.05,
+            "glazingHeight": 3.25,
+            "splitHeight": 2.65,
+            "bays": 1,
+            "pierWidth": 0.26,
+            "pierDepth": 0.17,
+            "doorWidth": 1.55,
+            "doorHeight": 2.18,
+            "frameWidth": 0.06
+          }
+        }
+      ],
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 11,
+          "balconies": false,
+          "windows": false,
+          "wallFinish": "white",
+          "panels": [
+            {
+              "id": "vertical-0",
+              "type": "glazing",
+              "from": 0.07666666666666665,
+              "to": 0.25666666666666665,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-1",
+              "type": "glazing",
+              "from": 0.41,
+              "to": 0.59,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-2",
+              "type": "glazing",
+              "from": 0.7433333333333334,
+              "to": 0.9233333333333333,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "balconies": false,
+          "windows": false,
+          "wallFinish": "white",
+          "panels": [
+            {
+              "id": "vertical-0",
+              "type": "glazing",
+              "from": 0.046,
+              "to": 0.15400000000000003,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-1",
+              "type": "glazing",
+              "from": 0.246,
+              "to": 0.354,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-2",
+              "type": "glazing",
+              "from": 0.446,
+              "to": 0.554,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-3",
+              "type": "glazing",
+              "from": 0.6459999999999999,
+              "to": 0.754,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-4",
+              "type": "glazing",
+              "from": 0.846,
+              "to": 0.9540000000000001,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 3,
+          "balconies": false,
+          "windows": false,
+          "wallFinish": "white",
+          "panels": [
+            {
+              "id": "vertical-0",
+              "type": "glazing",
+              "from": 0.07666666666666665,
+              "to": 0.25666666666666665,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-1",
+              "type": "glazing",
+              "from": 0.41,
+              "to": 0.59,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            },
+            {
+              "id": "vertical-2",
+              "type": "glazing",
+              "from": 0.7433333333333334,
+              "to": 0.9233333333333333,
+              "bottom": 3.72,
+              "top": 9.45,
+              "columns": 2,
+              "rows": 2,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        }
+      ],
+      "roofVolumes": [
+        {
+          "id": "north-central-head",
+          "part": "body",
+          "polygon": 0,
+          "edge": 1,
+          "from": 0.405,
+          "to": 0.61,
+          "inset": 0.85,
+          "depth": 2,
+          "rise": 1.2,
+          "cap": {
+            "height": 0.18,
+            "overhang": 0.18
+          }
+        }
+      ]
     },
     "way/759158606": {
       "name": "西校园学生宿舍楼4栋",
@@ -12382,6 +13326,3906 @@
           "note": "楼栋、B区和首层供餐已核实。具体外门朝向和门槛未经近照确认，暂沿南侧道路示意。"
         }
       }
+    },
+    "way/759096577": {
+      "name": "医学院",
+      "footprintRevision": "98a22ee5fb33643c90e55bfb631af683a2bf1bf0859531a34abea5326aebc67e",
+      "levels": 3,
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "medicineStreetNorth",
+            "orientation2026"
+          ],
+          "note": "北侧街景可辨三层；地图与街景对应依相机点位推断，层高按3.3米估算，其他翼楼及现状待核。"
+        }
+      }
+    },
+    "way/948683813": {
+      "name": "校内建筑 948683813",
+      "footprintRevision": "a543f1137c8310857a886473f2d21059748594eb1c8f2e14a194de0b8b33351a",
+      "levels": 2,
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "sportsEastStreet"
+          ],
+          "note": "东面中央三跨上下窗同轴，以窄实墙横带分隔。两层为外观估算，场内楼板标高待核。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "sportsWingWindow267",
+            "sportsWingDoor308",
+            "sportsWingNorth209"
+          ],
+          "note": "东面自南起第1、5跨门与上窗对轴，第6跨仍为窗。雨棚下门扇后退，两门主次、净宽与退深为估算。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "sportsEastStreet",
+            "sportsWingNorth209"
+          ],
+          "note": "267°实景的上檐到地面投影大于6.6米原估算。候选东面檐高8.6米；209°北端可辨山尖和圆章，脊顶另升1.6米。均未测量。"
+        }
+      },
+      "entrances": [
+        {
+          "id": "photo-1",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "t": 0.9166666666666666,
+          "width": 2.59,
+          "primary": true
+        },
+        {
+          "id": "photo-2",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "t": 0.25,
+          "width": 2.59,
+          "primary": false
+        }
+      ],
+      "height": 8.6
+    },
+    "relation/20369638": {
+      "name": "农林动教学科研实验中心",
+      "footprintRevision": "1908d794989887a1c443aea485aa57ac721bf861856a55c4a081640a7d601683",
+      "levels": 8,
+      "evidence": {
+        "levels": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "agriLabSurvey2025"
+          ],
+          "note": "初设八层、局部一层；2025年施工简报分别记录三翼主体与报告厅。"
+        },
+        "floorHeights": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "agriLabApproval2023"
+          ],
+          "note": "各层之和42.3米。批复设计总高44.1米，模型将余下1.8米计入最高屋面围边以约束包络；具体构造与竣工标高待核。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "agriLabApproval2023",
+            "agriFormwork2024",
+            "agriConstruction2025"
+          ],
+          "note": "依俯拍在三翼转折处分割两处低连接，保留原三内院。七八层退台位置、桥净空与柱位据案例效果图估算，尚缺竣工屋面测绘。"
+        }
+      },
+      "floorHeights": [
+        7.2,
+        4.5,
+        4.5,
+        4.5,
+        4.5,
+        4.5,
+        5.4,
+        7.2
+      ],
+      "parts": [
+        {
+          "id": "west-animal-terrace",
+          "polygons": [
+            [
+              [
+                [
+                  125.38094146284224,
+                  549.3530680002309
+                ],
+                [
+                  123.06249171803758,
+                  542.9632999999112
+                ],
+                [
+                  121.88274959175314,
+                  536.2729680000339
+                ],
+                [
+                  121.87249096517655,
+                  529.4713160000423
+                ],
+                [
+                  123.03171583684995,
+                  522.7698520000349
+                ],
+                [
+                  119.87883175670572,
+                  508.9238344313082
+                ],
+                [
+                  119.10873994345314,
+                  510.20865500076513
+                ],
+                [
+                  117.11572220571388,
+                  514.4225369626582
+                ],
+                [
+                  115.54533405272008,
+                  518.8114778304131
+                ],
+                [
+                  114.41269918084654,
+                  523.3332097042339
+                ],
+                [
+                  113.72872548307066,
+                  527.9441858343458
+                ],
+                [
+                  113.5,
+                  532.6
+                ],
+                [
+                  113.72872548307065,
+                  537.2558141656541
+                ],
+                [
+                  114.41269918084654,
+                  541.8667902957661
+                ],
+                [
+                  115.54533405272008,
+                  546.388522169587
+                ],
+                [
+                  117.11572220571387,
+                  550.7774630373418
+                ],
+                [
+                  119.10873994345314,
+                  554.9913449992349
+                ],
+                [
+                  120.81629521034614,
+                  557.8402288500091
+                ],
+                [
+                  128.77654706087623,
+                  555.2418960002333
+                ],
+                [
+                  125.38094146284224,
+                  549.3530680002309
+                ]
+              ]
+            ]
+          ],
+          "levels": 6,
+          "height": 29.7,
+          "wallFinish": "white"
+        },
+        {
+          "id": "west-animal-upper",
+          "polygons": [
+            [
+              [
+                [
+                  70.11771681314163,
+                  505.32600800025637
+                ],
+                [
+                  69.89202701533604,
+                  566.6744600001605
+                ],
+                [
+                  102.83247890773738,
+                  566.7969120000095
+                ],
+                [
+                  109.6442073598742,
+                  561.4869480000483
+                ],
+                [
+                  120.81629521034614,
+                  557.8402288500091
+                ],
+                [
+                  119.10873994345314,
+                  554.9913449992349
+                ],
+                [
+                  117.11572220571387,
+                  550.7774630373418
+                ],
+                [
+                  115.54533405272008,
+                  546.388522169587
+                ],
+                [
+                  114.41269918084654,
+                  541.8667902957661
+                ],
+                [
+                  113.72872548307065,
+                  537.2558141656541
+                ],
+                [
+                  113.5,
+                  532.6
+                ],
+                [
+                  113.72872548307066,
+                  527.9441858343458
+                ],
+                [
+                  114.41269918084654,
+                  523.3332097042339
+                ],
+                [
+                  115.54533405272008,
+                  518.8114778304131
+                ],
+                [
+                  117.11572220571388,
+                  514.4225369626582
+                ],
+                [
+                  119.10873994345314,
+                  510.20865500076513
+                ],
+                [
+                  119.87883175670572,
+                  508.9238344313082
+                ],
+                [
+                  119.10266162476071,
+                  505.51525200009496
+                ],
+                [
+                  70.11771681314163,
+                  505.32600800025637
+                ]
+              ],
+              [
+                [
+                  91.55824763091388,
+                  519.441383999896
+                ],
+                [
+                  100.74997759023059,
+                  519.4747800002863
+                ],
+                [
+                  100.72946033561956,
+                  525.8979440002053
+                ],
+                [
+                  107.63351643131922,
+                  525.9202080000699
+                ],
+                [
+                  107.57196466748616,
+                  543.5421639999525
+                ],
+                [
+                  95.91816418546112,
+                  550.9449440002458
+                ],
+                [
+                  91.43514410470557,
+                  550.9338120001156
+                ],
+                [
+                  91.55824763091388,
+                  519.441383999896
+                ]
+              ],
+              [
+                [
+                  91.0,
+                  556.0
+                ],
+                [
+                  76.0,
+                  556.0
+                ],
+                [
+                  76.0,
+                  513.0
+                ],
+                [
+                  91.0,
+                  513.0
+                ],
+                [
+                  91.0,
+                  556.0
+                ]
+              ]
+            ]
+          ],
+          "levels": 7,
+          "height": 35.1,
+          "wallFinish": "white"
+        },
+        {
+          "id": "west-animal-top",
+          "polygons": [
+            [
+              [
+                [
+                  76.0,
+                  513.0
+                ],
+                [
+                  76.0,
+                  556.0
+                ],
+                [
+                  91.0,
+                  556.0
+                ],
+                [
+                  91.0,
+                  513.0
+                ],
+                [
+                  76.0,
+                  513.0
+                ]
+              ]
+            ]
+          ],
+          "levels": 8,
+          "height": 42.3,
+          "wallFinish": "white"
+        },
+        {
+          "id": "west-link",
+          "polygons": [
+            [
+              [
+                [
+                  137.8656907471378,
+                  564.5148520002342
+                ],
+                [
+                  133.13646361542345,
+                  560.4628039999448
+                ],
+                [
+                  128.77654706087623,
+                  555.2418960002333
+                ],
+                [
+                  109.6442073598742,
+                  561.4869480000483
+                ],
+                [
+                  114.48627939122025,
+                  568.8118040002219
+                ],
+                [
+                  120.3644727680314,
+                  575.3351560001252
+                ],
+                [
+                  137.8656907471378,
+                  564.5148520002342
+                ]
+              ]
+            ]
+          ],
+          "levels": 1,
+          "height": 7.2,
+          "wallFinish": "white",
+          "openBelow": {
+            "clearHeight": 6.65,
+            "floorHeight": 0.22,
+            "columns": [
+              {
+                "center": [
+                  121.44984855603616,
+                  562.5953512294253
+                ],
+                "width": 0.7,
+                "depth": 0.7,
+                "angle": 0
+              },
+              {
+                "center": [
+                  125.44984855603616,
+                  566.5953512294253
+                ],
+                "width": 0.7,
+                "depth": 0.7,
+                "angle": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "north-agriculture-terrace",
+          "polygons": [
+            [
+              [
+                [
+                  185.4144277520214,
+                  563.4461800000058
+                ],
+                [
+                  181.11606296130722,
+                  566.4295560000669
+                ],
+                [
+                  176.45864622000255,
+                  568.8118040002219
+                ],
+                [
+                  171.53450517021238,
+                  570.5595280000806
+                ],
+                [
+                  166.41545020526212,
+                  571.6393320000436
+                ],
+                [
+                  161.20406759529115,
+                  572.0178200001163
+                ],
+                [
+                  154.98733951958485,
+                  571.561407999924
+                ],
+                [
+                  148.93474948076675,
+                  570.1365120002786
+                ],
+                [
+                  143.16940100212946,
+                  567.7653960002535
+                ],
+                [
+                  137.8656907471378,
+                  564.5148520002342
+                ],
+                [
+                  130.55429596899396,
+                  569.0351953418907
+                ],
+                [
+                  130.86631900222682,
+                  569.31799653473
+                ],
+                [
+                  134.6104139315689,
+                  572.0948065843709
+                ],
+                [
+                  138.6086550007651,
+                  574.4912600565469
+                ],
+                [
+                  142.8225369626582,
+                  576.4842777942861
+                ],
+                [
+                  147.21147783041303,
+                  578.05466594728
+                ],
+                [
+                  151.7332097042339,
+                  579.1873008191535
+                ],
+                [
+                  156.34418583434586,
+                  579.8712745169294
+                ],
+                [
+                  161.0,
+                  580.1
+                ],
+                [
+                  165.6558141656541,
+                  579.8712745169294
+                ],
+                [
+                  170.2667902957661,
+                  579.1873008191535
+                ],
+                [
+                  174.78852216958694,
+                  578.05466594728
+                ],
+                [
+                  179.17746303734177,
+                  576.4842777942862
+                ],
+                [
+                  183.3913449992349,
+                  574.4912600565469
+                ],
+                [
+                  187.38958606843107,
+                  572.0948065843709
+                ],
+                [
+                  191.13368099777315,
+                  569.31799653473
+                ],
+                [
+                  194.53784619453765,
+                  566.232641045769
+                ],
+                [
+                  189.27167157515882,
+                  559.9173359998981
+                ],
+                [
+                  185.4144277520214,
+                  563.4461800000058
+                ]
+              ]
+            ]
+          ],
+          "levels": 6,
+          "height": 29.7,
+          "wallFinish": "white"
+        },
+        {
+          "id": "north-agriculture-upper",
+          "polygons": [
+            [
+              [
+                [
+                  110.00325931046468,
+                  587.4245080002133
+                ],
+                [
+                  110.31101812671437,
+                  618.0709040000379
+                ],
+                [
+                  212.26125509784043,
+                  617.0356280001997
+                ],
+                [
+                  211.95349628159073,
+                  587.146208000125
+                ],
+                [
+                  201.85900713105167,
+                  575.012327999912
+                ],
+                [
+                  194.53784619453765,
+                  566.232641045769
+                ],
+                [
+                  191.13368099777315,
+                  569.31799653473
+                ],
+                [
+                  187.38958606843107,
+                  572.0948065843709
+                ],
+                [
+                  183.3913449992349,
+                  574.4912600565469
+                ],
+                [
+                  179.17746303734177,
+                  576.4842777942862
+                ],
+                [
+                  174.78852216958694,
+                  578.05466594728
+                ],
+                [
+                  170.2667902957661,
+                  579.1873008191535
+                ],
+                [
+                  165.6558141656541,
+                  579.8712745169294
+                ],
+                [
+                  161.0,
+                  580.1
+                ],
+                [
+                  156.34418583434586,
+                  579.8712745169294
+                ],
+                [
+                  151.7332097042339,
+                  579.1873008191535
+                ],
+                [
+                  147.21147783041303,
+                  578.05466594728
+                ],
+                [
+                  142.8225369626582,
+                  576.4842777942861
+                ],
+                [
+                  138.6086550007651,
+                  574.4912600565469
+                ],
+                [
+                  134.6104139315689,
+                  572.0948065843709
+                ],
+                [
+                  130.86631900222682,
+                  569.31799653473
+                ],
+                [
+                  130.55429596899396,
+                  569.0351953418907
+                ],
+                [
+                  120.3644727680314,
+                  575.3351560001252
+                ],
+                [
+                  110.00325931046468,
+                  587.4245080002133
+                ]
+              ],
+              [
+                [
+                  155.32587421702215,
+                  584.9977319999334
+                ],
+                [
+                  161.06044681447182,
+                  585.4986720002506
+                ],
+                [
+                  165.6357945387902,
+                  585.3762200000061
+                ],
+                [
+                  170.180366381921,
+                  584.7750920001
+                ],
+                [
+                  174.63261058003113,
+                  583.7175520000017
+                ],
+                [
+                  178.9514926253563,
+                  582.2036000001065
+                ],
+                [
+                  190.0923617493949,
+                  595.4061520001524
+                ],
+                [
+                  189.95899959661003,
+                  601.8738440001962
+                ],
+                [
+                  131.55663502786865,
+                  601.9406360001858
+                ],
+                [
+                  131.61818679170173,
+                  595.4061520001524
+                ],
+                [
+                  144.27733273800422,
+                  581.791716000039
+                ],
+                [
+                  149.6938878926276,
+                  583.7509479999965
+                ],
+                [
+                  155.32587421702215,
+                  584.9977319999334
+                ]
+              ],
+              [
+                [
+                  190.0,
+                  614.0
+                ],
+                [
+                  129.0,
+                  614.0
+                ],
+                [
+                  129.0,
+                  602.0
+                ],
+                [
+                  190.0,
+                  602.0
+                ],
+                [
+                  190.0,
+                  614.0
+                ]
+              ]
+            ]
+          ],
+          "levels": 7,
+          "height": 35.1,
+          "wallFinish": "white"
+        },
+        {
+          "id": "north-agriculture-top",
+          "polygons": [
+            [
+              [
+                [
+                  129.0,
+                  602.0
+                ],
+                [
+                  129.0,
+                  614.0
+                ],
+                [
+                  190.0,
+                  614.0
+                ],
+                [
+                  190.0,
+                  602.0
+                ],
+                [
+                  129.0,
+                  602.0
+                ]
+              ]
+            ]
+          ],
+          "levels": 8,
+          "height": 42.3,
+          "wallFinish": "white"
+        },
+        {
+          "id": "east-link",
+          "polygons": [
+            [
+              [
+                [
+                  196.44245197788612,
+                  549.8094800000276
+                ],
+                [
+                  193.51874323007436,
+                  554.607371999937
+                ],
+                [
+                  189.27167157515882,
+                  559.9173359998981
+                ],
+                [
+                  201.85900713105167,
+                  575.012327999912
+                ],
+                [
+                  207.80901089827248,
+                  568.27746799991
+                ],
+                [
+                  212.66134155765297,
+                  560.7077080000383
+                ],
+                [
+                  196.44245197788612,
+                  549.8094800000276
+                ]
+              ]
+            ]
+          ],
+          "levels": 1,
+          "height": 7.2,
+          "wallFinish": "white",
+          "openBelow": {
+            "clearHeight": 6.65,
+            "floorHeight": 0.22,
+            "columns": [
+              {
+                "center": [
+                  198.72243865148036,
+                  559.9247193330573
+                ],
+                "width": 0.7,
+                "depth": 0.7,
+                "angle": 0
+              },
+              {
+                "center": [
+                  202.72243865148036,
+                  563.9247193330573
+                ],
+                "width": 0.7,
+                "depth": 0.7,
+                "angle": 0
+              }
+            ]
+          }
+        },
+        {
+          "id": "east-forestry-terrace",
+          "polygons": [
+            [
+              [
+                [
+                  198.99685014707296,
+                  542.217455999896
+                ],
+                [
+                  196.44245197788612,
+                  549.8094800000276
+                ],
+                [
+                  203.1958287210988,
+                  554.347388662364
+                ],
+                [
+                  204.8842777942861,
+                  550.7774630373418
+                ],
+                [
+                  206.45466594727992,
+                  546.388522169587
+                ],
+                [
+                  207.58730081915343,
+                  541.8667902957661
+                ],
+                [
+                  208.27127451692934,
+                  537.2558141656541
+                ],
+                [
+                  208.5,
+                  532.6
+                ],
+                [
+                  208.27127451692934,
+                  527.944185834346
+                ],
+                [
+                  207.58730081915346,
+                  523.3332097042339
+                ],
+                [
+                  206.45466594727992,
+                  518.8114778304131
+                ],
+                [
+                  204.8842777942861,
+                  514.4225369626582
+                ],
+                [
+                  202.89126005654686,
+                  510.20865500076513
+                ],
+                [
+                  200.4948065843709,
+                  506.2104139315689
+                ],
+                [
+                  200.1146243648036,
+                  505.6977975497995
+                ],
+                [
+                  198.62753956844804,
+                  522.0351400001498
+                ],
+                [
+                  199.9303852209408,
+                  528.7032080001622
+                ],
+                [
+                  200.0534887471491,
+                  535.5048600001539
+                ],
+                [
+                  198.99685014707296,
+                  542.217455999896
+                ]
+              ]
+            ]
+          ],
+          "levels": 6,
+          "height": 29.7,
+          "wallFinish": "white"
+        },
+        {
+          "id": "east-forestry-upper",
+          "polygons": [
+            [
+              [
+                [
+                  219.91419097736653,
+                  564.8042840000572
+                ],
+                [
+                  252.93671188821196,
+                  564.9267359999062
+                ],
+                [
+                  253.15214305944096,
+                  504.09035600005393
+                ],
+                [
+                  200.27917854495468,
+                  503.8899800000853
+                ],
+                [
+                  200.1146243648036,
+                  505.6977975497995
+                ],
+                [
+                  200.4948065843709,
+                  506.2104139315689
+                ],
+                [
+                  202.89126005654686,
+                  510.20865500076513
+                ],
+                [
+                  204.8842777942861,
+                  514.4225369626582
+                ],
+                [
+                  206.45466594727992,
+                  518.8114778304131
+                ],
+                [
+                  207.58730081915346,
+                  523.3332097042339
+                ],
+                [
+                  208.27127451692934,
+                  527.944185834346
+                ],
+                [
+                  208.5,
+                  532.6
+                ],
+                [
+                  208.27127451692934,
+                  537.2558141656541
+                ],
+                [
+                  207.58730081915343,
+                  541.8667902957661
+                ],
+                [
+                  206.45466594727992,
+                  546.388522169587
+                ],
+                [
+                  204.8842777942861,
+                  550.7774630373418
+                ],
+                [
+                  203.1958287210988,
+                  554.347388662364
+                ],
+                [
+                  212.66134155765297,
+                  560.7077080000383
+                ],
+                [
+                  219.91419097736653,
+                  564.8042840000572
+                ]
+              ],
+              [
+                [
+                  220.97082957744266,
+                  525.9424719999346
+                ],
+                [
+                  220.99134683205367,
+                  519.5193080000156
+                ],
+                [
+                  230.18307679137038,
+                  519.5527040000104
+                ],
+                [
+                  230.07023189173867,
+                  551.0451320002301
+                ],
+                [
+                  225.58721181098312,
+                  551.0340000000999
+                ],
+                [
+                  213.99496309133332,
+                  543.5421639999525
+                ],
+                [
+                  214.06677348174298,
+                  525.9202080000699
+                ],
+                [
+                  220.97082957744266,
+                  525.9424719999346
+                ]
+              ],
+              [
+                [
+                  247.0,
+                  555.0
+                ],
+                [
+                  232.0,
+                  555.0
+                ],
+                [
+                  232.0,
+                  512.0
+                ],
+                [
+                  247.0,
+                  512.0
+                ],
+                [
+                  247.0,
+                  555.0
+                ]
+              ]
+            ]
+          ],
+          "levels": 7,
+          "height": 35.1,
+          "wallFinish": "white"
+        },
+        {
+          "id": "east-forestry-top",
+          "polygons": [
+            [
+              [
+                [
+                  232.0,
+                  512.0
+                ],
+                [
+                  232.0,
+                  555.0
+                ],
+                [
+                  247.0,
+                  555.0
+                ],
+                [
+                  247.0,
+                  512.0
+                ],
+                [
+                  232.0,
+                  512.0
+                ]
+              ]
+            ]
+          ],
+          "levels": 8,
+          "height": 42.3,
+          "wallFinish": "white"
+        }
+      ]
+    },
+    "way/1502723420": {
+      "name": "南侧学术中心（报告厅候选）",
+      "footprintRevision": "e33f9c4ef3b1c1c7a7efe5ff10949c5068dab5be3215367e52e88b1a9a18076a",
+      "levels": 1,
+      "height": 12.5,
+      "entrances": [
+        {
+          "id": "south-hall-entry",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 8,
+          "t": 0.5,
+          "width": 4.9,
+          "primary": true
+        }
+      ],
+      "evidence": {
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "agriLabApproval2023",
+            "agriHallSouthPhoto2026"
+          ],
+          "note": "批复明确项目主入口设在学术中心南侧。照片中两处低位门口合计外包宽度暂估4.9米，以南面直段中点定位入口组。门宽和门槛标高均未经实测。"
+        },
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "agriLabApproval2023",
+            "agriConstruction2025"
+          ],
+          "note": "南侧独立报告厅与初设局部一层相符；观众厅夹层未核。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "agriFormwork2024"
+          ],
+          "note": "按设计透视估算大厅围护高度，作为独立大跨单层表达；尚无实测剖面。"
+        }
+      }
+    },
+    "way/948683812": {
+      "name": "体育学院",
+      "footprintRevision": "886baa1e7cfa68ba2123e16f8aed9d8ff9ebc4087006074ebf2e33f5ed470a95",
+      "evidence": {
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "sportsCorner"
+          ],
+          "note": "东南斜角可读院名与官图13雕塑、阶梯窗同框，位置按地图斜边中段估算。"
+        }
+      },
+      "entrances": [
+        {
+          "id": "photo-1",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "t": 0.5,
+          "width": 2.75,
+          "primary": true
+        }
+      ]
+    },
+    "way/759193120": {
+      "name": "东校园体育馆",
+      "footprintRevision": "16b6cadf895f311399d9d78ebbd41f6f9d2774aed1f1fa9663f4f0ea6730035f",
+      "entrances": [
+        {
+          "id": "photographed-entry",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 2,
+          "t": 0.5,
+          "width": 11.1,
+          "primary": true
+        }
+      ],
+      "evidence": {
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "eastGymStreet"
+          ],
+          "note": "按南面上翘雨棚与两根圆柱确定。"
+        },
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "eastGymFacilities",
+            "gxuDonationProjects"
+          ],
+          "note": "2024年馆方列出四个使用楼层；历史项目册印刷第39页记五层。技术夹层未获剖面确认。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "eastGymStreet",
+            "gxuDonationProjects"
+          ],
+          "note": "依门廊、圆窗带及上层高窗的比例估算19.8米，未取得实测或竣工标高。"
+        }
+      },
+      "levels": 4,
+      "height": 19.8
+    },
+    "way/880036336": {
+      "name": "动物繁殖研究所",
+      "footprintRevision": "9f743cd50c5d962f518b21c7cd350fd95a8cb8e431d4f23110a6b6d8865dfb59",
+      "entrances": [
+        {
+          "id": "photographed-entry",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 8,
+          "t": 0.5,
+          "width": 2.2,
+          "primary": true
+        }
+      ],
+      "evidence": {
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "animalResearchStreet"
+          ],
+          "note": "西侧雨棚下可见门洞。门轴、门宽与主次仍待挂牌照核对。"
+        }
+      }
+    },
+    "relation/11970573": {
+      "name": "育林楼",
+      "footprintRevision": "23b37de6fbba9df8579ead451f3aec858da6fa121c71769519cb5a184ad30df2",
+      "levels": 6,
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "gxuCollegesGalleryYulin"
+          ],
+          "note": "校方育林楼具名照片可见底层及五层上部窗列，校方规划图将文学院、法学院合用楼标为6F；按6层修正原默认5层。层高仍采用3.3米估值，非现场测量；拍摄时间未注明。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuYulinStreet2019"
+          ],
+          "note": "358°门组在西段偏中央，较原候选西移；门扇分组与进深按影像估算；退廊后壁的门窗分别生成。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCollegesGalleryYulin",
+            "gxuYulinStreet2019"
+          ],
+          "note": "南面成组条窗，中央下部宽窗夹两侧单窗，顶层圆窗与弧形线脚见图库10。按比例估窗宽，背侧沿用估算。"
+        },
+        "roofVolumes": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCollegesGalleryYulin"
+          ],
+          "note": "中央直线重檐、弧形线脚与字牌按图库10。建筑南面斜拍，不据此改成坡屋顶。"
+        }
+      },
+      "review": {
+        "levels": {
+          "status": "partial",
+          "note": "照片与规划图支持6层；局部顶饰及后侧高度尚待核对。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "358°门组在西段偏中央，较原候选西移；门扇分组与进深按影像估算；退廊后壁的门窗分别生成。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "南面成组条窗，中央下部宽窗夹两侧单窗，顶层圆窗与弧形线脚见图库10。按比例估窗宽，背侧沿用估算。"
+        },
+        "roofVolumes": {
+          "status": "partial",
+          "note": "中央直线重檐、弧形线脚与字牌按图库10。建筑南面斜拍，不据此改成坡屋顶。"
+        }
+      },
+      "entrances": [
+        {
+          "id": "south-main",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 6,
+          "t": 0.342,
+          "width": 3.4,
+          "primary": true
+        }
+      ],
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 2,
+          "balconies": false,
+          "windowBands": {
+            "from": 0,
+            "to": 1,
+            "firstLevel": 1,
+            "heightRatio": 0.54,
+            "depth": 0.19,
+            "thickness": 0.11,
+            "windows": [
+              {
+                "from": 0.018,
+                "to": 0.105,
+                "panes": 2
+              },
+              {
+                "from": 0.125,
+                "to": 0.46,
+                "panes": 9
+              },
+              {
+                "from": 0.48,
+                "to": 0.834,
+                "panes": 9
+              },
+              {
+                "from": 0.86,
+                "to": 0.982,
+                "panes": 3
+              }
+            ]
+          },
+          "openCorridor": {
+            "firstLevel": 0,
+            "lastLevel": 0,
+            "depth": 1.2,
+            "endInset": 0.7,
+            "railHeight": 0.1,
+            "piers": {
+              "bays": 4,
+              "width": 0.44,
+              "depth": 0.5
+            },
+            "finish": {
+              "wall": "pink"
+            },
+            "openings": [
+              {
+                "kind": "window",
+                "t": 0.095,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.225,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.5,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.64,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.79,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.91,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 6,
+          "balconies": false,
+          "windowBands": {
+            "from": 0,
+            "to": 1,
+            "firstLevel": 1,
+            "heightRatio": 0.54,
+            "depth": 0.19,
+            "thickness": 0.11,
+            "windows": [
+              {
+                "from": 0.018,
+                "to": 0.105,
+                "panes": 2
+              },
+              {
+                "from": 0.125,
+                "to": 0.46,
+                "panes": 9
+              },
+              {
+                "from": 0.48,
+                "to": 0.834,
+                "panes": 9
+              },
+              {
+                "from": 0.86,
+                "to": 0.982,
+                "panes": 3
+              }
+            ]
+          },
+          "openCorridor": {
+            "firstLevel": 0,
+            "lastLevel": 0,
+            "depth": 1.2,
+            "endInset": 0.7,
+            "railHeight": 0.1,
+            "piers": {
+              "bays": 4,
+              "width": 0.44,
+              "depth": 0.5
+            },
+            "finish": {
+              "wall": "pink"
+            },
+            "openings": [
+              {
+                "kind": "window",
+                "t": 0.095,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.225,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.5,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.64,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.79,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.91,
+                "width": 2.0,
+                "height": 1.38,
+                "sill": 0.88,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "door",
+                "t": 0.317,
+                "width": 1.6,
+                "height": 2.48,
+                "sill": 0,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "door",
+                "t": 0.367,
+                "width": 1.6,
+                "height": 2.48,
+                "sill": 0,
+                "levels": [
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 4,
+          "balconies": false,
+          "panels": [
+            {
+              "id": "central-round-window",
+              "type": "round-window-wall",
+              "from": 0.28,
+              "to": 0.72,
+              "bottom": 17.0,
+              "top": 19.65,
+              "columns": 1,
+              "rows": 1,
+              "frameWidth": 0.08,
+              "depth": 0.1,
+              "openings": [
+                {
+                  "t": 0.5,
+                  "height": 18.1,
+                  "radius": 0.55
+                }
+              ]
+            }
+          ],
+          "wallFinish": "pink",
+          "windowBands": {
+            "from": 0,
+            "to": 1,
+            "firstLevel": 1,
+            "heightRatio": 0.54,
+            "depth": 0.19,
+            "thickness": 0.11,
+            "windows": [
+              {
+                "from": 0.075,
+                "to": 0.17,
+                "panes": 1
+              },
+              {
+                "from": 0.285,
+                "to": 0.702,
+                "panes": 5
+              },
+              {
+                "from": 0.81,
+                "to": 0.905,
+                "panes": 1
+              }
+            ],
+            "lastLevel": 4
+          }
+        }
+      ],
+      "roofVolumes": [
+        {
+          "id": "central-parapet",
+          "part": "body",
+          "polygon": 0,
+          "edge": 4,
+          "from": 0.065,
+          "to": 0.935,
+          "inset": 0.84,
+          "depth": 2.9,
+          "rise": 1.92,
+          "cap": {
+            "overhang": 0.12,
+            "height": 0.18
+          }
+        }
+      ]
+    },
+    "relation/12875607": {
+      "name": "邵逸夫楼",
+      "footprintRevision": "7275abc784a4712a111c975702779e42e3ab246acfe636b9a6bfada5a502aeb1",
+      "levels": 8,
+      "parts": [
+        {
+          "id": "rear-tower",
+          "polygons": [
+            [
+              [
+                [
+                  -397.33714815388237,
+                  -813.3150519997138
+                ],
+                [
+                  -397.3474067819168,
+                  -818.7029399997946
+                ],
+                [
+                  -392.2693863247307,
+                  -818.7140719999246
+                ],
+                [
+                  -392.2796449513073,
+                  -827.7643880000921
+                ],
+                [
+                  -389.4482638485162,
+                  -827.7643880000921
+                ],
+                [
+                  -389.45447770623167,
+                  -831.8
+                ],
+                [
+                  -429.2,
+                  -831.8
+                ],
+                [
+                  -429.2,
+                  -829.0
+                ],
+                [
+                  -435.8,
+                  -829.0
+                ],
+                [
+                  -435.8,
+                  -831.8
+                ],
+                [
+                  -450.2660766865348,
+                  -831.8
+                ],
+                [
+                  -450.2614058041673,
+                  -825.3376119998122
+                ],
+                [
+                  -442.56743541541914,
+                  -825.3487439999424
+                ],
+                [
+                  -442.5469181608081,
+                  -813.2593919998543
+                ],
+                [
+                  -397.33714815388237,
+                  -813.3150519997138
+                ]
+              ],
+              [
+                [
+                  -425.57914879575696,
+                  -827.7198599999673
+                ],
+                [
+                  -395.7162850585633,
+                  -827.7532559999621
+                ],
+                [
+                  -395.7162850585633,
+                  -821.6863159998557
+                ],
+                [
+                  -429.28251321004063,
+                  -821.6417879997307
+                ],
+                [
+                  -429.28251321004063,
+                  -825.3598760000725
+                ],
+                [
+                  -425.57914879575696,
+                  -825.371007999807
+                ],
+                [
+                  -425.57914879575696,
+                  -827.7198599999673
+                ]
+              ]
+            ]
+          ],
+          "height": 23.1,
+          "levels": 7,
+          "wallFinish": "white"
+        },
+        {
+          "id": "front-podium",
+          "polygons": [
+            [
+              [
+                [
+                  -427.846305404763,
+                  -841.0448639998623
+                ],
+                [
+                  -431.21113512160935,
+                  -839.5531759998318
+                ],
+                [
+                  -450.2716644322017,
+                  -839.5309119999671
+                ],
+                [
+                  -450.2660766865348,
+                  -831.8
+                ],
+                [
+                  -435.8,
+                  -831.8
+                ],
+                [
+                  -435.8,
+                  -834.2
+                ],
+                [
+                  -429.2,
+                  -834.2
+                ],
+                [
+                  -429.2,
+                  -831.8
+                ],
+                [
+                  -389.45447770623167,
+                  -831.8
+                ],
+                [
+                  -389.46878110312724,
+                  -841.0893919999871
+                ],
+                [
+                  -427.846305404763,
+                  -841.0448639998623
+                ]
+              ]
+            ]
+          ],
+          "height": 9.9,
+          "levels": 3
+        },
+        {
+          "id": "stair-core",
+          "polygons": [
+            [
+              [
+                [
+                  -429.2,
+                  -834.2
+                ],
+                [
+                  -429.2,
+                  -829.0
+                ],
+                [
+                  -435.8,
+                  -829.0
+                ],
+                [
+                  -435.8,
+                  -834.2
+                ],
+                [
+                  -429.2,
+                  -834.2
+                ]
+              ]
+            ]
+          ],
+          "levels": 8,
+          "height": 26.4,
+          "wallFinish": "white"
+        }
+      ],
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCampusPlanShaw",
+            "gxuCollegesGalleryShaw"
+          ],
+          "note": "校方规划图在外国语学院标注8F；3.3米层高和局部塔顶高度并非实测。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuRedHouseExterior",
+            "gxuCollegesGalleryShaw"
+          ],
+          "note": "学院正对门口照片可见塔身两侧并列竖玻璃与白色实心廊板，南侧退廊从裙楼顶部开始，白色廊板高按层高比例估算。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCollegesGalleryShaw",
+            "gxuShawStreet91",
+            "gxuRedHouseExterior",
+            "gxuShawEntryAerial",
+            "gxuShawStreet8"
+          ],
+          "note": "Esri 与 OSM 确认平行长翼在门头错位，东翼更南。短接段整段约 22°，本地端点弦角 23.84°。校方全景、门前合影和 8° 街景可辨多个平板及贯通的两道横梃，单片角度估算。"
+        },
+        "exposedFacadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCollegesGalleryShaw"
+          ],
+          "note": "照片显示裙楼以上后翼有白色栏板及连续外廊；按后翼南侧高出裙楼部分估设，层数、深度和分界未测量。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuShawStreet8",
+            "gxuRedHouseExterior",
+            "gxuShawEntryAerial"
+          ],
+          "note": "院名短接段包住后退门组。模型专用剖面以西翼前缘为基准，西侧入门净深估 1.55 米，东侧约 3.04 米，净洞宽约 4.92 米。近照支持较直的后门框和台阶前沿，模型分别按近东西向。门扇轴线、各侧回墙进深与尺寸待实测。"
+        }
+      },
+      "review": {
+        "parts": {
+          "status": "partial",
+          "note": "学院正对门口照片可见塔身两侧并列竖玻璃与白色实心廊板，南侧退廊从裙楼顶部开始，白色廊板高按层高比例估算。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "院名短接段包住后退门组。模型专用剖面以西翼前缘为基准，西侧入门净深估 1.55 米，东侧约 3.04 米，净洞宽约 4.92 米。近照支持较直的后门框和台阶前沿，模型分别按近东西向。门扇轴线、各侧回墙进深与尺寸待实测。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "Esri 与 OSM 确认平行长翼在门头错位，东翼更南。短接段整段约 22°，本地端点弦角 23.84°。校方全景、门前合影和 8° 街景可辨多个平板及贯通的两道横梃，单片角度估算。"
+        }
+      },
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 7,
+          "balconies": false,
+          "panels": [
+            {
+              "id": "south-glazing",
+              "type": "glazing",
+              "from": 0.015,
+              "to": 0.985,
+              "bottom": 3.72,
+              "top": 9.73,
+              "columns": 16,
+              "rows": 3,
+              "frameWidth": 0.1,
+              "frameFinish": "dark",
+              "depth": 0.12,
+              "rowFractions": [
+                0.16,
+                0.56
+              ]
+            }
+          ],
+          "openCorridor": {
+            "depth": 0.6,
+            "firstLevel": 0,
+            "lastLevel": 0,
+            "railHeight": 0.12,
+            "endInset": 0.55,
+            "piers": {
+              "bays": 9,
+              "width": 0.46,
+              "depth": 0.55
+            },
+            "openings": [
+              {
+                "kind": "window",
+                "t": 0.0556,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.1667,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.2778,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.3889,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.5,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.6111,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.7222,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.8333,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.9444,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 9,
+          "balconies": false,
+          "panels": [
+            {
+              "id": "southwest-glazing",
+              "type": "glazing",
+              "from": 0.025,
+              "to": 0.975,
+              "bottom": 3.72,
+              "top": 9.73,
+              "columns": 8,
+              "rows": 3,
+              "frameWidth": 0.1,
+              "frameFinish": "dark",
+              "depth": 0.12,
+              "rowFractions": [
+                0.16,
+                0.56
+              ]
+            }
+          ],
+          "openCorridor": {
+            "depth": 0.6,
+            "firstLevel": 0,
+            "lastLevel": 0,
+            "railHeight": 0.12,
+            "endInset": 0.55,
+            "piers": {
+              "bays": 5,
+              "width": 0.46,
+              "depth": 0.55
+            },
+            "openings": [
+              {
+                "kind": "window",
+                "t": 0.1,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.3,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.5,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.7,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              },
+              {
+                "kind": "window",
+                "t": 0.9,
+                "width": 2.35,
+                "height": 2.25,
+                "sill": 0.48,
+                "levels": [
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 8,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "corner-glass",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 3.72,
+              "top": 9.73,
+              "columns": 1,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "openCorridor": {
+            "depth": 1.8,
+            "firstLevel": 0,
+            "lastLevel": 0,
+            "railHeight": 0.1,
+            "endInset": 0.27,
+            "piers": {
+              "bays": 1,
+              "width": 0.27,
+              "depth": 0.35
+            },
+            "openings": [
+              {
+                "kind": "door",
+                "t": 0.5,
+                "width": 2.72,
+                "height": 2.45,
+                "sill": 0,
+                "levels": [
+                  0
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 10,
+          "balconies": false,
+          "part": "front-podium",
+          "windows": false,
+          "wallFinish": "pink"
+        }
+      ],
+      "exposedFacadeRules": [
+        {
+          "part": "rear-tower",
+          "adjacentPart": "front-podium",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 5,
+          "rule": {
+            "balconies": false,
+            "openCorridor": {
+              "depth": 1.55,
+              "firstLevel": 4,
+              "lastLevel": 6,
+              "railHeight": 1.33,
+              "endInset": 0.4,
+              "finish": {
+                "wall": "white",
+                "rail": "white"
+              }
+            }
+          }
+        },
+        {
+          "part": "rear-tower",
+          "adjacentPart": "front-podium",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 9,
+          "rule": {
+            "balconies": false,
+            "openCorridor": {
+              "depth": 1.55,
+              "firstLevel": 4,
+              "lastLevel": 6,
+              "railHeight": 1.33,
+              "endInset": 0.4,
+              "finish": {
+                "wall": "white",
+                "rail": "white"
+              }
+            }
+          }
+        }
+      ],
+      "entrances": [
+        {
+          "id": "south-colonnade",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 8,
+          "t": 0.5,
+          "width": 2.72,
+          "primary": true
+        }
+      ]
+    },
+    "relation/11564915": {
+      "name": "公共管理与工商管理学院楼",
+      "footprintRevision": "e34069189b417e6be07d40e11a53f2da7639e11115530b6740d4ba6a19a5046c",
+      "levels": 6,
+      "parts": [
+        {
+          "id": "main",
+          "polygons": [
+            [
+              [
+                [
+                  -476.07211180452117,
+                  -1146.0727959999142
+                ],
+                [
+                  -476.5132327720979,
+                  -1149.245415999814
+                ],
+                [
+                  -477.8981474430348,
+                  -1152.1174719997607
+                ],
+                [
+                  -480.11401091478433,
+                  -1154.421795999796
+                ],
+                [
+                  -482.9351333909988,
+                  -1155.9246159999566
+                ],
+                [
+                  -486.08453193661614,
+                  -1156.492347999868
+                ],
+                [
+                  -486.31022173442176,
+                  -1159.186292000106
+                ],
+                [
+                  -486.29996310784514,
+                  -1161.9692919998029
+                ],
+                [
+                  -476.81073296177107,
+                  -1161.9581600000683
+                ],
+                [
+                  -476.7799570791256,
+                  -1185.179511999735
+                ],
+                [
+                  -485.7562558672133,
+                  -1185.190643999865
+                ],
+                [
+                  -485.68444547680366,
+                  -1193.951527999814
+                ],
+                [
+                  -485.30082941911826,
+                  -1194.6
+                ],
+                [
+                  -491.42225642624925,
+                  -1194.6
+                ],
+                [
+                  -491.56263885361477,
+                  -1185.1349840000055
+                ],
+                [
+                  -509.60756407335305,
+                  -1185.0904559998808
+                ],
+                [
+                  -509.45990133270624,
+                  -1194.6
+                ],
+                [
+                  -520.7600078809398,
+                  -1194.6
+                ],
+                [
+                  -520.7792090785792,
+                  -1185.1127199997454
+                ],
+                [
+                  -538.2188752938526,
+                  -1185.2685679999847
+                ],
+                [
+                  -538.0166416883386,
+                  -1194.6
+                ],
+                [
+                  -544.6539351123962,
+                  -1194.6
+                ],
+                [
+                  -544.4766378773231,
+                  -1185.2796999997192
+                ],
+                [
+                  -563.7423397325679,
+                  -1185.313095999714
+                ],
+                [
+                  -563.7525983591445,
+                  -1179.9140759998986
+                ],
+                [
+                  -573.016138707413,
+                  -1179.9363399997633
+                ],
+                [
+                  -573.036655962024,
+                  -1166.0547360000871
+                ],
+                [
+                  -552.9092294247789,
+                  -1166.0213400000926
+                ],
+                [
+                  -552.9400053059666,
+                  -1146.4958119997164
+                ],
+                [
+                  -568.3484633380739,
+                  -1146.5180759999766
+                ],
+                [
+                  -568.3587219661083,
+                  -1134.5400440000028
+                ],
+                [
+                  -552.9605225605776,
+                  -1134.5177799997427
+                ],
+                [
+                  -552.9605225605776,
+                  -1135.2302279997632
+                ],
+                [
+                  -505.69902711587486,
+                  -1135.6866399999556
+                ],
+                [
+                  -505.69902711587486,
+                  -1134.4509879997531
+                ],
+                [
+                  -494.79410641767623,
+                  -1134.4398560000186
+                ],
+                [
+                  -494.7838477910997,
+                  -1140.6515119998387
+                ],
+                [
+                  -492.4551394197184,
+                  -1138.1356800001001
+                ],
+                [
+                  -489.6340169435039,
+                  -1136.6328599999395
+                ],
+                [
+                  -486.48461839788655,
+                  -1136.0651280000282
+                ],
+                [
+                  -483.32496122423476,
+                  -1136.4992759999604
+                ],
+                [
+                  -480.4422869841872,
+                  -1137.8907760000066
+                ],
+                [
+                  -478.1443544954514,
+                  -1140.106043999792
+                ],
+                [
+                  -476.6363362983063,
+                  -1142.9335720000095
+                ],
+                [
+                  -476.07211180452117,
+                  -1146.0727959999142
+                ]
+              ],
+              [
+                [
+                  -491.9627253148852,
+                  -1173.3795919998652
+                ],
+                [
+                  -491.98324256803835,
+                  -1159.1974239998406
+                ],
+                [
+                  -538.0855131410677,
+                  -1159.2642159998302
+                ],
+                [
+                  -538.0649958864567,
+                  -1173.4463839998548
+                ],
+                [
+                  -491.9627253148852,
+                  -1173.3795919998652
+                ]
+              ]
+            ]
+          ],
+          "height": 19.8,
+          "levels": 6
+        },
+        {
+          "id": "south-curved-wing",
+          "polygons": [
+            [
+              [
+                [
+                  -478.0520268504307,
+                  -1206.8535159999071
+                ],
+                [
+                  -486.1050491912272,
+                  -1211.0502799999103
+                ],
+                [
+                  -492.33203589351007,
+                  -1213.46592400006
+                ],
+                [
+                  -498.76419513898753,
+                  -1215.2804399999084
+                ],
+                [
+                  -505.3297165372499,
+                  -1216.4938279998505
+                ],
+                [
+                  -511.98756558053293,
+                  -1217.0949559997566
+                ],
+                [
+                  -518.665931878427,
+                  -1217.0615599997618
+                ],
+                [
+                  -525.477660329106,
+                  -1216.3825079997362
+                ],
+                [
+                  -532.1868025096455,
+                  -1215.057800000075
+                ],
+                [
+                  -538.7420652813313,
+                  -1213.098567999722
+                ],
+                [
+                  -545.0818968817881,
+                  -1210.5270759997284
+                ],
+                [
+                  -551.1447455486406,
+                  -1207.3544559998288
+                ],
+                [
+                  -544.6612931673645,
+                  -1194.9868040000479
+                ],
+                [
+                  -544.6539351123962,
+                  -1194.6
+                ],
+                [
+                  -538.0166416883386,
+                  -1194.6
+                ],
+                [
+                  -537.9829268694705,
+                  -1196.1556639998653
+                ],
+                [
+                  -532.3817164262636,
+                  -1198.1037640000882
+                ],
+                [
+                  -526.6163679476263,
+                  -1199.4952639997387
+                ],
+                [
+                  -520.7484331973917,
+                  -1200.3190319998737
+                ],
+                [
+                  -520.7600078809398,
+                  -1194.6
+                ],
+                [
+                  -509.45990133270624,
+                  -1194.6
+                ],
+                [
+                  -509.3716156489709,
+                  -1200.2856359998789
+                ],
+                [
+                  -500.7851446941191,
+                  -1198.7939479998483
+                ],
+                [
+                  -494.37350270325265,
+                  -1196.834715999891
+                ],
+                [
+                  -491.4087594462189,
+                  -1195.5100079998342
+                ],
+                [
+                  -491.42225642624925,
+                  -1194.6
+                ],
+                [
+                  -485.30082941911826,
+                  -1194.6
+                ],
+                [
+                  -478.0520268504307,
+                  -1206.8535159999071
+                ]
+              ]
+            ]
+          ],
+          "height": 6.6,
+          "levels": 2
+        }
+      ],
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCampusPlanShaw",
+            "gxuCollegesGalleryManagement"
+          ],
+          "note": "学校规划图对工商学院主体标注6F，层高按3.3米估算；部分圆形体量的细部分层待核。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "gxuCampusPlanShaw",
+            "gxuCollegesGalleryManagement"
+          ],
+          "note": "校方规划图将公管学院弧形南翼标为2F，工商学院主体标为6F；按轮廓和约-1194.6米分界粗分，连接部真实边界及高度待核。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCollegesGalleryManagement",
+            "gxuWelcome2026"
+          ],
+          "note": "图库22正面清晰可见圆厅底部偏北的双扇门。以外弧三柱和北翼转角配准后，门落在东北偏北两柱之间；弧边编号43，轴线与退距为估算。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuManagementStreet146",
+            "gxuCollegesGalleryManagement",
+            "gxuDonationProjects"
+          ],
+          "note": "146°相机视线先命中北西短边34。其北正立面的独窗、成对窗与窗下横线分组生成。22号照圆厅首层方柱、带亮窗的内退门厅及顶层开敞廊板可辨。"
+        },
+        "roofVolumes": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuDonationProjects",
+            "gxuCollegesGalleryManagement"
+          ],
+          "note": "基金会项目册记七层，图库22东北圆厅后见局部升起的方形顶楼。规划标六层主体；局部顶楼位置和尺度按照片估算。"
+        }
+      },
+      "review": {
+        "parts": {
+          "status": "partial",
+          "note": "公管与工商按同一轮廓建模；南翼高度依据规划图，其切分线、圆形中庭及幕墙仍待修正。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "图库22正面清晰可见圆厅底部偏北的双扇门。以外弧三柱和北翼转角配准后，门落在东北偏北两柱之间；弧边编号43，轴线与退距为估算。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "146°相机视线先命中北西短边34。其北正立面的独窗、成对窗与窗下横线分组生成。22号照圆厅首层方柱、带亮窗的内退门厅及顶层开敞廊板可辨。"
+        },
+        "roofVolumes": {
+          "status": "partial",
+          "note": "基金会项目册记七层，图库22东北圆厅后见局部升起的方形顶楼。规划标六层主体；局部顶楼位置和尺度按照片估算。"
+        }
+      },
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 0,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 2,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 3,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 4,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 5,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 40,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 41,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 42,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 43,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 44,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 45,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 46,
+          "balconies": false,
+          "windows": false,
+          "panels": [
+            {
+              "id": "rotunda",
+              "type": "glazing",
+              "from": 0.012,
+              "to": 0.988,
+              "bottom": 6.85,
+              "top": 16.55,
+              "columns": 2,
+              "rows": 3,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ],
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 9,
+          "balconies": false,
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              3.25,
+              6.55,
+              9.85,
+              13.15,
+              16.45,
+              19.65
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 26,
+          "balconies": false,
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              3.25,
+              6.55,
+              9.85,
+              13.15,
+              16.45,
+              19.65
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 29,
+          "balconies": false,
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              3.25,
+              6.55,
+              9.85,
+              13.15,
+              16.45,
+              19.65
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 31,
+          "balconies": false,
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              3.25,
+              6.55,
+              9.85,
+              13.15,
+              16.45,
+              19.65
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 33,
+          "balconies": false,
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              3.25,
+              6.55,
+              9.85,
+              13.15,
+              16.45,
+              19.65
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 36,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windowBands": {
+            "from": 0,
+            "to": 1,
+            "firstLevel": 1,
+            "heightRatio": 0.54,
+            "depth": 0.19,
+            "thickness": 0.11,
+            "windows": [
+              {
+                "from": 0.033,
+                "to": 0.10300000000000001,
+                "panes": 2
+              },
+              {
+                "from": 0.118,
+                "to": 0.188,
+                "panes": 2
+              },
+              {
+                "from": 0.23,
+                "to": 0.30000000000000004,
+                "panes": 2
+              },
+              {
+                "from": 0.31499999999999995,
+                "to": 0.385,
+                "panes": 2
+              },
+              {
+                "from": 0.43000000000000005,
+                "to": 0.5,
+                "panes": 2
+              },
+              {
+                "from": 0.515,
+                "to": 0.5850000000000001,
+                "panes": 2
+              },
+              {
+                "from": 0.63,
+                "to": 0.7000000000000001,
+                "panes": 2
+              },
+              {
+                "from": 0.715,
+                "to": 0.785,
+                "panes": 2
+              },
+              {
+                "from": 0.831,
+                "to": 0.901,
+                "panes": 2
+              },
+              {
+                "from": 0.9159999999999999,
+                "to": 0.986,
+                "panes": 2
+              }
+            ],
+            "lastLevel": 5
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 37,
+          "balconies": false,
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              3.25,
+              6.55,
+              9.85,
+              13.15,
+              16.45,
+              19.65
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 38,
+          "balconies": false,
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              3.25,
+              6.55,
+              9.85,
+              13.15,
+              16.45,
+              19.65
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "wallFinish": "stone"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 14,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": false
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 15,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": true
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 16,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": true
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 17,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": false
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 18,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": true
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 19,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": true
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 20,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": false
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 21,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": true
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 22,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": true
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 23,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windows": false
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 34,
+          "balconies": false,
+          "wallFinish": "stone",
+          "windowBands": {
+            "from": 0,
+            "to": 1,
+            "firstLevel": 1,
+            "heightRatio": 0.54,
+            "depth": 0.19,
+            "thickness": 0.11,
+            "windows": [
+              {
+                "from": 0.07,
+                "to": 0.19,
+                "panes": 2
+              },
+              {
+                "from": 0.3,
+                "to": 0.41,
+                "panes": 2
+              },
+              {
+                "from": 0.57,
+                "to": 0.73,
+                "panes": 2
+              },
+              {
+                "from": 0.78,
+                "to": 0.94,
+                "panes": 2
+              }
+            ],
+            "lastLevel": 5
+          }
+        }
+      ],
+      "entrances": [
+        {
+          "id": "rotunda-lobby",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 43,
+          "t": 0.5,
+          "width": 1.9,
+          "primary": true,
+          "doorFrame": {
+            "bays": 1,
+            "pierWidth": 0.3,
+            "pierDepth": 0.6
+          },
+          "landingHeight": 0.2
+        }
+      ],
+      "roofVolumes": [
+        {
+          "id": "upper-stair-head",
+          "part": "main",
+          "polygon": 0,
+          "edge": 38,
+          "from": 0.16,
+          "to": 0.8,
+          "inset": 1.25,
+          "depth": 4.3,
+          "rise": 2.95,
+          "cap": {
+            "height": 0.18,
+            "overhang": 0.18
+          },
+          "glazing": {
+            "faces": {
+              "outer": 3,
+              "start": 1,
+              "end": 1
+            },
+            "sill": 0.5,
+            "height": 1.76,
+            "margin": 0.32,
+            "frameWidth": 0.085,
+            "projection": 0.11
+          }
+        }
+      ]
+    },
+    "way/1501460953": {
+      "name": "校内建筑 1501460953",
+      "footprintRevision": "e5df0f7001e0b9ae2615ee8f45e63424e5f6ebcd0691bb40ee05aa3872d83e63",
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 6,
+          "balconies": false,
+          "openCorridor": {
+            "depth": 1.1,
+            "firstLevel": 1,
+            "railHeight": 0.9,
+            "endInset": 0.3,
+            "finish": {
+              "wall": "stone",
+              "rail": "white"
+            }
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 4,
+          "balconies": false,
+          "openCorridor": {
+            "depth": 1.1,
+            "firstLevel": 1,
+            "railHeight": 0.9,
+            "endInset": 0.3,
+            "finish": {
+              "wall": "stone",
+              "rail": "white"
+            }
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 2,
+          "balconies": false,
+          "windowBands": {
+            "from": 0,
+            "to": 1,
+            "firstLevel": 1,
+            "heightRatio": 0.54,
+            "depth": 0.19,
+            "thickness": 0.11,
+            "windows": [
+              {
+                "from": 0.025,
+                "to": 0.108,
+                "panes": 3
+              },
+              {
+                "from": 0.131,
+                "to": 0.214,
+                "panes": 3
+              },
+              {
+                "from": 0.237,
+                "to": 0.32,
+                "panes": 3
+              },
+              {
+                "from": 0.343,
+                "to": 0.426,
+                "panes": 3
+              },
+              {
+                "from": 0.449,
+                "to": 0.532,
+                "panes": 3
+              },
+              {
+                "from": 0.555,
+                "to": 0.638,
+                "panes": 3
+              },
+              {
+                "from": 0.661,
+                "to": 0.744,
+                "panes": 3
+              },
+              {
+                "from": 0.767,
+                "to": 0.85,
+                "panes": 3
+              },
+              {
+                "from": 0.873,
+                "to": 0.956,
+                "panes": 3
+              }
+            ]
+          },
+          "wallFinish": "white"
+        }
+      ],
+      "evidence": {
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuContinuingStreet157",
+            "gxuGateStreet301",
+            "gxuWelcome2026"
+          ],
+          "note": "北面浅色外廊，沿街面白色窗框及栏板；不推断商铺名称延续到今天。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuContinuingStreet122",
+            "gxuWelcome2026"
+          ],
+          "note": "122°相机朝东南，先与长条楼北墙相交，门组、约四级踏步和浅色挑檐可见。定位在院内北面，门宽与沿墙偏移估算。"
+        },
+        "levels": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "gxuPropertySchedule2026",
+            "gxuWelcome2026",
+            "gxuCampusPlanShaw",
+            "gxuContinuingStreet292"
+          ],
+          "note": "校方2026年公共楼宇服务表第80项列原建院2号综合楼二至六层、楼梯一至六层。迎新校图定位门西长楼，分楼规划图在门西标六层，292°实景支持南立面多层条窗及街铺，层高仍按比例估算。"
+        }
+      },
+      "review": {
+        "facadeRules": {
+          "status": "partial",
+          "note": "北面浅色外廊，沿街面白色窗框及栏板；不推断商铺名称延续到今天。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "122°相机朝东南，先与长条楼北墙相交，门组、约四级踏步和浅色挑檐可见。定位在院内北面，门宽与沿墙偏移估算。"
+        },
+        "levels": {
+          "status": "partial",
+          "note": "校方2026年公共楼宇服务表第80项列原建院2号综合楼二至六层、楼梯一至六层。迎新校图定位门西长楼，分楼规划图在门西标六层，292°实景支持南立面多层条窗及街铺，层高仍按比例估算。"
+        }
+      },
+      "entrances": [
+        {
+          "id": "north-court",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 6,
+          "t": 0.52,
+          "width": 4,
+          "primary": true,
+          "landingHeight": 0.6,
+          "doorFrame": {
+            "bays": 3,
+            "pierWidth": 0.32,
+            "pierDepth": 0.6
+          },
+          "stairFlight": {
+            "width": 8.6,
+            "riserCount": 4,
+            "landingDepth": 1.05,
+            "tread": 0.32,
+            "baseHeight": 0
+          }
+        }
+      ],
+      "levels": 6
+    },
+    "relation/11564998": {
+      "name": "物理资治楼",
+      "footprintRevision": "7aea446cbbe8b9420bb39ca6683029ed3ef3c9378071e9d0eb42c63b0ff08486",
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 4,
+          "balconies": false,
+          "panels": [
+            {
+              "id": "south-glazing",
+              "type": "glazing",
+              "from": 0.03,
+              "to": 0.35,
+              "bottom": 5.65,
+              "top": 18.2,
+              "columns": 6,
+              "rows": 3,
+              "frameWidth": 0.08,
+              "depth": 0.1
+            }
+          ]
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 6,
+          "balconies": false,
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              3.5,
+              6.75,
+              10.05,
+              13.35,
+              16.65,
+              19.65
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "wallFinish": "pink"
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 8,
+          "balconies": false,
+          "wallFinish": "pink",
+          "panels": [
+            {
+              "id": "east-wing-entrance",
+              "type": "glazing",
+              "from": 0.245,
+              "to": 0.395,
+              "bottom": 4.1,
+              "top": 15.6,
+              "columns": 5,
+              "rows": 4,
+              "frameWidth": 0.09,
+              "depth": 0.12,
+              "frameFinish": "dark"
+            }
+          ]
+        }
+      ],
+      "evidence": {
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuMarxStreet1",
+            "gxuMarxStreet167",
+            "gxuWelcome2026"
+          ],
+          "note": "南入口上方青绿色玻璃、北侧石色柱脚与层间带；东翼不据西部门厅冠名。"
+        },
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCampusPlanShaw",
+            "gxuWelcome2026"
+          ],
+          "note": "旧规划图标注主体和东翼6F；迎新图在资源环境与材料学院以南标注马院。地图马院和研究基地两个点均落在该轮廓东翼；西部物理门厅仍保留原楼名。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuMarxStreet294",
+            "gxuMarxStreet1",
+            "gxuWelcome2026"
+          ],
+          "note": "294°同框可分出东西两处南向玻璃门厅；东翼南门与院系点和迎新图一致。东侧楼梯有学院巡察公告佐证，楼内门牌及各翼产权未核。"
+        }
+      },
+      "review": {
+        "facadeRules": {
+          "status": "partial",
+          "note": "南入口上方青绿色玻璃、北侧石色柱脚与层间带；东翼不据西部门厅冠名。"
+        },
+        "levels": {
+          "status": "partial",
+          "note": "旧规划图标注主体和东翼6F；迎新图在资源环境与材料学院以南标注马院。地图马院和研究基地两个点均落在该轮廓东翼；西部物理门厅仍保留原楼名。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "294°同框可分出东西两处南向玻璃门厅；东翼南门与院系点和迎新图一致。东侧楼梯有学院巡察公告佐证，楼内门牌及各翼产权未核。"
+        }
+      },
+      "levels": 6,
+      "entrances": [
+        {
+          "id": "south-glazed-entry",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 4,
+          "t": 0.145,
+          "width": 4.8,
+          "primary": false,
+          "attachedPortico": {
+            "width": 12,
+            "depth": 2.8,
+            "platformHeight": 0.85,
+            "clearHeight": 4.15,
+            "slabThickness": 0.35,
+            "parapetHeight": 0,
+            "columnWidth": 0.55,
+            "columnInset": 0.65,
+            "steps": 6,
+            "tread": 0.32,
+            "stepBaseHeight": 0
+          }
+        },
+        {
+          "id": "east-wing-south",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 8,
+          "t": 0.32,
+          "width": 5.0,
+          "primary": true,
+          "attachedPortico": {
+            "width": 9.2,
+            "depth": 2.45,
+            "platformHeight": 0.36,
+            "clearHeight": 3.5,
+            "slabThickness": 0.36,
+            "parapetHeight": 0,
+            "columnWidth": 0.45,
+            "columnInset": 0.55,
+            "steps": 3,
+            "tread": 0.32,
+            "stepBaseHeight": 0
+          }
+        }
+      ]
+    },
+    "way/1501460937": {
+      "name": "新东园门西侧低房",
+      "footprintRevision": "cad2ce503e4773c8545b7f2635372a0bd1fd92e36626eaee7221a51183a4a887",
+      "levels": 1,
+      "height": 3.35,
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuGateStreet11",
+            "newEastTour2025"
+          ],
+          "note": "西侧相邻小体量按可辨外景作一层，内部用途和门向不明。南侧临街可见低窗、竖向包板。"
+        },
+        "height": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuGateStreet11",
+            "newEastExterior2021",
+            "newEastPhoto2025"
+          ],
+          "note": "11°正面与视频00:15相比，高塔和门楣位于此轮廓以东，已由独立地标生成。低房顶在门楣以下，高3.35米按图估算。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuGateStreet11",
+            "newEastExterior2021"
+          ],
+          "note": "低房银灰竖肋及小窗按正面实拍。西侧建筑、短墙、高塔与门楣分别由对应对象生成。"
+        }
+      },
+      "review": {
+        "levels": {
+          "status": "partial",
+          "note": "西侧相邻小体量按可辨外景作一层，内部用途和门向不明。南侧临街可见低窗、竖向包板。"
+        },
+        "height": {
+          "status": "partial",
+          "note": "11°正面与视频00:15相比，高塔和门楣位于此轮廓以东，已由独立地标生成。低房顶在门楣以下，高3.35米按图估算。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "低房银灰竖肋及小窗按正面实拍。西侧建筑、短墙、高塔与门楣分别由对应对象生成。"
+        }
+      },
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 0,
+          "balconies": false,
+          "windows": false
+        }
+      ]
+    },
+    "way/759096564": {
+      "name": "外国语学院小红楼",
+      "footprintRevision": "81a42e3fffe33ba6d9b06019c335522f5b25663b6a39cf2ab03d739d3d6142e8",
+      "levels": 2,
+      "floorHeight": 3.45,
+      "roof": {
+        "type": "hipped",
+        "rise": 2.15
+      },
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuRedHouseExterior",
+            "gxuRedhouseStreet93"
+          ],
+          "note": "学院照片显示两层窗和门上窗。"
+        },
+        "floorHeight": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuRedHouseExterior",
+            "gxuRedhouseStreet93"
+          ],
+          "note": "以门窗为参照估计层高。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuRedHouseExterior",
+            "gxuRedhouseStreet93"
+          ],
+          "note": "学院斜侧照片见红瓦坡顶，按长轴四坡顶概化。"
+        },
+        "roof.rise": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuRedHouseExterior",
+            "gxuRedhouseStreet93"
+          ],
+          "note": "脊高相对于檐口估算。"
+        },
+        "entrances": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuRedHouseAddress",
+            "gxuRedHouseExterior",
+            "gxuRedhouseStreet93"
+          ],
+          "note": "93°从西面可见门廊；校方斜拍邵逸夫高楼在小红楼左后方，对应由东向西，门上挑檐与台阶可见。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuRedHouseExterior",
+            "gxuRedhouseStreet93"
+          ],
+          "note": "采用近照可辨的浅横带和端部独窗。长边开间数尚未逐一核实。"
+        }
+      },
+      "review": {
+        "levels": {
+          "status": "partial",
+          "note": "学院照片显示两层窗和门上窗。"
+        },
+        "floorHeight": {
+          "status": "partial",
+          "note": "以门窗为参照估计层高。"
+        },
+        "roof.type": {
+          "status": "partial",
+          "note": "学院斜侧照片见红瓦坡顶，按长轴四坡顶概化。"
+        },
+        "roof.rise": {
+          "status": "partial",
+          "note": "脊高相对于檐口估算。"
+        },
+        "entrances": {
+          "status": "partial",
+          "note": "93°从西面可见门廊；校方斜拍邵逸夫高楼在小红楼左后方，对应由东向西，门上挑檐与台阶可见。"
+        },
+        "facadeRules": {
+          "status": "partial",
+          "note": "采用近照可辨的浅横带和端部独窗。长边开间数尚未逐一核实。"
+        }
+      },
+      "entrances": [
+        {
+          "id": "east-porch",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 0,
+          "t": 0.5,
+          "width": 2.1,
+          "primary": true,
+          "flushEntrance": {
+            "floorHeight": 0.42,
+            "glazingHeight": 3.62,
+            "splitHeight": 3.02,
+            "bays": 1,
+            "pierWidth": 0.26,
+            "pierDepth": 0.17,
+            "doorWidth": 1.55,
+            "doorHeight": 2.18,
+            "frameWidth": 0.06,
+            "canopy": {
+              "width": 3.9,
+              "depth": 1.65,
+              "thickness": 0.27
+            }
+          }
+        },
+        {
+          "id": "west-porch",
+          "polygon": 0,
+          "ring": 0,
+          "edge": 2,
+          "t": 0.5,
+          "width": 2.1,
+          "primary": false,
+          "flushEntrance": {
+            "floorHeight": 0.42,
+            "glazingHeight": 3.62,
+            "splitHeight": 3.02,
+            "bays": 1,
+            "pierWidth": 0.26,
+            "pierDepth": 0.17,
+            "doorWidth": 1.55,
+            "doorHeight": 2.18,
+            "frameWidth": 0.06,
+            "canopy": {
+              "width": 3.9,
+              "depth": 1.65,
+              "thickness": 0.27
+            }
+          }
+        }
+      ],
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 0,
+          "balconies": false,
+          "wallFinish": "pink",
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              0.82,
+              3.48,
+              6.78
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "windows": false
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "balconies": false,
+          "wallFinish": "pink",
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              0.82,
+              3.48,
+              6.78
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "windows": true
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 2,
+          "balconies": false,
+          "wallFinish": "pink",
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              0.82,
+              3.48,
+              6.78
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "windows": false
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 3,
+          "balconies": false,
+          "wallFinish": "pink",
+          "horizontalLedges": {
+            "from": 0,
+            "to": 1,
+            "tops": [
+              0.82,
+              3.48,
+              6.78
+            ],
+            "depth": 0.19,
+            "thickness": 0.13
+          },
+          "windows": true
+        }
+      ]
     }
   }
 }

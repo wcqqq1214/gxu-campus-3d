@@ -169,6 +169,9 @@ def _parking_margin_uv(patch, points, course):
 
 
 def landscape_mesh(entry, z, C):
+    from materials_northeast_stair import applies, replace_finishes
+
+    north_side_stair = applies(entry)
     p = entry['recessedStairEntry']
     c = p['landscape']
     a = math.radians(entry['bearing'])
@@ -323,7 +326,11 @@ def landscape_mesh(entry, z, C):
         box(side * tw / 2, (end + back) / 2, top, 0.30, back - end, 0.12, 'stone')
         # Stone face of the broad terrace and guard beside the lower flight.
         wall(side * lower['width'] / 2, end, side * tw / 2, end, top, base - 0.2)
-        rail(side * lower['width'] / 2, end, side * tw / 2, end, top, top)
+        if side < 0 and north_side_stair:
+            rail(-lower['width'] / 2, end, -10.8, end, top, top)
+            rail(-13.0, end, -tw / 2, end, top, top)
+        else:
+            rail(side * lower['width'] / 2, end, side * tw / 2, end, top, top)
         rail(
             side * (lower['width'] / 2 - 0.12),
             toe,
@@ -332,6 +339,7 @@ def landscape_mesh(entry, z, C):
             base + rise,
             top,
         )
+    first_patch_face = len(mesh.f)
     for patch in c['groundPatches']:
         vs = patch['vertices']
         ts = patch['triangles']
@@ -488,4 +496,6 @@ def landscape_mesh(entry, z, C):
                     )
             for polygon in _parking_grass(patch):
                 face(polygon, 'green', grade=False)
+    if north_side_stair:
+        mesh = replace_finishes(mesh, first_patch_face, entry, z, C)
     return mesh, grading, masks

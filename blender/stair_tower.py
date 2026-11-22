@@ -2,7 +2,7 @@
 
 import math
 
-from geometry import Mesh
+from geometry import Mesh, tile_material
 
 
 def stair_access_door(mesh, door, z, C):
@@ -42,10 +42,22 @@ def stair_tower_model(b, z, C):
     roof = Mesh()
     access = Mesh()
 
-    def face(mesh, points, mat):
-        mesh.face([world(p) for p in points], mat)
+    # The courtyard photograph resolves square tiles on the vertical faces.
+    for key, file in [('biIvoryTile', 'ivory'), ('biRoseTile', 'rose')]:
+        tile_material(C, key, f'bihuyuan-{file}.png', (0.7, 0.62, 0.51))
+    ivory, rose = C['biIvoryTile'], C['biRoseTile']
 
-    def slab(mesh, shape, top, depth, mat):
+    def face(mesh, points, mat):
+        uv = None
+        if mat in (ivory, rose):
+            a, b = points[:2]
+            length = math.dist(a[:2], b[:2])
+            ux, uy = (b[0] - a[0]) / length, (b[1] - a[1]) / length
+            # The shared texture contains eight square tiles per repeat.
+            uv = [((x * ux + y * uy) / 0.8, h / 0.8) for x, y, h in points]
+        mesh.face([world(p) for p in points], mat, uvs=uv)
+
+    def slab(mesh, shape, top, depth, mat, edge_mat=None):
         for poly, ts in zip(shape['polygons'], shape['triangles']):
             flat = [p for ring in poly for p in ring[:-1]]
             for i in range(0, len(ts), 3):
@@ -60,7 +72,7 @@ def stair_tower_model(b, z, C):
                     face(
                         mesh,
                         [(*a, top - depth), (*b, top - depth), (*b, top), (*a, top)],
-                        mat,
+                        edge_mat if edge_mat is not None else mat,
                     )
 
     def wall(a, b, low0, low1):
@@ -74,29 +86,37 @@ def stair_tower_model(b, z, C):
         bb = [b[0] + nx * t, b[1] + ny * t]
         h = c['parapetHeight']
         for lo, hi, mat in [
-            (0, h * 0.72, C['white']),
-            (h * 0.72, h * 0.84, C['pink']),
-            (h * 0.84, h, C['white']),
+            (0, h * 0.72, ivory),
+            (h * 0.72, h * 0.84, rose),
+            (h * 0.84, h, ivory),
         ]:
-            p = [
-                (*a, low0 + lo),
-                (*b, low1 + lo),
-                (*bb, low1 + lo),
-                (*aa, low0 + lo),
-                (*a, low0 + hi),
-                (*b, low1 + hi),
-                (*bb, low1 + hi),
-                (*aa, low0 + hi),
-            ]
-            for ids in [
-                (3, 2, 1, 0),
-                (0, 1, 5, 4),
-                (1, 2, 6, 5),
-                (2, 3, 7, 6),
-                (3, 0, 4, 7),
-                (4, 5, 6, 7),
-            ]:
-                face(body, [p[i] for i in ids], mat)
+            face(
+                body,
+                [(*a, low0 + lo), (*b, low1 + lo), (*b, low1 + hi), (*a, low0 + hi)],
+                mat,
+            )
+            face(
+                body,
+                [
+                    (*bb, low1 + lo),
+                    (*aa, low0 + lo),
+                    (*aa, low0 + hi),
+                    (*bb, low1 + hi),
+                ],
+                mat,
+            )
+        for start, end, low in [(a, aa, low0), (bb, b, low1)]:
+            face(
+                body,
+                [(*end, low), (*start, low), (*start, low + h), (*end, low + h)],
+                C['white'],
+            )
+        face(
+            body,
+            [(*a, low0 + h), (*b, low1 + h), (*bb, low1 + h), (*aa, low0 + h)],
+            C['white'],
+        )
+        face(body, [(*aa, low0), (*bb, low1), (*b, low1), (*a, low0)], C['white'])
 
     cut = c['landingCut']
     well = c['wellWidth']
@@ -221,7 +241,7 @@ def stair_tower_model(b, z, C):
                 wall([x0, y0], [x0, y1], low, high)
                 wall([x1, y1], [x1, y0], high, low)
     roof_top = b['height']
-    slab(roof, s['roof'], roof_top, c['roofThickness'], C['white'])
+    slab(roof, s['roof'], roof_top, c['roofThickness'], C['white'], edge_mat=rose)
     for p in c['columns']:
         x, y = p['center']
         top = (
@@ -229,8 +249,15 @@ def stair_tower_model(b, z, C):
             if p['top'] == 'roof'
             else base + (levels - 1) * gap - depth
         )
-        point = world((x, y, (base + top) / 2))
-        body.box(*point, p['width'], p['width'], top - base, C['white'], angle)
+        half = p['width'] / 2
+        corners = [
+            (x - half, y - half),
+            (x + half, y - half),
+            (x + half, y + half),
+            (x - half, y + half),
+        ]
+        for a, b in zip(corners, corners[1:] + corners[:1]):
+            face(body, [(*a, base), (*b, base), (*b, top), (*a, top)], ivory)
     result = Mesh()
     result.add_part('01_主体轮廓', body)
     result.add_part('02_屋顶轮廓', roof)

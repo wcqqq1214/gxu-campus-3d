@@ -5,6 +5,7 @@ import math
 from dining_interiors import interior_finish
 from geometry import Mesh
 from huicui_front import dining_windows, finishes, hotel_lobby, lobby_side_glazing
+from huicui_stair import east_stair_entry
 
 
 def compact_source(obj):
@@ -136,6 +137,42 @@ def huicui(b, z, C, detail=True):
     entry = hotel_lobby(yn, z, C, detail)
     m.add_part('荟萃楼北门 · 双柱铝板雨棚、滑动玻璃门与两级踏步', entry)
 
+    south_arcade = e.get('southArcade')
+    if south_arcade:
+        south = Mesh()
+        soffit = e['arcadeClearHeight']
+        for poly, tri in zip(south_arcade['polygons'], south_arcade['triangles']):
+            flat = [v for ring in poly for v in ring[:-1]]
+            for i in range(0, len(tri), 3):
+                south.face(
+                    [
+                        (flat[k][0], flat[k][1], z + soffit)
+                        for k in reversed(tri[i : i + 3])
+                    ],
+                    trim,
+                )
+        pitch = (x1 - x0) / 14
+        for i in range(14):
+            x = x0 + (i + 0.5) * pitch
+            south.cylinder(
+                x, y0 + 0.7, z + soffit / 2, 0.43, soffit, trim, 16 if detail else 8
+            )
+            pane(south, x, y0 + 3.1, 3.6, pitch - 0.55, 6.25, divisions=3)
+        upper_pitch = (x1 - x0) / 42
+        for i in range(42):
+            x = x0 + (i + 0.5) * upper_pitch
+            for zz in (19.08, 22.85):
+                pane(south, x, y0, zz, 0.95, 2.25, divisions=1)
+            south.box(x - upper_pitch / 2, y0 - 0.20, z + 20.58, 0.18, 0.45, 7.55, trim)
+        m.add_part('新闻学院南翼 · 架空圆柱廊与双层窄窗', south)
+
+    east_entry = e.get('eastStairEntry')
+    if east_entry:
+        m.add_part(
+            '新闻教学区东端入口首跑',
+            east_stair_entry(east_entry, z, e['arcadeClearHeight'], C, detail, pane),
+        )
+
     other = Mesh()
     roof = Mesh()
     # Retain all courtyard edges and the mapped curved western recess. Unseen
@@ -157,12 +194,29 @@ def huicui(b, z, C, detail=True):
                 continue
             n = max(1, round(length / 4.2))
             for zz in [2.9, 6.05, 10.83, 14.21, 19.08, 22.85, 27.03]:
+                if (
+                    south_arcade
+                    and ri == 0
+                    and my < y0 + 0.3
+                    and (zz < 8.15 or 16.7 < zz < 24.55)
+                ):
+                    continue
                 for i in range(n):
                     t = (i + 0.5) / n
                     x = a[0] + t * dx
                     y = a[1] + t * dy
                     # Do not cap the side ends of the north colonnade with glazing.
-                    if zz < 8.15 and y > back - 0.5:
+                    if zz < 8.15 and (
+                        y > back - 0.5 or (south_arcade and y < y0 + 3.1)
+                    ):
+                        continue
+                    if (
+                        east_entry
+                        and ri == 0
+                        and zz < e['arcadeClearHeight']
+                        and x > x1 - 0.2
+                        and east_entry['south'] - 1.3 < y < east_entry['north'] + 1.3
+                    ):
                         continue
                     if 16.7 < zz < 24.55 and x < -36.1 and y > yn - 4.5:
                         continue

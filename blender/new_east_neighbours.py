@@ -14,6 +14,7 @@ from pathlib import Path
 import bpy
 
 import geometry
+from facade_bands import add_band_windows
 from geometry import Mesh
 
 EAST_25 = 'way/1501460952'
@@ -112,7 +113,14 @@ def facade_details(b, z, C, detail, facades):
         h, levels = facade['height'], max(1, round(facade['levels']))
         floor = h / levels
 
+        band = facade['rule'].get('windowBands')
+        corridor = facade['rule'].get('openCorridor')
+        recess = 0
+        if band:
+            add_band_windows(m, facade, z, C, detail)
+
         def box(u, height, width, depth, tall, material, offset):
+            offset -= recess
             m.box(
                 a[0] + tx * u + nx * offset,
                 a[1] + ty * u + ny * offset,
@@ -126,6 +134,8 @@ def facade_details(b, z, C, detail, facades):
 
         # The same bands, corner strips and sills survive the near/base swap.
         for level in range(1, levels):
+            if band or corridor:
+                continue
             box(length / 2, level * floor, length, 0.06, 0.22, trim, 0.045)
         for u in (0.12, length - 0.12):
             box(u, h / 2, 0.24, 0.055, h, trim, 0.035)
@@ -136,6 +146,18 @@ def facade_details(b, z, C, detail, facades):
         shops = shop_layout(b, facade)
         street_side = b['id'] == WEST_SHOPS and shops is not None
         for level in range(levels):
+            if band and band['firstLevel'] <= level <= band.get(
+                'lastLevel', levels - 1
+            ):
+                continue
+            recess = (
+                corridor['depth']
+                if corridor
+                and corridor['firstLevel']
+                <= level
+                <= corridor.get('lastLevel', levels - 1)
+                else 0
+            )
             # The historical street view shows taller upper-storey openings
             # and pale warm panels below them; unseen elevations stay unchanged.
             street_upper = street_side and level > 0
@@ -143,6 +165,11 @@ def facade_details(b, z, C, detail, facades):
             center_z = (level + 0.56) * floor
             for column in range(count):
                 u = (column + 0.5) * length / count
+                if (
+                    recess
+                    and min(u, length - u) < corridor['endInset'] + (width + 0.24) / 2
+                ):
+                    continue
                 if level == 0 and shops:
                     shop_start, bays, pitch = shops
                     if (
@@ -208,6 +235,7 @@ def facade_details(b, z, C, detail, facades):
                 sill_top = center_z - tall / 2 - 0.065
 
                 def sill_point(along, offset, height):
+                    offset -= recess
                     return (
                         a[0] + tx * along + nx * offset,
                         a[1] + ty * along + ny * offset,

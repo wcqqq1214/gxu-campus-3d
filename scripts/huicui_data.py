@@ -34,9 +34,20 @@ def prepare_huicui():
     # the west end of the dining floor is open in the May 2026 lawn view.
     vestibule = box(-4.07, north - 8.0, 4.07, north)
     west_loggia = box(local.bounds[0] - 1, north - 4.5, -36.1, north + 1)
+    # Views from the two southern approaches show an open two-storey edge.
+    south = local.bounds[1]
+    south_arcade = local.intersection(box(-100, south - 1, 100, south + 3.1))
+    # Two east-road panoramas show a glazed doorway and an adjacent flight
+    # ascending into the recessed southeast bay. Only the visible run is known.
+    east = local.bounds[2]
+    entry = dict(east=east, south=south + 3.1, north=south + 14.7, depth=7.0)
+    stair_pocket = box(east - entry['depth'], entry['south'], east + 1, entry['north'])
     storeys = [
         (
-            local.difference(arcade).difference(vestibule),
+            local.difference(arcade)
+            .difference(vestibule)
+            .difference(south_arcade)
+            .difference(stair_pocket),
             '首层及夹层 · 北侧退进门厅',
             0,
             8.15,
@@ -55,14 +66,25 @@ def prepare_huicui():
         height=l['height'],
         heightBasis='北立面跨度与七层窗带照片比例估算',
         customModel='huicui',
-        facadeBasis='荟萃楼北立面依据2026年5月住客入口与草坪斜拍、校方全景独立建模；其余立面按轮廓及同楼风格估算',
-        sourceRefs=['osm', l['reference'], *l['additionalReferences']],
+        facadeBasis='荟萃楼北立面依据2026年5月住客入口与草坪斜拍、校方全景独立建模；南侧架空柱列及上部窗肋依据双向街景，柱距和退深估算',
+        sourceRefs=[
+            'osm',
+            l['reference'],
+            *l['additionalReferences'],
+            'gxuNewsStreet27',
+            'gxuNewsStreet307',
+            'gxuNewsEast299',
+            'gxuNewsEast268',
+            'gxuWelcome2026',
+        ],
         architecture={
             'origin': origin,
             'angle': angle,
             'bounds': list(local.bounds),
             'parts': parts,
             'arcadeCeiling': pack(arcade, '北侧柱廊顶板', 0.2),
+            'eastStairEntry': entry,
+            'southArcade': pack(south_arcade, '新闻学院南侧柱廊', 0.2),
             'footprint': [list(local.exterior.coords)]
             + [list(r.coords) for r in local.interiors],
             'hotelEntrance': [0, north],
