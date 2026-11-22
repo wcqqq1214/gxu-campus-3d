@@ -54,7 +54,7 @@ npm run preview       # 本地预览：http://127.0.0.1:4300/gxu-campus-3d/
 
 ### 检查与测试
 
-- **前端检查**：`npm run check` 会依次执行 TypeScript 类型检查、oxlint 校验和 JS/TS 单元测试。
+- **前端检查**：`npm run check` 会依次执行 TypeScript 类型检查、oxlint 校验和 JS/TS 单元测试。CI 安装 npm 依赖后先运行 `npm run typecheck:fast`，用 tsrs 提前发现类型错误。本地也可单独运行这条命令。
 - **Python 检查**：Python 版本在 [.python-version](.python-version) 中固定为 3.12。安装开发依赖后，可用 `npm run lint:python` 运行 Ruff 检查，用 `npm run format:python` 格式化代码。
 - **浏览器回归**：先运行 `npx playwright install chromium`，再执行 `npm run test:browser`，验证菜单交互、相机控制以及中英文界面。
 

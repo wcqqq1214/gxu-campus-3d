@@ -54,7 +54,7 @@ npm run preview       # Serve at http://127.0.0.1:4300/gxu-campus-3d/
 
 ### Checks and tests
 
-- **Frontend checks**: `npm run check` runs TypeScript type checking, oxlint, and JS/TS unit tests.
+- **Frontend checks**: `npm run check` runs TypeScript type checking, oxlint, and JS/TS unit tests. CI runs `npm run typecheck:fast` immediately after installing npm dependencies to catch type errors early with tsrs. You can also run it locally.
 - **Python checks**: Python is pinned to 3.12 in [.python-version](.python-version). After installing the dev dependencies, run `npm run lint:python` for Ruff checks and `npm run format:python` to format.
 - **Browser regressions**: Install Chromium with `npx playwright install chromium`, then run `npm run test:browser` to test menus, cameras, and the bilingual interface.
 
