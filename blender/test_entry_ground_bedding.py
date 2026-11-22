@@ -132,7 +132,20 @@ class RearShoulderTests(unittest.TestCase):
         site.pop('buildingElevation', None)
         colors = {
             name: material('datum-test-' + name, (0.5, 0.5, 0.5))
-            for name in ('grass', 'stone', 'path', 'green', 'dark', 'white', 'glass')
+            for name in (
+                'grass',
+                'stone',
+                'path',
+                'green',
+                'dark',
+                'white',
+                'glass',
+                'curb',
+                'asphalt',
+                'wallStone',
+                'gateStone',
+                'slate',
+            )
         }
         sampled = []
 

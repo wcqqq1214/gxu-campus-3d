@@ -1454,7 +1454,7 @@ def export(name, groups):
         from college_chunk_budget import optimize_export
 
         optimize_export(path)
-    if name == 'base.glb':
+    if name == 'base.glb' and 'roads' in groups and groups['roads'].f:
         from road_budget import fit_road_budget
 
         fit_road_budget(path)
