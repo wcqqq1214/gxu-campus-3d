@@ -84,7 +84,7 @@ try {
       globalThis.__panelCameraProbe = () => ({
         position: camera.position.toArray(), target: controls.target.toArray(),
         projection: camera.projectionMatrix.toArray(), span: getSnapshot().span,
-        loading: [...loading], orbiting, tweenStart: tween?.start ?? null,
+        queuedDetails: details.queued, orbiting, tweenStart: tween?.start ?? null,
         frame: {...frame}, width: host.clientWidth, height: host.clientHeight,
         framedWidth, framedHeight, settledUpdates: panelSettledUpdates
       });\n`;
@@ -109,10 +109,9 @@ try {
           const scene = globalThis.__panelCameraProbe();
           return (
             m.readyMs > 0 &&
-            m.queuedDetails === 0 &&
+            scene.queuedDetails === 0 &&
             scene.tweenStart === null &&
-            scene.settledUpdates >= 2 &&
-            !scene.loading.some((key) => key.startsWith('landmark-'))
+            scene.settledUpdates >= 2
           );
         },
         undefined,
