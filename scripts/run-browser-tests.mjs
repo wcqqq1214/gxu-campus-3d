@@ -152,6 +152,10 @@ async function check(name, script, env, server) {
       }),
     ]);
     console.log(`通过：${name}`);
+  } catch (error) {
+    const log = await readFile(path.join(output, `${name}.log`), 'utf8');
+    console.error(log.trimEnd().split('\n').slice(-16).join('\n').slice(-4000));
+    throw error;
   } finally {
     clearTimeout(timer);
     await stop(task);
@@ -190,12 +194,14 @@ try {
     { MENU_TEST_URL: devUrl },
     dev,
   );
-  await check(
-    'camera',
-    'scripts/check-panel-camera-browser.mjs',
-    { PANEL_TEST_URL: devUrl },
-    dev,
-  );
+  for (const viewport of ['desktop', 'mobile']) {
+    await check(
+      `camera-${viewport}`,
+      'scripts/check-panel-camera-browser.mjs',
+      { PANEL_TEST_URL: devUrl, PANEL_VIEWPORT: viewport },
+      dev,
+    );
+  }
   await stop(dev);
   const preview = start('preview-server', ['scripts/preview.mjs'], {
     PORT: String(previewPort),
@@ -208,7 +214,7 @@ try {
     { I18N_URL: previewUrl },
     preview,
   );
-  console.log(`三项浏览器回归通过；产物：${output}`);
+  console.log(`浏览器回归全部通过；产物：${output}`);
 } finally {
   await Promise.all(processes.map(stop));
   clearTimeout(interruptTimer);
