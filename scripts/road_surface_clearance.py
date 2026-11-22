@@ -189,7 +189,7 @@ def conform_repaired_edges(mesh, repairs, targets):
     return mesh
 
 
-def repair_clearance(mesh, terrain, materials, repairs):
+def repair_clearance(mesh, terrain, materials, repairs, *, rendered_faces=None):
     targets = {
         r.get('material', 'asphalt'): materials[r.get('material', 'asphalt')]
         for r in repairs
@@ -209,7 +209,13 @@ def repair_clearance(mesh, terrain, materials, repairs):
     for repair in repairs:
         x0, y0, x1, y1 = repair['bounds']
         mask = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
-        for face in terrain.f:
+        faces = terrain.f
+        if repair.get('useExportTriangles'):
+            if rendered_faces is None and any(len(face) != 3 for face in faces):
+                raise ValueError('Export triangles are needed for this ground repair')
+            if rendered_faces is not None:
+                faces = rendered_faces
+        for face in faces:
             for i in range(1, len(face) - 1):
                 triangle = [terrain.v[j] for j in (face[0], face[i], face[i + 1])]
                 if (

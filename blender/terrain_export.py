@@ -17,6 +17,7 @@ from preserve_glb_geometry import (
     preserve_geometry,
     replace_compressed_node_parts,
 )
+from terrain_budget import fit_terrain_budget
 from terrain_precision_config import load_precision_regions
 
 TERRAIN_BITS = 18
@@ -130,6 +131,10 @@ def replace_precise_terrain(
                     precise.read_bytes(), path, [name], materials=materials
                 )
     compact_buffer_views(path, optimize_jpegs=True)
+    original = path.read_bytes()
+    candidate, _ = fit_terrain_budget(original)
+    if candidate is not original:
+        path.write_bytes(candidate)
 
 
 if __name__ == '__main__':

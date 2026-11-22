@@ -27,6 +27,36 @@ class Mesh:
 
 
 class RoadSurfaceClearanceTests(unittest.TestCase):
+    def test_export_diagonal_on_a_warped_ground_quad(self):
+        terrain, road = Mesh(), Mesh()
+        terrain.face([(0, 0, 0), (2, 0, 1), (2, 2, 0), (0, 2, 1)], 0)
+        road.face([(0, 0, 0), (2, 0, 0), (2, 2, 0), (0, 2, 0)], 0)
+        repairs = [
+            dict(
+                bounds=[0, 0, 2, 2],
+                clearance=0.05,
+                maxLift=1.1,
+                useExportTriangles=True,
+            )
+        ]
+        with self.assertRaisesRegex(ValueError, 'Export triangles'):
+            repair_clearance(road, terrain, {'asphalt': 0}, repairs)
+        fixed, _ = repair_clearance(
+            road,
+            terrain,
+            {'asphalt': 0},
+            repairs,
+            rendered_faces=[(0, 1, 3), (1, 2, 3)],
+        )
+        z = []
+        for face in fixed.f:
+            points = [fixed.v[i] for i in face]
+            if Polygon([v[:2] for v in points]).covers(Point(1, 1)):
+                a, b, c = plane(*points[:3])
+                z.append(a + b + c)
+        self.assertTrue(z)
+        self.assertAlmostEqual(max(z), 1.05)
+
     def test_terrain_peak_is_covered_without_overlays_or_uv_changes(self):
         road, terrain = Mesh(), Mesh()
         road.face([(-2, -2, 0), (2, -2, 0), (2, 2, 0)], 0)

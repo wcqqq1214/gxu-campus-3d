@@ -121,11 +121,13 @@ def main():
         terrain = Mesh()
         terrain.v = [tuple(ground.matrix_world @ v.co) for v in ground.data.vertices]
         terrain.f = [tuple(p.vertices) for p in ground.data.polygons]
+        ground.data.calc_loop_triangles()
         result, report = repair_clearance(
             mesh,
             terrain,
             {m.name: i for i, m in enumerate(road.data.materials)},
             repairs,
+            rendered_faces=[tuple(t.vertices) for t in ground.data.loop_triangles],
         )
         assert report['changedFaces'] > 0, report
         return result, report

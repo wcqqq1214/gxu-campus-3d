@@ -750,6 +750,14 @@ base['terrain'], base['green'], shore_meshes, shore_report = build_shores(
     shores, C, base['terrain'], base['green']
 )
 base.update(shore_meshes)
+from lakes_east import apply_lakes as apply_east_lakes
+from lakes_north import apply_lakes as apply_north_lakes
+from lakes_west import apply_lakes as apply_west_lakes
+
+apply_north_lakes(base, surfaces, C)
+apply_east_lakes(base, surfaces, C)
+apply_west_lakes(base, surfaces, C)
+
 from foundation_geometry import build_foundations
 
 base['terrain'], base['roads'], foundation_report = build_foundations(
@@ -1096,9 +1104,14 @@ base['roads'] = market_ground(base['roads'], clearance=0.02)
 
 base['roads'], road_display_report = trim_mesh(base['roads'], load_cuts(ROOT))
 from road_surface_clearance import load_repairs, repair_clearance
+from site_geometry import mesh_triangles
 
 base['roads'], road_clearance_report = repair_clearance(
-    base['roads'], base['terrain'], C, load_repairs(ROOT)
+    base['roads'],
+    base['terrain'],
+    C,
+    load_repairs(ROOT),
+    rendered_faces=[face for face, _ in mesh_triangles(base['terrain'])],
 )
 from computer_site import computer_forecourt
 
@@ -1125,7 +1138,11 @@ for building in buildings:
         for entrance in building['form']['entrances']:
             if materials_side_entry(entrance):
                 finish_materials_road(
-                    base['roads'], entrance, building['elevation'], C, terrain=base['terrain']
+                    base['roads'],
+                    entrance,
+                    building['elevation'],
+                    C,
+                    terrain=base['terrain'],
                 )
                 build_materials_civil_lanes(
                     base, entrance, building['elevation'], C, trees
@@ -1155,6 +1172,90 @@ from physics_street_grade import build_physics_street_grade
 
 build_physics_approaches(base, C)
 build_physics_street_grade(base, C)
+
+from farm_road_bed import lower_farm_road_bed
+
+base['terrain'] = lower_farm_road_bed(base['terrain'], base['roads'], C)
+
+from road_review_east import apply_roads as apply_east_roads
+from road_review_north import apply_roads as apply_north_roads
+from road_review_west import apply_roads as apply_west_roads
+
+apply_west_roads(base, C)
+apply_east_roads(base, C)
+apply_north_roads(base, C)
+
+from refine_roads_east import apply as apply_roads_east
+from refine_roads_north import apply as apply_roads_north
+from refine_roads_west import apply as apply_roads_west
+from refine_terrain_east import apply as apply_terrain_east
+from refine_terrain_north import apply as apply_terrain_north
+from refine_terrain_west import apply as apply_terrain_west
+
+apply_roads_west(base, C)
+apply_roads_east(base, C)
+apply_roads_north(base, C)
+apply_terrain_west(base, C)
+apply_terrain_east(base, C)
+apply_terrain_north(base, C)
+
+from tree_terrain_changes import apply_tree_heights, tree_surface_heights
+
+
+def sync_tree_contacts(previous_surface):
+    current_surface = tree_surface_heights(trees, base['terrain'])
+    moved_trees = apply_tree_heights(trees, previous_surface, current_surface)
+    if moved_trees:
+        (DATA / 'vegetation.json').write_text(
+            json.dumps(trees, separators=(',', ':')) + '\n'
+        )
+        if not BASE_ONLY:
+            for i in moved_trees:
+                bpy.data.objects[f'树木示意-{i:04}'].location.z = trees[i][4]
+    return current_surface
+
+
+previous_surface = tree_surface_heights(trees, base['terrain'])
+from next_roads_east import apply as next_roads_east_apply
+from next_roads_north import apply as next_roads_north_apply
+from next_roads_west import apply as next_roads_west_apply
+from next_seams_south import apply as next_seams_south_apply
+from next_terrain_east import apply as next_terrain_east_apply
+from next_terrain_north import apply as next_terrain_north_apply
+from next_terrain_west import apply as next_terrain_west_apply
+
+next_roads_west_apply(base, C)
+next_roads_east_apply(base, C)
+next_roads_north_apply(base, C)
+next_terrain_west_apply(base, C)
+next_terrain_east_apply(base, C)
+next_terrain_north_apply(base, C)
+next_seams_south_apply(base, C)
+previous_surface = sync_tree_contacts(previous_surface)
+
+from v5_roads_east import apply as v5_roads_east_apply
+from v5_roads_north import apply as v5_roads_north_apply
+from v5_roads_west import apply as v5_roads_west_apply
+from v5_terrain_east import apply as v5_terrain_east_apply
+from v5_terrain_north import apply as v5_terrain_north_apply
+from v5_terrain_west import apply as v5_terrain_west_apply
+
+v5_roads_west_apply(base, C)
+v5_roads_east_apply(base, C)
+v5_roads_north_apply(base, C)
+v5_terrain_west_apply(base, C)
+v5_terrain_east_apply(base, C)
+v5_terrain_north_apply(base, C)
+previous_surface = sync_tree_contacts(previous_surface)
+
+
+from verge_east import apply as apply_east_verges
+from verge_west import apply as apply_west_verges
+
+apply_west_verges(base, C)
+apply_east_verges(base, C)
+sync_tree_contacts(previous_surface)
+
 
 for k, m in base.items():
     if not BASE_ONLY and k.startswith('north-campus-'):
@@ -1353,6 +1454,10 @@ def export(name, groups):
         from college_chunk_budget import optimize_export
 
         optimize_export(path)
+    if name == 'base.glb':
+        from road_budget import fit_road_budget
+
+        fit_road_budget(path)
     if name.startswith('basketball-bank-'):
         from basketball_export import extract_bank
 
