@@ -65,7 +65,7 @@ jobs:
       - name: 安装浏览器回归运行时
         run: npx --no-install playwright install --with-deps --no-shell chromium
       - name: 菜单、相机与中英文浏览器回归
-        timeout-minutes: 25
+        timeout-minutes: 45
         run: npm run test:browser -- --skip-build
         env:
           SWIFTSHADER: '1'

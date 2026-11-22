@@ -58,7 +58,7 @@ npm run test:browser
 `npm run test:browser` 先构建 Pages，再启动服务依次运行菜单、相机与 i18n 检查：
 - **检查内容**：菜单与相机连接开发服务（相机探针仅注入测试响应）；i18n 使用 `out/` 静态产物并覆盖 `/gxu-campus-3d/` 子路径。视口覆盖 `1280px`、`390px`，i18n 另含 `320px` 及语言恢复、分享导出、存储受限与 WebGL 不可用场景。
 - **端口与复用**：默认占用 `4317`、`4318` 端口（已被占用直接报错；可用 `BROWSER_DEV_PORT`、`BROWSER_PREVIEW_PORT` 调整），退出、失败或中断时自动清理子进程。支持 macOS/Linux；刚构建过且 `PAGES_BASE_PATH` 一致（空字符串或 `/gxu-campus-3d`）时，可用 `-- --skip-build` 复用产物。
-- **输出与超时**：每次运行写入 `work/browser-checks/run-*`（含服务日志、断言输出、视口 trace 及未完成页面截图/控制台/网络日志；CI 失败上传保留 7 天），可用 `npx playwright show-trace <trace.zip>` 回放 DOM 与网络记录。单项超时 10 分钟，CI 浏览器步骤上限 25 分钟。
+- **输出与超时**：每次运行写入 `work/browser-checks/run-*`（含服务日志、断言输出、视口 trace 及未完成页面截图/控制台/网络日志；CI 失败上传保留 7 天），可用 `npx playwright show-trace <trace.zip>` 回放 DOM 与网络记录。菜单、桌面相机、手机相机、i18n 依次运行，各限时 10 分钟。相机日志记录场景耗时和最近的队列、动画状态。CI 浏览器步骤上限 45 分钟，包含服务启动和清理。
 - **渲染与覆盖变量**：默认使用 [Chromium 新无头模式](https://playwright.dev/docs/browsers#chromium-new-headless-mode)（`channel: chromium`），本地用可用 GPU，CI 设 `SWIFTSHADER=1` 走软件渲染（本地可用同变量复测）。此入口仅作功能回归，不比较 GPU 性能；支持 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`BROWSER_PATH`、`I18N_BROWSER=webkit`（需自装浏览器）及单脚本 URL 覆盖。
 
 ## 数据和完整模型构建
@@ -224,7 +224,7 @@ PANEL_TEST_URL=http://127.0.0.1:3000/ node scripts/check-panel-camera-browser.mj
 BASELINE_URL=http://127.0.0.1:4432/gxu-campus-3d/ REFINEMENT_URL=http://127.0.0.1:4430/gxu-campus-3d/ PERFORMANCE_REPORT=work/performance-check.json node scripts/check-campus-performance.mjs
 ```
 
-前两项覆盖桌面和手机且需连接运行中的开发服务（已纳入 `npm run test:browser`）；改动可访问名称时须同步翻译与这些脚本中的定位器。性能对照脚本 `check-campus-performance.mjs` 要求两端同视口、同相机、同画质与同构建前端（自动核对 JS 哈希），区分加载、静止与持续运动帧率；按真实耗时三组交替采样取中位数，由 `MutationObserver` 缓存在页面中，缺帧号、延迟超 `200` 毫秒或相位误差超 `0.03` 弧度即失败并保留已完成轮次（采集链路由 `scripts/check-benchmark-capture.mjs` 保护）。
+前两项默认覆盖桌面和手机，相机脚本可用 `PANEL_VIEWPORT=desktop` 或 `mobile` 单跑一个视口。两项均需连接运行中的开发服务（已纳入 `npm run test:browser`）；改动可访问名称时须同步翻译与这些脚本中的定位器。性能对照脚本 `check-campus-performance.mjs` 要求两端同视口、同相机、同画质与同构建前端（自动核对 JS 哈希），区分加载、静止与持续运动帧率；按真实耗时三组交替采样取中位数，由 `MutationObserver` 缓存在页面中，缺帧号、延迟超 `200` 毫秒或相位误差超 `0.03` 弧度即失败并保留已完成轮次（采集链路由 `scripts/check-benchmark-capture.mjs` 保护）。
 
 ### 历史复现
 
