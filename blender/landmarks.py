@@ -109,14 +109,7 @@ def landmark(l, b, z, C, detail=True):
     x = (xmin + xmax) / 2
     y = (ymin + ymax) / 2
     h = l['height']
-    stone, white, glass, dark, _roof, wood = (
-        C['stone'],
-        C['white'],
-        C['glass'],
-        C['dark'],
-        C['slate'],
-        C['wood'],
-    )
+    stone, white, glass, wood = C['stone'], C['white'], C['glass'], C['wood']
     if k == 'south-gate':
         return south_gate(x, y, z, C, detail, footprint_width=w, footprint_depth=d)
     elif k == 'auditorium':
@@ -169,8 +162,8 @@ def landmark(l, b, z, C, detail=True):
                 )
         steps(m, x, front - 6, z, w * 0.94, 9, 1.2, stone)
     elif k == 'stadium':
-        from west_gym_shell import stadium_shell
         from west_gym_entrances import add_entrances
+        from west_gym_shell import stadium_shell
 
         m = stadium_shell(l, b, z, C, detail)
         add_entrances(m, l, b, z, C, detail)

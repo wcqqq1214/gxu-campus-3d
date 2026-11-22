@@ -309,7 +309,10 @@ def optimize_export(path):
             # normals and seam duplicates survive this last budget pass.
             changes.extend(
                 optimize_node(
-                    doc, binary, node, far,
+                    doc,
+                    binary,
+                    node,
+                    far,
                     retry_before_view=original_view_count,
                     textured=True,
                 )

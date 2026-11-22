@@ -241,14 +241,29 @@ def food_annex(b, z, C, detail):
     for height in (9.13, 12.23):
         for x, y, width in ((-593.15, -1077.53, 1.44), (-598.82, -1074.58, 4.33)):
             f.box(x + 0.05, y, z + height, 0.13, width, 2.17, C['dark'])
-            f.box(x + 0.14, y + width * 0.10, z + height, 0.10,
-                  width * 0.73, 2.01, C['libraryGlass'])
+            f.box(
+                x + 0.14,
+                y + width * 0.10,
+                z + height,
+                0.10,
+                width * 0.73,
+                2.01,
+                C['libraryGlass'],
+            )
             if detail:
                 for j in range(4):
-                    f.box(x + 0.21, y + (j - 1.5) * width * 0.21,
-                          z + height, 0.05, 0.05, 2.06, C['metal'])
-            m.box(x + 0.04, y, z + height - 1.19, 0.44, width + 0.10,
-                  0.25, C['tenWall'])
+                    f.box(
+                        x + 0.21,
+                        y + (j - 1.5) * width * 0.21,
+                        z + height,
+                        0.05,
+                        0.05,
+                        2.06,
+                        C['metal'],
+                    )
+            m.box(
+                x + 0.04, y, z + height - 1.19, 0.44, width + 0.10, 0.25, C['tenWall']
+            )
     # A wide metal-framed ground light sits under the blind apron of the
     # low east tip. The service opening alongside it is visible in low-0.
     f.box(-590.14, -1081.03, z + 1.48, 0.18, 4.94, 2.57, C['huicuiFrame'])

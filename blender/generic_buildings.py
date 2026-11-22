@@ -64,8 +64,6 @@ from flush_entrance import add_flush_entrance, flush_entrance_blocks_window
 from food_college import BUILDING_ID as FOOD_ID
 from food_college import food_college
 from geometry import Mesh
-from mechanical_college import BUILDING_ID as MECHANICAL_ID
-from mechanical_college import mechanical_college
 from humanities_facades import (
     GATE,
     HISTORIC_PAIR,
@@ -88,6 +86,8 @@ from humanities_facades import (
     shaw_front,
     yulin_front,
 )
+from mechanical_college import BUILDING_ID as MECHANICAL_ID
+from mechanical_college import mechanical_college
 from nanyuan import CANTEEN_ID, nanyuan
 from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS
 from new_east_neighbours import (
@@ -524,7 +524,9 @@ def shared_form(b, z, C, *, entrance_mesh=None, shaw_entry=None):
                 ):
                     continue
                 parapet_height = (
-                    0.26 if b['id'] == 'way/880089961' and 'openBelow' in part else rim_height
+                    0.26
+                    if b['id'] == 'way/880089961' and 'openBelow' in part
+                    else rim_height
                 )
                 if b['id'] == 'way/759165563':
                     parapet_height = 1.12
