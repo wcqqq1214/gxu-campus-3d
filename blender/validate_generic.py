@@ -18,7 +18,7 @@ from mathutils.kdtree import KDTree
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'blender'), str(ROOT / 'scripts')]
-from building_models import building_mesh
+from building_models import SURVEYED, building_mesh
 from campus_offices import IDS as OFFICE_IDS
 from college_facades import BUILDERS as COLLEGE_FACADES
 from dining_halls import BEI, BI, BO, CUI, DONG, FRONTS, XIU
@@ -936,6 +936,11 @@ def main():
     if chunk:
         bs = [b for b in bs if by_building.get(b['id']) == chunk]
         assert bs, ('Unknown or empty ordinary building chunk', chunk)
+    selected = {a.split('=', 1)[1] for a in sys.argv if a.startswith('--building=')}
+    if selected:
+        bs = [b for b in bs if b['id'] in selected]
+        if {b['id'] for b in bs} != selected:
+            raise ValueError('Missing selected ordinary buildings')
     colors = [
         'pink',
         'residenceStone',
@@ -1000,6 +1005,7 @@ def main():
     generated = []
     authored_ids = (
         RESIDENCE_IDS
+        | SURVEYED.keys()
         | OFFICE_IDS
         | COLLEGE_MODELS.keys()
         | COLLEGE_FACADES.keys()
