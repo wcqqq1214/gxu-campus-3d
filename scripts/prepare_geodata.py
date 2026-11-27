@@ -173,6 +173,16 @@ def prepare():
     buildings = []
     landmarks = json.loads((ROOT / 'data/landmarks.json').read_text())
     lmids = {l['osmId']: l for l in landmarks if l.get('osmId')}
+    if len({l['id'] for l in landmarks}) != len(landmarks) or len(lmids) != sum(
+        bool(l.get('osmId')) for l in landmarks
+    ):
+        raise ValueError('Duplicate landmark ID or mapped feature in the catalogue')
+    for l in landmarks:
+        refs = {l['reference'], *l.get('additionalReferences', [])}
+        if refs - source_ids:
+            raise ValueError(
+                f'Unknown landmark sources for {l["id"]}: {refs - source_ids}'
+            )
     for e in elems:
         t = e.get('tags', {})
         kind = feature_kind(t)
@@ -234,6 +244,7 @@ def prepare():
                 estimated = True
             if lm:
                 height = lm.get('height', height)
+                levels = lm.get('levels', levels)
                 # Huicui is a curated north-wing destination within the mapped
                 # journalism building; its hotel label does not rename/reclassify
                 # the entire shared footprint during a full preparation.
@@ -329,6 +340,12 @@ def prepare():
                 and t.get('memorial') != 'column'
             ):
                 b = resolve_building(b, overrides.get(eid), source_ids)
+            if lm and lm['id'] == 'veterinary-hospital':
+                refs = [lm['reference'], *lm.get('additionalReferences', [])]
+                b['sourceRefs'] = list(
+                    dict.fromkeys([*b.get('sourceRefs', ['osm']), *refs])
+                )
+                props['sourceRefs'] = b['sourceRefs']
             props.update(
                 {
                     k: b[k]
@@ -401,17 +418,18 @@ def prepare():
                     w, d = d, w
                 l['bounds'] = [x - w / 2, y - d / 2, x + w / 2, y + d / 2]
                 ref = l.get('osmId', l.get('positionRoad'))
-                typ, num = ref.split('/')
-                source = byid[(typ, int(num))]
-                l['osmEditedAt'] = source.get('timestamp')
-                l['osmVersion'] = source.get('version')
+                if ref:
+                    typ, num = ref.split('/')
+                    source = byid[(typ, int(num))]
+                    l['osmEditedAt'] = source.get('timestamp')
+                    l['osmVersion'] = source.get('version')
                 props = {
                     'kind': 'entrances',
                     'name': l['name'],
                     'landmark': l['id'],
                     'sourceUrl': l['sourceUrl'],
-                    'osmEditedAt': l['osmEditedAt'],
-                    'osmVersion': l['osmVersion'],
+                    'osmEditedAt': l.get('osmEditedAt'),
+                    'osmVersion': l.get('osmVersion'),
                     'positionBasis': l['positionBasis'],
                 }
                 features.append(
@@ -422,10 +440,25 @@ def prepare():
                         'geometry': mapping(Point(l['lonLat'])),
                     }
                 )
+            elif l.get('placeKind') == 'garden':
+                features.append(
+                    {
+                        'type': 'Feature',
+                        'id': l['id'],
+                        'properties': {
+                            'kind': 'garden',
+                            'name': l['name'],
+                            'landmark': l['id'],
+                            'sourceUrl': l['sourceUrl'],
+                        },
+                        'geometry': mapping(Point(l['lonLat'])),
+                    }
+                )
             else:
                 l['bounds'] = [x - 34, y - 18, x + 34, y + 3]
         l['sourceRefs'] = (
-            ['osm', l['reference']]
+            (['osm'] if l.get('osmId') or l.get('positionRoad') else [])
+            + [l['reference']]
             + l.get('additionalReferences', [])
             + (['sports2024'] if l['id'] == 'stadium' else [])
         )
@@ -641,6 +674,10 @@ def prepare():
     from vegetation_data import generate_background, load_background
 
     trees = generate_background(campus.bounds, valid, greenmask, load_background(ROOT))
+    from field_tree_review import reviewed_field_positions
+
+    excluded, _ = reviewed_field_positions(ROOT)
+    trees = [row for row in trees if tuple(row[:2]) not in excluded]
     # Local exclusions never reseed other cells. Include crown radius at edges.
     grounds = unary_union([Polygon(field['ground']) for field in sports])
     west_stand = next(b for b in buildings if b['id'] == 'way/948683815')
@@ -654,7 +691,11 @@ def prepare():
     ]
     trees = clear_entrance_trees(trees, buildings)
     gate_mask = unary_union(
-        [box(*l['bounds']).buffer(2) for l in landmarks if l.get('placeKind') == 'gate']
+        [
+            box(*l['bounds']).buffer(2)
+            for l in landmarks
+            if l.get('placeKind') == 'gate' and l.get('treeClearance') != 'model'
+        ]
     )
     trees = [
         t for t in trees if gate_mask.distance(Point(t[0], t[1])) > 4 * t[2] / 9 + 1
@@ -690,6 +731,29 @@ if __name__ == '__main__':
     from infrastructure_data import prepare_infrastructure
 
     prepare_infrastructure()
+
+    # The navigation catalogue is usable before Blender exports the scene.
+    from terrain_elevation import make_elevation
+
+    elevation = make_elevation(json.loads((OUT / 'terrain.json').read_text()))
+    places = json.loads((OUT / 'landmarks.json').read_text())
+    hosts = {
+        b['landmark']: b
+        for b in json.loads((OUT / 'buildings.json').read_text())
+        if b.get('landmark')
+    }
+    for place in places:
+        if place.get('placeKind') == 'bridge':
+            continue
+        x, y = place['center']
+        place['elevation'] = round(elevation(x, y), 2)
+        if place['id'] in hosts and y > 200:
+            place['zone'] = 'north'
+        else:
+            place['zone'] = 'west' if x < 0 else 'east'
+    (OUT / 'landmarks.json').write_text(
+        json.dumps(places, ensure_ascii=False, separators=(',', ':'))
+    )
 
     from export_public_data import export_public_data
 

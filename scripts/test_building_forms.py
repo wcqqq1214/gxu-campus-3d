@@ -42,7 +42,18 @@ class BuildingFormTests(unittest.TestCase):
         self.assertEqual(
             traced_ids, {b['id'] for b in north['buildings']} | {dorms['east12']['id']}
         )
-        buildings = [b for b in buildings if b['id'] not in traced_ids]
+        housing = json.loads((ROOT / 'data/east-campus-housing.json').read_text())
+        source_rings = {row['id']: row['polygons'] for row in housing}
+        planned = [
+            b for b in buildings if b.get('geometrySource') == 'university-site-plan'
+        ]
+        self.assertCountEqual(
+            [b['id'] for b in planned], [row['id'] for row in housing]
+        )
+        for b in planned:
+            self.assertEqual(b['polygons'], source_rings[b['id']], b['id'])
+        supplemental_ids = traced_ids | source_rings.keys()
+        buildings = [b for b in buildings if b['id'] not in supplemental_ids]
         self.assertEqual(set(baseline), {b['id'] for b in buildings})
         for b in buildings:
             rings = originals.get(b['id'], b['polygons'])

@@ -48,7 +48,7 @@ export interface Building {
 }
 export interface Landmark {
   modelingBasis: 'photo' | 'type' | 'inferred';
-  placeKind?: 'gate' | 'bridge' | 'sculpture';
+  placeKind?: 'gate' | 'bridge' | 'sculpture' | 'garden';
   pickPolygon?: number[][];
   approachPath?: number[][];
   additionalReferences?: string[];

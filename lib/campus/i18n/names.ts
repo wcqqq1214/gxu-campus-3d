@@ -99,6 +99,37 @@ export const campusNames: Record<string, readonly [string, string]> = {
     '工程实践与训练中心',
     'Engineering Practice and Training Center',
   ],
+  东高门: ['东高门', 'Donggao Gate'],
+  劝学岛: ['劝学岛', 'Quanxue Island'],
+  '北门（西校园）': ['北门（西校园）', 'West Campus North Gate'],
+  东校园教师集资房1号楼: [
+    '东校园教师集资房1号楼',
+    'East Campus Faculty Housing 1',
+  ],
+  东校园教师集资房2号楼: [
+    '东校园教师集资房2号楼',
+    'East Campus Faculty Housing 2',
+  ],
+  东校园教师集资房3号楼: [
+    '东校园教师集资房3号楼',
+    'East Campus Faculty Housing 3',
+  ],
+  东校园教师集资房3A号楼: [
+    '东校园教师集资房3A号楼',
+    'East Campus Faculty Housing 3A',
+  ],
+  东校园教师集资房5号楼: [
+    '东校园教师集资房5号楼',
+    'East Campus Faculty Housing 5',
+  ],
+  东校园教师集资房6号楼: [
+    '东校园教师集资房6号楼',
+    'East Campus Faculty Housing 6',
+  ],
+  东校园教师集资房7号楼: [
+    '东校园教师集资房7号楼',
+    'East Campus Faculty Housing 7',
+  ],
   广西大学动物医院: ['广西大学动物医院', 'Guangxi University Animal Hospital'],
   广西房地产及住宅研究会: [
     '广西房地产及住宅研究会',

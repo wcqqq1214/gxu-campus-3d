@@ -494,6 +494,7 @@ const venues: Record<string, CollegeVenue> = {
     en: 'Guangxi University Animal Hospital',
     schools: ['animals'],
     aliases: ['动医院', 'Veterinary Hospital'],
+    landmark: 'veterinary-hospital',
     secondary: true,
   },
   'relation/11564703': {

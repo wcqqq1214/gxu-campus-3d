@@ -400,5 +400,138 @@
     ],
     "modelingBasis": "photo",
     "height": 31.1
+  },
+  {
+    "id": "veterinary-hospital",
+    "osmId": "way/1474800691",
+    "name": "广西大学动物医院",
+    "category": "service",
+    "description": "鲁班路北段的教学动物医院。既有长楼沿南北向布置，入口有宽台阶、玻璃门厅和红字金属雨棚。",
+    "detail": "保留 OSM 四角占地；按启用照片细化门厅，按早期街景校准长立面的窗列、楼层线和屋顶轮廓。高度、雨棚深度和遮挡面按可见比例估算。",
+    "positionBasis": "OSM way/1474800691 的原楼轮廓；广西大学 2024 年现场勘查公告指鲁班路北，2026 年后勤基建处附图标注鲁班路东、雁归湖北西侧的动物医院。",
+    "sourceUrl": "https://www.openstreetmap.org/way/1474800691",
+    "reference": "vetOpening2025",
+    "modelingBasis": "photo",
+    "distance": 92,
+    "additionalReferences": [
+      "vetStreetWest",
+      "vetStreetEast",
+      "vetLocation2024",
+      "vetSiteMap2026"
+    ],
+    "navigationOrder": 21,
+    "height": 22.6,
+    "levels": 6,
+    "frontBearing": 269,
+    "cameraOffset": [
+      -1,
+      0.36,
+      -0.42
+    ]
+  },
+  {
+    "id": "donggao-gate",
+    "name": "东高门",
+    "placeKind": "gate",
+    "category": "landmark",
+    "lonLat": [
+      108.29402485345445,
+      22.853941142651813
+    ],
+    "height": 4.18,
+    "gateWidth": 2.7,
+    "gateDepth": 4.2,
+    "frontBearing": 90,
+    "distance": 18,
+    "reference": "donggaoFront2023",
+    "additionalReferences": [
+      "donggaoOblique2023",
+      "donggaoIdentity",
+      "donggaoImagery"
+    ],
+    "sourceUrl": "https://www.gxu.edu.cn/info/1006/25948.htm",
+    "positionBasis": "校方同文分列东门、东高门和新东园门。以秀灵路两处2023年街景交会推定亭体中心，高德东高门POI及2025-03-25卫星影像核对路口。门亭无实测轮廓。",
+    "description": "秀灵路东校园入口，中央小亭低平，檐口朝街一端上有矩形面板。",
+    "detail": "按两个街侧视角估算亭体、窗带及檐板，背侧、精确高程以及近年变更未获确认。",
+    "cameraOffset": [
+      1,
+      0.29,
+      -0.3
+    ],
+    "modelingBasis": "photo",
+    "navigationOrder": 22,
+    "treeClearance": "model"
+  },
+  {
+    "id": "quanxue-island",
+    "name": "劝学岛",
+    "category": "culture",
+    "placeKind": "garden",
+    "lonLat": [
+      108.28920179096228,
+      22.847084153790874
+    ],
+    "bounds": [
+      80,
+      -29,
+      125,
+      15
+    ],
+    "height": 8.4,
+    "frontBearing": 113,
+    "distance": 95,
+    "cameraOffset": [
+      1,
+      0.48,
+      0.4
+    ],
+    "reference": "campusGallery",
+    "modelingBasis": "photo",
+    "sourceUrl": "https://www.gxu.edu.cn/info/1021/18800.htm",
+    "description": "东校园月牙湖三面环绕的半岛，岛上知行书院围合出一方天井。",
+    "detail": "校方照片核对灰瓦屋面、开敞木柱门廊及院内劝学景石。影像量取屋面包络约36×30米，高度按照片估算。",
+    "positionBasis": "2025-03-25 Esri/Vantor影像，北向原图663×870，边界[-25,-96,196,194]米。书院中心约(383,604)像素；OSM way/535275551为月牙湖水面，非书院建筑。绝对位置精度元数据8.47米。",
+    "navigationOrder": 23,
+    "additionalReferences": [
+      "quanxueImagery",
+      "quanxueGround"
+    ]
+  },
+  {
+    "id": "north-public-gate",
+    "name": "北门（西校园）",
+    "placeKind": "gate",
+    "category": "landmark",
+    "lonLat": [
+      108.2861007,
+      22.8454483
+    ],
+    "height": 3.52,
+    "gateWidth": 24.8,
+    "gateDepth": 1.3,
+    "frontBearing": 0,
+    "distance": 36,
+    "cameraOffset": [
+      -0.5,
+      0.25,
+      0.9
+    ],
+    "siteBoundsOffset": [
+      -12.6,
+      -0.75,
+      12.6,
+      0.75
+    ],
+    "reference": "westCampusNorthGate2023",
+    "sourceUrl": "https://www.openstreetmap.org/way/759496715",
+    "positionBasis": "西校园导引图将北门标在网球中心北侧。按农院路南侧短支路 way/759496715 中线与街景石柱所在横断面估计。node/13754037865 位于同一路段、约在模型以南13米。",
+    "description": "农院路南侧，西校园网球中心以北。入口两旁各有一座平顶石柱，柱肩较低，外侧接矮石墙和铁艺栏杆。",
+    "detail": "柱顶、分层石肩与短墙依据2019与2023年街景。柱距约11.7米，柱高约3.5米，均为图像比例估算。",
+    "modelingBasis": "photo",
+    "navigationOrder": 24,
+    "positionRoad": "way/759496715",
+    "additionalReferences": [
+      "westCampusNorthGateMap"
+    ]
   }
 ]

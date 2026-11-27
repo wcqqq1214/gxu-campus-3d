@@ -143,7 +143,7 @@ try {
           .evaluateAll((groups) =>
             groups.map((group) => group.getAttribute('aria-label')),
           ),
-        ['教学', '文体', '校门', '路桥', '生活'],
+        ['教学', '文体', '校门', '路桥', '生活', '校园服务'],
       );
       await search.fill('不存在的校园地点');
       assert.equal(await page.locator('.place-row').count(), 0);

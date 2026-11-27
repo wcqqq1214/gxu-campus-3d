@@ -3,6 +3,14 @@ import { placeName, translate, type Locale } from './i18n/index.ts';
 import type { Building, Landmark } from './types';
 
 const LANDMARK_ALIASES: Record<string, string[]> = {
+  'north-public-gate': ['西校园北门', 'North Gate'],
+  'quanxue-island': ['知行书院', 'Zhixing Academy'],
+  'veterinary-hospital': [
+    '广西大学教学动物医院',
+    '教学动物医院',
+    'Veterinary Hospital',
+    'Teaching Animal Hospital',
+  ],
   'time-gate': ['时空之门', '时光广场', '图书馆北广场'],
   'south-gate': ['南门', '大学东路校门'],
   'south-side-gate': ['西南门', '南大门西侧门'],
@@ -60,7 +68,7 @@ export function navigationFootprints(
     })),
     ...landmarks
       .filter((l) =>
-        ['gate', 'bridge', 'sculpture'].includes(l.placeKind ?? ''),
+        ['gate', 'bridge', 'sculpture', 'garden'].includes(l.placeKind ?? ''),
       )
       .map((l) => {
         const [x0, y0, x1, y1] = l.bounds;

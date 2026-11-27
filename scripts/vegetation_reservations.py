@@ -81,7 +81,10 @@ def crown_reservations(data):
     for ident, geometry in entrance_tree_masks(data['buildings']):
         add('entrance', ident, geometry)
     for landmark in data['landmarks']:
-        if landmark.get('placeKind') == 'gate':
+        if (
+            landmark.get('placeKind') == 'gate'
+            and landmark.get('treeClearance') != 'model'
+        ):
             add('gate', landmark['id'], box(*landmark['bounds']).buffer(2))
         elif landmark.get('placeKind') == 'sculpture':
             # Exact radial distance matches the existing sculpture rule;
