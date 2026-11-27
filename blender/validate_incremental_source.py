@@ -25,6 +25,10 @@ def updated(obj):
     name = obj.name
     if mode == 'new-east-gate':
         return obj.get('landmark') == 'new-east-gate'
+    if mode == 'south-side-gate':
+        return obj.get('landmark') == 'south-side-gate'
+    if mode == 'west-gate':
+        return obj.get('landmark') == 'west-gate'
     if mode == 'new-east-neighbours':
         from new_east_neighbours import BUILDING_IDS
 

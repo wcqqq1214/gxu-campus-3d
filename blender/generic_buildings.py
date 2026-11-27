@@ -660,7 +660,12 @@ def shared_form(b, z, C, *, entrance_mesh=None, shaw_entry=None):
             if 'recessGlazing' in e:
                 from recess_glazing import add_recess_glazing
 
-                add_recess_glazing(entrance, e, z, C)
+                if b['id'] == 'way/759132930':
+                    from campus_offices.south import lobby
+
+                    lobby(entrance, e, z, C)
+                else:
+                    add_recess_glazing(entrance, e, z, C)
             else:
                 entrance.box(
                     x + nx * 0.04,
@@ -1082,6 +1087,18 @@ def ordinary_building(b, z, C, detail):
         and any(f['rule'].get('windowBands') for f in b['form'].get('facades', []))
     ):
         m.add_part('西门院名与窗间壁柱', arts_entry_sign(b, z, C))
+    if (
+        detail
+        and b['id'] == 'way/671978896'
+        and any(
+            p['id'] == 'top-sign-wall'
+            for f in b['form'].get('facades', [])
+            for p in f['rule'].get('panels', [])
+        )
+    ):
+        from office_north import north_office_sign
+
+        m.add_part('办公北楼北面题字', north_office_sign(b, z, C))
     if b['id'] == RED_HOUSE and b['form']['roof']['type'] == 'hipped':
         m.add_part('端部山花、外墙与踏步', red_house_ends(b, z, C))
     if b['id'] in HISTORIC_PAIR and any(
@@ -1459,6 +1476,15 @@ def ordinary_building(b, z, C, detail):
             math.radians(-7.56),
         )
         m.add_part('06_二楼餐厅内门', interior)
+    if b['id'] == 'way/759132930' and any(
+        f.get('part') == 'west-low-portico' for f in b['form'].get('facades', [])
+    ):
+        from campus_offices.south import add_west, side_walls, tune_bands
+        from office_south_fascia import GROUP, fascia
+
+        m.add_part(GROUP, tune_bands(fascia(b, z, C, detail), z))
+        m.add_part('西面高窗、檐口与宽窗带', add_west(b, z, C, detail))
+        m.add_part('东南横带、分格窗与南侧门', side_walls(b, z, C, detail))
     if b['id'] in colleges.BUILDERS:
         m.add_part('05_学院外观', colleges.BUILDERS[b['id']](b, z, C, detail))
     return m
