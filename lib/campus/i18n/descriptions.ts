@@ -2,6 +2,8 @@
 export const englishDescriptions: Record<string, string> = {
   'south-gate':
     'A three-bay stone gateway on Daxue East Road, with a taller central bay and the university’s red Chinese name facing south.',
+  'south-side-gate':
+    'A functional entrance beside the Xueyuan Building on Daxue East Road, with divided vehicle lanes, a central checkpoint and pedestrian passages toward the light industry precinct.',
   library:
     'Stepped wings frame quiet reading courtyards, clad in blue-green glass and pale walls with open white roof frames.',
   huixue:
@@ -27,7 +29,7 @@ export const englishDescriptions: Record<string, string> = {
   'east-gate':
     'A stone gateway on Xiuling Road, with a broad central arch, two smaller side arches and a continuous horizontal cornice.',
   'west-gate':
-    'The west campus entrance on Luban Road, where a tree-lined avenue passes the gatehouse into the campus.',
+    'A curved beige gatehouse and a university name wall with a sloping edge mark the tree-lined entrance on Luban Road.',
   'chongzuo-bridge':
     'An underpass connecting campus areas on either side of Nongyuan Road. Raised walkways meet ramps, with rounded railings along the road.',
   'bocui-bridge':

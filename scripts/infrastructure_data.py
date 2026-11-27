@@ -952,6 +952,9 @@ def prepare_infrastructure():
     from vegetation_data import prepare_vegetation
 
     prepare_vegetation()
+    from student_residence_data import prepare_residences
+
+    prepare_residences()
     from north_campus_data import prepare as prepare_north_campus
 
     prepare_north_campus()

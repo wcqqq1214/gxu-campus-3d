@@ -1229,7 +1229,11 @@ def resolve_building(building, record=None, source_ids=None):
     b = copy.deepcopy(building)
     record = record or {}
     source_ids = set(source_ids or {'osm'})
-    if set(record) - FIELDS - {'footprintRevision', 'evidence', 'review', 'name'}:
+    if (
+        set(record)
+        - FIELDS
+        - {'footprintRevision', 'evidence', 'review', 'name', 'displayName'}
+    ):
         raise ValueError(f'{b["id"]}: unknown building override field')
     if record and record.get('footprintRevision') != footprint_revision(b):
         raise ValueError(
@@ -1238,7 +1242,8 @@ def resolve_building(building, record=None, source_ids=None):
     expected_evidence = (FIELDS & set(record) - {'roof'}) | {
         'roof.' + key for key in record.get('roof', {})
     }
-    if set(record.get('evidence', {})) != expected_evidence:
+    # Dedicated facade meshes can have photo evidence without generic facade rules.
+    if set(record.get('evidence', {})) - {'facade'} != expected_evidence:
         raise ValueError(
             f'{b["id"]}: evidence fields must exactly match applied override fields'
         )
@@ -1246,6 +1251,8 @@ def resolve_building(building, record=None, source_ids=None):
     warnings = []
     for field in FIELDS & set(record) - {'roof'}:
         provenance[field] = evidence(record, field, source_ids)
+    if 'facade' in record.get('evidence', {}):
+        provenance['facade'] = evidence(record, 'facade', source_ids)
     tags = b['tags']
     levels, warning = osm_number(tags, 'building:levels')
     if warning:
@@ -2013,6 +2020,8 @@ def resolve_building(building, record=None, source_ids=None):
         if building.get('calibration'):
             b['facadeBasis'] = '按建筑类型推定'
             b['sourceRefs'] = ['osm']
+    if 'displayName' in record:
+        b['name'] = record['displayName']
     return b
 
 

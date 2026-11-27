@@ -2674,6 +2674,28 @@
             "gxuDonationProjects"
           ],
           "note": "项目册PDF第35页具名照片的可见主体以平屋面/女儿墙表达；屋面背部和设备层未完全可见。"
+        },
+        "facadeRules": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuDonationProjects",
+            "gxuCampusPlanShaw"
+          ],
+          "note": "册第35页的办公北楼与网络楼合照支持北向可见弧面上多层连续密窗；逐段以三列模拟，窗距窗高均为估算，端部和背面无同等证据。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuDonationProjects"
+          ],
+          "note": "主楼可见白色饰面，沿用已校准十一层与原地图多边弧形外轮廓、3.3米估算层高。"
+        },
+        "roofEdgeFrames": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuDonationProjects"
+          ],
+          "note": "高处可见透空弧形顶带；只在北面四段做近似分段梁柱，不推断背面构架。"
         }
       },
       "review": {
@@ -2687,7 +2709,7 @@
         },
         "roof": {
           "status": "partial",
-          "note": "已看具名照片；主体平屋面为照片约束估算，背部小屋面和设备不推定。"
+          "note": "高处可见透空弧形顶带；只在北面四段做近似分段梁柱，不推断背面构架。"
         },
         "entrances": {
           "status": "pending",
@@ -2695,9 +2717,211 @@
         },
         "facadeRules": {
           "status": "partial",
-          "note": "已核对照片可见窗层；未把不可见立面、精确窗列及小构件视作已核实。"
+          "note": "册第35页的办公北楼与网络楼合照支持北向可见弧面上多层连续密窗；逐段以三列模拟，窗距窗高均为估算，端部和背面无同等证据。"
         }
-      }
+      },
+      "facadeRules": [
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 0,
+          "balconies": false,
+          "windowGrid": {
+            "columns": 3,
+            "firstLevel": 1,
+            "edgeInset": 0.16,
+            "widthRatio": 0.88,
+            "heightRatio": 0.49,
+            "pilasterWidth": 0,
+            "pilasterDepth": 0,
+            "paneRows": 1
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 1,
+          "balconies": false,
+          "windowGrid": {
+            "columns": 3,
+            "firstLevel": 1,
+            "edgeInset": 0.16,
+            "widthRatio": 0.88,
+            "heightRatio": 0.49,
+            "pilasterWidth": 0,
+            "pilasterDepth": 0,
+            "paneRows": 1
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 2,
+          "balconies": false,
+          "windowGrid": {
+            "columns": 3,
+            "firstLevel": 1,
+            "edgeInset": 0.16,
+            "widthRatio": 0.88,
+            "heightRatio": 0.49,
+            "pilasterWidth": 0,
+            "pilasterDepth": 0,
+            "paneRows": 1
+          }
+        },
+        {
+          "polygon": 0,
+          "ring": 0,
+          "edge": 3,
+          "balconies": false,
+          "windowGrid": {
+            "columns": 3,
+            "firstLevel": 1,
+            "edgeInset": 0.16,
+            "widthRatio": 0.88,
+            "heightRatio": 0.49,
+            "pilasterWidth": 0,
+            "pilasterDepth": 0,
+            "paneRows": 1
+          }
+        }
+      ],
+      "parts": [
+        {
+          "id": "body",
+          "polygons": [
+            [
+              [
+                [
+                  -272.65379334052574,
+                  -695.0152879998775
+                ],
+                [
+                  -265.5650819547847,
+                  -692.4771919998786
+                ],
+                [
+                  -259.3073193713142,
+                  -691.7870079997228
+                ],
+                [
+                  -252.29041837598282,
+                  -692.4771919998786
+                ],
+                [
+                  -244.8631722942623,
+                  -694.469819999831
+                ],
+                [
+                  -239.077306561014,
+                  -698.276964000027
+                ],
+                [
+                  -239.21066871525673,
+                  -704.8782400000499
+                ],
+                [
+                  -248.29981240151832,
+                  -708.7744400001002
+                ],
+                [
+                  -255.38852378725937,
+                  -710.0880160000268
+                ],
+                [
+                  -262.6105973257853,
+                  -710.355183999985
+                ],
+                [
+                  -269.83267086431124,
+                  -709.3310399998813
+                ],
+                [
+                  -274.16181153621307,
+                  -708.0508599999496
+                ],
+                [
+                  -278.4294004457396,
+                  -705.2010679998676
+                ],
+                [
+                  -278.4294004457396,
+                  -698.1879079997772
+                ],
+                [
+                  -272.65379334052574,
+                  -695.0152879998775
+                ]
+              ]
+            ]
+          ],
+          "height": 36.3,
+          "levels": 11,
+          "wallFinish": "white"
+        }
+      ],
+      "roofEdgeFrames": [
+        {
+          "id": "north-0",
+          "part": "body",
+          "polygon": 0,
+          "edge": 0,
+          "from": 0.055,
+          "to": 0.945,
+          "inset": 0.37,
+          "rise": 2.25,
+          "beamHeight": 0.32,
+          "beamDepth": 0.39,
+          "postWidth": 0.22,
+          "postDepth": 0.25,
+          "postCount": 2
+        },
+        {
+          "id": "north-1",
+          "part": "body",
+          "polygon": 0,
+          "edge": 1,
+          "from": 0.055,
+          "to": 0.945,
+          "inset": 0.37,
+          "rise": 2.25,
+          "beamHeight": 0.32,
+          "beamDepth": 0.39,
+          "postWidth": 0.22,
+          "postDepth": 0.25,
+          "postCount": 2
+        },
+        {
+          "id": "north-2",
+          "part": "body",
+          "polygon": 0,
+          "edge": 2,
+          "from": 0.055,
+          "to": 0.945,
+          "inset": 0.37,
+          "rise": 2.25,
+          "beamHeight": 0.32,
+          "beamDepth": 0.39,
+          "postWidth": 0.22,
+          "postDepth": 0.25,
+          "postCount": 2
+        },
+        {
+          "id": "north-3",
+          "part": "body",
+          "polygon": 0,
+          "edge": 3,
+          "from": 0.055,
+          "to": 0.945,
+          "inset": 0.37,
+          "rise": 2.25,
+          "beamHeight": 0.32,
+          "beamDepth": 0.39,
+          "postWidth": 0.22,
+          "postDepth": 0.25,
+          "postCount": 2
+        }
+      ]
     },
     "way/759191485": {
       "name": "东苑餐厅",
@@ -4370,7 +4594,7 @@
             "gxuDonationProjects",
             "osm"
           ],
-          "note": "同页近照支持中央北面第三层横向玻璃窗带、顶层大面积标识实墙与两端窄窗。仅原第1边中央体量采用：横带区间0.07–0.93、高7.05–9.25米、六列两行；顶层中央实墙0.18–0.82、高9.95–12.9米，两端窄窗各两列两行。数量与尺寸均为可见关系的简化估算，不精确复制金色文字、材料和檐口装饰；其余立面采用通用规则。 补查同一项目册第35页既有照片：中央北面第三层以上与屋顶边缘各有连续挑檐，两侧三层翼楼北面有连续层间横线和屋檐。仅中央原第1边增加9.9/13.2米两道、侧翼原第3/11边增加3.3/6.6/9.85米三道横檐；中央出挑0.38米/厚0.18米，侧翼出挑0.28米/厚0.14米均为照片约束估算。侧翼最高横檐留在9.9米体量内；被树遮挡窗列、端墙与背面不据此推定。"
+          "note": "校方捐赠项目册第35页具名照片。北向中央体量沿原第1边，第三层窗带沿用。顶层标识墙上可辨“办公楼”，两端各有两樘独立窄窗，窗中间为墙面，上亮短、下扇长。中央北面女儿墙顶与其下方横檐形成上下两条边线。以17.994米北立面和既有9.9米下檐至14.0米女儿墙顶约束单张照片，四樘窗底/顶10.70/12.45米，上部分格约35%，上檐顶由13.2调整到12.95米，题字中心高11.45米，均为估算。沿用原第三层及侧翼横檐，题字字形以项目字体近似，颜色未标定。拍摄日期和现状未确认。"
         }
       },
       "review": {
@@ -4396,7 +4620,7 @@
         },
         "facadeRules": {
           "status": "partial",
-          "note": "同页近照支持中央北面第三层横向玻璃窗带、顶层大面积标识实墙与两端窄窗。仅原第1边中央体量采用：横带区间0.07–0.93、高7.05–9.25米、六列两行；顶层中央实墙0.18–0.82、高9.95–12.9米，两端窄窗各两列两行。数量与尺寸均为可见关系的简化估算，不精确复制金色文字、材料和檐口装饰；其余立面采用通用规则。 补查同一项目册第35页既有照片：中央北面第三层以上与屋顶边缘各有连续挑檐，两侧三层翼楼北面有连续层间横线和屋檐。仅中央原第1边增加9.9/13.2米两道、侧翼原第3/11边增加3.3/6.6/9.85米三道横檐；中央出挑0.38米/厚0.18米，侧翼出挑0.28米/厚0.14米均为照片约束估算。侧翼最高横檐留在9.9米体量内；被树遮挡窗列、端墙与背面不据此推定。"
+          "note": "校方捐赠项目册第35页具名照片。北向中央体量沿原第1边，第三层窗带沿用。顶层标识墙上可辨“办公楼”，两端各有两樘独立窄窗，窗中间为墙面，上亮短、下扇长。中央北面女儿墙顶与其下方横檐形成上下两条边线。以17.994米北立面和既有9.9米下檐至14.0米女儿墙顶约束单张照片，四樘窗底/顶10.70/12.45米，上部分格约35%，上檐顶由13.2调整到12.95米，题字中心高11.45米，均为估算。沿用原第三层及侧翼横檐，题字字形以项目字体近似，颜色未标定。拍摄日期和现状未确认。"
         }
       },
       "entrances": [
@@ -4447,35 +4671,71 @@
               "from": 0.18,
               "to": 0.82,
               "bottom": 9.95,
-              "top": 12.9,
+              "top": 12.76,
               "columns": 1,
               "rows": 1,
               "frameWidth": 0.07,
               "depth": 0.1
             },
             {
-              "id": "top-west-pair",
+              "id": "top-west-1",
               "type": "glazing",
-              "from": 0.055,
-              "to": 0.16,
-              "bottom": 10.3,
-              "top": 12.25,
-              "columns": 2,
+              "from": 0.05,
+              "to": 0.095,
+              "bottom": 10.7,
+              "top": 12.45,
+              "columns": 1,
               "rows": 2,
               "frameWidth": 0.07,
-              "depth": 0.1
+              "depth": 0.1,
+              "rowFractions": [
+                0.65
+              ]
             },
             {
-              "id": "top-east-pair",
+              "id": "top-west-2",
               "type": "glazing",
-              "from": 0.84,
-              "to": 0.945,
-              "bottom": 10.3,
-              "top": 12.25,
-              "columns": 2,
+              "from": 0.119,
+              "to": 0.163,
+              "bottom": 10.7,
+              "top": 12.45,
+              "columns": 1,
               "rows": 2,
               "frameWidth": 0.07,
-              "depth": 0.1
+              "depth": 0.1,
+              "rowFractions": [
+                0.65
+              ]
+            },
+            {
+              "id": "top-east-1",
+              "type": "glazing",
+              "from": 0.832,
+              "to": 0.867,
+              "bottom": 10.7,
+              "top": 12.45,
+              "columns": 1,
+              "rows": 2,
+              "frameWidth": 0.07,
+              "depth": 0.1,
+              "rowFractions": [
+                0.65
+              ]
+            },
+            {
+              "id": "top-east-2",
+              "type": "glazing",
+              "from": 0.888,
+              "to": 0.928,
+              "bottom": 10.7,
+              "top": 12.45,
+              "columns": 1,
+              "rows": 2,
+              "frameWidth": 0.07,
+              "depth": 0.1,
+              "rowFractions": [
+                0.65
+              ]
             }
           ],
           "horizontalLedges": {
@@ -4483,7 +4743,7 @@
             "to": 1,
             "tops": [
               9.9,
-              13.2
+              12.95
             ],
             "depth": 0.38,
             "thickness": 0.18
@@ -4591,7 +4851,7 @@
             "gxuOfficeSouthIdentity2022",
             "gxuOfficeSouthCleanup2025"
           ],
-          "note": "低门厅正面上部按2025照片保留实体招牌区；柱后左右玻璃和中央门区已用recessGlazing简化表达。招牌颜色、两端竖向玻璃、屋顶凸出与其他立面窗列尚未校准。"
+          "note": "2025年校方照片可辨低门厅的深灰门额、两道浅色横带、两端横栅及中央上下两行金色题字。沿用原模型西侧门廊定位及柱后玻璃。门额分带、栅距、字形、颜色和凸出量均按照片估算。两侧竖向玻璃、屋面突出物及其他立面仍待核实。"
         }
       },
       "review": {
@@ -4617,7 +4877,7 @@
         },
         "facadeRules": {
           "status": "partial",
-          "note": "低门厅正面上部按2025照片保留实体招牌区；柱后左右玻璃和中央门区已用recessGlazing简化表达。招牌颜色、两端竖向玻璃、屋顶凸出与其他立面窗列尚未校准。"
+          "note": "2025年校方照片可辨低门厅的深灰门额、两道浅色横带、两端横栅及中央上下两行金色题字。沿用原模型西侧门廊定位及柱后玻璃。门额分带、栅距、字形、颜色和凸出量均按照片估算。两侧竖向玻璃、屋面突出物及其他立面仍待核实。"
         }
       },
       "parts": [
@@ -11894,8 +12154,8 @@
               ]
             ]
           ],
-          "height": 16.5,
-          "levels": 5.0,
+          "height": 13.2,
+          "levels": 4,
           "baseDepth": 1.1
         }
       ],
@@ -11903,9 +12163,28 @@
         "parts": {
           "status": "estimated",
           "sourceRefs": [
+            "gxuCampusPlanShaw",
+            "gxuOfficeJunwu",
+            "gxuOfficeWestRoofImagery",
             "osm"
           ],
-          "note": "Model ground repair only: extend closed walls below the adopted floor datum from 0.5 to 1.1 metres to close existing broad wall gaps. Preserve the mapped footprint, estimated height, storeys, roof, entrance and facades. This is not a surveyed foundation depth or exterior calibration."
+          "note": "沿用原轮廓及1.1米墙脚埋深；4层×3.3米仅为主体高度估算。涵盖可见平屋面两翼，不填内庭。"
+        },
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCampusPlanShaw",
+            "gxuOfficeJunwu",
+            "gxuWelcome2026"
+          ],
+          "note": "翠湖北岸、博萃楼东侧的折角内庭楼。规划图4F，现办公地址含四楼；西北小栋和庭内独立亭不在本ID。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeWestRoofImagery"
+          ],
+          "note": "影像可见内庭两侧平屋面，西翼屋面的横向构造用途未核。"
         }
       },
       "review": {
@@ -11913,7 +12192,12 @@
           "status": "partial",
           "note": "Model ground repair only: extend closed walls below the adopted floor datum from 0.5 to 1.1 metres to close existing broad wall gaps. Preserve the mapped footprint, estimated height, storeys, roof, entrance and facades. This is not a surveyed foundation depth or exterior calibration."
         }
-      }
+      },
+      "levels": 4,
+      "roof": {
+        "type": "flat"
+      },
+      "displayName": "君武馆"
     },
     "way/759079685": {
       "name": "工程实践与训练中心",
@@ -14493,6 +14777,13 @@
             "sportsCorner"
           ],
           "note": "东南斜角可读院名与官图13雕塑、阶梯窗同框，位置按地图斜边中段估算。"
+        },
+        "facade": {
+          "status": "estimated",
+          "sourceRefs": [
+            "sportsSouthWindows"
+          ],
+          "note": "2019年3月5日南侧街景可见首层四处窗区。独立立面生成器依此校准窗区投影，遮挡处和三维尺寸按照片比例估算。"
         }
       },
       "entrances": [
@@ -17226,6 +17517,671 @@
           "windows": true
         }
       ]
+    },
+    "way/957503108": {
+      "name": "校长楼",
+      "footprintRevision": "1bb881ca8f1f1c8071018ca602ef29ea539ca04acc91b09de541ce875d193c28",
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "gxuOfficeRepairs5F",
+            "gxuWelcome2026"
+          ],
+          "note": "OSM五层、校办五楼维修；学校历史规划图所注层数与后来的使用记录有差异。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeWestRoofImagery"
+          ],
+          "note": "总览可见东西向红色屋脊、红色两坡带与转折轮廓，西端高分瓦片吻合；用管线坡屋面包络，细部及较小凸部脊线待测。"
+        },
+        "roof.rise": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeWestRoofImagery"
+          ],
+          "note": "按屋面轮廓与可见坡度估算米制脊高；没有竣工高程。"
+        }
+      },
+      "levels": 5,
+      "roof": {
+        "type": "hipped",
+        "rise": 2.15
+      }
+    },
+    "way/759337807": {
+      "name": "校办新闻信息中心",
+      "footprintRevision": "c6887100f64cad70a1c896f2707cafc5acf5111d02ba2348927a07a21d176116",
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "osm",
+            "gxuOfficeProcurement2026"
+          ],
+          "note": "OSM具名独立小轮廓标二层。采购11号项919平方米明显大于此轮廓两层，保留已映射部分。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeWestRoofImagery"
+          ],
+          "note": "主楼西南紧邻的小栋见独立红色坡顶和端面，受树冠与瓦片边缘遮挡。"
+        },
+        "roof.rise": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeWestRoofImagery"
+          ],
+          "note": "按屋面轮廓与可见坡度估算米制脊高；没有竣工高程。"
+        }
+      },
+      "levels": 2,
+      "roof": {
+        "type": "hipped",
+        "rise": 1.55
+      }
+    },
+    "way/759096563": {
+      "name": "校内建筑 759096563",
+      "footprintRevision": "6b05f998a447bedc8ab106e54d1b35335c3180c81d824bba52fcbb6c0d9c1acd",
+      "evidence": {
+        "levels": {
+          "status": "confirmed",
+          "sourceRefs": [
+            "gxuDonationProjects",
+            "gxuCampusPlanShaw",
+            "gxuOfficeProcurement2026"
+          ],
+          "note": "册第35页记保卫处二层；图上位于基建处旧楼对面、电气学院北侧。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuDonationProjects",
+            "gxuOfficeWestRoofImagery"
+          ],
+          "note": "册第35页具名照片与影像可见红色坡面和端部收坡，以四坡包络；屋顶小通风构件无测量。"
+        },
+        "roof.rise": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuDonationProjects",
+            "gxuOfficeWestRoofImagery"
+          ],
+          "note": "按屋面轮廓与可见坡度估算米制脊高；没有竣工高程。"
+        }
+      },
+      "levels": 2,
+      "roof": {
+        "type": "hipped",
+        "rise": 2.45
+      },
+      "displayName": "保卫处"
+    },
+    "way/759096575": {
+      "name": "中国—东盟金融合作学院",
+      "footprintRevision": "72fabb7f40fd4b61d155db84004d3a44b7908127cd065be0640d949686f8a4bf",
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeProcurement2026",
+            "gxuOfficeAsean2F",
+            "gxuWelcome2026"
+          ],
+          "note": "原东金院办公楼，830平方米；维修记两层，OSM单层面积约416平方米，二层模型与此相容。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeWestRoofImagery"
+          ],
+          "note": "西校园俱乐部旧址在校办楼北侧，归档全校影像显示平整灰面，树冠和邻建遮挡。"
+        }
+      },
+      "levels": 2,
+      "roof": {
+        "type": "flat"
+      }
+    },
+    "way/759132932": {
+      "name": "广西房地产及住宅研究会",
+      "footprintRevision": "9112d348bd16b640fb4e1dfe0eccbd7eddc461cf89bc596a211802cf04f70ea6",
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCampusPlanShaw",
+            "gxuOfficeProcurement2026",
+            "gxuOfficeEditor"
+          ],
+          "note": "二教北侧、三教南侧单列长条红屋顶，图注2F；原二教小红楼现有校刊编辑办公。机构旧图标签可能仅指历史使用。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeWestRoofImagery",
+            "gxuCampusPlanShaw"
+          ],
+          "note": "配准瓦片可见连续东西长脊和两个短端收坡。"
+        },
+        "roof.rise": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeWestRoofImagery",
+            "gxuCampusPlanShaw"
+          ],
+          "note": "按屋面轮廓与可见坡度估算米制脊高；没有竣工高程。"
+        }
+      },
+      "levels": 2,
+      "roof": {
+        "type": "hipped",
+        "rise": 2.3
+      }
+    },
+    "way/759147086": {
+      "name": "校内建筑 759147086",
+      "footprintRevision": "c85be4ff8b89caec784029740ff0c77d669e288efda589b927f2d1aaca1600af",
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeAlumni6F",
+            "gxuDonationProjects"
+          ],
+          "note": "历史项目册为五层；较近的会议记录证实此楼有六楼。六层用于最高段。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuDonationProjects",
+            "gxuOfficeAlumni6F",
+            "gxuOfficeAlumniWest",
+            "gxuOfficeWestRoofImagery",
+            "gxuWelcome2026"
+          ],
+          "note": "校图定位6B以北的6A。影像可辨两段红屋脊及灰色中央/两端；西侧三层与六楼活动分别有据，具体分界与六楼是否恰在中央为估算，勿整体拉到六层。"
+        }
+      },
+      "levels": 6,
+      "parts": [
+        {
+          "id": "west-service",
+          "polygons": [
+            [
+              [
+                [
+                  12.823283981732866,
+                  -618.983728000027
+                ],
+                [
+                  14.2,
+                  -618.9852761071277
+                ],
+                [
+                  14.2,
+                  -630.7779663364722
+                ],
+                [
+                  9.704661317303124,
+                  -630.7725159997666
+                ],
+                [
+                  9.714919943879718,
+                  -627.4551799997578
+                ],
+                [
+                  2.44155326955513,
+                  -627.4440480000231
+                ],
+                [
+                  2.4518118975895615,
+                  -622.3567239998954
+                ],
+                [
+                  -18.4039771717866,
+                  -622.3344600000307
+                ],
+                [
+                  -18.39371854375217,
+                  -610.6124639998852
+                ],
+                [
+                  12.83354260830946,
+                  -610.64585999988
+                ],
+                [
+                  12.823283981732866,
+                  -618.983728000027
+                ]
+              ]
+            ]
+          ],
+          "height": 9.899999999999999,
+          "levels": 3,
+          "roof": {
+            "type": "flat",
+            "rise": 0
+          }
+        },
+        {
+          "id": "west-ridge",
+          "polygons": [
+            [
+              [
+                [
+                  42.52200968349616,
+                  -619.0171240000218
+                ],
+                [
+                  42.53226831153059,
+                  -614.9205480000029
+                ],
+                [
+                  43.9,
+                  -614.922393987725
+                ],
+                [
+                  43.9,
+                  -630.813975859132
+                ],
+                [
+                  14.2,
+                  -630.7779663364722
+                ],
+                [
+                  14.2,
+                  -618.9852761071277
+                ],
+                [
+                  42.52200968349616,
+                  -619.0171240000218
+                ]
+              ]
+            ]
+          ],
+          "height": 16.5,
+          "levels": 5,
+          "roof": {
+            "type": "hipped",
+            "rise": 1.8
+          }
+        },
+        {
+          "id": "middle",
+          "polygons": [
+            [
+              [
+                [
+                  59.028140826359504,
+                  -614.9428119998676
+                ],
+                [
+                  59.017882198325076,
+                  -618.026375999913
+                ],
+                [
+                  60.5,
+                  -618.0280606701958
+                ],
+                [
+                  60.5,
+                  -630.8341023936827
+                ],
+                [
+                  43.9,
+                  -630.813975859132
+                ],
+                [
+                  43.9,
+                  -614.922393987725
+                ],
+                [
+                  59.028140826359504,
+                  -614.9428119998676
+                ]
+              ]
+            ]
+          ],
+          "height": 19.799999999999997,
+          "levels": 6,
+          "roof": {
+            "type": "flat",
+            "rise": 0
+          }
+        },
+        {
+          "id": "east-ridge",
+          "polygons": [
+            [
+              [
+                [
+                  88.39859045871992,
+                  -618.0597719999078
+                ],
+                [
+                  88.40884908529652,
+                  -606.7719240000899
+                ],
+                [
+                  90.0,
+                  -606.7736511900792
+                ],
+                [
+                  90.0,
+                  -630.8698694279743
+                ],
+                [
+                  60.5,
+                  -630.8341023936827
+                ],
+                [
+                  60.5,
+                  -618.0280606701958
+                ],
+                [
+                  88.39859045871992,
+                  -618.0597719999078
+                ]
+              ]
+            ]
+          ],
+          "height": 16.5,
+          "levels": 5,
+          "roof": {
+            "type": "hipped",
+            "rise": 1.8
+          }
+        },
+        {
+          "id": "east-end",
+          "polygons": [
+            [
+              [
+                [
+                  119.17447201517037,
+                  -606.8053200000847
+                ],
+                [
+                  119.16421338859378,
+                  -619.1618399997355
+                ],
+                [
+                  99.20092488532123,
+                  -619.1395759998709
+                ],
+                [
+                  99.1906662572868,
+                  -625.4068919999461
+                ],
+                [
+                  92.34816192396237,
+                  -625.3957599998159
+                ],
+                [
+                  92.33790329738578,
+                  -630.8727039997509
+                ],
+                [
+                  90.0,
+                  -630.8698694279743
+                ],
+                [
+                  90.0,
+                  -606.7736511900792
+                ],
+                [
+                  119.17447201517037,
+                  -606.8053200000847
+                ]
+              ]
+            ]
+          ],
+          "height": 16.5,
+          "levels": 5,
+          "roof": {
+            "type": "flat",
+            "rise": 0
+          }
+        }
+      ],
+      "displayName": "校友之家"
+    },
+    "way/1501460942": {
+      "name": "研究生院",
+      "footprintRevision": "7e76ca27317fdf00d6ab8824ff3265378e6411bded408ba566d713952f3fbeb4",
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuCampusPlanShaw",
+            "gxuWelcome2026",
+            "gxuOfficeProcurement2026"
+          ],
+          "note": "研究生院位于医学院南侧带折角的独栋，历史规划图在该轮廓标6F；按最高体量估算。采购面积含办公室与教室。"
+        },
+        "parts": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeEastRoofImagery",
+            "gxuCampusPlanShaw",
+            "gxuOfficeProcurement2026"
+          ],
+          "note": "配准影像支持斜向高核心、东西较低平屋面及东端圆形轮廓；以OSM真实转角分割。翼部3/4层、3.3米层高为示意，未取得翼部剖面。"
+        }
+      },
+      "levels": 6,
+      "parts": [
+        {
+          "id": "diagonal",
+          "polygons": [
+            [
+              [
+                [
+                  577.8992452479811,
+                  -540.7146359997353
+                ],
+                [
+                  568.2458770664766,
+                  -531.35262399988
+                ],
+                [
+                  557.8538877262645,
+                  -521.2781640000044
+                ],
+                [
+                  546.4770701778436,
+                  -510.23521999988463
+                ],
+                [
+                  551.1960386829815,
+                  -505.3705359999857
+                ],
+                [
+                  547.3695707439473,
+                  -505.41506399971513
+                ],
+                [
+                  547.3285362347252,
+                  -502.00867199985197
+                ],
+                [
+                  554.5506097732512,
+                  -501.91961599999775
+                ],
+                [
+                  556.3561281571538,
+                  -500.0494399998945
+                ],
+                [
+                  584.8751117340904,
+                  -527.7124600000535
+                ],
+                [
+                  580.5562296887653,
+                  -537.9872959998978
+                ],
+                [
+                  577.8992452479811,
+                  -540.7146359997353
+                ]
+              ]
+            ]
+          ],
+          "height": 19.799999999999997,
+          "levels": 6,
+          "roof": {
+            "type": "flat",
+            "rise": 0
+          }
+        },
+        {
+          "id": "west-return",
+          "polygons": [
+            [
+              [
+                [
+                  568.2458770664766,
+                  -531.35262399988
+                ],
+                [
+                  545.8718111748366,
+                  -531.6531879998331
+                ],
+                [
+                  545.7384490205939,
+                  -521.4340119998483
+                ],
+                [
+                  557.8538877262645,
+                  -521.2781640000044
+                ],
+                [
+                  568.2458770664766,
+                  -531.35262399988
+                ]
+              ]
+            ]
+          ],
+          "height": 9.899999999999999,
+          "levels": 3,
+          "roof": {
+            "type": "flat",
+            "rise": 0
+          }
+        },
+        {
+          "id": "east-return",
+          "polygons": [
+            [
+              [
+                [
+                  584.8751117340904,
+                  -527.7124600000535
+                ],
+                [
+                  599.1243448945244,
+                  -527.5232159998194
+                ],
+                [
+                  599.0217586229271,
+                  -523.3598479998109
+                ],
+                [
+                  599.9860695779824,
+                  -521.9572160000301
+                ],
+                [
+                  601.596674046725,
+                  -521.3894839997233
+                ],
+                [
+                  603.217537142044,
+                  -521.8681599997803
+                ],
+                [
+                  604.253658487509,
+                  -523.2262639998318
+                ],
+                [
+                  604.3665033871408,
+                  -527.4564239998299
+                ],
+                [
+                  605.1051245443906,
+                  -527.4452920000953
+                ],
+                [
+                  605.2384866971755,
+                  -537.6533359999501
+                ],
+                [
+                  580.5562296887653,
+                  -537.9872959998978
+                ],
+                [
+                  584.8751117340904,
+                  -527.7124600000535
+                ]
+              ]
+            ]
+          ],
+          "height": 13.2,
+          "levels": 4,
+          "roof": {
+            "type": "flat",
+            "rise": 0
+          }
+        }
+      ]
+    },
+    "way/1501460949": {
+      "name": "校内建筑 1501460949",
+      "footprintRevision": "860f95f522d81242c73ff3ed498cb714bebd402dfca36b9290fb9002dc1d32fb",
+      "evidence": {
+        "levels": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuWelcome2026",
+            "gxuOfficeEast4F",
+            "gxuOfficeProcurement2026"
+          ],
+          "note": "2026图在东25栋北、研究生院南标科研院。四楼确有办公室；五层沿用默认假定，并非由房间号或服务面积推得。仅地图已描出的东段。"
+        },
+        "roof.type": {
+          "status": "estimated",
+          "sourceRefs": [
+            "gxuOfficeEastRoofImagery"
+          ],
+          "note": "影像中该段屋面为长方形灰色平顶，西侧另有实体超出OSM，以现有轮廓为界。"
+        }
+      },
+      "levels": 5,
+      "roof": {
+        "type": "flat"
+      }
+    },
+    "relation/12874259": {
+      "name": "专家楼二期（财务处所在楼）",
+      "footprintRevision": "97d10677bf40962cbe12e793c5c90eca4170d05e1aff21da64fba66b5041a182",
+      "evidence": {},
+      "review": {
+        "identity": {
+          "status": "reviewed",
+          "sourceRefs": [
+            "osm",
+            "gxuCampusPlanShaw",
+            "gxuWelcome2026",
+            "gxuOfficeProcurement2026"
+          ],
+          "note": "2026年采购表第14项将财务处列于专家楼二期。规划图的二期在君武路西、萃苑餐厅东，三条横翼由东侧连接；迎新图同一街块标财务处。关联到办公所在楼的外轮廓，具体翼段及占用面积边界待核。"
+        }
+      }
     }
   }
 }

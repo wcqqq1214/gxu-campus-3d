@@ -5,6 +5,7 @@ import type { Building, Landmark } from './types';
 const LANDMARK_ALIASES: Record<string, string[]> = {
   'time-gate': ['时空之门', '时光广场', '图书馆北广场'],
   'south-gate': ['南门', '大学东路校门'],
+  'south-side-gate': ['西南门', '南大门西侧门'],
   library: ['校图书馆', '西大图书馆'],
   huixue: ['君武文化艺术教育中心'],
   huicui: [
@@ -114,6 +115,7 @@ const ENGLISH_ALIASES: Record<string, string[]> = {
     'International Students’ Dormitory',
   ],
   'new-east-gate': ['New East Gate', 'Xiuling Road West Lane 1'],
+  'south-side-gate': ['Southwest Gate'],
   'chongzuo-bridge': ['Nongyuan Road'],
   'bocui-bridge': ['Nongyuan Road'],
   'huixian-bridge': ['Nongyuan Road'],
@@ -125,8 +127,6 @@ const PLACEHOLDER_NAME = /^校内建筑 \d+$/;
 
 // Navigation eligibility is entity-specific; do not rename or merge source footprints.
 const EXCLUDED_BUILDINGS = new Set([
-  // Conflicts with the confirmed huixue landmark, about 311 m away. Identity pending.
-  'way/759337787',
   // data/i18n-name-sources.json marks these as internal modeling descriptions (技),
   // not named destinations. Retain their geometry until real building names are verified.
   'north-campus/office',
