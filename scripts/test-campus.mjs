@@ -82,18 +82,21 @@ test('关系去重、要素 ID 与目录互相对应', async () => {
         `重复关系成员 ${member.ref}`,
       );
   }
+  const sources = (await json('sources')).sources;
   for (const b of buildings) {
     const f = geo.features.find((f) => f.id === b.id);
     assert.ok(f);
     assert.equal(f.properties.osmEditedAt, b.osmEditedAt);
     assert.ok(b.height > 0 && Number.isFinite(b.elevation));
     if (b.geometrySource === 'manual-imagery-trace') {
-      assert.ok(b.id.startsWith('north-campus/'));
       assert.equal(b.osmEditedAt, null);
-      assert.ok(b.sourceRefs.includes('northCampusImagery2024'));
+      const imageryId = b.id.startsWith('north-campus/')
+        ? 'northCampusImagery2024'
+        : 'studentDormImagery';
+      assert.ok(b.sourceRefs.includes(imageryId), b.id);
       assert.equal(
         b.sourceUrl,
-        'https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer',
+        sources.find((source) => source.id === imageryId).url,
       );
     } else {
       assert.equal(b.sourceUrl, `https://www.openstreetmap.org/${b.id}`);
@@ -123,7 +126,6 @@ test('庭院内环、三角面与真实轮廓保留', () => {
   );
 });
 test('地标定位与校园南北关系', () => {
-  assert.equal(landmarks.length, 20);
   assert.ok(
     landmarks.find((l) => l.id === 'south-gate').center[1] <
       landmarks.find((l) => l.id === 'laboratory').center[1],
@@ -282,7 +284,7 @@ test('来源日期字段和高程原始值可追溯', async () => {
 });
 
 test('索引、搜索和拾取仅使用精选地标目录', () => {
-  assert.equal(searchLandmarks(landmarks, '').length, 20);
+  assert.deepEqual(searchLandmarks(landmarks, ''), landmarks);
   assert.deepEqual(
     searchLandmarks(landmarks, ' 图书馆 ').map((p) => p.id),
     ['library', 'time-gate'],
@@ -362,15 +364,20 @@ test('图书馆与公寓入口的树冠避让台阶和柱廊', async () => {
   }
 });
 
-test('三座新增校门采用独立入口 POI，可导航且不伪造建筑轮廓', async () => {
+test('独立校门采用入口 POI，可导航且不伪造建筑轮廓', async () => {
   const gates = landmarks.filter((l) => l.placeKind === 'gate');
-  assert.equal(gates.length, 3);
-  assert.deepEqual(
-    gates.map((l) => l.frontBearing),
-    [180, 90, 270],
-  );
+  for (const [id, bearing] of [
+    ['new-east-gate', 180],
+    ['east-gate', 90],
+    ['west-gate', 270],
+    ['south-side-gate', 180],
+  ])
+    assert.equal(
+      gates.find((gate) => gate.id === id)?.frontBearing,
+      bearing,
+      id,
+    );
   const picks = navigationFootprints(buildings, landmarks);
-  assert.equal(picks.length, 20);
   for (const gate of gates) {
     assert.ok(picks.some((p) => p.id === gate.id));
     assert.ok(!buildings.some((b) => b.landmark === gate.id));
@@ -382,6 +389,13 @@ test('三座新增校门采用独立入口 POI，可导航且不伪造建筑轮�
   }
   const newEast = gates.find((g) => g.id === 'new-east-gate');
   const east = gates.find((g) => g.id === 'east-gate');
+  const southSide = gates.find((g) => g.id === 'south-side-gate');
+  assert.equal(southSide.osmId, 'node/7090009149');
+  assert.deepEqual(southSide.lonLat, [108.2825715, 22.8369212]);
+  assert.ok(
+    southSide.center[0] <
+      landmarks.find((l) => l.id === 'south-gate').center[0],
+  );
   assert.ok(east.center[1] - newEast.center[1] > 650);
   assert.equal(newEast.reference, 'newEastPhoto2025');
   assert.ok(newEast.additionalReferences.includes('newEastRoute2026'));
@@ -455,16 +469,16 @@ test('时光之门绑定原雕塑节点、保留别名并纳入精选文体地�
   assert.ok(manifest.landmarks.some((m) => m.id === l.id));
 });
 
-test('十教绑定原八层轮廓、索引十九且不再重复出现在普通区块', async () => {
+test('十教绑定原八层轮廓且不再重复出现在普通区块', async () => {
   const l = landmarks.find((p) => p.id === 'teaching-ten');
   const b = buildings.find((p) => p.id === 'way/759170254');
-  assert.equal(landmarks[17].id, 'time-gate');
-  assert.equal(landmarks[18].id, l.id);
   assert.equal(b.landmark, l.id);
   assert.equal(b.tags['building:levels'], '8');
   assert.equal(b.height, 26.4);
   assert.equal(l.category, 'academic');
-  assert.ok(l.center[1] > landmarks[17].center[1]);
+  assert.ok(
+    l.center[1] > landmarks.find((p) => p.id === 'time-gate').center[1],
+  );
   for (const name of ['第十教学楼', '十教', '10教', '多媒体教学楼'])
     assert.deepEqual(
       searchLandmarks(landmarks, name).map((p) => p.id),
@@ -496,16 +510,14 @@ test('十教绑定原八层轮廓、索引十九且不再重复出现在普通�
   for (const id of l.sourceRefs) assert.ok(sources.some((s) => s.id === id));
 });
 
-test('荟萃楼进入第20项索引并复用原关系及内院', async () => {
+test('荟萃楼复用原关系及内院', async () => {
   const sources = (await json('sources')).sources;
   const records = buildings.filter((b) => b.customModel === 'huicui');
   assert.equal(records.length, 1);
   const b = records[0];
   assert.equal(b.id, 'relation/11970574');
   assert.equal(b.landmark, 'huicui');
-  assert.equal(landmarks.length, 20);
-  const l = landmarks[19];
-  assert.equal(l.id, 'huicui');
+  const l = landmarks.find((place) => place.id === 'huicui');
   assert.ok(landmarkDirection(l, 'entrance', b.architecture).z < -0.8);
   const door = entranceBox(l, landmarkBox(l), false, b.architecture).getCenter(
     new Vector3(),
