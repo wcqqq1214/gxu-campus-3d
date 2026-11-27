@@ -10,10 +10,10 @@
 
 ## 功能
 
-- 按名称或简称搜索校园地点与建筑，切换观察视角，或开启校园游览按站浏览。
+- 按中英文名称、简称或院系搜索校园地标、学院楼、食堂与宿舍，切换多角度观察视角，或开启校园游览按站浏览。
 - 提供清晨、白天、黄昏、夜晚四种光照，可自由开关地图图层并调节渲染画质。
 - 复制当前视角链接分享给他人，或导出带有 OpenStreetMap 署名的 PNG 截图。
-- 适配手机触屏与键盘导航，并响应系统的“减少动态效果”设置。
+- 适配鼠标、手机触屏与键盘导航，并响应系统的“减少动态效果”设置。
 
 <details>
 <summary>更多截图：光影、近景与手机界面</summary>
@@ -54,11 +54,11 @@ npm run preview       # 本地预览：http://127.0.0.1:4300/gxu-campus-3d/
 
 ### 检查与测试
 
-- **前端检查**：`npm run check` 会依次执行 TypeScript 类型检查、oxlint 校验和 JS/TS 单元测试。CI 安装 npm 依赖后先运行 `npm run typecheck:fast`，用 tsrs 提前发现类型错误。本地也可单独运行这条命令。
-- **Python 检查**：Python 版本在 [.python-version](.python-version) 中固定为 3.12。安装开发依赖后，可用 `npm run lint:python` 运行 Ruff 检查，用 `npm run format:python` 格式化代码。
-- **浏览器回归**：先运行 `npx playwright install chromium`，再执行 `npm run test:browser`，验证菜单交互、相机控制以及中英文界面。
+- **前端检查**：`npm run check` 依次执行 TypeScript 类型检查、oxlint 校验和 JS/TS 单元测试；也可单独运行 `npm run typecheck:fast`（基于 tsrs 快速类型检查，CI 在安装依赖后优先执行）。
+- **Python 检查与测试**：Python 版本在 [.python-version](.python-version) 中固定为 3.12。安装开发依赖后，可运行 `npm run lint:python`（Ruff 检查）、`npm run format:python`（代码格式化）和 `npm run test:data`（数据与契约测试）。
+- **浏览器回归**：先运行 `npx playwright install chromium`，再执行 `npm run test:browser`，验证菜单交互、相机控制与中英文界面。
 
-向 `dev` 分支推送代码时，CI 会自动运行上述检查、Python 数据测试、Blender 几何回归与静态构建（仅验证，不部署）。完整环境说明见[模型结构、测试与重建](docs/MODELING.md)。
+向 `dev` 分支推送代码时，CI 会自动执行上述检查、Blender 几何回归（`npm run test:geometry`）与静态构建（仅验证，不部署）。完整环境与构建说明见[模型结构、测试与重建](docs/MODELING.md)。
 
 ## 数据与文档
 

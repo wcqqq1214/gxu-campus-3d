@@ -8,7 +8,7 @@
 | Draco 解码器（`public/draco`） | Apache 2.0，© The Draco Authors（条款见 [DRACO-LICENSE.txt](DRACO-LICENSE.txt)） |
 | React、Vite、shadcn / Base UI、Lucide 等前端依赖 | 适用各自 npm 包内的 LICENSE 及 `package-lock.json` 版本声明 |
 | Ma Shan Zheng 字体（`blender/fonts/MaShanZheng-Regular.ttf`） | SIL OFL 1.1（[OFL.txt](../blender/fonts/OFL.txt)）。用于生成南门立体校名字形，近似还原原校名书法。 |
-| 门牌与标识字体子集（`blender/fonts/GXUGateSerif.otf`、`GXUDiningSans.ttf`、`GXUFlavorSign.ttf`） | SIL OFL 1.1（条款分别见 `blender/fonts/` 下对应 `*-OFL.txt`）。按校门与食堂门头字符裁剪的子集。 |
+| 门牌与标识字体子集（`blender/fonts/GXUGateSerif.otf`、`GXUDiningSans.ttf`、`GXUFlavorSign.ttf`、`GXUArtsSign.ttf`、`GXUShawSign.ttf`、`GXUOfficeSouthSign.ttf`） | SIL OFL 1.1（条款分别见 `blender/fonts/` 下对应 `*-OFL.txt`）。按校门、食堂、学院与办公楼门头字符裁剪的 Noto Sans SC / Noto Serif SC 子集。 |
 | Noto Serif SC 子集（`app/fonts/gxu-serif.woff2`） | SIL OFL 1.1，© 2017–2024 Adobe (http://www.adobe.com/)（[NOTO-SERIF-OFL.txt](NOTO-SERIF-OFL.txt)）。按界面标题字符裁剪的子集。 |
 | 校方照片、视频与 PDF 资料 | 版权归校方或原作者所有；仅作外观参考并保留链接，不随网页纹理或模型分发。 |
 

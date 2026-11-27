@@ -10,10 +10,10 @@ An interactive 3D map of Guangxi University's main campus on Daxue East Road. Ge
 
 ## Features
 
-- Search campus landmarks and named buildings, switch viewpoints, or take a guided tour.
+- Search campus landmarks, college buildings, dining halls, and dormitories by Chinese or English name, abbreviation, or school; switch camera viewpoints or take a guided tour.
 - Switch between Morning, Day, Evening, and Night lighting, toggle map layers, and adjust graphics quality.
 - Share a link to your current view or export a PNG screenshot with OpenStreetMap attribution.
-- Works with touch, mouse, and keyboard navigation, and respects system reduced-motion settings.
+- Works with mouse, touch, and keyboard navigation, and respects system reduced-motion settings.
 
 <details>
 <summary>More screenshots: lighting, close-ups, and mobile</summary>
@@ -54,11 +54,11 @@ npm run preview       # Serve at http://127.0.0.1:4300/gxu-campus-3d/
 
 ### Checks and tests
 
-- **Frontend checks**: `npm run check` runs TypeScript type checking, oxlint, and JS/TS unit tests. CI runs `npm run typecheck:fast` immediately after installing npm dependencies to catch type errors early with tsrs. You can also run it locally.
-- **Python checks**: Python is pinned to 3.12 in [.python-version](.python-version). After installing the dev dependencies, run `npm run lint:python` for Ruff checks and `npm run format:python` to format.
-- **Browser regressions**: Install Chromium with `npx playwright install chromium`, then run `npm run test:browser` to test menus, cameras, and the bilingual interface.
+- **Frontend checks**: `npm run check` runs TypeScript type checking, oxlint, and JS/TS unit tests. You can also run `npm run typecheck:fast` for fast type checking with tsrs (which CI runs right after installing npm dependencies).
+- **Python checks and tests**: Python is pinned to 3.12 in [.python-version](.python-version). After installing the dev dependencies, run `npm run lint:python` for Ruff checks, `npm run format:python` to format, and `npm run test:data` for data and contract tests.
+- **Browser regressions**: Install Chromium with `npx playwright install chromium`, then run `npm run test:browser` to verify menus, camera controls, and the bilingual interface.
 
-Pushes to `dev` run these checks in CI along with Python data tests, Blender geometry regressions, and the static build (without deploying). See [model structure, tests, and rebuilding](docs/MODELING.md) for full setup details.
+Pushes to `dev` run these checks in CI along with Blender geometry regressions (`npm run test:geometry`) and the static build (without deploying). See [model structure, tests, and rebuilding](docs/MODELING.md) for full setup details.
 
 ## Data and documentation
 
