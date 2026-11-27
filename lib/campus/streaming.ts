@@ -2,6 +2,8 @@ export interface StreamAsset {
   id?: string;
   url: string;
   bytes: number;
+  /** Upper bound for the decoded mesh attribute and index buffers, when known. */
+  geometryBytes?: number;
   sha256?: string;
   featureIds?: string[];
   /** Local east/north bounds; height is handled by the scene's frustum. */
@@ -56,7 +58,8 @@ export function planDetails(options: {
     let count = 0;
     for (const item of candidates) {
       if (!item.id || count >= limit) continue;
-      const cost = costs.get(item.id) ?? item.bytes * factor;
+      const cost =
+        costs.get(item.id) ?? item.geometryBytes ?? item.bytes * factor;
       if (allocation + cost > cap) continue;
       allocation += cost;
       assets.push([item.id, item]);

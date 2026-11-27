@@ -24,15 +24,61 @@ def electrical_college(b, z, C, detail):
             C['bridgeConcrete'],
         )
     f = Mesh()
+    # Eleven unobscured second-storey centres back-projected to the glass plane.
+    # The palm hides the sixth centre, interpolated from its two neighbours.
+    front_axes = (
+        -353.58,
+        -350.40,
+        -347.27,
+        -344.16,
+        -341.11,
+        -338.11,
+        -335.11,
+        -332.17,
+        -329.25,
+        -326.29,
+        -323.40,
+        -320.60,
+    )
     for level in range(10):
         h = z + (level + 0.54) * 3.3
-        for j in range(13):
-            x = -362.5 + j * 4.12
+        # The measured street image spans the middle of the longer OSM face.
+        # Replace only windows intersecting that observed interval, below the
+        # photo cut at level five. Retain the original unobserved outer bays.
+        old_grid = [-362.5 + j * 4.12 for j in range(13)]
+        visible = level <= 5
+        grid = (
+            (
+                [x for x in old_grid if x + 1.5 < -355.05 or x - 1.5 > -318.70]
+                + list(front_axes)
+            )
+            if visible
+            else old_grid
+        )
+        for x in sorted(grid):
             if level == 0 and x < -358:
                 continue
-            pane(f, x, -824.32, h, 2.7, 1.83, (0, -1), C, detail)
+            measured = visible and -355.05 < x < -318.70
+            # Fixed window size, transom and ground grilles, not AC or banners.
+            glass_z = h + 0.65 if measured and level > 0 else h
+            pane(
+                f,
+                x,
+                -824.32,
+                glass_z,
+                1.58 if measured else 2.7,
+                1.83,
+                (0, -1),
+                C,
+                detail,
+            )
+            if measured and level == 0 and detail:
+                for dx in [-0.62, -0.41, -0.20, 0, 0.20, 0.41, 0.62]:
+                    f.box(x + dx, -824.60, h, 0.032, 0.046, 1.77, C['metal'])
+                f.box(x, -824.60, h - 0.10, 1.57, 0.046, 0.04, C['metal'])
             if level > 0:
-                m.box(x - 1.87, -824.63, h, 0.22, 0.83, 3.26, C['gateTrim'])
+                divider = x - (1.49 if measured else 1.87)
+                m.box(divider, -824.63, h, 0.22, 0.83, 3.26, C['gateTrim'])
         if level:
             m.box(-337.8, -824.83, h - 1.55, 53.2, 1.26, 0.18, C['gateStone'])
             m.box(-337.8, -825.46, h - 1.42, 53.2, 0.14, 0.31, C['gateTrim'])
@@ -41,6 +87,8 @@ def electrical_college(b, z, C, detail):
                 m.box(-363.8 + j * 2, -825.46, h - 0.93, 0.07, 0.07, 0.77, C['metal'])
             if detail:
                 for j in range(1, 152):
+                    if level <= 5 and -355.05 < -364.25 + j * 0.35 < -318.70:
+                        continue
                     m.box(
                         -364.25 + j * 0.35,
                         -825.46,
@@ -48,6 +96,20 @@ def electrical_college(b, z, C, detail):
                         0.035,
                         0.04,
                         0.73,
+                        C['metal'],
+                    )
+            if level <= 5:
+                # The above-sill infill consists of horizontal blades. The two
+                # end towers and upper seven projecting bays remain independent.
+                count = 6 if detail else 3
+                for i in range(count):
+                    m.box(
+                        -336.875,
+                        -825.49,
+                        h - 1.33 + (i + 0.5) * 0.70 / count,
+                        36.35,
+                        0.085,
+                        0.06 if detail else 0.085,
                         C['metal'],
                     )
     # Both end towers flank the south facade. The east-facing openings appear

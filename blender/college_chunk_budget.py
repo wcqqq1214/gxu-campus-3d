@@ -1,4 +1,4 @@
-"""Optimize only the four reviewed building chunks, after ordinary GLB export."""
+"""Optimize only the reviewed building chunks, after ordinary GLB export."""
 
 import copy
 import math
@@ -17,7 +17,13 @@ from preserve_glb_geometry import (
 )
 
 NEAR = {'chunk-n2-n3', 'chunk-p0-n3'}
-FAR = {'chunk-n2-n3', 'chunk-p0-n2'}
+FAR_LIMITS = {
+    'chunk-n2-n3': 300_000,
+    'chunk-p0-n2': 300_000,
+    'chunk-n1-n3': 300_000,
+    'chunk-p1-n2': 400_000,
+}
+FAR = frozenset(FAR_LIMITS)
 DRACO = 'KHR_draco_mesh_compression'
 
 
@@ -292,11 +298,11 @@ def optimize_export(path):
             continue
         node = nodes[name]
         size = node_size(doc, node)
-        if far and size <= 300_000:
+        if far and size <= FAR_LIMITS[name]:
             continue
         original_view_count = len(doc['bufferViews'])
         changes = optimize_node(doc, binary, node, far)
-        if far and node_size(doc, node) > 300_000:
+        if far and node_size(doc, node) > FAR_LIMITS[name]:
             # The existing split has already run. Retry only primitives still
             # using their source payload and keep all of their authored corners.
             changes.extend(
@@ -304,7 +310,7 @@ def optimize_export(path):
                     doc, binary, node, far, retry_before_view=original_view_count
                 )
             )
-        if far and node_size(doc, node) > 300_000:
+        if far and node_size(doc, node) > FAR_LIMITS[name]:
             # Exact corner comparison includes all UVs, so sampled textures,
             # normals and seam duplicates survive this last budget pass.
             changes.extend(
@@ -319,8 +325,8 @@ def optimize_export(path):
             )
         result = node_size(doc, node)
         out[name] = dict(before=size, after=result, changes=changes)
-        if far and result > 300_000:
-            raise ValueError(f'{name}: {result} > 300000')
+        if far and result > FAR_LIMITS[name]:
+            raise ValueError(f'{name}: {result} > {FAR_LIMITS[name]}')
     if not out:
         return {}
     from tempfile import TemporaryDirectory
@@ -334,8 +340,10 @@ def optimize_export(path):
         if not far and target.stat().st_size >= 2_000_000:
             raise ValueError(f'{path.name}: {target.stat().st_size} >= 2000000')
         if far:
-            from incremental_glb import validate_retained
+            from incremental_glb import splice_nodes, validate_retained
 
-            validate_retained(raw, target.read_bytes(), set(out))
+            result = splice_nodes(raw, target.read_bytes(), set(out))
+            validate_retained(raw, result, set(out))
+            target.write_bytes(result)
         target.replace(path)
     return out

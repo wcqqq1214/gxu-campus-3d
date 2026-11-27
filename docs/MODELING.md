@@ -109,6 +109,13 @@ npm run test:data
 | 岸段与局部基础 | [shore-overrides.json](../data/shore-overrides.json)、[foundation-overrides.json](../data/foundation-overrides.json) | `inspect_foundation_clearance.py`、`inspect_wall_ground_gaps.py` |
 | 植被与绿篱 | `data/vegetation-zones.json`、`vegetation-avenues.json`、`low-planting.json` → 植被准备及 `blender/tree_layout.py` | `validate_tree_clearance.py`（支持 `--scope=buildings\|site\|all`）、`validate_vegetation.py` |
 | 南门字形与场地 | `blender/fonts/gxu-wordmark.json`、`data/south-gate-site.json`；`scripts/prepare_gate_wordmark.py`、`prepare_south_gate_site.py` | 南门专项及入口场地检查 |
+| 南侧门 | `blender/south_side_gate.py`；`update_south_side_gate.py` 默认只写独立候选目录 | `validate_south_side_gate.py` 检查落杆位置、车道净高与人行净空、构件、接地及两档导出 |
+
+### 宿舍、办公楼与楼边地形
+
+学生宿舍按楼栋从 [student_residences](../blender/student_residences/) 生成。每栋的近景文件和基础模型中的远景节点共用 `chunk-dorm-<楼栋 ID>`，原网格分块只收录其余建筑。国际学生公寓沿用独立地标。办公楼的专用立面与量测参数位于 [campus_offices](../blender/campus_offices/)。
+
+[楼边地形参数](../blender/terrain_wall_grades.json) 给出各段墙脚控制点、过渡宽度与允许调整的高度。改动控制线后，在最终地形上检查墙脚、过渡段和邻接道路的剖面，再更新基础模型。
 
 ### 普通建筑与基础约束
 
@@ -165,7 +172,7 @@ blender --background --python-exit-code 1 --python blender/validate_materials_en
 - **双档与量化**：普通建筑两档共用主体、屋顶、入口和主要立面（近景加细部）；墙脚改动可能改变区块量化包围盒，须核对所在区块两档的实际解码几何。地形与普通道路共用位置量化范围（见 `blender/terrain_precision.py`、`road_export.py`、`terrain_export.py`、`build_campus.py`）；单改地形可用 `terrain_export.py --source=候选.blend --target=候选/base.glb`。
 - **高精度地形分区**：[terrain-export-regions.json](../data/terrain-export-regions.json) 可指定局部高精度范围；分区直接用完整源面，接缝吸附外围解码坐标且误差须小于 `0.1` 毫米（不重叠图元仍属同一地形节点；配置为空时退回单图元）。新增分区须回归旧区域、外围与预算。
 - **去重、共面与边界**：顶点去重仅合并全部属性逐字节相同的载荷，保留 UV 接缝与硬边，仅移除严格零面积面；地形与道路近共面重三角化保留外边界、材质边界与空隙，最大平面误差 `0.2` 毫米（由 `test_vertex_dedup.py`、`test_road_planar.py` 保护）。`gltf_bounds.compact_glb_float_bounds` 仅缩短可无损还原 Float32 位模式的边界 JSON（见 `test_gltf_bounds.py`）。
-- **专项资源**：新东园门完整与增量构建共用 `blender/detail_export.py` 以保留薄面板纹理坐标精度，`test_new_east_export.py` 检验基础、近景与增量产物中其余节点保留；英文字形由 `scripts/build_gate_latin_font.py` 生成（OFL 随字体保存，不依赖系统字体）。篮球基础档简化篮圈、省去镂空篮网并与近景保持相同精度，`models.json` 的 `sports` 在加载失败或流畅档时回退基础球场。
+- **专项资源**：新东园门完整与增量构建共用 `blender/detail_export.py` 以保留薄面板纹理坐标精度，`test_new_east_export.py` 检验基础、近景与增量产物中其余节点保留；英文字形由 `scripts/build_gate_latin_font.py` 生成（OFL 随字体保存，不依赖系统字体）。篮球基础档简化篮圈、省去镂空篮网并与近景保持相同精度，`models.json` 的 `sports` 在加载失败或流畅档时回退基础球场。西门校名使用 [西门可编辑资源](../blender/assets/west-gate.blend) 中的成形字网格。
 
 ### 增量入口
 
@@ -175,6 +182,7 @@ blender --background --python-exit-code 1 --python blender/validate_materials_en
 | --- | --- |
 | `update_roads.py`、`update_basketball.py` | 在独立候选中更新目标模型、相关地形与场地，校验后默认发布；传 `--output-root=/path/to/new-candidate` 时只生成并校验候选。 |
 | `update_new_east_gate.py` | 须传 `--output-root=work/new-east-candidate`，加 `--publish` 才安装。`new_east_gate.py` 保留具名构件，`validate_new_east_gate.py` 校验源模型、两档解码、通道净空、接地与围合（相机回归另验桌面、竖屏及横屏构图）。 |
+| `update_west_gate.py` | 用 `--output-root=work/west-gate-candidate-v1` 指定新目录，加 `--publish` 安装候选。`west_gate.py` 从 `blender/assets/west-gate.blend` 读取近远景网格、材质和 UV。`validate_west_gate.py` 将保存的校园场景及两档 GLB 与生成器比对，记录三角形数量，校验顶点位置。合并已有地标候选时，可用 `--base-root` 指定其校园场景及公开资产；该参数仅用于生成候选。 |
 | `update_new_east_neighbours.py` | 须传新 `--output-root`，加 `--publish` 才安装。细化三栋邻楼及沿街立面（保留主体、屋顶、入口与地图数据），仅重导共享区块并用 `validate_generic.py` 联验区块全部楼体、店面碰撞与铺装接地。 |
 | `update_tree_layout.py`、`build_vegetation.py` | 前者同步树位与朝向（`--ground` 从最终地形采样高程）；后者重导模板（模板变化须同步源模型）。 |
 

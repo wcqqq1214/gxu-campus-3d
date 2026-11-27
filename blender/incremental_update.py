@@ -23,39 +23,42 @@ def snapshot(root):
     }
 
 
-def copy_inputs(root, candidate):
+def copy_inputs(root, candidate, *, source_root=None):
+    """Build a candidate with the baseline scene/publication and current source files."""
+    source = root if source_root is None else source_root
+    folders = [(root, 'public'), (root, 'blender')]
+    folders.extend(
+        (source, name)
+        for name in ('blender', 'data', 'scripts', 'lib', 'app/fonts', 'node_modules')
+    )
     if any(
-        candidate.resolve().is_relative_to((root / name).resolve())
-        for name in (
-            'data',
-            'public',
-            'scripts',
-            'lib',
-            'blender',
-            'app/fonts',
-            'node_modules',
-        )
+        candidate.resolve().is_relative_to((parent / name).resolve())
+        for parent, name in folders
     ):
         raise ValueError('Candidate cannot be inside a copied input directory')
     candidate.mkdir(parents=True, exist_ok=False)
-    for name in ('data', 'public', 'scripts', 'lib'):
+    shutil.copytree(root / 'public', candidate / 'public')
+    for name in ('data', 'scripts', 'lib', 'app/fonts'):
         shutil.copytree(
-            root / name, candidate / name, ignore=shutil.ignore_patterns('__pycache__')
+            source / name,
+            candidate / name,
+            ignore=shutil.ignore_patterns('__pycache__'),
         )
-    shutil.copytree(root / 'app/fonts', candidate / 'app/fonts')
-    (candidate / 'blender').mkdir()
-    for path in (root / 'blender').glob('*.py'):
-        shutil.copy2(path, candidate / 'blender' / path.name)
-    for name in ('textures', 'fonts', 'fixtures', 'assets'):
-        shutil.copytree(root / 'blender' / name, candidate / 'blender' / name)
+    shutil.copytree(
+        source / 'blender',
+        candidate / 'blender',
+        ignore=shutil.ignore_patterns(
+            'gxu-campus.blend', '__pycache__', '*.blend[0-9]*'
+        ),
+    )
     shutil.copy2(
         root / 'blender/gxu-campus.blend', candidate / 'blender/gxu-campus.blend'
     )
     (candidate / 'work/model-checks').mkdir(parents=True)
     (candidate / 'node_modules').symlink_to(
-        (root / 'node_modules').resolve(), target_is_directory=True
+        (source / 'node_modules').resolve(), target_is_directory=True
     )
-    shutil.copy2(root / 'package.json', candidate / 'package.json')
+    shutil.copy2(source / 'package.json', candidate / 'package.json')
 
 
 def run_checked(command, candidate, name):

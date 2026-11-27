@@ -1,6 +1,13 @@
 /* Dev-server UI regressions. Set PLAYWRIGHT_MODULE / CHROMIUM_PATH if needed. */
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { browserCheck } from './browser-check.mjs';
+const landmarks = JSON.parse(
+  await readFile(
+    new URL('../public/data/landmarks.json', import.meta.url),
+    'utf8',
+  ),
+);
 const browser = await browserCheck('menu');
 const results = [];
 const errors = [];
@@ -31,6 +38,16 @@ try {
     const back = () =>
       page.getByRole('button', { name: '返回地点列表', exact: true }).click();
     const search = page.getByRole('searchbox', { name: '搜索校园地点' });
+    const placeIds = () =>
+      page
+        .locator('.place-row')
+        .evaluateAll((rows) => rows.map((row) => row.dataset.placeId));
+    const initialPlaces = await placeIds();
+    const compareIds = (a, b) => a.localeCompare(b);
+    assert.deepEqual(
+      [...initialPlaces].sort(compareIds),
+      landmarks.map((p) => p.id).sort(compareIds),
+    );
     await chooseGate();
     assert.equal(
       await page.getByRole('group', { name: '地点观察视角' }).isVisible(),
@@ -106,7 +123,7 @@ try {
         'teaching-six',
     );
     await page.getByTitle('清除搜索', { exact: true }).click();
-    assert.equal(await page.locator('.place-row').count(), 20);
+    assert.deepEqual(await placeIds(), initialPlaces);
     assert.equal(
       await search.evaluate((el) => document.activeElement === el),
       true,
@@ -123,7 +140,7 @@ try {
     assert.equal(await page.locator('.place-row').count(), 0);
     await page.getByRole('button', { name: '清空搜索', exact: true }).click();
     assert.equal(await search.inputValue(), '');
-    assert.equal(await page.locator('.place-row').count(), 20);
+    assert.deepEqual(await placeIds(), initialPlaces);
     assert.equal(
       await search.evaluate((el) => document.activeElement === el),
       true,

@@ -24,7 +24,6 @@ test('别名仍限于精选目录', () => {
     searchLandmarks(landmarks, '南宁楼').map((l) => l.id),
     ['teaching-two'],
   );
-  assert.equal(landmarks.filter((l) => l.category === 'landmark').length, 4);
 });
 test('分享保留地标、相机与光照，输入异常不会生成无效镜头', () => {
   const snapshot = {

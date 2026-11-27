@@ -277,22 +277,72 @@
     "gateDepth": 11,
     "frontBearing": 270,
     "distance": 48,
-    "reference": "westGatePhoto",
-    "description": "鲁班路上的校园西门，林荫校道从门卫室与通道旁穿过延入校内。",
-    "detail": "依据2021年西门内外景及2025年视频，重建斜边竖向校名墙、错层厚檐玻璃门卫室和入口分流护栏。无日期低清图片中的红白高杆无法对应，不再作为门体依据；尺寸、背面及遮棚现状仍需补证。",
+    "reference": "westGateStreet2017Rail",
+    "description": "从鲁班路进入西门，沿林荫校道可见米色曲面门卫室和斜边校名墙。",
+    "detail": "白色门梁高低错落，门卫室旁的方柱廊留有贯通的人行通道。外观依据2021年和2025年的校门视频及2026年11月23日提供的六张校内外实拍，尺寸按照片比例估算。",
     "osmId": "node/8850695397",
     "sourceUrl": "https://www.openstreetmap.org/node/8850695397",
     "positionBasis": "OSM 门节点；门体占地和高度按参考估算。",
     "additionalReferences": [
       "gateRoads2025",
       "westGate2026",
-      "westGateStudy20261027",
-      "westGateVideos20261027"
+      "westGateVideos20261027",
+      "westGateRide2025",
+      "westGateStreet2016Front",
+      "westGateStreet2016Window",
+      "westGateStreet2017Wall",
+      "westGateStreet2016Paving"
     ],
     "cameraOffset": [
       -1,
       0.38,
       -0.18
+    ],
+    "modelingBasis": "photo",
+    "siteBoundsOffset": [
+      -12.83,
+      -11.57,
+      57.38,
+      15.62
+    ]
+  },
+  {
+    "id": "south-side-gate",
+    "name": "南侧门",
+    "placeKind": "gate",
+    "category": "landmark",
+    "lonLat": [
+      108.2825715,
+      22.8369212
+    ],
+    "height": 4.2,
+    "gateWidth": 15,
+    "gateDepth": 18,
+    "siteBoundsOffset": [
+      -8,
+      -11,
+      9,
+      8
+    ],
+    "frontBearing": 180,
+    "distance": 52,
+    "reference": "southSidePhoto2025",
+    "description": "大学东路学员楼旁的功能性入口，分隔车道与中央道闸连接轻工学院一侧校道。",
+    "detail": "按校内向外实拍重建分隔车道、圆角岛台、单机箱落杆道闸、蓝色告示牌、石柱拱顶铁门、路缘石墙、单斜杠标牌、顺路活动护栏及停车划线。照片拍摄日期待考，构件尺寸与背面为估算。2025年1月人行与电动自行车道闸曾迁移，改造后位置和门岗轮廓待核。",
+    "osmId": "node/7090009149",
+    "sourceUrl": "https://www.openstreetmap.org/node/7090009149",
+    "positionBasis": "OSM node/7090009149（原标签名“西南门”）及 way/686131231 校道，结合校方地图、学员楼与酒店路线交叉定位。",
+    "additionalReferences": [
+      "southSideOfficialMap2020",
+      "southSideGateworks2025",
+      "southSideAccess2025",
+      "southSideRoute2026",
+      "southSideAccess2026"
+    ],
+    "cameraOffset": [
+      0.8,
+      0.62,
+      -1
     ],
     "modelingBasis": "photo"
   },

@@ -1,8 +1,9 @@
-"""Three independent gate studies. All dimensions are estimates, not surveys.
+"""Four independent gate studies. All dimensions are estimates, not surveys.
 
-East: 2018 inauguration photo, later undated street view. West: 2021 outside /
-inside gate video and 2025 entrance footage; the undated thumbnail is secondary.
-New east: November 2025 photo and September 2026 route footage.
+East: 2018 inauguration photo, later undated street view. West: 2021 video,
+2025 entrance footage and six user-supplied 2026 exterior/interior photographs.
+New east: November 2025 photo and September 2026 route footage. South side:
+one labelled interior photograph, official maps and access notices.
 Local facade faces -Y; rotation is derived from the catalogue compass bearing.
 """
 
@@ -11,6 +12,8 @@ import math
 from geometry import Mesh
 from new_east_gate import new_east_gate
 from south_gate import inscription
+from south_side_gate import south_side_gate
+from west_gate import west_gate
 
 
 def arch(m, x, half, spring, rise, depth, top, C, detail):
@@ -210,147 +213,18 @@ def booth(m, x, y, w, d, C, detail):
             m.box(x, y + sy * (d / 2 + 0.2), 3.39, w * 0.65, 0.10, 0.05, C['white'])
 
 
-def railing(m, x, y, length, C, detail):
-    for xx in [-length / 2, length / 2]:
-        m.cylinder(x + xx, y, 0.65, 0.055, 1.3, C['metal'], 8)
-    for z in [0.35, 1.18]:
-        m.line((x - length / 2, y, z), (x + length / 2, y, z), 0.04, C['metal'], 6)
-    if detail:
-        for j in range(int(length / 0.28)):
-            xx = x - length / 2 + (j + 0.5) * 0.28
-            m.line((xx, y, 0.35), (xx, y, 1.18), 0.022, C['metal'], 6)
-
-
-def barrier(m, x, y, C, detail, sign=1):
-    m.box(x, y, 0.55, 0.35, 0.45, 1.1, C['white'])
-    m.box(x, y, 1.16, 0.39, 0.48, 0.12, C['dark'])
-    # Raised arm keeps the vehicle entrance open in the display model.
-    a = (x, y, 1.15)
-    b = (x + sign * 0.7, y, 4.0)
-    m.line(a, b, 0.045, C['white'], 6)
-    if detail:
-        for j in range(5):
-            t = j / 5
-            m.line(
-                (x + sign * 0.7 * t, y, 1.15 + 2.85 * t),
-                (x + sign * 0.7 * (t + 0.09), y, 1.15 + 2.85 * (t + 0.09)),
-                0.047,
-                C['gateRed'],
-                6,
-            )
-
-
-def west_gate(C, detail):
-    # 2021 video 7047681296730082572, 26-31s: outside and inside views.
-    # The undated thumbnail is not enough to locate its red poles on the gate.
-    # Preserve an open lane between the north guardhouse and south name wall.
-    from south_gate import prism
-
-    m = Mesh()
-    p = Mesh()
-    # Recessed, full-height glazed guardhouse, with a broad concrete canopy.
-    p.box(-7.15, 1.15, 0.14, 5.6, 3.7, 0.28, C['gateTrim'])
-    p.box(-7.15, 1.15, 1.85, 5.25, 3.35, 3.42, C['glass'])
-    for sy in (-1, 1):
-        yy = 1.15 + sy * 1.70
-        for xx in [-9.7, -8.85, -8.0, -7.15, -6.30, -5.45, -4.60]:
-            p.box(xx, yy, 1.85, 0.065, 0.08, 3.42, C['white'])
-        for zz in (0.22, 2.65, 3.52):
-            p.box(-7.15, yy, zz, 5.25, 0.08, 0.065, C['white'])
-    for sx in (-1, 1):
-        xx = -7.15 + sx * 2.66
-        for yy in (-0.50, 0.60, 1.70, 2.80):
-            p.box(xx, yy, 1.85, 0.08, 0.065, 3.42, C['white'])
-    p.box(-7.15, 1.15, 3.65, 5.65, 3.75, 0.25, C['paleRoof'])
-    # Flared edge pier and two shallow staggered slabs; sizes are estimates.
-    prism(
-        p,
-        [(-10.55, 0.10), (-9.55, 0.10), (-9.30, 3.75), (-8.65, 4.60), (-10.55, 4.60)],
-        0.30,
-        3.90,
-        C['paleRoof'],
-    )
-    prism(
-        p,
-        [(-10.60, 4.55), (-4.05, 4.72), (-4.05, 5.05), (-10.60, 5.18)],
-        0.20,
-        4.40,
-        C['paleRoof'],
-    )
-    prism(
-        p,
-        [(-9.95, 5.15), (-5.10, 5.15), (-5.10, 5.48), (-9.95, 5.48)],
-        0.45,
-        3.80,
-        C['paleRoof'],
-    )
-    m.add_part('01_玻璃门卫室与错层厚檐_视频比例估算', p)
-    p = Mesh()
-    # Slanted pale name wall is visible at 26-27s; no invented rear text.
-    prism(
-        p,
-        [(7.65, 0.10), (10.65, 0.10), (10.65, 6.40), (8.85, 6.05)],
-        -1.55,
-        0.70,
-        C['white'],
-    )
-    prism(
-        p,
-        [(7.65, 0.10), (9.35, 0.10), (9.35, 4.78), (8.58, 4.93)],
-        -1.94,
-        0.08,
-        C['paleRoof'],
-    )
-    for char, z in zip('广西大学', (4.50, 3.55, 2.60, 1.65)):
-        p.extend(inscription(char, 8.65, -2.01, z, 0.70, 0.72, C['wood'], detail))
-    m.add_part('02_斜边竖向校名墙_背面未证实', p)
-    p = Mesh()
-    barrier(p, -3.50, 0.80, C, detail, -1)
-    barrier(p, 3.50, 0.80, C, detail)
-    m.add_part('03_开放车行道闸', p)
-    p = Mesh()
-    # Photo shows long lane dividers; keep vehicle and pedestrian corridors open.
-    for x in (4.70, 6.10, 7.45):
-        q = Mesh()
-        railing(q, 0, 0, 4.6, C, detail)
-        q.rotate_z(0, 0, math.pi / 2)
-        q.v = [(a + x, b + 2.0, c) for a, b, c in q.v]
-        p.extend(q)
-    for x in (-3.95, 3.95):
-        q = Mesh()
-        railing(q, 0, 0, 5.8, C, detail)
-        q.rotate_z(0, 0, math.pi / 2)
-        q.v = [(a + x, b + 2.0, c) for a, b, c in q.v]
-        p.extend(q)
-    m.add_part('04_入口分流护栏_间距估算', p)
-    return m
-
-
 def campus_gate(l, z, C, detail=True):
     m = {
         'east-gate': east_gate,
         'new-east-gate': new_east_gate,
+        'south-side-gate': south_side_gate,
         'west-gate': west_gate,
     }[l['id']](C, detail)
-    p = Mesh()
-    pads = {
-        'east-gate': [(-12, 0, 5.5, 6), (12, 0, 5.5, 6)],
-        'new-east-gate': [],  # Its grounded paving and ramps are part of the gate.
-        'west-gate': [(-7.15, 0.6, 6.8, 6.0), (7.65, 0.6, 5.9, 6.0)],
-    }
-    for x, y, w, d in pads[l['id']]:
-        p.box(
-            x,
-            y,
-            -0.06 if l['id'] == 'west-gate' else 0.20,
-            w,
-            d,
-            0.10 if l['id'] == 'west-gate' else 0.20,
-            C['path'],
-        )
-    if p.v:
-        m.add_part('07_人行铺装_范围估算', p)
     if l['id'] == 'east-gate':
+        paving = Mesh()
+        for x in (-12, 12):
+            paving.box(x, 0, 0.20, 5.5, 6, 0.20, C['path'])
+        m.add_part('07_人行铺装_范围估算', paving)
         # Width is constrained by the actual corridor between neighbouring OSM
         # footprints. Keep the mapped gate node rather than moving neighbours.
         m.v = [(a * l['gateWidth'] / 35, b, c * l['height'] / 11) for a, b, c in m.v]

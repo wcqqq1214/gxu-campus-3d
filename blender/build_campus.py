@@ -4,7 +4,6 @@
 import hashlib
 import json
 import math
-import random
 import sys
 from contextlib import nullcontext
 from pathlib import Path
@@ -14,7 +13,12 @@ import bpy
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'blender'))
 BASE_ONLY = '--base-only' in sys.argv
-from generic_buildings import compact_form_source, ordinary_building
+if BASE_ONLY:
+    # A rejected base-only update must leave even a fresh checkout untouched.
+    sys.dont_write_bytecode = True
+import student_residences
+from building_models import building_mesh
+from generic_buildings import compact_form_source
 from geometry import MATERIALS, Mesh, material
 from huicui import compact_source
 from infrastructure import approaches, bridge, lake_bridge, road_chunk
@@ -26,6 +30,33 @@ from west_market import market_building, market_ground
 DATA = ROOT / 'public/data'
 MODELS = ROOT / 'public/models'
 REPORTS = ROOT / 'work/model-checks'
+CHUNK_METERS = 360
+
+
+def chunk_key(b):
+    if b['id'] in student_residences.IDS:
+        return student_residences.chunk_id(b['id'])
+    ix = math.floor(b['center'][0] / CHUNK_METERS)
+    iy = math.floor(b['center'][1] / CHUNK_METERS)
+
+    def label(v):
+        return ('p' if v >= 0 else 'n') + str(abs(v))
+
+    return 'chunk-' + label(ix) + '-' + label(iy)
+
+
+buildings = json.loads((DATA / 'buildings.json').read_text())
+zoneids = {}
+for b in buildings:
+    if b['insideCampus'] and not b['landmark']:
+        b['chunk'] = chunk_key(b)
+        zoneids.setdefault(b['chunk'], []).append(b['id'])
+if BASE_ONLY:
+    manifest = json.loads((DATA / 'models.json').read_text())
+    published = {zone['id']: set(zone['featureIds']) for zone in manifest['zones']}
+    if published != {key: set(ids) for key, ids in zoneids.items()}:
+        raise RuntimeError('Chunk layout changed; run a full build before --base-only')
+
 MODELS.mkdir(exist_ok=True)
 REPORTS.mkdir(parents=True, exist_ok=True)
 bpy.ops.object.select_all(action='SELECT')
@@ -61,6 +92,7 @@ for name, color, rough, metal in [
     ('slate', '#4d6c70', 0.6, 0.15),
     ('paleRoof', '#bdbfb7', 0.7, 0.12),
     ('blueRoof', '#198ec4', 0.65, 0.15),
+    ('tentBlue', '#75bce2', 0.78, 0),
     ('wood', '#725246', 0.92, 0),
     ('red', '#ad6c54', 0.8, 0),
     ('pink', '#d1afa0', 0.9, 0),
@@ -85,7 +117,6 @@ from west_dorms import FINISHES as WEST_DORM_FINISHES
 for name, color in WEST_DORM_FINISHES.items():
     C[name] = material(name, rgb(color))
 terrain = json.loads((DATA / 'terrain.json').read_text())
-buildings = json.loads((DATA / 'buildings.json').read_text())
 landmarks = json.loads((DATA / 'landmarks.json').read_text())
 surfaces = json.loads((DATA / 'surfaces.json').read_text())
 trees = json.loads((DATA / 'vegetation.json').read_text())
@@ -423,9 +454,8 @@ for name, color, rough, metal in [
 from student_center import student_center_materials
 
 student_center_materials(C)
-# Original deterministic JPEG textures; packed into both .blend and exported GLBs.
+# Pack the original authored JPEGs into both the editable scene and the GLBs.
 texture_dir = ROOT / 'blender/textures'
-texture_dir.mkdir(exist_ok=True)
 for name in [
     'stone',
     'grass',
@@ -439,25 +469,8 @@ for name in [
     'asphalt',
 ]:
     mat = MATERIALS[C[name]]
-    base = [
-        1.055 * (v ** (1 / 2.4)) - 0.055 if v > 0.0031308 else v * 12.92
-        for v in mat.diffuse_color[:3]
-    ]
-    image = bpy.data.images.new('自制-' + name, width=128, height=128)
-    rng = random.Random(name)
-    pixels = []
-    for j in range(128):
-        for i in range(128):
-            grain = rng.uniform(0.83, 1.06)
-            if name in ['stone', 'path'] and (j % 32 == 0 or i % 64 == 0):
-                grain *= 0.83
-            if name == 'slate' and j % 8 == 0:
-                grain *= 0.72
-            pixels.extend([min(1, v * grain) for v in base] + [1])
-    image.pixels.foreach_set(pixels)
-    image.filepath_raw = str(texture_dir / (name + '.jpg'))
-    image.file_format = 'JPEG'
-    image.save()
+    image = bpy.data.images.load(str(texture_dir / (name + '.jpg')))
+    image.name = '自制-' + name
     image.pack()
     node = mat.node_tree.nodes.new('ShaderNodeTexImage')
     node.image = image
@@ -500,7 +513,7 @@ civil_grade = load_grade(ROOT)
 def building_elevation(b):
     if b.get('customModel') == 'west-market':
         return MARKET_DATUM
-    if b.get('customModel') == 'north-campus':
+    if b.get('customModel') == 'north-campus' or b['id'] == student_residences.EAST_12:
         return b['elevation']
     datum = building_datum(
         b,
@@ -578,7 +591,7 @@ def generic(b, detail):
                 )
         m.roof(cx, cy, z + h + 0.08, w * 1.4, d * 1.4, 0.35, stone)
         return m
-    return ordinary_building(b, z, C, detail)
+    return building_mesh(b, z, C, detail)
 
 
 base = {k: Mesh() for k in ['terrain', 'roads', 'water', 'green', 'sports', 'context']}
@@ -886,24 +899,12 @@ if not BASE_ONLY:
             },
         )
         compact_source(obj)
-# Whole buildings belong to one 360 m cell, including their courtyard rings.
+# Surveyed residences stream individually. Other buildings share 360 m cells.
 # Base nodes use the same key, so each near chunk replaces exactly its own low LOD.
-CHUNK_METERS = 360
 near = {}
-zoneids = {}
 chunkbounds = {}
 bylandmark = {b['landmark']: b for b in buildings if b['landmark']}
 tree_obstacles = []
-
-
-def chunk_key(b):
-    ix = math.floor(b['center'][0] / CHUNK_METERS)
-    iy = math.floor(b['center'][1] / CHUNK_METERS)
-
-    def label(v):
-        return ('p' if v >= 0 else 'n') + str(abs(v))
-
-    return 'chunk-' + label(ix) + '-' + label(iy)
 
 
 for index, b in enumerate(buildings):
@@ -951,22 +952,20 @@ for index, b in enumerate(buildings):
             if 'form' in b:
                 compact_form_source(obj)
     else:
-        key = chunk_key(b)
-        b['chunk'] = key
+        key = b['chunk']
         if key not in near:
             near[key] = Mesh()
             base[key] = Mesh()
-            zoneids[key] = []
             chunkbounds[key] = [math.inf, math.inf, -math.inf, -math.inf]
         low = generic(b, False)
         high = generic(b, True)
         base[key].extend(low)
-        zoneids[key].append(b['id'])
         tree_obstacles.extend([(b['id'], 'base', low), (b['id'], 'near', high)])
         bounds = chunkbounds[key]
+        margin = 0 if b['id'] in student_residences.IDS else 2
         for k in range(2):
-            bounds[k] = min(bounds[k], b['bounds'][k] - 2)
-            bounds[k + 2] = max(bounds[k + 2], b['bounds'][k + 2] + 2)
+            bounds[k] = min(bounds[k], b['bounds'][k] - margin)
+            bounds[k + 2] = max(bounds[k + 2], b['bounds'][k + 2] + margin)
         if not BASE_ONLY:
             near[key].extend(high)
             obj = high.object(
@@ -979,7 +978,7 @@ for index, b in enumerate(buildings):
                     'sourceUrl': b['sourceUrl'],
                 },
             )
-            if 'form' in b:
+            if b.get('form'):
                 obj['archetype'] = b['form']['archetype']
                 if 'roofBasis' in b:
                     obj['roofBasis'] = b['roofBasis']
@@ -1249,11 +1248,13 @@ v5_terrain_north_apply(base, C)
 previous_surface = sync_tree_contacts(previous_surface)
 
 
+from terrain_wall_grades import apply_wall_grades
 from verge_east import apply as apply_east_verges
 from verge_west import apply as apply_west_verges
 
 apply_west_verges(base, C)
 apply_east_verges(base, C)
+apply_wall_grades(base)
 sync_tree_contacts(previous_surface)
 
 
@@ -1364,6 +1365,8 @@ def export(name, groups):
             'landmark': key[9:] if key.startswith('landmark-') else '',
             'sportsId': key[7:] if key.startswith('sports-') else '',
         }
+        if key.startswith('chunk-dorm-'):
+            (props['buildingId'],) = zoneids[key]
         if key.startswith('north-campus-'):
             props['layer'] = 'sports' if key.endswith('sports') else 'roads'
         if key.startswith('vegetation-low-'):
@@ -1391,9 +1394,13 @@ def export(name, groups):
 
     # Keep the base budget reproducible through the normal build: share only
     # byte-identical vertex attributes, without lowering geometry/UV precision.
-    if name == 'new-east-gate.glb' or any(
-        b.get('customModel') == 'west-market' and b['chunk'] + '.glb' == name
-        for b in buildings
+    if (
+        name.startswith('chunk-dorm-')
+        or name in {'new-east-gate.glb', 'south-side-gate.glb', 'west-gate.glb'}
+        or any(
+            b.get('customModel') == 'west-market' and b['chunk'] + '.glb' == name
+            for b in buildings
+        )
     ):
         (obj,) = objs
         export_detail(obj, path)
@@ -1421,13 +1428,13 @@ def export(name, groups):
                 export_lights=False,
             )
     if name == 'base.glb':
-        # Replace only this landmark: other nodes retain their existing budgets.
+        # Replace the detailed gate nodes while preserving the other base nodes.
         from tempfile import TemporaryDirectory
 
         from incremental_glb import splice_nodes
 
         for obj in objs:
-            if obj.get('landmark') == 'new-east-gate':
+            if obj.get('landmark') in {'new-east-gate', 'south-side-gate', 'west-gate'}:
                 with TemporaryDirectory(prefix='gxu-gate-export-') as directory:
                     precise = Path(directory) / 'gate.glb'
                     export_detail(obj, precise)
@@ -1489,14 +1496,11 @@ from basketball_export import manifest_entries
 
 if BASE_ONLY:
     check_initial_budget()
-    manifest = json.loads((DATA / 'models.json').read_text())
     from vegetation_priorities import priority_positions
 
     manifest['treePriorityPositions'] = priority_positions(
         json.loads((DATA / 'vegetation-zones.json').read_text()), trees
     )
-    if {z['id'] for z in manifest['zones']} != set(near):
-        raise RuntimeError('Chunk layout changed; run a full build before --base-only')
     manifest['base'].update(
         bytes=sizes['base.glb'],
         sha256=hashlib.sha256((MODELS / 'base.glb').read_bytes()).hexdigest(),
@@ -1606,6 +1610,7 @@ manifest['infrastructure'] = [
     for c in infrastructure['chunks']
 ]
 manifest['sports'] = manifest_entries(basketball, MODELS)
+from detail_export import geometry_bytes
 from vegetation_priorities import priority_positions
 
 manifest['treePriorityPositions'] = priority_positions(
@@ -1617,9 +1622,10 @@ for entry in (
     + manifest['landmarks']
     + manifest['infrastructure']
 ):
-    entry['sha256'] = hashlib.sha256(
-        (ROOT / 'public' / entry['url']).read_bytes()
-    ).hexdigest()
+    raw = (ROOT / 'public' / entry['url']).read_bytes()
+    entry['sha256'] = hashlib.sha256(raw).hexdigest()
+    if 'featureIds' in entry:
+        entry['geometryBytes'] = geometry_bytes(raw)
 check_initial_budget()
 (DATA / 'models.json').write_text(json.dumps(manifest, ensure_ascii=False, indent=2))
 bpy.data.collections.remove(EXPORT)

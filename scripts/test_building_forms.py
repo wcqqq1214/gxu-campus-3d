@@ -32,14 +32,17 @@ class BuildingFormTests(unittest.TestCase):
         }
         self.assertEqual(set(poses), set(originals))
         buildings = json.loads((ROOT / 'public/data/buildings.json').read_text())
-        supplements = [
-            b for b in buildings if b.get('geometrySource') == 'manual-imagery-trace'
-        ]
-        config = json.loads((ROOT / 'data/north-campus-layout.json').read_text())
+        north = json.loads((ROOT / 'data/north-campus-layout.json').read_text())
+        dorms = json.loads((ROOT / 'data/student-residences.json').read_text())
+        traced_ids = {
+            b['id']
+            for b in buildings
+            if b.get('geometrySource') == 'manual-imagery-trace'
+        }
         self.assertEqual(
-            {b['id'] for b in supplements}, {b['id'] for b in config['buildings']}
+            traced_ids, {b['id'] for b in north['buildings']} | {dorms['east12']['id']}
         )
-        buildings = [b for b in buildings if b not in supplements]
+        buildings = [b for b in buildings if b['id'] not in traced_ids]
         self.assertEqual(set(baseline), {b['id'] for b in buildings})
         for b in buildings:
             rings = originals.get(b['id'], b['polygons'])

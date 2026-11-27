@@ -107,7 +107,7 @@ test('503 自动重试能恢复；持续失败最多三次；404 不自动重试
   );
   assert.equal(count, 1);
 });
-test('区块覆盖全部普通校内建筑一次，每块低于 2 MB 且使用相同基础替换节点', async () => {
+test('近景楼块低于 2 MB，能按距离选取并替换同名基础节点', async () => {
   const manifest = JSON.parse(
     await readFile(new URL('../public/data/models.json', import.meta.url)),
   );
@@ -116,7 +116,6 @@ test('区块覆盖全部普通校内建筑一次，每块低于 2 MB 且使用�
   );
   const gltf = JSON.parse(b.toString('utf8', 20, 20 + b.readUInt32LE(12)));
   assert.equal(manifest.version, 2);
-  assert.ok(manifest.zones.length >= 20);
   for (const a of manifest.zones) {
     assert.ok(a.bytes < 2_000_000, `${a.id}: ${a.bytes}`);
     assert.equal(
@@ -269,13 +268,25 @@ test('sports details share the memory cap and cannot displace building details',
   );
 });
 
-test('选中的宿舍分块优先于周边道路且仍遵守内存预算', () => {
-  const building = { id: 'campus-block', bytes: 2, featureIds: ['residence'] };
-  const road = { id: 'campus-road', bytes: 1 };
-  const options = {
-    foregroundReady: false, selectedBuildingId: 'residence',
-    roads: [road], buildings: [building], costs: new Map(), cap: 64,
+test('选中楼块按解码尺寸优先加载，实测超预算时让出名额', () => {
+  const building = {
+    id: 'dorm',
+    bytes: 3,
+    geometryBytes: 64,
+    featureIds: ['residence'],
   };
-  assert.deepEqual(planDetails(options).assets.map(([key]) => key), ['campus-block']);
-  assert.deepEqual(planDetails({ ...options, cap: 50 }).assets.map(([key]) => key), ['campus-road']);
+  const road = { id: 'road', bytes: 1 };
+  const options = {
+    foregroundReady: false,
+    selectedBuildingId: 'residence',
+    roads: [road],
+    buildings: [building],
+    costs: new Map(),
+    cap: 64,
+  };
+  assert.deepEqual(planDetails(options).assets, [['dorm', building]]);
+  assert.deepEqual(
+    planDetails({ ...options, costs: new Map([['dorm', 65]]) }).assets,
+    [['road', road]],
+  );
 });

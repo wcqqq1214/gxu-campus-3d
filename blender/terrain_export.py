@@ -130,7 +130,7 @@ def replace_precise_terrain(
                 preserve_geometry(
                     precise.read_bytes(), path, [name], materials=materials
                 )
-    compact_buffer_views(path, optimize_jpegs=True)
+    compact_buffer_views(path, optimize_jpegs=not terrain_only)
     original = path.read_bytes()
     candidate, _ = fit_terrain_budget(original)
     if candidate is not original:

@@ -2,6 +2,8 @@
 
 import math
 
+from campus_offices.faculty import animal as reproduction_institute
+from campus_offices.faculty import sports
 from geometry import Mesh
 
 MEDICINE = 'way/759096577'
@@ -61,46 +63,6 @@ def medicine(b, z, C, detail):
         for x, floor in [(-5.0, 1), (-5.0, 2), (1.1, 1), (1.1, 0), (9.2, 0)]:
             wall.box(x, -0.23, 1.10 + 3.3 * floor, 0.76, 0.47, 0.53, C['paleRoof'])
     attach(m, wall, frame, z)
-    return m
-
-
-def sports(b, z, C, detail):
-    """The sign and stepped window face the diagonal corner beside the sculpture."""
-    from south_gate import inscription
-
-    m = Mesh()
-    for edge in (0, 1, 2):
-        frame = wall_frame(b['polygons'][0][0], edge)
-        wall = Mesh()
-        length = frame[3]
-        wall.box(0, -0.021, 1.52, length, 0.042, 3.04, C['pink'])
-        if edge == 1:
-            for x in (-1.78, 1.78):
-                wall.box(x, -0.12, 1.52, 0.60, 0.24, 3.04, C['stone'])
-            pane(wall, 0, 1.35, 2.75, 2.70, C, detail, bars=True)
-            wall.box(0, -0.23, 3.25, 4.15, 0.44, 0.51, C['stone'])
-            if detail:
-                wall.extend(
-                    inscription(
-                        '体育学院',
-                        0,
-                        -0.47,
-                        3.25,
-                        2.85,
-                        0.44,
-                        C['dark'],
-                        False,
-                        flat=True,
-                    )
-                )
-            pane(wall, 0, 4.76, 2.85, 1.42, C, detail, bars=True)
-            pane(wall, 0, 5.65, 1.15, 0.45, C, detail)
-        else:
-            for i in range(4):
-                x = (i - 1.5) * length / 4.55
-                pane(wall, x, 4.8, 1.65, 1.48, C, detail, bars=True)
-                pane(wall, x, 1.66, 1.68, 1.28, C, detail)
-        attach(m, wall, frame, z)
     return m
 
 
@@ -1156,35 +1118,6 @@ def east_gym(b, z, C, detail):
     return m
 
 
-def reproduction_institute(b, z, C, detail):
-    """The southwest range has two masonry floors and a pale metal upper enclosure."""
-    m = Mesh()
-    ring = b['polygons'][0][0]
-    for edge in (7, 8):
-        frame = wall_frame(ring, edge)
-        wall = Mesh()
-        length = frame[3]
-        wall.box(0, -0.045, 3.25, length, 0.09, 6.50, C['pink'])
-        wall.box(0, -0.10, 0.47, length, 0.20, 0.94, C['stone'])
-        wall.box(0, -0.20, 8.2, length + 0.45, 0.4, 3.4, C['paleRoof'])
-        wall.box(0, -0.32, 6.5, length + 0.65, 0.65, 0.22, C['dark'])
-        wall.box(0, -0.24, 9.93, length + 0.52, 0.48, 0.18, C['dark'])
-        if edge == 7:
-            for i in range(6):
-                x = (i - 2.5) * length / 6.4
-                for h in (2.1, 5.05):
-                    pane(wall, x, h, 1.43, 1.56, C, detail, bars=True)
-                if i >= 2:
-                    wall.box(x, -0.36, 8.00, 1.00, 0.4, 0.84, C['metal'])
-            for h in (2.97, 5.98):
-                wall.box(0, -0.26, h, length - 0.75, 0.52, 0.17, C['stone'])
-        else:
-            wall.box(0, -0.9, 3.26, 3.55, 1.8, 0.24, C['stone'])
-            pane(wall, 0, 1.5, 2.2, 3.0, C, detail)
-        attach(m, wall, frame, z)
-    return m
-
-
 BUILDERS = {
     MEDICINE: medicine,
     SPORTS: sports,
@@ -1206,5 +1139,5 @@ PHOTO_EDGES = {
     LIFE: set(range(3, 12)),
     'way/759129516': {4},
     EAST_GYM: {0, 2},
-    REPRODUCTION_INSTITUTE: {7, 8},
+    REPRODUCTION_INSTITUTE: {2, 7, 8},
 }

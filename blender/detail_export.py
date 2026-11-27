@@ -1,8 +1,9 @@
-"""Shared export precision for the gate and its small facade details."""
+"""Export facade detail and report its decoded geometry allocation."""
 
 import bpy
 
 from export_attributes import omit_unused_uvs
+from preserve_glb_geometry import unpack
 
 
 def export_detail(obj, target, *, base_chunk=False):
@@ -24,3 +25,16 @@ def export_detail(obj, target, *, base_chunk=False):
             export_draco_normal_quantization=6 if base_chunk else 10,
             export_materials='EXPORT',
         )
+
+
+def geometry_bytes(raw):
+    """Four bytes per decoded attribute component and index in the streaming budget."""
+    doc, _ = unpack(raw)
+    widths = {'SCALAR': 1, 'VEC2': 2, 'VEC3': 3, 'VEC4': 4}
+    total = 0
+    for mesh in doc['meshes']:
+        for primitive in mesh['primitives']:
+            for index in (*primitive['attributes'].values(), primitive['indices']):
+                accessor = doc['accessors'][index]
+                total += 4 * accessor['count'] * widths[accessor['type']]
+    return total

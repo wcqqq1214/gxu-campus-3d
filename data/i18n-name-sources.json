@@ -1,11 +1,16 @@
 {
-  "checkedAt": "2026-10-12",
+  "checkedAt": "2026-11-28",
   "basis": "User-approved bilingual naming table; display overrides do not change source geometry or assert current building occupancy.",
   "sources": {
     "GXUWestMarket": [
       "广西大学保卫处西校园菜市场现场报道",
       "https://bwc.gxu.edu.cn/info/1080/9244.htm",
       "2026-05-28；中文地点名，英文为说明性翻译。"
+    ],
+    "GXUSouthSideGate": [
+      "广西大学南侧门道闸改造通知及新生报到说明",
+      "https://bwc.gxu.edu.cn/info/1013/8892.htm",
+      "中文；2025-01-14；确认“南侧门”实体名称；英文为项目说明性译名。"
     ],
     "G01": [
       "学校英文校园图库",
@@ -286,6 +291,31 @@
       "广西大学关于临时封闭鸪江路北端的公告附图",
       "https://www.gxu.edu.cn/info/1364/30562.htm",
       "附图标记东27栋；英文为宿舍楼编号的项目译名。"
+    ],
+    "DormWelcome": [
+      "广西大学2026年迎新交通示意图",
+      "https://bwc.gxu.edu.cn/info/1013/9286.htm",
+      "用于楼号和片区；连体建筑保留多个楼号。"
+    ],
+    "DormPrecinct": [
+      "广西大学学生公寓园区工程简报",
+      "https://ghjjc.gxu.edu.cn/info/1011/2411.htm",
+      "用于南区1至10栋公寓园区称呼。"
+    ],
+    "CampusPlan": [
+      "广西大学学校规划图",
+      "https://www.gxu.edu.cn/ggfw/xxght.htm",
+      "中文建筑与位置参照。"
+    ],
+    "JunwuOffice": [
+      "广西大学人力资源处联系地址",
+      "https://rlzyc.gxu.edu.cn/lxwm.htm",
+      "君武馆地址。"
+    ],
+    "AlumniOffice": [
+      "广西大学教育发展基金会联系地址",
+      "https://jjh.gxu.edu.cn/list.jsp?urltype=tree.TreeTempUrl&wbtreeid=1136",
+      "校友之家办公地址。"
     ]
   },
   "entries": {
@@ -293,6 +323,11 @@
       "status": "规",
       "sources": ["G05"],
       "note": "官网交通页用 south gate；校图库也用 Main Gate，推荐方位名。"
+    },
+    "南侧门": {
+      "status": "项",
+      "sources": ["GXUSouthSideGate"],
+      "note": "校方中文设施名；与南大门、新东园门分别为不同实体。英文采用说明性方位译名，未宣称校方英文定名。"
     },
     "图书馆": {
       "status": "官",
@@ -2804,8 +2839,8 @@
     },
     "西校园南区10栋": {
       "status": "项",
-      "sources": [],
-      "note": "项目编号译法；Area 不推断为住宅区，校区/字母后缀依原名保留。"
+      "sources": ["DormPrecinct"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
     },
     "西校园南区1号楼": {
       "status": "项",
@@ -2819,18 +2854,18 @@
     },
     "西校园南区3栋": {
       "status": "项",
-      "sources": [],
-      "note": "项目编号译法；Area 不推断为住宅区，校区/字母后缀依原名保留。"
+      "sources": ["DormPrecinct"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
     },
     "西校园南区4栋": {
       "status": "项",
-      "sources": [],
-      "note": "项目编号译法；Area 不推断为住宅区，校区/字母后缀依原名保留。"
+      "sources": ["DormPrecinct"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
     },
     "西校园南区5栋": {
       "status": "项",
-      "sources": [],
-      "note": "项目编号译法；Area 不推断为住宅区，校区/字母后缀依原名保留。"
+      "sources": ["DormPrecinct"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
     },
     "西校园南区6栋": {
       "status": "项",
@@ -2839,8 +2874,8 @@
     },
     "西校园南区7栋": {
       "status": "项",
-      "sources": [],
-      "note": "项目编号译法；Area 不推断为住宅区，校区/字母后缀依原名保留。"
+      "sources": ["DormPrecinct"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
     },
     "西校园南区8栋": {
       "status": "项",
@@ -2849,8 +2884,8 @@
     },
     "西校园南区9栋": {
       "status": "项",
-      "sources": [],
-      "note": "项目编号译法；Area 不推断为住宅区，校区/字母后缀依原名保留。"
+      "sources": ["DormPrecinct"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
     },
     "西校园学生宿舍16栋": {
       "status": "项",
@@ -2951,6 +2986,291 @@
       "status": "技",
       "sources": [],
       "note": "同名路段的技术标识；展示应省略 OSM 编号。"
+    },
+    "西1栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西2栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西3栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西4栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西5栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西6B栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西7栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西8栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西9栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西10栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西11栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西12栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "研究生西13栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西14栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西15栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西16栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西17栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西18栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西19栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西20栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西21栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西22栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西23栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西24栋、西25栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西26栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西27栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西28栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西校园南区1栋": {
+      "status": "项",
+      "sources": ["DormPrecinct"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "西校园南区2栋": {
+      "status": "项",
+      "sources": ["DormPrecinct"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东1B、东1A、东2A、东2B、东3栋（连体）": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东1栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东7栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东8栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东9栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东10栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东11栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东12栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东13栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东14栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东15栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东16栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东18栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东19栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东20栋、东21栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东22栋、东23栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东25栋（新东园1号综合楼）": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东27栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东29栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东30栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东31栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东32栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东33栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东34栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "东35栋": {
+      "status": "项",
+      "sources": ["DormWelcome"],
+      "note": "按已发布园区楼号标注。英文为项目说明性译名。"
+    },
+    "君武馆": {
+      "status": "项",
+      "sources": ["JunwuOffice", "CampusPlan"],
+      "note": "中文沿用校园建筑名称，英文为项目说明性译名。"
+    },
+    "校友之家": {
+      "status": "项",
+      "sources": ["AlumniOffice", "DormWelcome"],
+      "note": "中文沿用校园建筑名称，英文为项目说明性译名。"
+    },
+    "保卫处": {
+      "status": "项",
+      "sources": ["CampusPlan"],
+      "note": "中文沿用校园建筑名称，英文为项目说明性译名。"
     }
   }
 }

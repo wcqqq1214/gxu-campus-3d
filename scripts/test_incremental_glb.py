@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'blender'))
 from preserve_glb_geometry import (
     compact_buffer_views,
     mesh_nodes_by_name,
+    pack_glb,
     preserve_geometry,
     replace_compressed_node_parts,
     unpack,
@@ -85,7 +86,10 @@ class IncrementalGLBTests(unittest.TestCase):
             self.assertEqual(doc['nodes'][0]['name'], 'shore-jinghu')
 
     def test_disjoint_parts_replace_one_mesh_with_separate_accessors(self):
-        raw = self.encode('terrain', b'old-terrain', 9)
+        original, buffer = unpack(self.encode('terrain', b'old-terrain', 9))
+        original['materials'].append({'name': 'stone', 'doubleSided': True})
+        original['meshes'][0]['primitives'][0]['material'] = 1
+        raw = pack_glb(original, buffer)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'base.glb'
             path.write_bytes(raw)
@@ -103,6 +107,7 @@ class IncrementalGLBTests(unittest.TestCase):
             for p, count, payload in zip(
                 primitives, [12, 3], [b'main-geometry', b'precise-geometry']
             ):
+                self.assertEqual(p['material'], 1)
                 self.assertEqual(
                     doc['accessors'][p['attributes']['POSITION']]['count'], count
                 )

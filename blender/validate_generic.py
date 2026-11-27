@@ -1,4 +1,4 @@
-"""Verify ordinary form in both generators, saved source and decoded shipping GLBs.
+"""Verify campus building geometry in both LODs, saved source and shipping GLBs.
 
 --generated-only checks generators before rebuilding. The default also checks
 real source vertex groups and ray samples in base and every near chunk.
@@ -11,24 +11,28 @@ import sys
 from pathlib import Path
 
 import bpy
+import numpy as np
 from mathutils import Vector
 from mathutils.bvhtree import BVHTree
 from mathutils.kdtree import KDTree
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / 'blender'))
+sys.path[:0] = [str(ROOT / 'blender'), str(ROOT / 'scripts')]
+from building_models import building_mesh
+from campus_offices import IDS as OFFICE_IDS
+from college_facades import BUILDERS as COLLEGE_FACADES
 from dining_halls import BEI, BI, BO, CUI, DONG, FRONTS, XIU
-from east27_dining import EAST27_ID, hall_frame
-from generic_buildings import compact_form_source, ordinary_building
+from generic_buildings import COLLEGE_MODELS, compact_form_source
 from geometry import MATERIALS
+from humanities_facades import GATE, MANAGEMENT, SHAW, YULIN
 from nanyuan import CANTEEN_ID
 from new_east_neighbours import BUILDING_IDS as NEW_EAST_NEIGHBOURS
 from new_east_neighbours import SHOP_BUILDINGS
+from student_residences import IDS as RESIDENCE_IDS
+from student_residences import chunk_id as residence_chunk_id
 from student_water_tower import TOWER_ID
-from west22 import WEST22
-from west23 import WEST23
-from west_dorms import FINISHES, roof_frame
-from west_dorms import NUMBERS as WEST_DORMS
+from terrain_elevation import make_elevation
+from west_dorms import FINISHES
 
 
 def ordinary(b):
@@ -66,17 +70,21 @@ def vertex_tree(objects):
     return kd
 
 
-def check_neighbour_facade(b, kd, C, detail):
-    expected = ordinary_building(b, b['elevation'], C, detail)
-    ranges = [
-        (start, end)
-        for name, start, end in expected.parts
+def facade_vertices(mesh):
+    return [
+        point
+        for name, start, end in mesh.parts
         if name in ('04_立面窗格', '05_临街店面')
+        for point in mesh.v[start:end]
     ]
+
+
+def check_neighbour_facade(building_id, kd, points):
     # Includes catalogue datum rounding (5 mm) and the chunk's Draco grid.
-    assert all(
-        kd.find(p)[2] < 0.012 for start, end in ranges for p in expected.v[start:end]
-    ), (b['id'], 'missing exported facade')
+    assert points and all(kd.find(p)[2] < 0.012 for p in points), (
+        building_id,
+        'missing exported facade',
+    )
 
 
 def root_name(obj):
@@ -89,78 +97,6 @@ def samples(b):
     form = b['form']
     z = b['elevation']
     points = []
-    if b['id'] in WEST_DORMS:
-        ux, uy, x0, y0, x1, _ = roof_frame(b)
-        h = z + b['height']
-        # Open perimeter of the flat roof and a collector within the eastern array.
-        for label, x, y, lift in [
-            ('south-deck', (x0 + x1) / 2, y0 + 0.56, 0),
-            ('east-collector', x1 - 9.0, y0 + 2.7, 0.47),
-        ]:
-            points.append(
-                dict(
-                    kind=label,
-                    x=ux * x - uy * y,
-                    y=uy * x + ux * y,
-                    top=h + 2,
-                    expected=h + lift,
-                )
-            )
-        return points
-    if b['id'] == WEST23:
-        x = b['bounds'][0] + 6.3
-        y = b['bounds'][3]
-        return [
-            dict(kind=kind, x=x - u, y=y - v, expected=z + h, top=z + h + 0.13)
-            for kind, u, v, h in [
-                ('roof', -20, 8, b['height'] + 0.12),
-                ('west-arcade', 1.6, 0.8, 0),
-                ('left-entrance-mat', -14.4, -0.35, 0.021),
-                ('right-entrance-mat', -11.4, -0.30, 0.021),
-                ('fascia', -3.4, -0.28, 2.66),
-            ]
-        ]
-    if b['id'] == WEST22:
-        xmin, ymin, xmax, ymax = b['bounds']
-        length = xmax - xmin
-        targets = [
-            ('roof', length / 2, (ymax - ymin) / 2, b['height'] + 0.14),
-            ('threshold-mat', length * 3.5 / 18 + 1.2, 0.22, 0.024),
-            ('arcade', 30, -2.1, 0),
-        ]
-        angle = math.radians(-2.45)
-        for k in range(6):
-            v = -(k + 0.5) * 2.50 / 6
-            targets.append(
-                (
-                    f'east-tread-{k + 1}',
-                    length + 1.94 - v * math.sin(angle),
-                    -8.01 + v * math.cos(angle),
-                    -(k + 1) * 1.245 / 7,
-                )
-            )
-        return [
-            dict(kind=kind, x=xmin + x, y=ymin + y, top=z + h + 0.12, expected=z + h)
-            for kind, x, y, h in targets
-        ]
-    if b['id'] == EAST27_ID:
-        x, y, a = hall_frame(b)
-        for kind, u, v, top, h in (
-            ('covered-dining-floor', -3, -4.1, 0.60, 0.07),
-            ('serving-ledge', 2, -0.27, 1.58, 1.0),
-            ('east-link-roof', 29, 16.5, 25, b['height'] + 0.12),
-            ('court-crossing', -34, 16.55, 0.60, 0.09),
-        ):
-            points.append(
-                dict(
-                    kind=kind,
-                    x=x + u * math.cos(a) - v * math.sin(a),
-                    y=y + u * math.sin(a) + v * math.cos(a),
-                    top=z + top,
-                    expected=z + h,
-                )
-            )
-        return points
     if b['id'] == BEI:
         ring = b['polygons'][0][0]
         angle = math.atan2(ring[1][1] - ring[2][1], ring[1][0] - ring[2][0])
@@ -606,11 +542,17 @@ def samples(b):
                         }
                     )
             continue
-        platform = (
-            e['landingHeight'] / 2
-            if 'landingHeight' in e
-            else e.get('platformHeight', 0.075)
-        )
+        if (
+            b['id'] == SHAW
+            and e['id'] == 'south-colonnade'
+            and any(part['id'] == 'stair-core' for part in form['parts'])
+        ):
+            # At 1.6 m the ray hits the third tread below Shaw's 0.40 m landing.
+            platform = 0.10
+        elif 'landingHeight' in e:
+            platform = e['landingHeight'] / 2
+        else:
+            platform = e.get('platformHeight', 0.075)
         points.append(
             {
                 'kind': 'entrance-platform',
@@ -668,6 +610,280 @@ def check_samples(b, trees, tolerance):
     return result
 
 
+def surface_points(vertices, faces):
+    # Retain vertices and triangle-interior witnesses; welding and Draco can
+    # discard a vertex on a planar face without changing the visible surface.
+    vertices = np.asarray(vertices, dtype=np.float32)
+    points = vertices[list({index for face in faces for index in face})]
+    triangles = [face for face in faces if len(face) == 3]
+    if triangles:
+        centers = vertices[triangles].mean(axis=1)
+        points = np.concatenate((points, centers))
+    return np.unique(points, axis=0)
+
+
+def authored_points(mesh, building_id):
+    assert mesh.f and len(mesh.f) == len(mesh.m), (
+        building_id,
+        'empty or unpainted mesh',
+    )
+    points = surface_points(mesh.v, mesh.f)
+    assert np.isfinite(points).all(), building_id
+    return points
+
+
+def point_set_error(actual, expected):
+    # Welded vertices can have a different order and duplicate count.
+    maximum = 0.0
+    for points, reference in ((actual, expected), (expected, actual)):
+        tree = KDTree(len(reference))
+        for index, point in enumerate(reference):
+            tree.insert(point, index)
+        tree.balance()
+        maximum = max(maximum, max(tree.find(point)[2] for point in points))
+    return maximum
+
+
+def check_components(obj, mesh, parts, building_id, tolerance):
+    for name, start, end in parts:
+        group = obj.vertex_groups.get(name)
+        assert group is not None, (building_id, name, 'missing editable component')
+        actual = component_vertices(obj, group)
+        expected = mesh.v[start:end]
+        if not actual and not expected:
+            continue
+        assert actual and expected, (building_id, name, 'empty source component')
+        error = point_set_error(actual, expected)
+        assert error < tolerance, (building_id, name, 'stale source form', error)
+
+
+def check_authored_source(obj, mesh, building_id, component_tolerance=0.011):
+    # Compare the same editable representation on each side. Welding can reduce
+    # quads to triangles and change their centres without moving the surface.
+    predicted = mesh.object('source-weld-check', bpy.context.scene.collection)
+    compact_form_source(predicted)
+    # Blender names each part separately, including .001 suffixes for repeated labels.
+    parts = [
+        (group.name, start, end)
+        for group, (_, start, end) in zip(
+            predicted.vertex_groups, mesh.parts, strict=True
+        )
+    ]
+    actual, expected = [
+        surface_points(
+            [o.matrix_world @ vertex.co for vertex in o.data.vertices],
+            [tuple(face.vertices) for face in o.data.polygons],
+        )
+        for o in (obj, predicted)
+    ]
+    data = predicted.data
+    bpy.data.objects.remove(predicted, do_unlink=True)
+    bpy.data.meshes.remove(data)
+    maximum = point_set_error(actual, expected)
+    assert maximum < 0.011, (building_id, 'stale editable surface', maximum)
+    check_components(obj, mesh, parts, building_id, component_tolerance)
+    return [
+        {
+            'kind': 'editable-surface',
+            'points': len(actual),
+            'errorMeters': round(maximum, 6),
+        }
+    ]
+
+
+def check_authored_surface(building_id, points, trees, tolerance):
+    maximum = 0.0
+    for point in points:
+        distances = [tree.find_nearest(point, tolerance)[3] for tree in trees]
+        distance = min((d for d in distances if d is not None), default=None)
+        assert distance is not None, (
+            building_id,
+            'missing authored surface',
+            tuple(point),
+            tolerance,
+        )
+        maximum = max(maximum, distance)
+    return [
+        {
+            'kind': 'authored-surface',
+            'points': len(points),
+            'errorMeters': round(maximum, 6),
+        }
+    ]
+
+
+def check_editable_source(bs, authored, zones, report):
+    bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'blender/gxu-campus.blend'))
+    objects = {
+        o.get('featureId'): o
+        for o in bpy.context.scene.objects
+        if o.type == 'MESH' and o.get('featureId')
+    }
+    MATERIALS[:] = list(bpy.data.materials)
+    C = {mat.name: i for i, mat in enumerate(MATERIALS)}
+    # The neighbour update rebuilds whole chunks from unrounded terrain elevations.
+    neighbour_chunk_members = {
+        fid
+        for zone in zones
+        if NEW_EAST_NEIGHBOURS.intersection(zone['featureIds'])
+        for fid in zone['featureIds']
+    }
+    elevation = make_elevation(
+        json.loads((ROOT / 'public/data/terrain.json').read_text())
+    )
+    report['source'] = []
+    for b in bs:
+        assert b['id'] in objects, (b['id'], 'missing editable source object')
+        o = objects[b['id']]
+        in_neighbour_chunk = b['id'] in neighbour_chunk_members
+        z = elevation(*b['center']) if in_neighbour_chunk else b['elevation']
+        expected = building_mesh(b, z, C, b['insideCampus'])
+        component_tolerance = 0.001 if in_neighbour_chunk else 0.011
+        if b['id'] in authored:
+            report['source'].append(
+                {
+                    'id': b['id'],
+                    'samples': check_authored_source(
+                        o, expected, b['id'], component_tolerance
+                    ),
+                }
+            )
+            continue
+        parts = (
+            expected.parts
+            if in_neighbour_chunk or b['id'] in FRONTS or b['id'] == CANTEEN_ID
+            else expected.parts[:3]
+        )
+        check_components(o, expected, parts, b['id'], component_tolerance)
+        if b['id'] == TOWER_ID:
+            actual = [o.matrix_world @ v.co for v in o.data.vertices]
+            assert actual and expected.v
+            assert point_set_error(actual, expected.v) < 0.011, (
+                'Stale editable water tower'
+            )
+        report['source'].append(
+            {'id': b['id'], 'samples': check_samples(b, [mesh_tree(o)], 0.011)}
+        )
+    neighbours = [b for b in bs if b['id'] in NEW_EAST_NEIGHBOURS]
+    if neighbours:
+        (gate,) = [
+            o for o in bpy.context.scene.objects if o.get('landmark') == 'new-east-gate'
+        ]
+        gate_tree = mesh_tree(gate)
+        for b in neighbours:
+            assert not gate_tree.overlap(mesh_tree(objects[b['id']])), (
+                b['id'],
+                'facade intersects gate enclosure',
+            )
+        report['neighbourGateClearancePassed'] = True
+        for shop_id in sorted(SHOP_BUILDINGS & {b['id'] for b in neighbours}):
+            shop = objects[shop_id]
+            group = shop.vertex_groups['05_临街店面'].index
+            indices = {
+                v.index
+                for v in shop.data.vertices
+                if any(g.group == group for g in v.groups)
+            }
+            faces = [
+                tuple(p.vertices)
+                for p in shop.data.polygons
+                if all(i in indices for i in p.vertices)
+            ]
+            shop_tree = BVHTree.FromPolygons(
+                [shop.matrix_world @ v.co for v in shop.data.vertices], faces
+            )
+            for other_id in NEW_EAST_NEIGHBOURS - {shop_id}:
+                assert not shop_tree.overlap(mesh_tree(objects[other_id])), (
+                    shop_id,
+                    other_id,
+                    'shopfront intersects adjacent building',
+                )
+            report['shopfrontNeighbourClearancePassed'] = True
+            terrain_tree = mesh_tree(bpy.data.objects['terrain'])
+            paving = [
+                p
+                for p in shop.data.polygons
+                if shop.data.materials[p.material_index].name
+                in {'eastShopPaving', 'eastShopPavingJoint'}
+            ]
+            assert paving, 'Missing shop apron'
+            for face in paving:
+                point = shop.matrix_world @ face.center
+                hit, *_ = terrain_tree.ray_cast(
+                    point + Vector((0, 0, 2)), Vector((0, 0, -1)), 5
+                )
+                assert hit is not None and 0.01 < point.z - hit.z < 0.08, (
+                    'Shop apron ground clearance',
+                    point,
+                    hit,
+                )
+            report['shopApronGroundingPassed'] = True
+
+
+def check_shipping_meshes(bs, authored, facades, by_chunk, by_building, report):
+    # Import shipping meshes, not a newly re-exported test substitute.
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    bpy.ops.import_scene.gltf(filepath=str(ROOT / 'public/models/base.glb'))
+    bpy.context.view_layer.update()
+    objects = {}
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH':
+            objects.setdefault(root_name(o), []).append(o)
+    keys = {by_building[b['id']] if b['insideCampus'] else 'context' for b in bs}
+    trees = {key: [mesh_tree(o) for o in objects[key]] for key in keys}
+    neighbour_keys = {
+        by_building[b['id']] if b['insideCampus'] else 'context'
+        for b in bs
+        if b['id'] in facades
+    }
+    facade_trees = {key: vertex_tree(objects[key]) for key in neighbour_keys}
+    report['base'] = []
+    for b in bs:
+        key = by_building[b['id']] if b['insideCampus'] else 'context'
+        if b['id'] in RESIDENCE_IDS:
+            assert bpy.data.objects[key].get('buildingId') == b['id'], (
+                key,
+                'wrong base residence',
+            )
+        probes = (
+            check_authored_surface(b['id'], authored[b['id']][0], trees[key], 0.05)
+            if b['id'] in authored
+            else check_samples(b, trees[key], 0.05)
+        )
+        report['base'].append({'id': b['id'], 'samples': probes})
+        if b['id'] in facades:
+            check_neighbour_facade(b['id'], facade_trees[key], facades[b['id']][0])
+    report['near'] = []
+    for chunk in sorted({by_building[b['id']] for b in bs if b['insideCampus']}):
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+        bpy.ops.import_scene.gltf(
+            filepath=str(ROOT / 'public' / by_chunk[chunk]['url'])
+        )
+        bpy.context.view_layer.update()
+        objects = [o for o in bpy.context.scene.objects if o.type == 'MESH']
+        assert {root_name(o) for o in objects} == {chunk}, (
+            chunk,
+            'incorrect replacement node',
+        )
+        trees = [mesh_tree(o) for o in objects]
+        facade_tree = vertex_tree(objects) if chunk in neighbour_keys else None
+        for b in bs:
+            if by_building.get(b['id']) == chunk:
+                if b['id'] in RESIDENCE_IDS:
+                    assert bpy.data.objects[chunk].get('buildingId') == b['id'], (
+                        chunk,
+                        'wrong near residence',
+                    )
+                probes = (
+                    check_authored_surface(b['id'], authored[b['id']][1], trees, 0.02)
+                    if b['id'] in authored
+                    else check_samples(b, trees, 0.02)
+                )
+                report['near'].append({'id': b['id'], 'samples': probes})
+                if b['id'] in facades:
+                    check_neighbour_facade(b['id'], facade_tree, facades[b['id']][1])
+
+
 def main():
     prefix = next(
         (a.split('=', 1)[1] for a in sys.argv if a.startswith('--report-prefix=')),
@@ -680,11 +896,45 @@ def main():
         for b in json.loads((ROOT / 'public/data/buildings.json').read_text())
         if ordinary(b)
     ]
+    generated_only = '--generated-only' in sys.argv
     chunk = next(
         (a.split('=', 1)[1] for a in sys.argv if a.startswith('--chunk=')), None
     )
+    if generated_only:
+        by_building = {
+            b['id']: residence_chunk_id(b['id'])
+            if b['id'] in RESIDENCE_IDS
+            else b.get('chunk')
+            for b in bs
+            if b['insideCampus']
+        }
+    else:
+        zones = json.loads((ROOT / 'public/data/models.json').read_text())['zones']
+        by_chunk = {zone['id']: zone for zone in zones}
+        by_building = {}
+        for zone in zones:
+            for fid in zone['featureIds']:
+                assert fid not in by_building, (fid, 'assigned to two near chunks')
+                by_building[fid] = zone['id']
+        catalogue_ids = {b['id'] for b in bs}
+        assert RESIDENCE_IDS <= catalogue_ids, (
+            'missing residences',
+            RESIDENCE_IDS - catalogue_ids,
+        )
+        for b in bs:
+            if b['insideCampus']:
+                assert by_building[b['id']] == b['chunk'], (
+                    b['id'],
+                    'wrong catalogue chunk',
+                )
+                if b['id'] in RESIDENCE_IDS:
+                    key = residence_chunk_id(b['id'])
+                    assert by_chunk[key]['featureIds'] == [b['id']], (
+                        key,
+                        'residence must replace its own base mesh',
+                    )
     if chunk:
-        bs = [b for b in bs if b.get('chunk') == chunk]
+        bs = [b for b in bs if by_building.get(b['id']) == chunk]
         assert bs, ('Unknown or empty ordinary building chunk', chunk)
     colors = [
         'pink',
@@ -701,10 +951,36 @@ def main():
         'stoneCool',
         'white',
         'timeLetter',
+        'tenWall',
+        'tenTrim',
+        'tenGlass',
         'wallStone',
         'fenceIron',
         'gateRed',
         'gateRecess',
+        'gateStone',
+        'gateTrim',
+        'gateJoint',
+        'lampMetal',
+        'courtMetal',
+        'bridgeConcrete',
+        'asphalt',
+        'libraryGlass',
+        'libraryTrim',
+        'bark',
+        'bridgeJoint',
+        'drainStone',
+        'road',
+        'roadWhite',
+        'roadYellow',
+        'sportWhite',
+        'water',
+        'libraryStone',
+        'libraryMullion',
+        'huicuiFrame',
+        'huicuiTrim',
+        'huicuiWall',
+        'residencePodium',
         'libraryInk',
         'residenceGlass',
         'slate',
@@ -722,9 +998,30 @@ def main():
     C = {k: i for i, k in enumerate(colors)}
     MATERIALS[:] = [bpy.data.materials.new('generic-check-' + name) for name in colors]
     generated = []
+    authored_ids = (
+        RESIDENCE_IDS
+        | OFFICE_IDS
+        | COLLEGE_MODELS.keys()
+        | COLLEGE_FACADES.keys()
+        | {GATE, MANAGEMENT, YULIN}
+    )
+    authored = {}
+    facades = {}
     for b in bs:
-        low = ordinary_building(b, b.get('elevation', 0), C, False)
-        high = ordinary_building(b, b.get('elevation', 0), C, True)
+        low = building_mesh(b, b['elevation'], C, False)
+        high = building_mesh(b, b['elevation'], C, True)
+        if b['id'] in SHOP_BUILDINGS:
+            facades[b['id']] = (facade_vertices(low), facade_vertices(high))
+        if b['id'] in authored_ids or 'stairTower' in b['form']:
+            # These models have independently authored LODs and facade groups.
+            authored[b['id']] = (
+                authored_points(low, b['id']),
+                authored_points(high, b['id']),
+            )
+            generated.append(
+                {'id': b['id'], 'farFaces': len(low.f), 'nearFaces': len(high.f)}
+            )
+            continue
         for (name, a, c), (other, x, y) in zip(low.parts[:3], high.parts[:3]):
             assert name == other and low.v[a:c] == high.v[x:y], (
                 b['id'],
@@ -757,7 +1054,7 @@ def main():
         if b['form']['archetype'] == 'canteen' and b['id'] != CANTEEN_ID:
             residential = {**b, 'form': {**b['form'], 'archetype': 'dormitory'}}
             assert len(high.v) < len(
-                ordinary_building(residential, b.get('elevation', 0), C, True).v
+                building_mesh(residential, b['elevation'], C, True).v
             )
         generated.append(
             {
@@ -775,157 +1072,16 @@ def main():
     }
     target = ROOT / 'work/model-checks'
     target.mkdir(parents=True, exist_ok=True)
-    if '--generated-only' in sys.argv:
+    if generated_only:
         report['generatedPassed'] = True
         (target / (prefix + '-generated.json')).write_text(
             json.dumps(report, ensure_ascii=False, indent=2) + '\n'
         )
         print(f'Generated form passed: {len(bs)} ordinary buildings', flush=True)
         return
-    bpy.ops.wm.open_mainfile(filepath=str(ROOT / 'blender/gxu-campus.blend'))
-    objects = {
-        o.get('featureId'): o
-        for o in bpy.context.scene.objects
-        if o.type == 'MESH' and o.get('featureId')
-    }
-    C.clear()
-    MATERIALS.clear()
-    for mat in bpy.data.materials:
-        C[mat.name] = len(MATERIALS)
-        MATERIALS.append(mat)
-    report['source'] = []
-    for b in bs:
-        o = objects[b['id']]
-        expected = ordinary_building(b, b['elevation'], C, b['insideCampus'])
-        if b['id'] == TOWER_ID:
-            actual = [o.matrix_world @ v.co for v in o.data.vertices]
-            for left, right in ((actual, expected.v), (expected.v, actual)):
-                assert left and right
-                kd = KDTree(len(right))
-                for i, point in enumerate(right):
-                    kd.insert(point, i)
-                kd.balance()
-                assert all(kd.find(point)[2] < 0.011 for point in left), (
-                    'Stale editable water tower'
-                )
-        for name, start, end in (
-            expected.parts
-            if b['id'] in NEW_EAST_NEIGHBOURS
-            or b['id'] in FRONTS
-            or b['id'] in (CANTEEN_ID, EAST27_ID, WEST22, WEST23)
-            else expected.parts[:3]
-        ):
-            group = o.vertex_groups.get(name)
-            assert group is not None, (b['id'], name, 'missing editable component')
-            actual = component_vertices(o, group)
-            # Source vertices are welded for file size; compare geometry in
-            # both directions, independent of duplicate count or mesh ordering.
-            predicted = expected.v[start:end]
-            for left, right in ((actual, predicted), (predicted, actual)):
-                if not left and not right:
-                    continue
-                assert left and right, (b['id'], name, 'empty source component')
-                kd = KDTree(len(right))
-                for i, point in enumerate(right):
-                    kd.insert(point, i)
-                kd.balance()
-                assert all(kd.find(point)[2] < 0.011 for point in left), (
-                    b['id'],
-                    name,
-                    'stale source form',
-                )
-        report['source'].append(
-            {'id': b['id'], 'samples': check_samples(b, [mesh_tree(o)], 0.011)}
-        )
-    neighbours = [b for b in bs if b['id'] in NEW_EAST_NEIGHBOURS]
-    if neighbours:
-        (gate,) = [
-            o for o in bpy.context.scene.objects if o.get('landmark') == 'new-east-gate'
-        ]
-        gate_tree = mesh_tree(gate)
-        for b in neighbours:
-            assert not gate_tree.overlap(mesh_tree(objects[b['id']])), (
-                b['id'],
-                'facade intersects gate enclosure',
-            )
-        report['neighbourGateClearancePassed'] = True
-        for shop_id in sorted(SHOP_BUILDINGS & {b['id'] for b in neighbours}):
-            shop = objects[shop_id]
-            group = shop.vertex_groups['05_临街店面'].index
-            indices = {
-                v.index
-                for v in shop.data.vertices
-                if any(g.group == group for g in v.groups)
-            }
-            faces = [
-                tuple(p.vertices)
-                for p in shop.data.polygons
-                if all(i in indices for i in p.vertices)
-            ]
-            shop_tree = BVHTree.FromPolygons(
-                [shop.matrix_world @ v.co for v in shop.data.vertices], faces
-            )
-            for other in neighbours:
-                if other['id'] != shop_id:
-                    assert not shop_tree.overlap(mesh_tree(objects[other['id']])), (
-                        'Shopfront intersects adjacent building'
-                    )
-            report['shopfrontNeighbourClearancePassed'] = True
-            terrain_tree = mesh_tree(bpy.data.objects['terrain'])
-            paving = [
-                p
-                for p in shop.data.polygons
-                if shop.data.materials[p.material_index].name
-                in {'eastShopPaving', 'eastShopPavingJoint'}
-            ]
-            assert paving, 'Missing shop apron'
-            for face in paving:
-                point = shop.matrix_world @ face.center
-                hit, *_ = terrain_tree.ray_cast(
-                    point + Vector((0, 0, 2)), Vector((0, 0, -1)), 5
-                )
-                assert hit is not None and 0.01 < point.z - hit.z < 0.08, (
-                    'Shop apron ground clearance',
-                    point,
-                    hit,
-                )
-            report['shopApronGroundingPassed'] = True
-    # Import shipping meshes, not a newly re-exported test substitute.
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.ops.import_scene.gltf(filepath=str(ROOT / 'public/models/base.glb'))
-    bpy.context.view_layer.update()
-    objects = {}
-    for o in bpy.context.scene.objects:
-        if o.type == 'MESH':
-            objects.setdefault(root_name(o), []).append(o)
-    trees = {key: [mesh_tree(o) for o in group] for key, group in objects.items()}
-    neighbour_keys = {
-        b['chunk'] if b['insideCampus'] else 'context' for b in neighbours
-    }
-    facade_trees = {key: vertex_tree(objects[key]) for key in neighbour_keys}
-    report['base'] = []
-    for b in bs:
-        key = b['chunk'] if b['insideCampus'] else 'context'
-        report['base'].append(
-            {'id': b['id'], 'samples': check_samples(b, trees[key], 0.05)}
-        )
-        if b['id'] in NEW_EAST_NEIGHBOURS:
-            check_neighbour_facade(b, facade_trees[key], C, False)
-    report['near'] = []
-    for chunk in sorted({b['chunk'] for b in bs if b['insideCampus']}):
-        bpy.ops.wm.read_factory_settings(use_empty=True)
-        bpy.ops.import_scene.gltf(filepath=str(ROOT / 'public/models' / f'{chunk}.glb'))
-        bpy.context.view_layer.update()
-        objects = [o for o in bpy.context.scene.objects if o.type == 'MESH']
-        trees = [mesh_tree(o) for o in objects]
-        facade_tree = vertex_tree(objects) if chunk in neighbour_keys else None
-        for b in bs:
-            if b.get('chunk') == chunk:
-                report['near'].append(
-                    {'id': b['id'], 'samples': check_samples(b, trees, 0.02)}
-                )
-                if b['id'] in NEW_EAST_NEIGHBOURS:
-                    check_neighbour_facade(b, facade_tree, C, True)
+    check_shipping_meshes(bs, authored, facades, by_chunk, by_building, report)
+    print(f'Published base/near geometry passed: {len(bs)} buildings', flush=True)
+    check_editable_source(bs, authored, zones, report)
     report['passed'] = True
     (target / (prefix + '-geometry.json')).write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + '\n'

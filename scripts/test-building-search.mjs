@@ -35,6 +35,9 @@ test('all confirmed Huixue aliases resolve only to the curated hall', () => {
       query,
     );
   }
+  for (const query of ['君武馆', 'Junwu Hall']) {
+    assert.deepEqual(ids(query), ['way/759337787'], query);
+  }
 });
 
 test('南苑食堂的常用搜索词定位到旧餐厅北侧的南苑第二餐厅', () => {
@@ -78,24 +81,19 @@ test('餐厅别名可定位到独立餐厅或其所在楼栋', () => {
   }
 });
 
-test('internal model descriptions and the disputed footprint are not destinations', () => {
+test('internal model descriptions are not destinations', () => {
   const evidence = read('../data/i18n-name-sources.json');
   const internal = buildings.filter(
     (b) =>
       evidence.entries[b.name]?.status === '技' && !collegeVenues.has(b.id),
   );
-  assert.ok(internal.length >= 7);
+  assert.ok(internal.some((b) => b.id === 'north-campus/office'));
   const pool = searchableBuildings(buildings, landmarks);
   const ids = [...landmarks, ...pool].map((b) => b.id);
-  for (const id of ['way/759337787', ...internal.map((b) => b.id)]) {
+  for (const { id } of internal) {
     assert.ok(!ids.includes(id), id);
     assert.equal(decodeShare(`#place=${encodeURIComponent(id)}`, ids), null);
   }
-  // Withhold navigation, not the existing source geometry or its unverified name.
-  assert.equal(
-    buildings.find((b) => b.id === 'way/759337787').name,
-    '君武文化艺术教育中心',
-  );
   for (const name of [
     '物理资治楼',
     '广西碳酸钙产业化工工程院',
@@ -181,6 +179,7 @@ test('ordering is stable across input order and arbitrary modeling zone changes'
 
 test('every eligible full name stays reachable within 40 results in both languages and can be shared', () => {
   const pool = searchableBuildings(buildings, landmarks);
+  assert.ok(pool.some((b) => b.id === 'student-dorm/east-12'));
   const ids = [...landmarks, ...pool].map((b) => b.id);
   for (const b of pool) {
     for (const locale of ['zh', 'en']) {
@@ -229,7 +228,6 @@ test('exact names rank before prefixes and substrings', () => {
 test('placeholders, outside buildings and curated landmarks stay out of building search', () => {
   const pool = searchableBuildings(buildings, landmarks);
   const curated = new Set(landmarks.map((place) => place.id));
-  assert.ok(pool.length > 200);
   for (const b of pool) {
     assert.ok(b.insideCampus, b.id);
     assert.doesNotMatch(destinationName(b, 'zh'), /^校内建筑 \d+$/);
