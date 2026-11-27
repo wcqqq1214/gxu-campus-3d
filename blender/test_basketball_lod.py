@@ -52,4 +52,5 @@ class CourtLODTests(unittest.TestCase):
             self.assertAlmostEqual(min(ring), 1.225 + 3.032)
 
 
-unittest.main(argv=[sys.argv[0]])
+if __name__ == '__main__':
+    unittest.main(argv=[sys.argv[0]])

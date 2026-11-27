@@ -134,7 +134,8 @@ class WallContactTests(unittest.TestCase):
             probes(b, horizontal(0), horizontal(-20))
 
 
-suite = unittest.defaultTestLoader.loadTestsFromTestCase(WallContactTests)
-result = unittest.TextTestRunner(verbosity=2).run(suite)
-if not result.wasSuccessful():
-    raise AssertionError('Wall contact fixtures failed')
+if __name__ == '__main__':
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase(WallContactTests)
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    if not result.wasSuccessful():
+        raise AssertionError('Wall contact fixtures failed')

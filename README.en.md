@@ -54,11 +54,11 @@ npm run preview       # Serve at http://127.0.0.1:4300/gxu-campus-3d/
 
 ### Checks and tests
 
-- **Frontend checks**: `npm run check` runs TypeScript type checking, oxlint, and JS/TS unit tests. You can also run `npm run typecheck:fast` for fast type checking with tsrs (which CI runs right after installing npm dependencies).
+- **Frontend checks**: `npm run check` runs TypeScript type checking, oxlint, and JS/TS unit tests. You can also run `npm run typecheck:fast` for fast type checking with tsrs (used by CI in the `frontend` job).
 - **Python checks and tests**: Python is pinned to 3.12 in [.python-version](.python-version). After installing the dev dependencies, run `npm run lint:python` for Ruff checks, `npm run format:python` to format, and `npm run test:data` for data and contract tests.
-- **Browser regressions**: Install Chromium with `npx playwright install chromium`, then run `npm run test:browser` to verify menus, camera controls, and the bilingual interface.
+- **Browser regressions**: Install Chromium with `npx playwright install chromium`, then run `npm run test:browser` to verify menus, camera controls, and the bilingual interface (set `BROWSER_TRACE=1` to record DOM/network traces).
 
-Pushes to `dev` run these checks in CI along with Blender geometry regressions (`npm run test:geometry`) and the static build (without deploying). See [model structure, tests, and rebuilding](docs/MODELING.md) for full setup details.
+Pushes to `dev` trigger CI jobs in parallel by changed paths across frontend, Python (`npm run test:data`), Blender geometry regressions (`npm run test:geometry`), and browser regressions; pushes or PRs to `main` run the full suite, and only pushes to `main` deploy. See [model structure, tests, and rebuilding](docs/MODELING.md) for full setup details.
 
 ## Data and documentation
 

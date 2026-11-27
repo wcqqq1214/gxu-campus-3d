@@ -50,8 +50,9 @@ class TowerGeometry(unittest.TestCase):
                 self.assertIn('studentTowerTank', names)
 
 
-result = unittest.TextTestRunner(verbosity=2).run(
-    unittest.defaultTestLoader.loadTestsFromTestCase(TowerGeometry)
-)
-if not result.wasSuccessful():
-    raise SystemExit(1)
+if __name__ == '__main__':
+    result = unittest.TextTestRunner(verbosity=2).run(
+        unittest.defaultTestLoader.loadTestsFromTestCase(TowerGeometry)
+    )
+    if not result.wasSuccessful():
+        raise SystemExit(1)

@@ -1,6 +1,7 @@
 import copy
 import json
 import math
+import os
 import shutil
 import tempfile
 import unittest
@@ -84,9 +85,21 @@ class CrownReservationTests(unittest.TestCase):
         )
         with tempfile.TemporaryDirectory() as directory:
             isolated = Path(directory)
-            shutil.copytree(root / 'data', isolated / 'data')
-            shutil.copytree(root / 'public/data', isolated / 'public/data')
+            os.symlink(root / 'data', isolated / 'data')
             out = isolated / 'public/data'
+            out.mkdir(parents=True)
+            writable = {
+                'vegetation.json',
+                'vegetation-zones.json',
+                'overview.json',
+                'low-planting.json',
+            }
+            for source in (root / 'public/data').iterdir():
+                target = out / source.name
+                if source.name in writable:
+                    shutil.copyfile(source, target)
+                else:
+                    os.symlink(source, target)
             read = lambda n: json.loads((out / f'{n}.json').read_text())
             original = read('vegetation')
             data = {n: read(n) for n in INPUT_NAMES}

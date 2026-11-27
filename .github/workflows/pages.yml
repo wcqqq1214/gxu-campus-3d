@@ -11,7 +11,42 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
-  build:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      python: ${{ steps.detect.outputs.python }}
+      blender: ${{ steps.detect.outputs.blender }}
+      browser: ${{ steps.detect.outputs.browser }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/dev') && 0 || 1 }}
+      - id: detect
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ github.ref }}" == "refs/heads/main" || "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "python=true" >> "$GITHUB_OUTPUT"
+            echo "blender=true" >> "$GITHUB_OUTPUT"
+            echo "browser=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          before="${{ github.event.before }}"
+          if [[ -z "$before" || "$before" == "0000000000000000000000000000000000000000" ]] || ! git cat-file -e "${before}^{commit}" 2>/dev/null; then
+            echo "python=true" >> "$GITHUB_OUTPUT"
+            echo "blender=true" >> "$GITHUB_OUTPUT"
+            echo "browser=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          changed="$(git diff --name-only "$before" "$GITHUB_SHA")"
+          match() {
+            grep -Eq "$1" <<< "$changed" && echo "true" || echo "false"
+          }
+          echo "python=$(match '^(scripts/.*\.py|scripts/fixtures/|scripts/requirements.*\.txt|scripts/constraints-.*\.txt|data/|public/data/|pyproject\.toml|\.python-version|\.github/workflows/pages\.yml)$')" >> "$GITHUB_OUTPUT"
+          echo "blender=$(match '^(blender/|data/|public/data/|scripts/run-geometry-tests\.mjs|\.github/workflows/pages\.yml)$')" >> "$GITHUB_OUTPUT"
+          echo "browser=$(match '^(app/|components/|hooks/|lib/|public/|index\.html|vite\.config\.ts|tsconfig\.json|package\.json|package-lock\.json|scripts/build-pages\.mjs|scripts/preview\.mjs|scripts/runtime-data\.mjs|scripts/run-browser-tests\.mjs|scripts/browser-check\.mjs|scripts/check-.*-browser\.mjs|\.github/workflows/pages\.yml)$')" >> "$GITHUB_OUTPUT"
+
+  frontend:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -22,6 +57,26 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: npm
+      - uses: actions/configure-pages@v5
+        id: pages
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+      - run: npm ci
+      - name: 类型检查、Lint 与单元测试
+        run: npm run typecheck:fast && npm run lint && npm test
+      - run: npm run build:pages
+        env:
+          PAGES_BASE_PATH: ${{ (github.event_name == 'pull_request' || github.ref != 'refs/heads/main') && '/gxu-campus-3d' || steps.pages.outputs.base_path }}
+      - uses: actions/upload-pages-artifact@v4
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        with:
+          path: out
+
+  python:
+    needs: changes
+    if: needs.changes.outputs.python == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
       - uses: actions/setup-python@v6
         with:
           python-version-file: '.python-version'
@@ -30,23 +85,35 @@ jobs:
             scripts/requirements.txt
             scripts/requirements-dev.txt
             scripts/constraints-geodata.txt
-      - uses: actions/configure-pages@v5
-        id: pages
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-      - run: npm ci
-      - name: tsrs 快速类型检查
-        run: npm run typecheck:fast
       - run: python -m pip install -r scripts/requirements-dev.txt -c scripts/constraints-geodata.txt
-      - name: Python 静态检查
-        run: npm run lint:python -- --output-format=github
-      - name: Python 格式检查
-        run: python -m ruff format --check --diff .
       - name: 安装无损 JPEG 测试依赖
         run: |
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends libjpeg-turbo-progs
           command -v jpegtran
+      - name: Python 静态检查
+        run: npm run lint:python -- --output-format=github
+      - name: Python 格式检查
+        run: python -m ruff format --check --diff .
+      - run: npm run test:data
+
+  blender:
+    needs: changes
+    if: needs.changes.outputs.blender == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+      - name: 缓存 Blender 几何测试运行时
+        id: blender-cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/blender-5.2.2-linux-x64
+          key: blender-5.2.2-linux-x64-8409891278
       - name: 安装 Blender 几何测试运行时
+        if: steps.blender-cache.outputs.cache-hit != 'true'
         run: |
           set -euo pipefail
           geometry_blender_archive="$RUNNER_TEMP/blender-5.2.2-linux-x64.tar.xz"
@@ -56,18 +123,37 @@ jobs:
           # 固定校验值来自同版本的官方 blender-5.2.2.sha256。
           echo "84098912789dc450e95697c4184fb8a90acbe5111c2ba4aede3fecb57806a168  $geometry_blender_archive" | sha256sum --check
           tar -xf "$geometry_blender_archive" -C "$RUNNER_TEMP"
+          rm -f "$geometry_blender_archive"
+      - name: 启用 Blender 运行时
+        run: |
           "$RUNNER_TEMP/blender-5.2.2-linux-x64/blender" --version
           echo "$RUNNER_TEMP/blender-5.2.2-linux-x64" >> "$GITHUB_PATH"
-      - run: npm run check
-      - run: npm run test:data
       - run: npm run test:geometry
+
+  browser:
+    needs: changes
+    if: needs.changes.outputs.browser == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - uses: actions/configure-pages@v5
+        id: pages
+        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+      - run: npm ci
       - run: npm run build:pages
         env:
           PAGES_BASE_PATH: ${{ (github.event_name == 'pull_request' || github.ref != 'refs/heads/main') && '/gxu-campus-3d' || steps.pages.outputs.base_path }}
       - name: 安装浏览器回归运行时
         run: npx --no-install playwright install --with-deps --no-shell chromium
       - name: 菜单、相机与中英文浏览器回归
-        timeout-minutes: 45
+        timeout-minutes: 30
         run: npm run test:browser -- --skip-build
         env:
           SWIFTSHADER: '1'
@@ -80,13 +166,10 @@ jobs:
           path: work/browser-checks/
           if-no-files-found: ignore
           retention-days: 7
-      - uses: actions/upload-pages-artifact@v4
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-        with:
-          path: out
+
   deploy:
-    needs: build
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [frontend, python, blender, browser]
+    if: always() && github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
     runs-on: ubuntu-latest
     permissions:
       pages: write

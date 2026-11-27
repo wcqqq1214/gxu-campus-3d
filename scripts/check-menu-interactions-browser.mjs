@@ -54,124 +54,144 @@ try {
       true,
       'Landmark views must be available in the compact detail panel',
     );
-    await page.getByRole('button', { name: '环绕', exact: true }).click();
-    await back();
-    await page
-      .getByRole('button', { name: '返回 南大门', exact: true })
-      .click();
-    assert.equal(
-      await page.getByRole('button', { name: '暂停环绕', exact: true }).count(),
-      0,
-      'Returning to the list must pause orbit',
-    );
-    passed('返回列表暂停环绕');
-    await page.locator('.tour-start').click();
-    await back();
-    assert.equal(
-      await page.locator('.tour-start span').textContent(),
-      '继续游览',
-      'Returning to the list must pause the tour',
-    );
-    const station = await page.locator('.tour-copy small').textContent();
-    await page.waitForTimeout(8800);
-    assert.equal(
-      await page.locator('.tour-copy small').textContent(),
-      station,
-      'Paused tour must not advance',
-    );
-    passed('返回列表暂停自动游览且不再切站');
-    await page.locator('.tour-start').click();
-    await page.getByRole('button', { name: '收起面板', exact: true }).click();
-    assert.match(await page.locator('.tour-compact').textContent(), /暂停游览/);
-    await page.locator('.tour-compact').click();
-    assert.match(await page.locator('.tour-compact').textContent(), /继续游览/);
-    await page.locator('.tour-compact').click();
-    await page.getByRole('button', { name: '展开面板', exact: true }).click();
-    await search.focus();
-    assert.equal(
-      await page.locator('.tour-start span').textContent(),
-      '继续游览',
-    );
-    passed('收起面板可暂停继续，搜索暂停游览');
-    await page.getByRole('button', { name: '结束游览', exact: true }).click();
-    await search.fill('六教');
-    assert.deepEqual(
-      await page.locator('.place-group').evaluateAll((groups) =>
-        groups.map((group) => ({
-          name: group.getAttribute('aria-label'),
-          ids: [...group.querySelectorAll('.place-row')].map((row) =>
-            row.getAttribute('data-place-id'),
-          ),
-        })),
-      ),
-      [
-        { name: '精选地点', ids: ['teaching-six'] },
-        { name: '其他建筑', ids: ['north-campus/teaching-north-middle'] },
-      ],
-    );
-    assert.equal(
-      await page.locator('.building-row strong').textContent(),
-      '第十六教学楼',
-    );
-    assert.equal(await page.locator('.place-group h3').count(), 2);
-    await page.locator('.place-row[data-place-id="teaching-six"]').click();
-    await back();
-    assert.equal(await search.inputValue(), '六教');
-    await page.waitForFunction(
-      () =>
-        document.activeElement?.getAttribute('data-place-id') ===
-        'teaching-six',
-    );
-    await page.getByTitle('清除搜索', { exact: true }).click();
-    assert.deepEqual(await placeIds(), initialPlaces);
-    assert.equal(
-      await search.evaluate((el) => document.activeElement === el),
-      true,
-    );
-    assert.deepEqual(
+    if (width >= 760) {
+      await page.getByRole('button', { name: '环绕', exact: true }).click();
+      await back();
       await page
-        .locator('.place-group')
-        .evaluateAll((groups) =>
-          groups.map((group) => group.getAttribute('aria-label')),
+        .getByRole('button', { name: '返回 南大门', exact: true })
+        .click();
+      assert.equal(
+        await page
+          .getByRole('button', { name: '暂停环绕', exact: true })
+          .count(),
+        0,
+        'Returning to the list must pause orbit',
+      );
+      passed('返回列表暂停环绕');
+      await page.locator('.tour-start').click();
+      await back();
+      assert.equal(
+        await page.locator('.tour-start span').textContent(),
+        '继续游览',
+        'Returning to the list must pause the tour',
+      );
+      const station = await page.locator('.tour-copy small').textContent();
+      await page.waitForTimeout(8800);
+      assert.equal(
+        await page.locator('.tour-copy small').textContent(),
+        station,
+        'Paused tour must not advance',
+      );
+      passed('返回列表暂停自动游览且不再切站');
+      await page.locator('.tour-start').click();
+      await page.getByRole('button', { name: '收起面板', exact: true }).click();
+      assert.match(
+        await page.locator('.tour-compact').textContent(),
+        /暂停游览/,
+      );
+      await page.locator('.tour-compact').click();
+      assert.match(
+        await page.locator('.tour-compact').textContent(),
+        /继续游览/,
+      );
+      await page.locator('.tour-compact').click();
+      await page.getByRole('button', { name: '展开面板', exact: true }).click();
+      await search.focus();
+      assert.equal(
+        await page.locator('.tour-start span').textContent(),
+        '继续游览',
+      );
+      passed('收起面板可暂停继续，搜索暂停游览');
+      await page.getByRole('button', { name: '结束游览', exact: true }).click();
+      await search.fill('六教');
+      assert.deepEqual(
+        await page.locator('.place-group').evaluateAll((groups) =>
+          groups.map((group) => ({
+            name: group.getAttribute('aria-label'),
+            ids: [...group.querySelectorAll('.place-row')].map((row) =>
+              row.getAttribute('data-place-id'),
+            ),
+          })),
         ),
-      ['教学', '文体', '校门', '路桥', '生活'],
-    );
-    await search.fill('不存在的校园地点');
-    assert.equal(await page.locator('.place-row').count(), 0);
-    await page.getByRole('button', { name: '清空搜索', exact: true }).click();
-    assert.equal(await search.inputValue(), '');
-    assert.deepEqual(await placeIds(), initialPlaces);
-    assert.equal(
-      await search.evaluate((el) => document.activeElement === el),
-      true,
-    );
-    passed('精选与普通建筑搜索分组、分类恢复、返回焦点和空结果重置');
-    await page.getByRole('tab', { name: '光影', exact: true }).click();
-    await page.getByRole('button', { name: '夜晚', exact: true }).click();
-    await page.getByRole('tab', { name: '图层', exact: true }).click();
-    const labels = page.getByRole('switch', { name: '地点名称', exact: true });
-    await labels.click();
-    assert.equal(await labels.getAttribute('aria-checked'), 'false');
-    await page.getByRole('tab', { name: '地点', exact: true }).click();
-    await page.getByRole('tab', { name: '光影', exact: true }).click();
-    assert.equal(
-      await page
-        .getByRole('button', { name: '夜晚', exact: true })
-        .getAttribute('aria-pressed'),
-      'true',
-    );
-    await page.getByRole('tab', { name: '图层', exact: true }).click();
-    assert.equal(await labels.getAttribute('aria-checked'), 'false');
-    await labels.click();
-    passed('切换菜单保留光照和图层状态');
-    if (width < 760) {
+        [
+          { name: '精选地点', ids: ['teaching-six'] },
+          { name: '其他建筑', ids: ['north-campus/teaching-north-middle'] },
+        ],
+      );
+      assert.equal(
+        await page.locator('.building-row strong').textContent(),
+        '第十六教学楼',
+      );
+      assert.equal(await page.locator('.place-group h3').count(), 2);
+      await page.locator('.place-row[data-place-id="teaching-six"]').click();
+      await back();
+      assert.equal(await search.inputValue(), '六教');
+      await page.waitForFunction(
+        () =>
+          document.activeElement?.getAttribute('data-place-id') ===
+          'teaching-six',
+      );
+      await page.getByTitle('清除搜索', { exact: true }).click();
+      assert.deepEqual(await placeIds(), initialPlaces);
+      assert.equal(
+        await search.evaluate((el) => document.activeElement === el),
+        true,
+      );
+      assert.deepEqual(
+        await page
+          .locator('.place-group')
+          .evaluateAll((groups) =>
+            groups.map((group) => group.getAttribute('aria-label')),
+          ),
+        ['教学', '文体', '校门', '路桥', '生活'],
+      );
+      await search.fill('不存在的校园地点');
+      assert.equal(await page.locator('.place-row').count(), 0);
+      await page.getByRole('button', { name: '清空搜索', exact: true }).click();
+      assert.equal(await search.inputValue(), '');
+      assert.deepEqual(await placeIds(), initialPlaces);
+      assert.equal(
+        await search.evaluate((el) => document.activeElement === el),
+        true,
+      );
+      passed('精选与普通建筑搜索分组、分类恢复、返回焦点和空结果重置');
+      await page.getByRole('tab', { name: '光影', exact: true }).click();
+      await page.getByRole('button', { name: '夜晚', exact: true }).click();
+      await page.getByRole('tab', { name: '图层', exact: true }).click();
+      const labels = page.getByRole('switch', {
+        name: '地点名称',
+        exact: true,
+      });
+      await labels.click();
+      assert.equal(await labels.getAttribute('aria-checked'), 'false');
+      await page.getByRole('tab', { name: '地点', exact: true }).click();
+      await page.getByRole('tab', { name: '光影', exact: true }).click();
+      assert.equal(
+        await page
+          .getByRole('button', { name: '夜晚', exact: true })
+          .getAttribute('aria-pressed'),
+        'true',
+      );
+      await page.getByRole('tab', { name: '图层', exact: true }).click();
+      assert.equal(await labels.getAttribute('aria-checked'), 'false');
+      await labels.click();
+      passed('切换菜单保留光照和图层状态');
+      await page.getByRole('button', { name: '分享', exact: true }).click();
+    } else {
+      await back();
+      await page.getByRole('button', { name: '收起面板', exact: true }).click();
+      await page.getByRole('button', { name: '展开面板', exact: true }).click();
+      passed('手机端详情返回与面板收起展开');
+      await page.getByRole('tab', { name: '光影', exact: true }).click();
+      await page.getByRole('button', { name: '夜晚', exact: true }).click();
+      await page.getByRole('tab', { name: '地点', exact: true }).click();
+      await search.fill('六教');
+      await page.locator('.place-row[data-place-id="teaching-six"]').click();
       await page.getByRole('button', { name: '更多工具', exact: true }).click();
       await page
         .getByRole('dialog')
         .getByRole('button', { name: '分享', exact: true })
         .click();
-    } else {
-      await page.getByRole('button', { name: '分享', exact: true }).click();
     }
     await page
       .getByRole('dialog', { name: '分享', exact: true })

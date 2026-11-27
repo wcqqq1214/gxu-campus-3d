@@ -54,11 +54,11 @@ npm run preview       # 本地预览：http://127.0.0.1:4300/gxu-campus-3d/
 
 ### 检查与测试
 
-- **前端检查**：`npm run check` 依次执行 TypeScript 类型检查、oxlint 校验和 JS/TS 单元测试；也可单独运行 `npm run typecheck:fast`（基于 tsrs 快速类型检查，CI 在安装依赖后优先执行）。
+- **前端检查**：`npm run check` 依次执行 TypeScript 类型检查、oxlint 校验和 JS/TS 单元测试；也可单独运行 `npm run typecheck:fast`（基于 tsrs 快速类型检查，CI 在 `frontend` 任务中优先执行）。
 - **Python 检查与测试**：Python 版本在 [.python-version](.python-version) 中固定为 3.12。安装开发依赖后，可运行 `npm run lint:python`（Ruff 检查）、`npm run format:python`（代码格式化）和 `npm run test:data`（数据与契约测试）。
-- **浏览器回归**：先运行 `npx playwright install chromium`，再执行 `npm run test:browser`，验证菜单交互、相机控制与中英文界面。
+- **浏览器回归**：先运行 `npx playwright install chromium`，再执行 `npm run test:browser`，验证菜单交互、相机控制与中英文界面（需要 DOM/网络 trace 时附加 `BROWSER_TRACE=1`）。
 
-向 `dev` 分支推送代码时，CI 会自动执行上述检查、Blender 几何回归（`npm run test:geometry`）与静态构建（仅验证，不部署）。完整环境与构建说明见[模型结构、测试与重建](docs/MODELING.md)。
+向 `dev` 分支推送代码时，CI 会按改动路径并行触发前端、Python（`npm run test:data`）、Blender 几何回归（`npm run test:geometry`）与浏览器回归；向 `main` 推送或提 PR 时运行全量检查，仅直接推送 `main` 时自动部署。完整环境与构建说明见[模型结构、测试与重建](docs/MODELING.md)。
 
 ## 数据与文档
 

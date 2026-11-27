@@ -81,8 +81,9 @@ class StudentCenterGeometry(unittest.TestCase):
                 self.assertIsNone(tree.ray_cast((274.6, 1.6, 10), (0, 0, -1))[0])
 
 
-result = unittest.TextTestRunner(verbosity=2).run(
-    unittest.defaultTestLoader.loadTestsFromTestCase(StudentCenterGeometry)
-)
-if not result.wasSuccessful():
-    raise SystemExit(1)
+if __name__ == '__main__':
+    result = unittest.TextTestRunner(verbosity=2).run(
+        unittest.defaultTestLoader.loadTestsFromTestCase(StudentCenterGeometry)
+    )
+    if not result.wasSuccessful():
+        raise SystemExit(1)

@@ -44,7 +44,7 @@ npm run build:pages
 
 - **静态导出与预览**：`npm run build:pages` 输出到 `out/`（可用 `PAGES_BASE_PATH` 指定子路径），`npm run preview` 默认在 `4300` 端口预览；清理或重编前请确认没有预览进程在使用 `out/`。`out/data/buildings.json` 仅保留前端字段并将轮廓取整到厘米（`scripts/runtime-data.mjs`），建模、校验和指纹仍以 `public/data/buildings.json` 为准；增减 `Building` 字段须同步该清单（由 `test-runtime-data.mjs` 保护）。
 - **检查分级**：`npm run check` 依次执行类型检查、oxlint 与 JS/TS 测试，任一失败即退出（不依赖 Python、Blender 或 `.blend`）；`npm run typecheck:fast` 使用 tsrs 做快速类型检查（缓存写入 `work/tsrs.tsbuildinfo`），CI 在安装 npm 依赖后优先执行。完整检查另含 `npm run lint:python`、`npm run test:data`、`npm run test:geometry` 与 `npm run test:browser`。
-- **持续集成**：向 `dev`、`main` 推送或向 `main` 提交 PR 时，CI 在 Linux 运行全套检查，也可运行 `gh workflow run pages.yml --ref dev` 手动触发。非 `main` 分支使用 `/gxu-campus-3d` 前缀构建且跳过部署；只有直接推送 `main` 且全部检查通过才会发布。流程定义见 [pages.yml](../.github/workflows/pages.yml)（CI 安装 `libjpeg-turbo-progs` 以运行依赖 `jpegtran` 的回归）。
+- **持续集成**：向 `dev`、`main` 推送或向 `main` 提交 PR 时，CI 在 Linux 按改动路径并行触发检查（`frontend` 始终运行 `typecheck:fast`、`lint` 与 `npm test`；推送 `dev` 且未命中对应路径时跳过 `python`、`blender` 或 `browser`；向 `main` 推送、PR 及手动触发运行全量），也可运行 `gh workflow run pages.yml --ref dev` 手动触发。非 `main` 分支使用 `/gxu-campus-3d` 前缀构建且跳过部署；只有直接推送 `main` 且全部检查通过才会发布。流程定义见 [pages.yml](../.github/workflows/pages.yml)（`python` 任务安装 `libjpeg-turbo-progs` 以运行依赖 `jpegtran` 的回归）。
 
 ### 浏览器回归
 
@@ -57,9 +57,9 @@ npm run test:browser
 ```
 
 `npm run test:browser` 先构建 Pages，再启动服务依次运行菜单、相机与 i18n 检查：
-- **检查内容**：菜单与相机连接开发服务（相机探针仅注入测试响应）；i18n 使用 `out/` 静态产物并覆盖 `/gxu-campus-3d/` 子路径。视口覆盖 `1280px`、`390px`，i18n 另含 `320px` 及语言恢复、分享导出、存储受限与 WebGL 不可用场景。
+- **检查内容**：菜单与相机连接开发服务（相机探针仅注入测试响应）；i18n 使用 `out/` 静态产物并覆盖 `/gxu-campus-3d/` 子路径。菜单在桌面端 `1280px` 覆盖全套交互并在 `390px` 验证手机端关键路径；相机覆盖 `1280px` 与 `390px`；i18n 覆盖 `1280px` 与 `320px` 及语言恢复、分享导出、存储受限与 WebGL 不可用场景。
 - **端口与复用**：默认占用 `4317`、`4318` 端口（已被占用直接报错；可用 `BROWSER_DEV_PORT`、`BROWSER_PREVIEW_PORT` 调整），退出、失败或中断时自动清理子进程。支持 macOS/Linux；刚构建过且 `PAGES_BASE_PATH` 一致（空字符串或 `/gxu-campus-3d`）时，可用 `-- --skip-build` 复用产物。
-- **输出与超时**：每次运行写入 `work/browser-checks/run-*`（含服务日志、断言输出、视口 trace 及未完成页面截图/控制台/网络日志；CI 失败上传保留 7 天），可用 `npx playwright show-trace <trace.zip>` 回放 DOM 与网络记录。菜单、桌面相机、手机相机、i18n 依次运行，各限时 10 分钟。相机日志记录场景耗时和最近的队列、动画状态。CI 浏览器步骤上限 45 分钟，包含服务启动和清理。
+- **输出与超时**：每次运行写入 `work/browser-checks/run-*`（含服务日志、断言输出及未完成页面截图/控制台/网络日志；默认不落盘全量 `trace.zip`，需回放 DOM 与网络记录时可设 `BROWSER_TRACE=1`；CI 失败上传保留 7 天），可用 `npx playwright show-trace <trace.zip>` 回放。菜单、桌面相机、手机相机、i18n 依次运行，各限时 10 分钟。相机日志记录场景耗时和最近的队列、动画状态。CI 浏览器步骤上限 30 分钟，包含服务启动和清理。
 - **渲染与覆盖变量**：默认使用 [Chromium 新无头模式](https://playwright.dev/docs/browsers#chromium-new-headless-mode)（`channel: chromium`），本地用可用 GPU，CI 设 `SWIFTSHADER=1` 走软件渲染（本地可用同变量复测）。此入口仅作功能回归，不比较 GPU 性能；支持 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`BROWSER_PATH`、`I18N_BROWSER=webkit`（需自装浏览器）及单脚本 URL 覆盖。
 
 ## 数据和完整模型构建
@@ -218,7 +218,7 @@ npm run test:geometry
 BLENDER_BIN=/path/to/blender npm run test:geometry
 ```
 
-`test:geometry` 在隔离的 factory 环境逐个运行 `blender/test_*.py`（仅用 Blender 内置 Python，不读本地 `.blend` 或写正式资产，自动发现地标双 LOD 回归）；但它主要保护生成规则，**不能替代对已发布 GLB 的实际解码验收**。
+`test:geometry` 在单次启动的隔离 factory 环境中通过 `unittest` 统一发现并逐用例重置场景运行 `blender/test_*.py`（仅用 Blender 内置 Python，不读本地 `.blend` 或写正式资产，自动发现地标双 LOD 回归；支持传入模块名过滤，如 `npm run test:geometry -- test_west_gate`）；但它主要保护生成规则，**不能替代对已发布 GLB 的实际解码验收**。
 
 ### 专项与前后对照
 
