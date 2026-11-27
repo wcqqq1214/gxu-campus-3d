@@ -9,7 +9,7 @@ from mathutils import Matrix, Vector
 from mathutils.kdtree import KDTree
 
 from export_attributes import omit_unused_uvs, omit_zero_area_terrain_faces
-from preserve_glb_geometry import compact_buffer_views, replace_compressed_node_parts
+from preserve_glb_geometry import replace_compressed_node_parts
 from terrain_planar import planar_terrain_candidate
 
 
@@ -165,7 +165,6 @@ def replace_with_local_precision(target, source, regions, *, report_directory=No
             replace_compressed_node_parts(
                 target, 'terrain', [a.read_bytes(), b.read_bytes()]
             )
-            compact_buffer_views(target, optimize_jpegs=True)
         record = dict(
             passed=True,
             mainPolygons=len(outer),

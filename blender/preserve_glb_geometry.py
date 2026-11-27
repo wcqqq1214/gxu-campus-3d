@@ -60,6 +60,9 @@ def replace_compressed_node_parts(path, name, parts):
     doc, raw = unpack(path.read_bytes())
     binary = bytearray(raw)
     node = mesh_nodes_by_name(doc)[name]
+    mesh_materials = {
+        p.get('material') for p in doc['meshes'][node['mesh']]['primitives']
+    }
     primitives = []
     if sum(n.get('mesh') == node['mesh'] for n in doc['nodes']) != 1:
         raise ValueError('Cannot replace a mesh shared by multiple nodes')
@@ -136,6 +139,8 @@ def replace_compressed_node_parts(path, name, parts):
             matches = [
                 i for i, m in enumerate(doc['materials']) if m['name'] == material
             ]
+            if len(matches) > 1:
+                matches = [i for i in matches if i in mesh_materials]
             if len(matches) != 1:
                 raise ValueError('Missing or ambiguous mesh part material')
             p['material'] = matches[0]
