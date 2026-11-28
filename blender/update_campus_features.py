@@ -70,7 +70,25 @@ def outline(obj):
     return np.array([points[i] for i in convex_hull_2d(points)])
 
 
-def sync_tree_instances(rows, excluded, obstacles, colors):
+def selected_tree_grounds(buildings, ordinary, target):
+    from east_graduate_residence import IDS as graduate_ids
+    from old_high_housing import IDS as housing_ids
+
+    grounds = [
+        polygon
+        for fid in ordinary & housing_ids
+        for polygon in buildings[fid]['polygons']
+    ]
+    if ordinary & graduate_ids:
+        site = json.loads(
+            (target / 'data/east-graduate-construction-site.json').read_text()
+        )
+        grounds.append([site['polygon']])
+    return grounds
+
+
+def sync_tree_instances(rows, excluded, obstacles, colors, *, grounds=()):
+    from site_geometry import polygon_distance
     from tree_clearance import filter_building_collisions
     from vegetation import tree_templates
     from vegetation_layout import tree_rotation, tree_scale
@@ -86,9 +104,14 @@ def sync_tree_instances(rows, excluded, obstacles, colors):
             continue
         xy = tuple(round(v, 1) for v in obj.location[:2])
         row = retained.pop(xy, None)
+        on_ground = any(polygon_distance(xy, polygon) == 0 for polygon in grounds)
+        if on_ground and row is not None:
+            raise ValueError(
+                f'Prepared tree inside selected building or construction ground: {xy}'
+            )
         if row is None:
             removed.append(dict(name=obj.name, xy=xy))
-            if xy not in excluded:
+            if xy not in excluded and not on_ground:
                 kind = next(i for i, t in enumerate(templates) if t.data == obj.data)
                 missing.append([*xy, round(obj.scale.z * 9, 1), kind, obj.location.z])
             continue
@@ -195,10 +218,16 @@ def main():
             if previous_zones.get(fid) != current_zones.get(fid)
         }
         mapped = {l.get('osmId') for l in latest if l['id'] in args.landmark}
-        if retired - previous_zones.keys() or retired & {b['id'] for b in catalog}:
-            parser.error(
-                'Retired building IDs must be in the prior manifest and absent from the new catalogue'
+        if retired:
+            registered = json.loads(
+                (ROOT / 'data/retired-campus-buildings.json').read_text()
             )
+            if retired - (registered.keys() & previous_zones.keys()) or retired & {
+                b['id'] for b in catalog
+            }:
+                parser.error(
+                    'Retired building IDs must be registered, in the prior manifest and absent from the new catalogue'
+                )
         omitted = changed - set(args.building) - mapped - retired
         if omitted or set(args.building) - current_zones.keys():
             parser.error(
@@ -414,7 +443,11 @@ def main():
             'Prepared tree rows disagree with reviewed field tree positions'
         )
     removed_trees = sync_tree_instances(
-        trees, excluded if args.fields else set(), obstacles, colors
+        trees,
+        excluded if args.fields else set(),
+        obstacles,
+        colors,
+        grounds=selected_tree_grounds(buildings, ordinary, target),
     )
     for key in args.landmark:
         if sum(o.get('landmark') == key for o in source.objects) != 1:
