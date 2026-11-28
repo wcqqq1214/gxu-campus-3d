@@ -2,37 +2,144 @@
 
 import math
 
-from geometry import Mesh
+from geometry import Mesh, tile_material
 from south_gate import inscription, prism
 
 
-def roof(m, x, y, w, d, eave, rise, C, detail, turn=False):
+def entrance_gable(m, x, half_depth, eave, rise, C, detail=True):
+    # Section along the visible front pitch. The sill follows the roof plane.
+    # The returned cap dies into the unaltered rear pitch behind the ridge.
+    profile = [
+        (-half_depth, 0.56),
+        (-3.95, 0.56),
+        (-3.95, 0.43),
+        (-1.02, 0.43),
+        (-0.72, 0.50),
+        (-0.66, 1.15),
+    ]
+    for i in range(1, 11):
+        a = math.pi * (1 - i / 10)
+        profile.append((-0.13 + 0.53 * math.cos(a), 1.15 + 0.53 * math.sin(a)))
+    profile.extend([(0.48, 0.56), (0.68, 0.29), (1.15, 0.13)])
+    # Solid masonry and slightly wider dark coping share a horizontal joint.
+    for layer in ('wall', 'coping', 'course') if detail else ('wall', 'coping'):
+        half_width = 0.13 if layer == 'wall' else 0.16
+        section = []
+        for y, height in profile:
+            bed = (
+                eave + rise * (1 - abs(y) / half_depth) + 0.34 * max(0, -y / half_depth)
+            )
+            bottom = bed - 0.42 if layer == 'wall' else bed + height - 0.09
+            top = bed + height - (0.09 if layer == 'wall' else 0)
+            if layer == 'course':
+                bottom, top = bed + height - 0.30, bed + height - 0.24
+            section.append(
+                [
+                    (x - half_width, y, bottom),
+                    (x - half_width, y, top),
+                    (x + half_width, y, top),
+                    (x + half_width, y, bottom),
+                ]
+            )
+        mat = C['bridgeConcrete'] if layer == 'wall' else C['stone']
+        m.face(section[0][::-1], mat)
+        for first, second in zip(section, section[1:]):
+            if first[0][1] == second[0][1]:
+                m.face([first[1], first[2], second[2], second[1]], mat)
+                continue
+            for k in range(4):
+                j = (k + 1) % 4
+                m.face([first[k], first[j], second[j], second[k]], mat)
+        m.face(section[-1], mat)
+
+
+def roof(m, x, y, w, d, eave, rise, C, detail, turn=False, entrance=False, wing=False):
     r = Mesh()
     h = d / 2
+    front_lift = 0.34 if entrance else 0.26 if wing else 0.0
+    front_fascia = 0.42 if entrance else 0.50 if wing else 0.18
     for side in (-1, 1):
         a, b = -w / 2, w / 2
         edge = side * h
+        front = (entrance or wing) and side < 0
+        lip = eave + (front_lift if front else 0)
         face = [
-            (a, edge, eave),
-            (b, edge, eave),
+            (a, edge, lip),
+            (b, edge, lip),
             (b, 0, eave + rise),
             (a, 0, eave + rise),
         ]
         r.face(face if side < 0 else face[::-1], C['slate'])
-        r.box(0, edge, eave - 0.09, w, 0.16, 0.18, C['white'])
+        fascia = front_fascia if front else 0.18
+        r.box(0, edge, lip - fascia / 2, w, 0.16, fascia, C['white'])
+        if entrance and front:
+            # Visible soffit return from the eave fascia to the transom face.
+            front_edge, beam_edge = edge + 0.08, -3.18
+            r.face(
+                [
+                    (a, front_edge, lip - fascia),
+                    (a, beam_edge, eave + 0.125),
+                    (b, beam_edge, eave + 0.125),
+                    (b, front_edge, lip - fascia),
+                ],
+                C['white'],
+            )
         if detail:
-            count = round(w / 0.27)
+            count = 12 if wing and front else round(w / 0.27)
             for i in range(count):
                 u = w * ((i + 0.5) / count - 0.5)
                 r.line(
-                    (u, edge, eave), (u, 0, eave + rise), 0.045, C['residencePodium'], 5
+                    (u, edge, lip), (u, 0, eave + rise), 0.045, C['residencePodium'], 5
                 )
+                if front:
+                    pitch = w / count
+                    radius = pitch * 0.23
+                    # Exposed round ends and the scalloped pan between adjacent rolls.
+                    ring = [
+                        (
+                            u + radius * math.cos(j * math.tau / 12),
+                            edge - 0.12,
+                            lip + radius * math.sin(j * math.tau / 12),
+                        )
+                        for j in range(12)
+                    ]
+                    back = [(px, py + 0.13, pz) for px, py, pz in ring]
+                    r.face(ring, C['slate'])
+                    for j in range(12):
+                        k = (j + 1) % 12
+                        r.face([ring[k], ring[j], back[j], back[k]], C['slate'])
+                    if i < count - 1:
+                        outline = [
+                            (u + pitch * t, edge - 0.105, lip - radius * v)
+                            for t, v in [
+                                (0.12, 0.25),
+                                (0.24, 0.84),
+                                (0.5, 1.35),
+                                (0.76, 0.84),
+                                (0.88, 0.25),
+                                (0.5, 0.52),
+                            ]
+                        ]
+                        r.face(outline, C['slate'])
     for side in (-1, 1):
         u = side * w / 2
-        pts = [(u, -h, eave - 0.18), (u, h, eave - 0.18), (u, 0, eave + rise + 0.12)]
+        if entrance:
+            entrance_gable(r, u, h, eave, rise, C, detail)
+        pts = [
+            (u, -h, eave + front_lift - front_fascia),
+            (u, h, eave - 0.18),
+            (u, 0, eave + rise + 0.12),
+        ]
         r.face(pts if side > 0 else pts[::-1], C['bridgeConcrete'])
         for v in (-h, h):
-            r.line((u, v, eave + 0.06), (u, 0, eave + rise + 0.2), 0.105, C['stone'])
+            if entrance and v < 0:
+                continue
+            r.line(
+                (u, v, eave + (front_lift if v < 0 else 0) + 0.06),
+                (u, 0, eave + rise + 0.2),
+                0.105,
+                C['stone'],
+            )
     r.box(0, 0, eave + rise + 0.08, w + 0.12, 0.20, 0.2, C['slate'])
     if turn:
         r.rotate_z(0, 0, math.pi / 2)
@@ -63,8 +170,26 @@ def build(l, b, z, C, detail):
         m.cylinder(x, 9, floor + 2, 0.22, 4, stone)
     for side in (-1, 1):
         x = side * 7.5
+        start = len(m.f)
         m.box(x, -12.9, floor + 1.95, 4.9, 7.7, 3.9, stone)
-        roof(m, x, -12.9, 5.05, 8.8, floor + 4, 1.45, C, detail)
+        if detail:
+            tile_material(
+                C,
+                'zhixingGreyBrick',
+                'zhixing-grey-brick.jpg',
+                (0.235, 0.270, 0.301),
+                roughness=0.86,
+            )
+            # The box has a single approach-facing quad. UVs stay aligned
+            # with the brick courses when the completed academy rotates.
+            for index in range(start, len(m.f)):
+                corners = [m.v[i] for i in m.f[index]]
+                if all(abs(y + 16.75) < 1e-6 for _, y, _ in corners):
+                    m.m[index] = C['zhixingGreyBrick']
+                    m.face_uvs[index] = [
+                        (px / 1.92, (h - floor) / 0.96) for px, _, h in corners
+                    ]
+        roof(m, x, -12.9, 5.05, 8.8, floor + 4, 1.45, C, detail, wing=True)
         m.box(x, -16.79, floor + 2, 1.45, 0.13, 2.15, C['gateRed'])
         m.box(x, -16.88, floor + 2, 1.24, 0.07, 1.92, C['glass'])
         m.box(x, -16.93, floor + 2.49, 1.24, 0.055, 0.065, C['gateRed'])
@@ -73,7 +198,7 @@ def build(l, b, z, C, detail):
             height = 4.9 + (transom_lift if y == -16 else 0)
             m.cylinder(side * 3.15, y, floor + height / 2, 0.245, height, wood, 16)
             m.cylinder(side * 3.15, y, floor + 0.14, 0.34, 0.28, stone, 16)
-    roof(m, 0, -12.95, 10.2, 9.1, floor + 5, 1.8, C, detail)
+    roof(m, 0, -12.95, 10.2, 9.1, floor + 5, 1.8, C, detail, entrance=True)
     m.box(0, -16, floor + transom_lift + 4.48, 3.48, 0.29, 0.9, wood)
     m.box(0, -16, floor + transom_lift + 4.95, 10, 0.26, 0.17, wood)
     # Pale soffit and the solid fascia above each five-bar side screen.

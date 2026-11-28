@@ -31,7 +31,7 @@ def glazing(
         width,
         height,
         0.025,
-        'vetWindowScreen' if screened else 'glass',
+        'vetWestScreenBalanced' if screened else 'glass',
     )
     if detail:
         for i in range(panes + 1):
@@ -56,7 +56,8 @@ def build(l, b, z, C, detail):
     m = Mesh()
     # x runs south along the street frontage, y east towards the lake.
     # Neutral screened-window appearance sampled separately from the entrance glass.
-    finish(C, 'vetWindowScreen', (0.292, 0.305, 0.296), 0.64)
+    finish(C, 'vetWestScreenBalanced', (0.410, 0.425, 0.414), 0.64)
+    finish(C, 'vetCanopyPanel', (0.74, 0.75, 0.74), 0.48, 0.18)
     pocket_left, pocket_right, recess = 4.43, 8.23, 1.85
     outline = [
         (0, 0),
@@ -221,6 +222,39 @@ def build(l, b, z, C, detail):
     entry = 39.0
     glazing(m, entry, 0, 1.59, 8.65, 2.86, 8, C, detail)
     m.box(entry, -1.44, 4.89, 12.0, 3.1, 0.83, C['metal'])
+    # Opening-day photograph: narrow vertical joints across the sign fascia.
+    panel_count = 21 if detail else 1
+    panel_width = 12.0 / panel_count
+    for i in range(panel_count):
+        left = entry - 6.0 + i * panel_width + 0.006
+        right = left + panel_width - 0.012
+        m.face(
+            [
+                (left, -2.998, 4.475),
+                (right, -2.998, 4.475),
+                (right, -2.998, 5.305),
+                (left, -2.998, 5.305),
+            ],
+            C['vetCanopyPanel'],
+        )
+        if detail:
+            # The underside photo resolves rows of joints continuing the fascia seams.
+            for row in range(3):
+                front = -2.99 + row * 3.1 / 3 + 0.006
+                back = front + 3.1 / 3 - 0.012
+                m.face(
+                    [
+                        (left, front, 4.469),
+                        (left, back, 4.469),
+                        (right, back, 4.469),
+                        (right, front, 4.469),
+                    ],
+                    C['vetCanopyPanel'],
+                )
+    if detail:
+        # One flush round fixture is visible above the entrance, centred under the canopy.
+        m.cylinder(entry, -1.44, 4.446, 0.245, 0.046, C['metal'], n=24)
+        m.cylinder(entry, -1.44, 4.418, 0.225, 0.012, C['white'], n=24)
     for side in (-1, 1):
         m.box(entry + side * 4.6, -0.23, 3.04, 0.58, 0.6, 2.92, C['paleRoof'])
         for y, h in ((-1, 1.58), (-4.9, 0.16)):

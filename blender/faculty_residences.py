@@ -2,7 +2,7 @@
 
 import math
 
-from geometry import Mesh
+from geometry import Mesh, tile_material
 from humanities_facades import finish as roof_finish
 
 # West to east, in the roof's own axes. Rows run from the south eave north.
@@ -119,14 +119,97 @@ def _exterior(b, z, colors, detail, height, style):
         )
     plan.append((0, north))
     ring = [(sw[0] + u * cs - v * sn, sw[1] + u * sn + v * cs) for u, v in plan]
-    body.extrude([[ring + [ring[0]]]], [[]], z - 0.5, height + 0.5, plaster)
+    tiled_gable = detail and b['id'] == 'way/760144473'
+    if tiled_gable:
+        # Replace the east shell edge with the stepped, street-visible finish.
+        for i, (a, end_point) in enumerate(zip(ring, ring[1:] + ring[:1])):
+            if i != 1:
+                body.face(
+                    [
+                        (*a, z - 0.5),
+                        (*end_point, z - 0.5),
+                        (*end_point, z + height),
+                        (*a, z + height),
+                    ],
+                    plaster,
+                )
 
+        tile_material(
+            colors, 'faculty17bGable', 'faculty17b-gable.jpg', (0.52, 0.35, 0.24), 0.87
+        )
+        tile_material(
+            colors,
+            'faculty17bPlinth',
+            'faculty17b-plinth.jpg',
+            (0.17, 0.18, 0.18),
+            0.91,
+        )
+        end = depth * 0.70
+        front = width + 0.55
+
+        def point(u, v, h):
+            return (sw[0] + u * cs - v * sn, sw[1] + u * sn + v * cs, z + h)
+
+        path = [(front, 0.71), (front, end), (width, end), (width, north)]
+        run = 0.0
+        for a, e in zip(path, path[1:]):
+            length = math.dist(a, e)
+            for bottom, top, mat in (
+                (-0.5, 0, colors['slate']),
+                (0, 0.72, colors['faculty17bPlinth']),
+                (0.72, height, colors['faculty17bGable']),
+            ):
+                coords = [
+                    point(*a, bottom),
+                    point(*e, bottom),
+                    point(*e, top),
+                    point(*a, top),
+                ]
+                # Unwrap continuously along the stepped elevation. V starts at grade.
+                uv = [
+                    (u / 1.92, h / 0.96)
+                    for u, h in (
+                        (run, bottom),
+                        (run + length, bottom),
+                        (run + length, top),
+                        (run, top),
+                    )
+                ]
+                body.face(coords, mat, uv if bottom >= 0 else None)
+            run += length
+        for bottom, top, mat in (
+            (-0.5, 0.42, colors['slate']),
+            (0.42, height, plaster),
+        ):
+            body.face(
+                [
+                    point(width, 0.71, bottom),
+                    point(front, 0.71, bottom),
+                    point(front, 0.71, top),
+                    point(width, 0.71, top),
+                ],
+                mat,
+            )
+        body.face(
+            [
+                point(width, 0.71, height),
+                point(front, 0.71, height),
+                point(front, end, height),
+                point(width, end, height),
+            ],
+            plaster,
+        )
+    else:
+        body.extrude([[ring + [ring[0]]]], [[]], z - 0.5, height + 0.5, plaster)
+
+    # End the old base just inside the replacement east surface.
+    inset = 0.03 if tiled_gable else 0
     box(
         body,
-        width / 2,
+        (width - inset) / 2,
         depth / 2,
         -0.5,
-        width + 0.04,
+        width + 0.04 - inset,
         depth - 1.38,
         0.92,
         colors['slate'],
@@ -337,8 +420,9 @@ def _exterior(b, z, colors, detail, height, style):
             end = depth * 0.70
             center = (0.71 + end) / 2
             span = end - 0.71
-            box(body, u + 0.27, center, 0, 0.56, span, height, plaster)
-            box(body, u + 0.28, center, -0.5, 0.57, span, 0.92, colors['slate'])
+            if not tiled_gable:
+                box(body, u + 0.27, center, 0, 0.56, span, height, plaster)
+                box(body, u + 0.28, center, -0.5, 0.57, span, 0.92, colors['slate'])
             for i in range(6):
                 low = base + i * step
                 box(body, u + 0.55, center, low - 0.14, 0.07, span, 0.14, belt)
@@ -370,6 +454,34 @@ def _exterior(b, z, colors, detail, height, style):
                         step * h,
                         glazing,
                     )
+                    if detail:
+                        pane_v = frac * depth
+                        bottom = low + sill * step
+                        pane_h = step * h
+                        for edge in (-1, 1):
+                            box(
+                                openings,
+                                u + 0.61,
+                                pane_v + edge * (w - 0.035) / 2,
+                                bottom,
+                                0.036,
+                                0.035,
+                                pane_h,
+                                rail,
+                            )
+                        box(openings, u + 0.61, pane_v, bottom, 0.04, w, 0.035, rail)
+                        if h > 0.5:
+                            # The tall gable window has a shallow upper light.
+                            box(
+                                openings,
+                                u + 0.61,
+                                pane_v,
+                                bottom + 0.76 * pane_h,
+                                0.036,
+                                w,
+                                0.04,
+                                rail,
+                            )
             continue
         for i in range(6):
             low = base + i * step
@@ -490,8 +602,23 @@ def _exterior(b, z, colors, detail, height, style):
                 1,
             )
     if b['id'] == 'way/760144474':
-        for u in (0.18, 0.40, 0.62, 0.84):
+        for u in (0.18, 0.40, 0.62):
             box(body, width * u, 0.26, base - 0.26, width * 0.16, 1.18, 0.23, belt)
+
+        def hood_point(u, v, h):
+            return (sw[0] + u * cs - v * sn, sw[1] + u * sn + v * cs, z + base + h)
+
+        # At the east end each of the last two doors has its own tiled hood.
+        half = min(1.63, width / 18 - 0.07)
+        for door in (7, 8):
+            center = width * door / 9
+            front = [hood_point(center + k * half, -0.30, -0.24) for k in (-1, 1)]
+            back = [hood_point(center + k * (half - 0.22), 0.71, 0.10) for k in (-1, 1)]
+            heels = [hood_point(center + k * half, 0.71, -0.24) for k in (-1, 1)]
+            body.face([front[0], front[1], back[1], back[0]], belt)
+            body.face([front[0], back[0], heels[0]], plaster)
+            body.face([front[1], heels[1], back[1]], plaster)
+            box(body, center, 0.205, base - 0.35, half * 2, 1.01, 0.11, plaster)
     box(body, mid, north + 0.57, base - 0.30, 2.75, 1.29, 0.21, belt)
     box(openings, mid, north + 0.046, 0.05, 1.58, 0.12, base - 0.40, colors['dark'])
     if style == 'paired':
