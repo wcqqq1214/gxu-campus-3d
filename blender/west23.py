@@ -138,10 +138,23 @@ def west23(building, elevation, colors, detail):
                 if not detail:
                     continue
                 ac = x + s * 0.84
-                m.box(ac, -0.38, z + 1.03, 1.09, 0.54, 0.86, cream)
-                badge(ac, -0.66, z + 1.03, 1.04, 0.82, fan)
+                width, height, center_z = 1.09, 0.86, z + 1.03
+                if j == 0 and level == 1:
+                    # The pair above the west fixed window is smaller and sits lower.
+                    ac = x + 0.03 + s * 0.79
+                    width, height, center_z = 1.04, 0.76, z + 0.96
+                m.box(ac, -0.38, center_z, width, 0.54, height, cream)
+                badge(ac, -0.66, center_z, width - 0.05, height - 0.04, fan)
                 for dx in (-0.34, 0.34):
-                    m.box(ac + dx, -0.40, z + 0.56, 0.055, 0.67, 0.055, frame)
+                    m.box(
+                        ac + dx,
+                        -0.40,
+                        center_z - height / 2 - 0.04,
+                        0.055,
+                        0.67,
+                        0.055,
+                        frame,
+                    )
             m.box(x, -0.18, z + 1.59, 0.28, 0.09, 3.03, cream)
     # Window and condenser above the passage on the west return.
     for lev in range(1, 8):

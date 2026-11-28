@@ -250,13 +250,29 @@ def library(l, b, z, C, detail):
     north.box(cx, 27.08, z + 3.5, 25.5, 0.28, 7.0, stone)
     north.box(cx, 31.35, z + 9.65, 24.8, 9.1, 0.7, stone)
     north.box(cx, 31.55, z + 10.08, 25.4, 9.4, 0.16, trim)
-    north.box(cx, 35.55, z + 10.8, 23.6, 0.8, 2.3, stone)
-    # Recessed sign panel and projecting coping visible in the library's header photo.
-    for xx in [cx - 11.0, cx + 11.0]:
-        north.box(xx, 36.03, z + 10.9, 0.24, 0.18, 1.9, trim)
-    for zz in [9.98, 11.84]:
-        north.box(cx, 36.03, z + zz, 22.2, 0.18, 0.14, trim)
-    north.box(cx, 35.65, z + 12.12, 25.6, 1.6, 0.25, trim)
+    # North name panel and open coping, measured against the central column bay.
+    north.box(cx, 35.55, z + 11.56, 16.9, 0.8, 3.08, stone)
+    for sx in (-1, 1):
+        north.box(cx + sx * 6.975, 35.98, z + 11.56, 2.95, 0.26, 3.08, stone)
+    for zz in (10.27, 12.85):
+        north.box(cx, 35.98, z + zz, 11.0, 0.26, 0.50, stone)
+    for axis in (-8.1, -4.1, 4.1, 8.1):
+        for offset in (-0.19, 0.19):
+            north.box(cx + axis + offset, 35.57, z + 13.38, 0.27, 0.54, 0.56, trim)
+    # The pale lip flares outward above a narrower soffit in both photographs.
+    lower = [
+        (cx + sx * 8.65, 35.57 + sy * 0.76, z + 13.66)
+        for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))
+    ]
+    upper = [
+        (cx + sx * 9.40, 35.57 + sy * 1.06, z + 14.21)
+        for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))
+    ]
+    north.face(lower[::-1], trim)
+    for i in range(4):
+        j = (i + 1) % 4
+        north.face([lower[i], lower[j], upper[j], upper[i]], trim)
+    north.box(cx, 35.57, z + 14.28, 18.8, 2.12, 0.14, trim)
     # The 2026-04-26 north-forecourt event photo shows six columns, with a
     # wider central bay. Column count is documented; spacing remains estimated.
     for xx in [cx - 10.5, cx - 7.3, cx - 4.1, cx + 4.1, cx + 7.3, cx + 10.5]:
@@ -326,10 +342,14 @@ def library(l, b, z, C, detail):
     m.add_part('09_北入口六柱门廊', north)
     m.add_part('10_北门感应玻璃门', doors)
     m.add_part('11_北入口平台台阶', north_steps)
-    north_sign = inscription(
-        '图 书 馆', cx, 36.09, z + 10.9, 11.8, 1.45, C['libraryInk'], False
-    )
-    north_sign.rotate_z(cx, 36.09, math.pi)
+    north_sign = Mesh()
+    for i, glyph in enumerate('图书馆'):
+        xx = cx + (1 - i) * 2.90
+        letter = inscription(
+            glyph, xx, 35.97, z + 11.56, 1.30, 1.24, C['libraryInk'], False
+        )
+        letter.rotate_z(xx, 35.97, math.pi)
+        north_sign.extend(letter)
     m.add_part('12_北向立体馆名', north_sign)
     # Local axes are derived from the OSM edge, never a north-aligned bounding box.
     m.rotate_z(0, 0, envelope['angle'])

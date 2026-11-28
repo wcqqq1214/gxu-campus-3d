@@ -47,15 +47,31 @@ def prism(m, poly, bottom, top, z, mat):
         m.face((lo[i], lo[j], hi[j], hi[i]), mat)
 
 
-def pane(m, f, C, l, r, b, t, v, kind='JW glass'):
-    # One optical interface per pane. The separately modelled sash supplies its perimeter depth.
-    m.face(
-        [f.point(l, v, b), f.point(r, v, b), f.point(r, v, t), f.point(l, v, t)],
-        C['Office ' + kind],
-    )
+def pane(m, f, C, l, r, b, t, v, kind='JW glass', marked=False):
+    # Partition the glass face so the two safety bands survive GLB quantization
+    # without coplanar decal surfaces. The sash covers the leaf edges.
+    spans = [(b, t, kind)]
+    if marked:
+        spans = [
+            (b, 2.002, kind),
+            (2.002, 2.034, 'JW safety blue'),
+            (2.034, 2.076, kind),
+            (2.076, 2.117, 'JW safety blue'),
+            (2.117, t, kind),
+        ]
+    for bottom, top, material in spans:
+        m.face(
+            [
+                f.point(l, v, bottom),
+                f.point(r, v, bottom),
+                f.point(r, v, top),
+                f.point(l, v, top),
+            ],
+            C['Office ' + material],
+        )
 
 
-def glazing(m, f, L, C, door=False, lights=4, detail=True):
+def glazing(m, f, L, C, door=False, lights=4, detail=True, marked=False):
     base = 0.84
     top = 7.03
     mid = 2.95 if not door else 3.47
@@ -72,7 +88,7 @@ def glazing(m, f, L, C, door=False, lights=4, detail=True):
             x0 = max(l, x0)
             x1 = min(r, x1)
             if x1 > x0:
-                pane(m, f, C, x0, x1, base, mid, -0.085)
+                pane(m, f, C, x0, x1, base, mid, -0.085, marked=marked)
     for x in bars:
         lo = mid if door and a + 0.001 < x < b - 0.001 else base
         f.box(m, C, x - 0.031, x + 0.031, -0.115, 0.018, lo, top, 'JW silver')
@@ -101,6 +117,7 @@ def glazing(m, f, L, C, door=False, lights=4, detail=True):
             mid - head - 0.02,
             -0.22,
             'JW door glass',
+            marked=marked,
         )
         if detail:
             f.box(
@@ -132,6 +149,8 @@ def glazing(m, f, L, C, door=False, lights=4, detail=True):
 
 def build(b, datum, C, detail, ordinary):
     mesh = build_entrance(b, datum, C, detail, ordinary)
+    if detail:
+        finish(C, 'Office JW safety blue', (0.024, 0.068, 0.160), 0.53, 0)
     for name, rgb, rough, metal, alpha in [
         ('JW column', (0.44, 0.378, 0.347), 0.45, 0.05, 1),
         ('JW base stone', (0.324, 0.268, 0.236), 0.48, 0.07, 1),
@@ -250,7 +269,15 @@ def build(b, datum, C, detail, ordinary):
             ps.pop(2)
         prism(body, ps, lo, hi, z, Cmat(mat))
 
-    slab(7.19, 7.43, 1.05, 'JW soffit')
+    # A recessed outer soffit turns above the east pier. The shelf runs
+    # back into the existing slab before the northern column bearing.
+    outer = outline(1.05)
+    a, corner, b = outer[2:5]
+    end = tuple(u + 0.55 * (v - u) for u, v in zip(corner, b))
+    inset = outline(0.72)[3]
+    low = [*outer[:3], inset, end, *outer[4:]]
+    prism(body, low, 7.19, 7.43, z, Cmat('JW soffit'))
+    prism(body, [a, corner, end, inset], 7.40, 7.43, z, Cmat('JW soffit'))
     slab(7.43, 7.54, 1.15, 'JW silver')
     slab(7.54, 7.65, 1.02, 'JW shadow')
     slab(7.65, 7.83, 1.095, 'JW base stone')
@@ -266,8 +293,10 @@ def build(b, datum, C, detail, ordinary):
     slab(13.92, 14.0, 0.86, 'JW portal')
     mesh.add_part('东北三折挑檐与连续侧墙', body)
     glazing_mesh = Mesh()
-    glazing(glazing_mesh, side, side_len, C, lights=4, detail=detail)
-    glazing(glazing_mesh, front, L, C, door=True, lights=7, detail=detail)
+    glazing(glazing_mesh, side, side_len, C, lights=4, detail=detail, marked=detail)
+    glazing(
+        glazing_mesh, front, L, C, door=True, lights=7, detail=detail, marked=detail
+    )
     glazing(glazing_mesh, ret, ret_len, C, lights=3, detail=detail)
     # Ceiling reveal behind the curtain wall and plinth below the glazing.
     for f, ln in ((side, side_len), (front, L), (ret, ret_len)):

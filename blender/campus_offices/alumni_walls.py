@@ -222,6 +222,25 @@ class Wall:
                         'sill',
                     )
 
+    def portal_screen(self, l, r, lo, hi):
+        # The north entrance has square cast units with a heavier perimeter.
+        # Keep the small web behind that rim so the larger divisions read at street scale.
+        cols = round((r - l) / 0.43)
+        rows = round((hi - lo) / 0.43)
+        for vertical, start, end, units in ((True, l, r, cols), (False, lo, hi, rows)):
+            count = units * 3
+            for i in range(count + 1):
+                major = i % 3 == 0
+                half = 0.024 if major else 0.013
+                center = start + (end - start) * i / count
+                a, b = max(start, center - half), min(end, center + half)
+                # Bed crossing bars at slightly different depths.
+                front = (-0.135 if major else -0.163) - (0 if vertical else 0.006)
+                if vertical:
+                    self.box(self.grilles, a, b, lo, hi, -0.245, front, 'cream')
+                else:
+                    self.box(self.grilles, l, r, a, b, -0.24, front, 'cream')
+
     def diamond(self, l, r, lo, hi):
         # The three panels above the landing share one deep aperture. Clip each
         # diagonal flat bar to its panel's inset, including the top and bottom.
@@ -275,6 +294,7 @@ class Wall:
                 'vent': 0.22,
                 'window': 0.245,
                 'screen': 0.49,
+                'portal_screen': 0.49,
                 'diamond': 0.66,
                 'door': 0.50,
                 'glazed': 0.50,
@@ -310,8 +330,11 @@ class Wall:
                             -0.022,
                             'cream',
                         )
-                if kind == 'screen':
-                    self.screen(l, r, lo, hi)
+                if kind in ('screen', 'portal_screen'):
+                    if kind == 'portal_screen':
+                        self.portal_screen(l, r, lo, hi)
+                    else:
+                        self.screen(l, r, lo, hi)
                     self.sill(l, r, lo)
                 if kind == 'diamond':
                     self.diamond(l, r, lo, hi)
