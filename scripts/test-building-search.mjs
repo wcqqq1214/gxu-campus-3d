@@ -40,6 +40,7 @@ test('场馆和餐厅别名只返回对应地点', () => {
       'Huixuetang Hall',
       'Junwu Center for Culture and Arts Education',
     ],
+    ['way/759337787', '君武馆', 'Junwu Hall'],
     ['way/759140894', '西23栋供餐点'],
     ['way/759140893', '西22栋供餐点'],
     ['way/759337794', '萃苑食堂'],
@@ -52,19 +53,8 @@ test('场馆和餐厅别名只返回对应地点', () => {
     ['student-center', '老水塔咖啡厅', 'Old Water Tower Café'],
   ]) {
     for (const query of queries) {
-      const matches = [
-        ...searchLandmarks(landmarks, query),
-        ...searchBuildings(buildings, landmarks, query),
-      ];
-      assert.deepEqual(
-        matches.map((place) => place.id),
-        [id],
-        query,
-      );
+      assert.deepEqual(ids(query), [id], query);
     }
-  }
-  for (const query of ['君武馆', 'Junwu Hall']) {
-    assert.deepEqual(ids(query), ['way/759337787'], query);
   }
 });
 
