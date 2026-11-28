@@ -1,11 +1,11 @@
 """Append the faculty housing footprints traced from the university site plan."""
 
 import json
-import math
 
 from shapely.geometry import Polygon, mapping
 from shapely.ops import transform
 
+from building_chunks import grid_chunk
 from building_overrides import pack_geometry, source_catalogue
 from prepare_geodata import OUT, ROOT, inverse
 from terrain_elevation import make_elevation
@@ -56,10 +56,6 @@ def prepare_housing():
             raise ValueError(f'Invalid faculty housing footprint: {row["id"]}')
         x, y = polygon.centroid.coords[0]
         polys, triangles = pack_geometry([polygon])
-        cell = [math.floor(v / 360) for v in (x, y)]
-        chunk = 'chunk-' + '-'.join(
-            ('p' if n >= 0 else 'n') + str(abs(n)) for n in cell
-        )
         building = dict(
             row,
             category='living',
@@ -68,7 +64,7 @@ def prepare_housing():
             elevation=round(elevation(x, y), 2),
             campusArea='east',
             zone='north' if y > 200 else 'west' if x < 0 else 'east',
-            chunk=chunk,
+            chunk=grid_chunk(x, y),
             polygons=polys,
             roofTriangles=triangles,
             insideCampus=True,

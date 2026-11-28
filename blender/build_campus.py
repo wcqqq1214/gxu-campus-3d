@@ -28,22 +28,18 @@ from sports import athletics, west_stand
 from west_market import DATUM as MARKET_DATUM
 from west_market import market_building, market_ground
 
+sys.path.insert(0, str(ROOT / 'scripts'))
+from building_chunks import CHUNK_METERS, grid_chunk
+
 DATA = ROOT / 'public/data'
 MODELS = ROOT / 'public/models'
 REPORTS = ROOT / 'work/model-checks'
-CHUNK_METERS = 360
 
 
 def chunk_key(b):
     if b['id'] in student_residences.IDS:
         return student_residences.chunk_id(b['id'])
-    ix = math.floor(b['center'][0] / CHUNK_METERS)
-    iy = math.floor(b['center'][1] / CHUNK_METERS)
-
-    def label(v):
-        return ('p' if v >= 0 else 'n') + str(abs(v))
-
-    return 'chunk-' + label(ix) + '-' + label(iy)
+    return grid_chunk(*b['center'])
 
 
 buildings = json.loads((DATA / 'buildings.json').read_text())
@@ -123,7 +119,6 @@ basketball = json.loads((DATA / 'basketball.json').read_text())
 campus_roads = json.loads((DATA / 'campus-roads.json').read_text())
 sites = json.loads((DATA / 'sites.json').read_text())
 pavings = json.loads((DATA / 'pavings.json').read_text())
-sys.path.insert(0, str(ROOT / 'scripts'))
 from foundation_contract import load_foundations
 
 foundations = load_foundations(ROOT)
