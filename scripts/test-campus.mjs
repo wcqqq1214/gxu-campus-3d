@@ -91,11 +91,16 @@ test('关系去重、要素 ID 与目录互相对应', async () => {
     let sourceId;
     if (b.geometrySource === 'university-site-plan') {
       sourceId = 'infillPlan';
+    } else if (b.geometrySource === 'ortho-located-typology') {
+      sourceId = 'oldHighLayout';
+    } else if (b.geometrySource === 'university-design-and-construction-photos') {
+      sourceId = 'eastGraduateTopping';
     } else if (b.geometrySource === 'manual-imagery-trace') {
       sourceId = b.id.startsWith('north-campus/')
         ? 'northCampusImagery2024'
         : 'studentDormImagery';
     } else {
+      assert.match(b.id, /^(way|relation)\/\d+$/);
       assert.equal(b.sourceUrl, `https://www.openstreetmap.org/${b.id}`);
       continue;
     }

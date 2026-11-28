@@ -9,6 +9,7 @@ from huixue import huixue
 from international_residence import international_residence
 from laboratory import laboratory
 from library import library
+from north_campus_north_gate import build as north_campus_north_gate
 from north_public_gate import build as north_public_gate
 from quanxue_island import build as quanxue_island
 from south_gate import south_gate
@@ -19,6 +20,7 @@ from time_gate import time_gate
 from veterinary_hospital import build as veterinary_hospital
 
 DEDICATED_LANDMARKS = {
+    'north-campus-north-gate': north_campus_north_gate,
     'north-public-gate': north_public_gate,
     'donggao-gate': donggao_gate,
     'quanxue-island': quanxue_island,

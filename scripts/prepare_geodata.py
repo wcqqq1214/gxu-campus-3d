@@ -665,9 +665,21 @@ def prepare():
             if f['properties']['kind'] == 'sports'
         ]
     )
+    construction = json.loads(
+        (ROOT / 'data/east-graduate-construction-site.json').read_text()
+    )
+    construction_ground = Polygon(construction['polygon'])
     valid = prep(
         campus.difference(
-            unary_union([bg, waters.buffer(5), roadmask, sportsmask.buffer(3)])
+            unary_union(
+                [
+                    bg,
+                    waters.buffer(5),
+                    roadmask,
+                    sportsmask.buffer(3),
+                    construction_ground,
+                ]
+            )
         )
     )
     greenmask = prep(greenmask)
@@ -728,6 +740,9 @@ def prepare():
 
 if __name__ == '__main__':
     prepare()
+    from east_road_survey import apply_east_road_survey
+
+    apply_east_road_survey(ROOT)
     from infrastructure_data import prepare_infrastructure
 
     prepare_infrastructure()

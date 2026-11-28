@@ -196,6 +196,25 @@ def east19(b, z, C, detail, mesh, patch, discard):
                 'glass',
             )
         ]
+        left = 0
+        if level == 5:
+            # The ivory return ends at the second window sill at both north stations.
+            sill = holes[0][2]
+            surface.rect(patch, 0, stop, floor + 0.14, sill, 0, mat)
+            storey(
+                patch,
+                surface,
+                0,
+                stop,
+                sill,
+                floor + step - sill,
+                holes,
+                C['dormPeijiaIvory'],
+                C,
+                detail,
+            )
+            holes = []
+            left = stop
         for j in range(9):
             mid = start + (j + 0.5) * pitch
             if j % 3 == 1:
@@ -227,7 +246,7 @@ def east19(b, z, C, detail, mesh, patch, discard):
         storey(
             patch,
             surface,
-            0,
+            left,
             surface.length,
             floor + 0.14,
             step - 0.14,

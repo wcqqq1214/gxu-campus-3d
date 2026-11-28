@@ -127,13 +127,22 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-root', type=Path, required=True)
     parser.add_argument('--building', action='append', default=[])
+    parser.add_argument(
+        '--retire-building',
+        action='append',
+        default=[],
+        help='Remove a catalogued retirement from its previous shared building chunk',
+    )
     parser.add_argument('--landmark', action='append', default=[])
     parser.add_argument('--fields', action='store_true')
     parser.add_argument('--publish', action='store_true')
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1 :])
+    retired = set(args.retire_building)
     args.landmark = list(dict.fromkeys(args.landmark))
     args.building = list(dict.fromkeys(args.building))
     supported_buildings = SURVEYED.keys() | {
+        'way/759193120',
+        'way/1076517223',
         'way/957503108',
         'way/759191485',
         'way/759337787',
@@ -145,6 +154,7 @@ def main():
         'library',
         'donggao-gate',
         'north-public-gate',
+        'north-campus-north-gate',
         'quanxue-island',
         'veterinary-hospital',
     }
@@ -153,7 +163,7 @@ def main():
         or set(args.landmark) - supported_places
     ):
         parser.error('Unsupported campus building or landmark for incremental export')
-    if not (args.building or args.landmark or args.fields):
+    if not (args.building or retired or args.landmark or args.fields):
         parser.error('Select a surveyed building, landmark or fields')
     target = args.output_root.resolve()
     from incremental_update import publication_lock, require_recovered
@@ -185,7 +195,11 @@ def main():
             if previous_zones.get(fid) != current_zones.get(fid)
         }
         mapped = {l.get('osmId') for l in latest if l['id'] in args.landmark}
-        omitted = changed - set(args.building) - mapped
+        if retired - previous_zones.keys() or retired & {b['id'] for b in catalog}:
+            parser.error(
+                'Retired building IDs must be in the prior manifest and absent from the new catalogue'
+            )
+        omitted = changed - set(args.building) - mapped - retired
         if omitted or set(args.building) - current_zones.keys():
             parser.error(
                 f'Catalogue and model release must include all changed building assignments: {sorted(omitted)}'
@@ -215,7 +229,7 @@ def main():
     updated = set()
     diagnostics = {}
     obstacles = []
-    updates = set(args.building)
+    updates = set(args.building) | retired
     for key in args.landmark:
         if places[key].get('osmId') in buildings:
             updates.add(places[key]['osmId'])
@@ -223,7 +237,7 @@ def main():
     zones = {
         z['id'] for z in old_zones.values() if updates.intersection(z['featureIds'])
     }
-    ordinary = {fid for fid in updates if not buildings[fid]['landmark']}
+    ordinary = {fid for fid in updates - retired if not buildings[fid]['landmark']}
     zones.update(buildings[fid]['chunk'] for fid in ordinary)
     for zone in sorted(zones):
         z = old_zones.get(
@@ -273,6 +287,10 @@ def main():
                 if not far:
                     old = objects.get(b['id'])
                     props = dict(old.items()) if old else {}
+                    if b.get('form'):
+                        props['archetype'] = b['form']['archetype']
+                        if 'roofBasis' in b:
+                            props['roofBasis'] = b['roofBasis']
                     prior_slots = list(old.data.materials) if old else []
                     if old:
                         remove(old)
@@ -338,6 +356,8 @@ def main():
         z.update(featureIds=member_ids, bounds=bounds)
         if zone not in old_zones:
             manifest['zones'].append(z)
+    for fid in retired:
+        remove(objects[fid])
     entries = {l['id']: l for l in manifest['landmarks']}
     for key in args.landmark:
         l = places[key]

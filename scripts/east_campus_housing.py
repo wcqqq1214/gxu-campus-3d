@@ -13,6 +13,8 @@ from terrain_elevation import make_elevation
 
 def prepare_housing():
     records = json.loads((ROOT / 'data/east-campus-housing.json').read_text())
+    records.extend(json.loads((ROOT / 'data/east-old-high-housing.json').read_text()))
+    records.extend(json.loads((ROOT / 'data/east-graduate-residence.json').read_text()))
     ids = {row['id'] for row in records}
     buildings = [
         b
@@ -34,7 +36,14 @@ def prepare_housing():
         b['sourceRefs'] = list(dict.fromkeys([*b.get('sourceRefs', ['osm']), *refs]))
         props = features[fid]['properties']
         props['sourceRefs'] = b['sourceRefs']
-        for key in ('levels', 'height', 'heightStatus', 'heightBasis'):
+        for key in (
+            'name',
+            'category',
+            'levels',
+            'height',
+            'heightStatus',
+            'heightBasis',
+        ):
             if key in appearance:
                 props[key] = b[key] = appearance[key]
                 if key in ('levels', 'height') and 'form' in b:
@@ -66,12 +75,15 @@ def prepare_housing():
             landmark=None,
             osmEditedAt=None,
             osmVersion=None,
-            heightBasis='校方工程文件的设计高度，竣工实测未核；屋面小构筑物高度估算。',
-            heightStatus='design',
-            geometrySource='university-site-plan',
+            heightBasis=row.get(
+                'heightBasis',
+                '校方工程文件的设计高度，竣工实测未核；屋面小构筑物高度估算。',
+            ),
+            heightStatus=row.get('heightStatus', 'design'),
+            geometrySource=row.get('geometrySource', 'university-site-plan'),
             archetype='generic',
             tags={},
-            constructionStatus=None,
+            constructionStatus=row.get('constructionStatus'),
         )
         buildings.append(building)
         props = {
