@@ -134,6 +134,19 @@ jobs:
     needs: changes
     if: needs.changes.outputs.browser == 'true'
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        suite:
+          - name: menu-i18n
+            only: menu,i18n
+            needs_build: true
+          - name: camera-desktop
+            only: camera-desktop
+            needs_build: false
+          - name: camera-mobile
+            only: camera-mobile
+            needs_build: false
     permissions:
       contents: read
       pages: read
@@ -145,16 +158,35 @@ jobs:
           cache: npm
       - uses: actions/configure-pages@v5
         id: pages
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        if: matrix.suite.needs_build && github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
       - run: npm ci
       - run: npm run build:pages
+        if: matrix.suite.needs_build
         env:
           PAGES_BASE_PATH: ${{ (github.event_name == 'pull_request' || github.ref != 'refs/heads/main') && '/gxu-campus-3d' || steps.pages.outputs.base_path }}
+      - name: 读取 Playwright 版本
+        id: pw
+        run: echo "version=$(node -p "require('./node_modules/playwright/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: 缓存浏览器回归运行时
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ steps.pw.outputs.version }}
       - name: 安装浏览器回归运行时
+        if: steps.pw-cache.outputs.cache-hit != 'true'
         run: npx --no-install playwright install --with-deps --no-shell chromium
-      - name: 菜单、相机与中英文浏览器回归
-        timeout-minutes: 30
-        run: npm run test:browser -- --skip-build
+      - name: 安装浏览器系统依赖
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx --no-install playwright install-deps chromium
+      - name: 菜单、相机与中英文浏览器回归（${{ matrix.suite.name }}）
+        timeout-minutes: 15
+        run: |
+          if [[ "${{ matrix.suite.needs_build }}" == "true" ]]; then
+            npm run test:browser -- --skip-build --only=${{ matrix.suite.only }}
+          else
+            npm run test:browser -- --only=${{ matrix.suite.only }}
+          fi
         env:
           SWIFTSHADER: '1'
           PAGES_BASE_PATH: ${{ (github.event_name == 'pull_request' || github.ref != 'refs/heads/main') && '/gxu-campus-3d' || steps.pages.outputs.base_path }}
@@ -162,7 +194,7 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-checks-${{ github.run_id }}-${{ github.run_attempt }}
+          name: browser-checks-${{ matrix.suite.name }}-${{ github.run_id }}-${{ github.run_attempt }}
           path: work/browser-checks/
           if-no-files-found: ignore
           retention-days: 7

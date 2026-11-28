@@ -145,7 +145,12 @@ try {
     );
     const settle = async () => {
       action('等待场景稳定');
-      await page.waitForTimeout(1600);
+      await page.evaluate(
+        () =>
+          new Promise((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve)),
+          ),
+      );
       await page.waitForFunction(
         () => {
           const metrics = document.querySelector('.debug-metrics')?.textContent;
@@ -162,7 +167,12 @@ try {
         undefined,
         { timeout: 90000 },
       );
-      await page.waitForTimeout(350);
+      await page.evaluate(
+        () =>
+          new Promise((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve)),
+          ),
+      );
     };
     const snapshot = () => page.evaluate(() => globalThis.__panelCameraProbe());
     const unchanged = (a, b, label) => {
@@ -186,7 +196,7 @@ try {
       for (const name of ['收起面板', '展开面板']) {
         action(name);
         await page.getByRole('button', { name, exact: true }).click();
-        await page.waitForTimeout(650);
+        await page.waitForTimeout(350);
         unchanged(before, await snapshot(), `${stage}/${name}`);
         if (controls)
           assert.deepEqual(
@@ -252,7 +262,7 @@ try {
     for (const name of ['收起面板', '展开面板']) {
       action(name);
       await page.getByRole('button', { name, exact: true }).click();
-      await page.waitForTimeout(650);
+      await page.waitForTimeout(350);
       const after = await snapshot();
       assert.equal(after.orbiting, true);
       assert.equal(
@@ -271,8 +281,8 @@ try {
       assert.ok(Math.abs(radius(beforeOrbit) - radius(after)) < 1e-6);
     }
     passed();
-    begin('分享链接恢复后保持相机与投影');
     await page.getByRole('button', { name: '暂停环绕', exact: true }).click();
+    begin('分享链接恢复后保持相机与投影');
     const saved = await snapshot();
     const hash = new URLSearchParams({
       place: 'south-gate',

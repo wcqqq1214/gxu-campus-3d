@@ -56,10 +56,10 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-`npm run test:browser` 先构建 Pages，再启动服务依次运行菜单、相机与 i18n 检查：
-- **检查内容**：菜单与相机连接开发服务（相机探针仅注入测试响应）；i18n 使用 `out/` 静态产物并覆盖 `/gxu-campus-3d/` 子路径。菜单在桌面端 `1280px` 覆盖全套交互并在 `390px` 验证手机端关键路径；相机覆盖 `1280px` 与 `390px`；i18n 覆盖 `1280px` 与 `320px` 及语言恢复、分享导出、存储受限与 WebGL 不可用场景。
+`npm run test:browser` 默认按需构建 Pages 并启动服务并行运行菜单、相机与 i18n 检查（设 `SWIFTSHADER=1` 时默认串行，可用 `BROWSER_CONCURRENCY` 覆盖，或传 `--only=menu,camera-desktop,camera-mobile,i18n` 按项单跑）：
+- **检查内容**：菜单与相机连接开发服务（相机探针仅注入测试响应）；i18n 使用 `out/` 静态产物并覆盖 `/gxu-campus-3d/` 子路径。菜单在桌面端 `1280px` 覆盖全套交互并在 `390px` 验证手机端关键路径；桌面 `1280px` 和手机 `390px` 均检查俯视、手动平移缩放与环绕，手机另检查详情面板收展后的视角控件；i18n 覆盖 `1280px` 与 `320px` 及语言恢复、分享导出、存储受限与 WebGL 不可用场景。
 - **端口与复用**：默认占用 `4317`、`4318` 端口（已被占用直接报错；可用 `BROWSER_DEV_PORT`、`BROWSER_PREVIEW_PORT` 调整），退出、失败或中断时自动清理子进程。支持 macOS/Linux；刚构建过且 `PAGES_BASE_PATH` 一致（空字符串或 `/gxu-campus-3d`）时，可用 `-- --skip-build` 复用产物。
-- **输出与超时**：每次运行写入 `work/browser-checks/run-*`（含服务日志、断言输出及未完成页面截图/控制台/网络日志；默认不落盘全量 `trace.zip`，需回放 DOM 与网络记录时可设 `BROWSER_TRACE=1`；CI 失败上传保留 7 天），可用 `npx playwright show-trace <trace.zip>` 回放。菜单、桌面相机、手机相机、i18n 依次运行，各限时 10 分钟。相机日志记录场景耗时和最近的队列、动画状态。CI 浏览器步骤上限 30 分钟，包含服务启动和清理。
+- **输出与超时**：每次运行写入 `work/browser-checks/run-*`（含服务日志、断言输出及未完成页面截图/控制台/网络日志；默认不落盘全量 `trace.zip`，需回放 DOM 与网络记录时可设 `BROWSER_TRACE=1`；CI 失败上传保留 7 天），可用 `npx playwright show-trace <trace.zip>` 回放。每项检查限时 10 分钟，相机日志记录场景耗时和最近的队列、动画状态。CI 中 `browser` 按 3 路矩阵并行并缓存 Playwright Chromium，单路限时 15 分钟。
 - **渲染与覆盖变量**：默认使用 [Chromium 新无头模式](https://playwright.dev/docs/browsers#chromium-new-headless-mode)（`channel: chromium`），本地用可用 GPU，CI 设 `SWIFTSHADER=1` 走软件渲染（本地可用同变量复测）。此入口仅作功能回归，不比较 GPU 性能；支持 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`BROWSER_PATH`、`I18N_BROWSER=webkit`（需自装浏览器）及单脚本 URL 覆盖。
 
 ## 数据和完整模型构建
@@ -212,13 +212,13 @@ npm run test:incremental -- --output-root=/path/to/new-gate-regression --kinds n
 网页端检查见[网页开发和检查](#网页开发和检查)，Python 数据测试与独立几何回归如下：
 
 ```sh
-work/venv/bin/python -m unittest discover -s scripts -p 'test_*.py'
+work/venv/bin/python scripts/run_data_tests.py
 npm run test:geometry
 # Blender 不在 PATH 时可指定：
 BLENDER_BIN=/path/to/blender npm run test:geometry
 ```
 
-`test:geometry` 在单次启动的隔离 factory 环境中通过 `unittest` 统一发现并逐用例重置场景运行 `blender/test_*.py`（仅用 Blender 内置 Python，不读本地 `.blend` 或写正式资产，自动发现地标双 LOD 回归；支持传入模块名过滤，如 `npm run test:geometry -- test_west_gate`）；但它主要保护生成规则，**不能替代对已发布 GLB 的实际解码验收**。
+`npm run test:data` 通过 `scripts/run_data_tests.py` 多进程并行运行 `scripts/test_*.py`（支持传入模块名过滤与 `TEST_DATA_WORKERS` 覆盖并发数）。`test:geometry` 在单次启动的隔离 factory 环境中通过 `unittest` 统一发现并逐用例重置场景运行 `blender/test_*.py`（仅用 Blender 内置 Python，不读本地 `.blend` 或写正式资产，自动发现地标双 LOD 回归；支持传入模块名过滤，如 `npm run test:geometry -- test_west_gate`）；但它主要保护生成规则，**不能替代对已发布 GLB 的实际解码验收**。
 
 ### 专项与前后对照
 
