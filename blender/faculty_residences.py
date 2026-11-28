@@ -102,6 +102,7 @@ def _exterior(b, z, colors, detail, height, style):
     step = (height - base) / 6
     east_row = b['id'] in _ROOFS
     south_obscured = b['id'] == 'way/760144467'
+    south_19b = b['id'] == 'way/760144474'
     # A recessed wall behind the balcony fronts keeps their returns visible.
     mid = width / 2
     north = depth - 0.71
@@ -152,12 +153,22 @@ def _exterior(b, z, colors, detail, height, style):
             bays = _SHORT_BAYS if east_row else _LONG_BAYS
             if side < 0 and south_obscured:
                 bays = ((0.62, 0.20), (0.805, 0.089), (0.924, 0.09))
+            elif side < 0 and south_19b:
+                bays = (
+                    (0.074, 0.12),
+                    (0.18, 0.065),
+                    (0.315, 0.19),
+                    (0.685, 0.19),
+                    (0.82, 0.065),
+                    (0.926, 0.12),
+                )
             elif side < 0 and b['id'] == 'way/760144465':
                 bays = ((0.20, 0.16), (0.80, 0.16))
             for frac, span in bays:
                 u = frac * width
-                if south_obscured and side < 0 and frac > 0.78:
-                    # The two eastern stacks at station 105 have splayed returns.
+                floating = south_19b and side < 0 and span < 0.14
+                if floating or (south_obscured and side < 0 and frac > 0.78):
+                    # 19B has splayed window boxes flanking both broad balconies.
                     half = span * width / 2
                     profile = [
                         (-half, v),
@@ -169,11 +180,14 @@ def _exterior(b, z, colors, detail, height, style):
                         (sw[0] + (u + t) * cs - q * sn, sw[1] + (u + t) * sn + q * cs)
                         for t, q in profile
                     ]
+                    bottom_edge, sill, head, top_edge = (
+                        (0.21, 0.27, 0.84, 0.9) if floating else (0, 0.32, 0.88, 1)
+                    )
                     for a, bp in zip(world, world[1:]):
                         for bottom, top, mat in (
-                            (0, 0.32, plaster),
-                            (0.32, 0.88, glazing),
-                            (0.88, 1, plaster),
+                            (bottom_edge, sill, plaster),
+                            (sill, head, glazing),
+                            (head, top_edge, plaster),
                         ):
                             body.face(
                                 [
@@ -184,7 +198,27 @@ def _exterior(b, z, colors, detail, height, style):
                                 ],
                                 mat,
                             )
-                    body.face([(*a, z + low + step) for a in world], plaster)
+                    body.face([(*a, z + low + top_edge * step) for a in world], plaster)
+                    if floating:
+                        body.face(
+                            [
+                                (*a, z + low + bottom_edge * step)
+                                for a in reversed(world)
+                            ],
+                            plaster,
+                        )
+                        if detail:
+                            for t in (-0.68, 0, 0.68):
+                                box(
+                                    openings,
+                                    u + t * half,
+                                    v - 0.75,
+                                    low + sill * step,
+                                    0.045,
+                                    0.046,
+                                    (head - sill) * step,
+                                    rail,
+                                )
                     continue
                 out = v + side * (0.90 if 0.15 < frac < 0.85 else 0.62)
                 box(
@@ -298,6 +332,45 @@ def _exterior(b, z, colors, detail, height, style):
     # Two narrow openings per storey on the visible gables.
     for sign in (-1, 1):
         u = 0 if sign == -1 else width
+        if sign == 1 and b['id'] == 'way/760144473':
+            # Both window columns share the advanced southern panel of the east gable.
+            end = depth * 0.70
+            center = (0.71 + end) / 2
+            span = end - 0.71
+            box(body, u + 0.27, center, 0, 0.56, span, height, plaster)
+            box(body, u + 0.28, center, -0.5, 0.57, span, 0.92, colors['slate'])
+            for i in range(6):
+                low = base + i * step
+                box(body, u + 0.55, center, low - 0.14, 0.07, span, 0.14, belt)
+                box(body, u + 0.28, end, low - 0.14, 0.56, 0.07, 0.14, belt)
+                box(
+                    body,
+                    u + 0.02,
+                    (end + north) / 2,
+                    low - 0.14,
+                    0.055,
+                    north - end,
+                    0.14,
+                    belt,
+                )
+                # Short ledges mark the two outer gable corners at each storey.
+                for edge_u, edge_v in ((u + 0.63, 0.91), (u + 0.12, north - 0.20)):
+                    box(body, edge_u, edge_v, low - 0.08, 0.38, 0.62, 0.12, rail)
+                for frac, w, h, sill in (
+                    (0.36, 0.85, 0.60, 0.26),
+                    (0.57, 0.72, 0.33, 0.43),
+                ):
+                    box(
+                        openings,
+                        u + 0.57,
+                        frac * depth,
+                        low + sill * step,
+                        0.075,
+                        w,
+                        step * h,
+                        glazing,
+                    )
+            continue
         for i in range(6):
             low = base + i * step
             box(

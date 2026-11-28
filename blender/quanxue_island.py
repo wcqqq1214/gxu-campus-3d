@@ -45,7 +45,8 @@ def build(l, b, z, C, detail):
     floor = z + 1.38
     # Both entrance views constrain the lift; a larger rise masks the plaque.
     transom_lift = 0.09
-    screen_height = 4.10 + transom_lift
+    band_bottom = 3.88
+    band_top = 4.41
     stone, wood = C['bridgeConcrete'], C['wood']
     # A continuous plinth beds into the sloping baseline ground and pedestrian surface.
     m.box(0, 0.1, floor - 1.35, 28.6, 33.2, 2.7, stone)
@@ -75,32 +76,87 @@ def build(l, b, z, C, detail):
     roof(m, 0, -12.95, 10.2, 9.1, floor + 5, 1.8, C, detail)
     m.box(0, -16, floor + transom_lift + 4.48, 3.48, 0.29, 0.9, wood)
     m.box(0, -16, floor + transom_lift + 4.95, 10, 0.26, 0.17, wood)
+    # Pale soffit and the solid fascia above each five-bar side screen.
+    m.box(0, -12.21, floor + 5.04, 9.88, 7.24, 0.07, C['white'])
     if detail:
-        for side in (-1, 1):
-            for i in range(4):
-                m.box(
-                    side * (3.53 + i * 0.39),
-                    -16,
-                    floor + screen_height / 2,
-                    0.079,
-                    0.11,
-                    screen_height,
-                    wood,
-                )
-            for i in range(6):
-                px = side * (1.89 + i * 0.56)
-                m.box(px, -16, floor + transom_lift + 4.48, 0.052, 0.09, 0.86, wood)
-                m.box(
-                    px + side * 0.22,
-                    -16,
-                    floor + transom_lift + 4.35 + 0.25 * (i % 2),
-                    0.44,
-                    0.09,
-                    0.05,
-                    wood,
-                )
+        # The news-school photograph shows three ribbed shades across the
+        # near bay and another on the passage axis behind them.
+        for x, y in ((-2.65, -13.8), (0, -13.8), (2.65, -13.8), (0, -9.9)):
+            crown = floor + 4.91
+            m.cylinder(x, y, floor + 4.96, 0.012, 0.10, wood, 8)
+            for i in range(8):
+                angle = math.tau * i / 8
+                points = [
+                    (
+                        x + radius * math.cos(angle),
+                        y + radius * math.sin(angle),
+                        crown - drop,
+                    )
+                    for radius, drop in (
+                        (0.065, 0),
+                        (0.16, 0.08),
+                        (0.18, 0.18),
+                        (0.16, 0.28),
+                        (0.07, 0.35),
+                    )
+                ]
+                for a, end in zip(points, points[1:]):
+                    m.line(a, end, 0.012, wood, 5)
+            for drop in (0, 0.35):
+                m.cylinder(x, y, crown - drop, 0.073, 0.02, wood, 10)
+    for side in (-1, 1):
+        post_edge = 3.36
+        jamb = 4.97
+        m.box(
+            side * (post_edge + jamb) / 2,
+            -16,
+            floor + (band_bottom + band_top) / 2,
+            jamb - post_edge,
+            0.18,
+            band_top - band_bottom,
+            C['white'],
+        )
+        if not detail:
+            continue
+        for i in range(5):
+            u = post_edge + (jamb - post_edge) * (i + 0.5) / 5
             m.box(
-                side * 3.325, -16, floor + transom_lift + 4.06, 3.07, 0.10, 0.07, wood
+                side * u, -16, floor + band_bottom / 2, 0.085, 0.11, band_bottom, wood
+            )
+
+        # The outer panel stops on the white fascia. The taller inner panel
+        # runs from the plaque to the post, with a continuous bottom rail.
+        for start, end, bottom in [(1.74, 2.94, 4.12), (post_edge, jamb, band_top)]:
+            top = 4.95 + transom_lift - 0.085
+            width = end - start
+            height = top - bottom
+            cells = 3 if start < 2 else 4
+            for i in range(cells):
+                u = start + i * width / cells
+                step = width / cells
+                h = bottom + (0.38 if i % 2 else 0.64) * height
+                m.box(side * (u + step / 2), -16, floor + h, step, 0.09, 0.047, wood)
+                m.box(
+                    side * (u + step / 2),
+                    -16,
+                    floor + (top + h) / 2,
+                    0.047,
+                    0.09,
+                    top - h,
+                    wood,
+                )
+                if i:
+                    m.box(
+                        side * u,
+                        -16,
+                        floor + (top + bottom) / 2,
+                        0.047,
+                        0.09,
+                        height,
+                        wood,
+                    )
+            m.box(
+                side * (start + end) / 2, -16, floor + bottom, width, 0.10, 0.055, wood
             )
 
     for i in range(3):

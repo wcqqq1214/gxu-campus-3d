@@ -1,6 +1,7 @@
 """Teaching animal hospital on Luban Road, fitted to the four mapped corners."""
 
 from geometry import Mesh
+from humanities_facades import finish
 from south_gate import inscription
 
 LENGTH = 53.32
@@ -9,7 +10,9 @@ STOREY = 3.15
 ROOF = 20.7
 
 
-def glazing(mesh, x, y, bottom, width, height, panes, C, detail, *, rear=False):
+def glazing(
+    mesh, x, y, bottom, width, height, panes, C, detail, *, rear=False, screened=False
+):
     direction = 1 if rear else -1
 
     def panel(cx, cz, w, h, offset, finish):
@@ -22,7 +25,14 @@ def glazing(mesh, x, y, bottom, width, height, panes, C, detail, *, rear=False):
         ]
         mesh.face(pts[::-1] if rear else pts, C[finish])
 
-    panel(x, bottom + height / 2, width, height, 0.025, 'glass')
+    panel(
+        x,
+        bottom + height / 2,
+        width,
+        height,
+        0.025,
+        'vetWindowScreen' if screened else 'glass',
+    )
     if detail:
         for i in range(panes + 1):
             panel(
@@ -33,6 +43,11 @@ def glazing(mesh, x, y, bottom, width, height, panes, C, detail, *, rear=False):
                 0.045,
                 'white',
             )
+        if screened:
+            for sash in range(panes):
+                for bar in range(1, 6):
+                    cx = x - width / 2 + width * (sash + bar / 6) / panes
+                    panel(cx, bottom + height / 2, 0.021, height, 0.067, 'paleRoof')
         for t in (0, 0.72, 1):
             panel(x, bottom + height * t, width, 0.07, 0.055, 'white')
 
@@ -40,9 +55,56 @@ def glazing(mesh, x, y, bottom, width, height, panes, C, detail, *, rear=False):
 def build(l, b, z, C, detail):
     m = Mesh()
     # x runs south along the street frontage, y east towards the lake.
-    m.box(LENGTH / 2, DEPTH / 2, ROOF / 2, LENGTH, DEPTH, ROOF, C['white'])
-    m.box(LENGTH / 2, DEPTH / 2, ROOF + 0.08, LENGTH, DEPTH, 0.16, C['paleRoof'])
-    m.box(3, 4, ROOF + 0.85, 6, 8, 1.7, C['white'])
+    # Neutral screened-window appearance sampled separately from the entrance glass.
+    finish(C, 'vetWindowScreen', (0.292, 0.305, 0.296), 0.64)
+    pocket_left, pocket_right, recess = 4.43, 8.23, 1.85
+    outline = [
+        (0, 0),
+        (pocket_left, 0),
+        (pocket_left, recess),
+        (pocket_right, recess),
+        (pocket_right, 0),
+        (LENGTH, 0),
+        (LENGTH, DEPTH),
+        (0, DEPTH),
+    ]
+    for a, bxy in zip(outline, outline[1:] + outline[:1]):
+        m.face([(*a, 0), (*bxy, 0), (*bxy, ROOF), (*a, ROOF)], C['white'])
+    roof_tail = LENGTH - pocket_right
+    m.box(
+        pocket_right + roof_tail / 2,
+        DEPTH / 2,
+        ROOF + 0.08,
+        roof_tail,
+        DEPTH,
+        0.16,
+        C['paleRoof'],
+    )
+    m.box(
+        pocket_right / 2,
+        (DEPTH + recess) / 2,
+        ROOF + 0.08,
+        pocket_right,
+        DEPTH - recess,
+        0.16,
+        C['paleRoof'],
+    )
+    pocket_width = pocket_right - pocket_left
+    pocket_x = (pocket_left + pocket_right) / 2
+    # The end landing is half a storey higher; the open frame rises above its ceiling.
+    m.box(pocket_left / 2, 4, ROOF + 2.05, pocket_left, 8, 4.10, C['white'])
+    m.box(
+        pocket_x,
+        (8 + recess) / 2,
+        ROOF + 0.77,
+        pocket_width,
+        8 - recess,
+        1.54,
+        C['white'],
+    )
+    m.box(pocket_x, recess / 2, ROOF + 1.51, pocket_width, recess, 0.24, C['paleRoof'])
+    m.box(pocket_right - 0.1, 0.10, ROOF + 2.05, 0.2, 0.22, 4.10, C['white'])
+    m.box(pocket_x, 0.10, ROOF + 3.97, pocket_width, 0.22, 0.26, C['white'])
     m.box(34.6, DEPTH - 2.2, ROOF + 0.77, 8.0, 4.8, 1.54, C['white'])
     # The lower stair head window straddles the eaves.
     glazing(m, 36.65, DEPTH + 0.33, 19.68, 1.75, 0.94, 3, C, detail, rear=True)
@@ -50,12 +112,27 @@ def build(l, b, z, C, detail):
     m.box(LENGTH / 2, -0.02, 0.78, LENGTH, 0.12, 1.56, C['metal'])
     for level in range(6):
         base = 1.6 + level * STOREY
-        for y in (0, DEPTH):
-            m.box(LENGTH / 2, y, base + 2.94, LENGTH, 0.62, 0.19, C['paleRoof'])
-        glazing(m, 2.2, 0, base + 0.62, 2.3, 1.46, 2, C, detail)
+        landing = base + 1.70
+        m.box(LENGTH / 2, DEPTH, base + 2.94, LENGTH, 0.62, 0.19, C['paleRoof'])
+        m.box(
+            pocket_right + roof_tail / 2,
+            0,
+            base + 2.94,
+            roof_tail,
+            0.62,
+            0.19,
+            C['paleRoof'],
+        )
+        glazing(m, 2.2, 0, landing + 0.62, 2.3, 1.46, 2, C, detail)
         glazing(m, 50.8, 0, base + 0.62, 2.1, 1.46, 2, C, detail)
-        # The open end bay and the continuous glazed bays have different rhythms.
-        m.box(6.3, -0.06, base + 1.43, 3.4, 0.13, 2.5, C['dark'])
+        # The north-end gallery has a recessed back wall and a vertical balustrade.
+        m.box(pocket_x, recess / 2, landing, pocket_width, recess, 0.20, C['paleRoof'])
+        for h in (0.15, 0.95):
+            m.box(pocket_x, -0.04, landing + h, pocket_width, 0.065, 0.055, C['white'])
+        count = 22 if detail else 11
+        for i in range(count):
+            xx = pocket_left + (i + 0.5) * pocket_width / count
+            m.box(xx, -0.04, landing + 0.54, 0.037, 0.048, 0.83, C['paleRoof'])
         for bay in range(5):
             left = 8.4 + bay * 7.92 + 0.19
             right = left + 7.54
@@ -73,13 +150,33 @@ def build(l, b, z, C, detail):
                 6 if right - left > 5 else 3,
                 C,
                 detail,
+                screened=True,
             )
-        if detail:
-            for h in (0.58, 0.83, 1.08):
-                if level:
-                    m.box(26.2, -0.31, base + h, 43, 0.06, 0.055, C['white'])
-                else:
-                    m.box(19.4, -0.31, base + h, 29.4, 0.06, 0.055, C['white'])
+            if right - left > 5:
+                m.box(
+                    (left + right) / 2,
+                    -0.084,
+                    base + 1.60,
+                    0.22,
+                    0.075,
+                    2.15,
+                    C['white'],
+                )
+            # Six horizontal rails are resolved in the opening-day photograph.
+            if level or bay < 3:
+                for h in (0.22, 0.39, 0.56, 0.73, 0.90, 1.12):
+                    m.box(
+                        (left + right) / 2,
+                        -0.31,
+                        base + h,
+                        right - left,
+                        0.062,
+                        0.055,
+                        C['white'],
+                    )
+                for i in range(5):
+                    xx = left + (right - left) * i / 4
+                    m.box(xx, -0.30, base + 0.65, 0.07, 0.065, 1.06, C['paleRoof'])
         for bay in range(14):
             x = 2 + (bay + 0.5) * 3.56
             if bay == 8:
