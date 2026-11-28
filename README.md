@@ -10,10 +10,10 @@
 
 ## 功能
 
-- 按中英文名称、简称或院系搜索校园地标、学院楼、食堂与宿舍，切换多角度观察视角，或开启校园游览按站浏览。
-- 提供清晨、白天、黄昏、夜晚四种光照，可自由开关地图图层并调节渲染画质。
+- 按中英文名称、简称或院系搜索精选地标、学院楼、食堂与宿舍，切换多角度视角，或开启自动游览按站浏览。
+- 提供清晨、白天、黄昏、夜晚四种光照，支持中英文界面切换、地图图层开关与渲染画质调节。
 - 复制当前视角链接分享给他人，或导出带有 OpenStreetMap 署名的 PNG 截图。
-- 适配鼠标、手机触屏与键盘导航，并响应系统的“减少动态效果”设置。
+- 适配鼠标、触屏与键盘导航，并响应系统的“减少动态效果”设置。
 
 <details>
 <summary>更多截图：光影、近景与手机界面</summary>
@@ -54,11 +54,11 @@ npm run preview       # 本地预览：http://127.0.0.1:4300/gxu-campus-3d/
 
 ### 检查与测试
 
-- **前端检查**：`npm run check` 依次执行 TypeScript 类型检查、oxlint 校验和 JS/TS 单元测试；也可单独运行 `npm run typecheck:fast`（基于 tsrs 快速类型检查，CI 在 `frontend` 任务中优先执行）。
-- **Python 检查与测试**：Python 版本在 [.python-version](.python-version) 中固定为 3.12。安装开发依赖后，可运行 `npm run lint:python`（Ruff 检查）、`npm run format:python`（代码格式化）和 `npm run test:data`（多进程并行数据与契约测试，支持传模块名过滤与 `TEST_DATA_WORKERS`）。
-- **浏览器回归**：先运行 `npx playwright install chromium`，再执行 `npm run test:browser`，验证菜单交互、相机控制与中英文界面（本地默认并行，`SWIFTSHADER=1` 时默认串行，可用 `-- --only=menu,camera-desktop,camera-mobile,i18n` 按项单跑，需 DOM/网络 trace 时附加 `BROWSER_TRACE=1`）。
+- **前端检查**：`npm run check` 依次执行 TypeScript 类型检查、oxlint 校验与 JS/TS 单元测试；也可单独运行 `npm run typecheck:fast`（基于 tsrs 快速类型检查）。
+- **Python 检查与测试**：Python 固定为 3.12（见 [.python-version](.python-version)）。安装开发依赖后，可运行 `npm run lint:python`、`npm run format:python` 与 `npm run test:data`（数据与契约测试）。
+- **浏览器回归**：先运行 `npx playwright install chromium`，再执行 `npm run test:browser`，验证菜单交互、相机控制与中英文界面（支持通过 `-- --only=...` 按项单跑）。
 
-向 `dev` 分支推送代码时，CI 会按改动路径并行触发前端、Python（`npm run test:data`）、Blender 几何回归（`npm run test:geometry`）与 3 路矩阵并行的浏览器回归（并缓存 Playwright Chromium）；向 `main` 推送或提 PR 时运行全量检查，仅直接推送 `main` 时自动部署。完整环境与构建说明见[模型结构、测试与重建](docs/MODELING.md)。
+向 `dev` 分支推送时，CI 按改动路径并行运行前端、Python、Blender 几何回归（`npm run test:geometry`）与浏览器回归；向 `main` 推送或提 PR 时执行全量检查，仅直接推送 `main` 时自动部署。完整环境、参数与构建说明见[模型结构、测试与重建](docs/MODELING.md)。
 
 ## 数据与文档
 

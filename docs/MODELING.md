@@ -103,16 +103,16 @@ npm run test:data
 
 | 对象 | 数据与生成入口 | 主要校验入口（`blender/` 下） |
 | --- | --- | --- |
-| 普通建筑与学院专修 | [building-overrides.json](../data/building-overrides.json) → `scripts/building_overrides.py` / `building_forms.py` → `blender/building_models.py`、`generic_buildings.py`、`college_facades.py`、`college_refinements.py`、`humanities_facades.py` 及各学院模块 | `validate_generic.py` |
-| 学生宿舍与办公楼 | [student-residences.json](../data/student-residences.json) → `scripts/student_residence_data.py` → `blender/student_residences/`、`west_dorms.py`、`west_dorm_garden.py`；办公楼群见 `blender/campus_offices/`、`office_north.py` | `validate_generic.py`、`test_west_dorm_garden.py` |
+| 普通建筑与学院专修 | [building-overrides.json](../data/building-overrides.json) → `scripts/building_overrides.py` / `building_forms.py` / `building_chunks.py` → `blender/building_models.py`、`building_finishes.py`、`generic_buildings.py`、`college_facades.py`、`college_refinements.py`、`humanities_facades.py`、`teaching_classrooms.py`、`east_north_buildings.py`、`east_north_fields.py` 及各学院模块 | `validate_generic.py` |
+| 学生宿舍、住宅与办公楼 | [student-residences.json](../data/student-residences.json)、[east-campus-housing.json](../data/east-campus-housing.json)、[east-old-high-housing.json](../data/east-old-high-housing.json)、[east-graduate-residence.json](../data/east-graduate-residence.json)、[retired-campus-buildings.json](../data/retired-campus-buildings.json) → `scripts/student_residence_data.py`、`east_campus_housing.py` → `blender/student_residences/`、`west_dorms.py`、`west_dorm_garden.py`、`faculty_residences.py`、`old_high_housing.py`、`east_graduate_residence.py`；办公楼群见 `blender/campus_offices/`、`office_north.py` | `validate_generic.py`、`test_west_dorm_garden.py` |
 | 食堂与西菜市场 | `blender/dining_halls.py`、`dining_interiors.py`、各餐厅模块及读取 [west-market.blend](../blender/assets/west-market.blend) 的 `west_market.py` | `validate_generic.py` |
-| 独立地标与体育场馆 | [landmarks.json](../data/landmarks.json) 及 `blender/` 专用模块（如 `library.py`、`teaching_six.py`、`south_gate.py`、`west_gym_shell.py`、`west_gym_entrances.py`） | `validate_landmarks.py`、`validate_landmark_refinements.py` |
+| 独立地标与体育场馆 | [landmarks.json](../data/landmarks.json) 及 `blender/` 专用模块（如 `library.py`、`teaching_six.py`、`south_gate.py`、`quanxue_island.py`、`veterinary_hospital.py`、`west_gym_shell.py`、`west_gym_entrances.py`） | `validate_landmarks.py`、`validate_landmark_refinements.py` |
 | 道路与桥梁 | `scripts/infrastructure_data.py`、`campus_roads_data.py` → `blender/infrastructure.py`、`road_export.py`、`bocui_junction.py` 及分区道路模块 | `validate_bridge_joins.py`、`validate_civil_edges.py`、`validate_civil_grade.py` |
 | 入口与铺地 | [site-overrides.json](../data/site-overrides.json)、[paving-overrides.json](../data/paving-overrides.json) → `scripts/site_data.py`、`paving_data.py` | `validate_materials_entry.py` |
 | 岸段与局部基础 | [shore-overrides.json](../data/shore-overrides.json)、[foundation-overrides.json](../data/foundation-overrides.json) 及 `blender/lakes_*.py` | `inspect_foundation_clearance.py`、`inspect_wall_ground_gaps.py` |
-| 植被与绿篱 | `data/vegetation-zones.json`、`vegetation-avenues.json`、`west-dorm-canopy.json`、`low-planting.json` → 植被准备及 `blender/tree_layout.py`、`tree_terrain_changes.py` | `validate_tree_clearance.py`（支持 `--scope=buildings\|site\|all`）、`validate_vegetation.py` |
+| 植被与绿篱 | `data/vegetation-zones.json`、`vegetation-avenues.json`、`west-dorm-canopy.json`、`east-north-field-vegetation.json`、`low-planting.json` → 植被准备、`scripts/field_tree_review.py` 及 `blender/tree_layout.py`、`tree_terrain_changes.py` | `validate_tree_clearance.py`（支持 `--scope=buildings\|site\|all`）、`validate_vegetation.py` |
 | 南门字形与场地 | `blender/fonts/gxu-wordmark.json`、`data/south-gate-site.json`；`scripts/prepare_gate_wordmark.py`、`prepare_south_gate_site.py` | 南门专项及入口场地检查 |
-| 其余独立校门 | `blender/campus_gates.py`、`new_east_gate.py`、`west_gate.py`（读取 [west-gate.blend](../blender/assets/west-gate.blend)）、`south_side_gate.py` | `validate_new_east_gate.py`、`validate_west_gate.py`、`validate_south_side_gate.py` |
+| 其余独立校门 | `blender/campus_gates.py`、`new_east_gate.py`、`west_gate.py`（读取 [west-gate.blend](../blender/assets/west-gate.blend)）、`south_side_gate.py`、`donggao_gate.py`、`north_public_gate.py`、`north_campus_north_gate.py` | `validate_new_east_gate.py`、`validate_west_gate.py`、`validate_south_side_gate.py` |
 
 ### 宿舍、办公楼与楼边地形
 
@@ -183,6 +183,7 @@ blender --background --python-exit-code 1 --python blender/validate_materials_en
 
 | 入口 | 范围与调用方式 |
 | --- | --- |
+| `update_campus_features.py` | 通用有界增量构建入口，须传 `--output-root=work/<候选目录>`，按 `--building`、`--landmark`、`--fields` 指定变更项并结合退役名录重放，加 `--publish` 安装校验通过的候选。 |
 | `update_roads.py`、`update_basketball.py` | 在独立候选中更新目标模型、相关地形与场地，校验后默认发布；传 `--output-root=/path/to/new-candidate` 时只生成并校验候选。 |
 | `update_new_east_gate.py` | 须传 `--output-root=work/new-east-candidate`，加 `--publish` 才安装。`new_east_gate.py` 保留具名构件，`validate_new_east_gate.py` 校验源模型、两档解码、通道净空、接地与围合（相机回归另验桌面、竖屏及横屏构图）。 |
 | `update_west_gate.py` | 用 `--output-root=work/west-gate-candidate-v1` 指定新目录，加 `--publish` 安装候选。`west_gate.py` 从 `blender/assets/west-gate.blend` 读取近远景网格、材质和 UV。`validate_west_gate.py` 将保存的校园场景及两档 GLB 与生成器比对，记录三角形数量，校验顶点位置。合并已有地标候选时，可用 `--base-root` 指定其校园场景及公开资产；该参数仅用于生成候选。 |
