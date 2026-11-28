@@ -32,7 +32,7 @@ An interactive 3D map of Guangxi University's main campus on Daxue East Road. Ge
 
 </details>
 
-> Overview captured on 2026-10-27; the rest on 2026-10-12 from local `dev` static builds (with simulated mobile viewports), so details may differ slightly from the live site.
+> Screenshots were captured on 2026-11-28 from a local `dev` static build and may differ slightly from the live site. Mobile screenshots use a simulated browser viewport.
 
 ## Run locally
 
