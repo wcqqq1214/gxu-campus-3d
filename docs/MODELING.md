@@ -6,7 +6,7 @@
 
 | 内容 | 位置与用途 |
 | --- | --- |
-| 可编辑源模型 | 本地 `blender/gxu-campus.blend`（不纳入 Git，未提供 Release 下载）。仅增量建模或核验源模型时需要，网页开发与常规测试不依赖它。 |
+| 可编辑源模型 | 本地 `blender/gxu-campus.blend`（不纳入 Git，未提供 Release 下载），仅增量建模或核验源模型时需要，网页开发与常规测试不依赖它；西门与西菜市场的独立可编辑网格随仓库保存在 `blender/assets/`。 |
 | 建模规则与参数 | `blender/`、`scripts/`、`data/`，随代码库管理。 |
 | 网页发布资产 | `public/models/`、`public/data/`。模型与清单须成套更新；迭代候选留在 `work/`，验收确认后再一次性提交。 |
 | 本地工作产物 | `work/`（不纳入 Git）。参考资料、候选模型、基准数据、截图报告和归档统一放在此处，不另建 `output/`、`outputs/` 等顶层目录。 |
@@ -32,6 +32,7 @@ npm run build:pages
 - `app/campus-map.tsx`：编排场景初始化、当前选中与面板状态。
 - `components/campus-*.tsx`：承载地点列表、图层、光影、游览、分享与地图工具栏。
 - `hooks/`：维护游览计时器与视口尺寸测量。
+- `lib/campus/navigation.ts`、`college-venues.ts`：管理精选地标、学院合用楼、食堂与分栋宿舍的中英文检索、别名映射和排序。
 - `lib/campus/scene.ts`（`createScene`）按职责拆分子模块：
   - 交互与标注：`scene-pointer.ts`（拾取）、`scene-labels.ts`（地点标注）
   - 模型与资源：`scene-details.ts`（近景流式加载）、`scene-trees.ts`（树木）、`scene-base.ts`（解码与基础地形细化）、`scene-models.ts`（下载、样式与光照同步）
@@ -42,8 +43,8 @@ npm run build:pages
 ### 静态构建与 CI 流程
 
 - **静态导出与预览**：`npm run build:pages` 输出到 `out/`（可用 `PAGES_BASE_PATH` 指定子路径），`npm run preview` 默认在 `4300` 端口预览；清理或重编前请确认没有预览进程在使用 `out/`。`out/data/buildings.json` 仅保留前端字段并将轮廓取整到厘米（`scripts/runtime-data.mjs`），建模、校验和指纹仍以 `public/data/buildings.json` 为准；增减 `Building` 字段须同步该清单（由 `test-runtime-data.mjs` 保护）。
-- **检查分级**：`npm run check` 依次执行类型检查、oxlint 与 JS/TS 测试，任一失败即退出（不依赖 Python、Blender 或 `.blend`）。完整检查另含 `npm run lint:python`、`npm run test:data`、`npm run test:geometry` 与 `npm run test:browser`。
-- **持续集成**：向 `dev`、`main` 推送或向 `main` 提交 PR 时，CI 在 Linux 运行全套检查，也可运行 `gh workflow run pages.yml --ref dev` 手动触发。非 `main` 分支使用 `/gxu-campus-3d` 前缀构建且跳过部署；只有直接推送 `main` 且全部检查通过才会发布。流程定义见 [pages.yml](../.github/workflows/pages.yml)（CI 安装 `libjpeg-turbo-progs` 以运行依赖 `jpegtran` 的回归）。
+- **检查分级**：`npm run check` 依次执行类型检查、oxlint 与 JS/TS 测试，任一失败即退出（不依赖 Python、Blender 或 `.blend`）；`npm run typecheck:fast` 使用 tsrs 做快速类型检查（缓存写入 `work/tsrs.tsbuildinfo`），CI 在安装 npm 依赖后优先执行。完整检查另含 `npm run lint:python`、`npm run test:data`、`npm run test:geometry` 与 `npm run test:browser`。
+- **持续集成**：向 `dev`、`main` 推送或向 `main` 提交 PR 时，CI 在 Linux 按改动路径并行触发检查（`frontend` 始终运行 `typecheck:fast`、`lint` 与 `npm test`；推送 `dev` 且未命中对应路径时跳过 `python`、`blender` 或 `browser`；向 `main` 推送、PR 及手动触发运行全量），也可运行 `gh workflow run pages.yml --ref dev` 手动触发。非 `main` 分支使用 `/gxu-campus-3d` 前缀构建且跳过部署；只有直接推送 `main` 且全部检查通过才会发布。流程定义见 [pages.yml](../.github/workflows/pages.yml)（`python` 任务安装 `libjpeg-turbo-progs` 以运行依赖 `jpegtran` 的回归）。
 
 ### 浏览器回归
 
@@ -55,10 +56,10 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-`npm run test:browser` 先构建 Pages，再启动服务依次运行菜单、相机与 i18n 检查：
-- **检查内容**：菜单与相机连接开发服务（相机探针仅注入测试响应）；i18n 使用 `out/` 静态产物并覆盖 `/gxu-campus-3d/` 子路径。视口覆盖 `1280px`、`390px`，i18n 另含 `320px` 及语言恢复、分享导出、存储受限与 WebGL 不可用场景。
+`npm run test:browser` 默认按需构建 Pages 并启动服务并行运行菜单、相机与 i18n 检查（设 `SWIFTSHADER=1` 时默认串行，可用 `BROWSER_CONCURRENCY` 覆盖，或传 `--only=menu,camera-desktop,camera-mobile,i18n` 按项单跑）：
+- **检查内容**：菜单与相机连接开发服务（相机探针仅注入测试响应）；i18n 使用 `out/` 静态产物并覆盖 `/gxu-campus-3d/` 子路径。菜单在桌面端 `1280px` 覆盖全套交互并在 `390px` 验证手机端关键路径；桌面 `1280px` 和手机 `390px` 均检查俯视、手动平移缩放与环绕，手机另检查详情面板收展后的视角控件；i18n 覆盖 `1280px` 与 `320px` 及语言恢复、分享导出、存储受限与 WebGL 不可用场景。
 - **端口与复用**：默认占用 `4317`、`4318` 端口（已被占用直接报错；可用 `BROWSER_DEV_PORT`、`BROWSER_PREVIEW_PORT` 调整），退出、失败或中断时自动清理子进程。支持 macOS/Linux；刚构建过且 `PAGES_BASE_PATH` 一致（空字符串或 `/gxu-campus-3d`）时，可用 `-- --skip-build` 复用产物。
-- **输出与超时**：每次运行写入 `work/browser-checks/run-*`（含服务日志、断言输出、视口 trace 及未完成页面截图/控制台/网络日志；CI 失败上传保留 7 天），可用 `npx playwright show-trace <trace.zip>` 回放 DOM 与网络记录。菜单、桌面相机、手机相机、i18n 依次运行，各限时 10 分钟。相机日志记录场景耗时和最近的队列、动画状态。CI 浏览器步骤上限 45 分钟，包含服务启动和清理。
+- **输出与超时**：每次运行写入 `work/browser-checks/run-*`（含服务日志、断言输出及未完成页面截图/控制台/网络日志；默认不落盘全量 `trace.zip`，需回放 DOM 与网络记录时可设 `BROWSER_TRACE=1`；CI 失败上传保留 7 天），可用 `npx playwright show-trace <trace.zip>` 回放。每项检查限时 10 分钟，相机日志记录场景耗时和最近的队列、动画状态。CI 中 `browser` 按 3 路矩阵并行并缓存 Playwright Chromium，单路限时 15 分钟。
 - **渲染与覆盖变量**：默认使用 [Chromium 新无头模式](https://playwright.dev/docs/browsers#chromium-new-headless-mode)（`channel: chromium`），本地用可用 GPU，CI 设 `SWIFTSHADER=1` 走软件渲染（本地可用同变量复测）。此入口仅作功能回归，不比较 GPU 性能；支持 `PLAYWRIGHT_MODULE`、`CHROMIUM_PATH`、`BROWSER_PATH`、`I18N_BROWSER=webkit`（需自装浏览器）及单脚本 URL 覆盖。
 
 ## 数据和完整模型构建
@@ -95,27 +96,29 @@ npm run test:data
 
 全量构建会生成源文件及两档 GLB，但**尚未验证能否逐字节复现全部历史增量精修成果**，且工具版本变化也会影响导出；请妥善保留现有源文件与资产，不要无条件覆写。
 
-- **准备顺序**：依次准备建筑、最终道路、入口场地、铺地、岸段与植被；待地形和场地成型后再补采树根高程并检查树冠净空。入口标高从本次地形采样（旧场地含 `buildingElevation` 时须重跑准备）；道路接台阶采本次建筑标高，锚点指纹须匹配。
+- **准备顺序**：依次准备建筑、农院路与桥梁、雕塑与周边背景、篮球场、荟萃楼、校园道路、入口场地、铺地、岸段、植被、学生宿舍名录（`student_residence_data.py`）、北校园补充体块及局部基础指纹（`foundation_data.py`）；待地形和场地成型后再补采树根高程并检查树冠与三维楼体净空。入口标高从本次地形采样（旧场地含 `buildingElevation` 时须重跑准备）；道路接台阶采本次建筑标高，锚点指纹须匹配。
 - **离线公开导出**：`npm run data:export`（完整准备链也会自动调用）仅删除前端不用的说明字段并迁移依赖指纹，不抓取数据或导出几何（完整说明保留在 `data/`，需要完整字段的增量脚本仍从完整准备链运行）。轮廓、道路、朝向、标高或台阶变更后须重建下游依赖，不能靠改指纹掩盖过期几何；契约由 `test_public_data_export.py`、`test_recessed_entry_site_data.py` 与 `test_road_landing_contract.py` 保护。
 
 ## 几何与参数入口
 
 | 对象 | 数据与生成入口 | 主要校验入口（`blender/` 下） |
 | --- | --- | --- |
-| 普通建筑 | [building-overrides.json](../data/building-overrides.json) → `scripts/building_overrides.py` / `building_forms.py` → `blender/generic_buildings.py` | `validate_generic.py` |
-| 独立地标 | [landmarks.json](../data/landmarks.json) 及 `blender/` 专用模块（如 `library.py`、`teaching_six.py`、`south_gate.py`） | `validate_landmarks.py`、`validate_landmark_refinements.py` |
-| 道路与桥梁 | `scripts/infrastructure_data.py`、`campus_roads_data.py` → `blender/infrastructure.py`、`road_export.py` | `validate_bridge_joins.py`、`validate_civil_edges.py`、`validate_civil_grade.py` |
+| 普通建筑与学院专修 | [building-overrides.json](../data/building-overrides.json) → `scripts/building_overrides.py` / `building_forms.py` / `building_chunks.py` → `blender/building_models.py`、`building_finishes.py`、`generic_buildings.py`、`college_facades.py`、`college_refinements.py`、`humanities_facades.py`、`teaching_classrooms.py`、`east_north_buildings.py`、`east_north_fields.py` 及各学院模块 | `validate_generic.py` |
+| 学生宿舍、住宅与办公楼 | [student-residences.json](../data/student-residences.json)、[east-campus-housing.json](../data/east-campus-housing.json)、[east-old-high-housing.json](../data/east-old-high-housing.json)、[east-graduate-residence.json](../data/east-graduate-residence.json)、[retired-campus-buildings.json](../data/retired-campus-buildings.json) → `scripts/student_residence_data.py`、`east_campus_housing.py` → `blender/student_residences/`、`west_dorms.py`、`west_dorm_garden.py`、`faculty_residences.py`、`old_high_housing.py`、`east_graduate_residence.py`；办公楼群见 `blender/campus_offices/`、`office_north.py` | `validate_generic.py`、`test_west_dorm_garden.py` |
+| 食堂与西菜市场 | `blender/dining_halls.py`、`dining_interiors.py`、各餐厅模块及读取 [west-market.blend](../blender/assets/west-market.blend) 的 `west_market.py` | `validate_generic.py` |
+| 独立地标与体育场馆 | [landmarks.json](../data/landmarks.json) 及 `blender/` 专用模块（如 `library.py`、`teaching_six.py`、`south_gate.py`、`quanxue_island.py`、`veterinary_hospital.py`、`west_gym_shell.py`、`west_gym_entrances.py`） | `validate_landmarks.py`、`validate_landmark_refinements.py` |
+| 道路与桥梁 | `scripts/infrastructure_data.py`、`campus_roads_data.py` → `blender/infrastructure.py`、`road_export.py`、`bocui_junction.py` 及分区道路模块 | `validate_bridge_joins.py`、`validate_civil_edges.py`、`validate_civil_grade.py` |
 | 入口与铺地 | [site-overrides.json](../data/site-overrides.json)、[paving-overrides.json](../data/paving-overrides.json) → `scripts/site_data.py`、`paving_data.py` | `validate_materials_entry.py` |
-| 岸段与局部基础 | [shore-overrides.json](../data/shore-overrides.json)、[foundation-overrides.json](../data/foundation-overrides.json) | `inspect_foundation_clearance.py`、`inspect_wall_ground_gaps.py` |
-| 植被与绿篱 | `data/vegetation-zones.json`、`vegetation-avenues.json`、`low-planting.json` → 植被准备及 `blender/tree_layout.py` | `validate_tree_clearance.py`（支持 `--scope=buildings\|site\|all`）、`validate_vegetation.py` |
+| 岸段与局部基础 | [shore-overrides.json](../data/shore-overrides.json)、[foundation-overrides.json](../data/foundation-overrides.json) 及 `blender/lakes_*.py` | `inspect_foundation_clearance.py`、`inspect_wall_ground_gaps.py` |
+| 植被与绿篱 | `data/vegetation-zones.json`、`vegetation-avenues.json`、`west-dorm-canopy.json`、`east-north-field-vegetation.json`、`low-planting.json` → 植被准备、`scripts/field_tree_review.py` 及 `blender/tree_layout.py`、`tree_terrain_changes.py` | `validate_tree_clearance.py`（支持 `--scope=buildings\|site\|all`）、`validate_vegetation.py` |
 | 南门字形与场地 | `blender/fonts/gxu-wordmark.json`、`data/south-gate-site.json`；`scripts/prepare_gate_wordmark.py`、`prepare_south_gate_site.py` | 南门专项及入口场地检查 |
-| 南侧门 | `blender/south_side_gate.py`；`update_south_side_gate.py` 默认只写独立候选目录 | `validate_south_side_gate.py` 检查落杆位置、车道净高与人行净空、构件、接地及两档导出 |
+| 其余独立校门 | `blender/campus_gates.py`、`new_east_gate.py`、`west_gate.py`（读取 [west-gate.blend](../blender/assets/west-gate.blend)）、`south_side_gate.py`、`donggao_gate.py`、`north_public_gate.py`、`north_campus_north_gate.py` | `validate_new_east_gate.py`、`validate_west_gate.py`、`validate_south_side_gate.py` |
 
 ### 宿舍、办公楼与楼边地形
 
-学生宿舍按楼栋从 [student_residences](../blender/student_residences/) 生成。每栋的近景文件和基础模型中的远景节点共用 `chunk-dorm-<楼栋 ID>`，原网格分块只收录其余建筑。国际学生公寓沿用独立地标。办公楼的专用立面与量测参数位于 [campus_offices](../blender/campus_offices/)。
+学生宿舍按楼栋从 [student_residences](../blender/student_residences/) 生成。每栋的近景文件（`chunk-dorm-<楼栋 ID>.glb`）和基础模型中的同名远景节点一一对应，原网格分块（`chunk-p*/n*`）只收录其余校内普通建筑；国际学生公寓沿用独立地标。办公楼的专用立面与量测参数位于 [campus_offices](../blender/campus_offices/)。
 
-[楼边地形参数](../blender/terrain_wall_grades.json) 给出各段墙脚控制点、过渡宽度与允许调整的高度。改动控制线后，在最终地形上检查墙脚、过渡段和邻接道路的剖面，再更新基础模型。
+[楼边地形参数](../blender/terrain_wall_grades.json)（配合 `blender/terrain_wall_grades.py`）给出各段墙脚控制点、过渡宽度与允许调整的高度。改动控制线后，在最终地形上检查墙脚、过渡段和邻接道路的剖面，再更新基础模型。
 
 ### 普通建筑与基础约束
 
@@ -156,14 +159,14 @@ blender --background --python-exit-code 1 --python blender/validate_materials_en
 
 | 资源 | 内容 |
 | --- | --- |
-| `base.glb` | 地形、道路、水体、场地、基础建筑和地标基础体量 |
-| `chunk-*.glb` | 普通建筑近景分块，加载后替换对应基础区块 |
+| `base.glb` | 地形、道路、水体、场地、基础建筑（含网格分块与 `chunk-dorm-*` 远景节点）和地标基础体量 |
+| `chunk-*.glb` | 普通建筑网格近景分块（`chunk-p*/n*`）与学生宿舍分栋近景（`chunk-dorm-*`），加载后替换对应基础节点 |
 | 地标与道路 GLB | 按目录索引与视距单独流式加载 |
 | `basketball-bank-*.glb` | 完整篮筐与镂空篮网，近景替换基础球场 |
 | `trees.glb` / `trees-near.glb` | 远近植物模板，网页按空间块实例化 |
-| `public/data/models.json` | 资源 URL、大小、SHA256 与区块信息（哈希参与地址） |
+| `public/data/models.json` | 资源 URL、大小、`geometryBytes`（解码几何字节上限）、SHA256 与区块信息（哈希参与地址） |
 
-模型统一采用 Draco 压缩并内嵌纹理，解码器置于 `public/draco/`。发布须同步源对象、基础节点、相关近景与清单，并核对无关资产未变；`--base-only` 仅用于区块键不变时的基础包重导（两档篮球场仍同步更新）。
+模型统一采用 Draco 压缩并内嵌纹理，解码器置于 `public/draco/`（导出辅助与分块预算控制见 `blender/campus_draco.py`、`college_chunk_budget.py`、`road_budget.py` 与 `terrain_budget.py`）。发布须同步源对象、基础节点、相关近景与清单，并核对无关资产未变；`--base-only` 仅用于区块键不变时的基础包重导（两档篮球场仍同步更新）。
 
 首屏模型 `base.glb + trees.glb` 的体积预算配置在 [initial-model-budget.json](../data/initial-model-budget.json) 中：合计超过 `8,000,000` 字节警告，超过 `16,000,000` 字节阻止构建（全量、`--base-only` 与增量入口均检查；JS、JSON 与解码器另计）。同一配置中的 `baseLayerLimitBytes` 规定基础模型单节点压缩几何的上限，道路为 `2,000,000` 字节，地形为 `3,000,000` 字节。
 
@@ -180,9 +183,11 @@ blender --background --python-exit-code 1 --python blender/validate_materials_en
 
 | 入口 | 范围与调用方式 |
 | --- | --- |
+| `update_campus_features.py` | 通用有界增量构建入口，须传 `--output-root=work/<候选目录>`，按 `--building`、`--landmark`、`--fields` 指定变更项并结合退役名录重放，加 `--publish` 安装校验通过的候选。 |
 | `update_roads.py`、`update_basketball.py` | 在独立候选中更新目标模型、相关地形与场地，校验后默认发布；传 `--output-root=/path/to/new-candidate` 时只生成并校验候选。 |
 | `update_new_east_gate.py` | 须传 `--output-root=work/new-east-candidate`，加 `--publish` 才安装。`new_east_gate.py` 保留具名构件，`validate_new_east_gate.py` 校验源模型、两档解码、通道净空、接地与围合（相机回归另验桌面、竖屏及横屏构图）。 |
 | `update_west_gate.py` | 用 `--output-root=work/west-gate-candidate-v1` 指定新目录，加 `--publish` 安装候选。`west_gate.py` 从 `blender/assets/west-gate.blend` 读取近远景网格、材质和 UV。`validate_west_gate.py` 将保存的校园场景及两档 GLB 与生成器比对，记录三角形数量，校验顶点位置。合并已有地标候选时，可用 `--base-root` 指定其校园场景及公开资产；该参数仅用于生成候选。 |
+| `update_south_side_gate.py` | 须传 `--output-root=work/south-side-candidate`，加 `--publish` 安装候选。同步校门目录、树冠预留与两档节点，并用 `validate_south_side_gate.py` 校验落杆位置、车道净高、人行净空、构件接地与两档导出。 |
 | `update_new_east_neighbours.py` | 须传新 `--output-root`，加 `--publish` 才安装。细化三栋邻楼及沿街立面（保留主体、屋顶、入口与地图数据），仅重导共享区块并用 `validate_generic.py` 联验区块全部楼体、店面碰撞与铺装接地。 |
 | `update_tree_layout.py`、`build_vegetation.py` | 前者同步树位与朝向（`--ground` 从最终地形采样高程）；后者重导模板（模板变化须同步源模型）。 |
 
@@ -208,13 +213,13 @@ npm run test:incremental -- --output-root=/path/to/new-gate-regression --kinds n
 网页端检查见[网页开发和检查](#网页开发和检查)，Python 数据测试与独立几何回归如下：
 
 ```sh
-work/venv/bin/python -m unittest discover -s scripts -p 'test_*.py'
+work/venv/bin/python scripts/run_data_tests.py
 npm run test:geometry
 # Blender 不在 PATH 时可指定：
 BLENDER_BIN=/path/to/blender npm run test:geometry
 ```
 
-`test:geometry` 在隔离的 factory 环境逐个运行 `blender/test_*.py`（仅用 Blender 内置 Python，不读本地 `.blend` 或写正式资产，自动发现地标双 LOD 回归）；但它主要保护生成规则，**不能替代对已发布 GLB 的实际解码验收**。
+`npm run test:data` 通过 `scripts/run_data_tests.py` 多进程并行运行 `scripts/test_*.py`（支持传入模块名过滤与 `TEST_DATA_WORKERS` 覆盖并发数）。`test:geometry` 在单次启动的隔离 factory 环境中通过 `unittest` 统一发现并逐用例重置场景运行 `blender/test_*.py`（仅用 Blender 内置 Python，不读本地 `.blend` 或写正式资产，自动发现地标双 LOD 回归；支持传入模块名过滤，如 `npm run test:geometry -- test_west_gate`）；但它主要保护生成规则，**不能替代对已发布 GLB 的实际解码验收**。
 
 ### 专项与前后对照
 

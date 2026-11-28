@@ -23,6 +23,12 @@ bridges = {
 
 def updated(obj):
     name = obj.name
+    if mode == 'campus-features':
+        return (
+            obj.get('featureId') in selected['features']
+            or obj.get('landmark') in selected['landmarks']
+            or name in selected['sites']
+        )
     if mode == 'new-east-gate':
         return obj.get('landmark') == 'new-east-gate'
     if mode == 'south-side-gate':
@@ -90,6 +96,9 @@ def signatures(path):
         output[obj.name] = h.hexdigest()
     return output
 
+
+if mode == 'campus-features':
+    selected = json.loads(Path(args['selection']).read_text())
 
 before = signatures(baseline / 'blender/gxu-campus.blend')
 after = signatures(ROOT / 'blender/gxu-campus.blend')

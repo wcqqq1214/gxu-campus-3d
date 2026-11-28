@@ -25,13 +25,16 @@ export async function browserCheck(name, engine = 'chromium') {
   });
   const pages = new Map();
   const messages = [];
+  const traceEnabled = process.env.BROWSER_TRACE === '1';
   let sequence = 0;
   async function closePage(page) {
     const id = pages.get(page);
     if (id === undefined) return;
-    await page
-      .context()
-      .tracing.stop({ path: path.join(output, `trace-${id}.zip`) });
+    if (traceEnabled) {
+      await page
+        .context()
+        .tracing.stop({ path: path.join(output, `trace-${id}.zip`) });
+    }
     await page.context().close();
     pages.delete(page);
   }
@@ -39,9 +42,11 @@ export async function browserCheck(name, engine = 'chromium') {
     output,
     async newPage(options = {}) {
       const context = await browser.newContext(options);
-      // Continuous screencast readbacks can stall this WebGL scene on software GPUs.
-      // Keep DOM/network traces and capture a single screenshot on failure instead.
-      await context.tracing.start({ screenshots: false, snapshots: true });
+      if (traceEnabled) {
+        // Continuous screencast readbacks can stall this WebGL scene on software GPUs.
+        // Keep DOM/network traces when BROWSER_TRACE=1 and capture a screenshot on failure.
+        await context.tracing.start({ screenshots: false, snapshots: true });
+      }
       const page = await context.newPage();
       const id = ++sequence;
       pages.set(page, id);

@@ -99,6 +99,38 @@ export const campusNames: Record<string, readonly [string, string]> = {
     '工程实践与训练中心',
     'Engineering Practice and Training Center',
   ],
+  东高门: ['东高门', 'Donggao Gate'],
+  劝学岛: ['劝学岛', 'Quanxue Island'],
+  秀厢北门: ['秀厢北门', 'Xiuxiang North Gate'],
+  '北门（西校园）': ['北门（西校园）', 'West Campus North Gate'],
+  东校园教师集资房1号楼: [
+    '东校园教师集资房1号楼',
+    'East Campus Faculty Housing 1',
+  ],
+  东校园教师集资房2号楼: [
+    '东校园教师集资房2号楼',
+    'East Campus Faculty Housing 2',
+  ],
+  东校园教师集资房3号楼: [
+    '东校园教师集资房3号楼',
+    'East Campus Faculty Housing 3',
+  ],
+  东校园教师集资房3A号楼: [
+    '东校园教师集资房3A号楼',
+    'East Campus Faculty Housing 3A',
+  ],
+  东校园教师集资房5号楼: [
+    '东校园教师集资房5号楼',
+    'East Campus Faculty Housing 5',
+  ],
+  东校园教师集资房6号楼: [
+    '东校园教师集资房6号楼',
+    'East Campus Faculty Housing 6',
+  ],
+  东校园教师集资房7号楼: [
+    '东校园教师集资房7号楼',
+    'East Campus Faculty Housing 7',
+  ],
   广西大学动物医院: ['广西大学动物医院', 'Guangxi University Animal Hospital'],
   广西房地产及住宅研究会: [
     '广西房地产及住宅研究会',
@@ -152,6 +184,49 @@ export const campusNames: Record<string, readonly [string, string]> = {
   东14栋: ['东14栋', 'East Hall 14'],
   东15栋: ['东15栋', 'East Hall 15'],
   东16栋: ['东16栋', 'East Hall 16'],
+  '东28栋（北侧楼体）': [
+    '东28栋（北侧楼体）',
+    'East Building 28 (North Block)',
+  ],
+  '东28栋（南侧楼体）': [
+    '东28栋（南侧楼体）',
+    'East Building 28 (South Block)',
+  ],
+  东17栋: ['东17栋', 'East Hall 17'],
+  '研究生公寓1号楼（在建）': [
+    '研究生公寓1号楼（在建）',
+    'Graduate Residence 1 (under construction)',
+  ],
+  东高九栋: ['东高九栋', 'Donggao Faculty Housing, Building 9'],
+  东高六栋: ['东高六栋', 'Donggao Faculty Housing, Building 6'],
+  东高教职工住宅北排中座: [
+    '东高教职工住宅北排中座',
+    'Donggao Faculty Housing, North Row, Centre',
+  ],
+  东高教职工住宅北排东座: [
+    '东高教职工住宅北排东座',
+    'Donggao Faculty Housing, North Row, East',
+  ],
+  东高教职工住宅中排西座: [
+    '东高教职工住宅中排西座',
+    'Donggao Faculty Housing, Middle Row, West',
+  ],
+  东高教职工住宅中排东座: [
+    '东高教职工住宅中排东座',
+    'Donggao Faculty Housing, Middle Row, East',
+  ],
+  东高教职工住宅南排西座: [
+    '东高教职工住宅南排西座',
+    'Donggao Faculty Housing, South Row, West',
+  ],
+  东高教职工住宅南排中座: [
+    '东高教职工住宅南排中座',
+    'Donggao Faculty Housing, South Row, Centre',
+  ],
+  东高教职工住宅南排东座: [
+    '东高教职工住宅南排东座',
+    'Donggao Faculty Housing, South Row, East',
+  ],
   东18栋: ['东18栋', 'East Hall 18'],
   东19栋: ['东19栋', 'East Hall 19'],
   '东20栋、东21栋': ['东20栋、东21栋', 'East Halls 20 and 21'],

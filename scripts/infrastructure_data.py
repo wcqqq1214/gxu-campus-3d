@@ -955,6 +955,9 @@ def prepare_infrastructure():
     from student_residence_data import prepare_residences
 
     prepare_residences()
+    from east_campus_housing import prepare_housing
+
+    prepare_housing()
     from north_campus_data import prepare as prepare_north_campus
 
     prepare_north_campus()

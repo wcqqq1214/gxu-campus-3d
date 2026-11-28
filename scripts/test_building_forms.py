@@ -42,8 +42,31 @@ class BuildingFormTests(unittest.TestCase):
         self.assertEqual(
             traced_ids, {b['id'] for b in north['buildings']} | {dorms['east12']['id']}
         )
-        buildings = [b for b in buildings if b['id'] not in traced_ids]
-        self.assertEqual(set(baseline), {b['id'] for b in buildings})
+        surveyed = {
+            row['id']: row
+            for name in (
+                'east-campus-housing',
+                'east-old-high-housing',
+                'east-graduate-residence',
+            )
+            for row in json.loads((ROOT / 'data' / f'{name}.json').read_text())
+        }
+        source_types = {
+            row.get('geometrySource', 'university-site-plan')
+            for row in surveyed.values()
+        }
+        published = [b for b in buildings if b.get('geometrySource') in source_types]
+        self.assertCountEqual([b['id'] for b in published], surveyed.keys())
+        for b in published:
+            row = surveyed[b['id']]
+            self.assertEqual(
+                b['geometrySource'], row.get('geometrySource', 'university-site-plan')
+            )
+            self.assertEqual(b['polygons'], row['polygons'], b['id'])
+        supplemental_ids = traced_ids | surveyed.keys()
+        buildings = [b for b in buildings if b['id'] not in supplemental_ids]
+        retired = json.loads((ROOT / 'data/retired-campus-buildings.json').read_text())
+        self.assertEqual(baseline.keys() - retired.keys(), {b['id'] for b in buildings})
         for b in buildings:
             rings = originals.get(b['id'], b['polygons'])
             if b['id'] in poses:

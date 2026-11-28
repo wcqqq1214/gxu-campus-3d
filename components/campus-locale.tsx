@@ -44,7 +44,7 @@ export function CampusLocaleProvider({ children }: { children: ReactNode }) {
         'content',
         translate(
           locale,
-          '广西大学主校区三维地图，支持地标搜索、游览和昼夜切换。使用 Three.js 和 Blender 制作。',
+          '广西大学主校区三维地图，支持地点与建筑搜索、多视角浏览、校园游览与昼夜切换。使用 Three.js 和 Blender 制作。',
         ),
       );
     try {

@@ -1,5 +1,15 @@
 /** Visitor descriptions, keyed by stable landmark ID rather than translated names. */
 export const englishDescriptions: Record<string, string> = {
+  'quanxue-island':
+    'Yueya Lake wraps around three sides of this east campus peninsula. The wings of Zhixing Academy enclose a courtyard.',
+  'north-campus-north-gate':
+    'On the north side of Xiuxiang Avenue, the former Xingjian East Gate leads into the North Campus teaching area. Globe lamps top the gateposts, with a single-storey guardhouse on the east side.',
+  'north-public-gate':
+    'Two stepped stone pillars and low walls flank the entrance on Nongyuan Road, north of the west campus tennis centre.',
+  'donggao-gate':
+    'A low pavilion with a rectangular sign above its street-facing eave marks this entrance on Xiuling Road.',
+  'veterinary-hospital':
+    'The teaching animal hospital on northern Luban Road occupies a long north–south building. Broad steps lead to a glazed entrance beneath a canopy bearing red lettering.',
   'south-gate':
     'A three-bay stone gateway on Daxue East Road, with a taller central bay and the university’s red Chinese name facing south.',
   'south-side-gate':

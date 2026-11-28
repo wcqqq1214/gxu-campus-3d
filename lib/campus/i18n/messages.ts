@@ -87,8 +87,8 @@ export const englishMessages: Record<string, string> = {
   '广西大学 校园地图': 'Guangxi University Campus Map',
   '白色细线：校园大致边界': 'White line: approximate campus boundary',
   '广西大学-校园视图.png': 'Guangxi-University-Campus.png',
-  '广西大学主校区三维地图，支持地标搜索、游览和昼夜切换。使用 Three.js 和 Blender 制作。':
-    'Explore Guangxi University’s main campus in 3D. Search landmarks, take a tour and switch between day and night. Built with Three.js and Blender.',
+  '广西大学主校区三维地图，支持地点与建筑搜索、多视角浏览、校园游览与昼夜切换。使用 Three.js 和 Blender 制作。':
+    'Explore Guangxi University’s main campus in 3D. Search places and buildings, switch viewpoints, take a guided tour, and toggle day and night. Built with Three.js and Blender.',
   搜索地点或建筑: 'Search places or buildings',
   东: 'east',
   东北: 'northeast',
@@ -135,7 +135,8 @@ export const englishMessages: Record<string, string> = {
   'Tab 切换控件，Enter 确认；选中地图后，方向键平移，+ 和 − 缩放，Home 回到全景':
     'Press Tab to switch controls and Enter to activate. With the map focused, use arrow keys to pan, + and − to zoom, and Home to return to the overview.',
   搜索: 'Search',
-  '支持名称和简称，如“六教”': 'Search by name or short name, such as “No. 6”',
+  '支持中英文名称、简称与院系，如“六教”':
+    'Search in Chinese or English by name, short name, or school, such as “No. 6”',
   游览: 'Tour',
   拖动地图即可暂停: 'Drag the map to pause',
   复制链接: 'Copy link',

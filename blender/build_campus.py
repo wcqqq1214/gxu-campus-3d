@@ -17,7 +17,8 @@ if BASE_ONLY:
     # A rejected base-only update must leave even a fresh checkout untouched.
     sys.dont_write_bytecode = True
 import student_residences
-from building_models import building_mesh
+from building_finishes import ensure_building_finishes, rgb
+from building_models import SURVEYED, building_mesh
 from generic_buildings import compact_form_source
 from geometry import MATERIALS, Mesh, material
 from huicui import compact_source
@@ -27,22 +28,18 @@ from sports import athletics, west_stand
 from west_market import DATUM as MARKET_DATUM
 from west_market import market_building, market_ground
 
+sys.path.insert(0, str(ROOT / 'scripts'))
+from building_chunks import CHUNK_METERS, grid_chunk
+
 DATA = ROOT / 'public/data'
 MODELS = ROOT / 'public/models'
 REPORTS = ROOT / 'work/model-checks'
-CHUNK_METERS = 360
 
 
 def chunk_key(b):
     if b['id'] in student_residences.IDS:
         return student_residences.chunk_id(b['id'])
-    ix = math.floor(b['center'][0] / CHUNK_METERS)
-    iy = math.floor(b['center'][1] / CHUNK_METERS)
-
-    def label(v):
-        return ('p' if v >= 0 else 'n') + str(abs(v))
-
-    return 'chunk-' + label(ix) + '-' + label(iy)
+    return grid_chunk(*b['center'])
 
 
 buildings = json.loads((DATA / 'buildings.json').read_text())
@@ -76,11 +73,6 @@ SOURCE = collection('校园建筑 · 可编辑')
 GROUND = collection('道路水体与地形')
 PLANTS = collection('植被示意 · 固定随机种子')
 EXPORT = collection('网页导出 · 临时')
-
-
-def rgb(h):
-    v = [int(h[i : i + 2], 16) / 255 for i in (1, 3, 5)]
-    return tuple(((c + 0.055) / 1.055) ** 2.4 if c > 0.04045 else c / 12.92 for c in v)
 
 
 C = {}
@@ -127,7 +119,6 @@ basketball = json.loads((DATA / 'basketball.json').read_text())
 campus_roads = json.loads((DATA / 'campus-roads.json').read_text())
 sites = json.loads((DATA / 'sites.json').read_text())
 pavings = json.loads((DATA / 'pavings.json').read_text())
-sys.path.insert(0, str(ROOT / 'scripts'))
 from foundation_contract import load_foundations
 
 foundations = load_foundations(ROOT)
@@ -480,19 +471,7 @@ for name in [
         mat.node_tree.nodes['Principled BSDF'].inputs['Base Color'],
     )
 # Modest near-view variation remains an explicitly estimated facade treatment.
-for name, color in [
-    ('stoneWarm', '#c6b69f'),
-    ('stoneCool', '#c5c0b1'),
-    ('livingWarm', '#d0b39f'),
-    ('livingCool', '#c3b0a4'),
-    ('shadeGlass', '#3b6573'),
-]:
-    C[name] = material(
-        name,
-        rgb(color),
-        0.28 if name.endswith('Glass') else 0.84,
-        0.28 if name.endswith('Glass') else 0,
-    )
+ensure_building_finishes(C)
 from south_gate_site import ensure_materials, repair_roads
 
 ensure_materials(C)
@@ -595,7 +574,10 @@ def generic(b, detail):
 
 
 base = {k: Mesh() for k in ['terrain', 'roads', 'water', 'green', 'sports', 'context']}
+from east_north_fields import site_meshes as east_field_meshes
 from north_campus import site_models
+
+base.update(east_field_meshes(elevation, C))
 
 north_data = json.loads((DATA / 'north-campus.json').read_text())
 north_replaced = set(north_data['replacedSurfaceIds'])
@@ -983,6 +965,8 @@ for index, b in enumerate(buildings):
                 if 'roofBasis' in b:
                     obj['roofBasis'] = b['roofBasis']
                 compact_form_source(obj)
+            elif b['id'] in SURVEYED:
+                compact_form_source(obj)
     if index % 100 == 0:
         print('Buildings', index, '/', len(buildings), flush=True)
 for l in landmarks:
@@ -1041,10 +1025,13 @@ for planting in low_plantings:
     base['vegetation-low-' + planting['id']] = hedge_mesh(
         planting, base['terrain'].v, base['terrain'].f, C
     )
+from field_tree_review import reviewed_field_positions
 from tree_layout import ground_tree_rows
 from vegetation import tree_templates
 from vegetation_layout import tree_rotation, tree_scale
 
+excluded_fields, retained_fields = reviewed_field_positions(ROOT)
+trees = [row for row in trees if tuple(row[:2]) not in excluded_fields]
 trees = ground_tree_rows(trees, base['terrain'].v, base['terrain'].f)
 templates = tree_templates(C, PLANTS, True)
 low_templates = tree_templates(C, PLANTS, False)
@@ -1053,6 +1040,8 @@ from tree_clearance import filter_building_collisions
 trees, tree_clearance = filter_building_collisions(
     trees, {'near': templates, 'base': low_templates}, tree_obstacles
 )
+if not retained_fields <= {tuple(row[:2]) for row in trees}:
+    raise ValueError('Reviewed field-edge trees missing after building clearance')
 del tree_obstacles
 (DATA / 'vegetation.json').write_text(json.dumps(trees, separators=(',', ':')) + '\n')
 for filename in ['overview.json', 'vegetation-zones.json']:
@@ -1282,6 +1271,8 @@ for k, m in base.items():
             if k.startswith(('infra-', 'site-', 'paving-'))
             else k
         }
+        if k.startswith('east-field-'):
+            props['layer'] = 'vegetation'
         if k.startswith('vegetation-low-'):
             props.update(
                 layer='vegetation', plantingId=k.removeprefix('vegetation-low-')
@@ -1369,6 +1360,8 @@ def export(name, groups):
             (props['buildingId'],) = zoneids[key]
         if key.startswith('north-campus-'):
             props['layer'] = 'sports' if key.endswith('sports') else 'roads'
+        if key.startswith('east-field-'):
+            props['layer'] = 'vegetation'
         if key.startswith('vegetation-low-'):
             props.update(
                 layer='vegetation', plantingId=key.removeprefix('vegetation-low-')
@@ -1398,7 +1391,9 @@ def export(name, groups):
         name.startswith('chunk-dorm-')
         or name in {'new-east-gate.glb', 'south-side-gate.glb', 'west-gate.glb'}
         or any(
-            b.get('customModel') == 'west-market' and b['chunk'] + '.glb' == name
+            # Preserve the graduate school's narrow roof faces in its shared chunk.
+            (b['id'] == 'way/1501460942' or b.get('customModel') == 'west-market')
+            and b['chunk'] + '.glb' == name
             for b in buildings
         )
     ):

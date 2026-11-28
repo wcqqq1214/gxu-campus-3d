@@ -605,12 +605,6 @@ kbd {
 .place-row.selected.linked-hover {
   background: var(--accent-bg);
 }
-.place-index {
-  min-width: 2ch;
-  font-size: var(--size-meta);
-  font-variant-numeric: tabular-nums;
-  color: var(--text-2);
-}
 .place-copy {
   flex: 1;
   min-width: 0;
@@ -1304,7 +1298,7 @@ kbd {
   align-items: center;
   gap: 6px;
   margin-top: -8px;
-  padding: 4px 8px 4px 4px;
+  padding: 4px 9px 4px 7px;
   border: var(--hairline) solid var(--line);
   border-radius: var(--radius-control);
   background: var(--label-fill);
@@ -1325,15 +1319,12 @@ kbd {
   border-right: 6px solid transparent;
   border-top: 6px solid var(--label-fill);
 }
-.map-label > span:first-child {
+.map-label-dot {
   flex-shrink: 0;
-  padding: 2px 4px;
-  /* 8px label − 4px inset */
-  border-radius: var(--radius-chip);
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
   background: var(--accent-solid);
-  color: white;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }
 .map-label .map-label-name {
   max-width: 210px;
@@ -1353,14 +1344,10 @@ kbd {
   border-color: var(--current-solid);
   color: white;
 }
-.map-label:hover > span:first-child,
-.map-label.linked-hover > span:first-child {
+.map-label:hover .map-label-dot,
+.map-label.linked-hover .map-label-dot,
+.map-label.active .map-label-dot {
   background: white;
-  color: var(--accent-text);
-}
-.map-label.active > span:first-child {
-  background: white;
-  color: var(--current-text);
 }
 
 /* ---------- Footer ---------- */
@@ -1826,9 +1813,9 @@ kbd {
   }
 
   .map-label {
-    gap: 4px;
+    gap: 5px;
     min-height: 32px;
-    padding: 4px 6px 4px 4px;
+    padding: 4px 7px 4px 6px;
   }
   .map-label .map-label-name {
     max-width: 165px;

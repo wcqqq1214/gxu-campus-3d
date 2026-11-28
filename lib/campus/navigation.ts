@@ -3,11 +3,36 @@ import { placeName, translate, type Locale } from './i18n/index.ts';
 import type { Building, Landmark } from './types';
 
 const LANDMARK_ALIASES: Record<string, string[]> = {
-  'time-gate': ['时空之门', '时光广场', '图书馆北广场'],
+  'north-campus-north-gate': [
+    '北校园北门',
+    '行健东门',
+    '行健文理学院东门',
+    'North Campus North Gate',
+    'Xingjian East Gate',
+  ],
+  'north-public-gate': ['西校园北门', 'North Gate'],
+  'quanxue-island': ['知行书院', 'Zhixing Academy'],
+  'veterinary-hospital': [
+    '广西大学教学动物医院',
+    '教学动物医院',
+    'Veterinary Hospital',
+    'Teaching Animal Hospital',
+  ],
+  'time-gate': [
+    '时空之门',
+    '时光广场',
+    '图书馆北广场',
+    'Time Square',
+    'Library North Square',
+  ],
   'south-gate': ['南门', '大学东路校门'],
-  'south-side-gate': ['西南门', '南大门西侧门'],
+  'south-side-gate': ['西南门', '南大门西侧门', 'Southwest Gate'],
   library: ['校图书馆', '西大图书馆'],
-  huixue: ['君武文化艺术教育中心'],
+  huixue: [
+    '君武文化艺术教育中心',
+    'Huixuetang Hall',
+    'Junwu Center for Culture and Arts Education',
+  ],
   huicui: [
     '荟萃楼酒店',
     '荟萃餐厅',
@@ -16,25 +41,61 @@ const LANDMARK_ALIASES: Record<string, string[]> = {
     '西大荟萃楼',
     '新闻传播学院',
     '新闻与传播学院',
+    'Huicui Building Hotel',
+    'Huicui Dining Hall',
+    'School of Journalism and Communication',
   ],
-  'teaching-ten': ['十教', '10教', '教学十楼', '多媒体教学楼'],
-  'teaching-six': ['六教', '6教'],
-  'teaching-two': ['二教', '2教', '南宁楼'],
+  'teaching-ten': [
+    '十教',
+    '10教',
+    '教学十楼',
+    '多媒体教学楼',
+    'Multimedia Teaching Building',
+    'Teaching Building 10',
+    'Shijiao',
+  ],
+  'teaching-six': ['六教', '6教', 'Teaching Building 6', 'Liu Jiao'],
+  'teaching-two': [
+    '二教',
+    '2教',
+    '南宁楼',
+    'Nanning Building',
+    'Teaching Building 2',
+  ],
   'student-center': [
     '大活',
     '学生活动中心',
     '老水塔咖啡厅',
     '老水塔西餐厅',
     '水塔餐厅',
+    'Old Water Tower Café',
+    'Old Water Tower Cafe',
   ],
-  computer: ['计电', '计电学院', '计算机学院'],
-  'international-residence': ['留学生', '国际学生公寓'],
-  'new-east-gate': ['新东园门', '新东园入口', '秀灵西一里'],
+  computer: [
+    '计电',
+    '计电学院',
+    '计算机学院',
+    'School of Computer and Electronic Information',
+    'Computer Science',
+  ],
+  'international-residence': [
+    '留学生',
+    '国际学生公寓',
+    'International Students Dormitory',
+    'International Students’ Dormitory',
+  ],
+  'new-east-gate': [
+    '新东园门',
+    '新东园入口',
+    '秀灵西一里',
+    'New East Gate',
+    'Xiuling Road West Lane 1',
+  ],
   'east-gate': ['秀灵路东门'],
   'west-gate': ['鲁班路西门'],
-  'chongzuo-bridge': ['崇左', '农院路', '桥下通道'],
-  'bocui-bridge': ['博萃', '博翠桥', '农院路'],
-  'huixian-bridge': ['荟贤', '汇贤桥', '农院路'],
+  'chongzuo-bridge': ['崇左', '农院路', '桥下通道', 'Nongyuan Road'],
+  'bocui-bridge': ['博萃', '博翠桥', '农院路', 'Nongyuan Road'],
+  'huixian-bridge': ['荟贤', '汇贤桥', '农院路', 'Nongyuan Road'],
 };
 
 export function navigableBuildings(
@@ -60,7 +121,7 @@ export function navigationFootprints(
     })),
     ...landmarks
       .filter((l) =>
-        ['gate', 'bridge', 'sculpture'].includes(l.placeKind ?? ''),
+        ['gate', 'bridge', 'sculpture', 'garden'].includes(l.placeKind ?? ''),
       )
       .map((l) => {
         const [x0, y0, x1, y1] = l.bounds;
@@ -89,38 +150,6 @@ export function navigationFootprints(
       }),
   ];
 }
-
-/** Search associations do not change the canonical name or merge physical places. */
-const ENGLISH_ALIASES: Record<string, string[]> = {
-  'student-center': ['Old Water Tower Café', 'Old Water Tower Cafe'],
-  computer: [
-    'School of Computer and Electronic Information',
-    'Computer Science',
-  ],
-  huixue: ['Huixuetang Hall', 'Junwu Center for Culture and Arts Education'],
-  huicui: [
-    'Huicui Building Hotel',
-    'Huicui Dining Hall',
-    'School of Journalism and Communication',
-  ],
-  'teaching-ten': [
-    'Multimedia Teaching Building',
-    'Teaching Building 10',
-    'Shijiao',
-  ],
-  'teaching-six': ['Teaching Building 6', 'Liu Jiao'],
-  'teaching-two': ['Nanning Building', 'Teaching Building 2'],
-  'international-residence': [
-    'International Students Dormitory',
-    'International Students’ Dormitory',
-  ],
-  'new-east-gate': ['New East Gate', 'Xiuling Road West Lane 1'],
-  'south-side-gate': ['Southwest Gate'],
-  'chongzuo-bridge': ['Nongyuan Road'],
-  'bocui-bridge': ['Nongyuan Road'],
-  'huixian-bridge': ['Nongyuan Road'],
-  'time-gate': ['Time Square', 'Library North Square'],
-};
 
 /** OSM objects without a usable name keep a numeric placeholder; they are not searchable. */
 const PLACEHOLDER_NAME = /^校内建筑 \d+$/;
@@ -200,7 +229,17 @@ export function buildingLocationLabel(
   });
 }
 
+const east28Aliases = [
+  '东28栋学生公寓',
+  '东28栋教职工宿舍',
+  '东28栋教职工住房',
+  '东28学生公寓',
+];
+
 const BUILDING_ALIASES: Record<string, string[]> = {
+  'relation/12874252': ['东校园学生宿舍17栋', '东17宿舍'],
+  'way/948683801': [...east28Aliases, '东28北栋'],
+  'way/948683803': [...east28Aliases, '东28南栋'],
   'way/759140894': ['西23栋供餐点', '西23供餐点', 'West 23 Dining Point'],
   'way/759140893': ['西22栋供餐点', '西22供餐点', 'West 22 Dining Point'],
   'relation/12774256': [
@@ -263,14 +302,11 @@ export function destinationName(place: Place, locale: Locale, query = '') {
 
 function indexPlace<T extends Place>(place: T, aliases: string[]) {
   const venue = collegeVenues.get(place.id);
+  const zh = placeName(place.name, 'zh');
+  const en = placeName(place.name, 'en');
   const named =
     Boolean(place.name.trim()) && !PLACEHOLDER_NAME.test(place.name);
-  const names = [
-    ...(named
-      ? [place.name, placeName(place.name, 'zh'), placeName(place.name, 'en')]
-      : []),
-    ...aliases,
-  ];
+  const names = named ? [place.name, zh, en, ...aliases] : aliases;
 
   return {
     place,
@@ -282,8 +318,8 @@ function indexPlace<T extends Place>(place: T, aliases: string[]) {
         ].filter(Boolean),
       ),
     ],
-    zh: venue?.zh ?? placeName(place.name, 'zh'),
-    en: venue?.en ?? placeName(place.name, 'en'),
+    zh: venue?.zh ?? zh,
+    en: venue?.en ?? en,
     secondary: venue?.secondary ? 1 : 0,
   };
 }
@@ -319,10 +355,7 @@ function matchesFor<T extends Place>(
 
 function buildSearchIndex(buildings: Building[], landmarks: Landmark[]) {
   const featured = landmarks.map((p) =>
-    indexPlace(p, [
-      ...(LANDMARK_ALIASES[p.id] ?? []),
-      ...(ENGLISH_ALIASES[p.id] ?? []),
-    ]),
+    indexPlace(p, LANDMARK_ALIASES[p.id] ?? []),
   );
   const ordinary = searchableBuildings(buildings, landmarks).map((b) =>
     indexPlace(b, BUILDING_ALIASES[b.id] ?? []),

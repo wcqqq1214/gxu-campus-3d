@@ -144,7 +144,8 @@ def replace_walls(mesh, z, C, M, detail):
                 'diamond' if n > 0 and ix == 1 else 'glazed' if n < 0 else 'door',
             )
             for low in (3.63, 6.78, 9.93, 13.04, 15.76, 18.0):
-                w.aperture(pos(x), width, low, min(low + 1.77, 19.55), 'screen')
+                kind = 'portal_screen' if n > 0 and detail else 'screen'
+                w.aperture(pos(x), width, low, min(low + 1.77, 19.55), kind)
         for x in (47.42, 49.51, 52.23, 54.30):
             w.pier(pos(x), 0.07, 19.67, 0.21, 0.16)
         for x in (47.42, 54.30):

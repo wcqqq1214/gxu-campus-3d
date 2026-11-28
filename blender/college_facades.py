@@ -1041,19 +1041,37 @@ def mathematics(b, z, C, detail):
 def east_gym(b, z, C, detail):
     """Long elevations have portholes below a clerestory; the south door has a swept canopy."""
     m = Mesh()
+    from humanities_facades import finish
+
+    cladding = finish(C, 'eastGymSlateTile', (0.147, 0.154, 0.180), 0.85)
+    shades = finish(C, 'eastGymRoseShades', (0.26, 0.15, 0.14), 0.78)
     ring = b['polygons'][0][0]
     height = b['form']['height']
     for edge in (0, 2):
         wall = Mesh()
         frame = wall_frame(ring, edge)
         length = frame[3]
-        wall.box(0, -0.04, 6.1, length, 0.08, 12.2, C['stone'])
+        wall.box(0, -0.04, 6.1, length, 0.08, 12.2, cladding)
         for i in range(14):
             x = (i - 6.5) * length / 14
             if abs(x) > 7.5:
                 for h in (1.9, 5.6, 9.4):
                     pane(wall, x, h, 5.2, 1.8, C, detail)
-                    wall.box(x, -0.21, h + 1.12, 5.55, 0.42, 0.26, C['pink'])
+                    if detail:
+                        # Three clear slots divide the four blades above the south windows.
+                        blades = 4 if edge == 2 else 3
+                        for row in range(blades):
+                            wall.box(
+                                x,
+                                -0.24,
+                                h + 0.84 + row * 0.23,
+                                5.55,
+                                0.46,
+                                0.14,
+                                shades,
+                            )
+                    else:
+                        wall.box(x, -0.21, h + 1.12, 5.55, 0.42, 0.42, shades)
             points = [
                 (
                     x + 0.92 * math.cos(t * math.tau / 24),
@@ -1069,9 +1087,17 @@ def east_gym(b, z, C, detail):
             pane(wall, x, height - 1.15, length / 14 - 0.24, 1.95, C, detail)
         wall.box(0, -0.70, height + 0.12, length + 1.7, 2.0, 0.38, C['paleRoof'])
         if edge == 2:
+            top = 9.78
+            span = 9.0
+
+            def soffit(x):
+                return 8.0 + 1.6 * (x / span) ** 2
+
             for x in (-7.25, 7.25):
-                wall.box(x, -0.29, height / 2, 2.6, 0.58, height, C['stone'])
-                wall.cylinder(x * 0.76, -3.05, 4.23, 0.5, 8.46, C['pink'], 20)
+                wall.box(x, -0.29, height / 2, 2.6, 0.58, height, cladding)
+                column = x * 0.76
+                shaft = soffit(column)
+                wall.cylinder(column, -3.05, shaft / 2, 0.5, shaft, C['pink'], 20)
             for x in (-3.7, 0, 3.7):
                 pane(wall, x, 1.85, 3.65, 3.64, C, detail)
                 pane(wall, x, 5.8, 3.65, 3.9, C, detail)
@@ -1085,35 +1111,35 @@ def east_gym(b, z, C, detail):
                     0.60 - i * 0.15,
                     C['stone'],
                 )
-            # Viewed from the track, the lower edge curves down at midspan.
+            # The upper rim is straight. The soffit rises towards the outer tips.
             for j in range(16):
-                a, c = -9 + j * 1.125, -9 + (j + 1) * 1.125
-                ha, hc = 8.0 + 1.6 * (a / 9) ** 2, 8.0 + 1.6 * (c / 9) ** 2
-                for y1, y2, dz1, dz2 in [
-                    (-4.5, -4.5, 0, 0.64),
-                    (-4.5, 0, 0.64, 0.64),
-                    (0, -4.5, 0, 0),
-                ]:
-                    wall.face(
-                        [
-                            (a, y1, ha + dz1),
-                            (c, y1, hc + dz1),
-                            (c, y2, hc + dz2),
-                            (a, y2, ha + dz2),
-                        ],
-                        C['white'],
-                    )
-                if j in (0, 15):
-                    x, h = (a, ha) if j == 0 else (c, hc)
-                    wall.face(
-                        [
-                            (x, -4.5, h),
-                            (x, 0, h),
-                            (x, 0, h + 0.64),
-                            (x, -4.5, h + 0.64),
-                        ],
-                        C['white'],
-                    )
+                a = -span + j * span / 8
+                c = a + span / 8
+                ha, hc = soffit(a), soffit(c)
+                wall.face(
+                    [(a, -4.5, ha), (c, -4.5, hc), (c, -4.5, top), (a, -4.5, top)],
+                    C['white'],
+                )
+                wall.face(
+                    [(a, 0, ha), (c, 0, hc), (c, -4.5, hc), (a, -4.5, ha)], C['white']
+                )
+            wall.face(
+                [
+                    (-span, -4.5, top),
+                    (span, -4.5, top),
+                    (span, 0, top),
+                    (-span, 0, top),
+                ],
+                C['white'],
+            )
+            for x in (-span, span):
+                end = [
+                    (x, -4.5, soffit(x)),
+                    (x, 0, soffit(x)),
+                    (x, 0, top),
+                    (x, -4.5, top),
+                ]
+                wall.face(end if x > 0 else end[::-1], C['white'])
         attach(m, wall, frame, z)
     return m
 

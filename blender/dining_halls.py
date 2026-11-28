@@ -12,6 +12,7 @@ from cuiyuan import cui, upper_court, wing
 from dongyuan import cast_letter as dong_letter
 from dongyuan import finishes as dong_finishes
 from dongyuan import north_window as dong_window
+from dongyuan import upper_window as dong_upper_window
 from dongyuan import west_front as dong_west
 from geometry import Mesh, material, tile_material
 from south_gate import inscription
@@ -139,24 +140,42 @@ def dong_front(e):
     dong_finishes(e)
     w = e.length
     tile_material(e.colors, 'dongPorcelain', 'dong-porcelain.png', (0.74, 0.74, 0.71))
-    e.cladding(-w / 2, w / 2, 0, e.height, 0.045, 'dongPorcelain')
 
     # The signed end has four narrow stacks, a wider paired stack, then
     # one narrow stack beside the raised sign pier (project booklet, p. 39).
-    for x, span, upper_sill, opening in [
+    stacks = [
         (-12.734, 1.401, 10.412, 1.616),
         (-9.922, 1.459, 10.4, 1.613),
         (-7.08, 1.353, 10.334, 1.695),
         (-4.182, 1.464, 10.486, 1.616),
         (0.124, 2.292, 10.377, 1.703),
         (4.454, 1.47, 10.281, 1.767),
-    ]:
+    ]
+    # Keep the tile grid continuous around the two rows of recessed windows.
+    cursor = -w / 2
+    for x, span, upper_sill, opening in stacks:
+        left, right = x - span / 2, x + span / 2
+        e.cladding(cursor, left, 0, e.height, 0.045, 'dongPorcelain')
+        middle_sill = upper_sill - 3.23
+        for lo, hi in (
+            (0, middle_sill),
+            (middle_sill + opening, upper_sill),
+            (upper_sill + opening, e.height),
+        ):
+            e.cladding(left, right, lo, hi, 0.045, 'dongPorcelain')
+        cursor = right
+    e.cladding(cursor, w / 2, 0, e.height, 0.045, 'dongPorcelain')
+
+    for x, span, upper_sill, opening in stacks:
         for level in range(4):
             if level == 0 and (x > 3 or -8.3 < x < -4.5):
                 continue
             bottom = upper_sill - (3 - level) * 3.23
-            dong_window(e, x, bottom, span, opening)
-            e.box(x, 0.26, bottom - 0.038, span + 0.20, 0.34, 0.10, 'paleRoof')
+            if level >= 2:
+                dong_upper_window(e, x, bottom, span, opening)
+            else:
+                dong_window(e, x, bottom, span, opening)
+                e.box(x, 0.26, bottom - 0.038, span + 0.20, 0.34, 0.10, 'paleRoof')
     e.pane(-w * 0.23, 0.26, 0.08, 3.35, 2.78, 3)
     # The project booklet and northwest street view show one continuous canopy.
     e.box(-2.40, 0.99, 3.13, 16.40, 1.98, 0.26, 'paleRoof')

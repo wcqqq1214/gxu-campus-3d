@@ -19,6 +19,7 @@ def finishes(e):
     tile_material(e.colors, 'dongWestTile', 'dong-west-tile.png', (0.66, 0.56, 0.47))
     for name, rgb, roughness, metal in (
         ('dongGlass', (0.105, 0.14, 0.155), 0.22, 0.40),
+        ('dongNorthLight', (0.245, 0.248, 0.245), 0.25, 0.22),
         ('dongAperture', (0.055, 0.056, 0.053), 0.68, 0.04),
         ('dongShadow', (0.035, 0.039, 0.038), 0.82, 0.02),
         ('dongCurtain', (0.40, 0.24, 0.25), 0.80, 0),
@@ -69,6 +70,34 @@ def pane(e, left, right, bottom, top, cols, *, grille=False, ribbon=0):
             g.box(left + w * i / n, -0.206, z, 0.019, 0.022, h - 0.04, c['dongSash'])
         for ratio in (0.35, 0.68):
             g.box(x, -0.211, bottom + h * ratio, w, 0.027, 0.025, c['dongSash'])
+
+
+def upper_window(e, x, z, width, height):
+    # Both archive views show an undivided transom over two sliding lights.
+    # The tiled face is at 0.045; the rear track sits inside that face.
+    left, right = x - width / 2, x + width / 2
+    head = z + height
+    transom = z + height * 0.73
+    nose = 0.148
+    back = 0.014
+    for u in (left - 0.034, right + 0.034):
+        e.box(u, nose / 2, z + height / 2, 0.068, nose, height, 'paleRoof')
+    e.box(x, nose / 2, head + 0.034, width + 0.136, nose, 0.068, 'paleRoof')
+    e.box(x, 0.095, z - 0.035, width + 0.17, 0.19, 0.07, 'paleRoof')
+
+    # Three separate lights, with the nearer sliding leaf on its own track.
+    for lo, hi, sill, top, out in (
+        (left, right, transom, head, back),
+        (left, x, z, transom, back),
+        (x, right, z, transom, 0.041),
+    ):
+        e.glazing.face(
+            [(lo, -out, sill), (hi, -out, sill), (hi, -out, top), (lo, -out, top)],
+            e.colors['dongNorthLight'],
+        )
+    if e.detail:
+        e.trim(x, 0.059, transom, width, 0.04, 0.045, 'dongSash')
+        e.trim(x, 0.055, (z + transom) / 2, 0.048, 0.055, transom - z, 'dongSash')
 
 
 def north_window(e, x, z, width, height):

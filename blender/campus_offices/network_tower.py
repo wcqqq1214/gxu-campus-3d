@@ -74,10 +74,14 @@ def tower(b, datum, paint, detail):
             bottom = 0.02 if level == 0 else step * level
             top = step * (level + 1)
             if ribbons:
+                # The upper east ribbon has a masonry pier across the edge 7/8 turn.
+                # Each face supplies half its estimated 0.56 m unfolded width.
+                left_jamb = 0.28 if i == 8 and level >= 3 else 0.12
+                right_jamb = 0.28 if i == 7 and level >= 3 else 0.12
                 gaps = [
                     (
-                        0.12,
-                        L - 0.12,
+                        left_jamb,
+                        L - right_jamb,
                         bottom + 0.89,
                         top - 0.79,
                         0.235,

@@ -21,10 +21,10 @@ def material(name, color, roughness=0.8, metallic=0):
     return len(MATERIALS) - 1
 
 
-def tile_material(colors, name, file, base):
+def tile_material(colors, name, file, base, roughness=0.58):
     if name in colors:
         return
-    colors[name] = material(name, base, 0.58)
+    colors[name] = material(name, base, roughness)
     mat = MATERIALS[colors[name]]
     tex = mat.node_tree.nodes.new('ShaderNodeTexImage')
     tex.image = bpy.data.images.load(

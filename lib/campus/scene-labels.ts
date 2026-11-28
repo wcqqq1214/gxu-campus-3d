@@ -4,7 +4,7 @@ import { landmarkLabelAnchor } from './labels';
 import type { Landmark, Preset, ViewportFrame } from './types';
 
 /**
- * Numbered landmark labels in a DOM layer over the canvas. Each frame they are
+ * Landmark labels in a DOM layer over the canvas. Each frame they are
  * projected, prioritized by hover and selection, and hidden where they would
  * overlap, leave the visible frame or belong to a hidden layer.
  */
@@ -28,7 +28,7 @@ export function createSceneLabels({
   const layer = document.createElement('div');
   layer.className = 'scene-labels';
   host.appendChild(layer);
-  const nodes = landmarks.map((l, i) => {
+  const nodes = landmarks.map((l) => {
     const el = document.createElement('button');
     el.className = 'map-label';
     el.dataset.placeId = l.id;
@@ -36,9 +36,10 @@ export function createSceneLabels({
     el.onpointerleave = () => onHover(null);
     el.onfocus = () => onHover(l.id);
     el.onblur = () => onHover(null);
-    const number = document.createElement('span');
-    number.textContent = String(i + 1).padStart(2, '0');
-    el.appendChild(number);
+    const dot = document.createElement('span');
+    dot.className = 'map-label-dot';
+    dot.setAttribute('aria-hidden', 'true');
+    el.appendChild(dot);
     const caption = document.createElement('span');
     caption.className = 'map-label-name';
     caption.textContent = placeName(l.name, locale);

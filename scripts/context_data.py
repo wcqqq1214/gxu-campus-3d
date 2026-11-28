@@ -42,8 +42,11 @@ def prepare_context():
         shape(next(f for f in geo['features'] if f['id'] == 'campus')['geometry']),
     )
     buildings = json.loads((out / 'buildings.json').read_text())
-    buildings, excluded = select_context(buildings, campus)
-    removed = {b['id'] for b in excluded}
+    retired = json.loads((ROOT / 'data/retired-campus-buildings.json').read_text())
+    buildings, excluded = select_context(
+        [b for b in buildings if b['id'] not in retired], campus
+    )
+    removed = {b['id'] for b in excluded} | retired.keys()
     geo['features'] = [f for f in geo['features'] if f['id'] not in removed]
     policy = {
         'maxDistanceMeters': MAX_CONTEXT_DISTANCE_METERS,

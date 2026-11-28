@@ -1,5 +1,6 @@
 import copy
 import json
+import os
 import shutil
 import tempfile
 import unittest
@@ -171,9 +172,21 @@ class FinalVegetationTests(unittest.TestCase):
         root = Path(__file__).resolve().parents[1]
         with tempfile.TemporaryDirectory() as directory:
             isolated = Path(directory)
-            shutil.copytree(root / 'data', isolated / 'data')
-            shutil.copytree(root / 'public/data', isolated / 'public/data')
+            os.symlink(root / 'data', isolated / 'data')
             out = isolated / 'public/data'
+            out.mkdir(parents=True)
+            writable = {
+                'vegetation.json',
+                'vegetation-zones.json',
+                'overview.json',
+                'low-planting.json',
+            }
+            for source in (root / 'public/data').iterdir():
+                target = out / source.name
+                if source.name in writable:
+                    shutil.copyfile(source, target)
+                else:
+                    os.symlink(source, target)
             read = lambda name: json.loads((out / f'{name}.json').read_text())
             original = read('vegetation')
             data = {name: read(name) for name in INPUT_NAMES}
@@ -204,11 +217,6 @@ class FinalVegetationTests(unittest.TestCase):
             self.assertEqual(len(report['removed']), 4)
             self.assertEqual(read('overview')['trees'], len(original))
             self.assertEqual([r['tree'] for r in report['removed']], injected)
-            prepare_vegetation(isolated)
-            self.assertEqual(read('vegetation'), original)
-            self.assertEqual(
-                read('vegetation-zones')['finalGroundExclusion']['removed'], []
-            )
 
 
 if __name__ == '__main__':

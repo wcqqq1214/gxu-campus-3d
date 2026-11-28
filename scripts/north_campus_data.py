@@ -13,6 +13,7 @@ from shapely.geometry import Point, Polygon, mapping, shape
 from shapely.geometry.polygon import orient
 from shapely.ops import transform, unary_union
 
+from building_chunks import grid_chunk
 from building_forms import resolve_form
 from building_overrides import pack_geometry, source_catalogue
 from north_campus_forms import prepare_form
@@ -83,8 +84,6 @@ def prepare(root=ROOT):
         polygon = orient(polygon, sign=1)
         center = list(polygon.representative_point().coords)[0]
         rings, triangles = pack_geometry([polygon])
-        ix, iy = (math.floor(v / 360) for v in center)
-        label = lambda v: ('p' if v >= 0 else 'n') + str(abs(v))
         # Conservative foundation: all footprint corners touch or penetrate
         # the unchanged coarse ground. Height is still only a massing estimate.
         samples = [elevation(terrain, *p) for p in polygon.exterior.coords]
@@ -103,7 +102,7 @@ def prepare(root=ROOT):
             insideCampus=True,
             landmark=None,
             zone='north',
-            chunk=f'chunk-{label(ix)}-{label(iy)}',
+            chunk=grid_chunk(*center),
             customModel='north-campus',
             tags={'building': 'yes'},
             geometrySource='manual-imagery-trace',

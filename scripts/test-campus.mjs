@@ -88,19 +88,28 @@ test('关系去重、要素 ID 与目录互相对应', async () => {
     assert.ok(f);
     assert.equal(f.properties.osmEditedAt, b.osmEditedAt);
     assert.ok(b.height > 0 && Number.isFinite(b.elevation));
-    if (b.geometrySource === 'manual-imagery-trace') {
-      assert.equal(b.osmEditedAt, null);
-      const imageryId = b.id.startsWith('north-campus/')
+    let sourceId;
+    if (b.geometrySource === 'university-site-plan') {
+      sourceId = 'infillPlan';
+    } else if (b.geometrySource === 'ortho-located-typology') {
+      sourceId = 'oldHighLayout';
+    } else if (b.geometrySource === 'university-design-and-construction-photos') {
+      sourceId = 'eastGraduateTopping';
+    } else if (b.geometrySource === 'manual-imagery-trace') {
+      sourceId = b.id.startsWith('north-campus/')
         ? 'northCampusImagery2024'
         : 'studentDormImagery';
-      assert.ok(b.sourceRefs.includes(imageryId), b.id);
-      assert.equal(
-        b.sourceUrl,
-        sources.find((source) => source.id === imageryId).url,
-      );
     } else {
+      assert.match(b.id, /^(way|relation)\/\d+$/);
       assert.equal(b.sourceUrl, `https://www.openstreetmap.org/${b.id}`);
+      continue;
     }
+    assert.equal(b.osmEditedAt, null);
+    assert.ok(b.sourceRefs.includes(sourceId), b.id);
+    assert.equal(
+      b.sourceUrl,
+      sources.find((source) => source.id === sourceId).url,
+    );
   }
 });
 test('庭院内环、三角面与真实轮廓保留', () => {
@@ -285,14 +294,19 @@ test('来源日期字段和高程原始值可追溯', async () => {
 
 test('索引、搜索和拾取仅使用精选地标目录', () => {
   assert.deepEqual(searchLandmarks(landmarks, ''), landmarks);
-  assert.deepEqual(
-    searchLandmarks(landmarks, ' 图书馆 ').map((p) => p.id),
-    ['library', 'time-gate'],
-  );
-  assert.deepEqual(
-    searchLandmarks(landmarks, '留学生').map((p) => p.id),
-    ['international-residence'],
-  );
+  for (const [query, expected] of [
+    [' 图书馆 ', ['library', 'time-gate']],
+    ['留学生', ['international-residence']],
+    ['六教', ['teaching-six']],
+    ['新东园门', ['new-east-gate']],
+    ['南宁楼', ['teaching-two']],
+  ]) {
+    assert.deepEqual(
+      searchLandmarks(landmarks, query).map((p) => p.id),
+      expected,
+      query,
+    );
+  }
   const ordinary = buildings.find(
     (b) => !b.landmark && b.name.startsWith('校内建筑'),
   );

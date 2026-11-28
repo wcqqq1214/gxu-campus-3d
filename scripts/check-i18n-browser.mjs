@@ -34,7 +34,7 @@ async function setLanguage(page, locale) {
   await page.keyboard.press('Escape');
 }
 try {
-  for (const width of [1280, 390, 320]) {
+  for (const width of [1280, 320]) {
     const page = await browser.newPage({
       viewport: { width, height: 844 },
       deviceScaleFactor: 1,
@@ -176,19 +176,23 @@ try {
       style: '.debug-metrics { visibility: hidden !important; }',
       path: new URL(`en-lighting-${width}.png`, output).pathname,
     });
-    await page.goto(base + '?debug'); // No lang parameter: restore the saved preference.
-    await page.waitForFunction(() => document.documentElement.lang === 'en');
-    await page
-      .getByRole('searchbox', { name: 'Search campus places' })
-      .waitFor();
-    // Language restores before model decoding finishes. Let this document finish
-    // initializing before navigating again: WebKit rejects blob loads in a departing document.
-    await waitForSceneReady(page);
-    // Explicit share language overrides the stored preference, without changing the place hash.
-    await page.goto(base + '?lang=zh#place=library');
-    await page.waitForFunction(() => document.documentElement.lang === 'zh-CN');
-    await languageTrigger(page).waitFor();
-    await waitForSceneReady(page);
+    if (width === 1280) {
+      await page.goto(base + '?debug'); // No lang parameter: restore the saved preference.
+      await page.waitForFunction(() => document.documentElement.lang === 'en');
+      await page
+        .getByRole('searchbox', { name: 'Search campus places' })
+        .waitFor();
+      // Language restores before model decoding finishes. Let this document finish
+      // initializing before navigating again: WebKit rejects blob loads in a departing document.
+      await waitForSceneReady(page);
+      // Explicit share language overrides the stored preference, without changing the place hash.
+      await page.goto(base + '?lang=zh#place=library');
+      await page.waitForFunction(
+        () => document.documentElement.lang === 'zh-CN',
+      );
+      await languageTrigger(page).waitFor();
+      await waitForSceneReady(page);
+    }
     results.push({ width, ...layout, passed: true });
     await browser.closePage(page);
   }

@@ -88,7 +88,8 @@ def encode(attributes, faces, pos=18, norm=10, uv=16):
         or faces.max() >= count
     ):
         raise ValueError('Expected M×3 triangle indices into the vertex arrays')
-    if not all(1 <= v <= 30 for v in (pos, norm, uv)):
+    # Zero selects lossless float coding for an already decoded attribute.
+    if not all(0 <= v <= 30 for v in (pos, norm, uv)):
         raise ValueError('Invalid Draco quantization bits')
     faces = np.ascontiguousarray(faces, np.uint32)
     enc = newenc(len(arr['POSITION']))

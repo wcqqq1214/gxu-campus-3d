@@ -142,7 +142,8 @@ def wall_material(b, C):
         return C['pink']
     if b['id'] == 'relation/11564998' and 'physicsTile' in C:
         return C['physicsTile']
-    if b['id'] == 'way/880089961':
+    # East 28's housing designation changes its directory category only.
+    if b['id'] in ('way/880089961', 'way/948683801', 'way/948683803'):
         return C['white']
     if b['id'] == XIU:
         return C['xiuIvory']

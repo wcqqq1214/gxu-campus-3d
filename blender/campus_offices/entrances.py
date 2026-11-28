@@ -142,6 +142,82 @@ def gallery(mesh, C, f, a, b, posts, detail):
     return mesh
 
 
+def west_gable(mesh, f, C, detail):
+    # The mapped west end runs north to south in local u. The 112° panorama
+    # resolves two attic openings and the raised ridge cap above the gallery.
+    left, ridge, right = -7.40, -0.48, 9.74
+    mesh = cut(mesh, f, (left - 0.1, right + 0.1, -0.30, 0.62, 13.64, 16.52))
+    wall = Mesh()
+    cream = C['Office cream']
+    face = 0.20
+    height = 17.12
+    # Keep the original roof behind the short end bay. The northwest view
+    # shows the side eave returning to the first facade setback.
+    back = -4.8
+    openings = [(-4.15, -2.82, 15.78, 16.52), (0.32, 1.62, 15.23, 16.94)]
+    cursor = left
+    for lo, hi, sill, head in openings:
+        f.box(wall, C, cursor, lo, -0.30, face, 13.64, height, 'cream')
+        f.box(wall, C, lo, hi, -0.30, face, 13.64, sill, 'cream')
+        f.box(wall, C, lo, hi, -0.30, face, head, height, 'cream')
+        opening(wall, f, C, lo, hi, sill, head, -0.16, 2, detail and hi > 0)
+        cursor = hi
+    f.box(wall, C, cursor, right, -0.30, face, 13.64, height, 'cream')
+    # Each profile point is shared by the wall head, soffit and coping.
+    profile = [
+        (left, 18.29),
+        (ridge - 0.32, 20.53),
+        (ridge, 20.87),
+        (ridge + 0.49, 20.87),
+        (right, 17.83),
+    ]
+    fascia = 0.28
+    for (a, h0), (b, h1) in zip(profile, profile[1:]):
+        roof = [
+            f.point(a, 0.46, h0),
+            f.point(b, 0.46, h1),
+            f.point(b, back, h1),
+            f.point(a, back, h0),
+        ]
+        wall.face(roof, C['Office ceramic'])
+        outer = [f.point(a, 0.46, h0 - fascia), f.point(b, 0.46, h1 - fascia)]
+        inner = [f.point(a, face, h0 - fascia), f.point(b, face, h1 - fascia)]
+        wall.face([*outer, roof[1], roof[0]], cream)
+        wall.face([*inner, outer[1], outer[0]], cream)
+        wall.face(
+            [f.point(a, face, height), f.point(b, face, height), inner[1], inner[0]],
+            cream,
+        )
+    for u, h in [profile[0], profile[-1]]:
+        side = [
+            f.point(u, back, 16.49),
+            f.point(u, -0.30, 16.49),
+            f.point(u, -0.30, height),
+            f.point(u, face, height),
+            f.point(u, face, h - fascia),
+            f.point(u, 0.46, h - fascia),
+            f.point(u, 0.46, h),
+            f.point(u, back, h),
+        ]
+        wall.face(side if u == left else side[::-1], cream)
+    wall.face(
+        [
+            f.point(right, back, 16.49),
+            f.point(left, back, 16.49),
+            *(f.point(u, back, h) for u, h in profile),
+        ],
+        cream,
+    )
+    for low, high, advance in [
+        (13.69, 13.85, 0.43),
+        (14.04, 14.28, 0.53),
+        (14.78, 14.97, 0.45),
+    ]:
+        f.box(wall, C, left, right, 0.19, advance, low, high, 'ceramic')
+    mesh.add_part('西端双坡山墙、压顶与两樘高窗', wall)
+    return mesh
+
+
 def president(mesh, z, C, detail):
     east = Facade(-394.26, -553.2, 1, 0, z)
     mesh = gallery(mesh, C, east, -5.80, 6.04, [-0.40, 1.72], detail)
@@ -174,7 +250,7 @@ def president(mesh, z, C, detail):
             m, C, -8.9, 0.0, 0.12, depth, bottom, bottom + thickness, 'ceramic'
         )
     mesh.add_part('东山墙转角叠檐', m)
-    return mesh
+    return west_gable(mesh, west, C, detail)
 
 
 def vestibule(mesh, f, C, a, b, top, detail, canopy):

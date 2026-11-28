@@ -1,6 +1,7 @@
 """Publishing strips documentation without weakening stale-geometry detection."""
 
 import json
+import os
 import shutil
 import tempfile
 import unittest
@@ -18,6 +19,7 @@ from low_planting_contract import (
 from road_landing_contract import load_landings
 
 ROOT = Path(__file__).resolve().parents[1]
+WRITABLE = (*EXPORTS, 'low-planting.json', 'pavings.json', 'shores.json')
 
 
 class PublicExportTests(unittest.TestCase):
@@ -25,14 +27,16 @@ class PublicExportTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
-        for folder in ('data', 'public/data'):
-            (self.root / folder).mkdir(parents=True)
-            for source in (ROOT / folder).glob('*.json'):
-                shutil.copyfile(source, self.root / folder / source.name)
-        shutil.copyfile(
-            ROOT / 'public/data/geography.geojson',
-            self.root / 'public/data/geography.geojson',
-        )
+        os.symlink(ROOT / 'data', self.root / 'data')
+        public_data = self.root / 'public/data'
+        public_data.mkdir(parents=True)
+        writable = set(WRITABLE)
+        for source in (ROOT / 'public/data').iterdir():
+            target = public_data / source.name
+            if source.name in writable:
+                shutil.copyfile(source, target)
+            else:
+                os.symlink(source, target)
 
     def read(self, name):
         return json.loads((self.root / 'public/data' / name).read_text())
@@ -78,7 +82,13 @@ class PublicExportTests(unittest.TestCase):
         )
         self.write('low-planting.json', low)
 
-    def test_fresh_preparation_fingerprints_follow_exported_site_fields(self):
+    def test_export_strips_documentation_migrates_fingerprints_and_is_idempotent(
+        self,
+    ):
+        buildings = self.read('buildings.json')
+        buildings[0]['heightBasis'] = 'test estimate'
+        buildings[0]['nested'] = {'note': 'nested annotation'}
+        self.write('buildings.json', buildings)
         sites = self.read('sites.json')
         sites['sites'][0]['evidence'] = {'dimensions': 'fresh preparation evidence'}
         self.write('sites.json', sites)
@@ -90,11 +100,20 @@ class PublicExportTests(unittest.TestCase):
         export_public_data(self.root)
         load_foundations(self.root)
         load_prepared(self.root)
+        load_landings(self.root)
+        self.assertNotIn('heightBasis', self.read('buildings.json')[0])
+        self.assertEqual(self.read('buildings.json')[0]['nested'], {})
+        self.assertNotIn('evidence', self.read('sites.json')['sites'][0])
         for name, context in self.ground_contexts().items():
             self.assertEqual(self.read(name)['contextRevision'], digest(context))
         first = self.snapshot()
         export_public_data(self.root)
         self.assertEqual(self.snapshot(), first)
+        # Adding provenance back cannot invalidate geometric dependencies.
+        self.write('buildings.json', buildings)
+        self.write('sites.json', sites)
+        load_foundations(self.root)
+        load_prepared(self.root)
 
     def test_stale_ground_fingerprints_are_not_blessed_by_export(self):
         for name in ('pavings.json', 'shores.json'):
@@ -108,30 +127,6 @@ class PublicExportTests(unittest.TestCase):
                     export_public_data(self.root)
                 self.assertEqual(self.snapshot(), before)
                 self.write(name, original)
-
-    def test_export_idempotence_and_documentation_independence(self):
-        buildings = self.read('buildings.json')
-        buildings[0]['heightBasis'] = 'test estimate'
-        buildings[0]['nested'] = {'note': 'nested annotation'}
-        self.write('buildings.json', buildings)
-        sites = self.read('sites.json')
-        sites['sites'][0]['evidence'] = {'dimensions': 'not surveyed'}
-        self.write('sites.json', sites)
-        self.prepare_dependent_fingerprints()
-        export_public_data(self.root)
-        load_foundations(self.root)
-        load_prepared(self.root)
-        load_landings(self.root)
-        self.assertNotIn('heightBasis', self.read('buildings.json')[0])
-        self.assertNotIn('evidence', self.read('sites.json')['sites'][0])
-        first = self.snapshot()
-        export_public_data(self.root)
-        self.assertEqual(first, self.snapshot())
-        # Adding provenance back cannot invalidate geometric dependencies.
-        self.write('buildings.json', buildings)
-        self.write('sites.json', sites)
-        load_foundations(self.root)
-        load_prepared(self.root)
 
     def test_stale_geometry_is_rejected_before_any_export_write(self):
         buildings = self.read('buildings.json')

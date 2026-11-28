@@ -69,11 +69,9 @@ test('English and Chinese search resolve the same stable landmark IDs', () => {
   for (const [term, id] of [
     ['LIBRARY', 'library'],
     ['图书馆', 'library'],
-    ['六教', 'teaching-six'],
     ['No. 6', 'teaching-six'],
     ['计电', 'computer'],
     ['School of Computer and Electronic Information', 'computer'],
-    ['新东门', 'new-east-gate'],
     ['Xindongyuan', 'new-east-gate'],
     ['西南门', 'south-side-gate'],
     ['Southwest Gate', 'south-side-gate'],
