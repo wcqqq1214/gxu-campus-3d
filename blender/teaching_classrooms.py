@@ -113,36 +113,62 @@ def build(b, z, colors, detail):
             if gallery_edge and level:
                 span = length - start
                 middle = (start + length) / 2
-                box(
-                    galleries,
-                    middle,
-                    offset / 2,
-                    stories * level,
-                    span,
-                    -offset + 0.12,
-                    0.18,
-                    rim,
-                )
-                box(
-                    galleries,
-                    middle,
-                    0.01,
-                    stories * level + 0.47,
-                    span,
-                    0.12,
-                    0.82,
-                    rose,
-                )
-                box(
-                    galleries,
-                    middle,
-                    0.015,
-                    stories * level + 0.91,
-                    span,
-                    0.16,
-                    0.07,
-                    rim,
-                )
+                floor = stories * level
+                if edge == 14 and level <= 2:
+                    # The two exposed west landings return to the wall behind the front rail.
+                    outer, inner = 1.11, offset - 0.06
+                    soffit = len(galleries.f)
+                    box(
+                        galleries,
+                        middle,
+                        (inner + outer) / 2,
+                        floor + 0.055,
+                        span,
+                        outer - inner,
+                        0.29,
+                        tile,
+                    )
+                    # Mesh.box emits the soffit first and the walking surface last.
+                    galleries.m[soffit] = galleries.m[-1] = rim
+                    for center_z, h, front, depth, mat in (
+                        (0.505, 0.61, 1.05, 0.12, rose),
+                        (0.895, 0.17, 1.055, 0.16, rim),
+                    ):
+                        box(
+                            galleries,
+                            middle,
+                            front,
+                            floor + center_z,
+                            span,
+                            depth,
+                            h,
+                            mat,
+                        )
+                        back = front - depth / 2
+                        for t, direction in ((start, 1), (length, -1)):
+                            box(
+                                galleries,
+                                t + direction * depth / 2,
+                                back / 2,
+                                floor + center_z,
+                                depth,
+                                back,
+                                h,
+                                mat,
+                            )
+                else:
+                    box(
+                        galleries,
+                        middle,
+                        offset / 2,
+                        floor,
+                        span,
+                        -offset + 0.12,
+                        0.18,
+                        rim,
+                    )
+                    box(galleries, middle, 0.01, floor + 0.47, span, 0.12, 0.82, rose)
+                    box(galleries, middle, 0.015, floor + 0.91, span, 0.16, 0.07, rim)
             if not first and level and edge in (6, 7):
                 width = 0.34 if edge == 6 else 0.045
                 box(
