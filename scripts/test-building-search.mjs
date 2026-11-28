@@ -145,6 +145,13 @@ test('map positions use east/north coordinates, independent of rendering zones',
 });
 
 test('same-name buildings remain distinct in the result and detail location labels', () => {
+  for (const query of ['东28栋学生公寓', '东28栋教职工宿舍']) {
+    assert.deepEqual(
+      ids(query).sort(),
+      ['way/948683801', 'way/948683803'],
+      query,
+    );
+  }
   const pool = searchableBuildings(buildings, landmarks);
   for (const locale of ['zh', 'en']) {
     const seen = new Set();

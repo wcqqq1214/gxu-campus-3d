@@ -215,10 +215,17 @@ export function buildingLocationLabel(
   });
 }
 
+const east28Aliases = [
+  '东28栋学生公寓',
+  '东28栋教职工宿舍',
+  '东28栋教职工住房',
+  '东28学生公寓',
+];
+
 const BUILDING_ALIASES: Record<string, string[]> = {
   'relation/12874252': ['东校园学生宿舍17栋', '东17宿舍'],
-  'way/948683801': ['东28栋教职工住房', '东28学生公寓', '东28北栋'],
-  'way/948683803': ['东28栋教职工住房', '东28学生公寓', '东28南栋'],
+  'way/948683801': [...east28Aliases, '东28北栋'],
+  'way/948683803': [...east28Aliases, '东28南栋'],
   'way/759140894': ['西23栋供餐点', '西23供餐点', 'West 23 Dining Point'],
   'way/759140893': ['西22栋供餐点', '西22供餐点', 'West 22 Dining Point'],
   'relation/12774256': [
