@@ -79,7 +79,6 @@ export function CampusPlaces({
       key="places"
       query={query}
       groups={groups}
-      landmarks={landmarks}
       selected={selected}
       hovered={hovered}
       ready={ready}
@@ -160,7 +159,6 @@ export function CampusPlaces({
 function PlaceGroups({
   query,
   groups,
-  landmarks,
   selected,
   hovered,
   ready,
@@ -170,7 +168,6 @@ function PlaceGroups({
 }: {
   query: string;
   groups: { key: string; name: string; places: Landmark[] }[];
-  landmarks: Landmark[];
   selected: string | null;
   hovered: string | null;
   ready: boolean;
@@ -200,12 +197,6 @@ function PlaceGroups({
               onClick={() => onChoose(p.id)}
               disabled={!ready}
             >
-              <span className="place-index">
-                {String(landmarks.findIndex((l) => l.id === p.id) + 1).padStart(
-                  2,
-                  '0',
-                )}
-              </span>
               <span className="place-copy">
                 <strong>{destinationName(p, locale, query)}</strong>
               </span>

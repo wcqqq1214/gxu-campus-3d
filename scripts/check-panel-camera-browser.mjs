@@ -222,7 +222,7 @@ try {
     );
     await page
       .locator('.panel-dock')
-      .getByRole('button', { name: '01 南大门', exact: true })
+      .getByRole('button', { name: '南大门', exact: true })
       .click();
     const controls =
       viewport.width < 760
