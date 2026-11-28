@@ -134,6 +134,8 @@ def main():
     args.landmark = list(dict.fromkeys(args.landmark))
     args.building = list(dict.fromkeys(args.building))
     supported_buildings = SURVEYED.keys() | {
+        'way/957503108',
+        'way/759191485',
         'way/759337787',
         'way/759147086',
         'way/759140894',
