@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'blender'), str(ROOT / 'scripts')]
 from building_finishes import ensure_building_finishes
 from building_models import SURVEYED, building_mesh
+from college_chunk_budget import optimize_export
 from detail_export import export_detail, geometry_bytes
 from generic_buildings import compact_form_source
 from geometry import MATERIALS, Mesh
@@ -132,16 +133,24 @@ def main():
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1 :])
     args.landmark = list(dict.fromkeys(args.landmark))
     args.building = list(dict.fromkeys(args.building))
+    supported_buildings = SURVEYED.keys() | {
+        'way/759337787',
+        'way/759147086',
+        'way/759140894',
+        'way/759132929',
+    }
     supported_places = {
+        'library',
         'donggao-gate',
         'north-public-gate',
         'quanxue-island',
         'veterinary-hospital',
     }
-    if set(args.building) - SURVEYED.keys() or set(args.landmark) - supported_places:
-        parser.error(
-            'Only surveyed ordinary buildings and the four campus landmark builders are supported'
-        )
+    if (
+        set(args.building) - supported_buildings
+        or set(args.landmark) - supported_places
+    ):
+        parser.error('Unsupported campus building or landmark for incremental export')
     if not (args.building or args.landmark or args.fields):
         parser.error('Select a surveyed building, landmark or fields')
     target = args.output_root.resolve()
@@ -226,7 +235,11 @@ def main():
         ]
         if (old_ids ^ {b['id'] for b in members}) - updates or not members:
             raise ValueError(f'Unexpected zone membership change: {zone}')
-        boxes = {fid: outline(objects[fid]) for fid in updates & old_ids}
+        dedicated = zone.startswith('chunk-dorm-')
+        shared = old_ids and not dedicated
+        boxes = (
+            {fid: outline(objects[fid]) for fid in updates & old_ids} if shared else {}
+        )
         for fid, hull in list(boxes.items()):
             overlapping = [
                 other
@@ -276,13 +289,16 @@ def main():
                     # Preserve editable slot numbers when rebuilding the same palette.
                     if set(slots) == set(prior_slots):
                         reorder_material_slots(obj, slots, prior_slots)
-                    compact_form_source(obj)
+                    if b.get('form') or b['id'] in SURVEYED:
+                        compact_form_source(obj)
             props = dict(layer='buildings', zone=zone, landmark='', sportsId='')
+            if dedicated:
+                (props['buildingId'],) = [b['id'] for b in members]
             near_path = models / (zone + '.glb')
             patch = (
                 export(
                     addition,
-                    'building-addition' if old_ids else zone,
+                    'building-addition' if shared else zone,
                     work / 'patch.glb',
                     props,
                     far,
@@ -290,7 +306,7 @@ def main():
                 if addition.f
                 else None
             )
-            if old_ids:
+            if shared:
                 patch, stats = replace_in_chunk(
                     original if far else near_path.read_bytes(),
                     zone,
@@ -304,19 +320,20 @@ def main():
                 updated.add(zone)
             else:
                 near_path.write_bytes(patch)
+                if optimize_export(near_path):
+                    patch = near_path.read_bytes()
                 z.update(attributes(patch), geometryBytes=geometry_bytes(patch))
-        z.update(
-            featureIds=[b['id'] for b in members],
-            bounds=[
-                op(b['bounds'][i] for b in members) + offset
-                for i, op, offset in [
-                    (0, min, -2),
-                    (1, min, -2),
-                    (2, max, 2),
-                    (3, max, 2),
-                ]
-            ],
-        )
+        member_ids = [b['id'] for b in members]
+        bounds = [
+            op(b['bounds'][i] for b in members) + (0 if dedicated else offset)
+            for i, op, offset in [(0, min, -2), (1, min, -2), (2, max, 2), (3, max, 2)]
+        ]
+        if set(member_ids) == old_ids:
+            # Existing streaming envelopes can include facade projections beyond the footprint.
+            bounds = [
+                op(a, b) for op, a, b in zip((min, min, max, max), z['bounds'], bounds)
+            ]
+        z.update(featureIds=member_ids, bounds=bounds)
         if zone not in old_zones:
             manifest['zones'].append(z)
     entries = {l['id']: l for l in manifest['landmarks']}
@@ -326,6 +343,15 @@ def main():
         b = buildings.get(fid)
         z = terrain(*(b or l)['center'])
         old = objects.get(fid)
+        editable_props = dict(old.items()) if old else {}
+        editable_props.pop('chunk', None)
+        editable_props.update(
+            landmark=key,
+            layer='buildings',
+            zone='',
+            featureId=fid,
+            sourceUrl=l['sourceUrl'],
+        )
         if old:
             remove(old)
         props = dict(landmark=key, layer='buildings', zone='')
@@ -335,9 +361,7 @@ def main():
         if not high.f or not low_mesh.f:
             raise ValueError(f'Empty landmark mesh: {key}')
         obstacles.extend([(key, 'near', high), (key, 'base', low_mesh)])
-        high.object(
-            l['name'], source, dict(props, featureId=fid, sourceUrl=l['sourceUrl'])
-        )
+        high.object(l['name'], source, editable_props)
         raw = export(high, node, models / (key + '.glb'), props)
         entries[key] = dict(id=key, url=f'models/{key}.glb', **attributes(raw))
         low = export(low_mesh, node, work / 'patch.glb', props, True)
@@ -376,11 +400,13 @@ def main():
     manifest['treePriorityPositions'] = priority_positions(
         read('vegetation-zones'), trees
     )
+    base_path.write_bytes(current)
+    if optimize_export(base_path):
+        current = base_path.read_bytes()
     retained = validate_retained(original, current, updated)
     manifest['landmarks'] = [entries[k] for k in places]
     manifest['base'].update(attributes(current))
     budget = check_initial_model_budget(len(current) + manifest['trees']['bytes'])
-    base_path.write_bytes(current)
     (data / 'models.json').write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2)
     )
