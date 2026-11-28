@@ -6,25 +6,10 @@ import {
   decodeShare,
   cameraBearing,
 } from '../lib/campus/share.ts';
-import { searchLandmarks } from '../lib/campus/navigation.ts';
 const landmarks = JSON.parse(
   await readFile(new URL('../public/data/landmarks.json', import.meta.url)),
 );
 const ids = landmarks.map((l) => l.id);
-test('别名仍限于精选目录', () => {
-  assert.deepEqual(
-    searchLandmarks(landmarks, '六教').map((l) => l.id),
-    ['teaching-six'],
-  );
-  assert.deepEqual(
-    searchLandmarks(landmarks, '新东园门').map((l) => l.id),
-    ['new-east-gate'],
-  );
-  assert.deepEqual(
-    searchLandmarks(landmarks, '南宁楼').map((l) => l.id),
-    ['teaching-two'],
-  );
-});
 test('分享保留地标、相机与光照，输入异常不会生成无效镜头', () => {
   const snapshot = {
     selected: 'library',

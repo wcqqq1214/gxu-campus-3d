@@ -294,14 +294,19 @@ test('来源日期字段和高程原始值可追溯', async () => {
 
 test('索引、搜索和拾取仅使用精选地标目录', () => {
   assert.deepEqual(searchLandmarks(landmarks, ''), landmarks);
-  assert.deepEqual(
-    searchLandmarks(landmarks, ' 图书馆 ').map((p) => p.id),
-    ['library', 'time-gate'],
-  );
-  assert.deepEqual(
-    searchLandmarks(landmarks, '留学生').map((p) => p.id),
-    ['international-residence'],
-  );
+  for (const [query, expected] of [
+    [' 图书馆 ', ['library', 'time-gate']],
+    ['留学生', ['international-residence']],
+    ['六教', ['teaching-six']],
+    ['新东园门', ['new-east-gate']],
+    ['南宁楼', ['teaching-two']],
+  ]) {
+    assert.deepEqual(
+      searchLandmarks(landmarks, query).map((p) => p.id),
+      expected,
+      query,
+    );
+  }
   const ordinary = buildings.find(
     (b) => !b.landmark && b.name.startsWith('校内建筑'),
   );

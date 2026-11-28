@@ -18,28 +18,6 @@ const read = (path) =>
 const buildings = read('../public/data/buildings.json');
 const landmarks = read('../public/data/landmarks.json');
 
-test('all confirmed Huixue aliases resolve only to the curated hall', () => {
-  for (const query of [
-    '汇学堂',
-    '君武文化艺术教育中心',
-    'Huixue Hall',
-    'Huixuetang Hall',
-    'Junwu Center for Culture and Arts Education',
-  ]) {
-    assert.deepEqual(
-      [
-        ...searchLandmarks(landmarks, query),
-        ...searchBuildings(buildings, landmarks, query),
-      ].map((place) => place.id),
-      ['huixue'],
-      query,
-    );
-  }
-  for (const query of ['君武馆', 'Junwu Hall']) {
-    assert.deepEqual(ids(query), ['way/759337787'], query);
-  }
-});
-
 test('南苑食堂的常用搜索词定位到旧餐厅北侧的南苑第二餐厅', () => {
   for (const query of ['南苑食堂', '南苑第二食堂', '南苑二餐厅', '南苑']) {
     const [place] = searchBuildings(buildings, landmarks, query);
@@ -52,32 +30,41 @@ test('南苑食堂的常用搜索词定位到旧餐厅北侧的南苑第二餐�
   );
 });
 
-test('餐厅别名可定位到独立餐厅或其所在楼栋', () => {
-  for (const [query, id] of [
-    ['西23栋供餐点', 'way/759140894'],
-    ['西22栋供餐点', 'way/759140893'],
-    ['萃苑食堂', 'way/759337794'],
-    ['博萃餐厅', 'way/1544361473'],
-    ['东苑食堂', 'way/759191485'],
-    ['秀苑食堂', 'way/822812186'],
-    ['碧湖苑食堂', 'way/759609659'],
-    ['风味餐厅', 'way/759609659'],
-    ['碧湖苑风味餐厅', 'way/759609659'],
-    ['北苑食堂', 'way/760187419'],
-    ['荟萃餐厅', 'huicui'],
-    ['Huicui Dining Hall', 'huicui'],
-    ['老水塔咖啡厅', 'student-center'],
-    ['Old Water Tower Café', 'student-center'],
+test('场馆和餐厅别名只返回对应地点', () => {
+  for (const [id, ...queries] of [
+    [
+      'huixue',
+      '汇学堂',
+      '君武文化艺术教育中心',
+      'Huixue Hall',
+      'Huixuetang Hall',
+      'Junwu Center for Culture and Arts Education',
+    ],
+    ['way/759140894', '西23栋供餐点'],
+    ['way/759140893', '西22栋供餐点'],
+    ['way/759337794', '萃苑食堂'],
+    ['way/1544361473', '博萃餐厅'],
+    ['way/759191485', '东苑食堂'],
+    ['way/822812186', '秀苑食堂'],
+    ['way/759609659', '碧湖苑食堂', '风味餐厅', '碧湖苑风味餐厅'],
+    ['way/760187419', '北苑食堂'],
+    ['huicui', '荟萃餐厅', 'Huicui Dining Hall'],
+    ['student-center', '老水塔咖啡厅', 'Old Water Tower Café'],
   ]) {
-    const matches = [
-      ...searchLandmarks(landmarks, query),
-      ...searchBuildings(buildings, landmarks, query),
-    ];
-    assert.deepEqual(
-      matches.map((place) => place.id),
-      [id],
-      query,
-    );
+    for (const query of queries) {
+      const matches = [
+        ...searchLandmarks(landmarks, query),
+        ...searchBuildings(buildings, landmarks, query),
+      ];
+      assert.deepEqual(
+        matches.map((place) => place.id),
+        [id],
+        query,
+      );
+    }
+  }
+  for (const query of ['君武馆', 'Junwu Hall']) {
+    assert.deepEqual(ids(query), ['way/759337787'], query);
   }
 });
 
