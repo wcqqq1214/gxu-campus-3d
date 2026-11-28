@@ -2,6 +2,8 @@
 export const englishDescriptions: Record<string, string> = {
   'quanxue-island':
     'Yueya Lake wraps around three sides of this east campus peninsula. The wings of Zhixing Academy enclose a courtyard.',
+  'north-campus-north-gate':
+    'On the north side of Xiuxiang Avenue, the former Xingjian East Gate leads into the North Campus teaching area. Globe lamps top the gateposts, with a single-storey guardhouse on the east side.',
   'north-public-gate':
     'Two stepped stone pillars and low walls flank the entrance on Nongyuan Road, north of the west campus tennis centre.',
   'donggao-gate':

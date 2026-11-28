@@ -331,7 +331,15 @@ const venues: Record<string, CollegeVenue> = {
     zh: '电气工程学院实验中心（东校园）',
     en: 'Electrical Engineering Laboratory Center (East Campus)',
     schools: ['electrical'],
-    aliases: ['东区电气实验中心', '电气实验中心'],
+    aliases: [
+      '东区电气实验中心',
+      '电气实验中心',
+      '东24栋',
+      '新东园学生公寓东24栋',
+      '东24栋南翼',
+      '西大社区居委会',
+      'East 24 South Wing',
+    ],
     secondary: true,
   },
   'way/759080588': {

@@ -3,6 +3,13 @@ import { placeName, translate, type Locale } from './i18n/index.ts';
 import type { Building, Landmark } from './types';
 
 const LANDMARK_ALIASES: Record<string, string[]> = {
+  'north-campus-north-gate': [
+    '北校园北门',
+    '行健东门',
+    '行健文理学院东门',
+    'North Campus North Gate',
+    'Xingjian East Gate',
+  ],
   'north-public-gate': ['西校园北门', 'North Gate'],
   'quanxue-island': ['知行书院', 'Zhixing Academy'],
   'veterinary-hospital': [
@@ -209,6 +216,9 @@ export function buildingLocationLabel(
 }
 
 const BUILDING_ALIASES: Record<string, string[]> = {
+  'relation/12874252': ['东校园学生宿舍17栋', '东17宿舍'],
+  'way/948683801': ['东28栋教职工住房', '东28学生公寓', '东28北栋'],
+  'way/948683803': ['东28栋教职工住房', '东28学生公寓', '东28南栋'],
   'way/759140894': ['西23栋供餐点', '西23供餐点', 'West 23 Dining Point'],
   'way/759140893': ['西22栋供餐点', '西22供餐点', 'West 22 Dining Point'],
   'relation/12774256': [
